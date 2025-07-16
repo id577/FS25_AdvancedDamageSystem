@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<sounds>
+    <starter file="sounds/starter.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="2.0" outdoor="2.1" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </starter>
+    <alarm file="sounds/alarm.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="1.5" outdoor="1.6" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </alarm>
+	<transmissionShiftFailed1 file="sounds/transmissionShiftFailed_1.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="2.0" outdoor="2.1" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </transmissionShiftFailed1>
+    <transmissionShiftFailed2 file="sounds/transmissionShiftFailed_2.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="2.2" outdoor="2.3" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </transmissionShiftFailed2>
+    <transmissionShiftFailed3 file="sounds/transmissionShiftFailed_3.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="2.1" outdoor="2.2" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </transmissionShiftFailed3>
+</sounds>

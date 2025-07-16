@@ -1,0 +1,242 @@
+<l10n>
+    <texts>
+        <text name="ads_serviceWear_label" text="Service Wear Rate"/>
+        <text name="ads_serviceWear_tooltip" text="Controls the wear rate of the 'Service' level per operating hour. For example, at 10%, the service level will be fully depleted in 10 hours of operation. A higher value means maintenance is required more frequently."/>
+        <text name="ads_conditionWear_label" text="Condition Wear Rate"/>
+        <text name="ads_conditionWear_tooltip" text="Controls the wear rate of the 'Condition' level per operating hour. For example, at 1%, the vehicle's condition will fully degrade in 100 hours of operation. A higher value leads to faster degradation of the vehicle's overall condition."/>
+        <text name="ads_breakdownProbability_label" text="Min. Breakdown Probability"/>
+        <text name="ads_breakdownProbability_tooltip" text="Sets the base probability of a breakdown occurring per operating hour when the vehicle's condition is at 100%. As the vehicle's condition decreases, the actual chance of a breakdown will increase. This setting acts as the starting point for breakdown calculations."/>
+        <text name="ads_maintenancePrice_label" text="Maintenance Price Multiplier"/>
+        <text name="ads_maintenancePrice_tooltip" text="Adjusts the cost of all workshop services, including inspections, repairs, and overhauls. A higher value makes all maintenance activities more expensive."/>
+        <text name="ads_maintenanceDuration_label" text="Maintenance Duration Multiplier"/>
+        <text name="ads_maintenanceDuration_tooltip" text="Adjusts the duration of all workshop services. A higher value increases the time your vehicle will spend undergoing maintenance or repairs."/>
+        <text name="ads_workshopOpenHour_label" text="Workshop Open Time"/>
+        <text name="ads_workshopOpenHour_tooltip" text="The hour of the day when the workshop opens. Repairs are only active during work hours."/>
+        <text name="ads_workshopCloseHour_label" text="Workshop Close Time"/>
+        <text name="ads_workshopCloseHour_tooltip" text="The hour of the day when the workshop closes. Repairs will pause after this time."/>
+        <text name="ads_ws_header_title" text="Workshop"/>
+
+        <text name="ads_ws_label_value" text="Value"/>
+        <text name="ads_ws_label_age" text="Age"/>
+        <text name="ads_ws_label_operating_hours" text="Operating hours"/>
+        <text name="ads_ws_label_service" text="Service"/>
+        <text name="ads_ws_label_condition" text="Condition"/>
+        <text name="ads_ws_label_current_power" text="Current power"/>
+        <text name="ads_ws_label_brake_efficiency" text="Brake efficiency"/>
+        <text name="ads_ws_label_harvest_efficiency" text="Harvest efficiency"/>
+        <text name="ads_ws_label_maintainability" text="Maintainability"/>
+
+        <text name="ads_ws_label_last_maintenance" text="Last maintenance"/>
+        <text name="ads_ws_label_last_inspection" text="Last inspection"/>
+
+        <text name="ads_ws_table_header_part" text="Part"/>
+        <text name="ads_ws_table_header_description" text="Description"/>
+        <text name="ads_ws_table_header_stage" text="Stage"/>
+        <text name="ads_ws_table_header_price" text="Price"/>
+        <text name="ads_ws_table_header_repair_select" text="Repair"/>
+
+        <text name="ads_ws_info_no_breakdowns" text="There are no breakdowns or they have not yet been detected."/>
+        <text name="ads_ws_status_initial" text="Loading status..."/>
+
+        <text name="ads_ws_action_inspection" text="Inspection"/>
+        <text name="ads_ws_action_maintenance" text="Maintenance"/>
+        <text name="ads_ws_action_repair" text="Repair"/>
+        <text name="ads_ws_action_overhaul" text="Overhaul"/>
+
+        <text name="ads_ws_age_unit" text="months"/>
+        <text name="ads_ws_hours_unit" text="h"/>
+        <text name="ads_ws_button_ok" text="OK"/>
+        <text name="ads_ws_option_yes" text="Yes"/>
+        <text name="ads_ws_option_no" text="No"/>
+        <text name="ads_ws_status_open" text="Workshop is open"/>
+        <text name="ads_ws_status_closed" text="Workshop is closed"/>
+        <text name="ads_ws_inspecting_status" text="Inspecting..."/>
+        <text name="ads_ws_status_in_progress_format" text="%s in progress until %s..."/>
+        <text name="ads_ws_task_inspection" text="Inspection"/>
+        <text name="ads_ws_task_maintenance" text="Maintenance"/>
+        <text name="ads_ws_task_repair" text="Repair"/>
+        <text name="ads_ws_task_overhaul" text="Overhaul"/>
+        <text name="ads_ws_button_price_format" text="%s (%s)"/>
+        <text name="ads_ws_info_nothing_to_repair_title" text="Nothing to Repair"/>
+        <text name="ads_ws_info_nothing_to_repair_text" text="Please select one or more items to repair from the list."/>
+        <text name="ads_ws_confirm_inspection_title" text="Confirm Inspection"/>
+        <text name="ads_ws_confirm_inspection_text" text="The inspection will allow you to identify hidden faults, as well as roughly assess the level of its technical condition.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
+        <text name="ads_ws_confirm_maintenance_title" text="Confirm Maintenance"/>
+        <text name="ads_ws_confirm_maintenance_text" text="Maintenance will restore the level of technical service to the maximum. In addition, the technical condition of the vehicle will be inspected.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
+        <text name="ads_ws_confirm_repair_title" text="Confirm Repair"/>
+        <text name="ads_ws_confirm_repair_text" text="This will eliminate the selected faults ({price}).\n\nDuration: {duration}\nFinishes at: {time}"/>
+        <text name="ads_ws_confirm_overhaul_title" text="Confirm Overhaul"/>
+        <text name="ads_ws_confirm_overhaul_text" text="Overhaul will fix all faults, perform maintenance and improve the technical condition of the vehicle.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
+
+
+        <text name="ads_breakdowns_part_vehicle" text="Vehicle"/>
+        <text name="ads_breakdowns_part_engine" text="Engine"/>
+        <text name="ads_breakdowns_part_turbocharger" text="Turbocharger"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="Fuel Pump"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="Fuel Injectors"/>
+        <text name="ads_breakdowns_part_brake_system" text="Brake System"/>
+        <text name="ads_breakdowns_part_transmission" text="Transmission"/>
+        <text name="ads_breakdowns_part_cvt_cooling_system" text="CVT Cooling System"/>
+        <text name="ads_breakdowns_part_cooling_system" text="Cooling System"/>
+        <text name="ads_breakdowns_part_hydraulic_lift_system" text="Hydraulic Lift System"/>
+        <text name="ads_breakdowns_part_electrical_system" text="Electrical System"/>
+        <text name="ads_breakdowns_part_carburetor" text="Carburetor"/>
+
+        <text name="ads_breakdowns_severity_permanent" text="Permanent"/>
+        <text name="ads_breakdowns_severity_reduce_power" text="Reduce Power"/>
+        <text name="ads_breakdowns_severity_shutdown" text="Shutdown"/>
+        <text name="ads_breakdowns_severity_minor" text="Minor"/>
+        <text name="ads_breakdowns_severity_moderate" text="Moderate"/>
+        <text name="ads_breakdowns_severity_major" text="Major"/>
+        <text name="ads_breakdowns_severity_critical" text="Critical"/>
+
+        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="The accumulated stress of years of hard work. Minor, irreversible wear on core components slightly reduces overall performance."/>
+
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="Engine protection mode"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Engine limp mode active! Power reduced!"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="Engine protection mode"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Engine limp mode active! Power reduced!"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="Engine protection mode"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Engine limp mode active! Power reduced!"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="Engine protection mode"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Engine is turned off to protect from overheating"/>
+
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="The engine completely failed"/>
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="Engine jammed"/>
+
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="ECU errors. Slightly reduced engine power."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="ECU malfunction. Noticeable power loss and increased fuel consumption."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Critical ECU malfunction. Significant power loss, high fuel consumption, and risk of engine stalls."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Complete ECU failure. The engine cannot be controlled and will not start."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Engine is faulty"/>
+
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Worn turbo bearings. A faint whistling sound can be heard, and there's a slight loss of power at high RPM."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Leaking turbo seals. Noticeable power loss, increased fuel consumption."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Damaged turbine blades. Severe power loss and a risk of engine stalls under heavy load."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Catastrophic turbo failure. The engine has lost most of its power and is in danger of severe internal damage."/>
+
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Early fuel pump wear. Slightly reduced engine power and increased fuel consumption."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Fuel pressure dropping. Noticeable power loss, higher fuel consumption, and occasional engine stalls."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Critical fuel pressure. Severe power loss, very high fuel consumption, and frequent engine stalls."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Complete fuel pump failure. Fuel is not supplied to the engine."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Engine start impossible"/>
+
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="One or more injectors have slightly clogged nozzles. The engine may run a bit rough, with a minor loss of power."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Poor fuel atomization. The engine misfires under load, resulting in noticeable power loss and engine hesitation."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="A fuel injector is sticking. The engine runs very poorly, with significant power loss and unreliable starting."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="An injector has completely failed. The engine will not run correctly and may not start at all."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Engine start impossible"/>
+
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Worn brake pads. A slight decrease in braking effectiveness."/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Leaking brake fluid or worn discs. Braking distance is noticeably increased."/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Severe loss of brake pressure. Brakes are very weak and unreliable."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Complete brake system failure. Further operation is extremely dangerous."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Brakes failure"/>
+
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Worn clutch plates. Occasional power loss due to transmission slipping under load."/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Significant clutch wear. Noticeable transmission slipping, especially during acceleration."/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Heavily worn clutch. Severe slipping makes it difficult to transfer power to the wheels."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="Clutch completely burned out. The vehicle is unable to move."/>
+
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Worn synchronizers. Occasional grinding or difficulty when shifting gears."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Damaged synchronizers. Shifting gears is frequently difficult and may fail."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Broken synchronizer teeth. High chance of failed shifts or gear rejection under load."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Synchronizers completely failed. It is impossible to shift gears."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Transmission failure"/>
+
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Low hydraulic pressure in Powershift. Slight delay and harshness when engaging gears."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Worn hydraulic pump seals. Noticeable lag and jolts during gear shifts."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Failing hydraulic pump. Severe delay and violent shocks when shifting."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Powershift hydraulic pump failed. Transmission is stuck in neutral."/>
+
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Thermostat is starting to stick. CVT may warm up slowly or run slightly hotter than normal under load."/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="The thermostat is partially stuck. The CVT temperature is unstable, leading to a risk of overheating during prolonged work."/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="The thermostat is mostly non-functional. The CVT is prone to severe overheating, which can cause internal damage."/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="The thermostat has failed completely, likely stuck in a closed position. Cooling is minimal, leading to rapid and dangerous overheating of the CVT."/>
+
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Engine thermostat is beginning to fail. The engine takes longer to reach optimal temperature or runs slightly hot."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Thermostat response is poor. Engine temperature regulation is unstable, increasing wear."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="The thermostat is stuck closed. The engine  will constantly overheat under load."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Complete thermostat failure. The engine coolant cannot circulate correctly, leading to imminent and severe overheating."/>
+
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Minor internal pump leak. Hydraulic implements are slightly slower."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Worn pump seals. Noticeably slower hydraulic operations."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Damaged hydraulic pump. Implements are extremely slow and weak."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Hydraulic pump failure. Hydraulic system is inoperable."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hydraulic failure"/>
+
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Worn insulation, occasional voltage drops. Minor electrical glitches can be observed."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Corroded contacts and unstable alternator output. Lights may fail, engine start is unreliable."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Risk of short circuits. Critical systems are unreliable and lights may fail completely."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Lights failure"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Main wiring harness failed. The vehicle's electrical system is dead."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Starter does not respond"/>
+
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Slight carburetor contamination. Engine occasionally hesitates under heavy load."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Clogged jets. Engine frequently sputters and loses power, especially when throttle is applied quickly."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Severe carburetor blockage. Engine runs very rough, stalls frequently, and struggles to maintain power."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Fuel starvation due to a completely clogged carburetor. The engine will not run."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Carburetor is clogged"/>
+
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Minor sensor contamination or calibration drift. The automatic threshing system is slightly less efficient, causing minimal crop loss."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="Inaccurate sensor readings are causing suboptimal adjustments to the threshing and separation systems. Yield loss is noticeable."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="Critical sensor malfunction. The control unit is receiving highly erroneous data, leading to significant losses as grain is incorrectly separated from chaff."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="Complete failure of the yield monitoring system. The combine is operating 'blind,' resulting in massive inefficiency and severe crop losses."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="Yield Monitoring System Failure"/>
+
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Slight wear on internal augers and elevator chains. A small amount of crop is lost during internal transport."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Worn auger flights and slipping conveyor belts are causing increased spillage inside the machine. You may hear occasional grinding noises."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Damaged elevator paddles and augers are struggling to move the crop mass, leading to significant losses and a risk of a major clog."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="A major component in the material flow system has failed, causing a severe blockage. The engine is under extreme strain."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Material Flow Blockage"/>
+
+        <text name="ads_breakdowns_engine_stalled_message" text="Engine stalled"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="Gear disengage"/>
+        <text name="ads_breakdown_at_progress_message" text="at progress"/>
+
+        <text name="ads_spec_this_month" text="This month"/>
+        <text name="ads_spec_months_ago" text="months ago"/>
+        <text name="ads_spec_never" text="Never"/>
+        <text name="ads_spec_op_hours_short" text="o/h"/>
+        <text name="ads_spec_tomorrow_at" text="tomorrow at "/>
+        <text name="ads_spec_day_after_tommorow_at" text="day after tommorow at "/>
+        <text name="ads_spec_in_days_at" text="in {days} days at "/>
+        <text name="ads_spec_day_s" text="day(s)"/>
+        <text name="ads_spec_hour_s" text="hour(s)"/>
+        <text name="ads_spec_minute_s" text="minute(s)"/>
+        <text name="ads_spec_and" text="and"/>
+        <text name="ads_spec_duration_format_hours" text="%d %s"/>
+        <text name="ads_spec_duration_format_minutes" text="%d %s"/>
+        <text name="ads_spec_duration_format_combined" text="%s and %s"/>
+        <text name="ads_spec_months_ago_unit" text="months ago"/>
+        <text name="ads_spec_months_ago_format" text="%s %s"/>
+        <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s until %s"/>
+
+        <text name="ads_spec_state_ready" text="Ready"/>
+        <text name="ads_spec_state_inspection" text="Inspection"/>
+        <text name="ads_spec_state_maintenance" text="Maintenance"/>
+        <text name="ads_spec_state_repair" text="Rapair"/>
+        <text name="ads_spec_state_overhaul" text="Overhaul"/>
+        <text name="ads_spec_state_broken" text="Broken"/>
+        <text name="ads_spec_state_excellent" text="Excellent"/>
+        <text name="ads_spec_state_good" text="Good"/>
+        <text name="ads_spec_state_normal" text="Normal"/>
+        <text name="ads_spec_state_bad" text="Bad"/>
+        <text name="ads_spec_state_terrible" text="Terrible"/>
+        <text name="ads_spec_state_unknown" text="Unknown"/>
+        <text name="ads_spec_state_not_required" text="Not required"/>
+        <text name="ads_spec_state_recommended" text="Recommended"/>
+        <text name="ads_spec_state_legendary" text="Legendary"/>
+        <text name="ads_spec_state_premium" text="Premium"/>
+        <text name="ads_spec_state_standart" text="Standart"/>
+        <text name="ads_spec_state_budget" text="Budget"/>
+        <text name="ads_spec_state_complex" text="Complex"/>
+        <text name="ads_spec_state_robust" text="Robust"/>
+        <text name="ads_spec_state_extreme" text="Extreme"/>
+        <text name="ads_spec_state_low" text="Low"/>
+        <text name="ads_spec_state_average" text="Average"/>
+        <text name="ads_spec_state_high" text="High"/>
+        <text name="ads_spec_state_workhorse" text="Workhorse"/>
+    </texts>
+</l10n>
