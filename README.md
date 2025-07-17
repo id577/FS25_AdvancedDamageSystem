@@ -7,8 +7,8 @@ IMPORTANT WARNING
 - Multiplayer (MP) is not currently supported. Support is planned for a future release.
 
 # Acknowledgements
-A huge thank you to Frvetz (https://github.com/Frvetz), creator of the Realistic Damage System mod for FS22, for the permission to use ideas from his mod and for the support during the early stages of development.
-Also, a big thank you to Derwen Modding for testing the early builds.
+A huge thank you to **Frvetz** (https://github.com/Frvetz), creator of the Realistic Damage System mod for FS22, for the permission to use ideas from his mod and for the support during the early stages of development.
+Also, a big thank you to **Derwen Modding** for testing the early builds.
 
 # Key Features
 Complete Overhaul of the Damage and Wear System
@@ -55,8 +55,8 @@ Each breakdown has a tangible impact on the vehicle's behavior:
 - Engine starting problems, especially when cold.
 
 # Unique Characteristics for Brands and Vehicle Age
-- Reliability and Maintainability: Different vehicle brands have their own reliability ratings (affecting breakdown chance) and maintainability ratings (affecting service cost and speed).
-- Year of Manufacture: The vehicle's age affects its behavior. For example, older tractors lack advanced overheat protection, making them more vulnerable.
+- **Reliability and Maintainability:** Different vehicle brands have their own reliability ratings (affecting breakdown chance) and maintainability ratings (affecting service cost and speed).
+- **Year of Manufacture:** The vehicle's age affects its behavior. For example, older tractors lack advanced overheat protection, making them more vulnerable.
 
 # Improved UI and HUD
 The mod adds new interface elements to track the state of your vehicles, including detailed information in the workshop menu and new indicators on the dashboard.
