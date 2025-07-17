@@ -17,3 +17,22 @@
       <slice id="maintainability" uvs="215px 890px 72px 72px" />
    </slices>
 </texture>
+<?xml version="1.0" encoding="UTF-8"?>
+<texture>
+   <meta>
+      <filename>ads_dashboardHud.dds</filename>
+      <size width="1024" height="1024" />
+   </meta>
+   <slices>
+      <slice id="engine" uvs="9px 74px 72px 72px" />
+      <slice id="transmission" uvs="318px 546px 72px 72px" />
+      <slice id="brakes" uvs="318px 231px 72px 72px" />
+      <slice id="battery" uvs="116px 150px 72px 72px" />
+      <slice id="coolant" uvs="116px 307px 72px 72px" />
+      <slice id="warning" uvs="216px 150px 72px 72px" />
+      <slice id="service" uvs="729px 194px 72px 24px" />
+      <slice id="oil" uvs="8px 381px 72px 72px" />
+      <slice id="reliability" uvs="103px 885px 72px 72px" />
+      <slice id="maintainability" uvs="215px 890px 72px 72px" />
+   </slices>
+</texture>
