@@ -75,6 +75,7 @@ Command	Description	Usage Example
 - **ads_startMaintance**	Starts a maintenance process for the current vehicle. Types: inspection, maintenance, repair, overhaul.	ads_startMaintance repair
 - **ads_finishMaintance**	Forces the completion of any ongoing maintenance for the current vehicle.	ads_finishMaintance
 
+# Screenshots
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-29-33_123" src="https://github.com/user-attachments/assets/c7fcaecf-2814-4ac8-a12e-631be8617d18" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-30-36_675" src="https://github.com/user-attachments/assets/7a76ced6-0c00-49d0-a780-7b8f3d564408" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-33-54_459" src="https://github.com/user-attachments/assets/3f4eba44-0214-4a5b-aaa0-7fe897d299bd" />
