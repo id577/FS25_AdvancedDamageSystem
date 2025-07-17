@@ -515,6 +515,9 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
        end
     end
+    if self:getIsAIActive() and (spec.transmissionTemperature > 105 or spec.engineTemperature > 105) then
+        self:stopCurrentAIJob()     
+    end
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
     if spec or spec.activeFunctions or next(spec.activeFunctions) ~= nil then
