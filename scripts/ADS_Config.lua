@@ -3,7 +3,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    DEBUG = true,
+    DEBUG = false,
 
     -- How often quick, interactive effects are updated, in milliseconds.
     -- This controls things that need to be very responsive, like flickering lights,

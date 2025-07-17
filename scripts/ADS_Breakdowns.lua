@@ -42,6 +42,14 @@ ADS_Breakdowns.COLOR_PRIORITY = {
 --                    BREAKDOWN REGISTRY
 -- ==========================================================
 
+local function getIsElectricVehicle(vehicle)
+    for _, consumer in pairs(vehicle.spec_motorized.consumers) do
+        if consumer.fillType == FillType.ELECTRICCHARGE then
+            return true
+        end
+    end
+end
+
 ADS_Breakdowns.BreakdownRegistry = {
 
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
@@ -225,12 +233,12 @@ ADS_Breakdowns.BreakdownRegistry = {
 
 -------------------------------------------- SELECTABLE -----------------------------------------
 
-    ECU_MALFUNCTION = { -- x2.5
+    ECU_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_engine",
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
-            if spec.year >= 2000 then
+            if spec.year >= 2000 and not getIsElectricVehicle(vehicle) then
                 return true
             end
             return false
@@ -385,7 +393,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         isSelectable = true,
         part = "ads_breakdowns_part_fuel_pump",
         isApplicable = function(vehicle)
-            return true
+            return not getIsElectricVehicle(vehicle)
         end,
         stages = {
             {
@@ -465,7 +473,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         isSelectable = true,
         part = "ads_breakdowns_part_fuel_injectors",
         isApplicable = function(vehicle)
-            return true
+            return not getIsElectricVehicle(vehicle)
         end,
         stages = {
             {
@@ -776,7 +784,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             local spec = vehicle.spec_AdvancedDamageSystem
-            if not motor then return false end
+            if not motor or getIsElectricVehicle(vehicle) then return false end
             return motor.minForwardGearRatio ~= nil and spec.year >= 2000
         end,
         stages = {
@@ -837,7 +845,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         isSelectable = true,
         part = "ads_breakdowns_part_cooling_system",
         isApplicable = function(vehicle)
-            return true
+            return not getIsElectricVehicle(vehicle)
         end,
         stages = {
             {
@@ -1031,7 +1039,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         part = "ads_breakdowns_part_carburetor",
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
-            return spec.year < 1980
+            return spec.year < 1980 and not getIsElectricVehicle(vehicle)
         end,
         stages = {
             {
@@ -2021,7 +2029,7 @@ function ADS_Breakdowns.getCanMotorRun(self, superFunc)
     local spec = self.spec_AdvancedDamageSystem
     if (spec and spec.activeEffects.ENGINE_FAILURE) then
         if spec.activeEffects.ENGINE_FAILURE.extraData.message then
-            g_currentMission:showBlinkingWarning(g_i18n:getText(spec.activeEffects.ENGINE_FAILURE.extraData.message), 1000)
+            g_currentMission:showBlinkingWarning(g_i18n:getText(spec.activeEffects.ENGINE_FAILURE.extraData.message), 100)
         end
         if spec.activeEffects.ENGINE_FAILURE.extraData.starter  then
             return true
@@ -2030,7 +2038,7 @@ function ADS_Breakdowns.getCanMotorRun(self, superFunc)
         end
     elseif self:isUnderMaintenance() then
         if self.getIsControlled ~= nil and self:getIsControlled() then
-            g_currentMission:showBlinkingWarning(g_i18n:getText(self:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdown_at_progress_message", 1000)) 
+            g_currentMission:showBlinkingWarning(g_i18n:getText(self:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdown_at_progress_message", 100)) 
         end
         return false
     end
@@ -2085,7 +2093,6 @@ function ADS_Breakdowns.updateConsumers(vehicle, dt, accInput)
 	local rpmFactor = idleFactor + rpmPercentage * (1 - idleFactor)
 	local loadFactor = math.max(spec.smoothedLoadPercentage * rpmPercentage, 0)
 	local motorFactor = 0.5 * (0.2 * rpmFactor + 1.8 * loadFactor)
-    local usageFactor = 1.5
 
     local fuelUsageFactors = {
         [1] = 1.0,
