@@ -92,11 +92,11 @@ function ADS_InGameSettings:initSettingsGui()
         self.ads_breakdownProbability.onClickCallback = ADS_InGameSettings.onValueChanged
         self.ads_breakdownProbability.buttonLRChange = ADS_InGameSettings.onValueChanged
         self.ads_breakdownProbability.texts = {}
-        for i = 0, 18 do
-            local value = 0.01 + i * 0.005
-            table.insert(self.ads_breakdownProbability.texts, getTextByValue(value))
+        for i = 0, 11 do
+            local value = 100 + i * 100
+            table.insert(self.ads_breakdownProbability.texts, tostring(value))
         end
-        local currentBreakdownProbText = getTextByValue(ADS_Config.CORE.BREAKDOWN_PROBABILITY.MIN)
+        local currentBreakdownProbText = tostring(ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF)
         self.ads_breakdownProbability:setState(findStateIndexByValue(self.ads_breakdownProbability.texts, currentBreakdownProbText))
 
         self.ads_maintenancePrice = self.economicDifficulty:clone()
@@ -155,7 +155,7 @@ function ADS_InGameSettings:initSettingsGui()
     else
         self.ads_serviceWear:setState(findStateIndexByValue(self.ads_serviceWear.texts, getTextByValue(ADS_Config.CORE.BASE_SERVICE_WEAR)))
         self.ads_conditionWear:setState(findStateIndexByValue(self.ads_conditionWear.texts, getTextByValue(ADS_Config.CORE.BASE_CONDITION_WEAR)))
-        self.ads_breakdownProbability:setState(findStateIndexByValue(self.ads_breakdownProbability.texts, getTextByValue(ADS_Config.CORE.BREAKDOWN_PROBABILITY.MIN)))
+        self.ads_breakdownProbability:setState(findStateIndexByValue(self.ads_breakdownProbability.texts, tostring(ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF)))
         self.ads_maintenancePrice:setState(findStateIndexByValue(self.ads_maintenancePrice.texts, getTextForMultiplier(ADS_Config.MAINTENANCE.MAINTENANCE_PRICE_MULTIPLIER)))
         self.ads_maintenanceDuration:setState(findStateIndexByValue(self.ads_maintenanceDuration.texts, getTextForMultiplier(ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER)))
         self.ads_workshopOpenHour:setState(findStateIndexByValue(self.ads_workshopOpenHour.texts, getTextForHour(ADS_Config.WORKSHOP.OPEN_HOUR)))
@@ -210,9 +210,9 @@ function ADS_InGameSettings:onValueChanged(newStateIndex, uiElement, loadFromSav
             ADS_Config.CORE.BASE_CONDITION_WEAR = newValue
         end
     elseif uiId == "ads_breakdownProbability" then
-        local newValue = getValueByText(newValueText)
-        if newValue ~= nil and newValue ~= ADS_Config.CORE.BREAKDOWN_PROBABILITY.MIN then
-            ADS_Config.CORE.BREAKDOWN_PROBABILITY.MIN = newValue
+        local newValue = tonumber(newValueText)
+        if newValue ~= nil and newValue ~= ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF then
+            ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF = newValue
         end
     elseif uiId == "ads_maintenancePrice" then
         local newValue = getValueFromMultiplierText(newValueText)
@@ -235,27 +235,22 @@ function ADS_InGameSettings.onWorkshopHourChanged(self, changedElement)
     local newOpenHour = getValueFromHourText(openHourText)
     local newCloseHour = getValueFromHourText(closeHourText)
 
-    -- Применяем логику валидации
-    -- Если время открытия стало >= времени закрытия
     if newOpenHour >= newCloseHour then
         if changedElement.id == "ads_workshopOpenHour" then
-            -- Если меняли время открытия, сдвигаем время закрытия
             newCloseHour = newOpenHour + 1
-            if newCloseHour > 23 then -- Если уперлись в потолок
+            if newCloseHour > 23 then
                 newCloseHour = 23
-                newOpenHour = 22 -- Сдвигаем и время открытия назад
+                newOpenHour = 22
             end
         elseif changedElement.id == "ads_workshopCloseHour" then
-            -- Если меняли время закрытия, сдвигаем время открытия
             newOpenHour = newCloseHour - 1
-            if newOpenHour < 0 then -- Если уперлись в пол
+            if newOpenHour < 0 then 
                 newOpenHour = 0
-                newCloseHour = 1 -- Сдвигаем и время закрытия вперед
+                newCloseHour = 1
             end
         end
     end
 
-    -- Сохраняем корректные значения в конфиг
     ADS_Config.WORKSHOP.OPEN_HOUR = newOpenHour
     ADS_Config.WORKSHOP.CLOSE_HOUR = newCloseHour
 

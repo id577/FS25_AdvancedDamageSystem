@@ -4,8 +4,8 @@
         <text name="ads_serviceWear_tooltip" text="Controls the wear rate of the 'Service' level per operating hour. For example, at 10%, the service level will be fully depleted in 10 hours of operation. A higher value means maintenance is required more frequently."/>
         <text name="ads_conditionWear_label" text="Condition Wear Rate"/>
         <text name="ads_conditionWear_tooltip" text="Controls the wear rate of the 'Condition' level per operating hour. For example, at 1%, the vehicle's condition will fully degrade in 100 hours of operation. A higher value leads to faster degradation of the vehicle's overall condition."/>
-        <text name="ads_breakdownProbability_label" text="Min. Breakdown Probability"/>
-        <text name="ads_breakdownProbability_tooltip" text="Sets the base probability of a breakdown occurring per operating hour when the vehicle's condition is at 100%. As the vehicle's condition decreases, the actual chance of a breakdown will increase. This setting acts as the starting point for breakdown calculations."/>
+        <text name="ads_breakdownProbability_label" text="Base Mean Time Between Failures"/>
+        <text name="ads_breakdownProbability_tooltip" text="Sets the base MTBF for breakdows in minutes when the vehicle's condition is at 100%. As the vehicle's condition decreases, the actual MTBF will also decrease. This setting acts as the starting point for breakdown calculations."/>
         <text name="ads_maintenancePrice_label" text="Maintenance Price Multiplier"/>
         <text name="ads_maintenancePrice_tooltip" text="Adjusts the cost of all workshop services, including inspections, repairs, and overhauls. A higher value makes all maintenance activities more expensive."/>
         <text name="ads_maintenanceDuration_label" text="Maintenance Duration Multiplier"/>

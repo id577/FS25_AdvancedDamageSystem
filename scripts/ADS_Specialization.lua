@@ -327,7 +327,8 @@ function AdvancedDamageSystem:onLoad(savegame)
             totalCooling = 0, 
             radiatorCooling = 0, 
             speedCooling = 0, 
-            convectionCooling = 0
+            convectionCooling = 0,
+            slipFactor = 0
         }
     }
 
@@ -635,14 +636,29 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     local C = ADS_Config.THERMAL
     local heat, cooling = 0, 0
     local radiatorCooling, convectionCooling = 0, 0
+    local slipFactor = 1.0
+    local speedLimit = math.huge
     
     local deltaTemp = math.max(0, spec.rawTransmissionTemperature - eviromentTemp)
     convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
 
     if isMotorStarted then
-        local slipFactor = (1 - math.min(speed / 30, 1.0)) * motorRpm
+        if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
+            for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
+                if implementData.object ~= nil then
+                    local implement = implementData.object
+                    local currentSpeedLimit = implement.speedLimit
+                    if currentSpeedLimit ~= nil and implement:getIsLowered() then
+                        if currentSpeedLimit < speedLimit then
+                            speedLimit = currentSpeedLimit
+                        end
+                    end
+                end
+            end
+        end
+
+        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp(self:getLastSpeed() / speedLimit , 0.2, 1.0)) end
         heat = C.TRANS_MIN_HEAT + motorLoad * (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * slipFactor
-        
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * dirt)
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
@@ -664,7 +680,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         spec.transTermPID.lastError = 0
     end
     
-    return {totalHeat = heat, totalCooling = cooling, radiatorCooling = radiatorCooling, speedCooling = speedCooling, convectionCooling = convectionCooling}
+    return {totalHeat = heat, totalCooling = cooling, radiatorCooling = radiatorCooling, speedCooling = speedCooling, convectionCooling = convectionCooling, slipFactor = slipFactor}
 end
 
 
@@ -752,13 +768,13 @@ end
 function AdvancedDamageSystem:updateServiceLevel(wearRate, dt)
     local spec = self.spec_AdvancedDamageSystem
     local newLevel = spec.serviceLevel - (wearRate * ADS_Config.CORE.BASE_SERVICE_WEAR / (60 * 60 * 1000) * dt)
-    spec.serviceLevel = math.clamp(newLevel, 0, 1)
+    spec.serviceLevel = math.clamp(newLevel, 0.001, 1)
 end
 
 function AdvancedDamageSystem:updateConditionLevel(wearRate, dt)
     local spec = self.spec_AdvancedDamageSystem
     local newLevel = spec.conditionLevel - (wearRate * ADS_Config.CORE.BASE_CONDITION_WEAR / (60 * 60 * 1000) * dt)
-    spec.conditionLevel = math.clamp(newLevel, 0, 1)
+    spec.conditionLevel = math.clamp(newLevel, 0.001, 1)
 end
 
 ---------------------- breakdowns ----------------------
@@ -945,7 +961,7 @@ function AdvancedDamageSystem:processBreakdowns(dt)
             if stageData.progressMultiplier and stageData.progressMultiplier > 0 then
                 breakdown.progressTimer = breakdown.progressTimer or 0
                 breakdown.progressTimer = breakdown.progressTimer + dt
-                local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier
+                local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
 
                 if breakdown.progressTimer >= stageDuration then
                     local maxStages = #registryEntry.stages
@@ -1598,13 +1614,18 @@ end
 
 
 function AdvancedDamageSystem.calculateBreakdownProbability(level, p, dt)
-    local checksCount = (60 * 60 * 1000 / dt)
-    if level == 0 then
-        return 1 - (1 - p.MAX) ^ (1 / checksCount)
-    else
-        local currentP = math.min(p.MIN / level ^ p.DEGREE, p.MAX)
-        return 1 - (1 - currentP) ^ (1 / checksCount)
+    local wear = 1 - math.max(0, math.min(1, level))
+
+    local calculatedMtbf = p.MAX_MTBF + (p.MIN_MTBF - p.MAX_MTBF) * wear ^ (math.max(p.DEGREE - p.DEGREE * wear, 0.1))
+    local mtbfInMinutes = math.max(calculatedMtbf, p.MIN_MTBF)
+    local mtbfInMillis = mtbfInMinutes * 60 * 1000
+
+    if mtbfInMillis <= 0 then
+        return 1.0
     end
+    local probability = 1 - math.exp(-dt / mtbfInMillis)
+
+    return probability
 end
 
 
@@ -2062,6 +2083,14 @@ function AdvancedDamageSystem.ConsoleCommands:getDebugVehicleInfo(rawArgs)
     print(string.format("Property state: %s", vehicle.propertyState))
     local motor = vehicle:getMotor()
     print(string.format("Transmission: %s, %s, %s", motor.minForwardGearRatio, motor.gearType, motor.groupType))
+
+    if vehicle.spec_attacherJoints and vehicle.spec_attacherJoints.attachedImplements then
+        for _, v in pairs(vehicle.spec_attacherJoints.attachedImplements) do
+            if v.object.speedLimit ~= nil then
+                print(v.object:getFullName() .. " " .. v.object.speedLimit)
+            end
+	    end
+    end
 
     if args and args[1] then
         print("--------------------------")
