@@ -55,7 +55,7 @@ Each breakdown has a tangible impact on the vehicle's behavior:
 - Engine starting problems, especially when cold.
 
 # Unique Characteristics for Brands and Vehicle Age
-- **Reliability and Maintainability:** Different vehicle brands have their own reliability ratings (affecting breakdown chance) and maintainability ratings (affecting service cost and speed).
+- **Reliability and Maintainability:** Different vehicle brands have their own reliability ratings (affecting speed of wear) and maintainability ratings (affecting service cost and speed).
 - **Year of Manufacture:** The vehicle's age affects its behavior. For example, older tractors lack advanced overheat protection, making them more vulnerable.
 
 # Improved UI and HUD
