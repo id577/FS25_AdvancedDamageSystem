@@ -36,6 +36,7 @@ Simple repairs are replaced with a multi-level maintenance system that requires 
 - Maintenance: Restores the Service level to 100%, replacing "virtual" oils and filters.
 - Repair: Fixes specific, identified breakdowns.
 - Overhaul: A costly and time-consuming procedure that partially restores the vehicle's Condition.
+
 All operations require time (in-game) and money, with the cost depending on the vehicle's price, age, and maintainability.
 
 # Realistic Effects from Malfunctions
