@@ -1,12 +1,26 @@
 # FS25_AdvancedDamageSystem
 Advanced Damage System mod for Farming Simulator 25.
+<table>
+<tr>
+<td width="65%" valign="top">
 
-IMPORTANT WARNING
-- This mod is a work in progress (WIP). Features are subject to change, and bugs are to be expected.
-- Use at your own risk. The author is not responsible for any potential issues with your savegame or game. It is strongly recommended to back up your saves.
-- Multiplayer (MP) is not currently supported. Support is planned for a future release.
+> [!WARNING]
+> **IMPORTANT WARNING**
+>
+> *   This mod is a work in progress (WIP). Features are subject to change, and bugs are to be expected.
+> *   Use at your own risk. The author is not responsible for any potential issues with your savegame or game. It is strongly recommended to back up your saves.
+> *   Multiplayer (MP) is not currently supported. Support is planned for a future release.
 
-# Acknowledgements
+</td>
+<td width="35%" align="center" valign="top">
+<img width="256" height="256" alt="icon_ads" src="https://github.com/user-attachments/assets/ac09c1b1-daa3-4026-b312-b09156d9a03e" />
+
+</td>
+</tr>
+</table>
+
+# Acknowledgements 
+
 A huge thank you to **Frvetz** (https://github.com/Frvetz), creator of the Realistic Damage System mod for FS22, for the permission to use ideas from his mod and for the support during the early stages of development.
 Also, a big thank you to **Derwen Modding** for testing the early builds.
 
@@ -51,8 +65,9 @@ Each breakdown has a tangible impact on the vehicle's behavior:
 - Problems with gear shifting or gears popping out.
 - Reduced braking effectiveness.
 - Failure of lights and hydraulics.
-
 - Engine starting problems, especially when cold.
+
+Demonstration of some effects: https://www.youtube.com/watch?v=NpnlvY25Xl0&list=PL73V6HaxZ69gRgpLGkHpb_k5Qh1w4ZtHa
 
 # Unique Characteristics for Brands and Vehicle Age
 - **Reliability and Maintainability:** Different vehicle brands have their own reliability ratings (affecting speed of wear) and maintainability ratings (affecting service cost and speed).
