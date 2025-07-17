@@ -1,0 +1,245 @@
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+
+    <GuiElement profile="ads_dialogBg" id="dialogElement">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        
+        <GuiElement profile="fs25_dialogContentContainer">
+            <GuiElement profile="fs25_menuHeaderPanel" absoluteSizeOffset="0px 0px">
+                <Bitmap profile="fs25_menuHeaderIconBg">
+                    <Bitmap profile="fs25_menuHeaderIcon" imageSliceId="gui.icon_vehicleDealer_machines" />
+                </Bitmap>
+                    <Text profile="fs25_menuHeaderTitle" id="headerText" text="$l10n_ads_ws_header_title"/>
+                <RoundCorner profile="fs25_shopMoneyBoxBg" id="moneyBoxBg"/>
+                <BoxLayout profile="fs25_shopMoneyBox" id="moneyBox">
+                    <Text profile="fs25_shopBalance" text="$l10n_ui_balance" />
+                    <Text profile="fs25_shopMoney" id="balanceElement"/>
+                </BoxLayout>
+            </GuiElement>
+            
+            <!-- =============================================================== -->
+            <!-- VEHICLE INFO                                                    -->
+            <!-- =============================================================== -->
+            <GuiElement profile="ads_vehicleInfoContainer">
+               <ThreePartBitmap profile="ads_containerFrame"/>
+                <Bitmap profile="ads_vehicleImage" id="vehicleImage" />
+                <Text profile="ads_headerBoldText" id="vehicleNameValue" text="John Deere 1900" position="395px 120px" size="100% 100%"/>
+
+                <Text profile="ads_textBold" id="valueTitle" text="$l10n_ads_ws_label_value" position="395px 240px"/>
+                <Text profile="ads_textBold" id="ageTitle" text="$l10n_ads_ws_label_age" position="395px 200px"/>
+                <Text profile="ads_textBold" id="operatingHoursTitle" text="$l10n_ads_ws_label_operating_hours" position="395px 160px"/>
+                <Text profile="ads_textBold" id="relAndMainTitle" text="$l10n_ads_ws_label_maintainability" position="395px 120px"/>
+                <Text profile="ads_textBold" id="lastInspectionTitle" text="$l10n_ads_ws_label_last_maintenance" position="395px 80px"/>
+                
+                <Text profile="fs25_textDefault" id="valueValue" text="-" position="550px 240px" textBold="false"/>
+                <Text profile="fs25_textDefault" id="ageValue" text="-" position="550px 200px"/>
+                <Text profile="fs25_textDefault" id="operatingHoursValue" text="-" position="550px 160px"/>
+                <Text profile="fs25_textDefault" id="relAndMainValue" text="- / -" position="550px 120px"/>
+                <Text profile="fs25_textDefault" id="lastServiceValue" text="-" position="550px 80px"/>
+
+                <Text profile="ads_textBold" id="serviceTitle" text="$l10n_ads_ws_label_service" position="730px 240px"/>
+                <Text profile="ads_textBold" id="conditionTitle" text="$l10n_ads_ws_label_condition" position="730px 200px"/>
+                <Text profile="ads_textBold" id="powerTitle" text="$l10n_ads_ws_label_current_power" position="730px 160px"/>
+                <Text profile="ads_textBold" id="brakeTitle" text="$l10n_ads_ws_label_brake_efficiency" position="730px 120px"/>
+                <Text profile="ads_textBold" id="yieldReductionTitle" text="$l10n_ads_ws_label_harvest_efficiency" position="730px 80px"/>
+
+                <Text profile="fs25_textDefault" id="serviceValue" text="-" position="890px 240px"/>
+                <Text profile="fs25_textDefault" id="condtionValue" text="-" position="890px 200px"/>
+                <Text profile="fs25_textDefault" id="powerValue" text="-" position="890px 160px"/>
+                <Text profile="fs25_textDefault" id="brakeValue" text="-" position="890px 120px"/>
+                <Text profile="fs25_textDefault" id="yieldReductionValue" text="-" position="890px 80px"/>
+
+                <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1010px 240px" textColor="0.5, 0.5, 0.5, 1"/>
+                <Text profile="fs25_textDefault" id="condtionLastInspectionDelataValue" text="-" position="1010px 200px" textColor="0.5, 0.5, 0.5, 1"/>
+
+                <ThreePartBitmap profile="ads_textSeporator" position="145px 228px" />
+                <ThreePartBitmap profile="ads_textSeporator" position="145px 188px" />
+                <ThreePartBitmap profile="ads_textSeporator" position="145px 148px" />
+                <ThreePartBitmap profile="ads_textSeporator" position="145px 108px" />
+            </GuiElement>
+
+
+            <!-- =============================================================== -->
+            <!-- BREAKDOWNS TABLE                                                -->
+            <!-- =============================================================== -->
+            <GuiElement profile="ads_breakdownTableContainer">
+               <ThreePartBitmap profile="ads_containerFrame"/>
+                
+                <Bitmap profile="ads_tableList" id="tableHeaderBox" position="50px -30px" size="1050px 50px">
+                    <Text profile="ads_tableDlgHeaderLeft" position="30px -0px" size="200px 40.77px" text="$l10n_ads_ws_table_header_part"/>
+                    <Text profile="ads_tableDlgHeaderLeft" position="230px -0px" size="500px 40.77px" text="$l10n_ads_ws_table_header_description"/>
+                    <Text profile="ads_tableDlgHeaderLeft" position="750px -0px" size="100px 40.77px" text="$l10n_ads_ws_table_header_stage"/>
+                    <Text profile="ads_tableDlgHeaderLeft" position="850px -0px" size="200px 40.77px" text="$l10n_ads_ws_table_header_price"/>
+                    <Text profile="ads_tableDlgHeaderLeft" position="950px -0px" size="200px 40.77px" text="$l10n_ads_ws_table_header_repair_select"/>
+                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
+                </Bitmap>
+                
+                <SmoothList profile="ads_tableList" id="breakdownTable" position="50px -85px" size="1050px 320px" onSelectionChange="onSelectionChange" focusInit="onOpen" focusChangeTop="nil" focusChangeBottom="nil" visible="false">
+                    <ListItem profile="ads_tableListItem"  name="orderRowTemplate" size="1050px 40.77px" onClick="onRowClick">
+                        <Text profile="ads_tableDlgRowCellLeft" position="30px -0px" size="200px 40.77px" name="ads_tableBreakdownName" textLayoutMode="scrolling"/>
+                        <Text profile="ads_tableDlgRowCellLeft" position="230px -0px" size="500px 40.77px" name="ads_tableBreakdownDisc" textLayoutMode="scrolling"/>
+                        <Text profile="ads_tableDlgRowCellLeft" position="750px -0px" size="100px 40.77px" name="ads_tableBreakdownStage" />
+                        <Text profile="ads_tableDlgRowCellLeft" position="850px -0px" size="200px 40.77px" name="ads_tableBreakdownPrice" />
+                        <Text profile="ads_tableDlgRowCellLeft" position="950px -0px" size="200px 40.77px" name="ads_tableBreakdownSelect" />
+                    </ListItem>
+                </SmoothList>
+
+                <ThreePartBitmap profile="fs25_listSliderBox" position="-50px 0px" size="12px 330px" with="anchorTopRight">
+                    <Slider profile="fs25_listSlider" size="6px 30px" dataElementId="breakdownTable" id="tableSlider" />
+                </ThreePartBitmap>
+                <Text profile="ads_textHeaderGrey" id="emptyTableText" text="$l10n_ads_ws_info_no_breakdowns" position="0px 250px" size="100% 50px"/>
+            </GuiElement>
+
+            <!-- =============================================================== -->`   
+            <!-- STATUS PANEL                                                    -->
+            <!-- =============================================================== -->
+            
+            <GuiElement profile="ads_statusBarContainer">
+                    <Animation profile="fs25_dialogLoading" id="maintanceInProgressSpinner" size="32px 32px" position="0px 40px"/>
+                    <Text profile="emptyPanel" id="statusText" textSize="22px" text="$l10n_ads_ws_status_initial" textColor="1 1 1 1" textAlignment="center"/>
+            </GuiElement>
+        </GuiElement> 
+
+        <!-- Buttons -->
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonMenuPrev" text="$l10n_ads_ws_action_inspection" onClick="onClickInspection" id="inscpectionButton"/>
+            <Button profile="buttonMenuNext" text="$l10n_ads_ws_action_maintenance" onClick="onClickService" id="maintenanceButton"/>
+            <Button profile="buttonOK" text="$l10n_button_repair" onClick="onClickRepair" id="repairButton"/>
+            <Button profile="buttonExtra1" text="$l10n_ads_ws_action_overhaul" onClick="onClickOverhaul" id="overhaulButton"/>
+            <Button profile="buttonBack" text="$l10n_button_back" onClick="onClickBack" id="backButton"/>
+        </BoxLayout>
+        
+    </GuiElement>
+
+
+    <!-- =============================================================== -->
+    <!-- PROFILES              -->
+    <!-- =============================================================== -->
+    <GUIProfiles>
+
+        <Presets>
+            <Preset name="colorWhite" value="1 1 1 1"/>
+            <Preset name="colorListHeaderBackground" value="0 0 0 0.35" />
+            <Preset name="colorBalanceGreen" value="0.659 0.847 0.286 1"/>
+        </Presets>
+
+        <Profile name="ads_dialogBg" extends="fs25_dialogBg">
+            <width value="1200px"/>
+            <height value="980px"/> 
+        </Profile>
+
+        <Profile name="ads_vehicleInfoContainer" extends="emptyPanel" with="anchorTopCenter">
+            <size value="1170px 350px"/>
+            <position value="0px 0px"/>
+        </Profile>
+
+        <Profile name="ads_breakdownTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
+            <size value="1170px 545px"/>
+            <position value="0px -300px"/>
+        </Profile>
+
+        <Profile name="ads_statusBarContainer" extends="emptyPanel" with="anchorTopStretchingX">
+            <size value="1170px 70px"/>
+            <position value="0px -830px"/>
+        </Profile>
+        
+        <Profile name="ads_vehicleImage" extends="baseReference" with="anchorMiddleLeft">
+            <position value="40px 60px"/>
+            <size value="300px 300px"/>
+            <imageSliceId value="noSlice"/>
+        </Profile>
+
+        <Profile name="ads_textSeporator" extends="baseReference" with="anchorBottomCenter">
+            <size value="700px 1dp" />
+            <absoluteSizeOffset value="0px 0px" />
+            <imageColor value="$preset_fs25_colorGreyLight_50" />
+            <startImageSize value="30px 0px" />
+            <startImageSliceId value="gui.list_divider" />
+            <endImageSize value="0px 0px" />
+            <endImageInvertX value="true" />
+            <endImageSliceId value="gui.list_divider" />
+        </Profile>
+
+        <Profile name="ads_headerBoldText" extends="fs25_textDefault" with="anchorStretchingYLeft">
+            <textSize value="24px" />
+            <textBold value="true" />
+            <textUpperCase value="true" />
+            <textOffset value="0px 0px" />
+            <textColor value="$preset_colorWhite_50" />
+        </Profile>
+
+        <Profile name="ads_textBold" extends="fs25_textDefault">
+            <textBold value="true" />
+        </Profile>
+
+        <Profile name="ads_textHeaderGrey" extends="fs25_textDefault">
+            <textBold value="true" />
+            <textSize value="24px" />
+            <textColor value="$preset_colorDisabled"/>
+            <textAlignment value="center"/>
+        </Profile>
+
+        <Profile name="ads_tableDlgHeaderLeft" extends="baseReference">
+            <imageColor value="0 0 0 0" />
+            <textFocusedColor value="$preset_fs25_colorMainHighlight" />
+            <textHighlightedColor value="$preset_fs25_colorMainHighlight" />
+            <textSize value="16px" />
+            <textBold value="true" />
+            <textUpperCase value="true" />
+            <textColor value="$preset_colorWhite_50" />
+            <textAlignment value="left" />
+            <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+
+        <Profile name="ads_tableList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
+        </Profile>
+        
+        <Profile name="ads_tableListItem" extends="baseReference" with="anchorTopStretchingX alternating">
+            <height value="32px"/>
+            <imageColor value="$preset_fs25_colorGrey" />
+            <imageSelectedColor value="$preset_fs25_colorMainHighlight" />
+            <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
+        </Profile> 
+
+        <Profile name="ads_tableDlgRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false" />
+            <textSize value="15px" />
+            <textAlignment value="left" />
+            <textColor value="$preset_fs25_colorMainLight" />
+            <textSelectedColor value="$preset_fs25_colorMainDark" />
+            <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+
+        <Profile name="ads_containerFrame" extends="baseReference" with="anchorTopStretchingX">    
+            <size value="100% 100%"/>
+            <imageSliceId value="gui.savegame_middle"/>
+            <imageSelectedSliceId value="gui.savegame_selected_middle"/>
+            <imageHighlightedSliceId value="gui.savegame_hover_middle"/>
+            <startImageSize value="20px 0"/>
+            <startImageSliceId value="gui.savegame_left"/>
+            <startImageSelectedSliceId value="gui.savegame_selected_left"/>
+            <startImageHighlightedSliceId value="gui.savegame_hover_left"/>
+            <endImageSize value="20px 0"/>
+            <endImageSliceId value="gui.savegame_right"/>
+            <endImageSelectedSliceId value="gui.savegame_selected_right"/>
+            <endImageHighlightedSliceId value="gui.savegame_hover_right"/>
+        </Profile>
+
+        <Profile name="shopListAttributeIconReliability" extends="shopListAttributeIconLifeTime">
+            <imageSliceId value="ads_DashboardHud.reliability"/>
+        </Profile>
+        <Profile name="shopConfigAttributeIconReliability" extends="shopConfigAttributeIconCapacity">
+            <imageSliceId value="ads_DashboardHud.reliability"/>
+        </Profile>
+        <Profile name="shopListAttributeIconMaintainability" extends="shopListAttributeIconLifeTime">
+            <imageSliceId value="ads_DashboardHud.maintainability"/>
+        </Profile>
+        <Profile name="shopConfigAttributeIconMaintainability" extends="shopConfigAttributeIconCapacity">
+            <imageSliceId value="ads_DashboardHud.maintainability"/>
+        </Profile>
+
+    </GUIProfiles>
+</GUI>
