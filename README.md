@@ -1,49 +1,56 @@
 # FS25_AdvancedDamageSystem
 Advanced Damage System mod for Farming Simulator 25.
-[!WARNING]
+
 IMPORTANT WARNING
-This mod is a work in progress (WIP). Features are subject to change, and bugs are to be expected.
-Use at your own risk. The author is not responsible for any potential issues with your savegame or game. It is strongly recommended to back up your saves.
-Multiplayer (MP) is not currently supported. Support is planned for a future release.
-Key Features
-Complete Overhaul of the Damage and Wear System
+- This mod is a work in progress (WIP). Features are subject to change, and bugs are to be expected.
+- Use at your own risk. The author is not responsible for any potential issues with your savegame or game. It is strongly recommended to back up your saves.
+- Multiplayer (MP) is not currently supported. Support is planned for a future release.
+
+# Key Features
+№ Complete Overhaul of the Damage and Wear System
 The mod completely replaces the standard damage system in FS25 with a deeper, more realistic model based on two key parameters:
-Condition: Represents the overall mechanical wear and tear of the vehicle's components. It decreases from high loads, overheating, and improper service. Low condition significantly increases the chance of critical breakdowns. It can only be restored through an Overhaul.
-Service: Indicates the state of consumables (oils, filters, etc.). It decreases with operating hours. Poor service accelerates the wear of the vehicle's Condition. It is restored through Maintenance.
-Dynamic Breakdown System
+- Condition: Represents the overall mechanical wear and tear of the vehicle's components. It decreases from high loads, overheating, and improper service. Low condition significantly increases the chance of critical breakdowns. It can only be restored through an Overhaul.
+- Service: Indicates the state of consumables (oils, filters, etc.). It decreases with operating hours. Poor service accelerates the wear of the vehicle's Condition. It is restored through Maintenance.
+
+# Dynamic Breakdown System
 Vehicles can break down at the most inconvenient times. The chance of a breakdown is directly dependent on its Condition.
-Each breakdown has several stages, from minor glitches to a complete component failure.
-Breakdowns can progress over time if not addressed.
-Dozens of unique malfunctions for different systems:
-Engine: ECU malfunction, turbocharger wear, fuel pump or injector failure, clogged carburetor (for older equipment).
-Transmission: Clutch slip, synchronizer wear, PowerShift hydraulics failure.
-Brake System: Reduced brake effectiveness, leading to complete failure.
-Hydraulics: Slower operation of attached implements.
-Electrical System: Flickering or total failure of lights, starting issues.
-Cooling System: Thermostat malfunction.
-Advanced Temperature Simulation
+- Each breakdown has several stages, from minor glitches to a complete component failure.
+- Breakdowns can progress over time if not addressed.
+- Dozens of unique malfunctions for different systems:
+  - Engine: ECU malfunction, turbocharger wear, fuel pump or injector failure, clogged carburetor (for older equipment).
+  - Transmission: Clutch slip, synchronizer wear, PowerShift hydraulics failure.
+  - Brake System: Reduced brake effectiveness, leading to complete failure.
+  - Hydraulics: Slower operation of attached implements.
+  - Electrical System: Flickering or total failure of lights, starting issues.
+  - Cooling System: Thermostat malfunction.
+      
+# Advanced Temperature Simulation
 The mod introduces a detailed thermal model for the engine and transmission (for modern tractors with CVT).
-The temperature of each component is calculated separately and depends on load, RPM, speed, ambient temperature, and even the vehicle's dirt level.
-Overheating has consequences: from power reduction to critical engine failure on older equipment.
-Modern vehicles are equipped with an overheat protection system that automatically reduces power to prevent damage.
-New Workshop Maintenance System
+- The temperature of each component is calculated separately and depends on load, RPM, speed, ambient temperature, and even the vehicle's dirt level.
+- Overheating has consequences: from power reduction to critical engine failure on older equipment.
+- Modern vehicles are equipped with an overheat protection system that automatically reduces power to prevent damage.
+
+# New Workshop Maintenance System
 Simple repairs are replaced with a multi-level maintenance system that requires planning and investment.
-Inspection: Allows for the detection of hidden faults that have not yet manifested.
-Maintenance: Restores the Service level to 100%, replacing "virtual" oils and filters.
-Repair: Fixes specific, identified breakdowns.
-Overhaul: A costly and time-consuming procedure that partially restores the vehicle's Condition.
+- Inspection: Allows for the detection of hidden faults that have not yet manifested.
+- Maintenance: Restores the Service level to 100%, replacing "virtual" oils and filters.
+- Repair: Fixes specific, identified breakdowns.
+- Overhaul: A costly and time-consuming procedure that partially restores the vehicle's Condition.
 All operations require time (in-game) and money, with the cost depending on the vehicle's price, age, and maintainability.
-Realistic Effects from Malfunctions
+
+# Realistic Effects from Malfunctions
 Each breakdown has a tangible impact on the vehicle's behavior:
-Reduction in engine power and torque.
-Increased fuel consumption.
-Power loss and unstable engine performance.
-Problems with gear shifting or gears popping out.
-Reduced braking effectiveness.
-Failure of lights and hydraulics.
-Engine starting problems, especially when cold.
-Unique Characteristics for Brands and Vehicle Age
-Reliability and Maintainability: Different vehicle brands have their own reliability ratings (affecting breakdown chance) and maintainability ratings (affecting service cost and speed).
-Year of Manufacture: The vehicle's age affects its behavior. For example, older tractors lack advanced overheat protection, making them more vulnerable.
-Improved UI and HUD
+- Reduction in engine power and torque.
+- Increased fuel consumption.
+- Power loss and unstable engine performance.
+- Problems with gear shifting or gears popping out.
+- Reduced braking effectiveness.
+- Failure of lights and hydraulics.
+- Engine starting problems, especially when cold.
+
+# Unique Characteristics for Brands and Vehicle Age
+- Reliability and Maintainability: Different vehicle brands have their own reliability ratings (affecting breakdown chance) and maintainability ratings (affecting service cost and speed).
+- Year of Manufacture: The vehicle's age affects its behavior. For example, older tractors lack advanced overheat protection, making them more vulnerable.
+
+# Improved UI and HUD
 The mod adds new interface elements to track the state of your vehicles, including detailed information in the workshop menu and new indicators on the dashboard.
