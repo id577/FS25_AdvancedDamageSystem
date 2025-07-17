@@ -65,8 +65,9 @@ Each breakdown has a tangible impact on the vehicle's behavior:
 - Problems with gear shifting or gears popping out.
 - Reduced braking effectiveness.
 - Failure of lights and hydraulics.
-
 - Engine starting problems, especially when cold.
+
+  Demonstration of some effects: https://www.youtube.com/watch?v=NpnlvY25Xl0&list=PL73V6HaxZ69gRgpLGkHpb_k5Qh1w4ZtHa
 
 # Unique Characteristics for Brands and Vehicle Age
 - **Reliability and Maintainability:** Different vehicle brands have their own reliability ratings (affecting speed of wear) and maintainability ratings (affecting service cost and speed).
