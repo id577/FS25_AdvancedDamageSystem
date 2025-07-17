@@ -12,7 +12,7 @@ Advanced Damage System mod for Farming Simulator 25.
 > *   Multiplayer (MP) is not currently supported. Support is planned for a future release.
 
 </td>
-<td width="25%" align="center" valign="top">
+<td width="35%" align="center" valign="top">
 <img width="256" height="256" alt="icon_ads" src="https://github.com/user-attachments/assets/ac09c1b1-daa3-4026-b312-b09156d9a03e" />
 
 </td>
