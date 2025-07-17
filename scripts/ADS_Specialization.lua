@@ -333,7 +333,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     }
 
     self.spec_AdvancedDamageSystem.effectsUpdateTimer = ADS_Config.EFFECTS_UPDATE_DELAY
-    self.spec_AdvancedDamageSystem.metaUpdateTimer = ADS_Config.META_UPDATE_DELAY
+    self.spec_AdvancedDamageSystem.metaUpdateTimer = math.random() * ADS_Config.META_UPDATE_DELAY
     self.spec_AdvancedDamageSystem.maintenanceTimer = 0
     self.spec_AdvancedDamageSystem.currentState = AdvancedDamageSystem.STATUS.READY
     self.spec_AdvancedDamageSystem.isElectricVehicle = false

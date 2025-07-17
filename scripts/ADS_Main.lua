@@ -267,7 +267,7 @@ function ADS_Main:update(dt)
             vehicle:adsUpdate(ADS_Config.CORE_UPDATE_DELAY, self.isWorkshopOpen)
 
             --- meta
-            if vehicle:getConditionLevel() < 0.666 then
+            if vehicle:getConditionLevel() < 0.666 or vehicle.spec_AdvancedDamageSystem.activeBreakdowns['GENERAL_WEAR_AND_TEAR'] ~= nil then
                 local spec = vehicle.spec_AdvancedDamageSystem
                 spec.metaUpdateTimer = spec.metaUpdateTimer + ADS_Config.CORE_UPDATE_DELAY
                 if spec.metaUpdateTimer > ADS_Config.META_UPDATE_DELAY then
