@@ -7,7 +7,7 @@ IMPORTANT WARNING
 - Multiplayer (MP) is not currently supported. Support is planned for a future release.
 
 # Key Features
-№ Complete Overhaul of the Damage and Wear System
+Complete Overhaul of the Damage and Wear System
 The mod completely replaces the standard damage system in FS25 with a deeper, more realistic model based on two key parameters:
 - Condition: Represents the overall mechanical wear and tear of the vehicle's components. It decreases from high loads, overheating, and improper service. Low condition significantly increases the chance of critical breakdowns. It can only be restored through an Overhaul.
 - Service: Indicates the state of consumables (oils, filters, etc.). It decreases with operating hours. Poor service accelerates the wear of the vehicle's Condition. It is restored through Maintenance.
@@ -46,6 +46,7 @@ Each breakdown has a tangible impact on the vehicle's behavior:
 - Problems with gear shifting or gears popping out.
 - Reduced braking effectiveness.
 - Failure of lights and hydraulics.
+
 - Engine starting problems, especially when cold.
 
 # Unique Characteristics for Brands and Vehicle Age
@@ -54,3 +55,9 @@ Each breakdown has a tangible impact on the vehicle's behavior:
 
 # Improved UI and HUD
 The mod adds new interface elements to track the state of your vehicles, including detailed information in the workshop menu and new indicators on the dashboard.
+
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-29-33_123" src="https://github.com/user-attachments/assets/c7fcaecf-2814-4ac8-a12e-631be8617d18" />
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-30-36_675" src="https://github.com/user-attachments/assets/7a76ced6-0c00-49d0-a780-7b8f3d564408" />
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-33-54_459" src="https://github.com/user-attachments/assets/3f4eba44-0214-4a5b-aaa0-7fe897d299bd" />
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-34-40_109" src="https://github.com/user-attachments/assets/39c982bc-034d-4f9f-a025-6802d63f201f" />
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-35-23_442" src="https://github.com/user-attachments/assets/956f21c7-f022-42e5-8599-b0adcd9614e0" />
