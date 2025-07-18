@@ -24,6 +24,14 @@ Advanced Damage System mod for Farming Simulator 25.
 A huge thank you to **Frvetz** (https://github.com/Frvetz), creator of the Realistic Damage System mod for FS22, for the permission to use ideas from his mod and for the support during the early stages of development.
 Also, a big thank you to **Derwen Modding** for testing the early builds.
 
+#  Philosophy Behind the Mod
+The main goal of this mod is to transform vehicle maintenance from a simple chore into a deep and engaging layer of gameplay. Instead of just clicking a "Repair" button, you will have to make meaningful decisions that directly impact your farm's success.
+- **Strategy Over Spam.** You now need to plan your maintenance. Servicing your vehicles too often will drain your bank account, but waiting too long will lead to breakdowns at the worst possible moment. You must find the right balance.
+- **Real Consequences & Risk.** The way you treat your equipment directly impacts its lifespan and reliability. An old, worn-out tractor truly feels different from a new one—it might just die in the middle of a field during harvest. Will you push your old machinery to its limits, risking it all? Or will you invest in new, dependable equipment?
+- **Meaningful Brand Choices.** Brands now have a distinct identity. What will you choose: a premium, reliable machine that is expensive and time-consuming to service? Or a cheap "workhorse" that suffers from frequent minor issues but can be fixed quickly and inexpensively?
+
+With this mod, vehicle ownership becomes a true **management** challenge for your fleet.
+
 # Key Features
 Complete Overhaul of the Damage and Wear System
 The mod completely replaces the standard damage system in FS25 with a deeper, more realistic model based on two key parameters:
