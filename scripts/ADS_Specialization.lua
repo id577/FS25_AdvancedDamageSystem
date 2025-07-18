@@ -463,7 +463,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             --- if first mod load or used vehicle
             if self:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel or self:getDamageAmount() > 0 then
                 spec.serviceLevel = 1 - self:getDamageAmount()
-                spec.conditionLevel = math.max(1 - self:getFormattedOperatingTime() / 100, math.random() * 0.3)
+                spec.conditionLevel = math.max(1 - self:getFormattedOperatingTime() / 150, math.random() * 0.3)
                 self:setDamageAmount(0.0, true)
                 AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
             elseif self:getDamageAmount() == 0 and self:getOperatingTime() == 0 and spec.serviceLevel == spec.baseServiceLevel and spec.conditionLevel == spec.baseConditionLevel then
@@ -515,12 +515,23 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
        end
     end
-    if self:getIsAIActive() and (spec.transmissionTemperature > 105 or spec.engineTemperature > 105) then
-        self:stopCurrentAIJob(AIMessageErrorVehicleBroken.new())     
+
+    --- Messages, Ai worker
+    if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
+        for _, effectData in pairs(spec.activeEffects) do
+            if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
+                if self.getIsControlled ~= nil and self:getIsControlled() and not self:isUnderMaintenance() then
+                    g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 200)
+                end
+                if self:getIsAIActive() and effectData.extraData.disableAi then 
+                    self:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) 
+                end
+            end
+        end
     end
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
-    if spec or spec.activeFunctions or next(spec.activeFunctions) ~= nil then
+    if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeFunctions) ~= nil then
         for _ , func in pairs(spec.activeFunctions) do
             func(self, spec.effectsUpdateTimer)
         end
@@ -1098,9 +1109,13 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
         local isCurrentlyActive = spec.activeEffects[effectId] ~= nil
         local wasPreviouslyActive = previouslyActiveEffects[effectId] ~= nil
 
+
         if isCurrentlyActive then
             if applicator.apply then
                 applicator.apply(self, spec.activeEffects[effectId], applicator)
+                if spec.activeEffects[effectId].extraData ~= nil and spec.activeEffects[effectId].extraData.message ~= nil and self.getIsControlled ~= nil and not self:getIsControlled() then
+                    g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, self:getFullName() .. ": " .. g_i18n:getText(spec.activeEffects[effectId].extraData.message))
+                end
             end
         elseif wasPreviouslyActive then
             if applicator.remove then

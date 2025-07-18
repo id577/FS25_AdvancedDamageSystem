@@ -133,7 +133,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.0,
                 repairPrice = 0.0,
                 effects = {
-                    { id = "ENGINE_LIMP_EFFECT", value = -0.2, aggregation = "min", extraData = {reason = "OVERHEAT", message = "ads_breakdowns_overheat_protection_stage1_message"} },
+                    { id = "ENGINE_LIMP_EFFECT", value = -0.2, aggregation = "min", extraData = {reason = "OVERHEAT", message = "ads_breakdowns_overheat_protection_stage1_message", disableAi = true } },
                 },
                 indicators = {
                     {  
@@ -151,7 +151,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.0,
                 repairPrice = 0.0,
                 effects = {
-                    { id = "ENGINE_LIMP_EFFECT", value = -0.5, aggregation = "min", extraData = {reason = "OVERHEAT", message = "ads_breakdowns_overheat_protection_stage2_message"}  },
+                    { id = "ENGINE_LIMP_EFFECT", value = -0.5, aggregation = "min", extraData = {reason = "OVERHEAT", message = "ads_breakdowns_overheat_protection_stage2_message", disableAi = true }  },
                 },
                 indicators = {
                     {  
@@ -169,7 +169,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.0,
                 repairPrice = 0.0,
                 effects = {
-                    { id = "ENGINE_LIMP_EFFECT", value = -0.8, aggregation = "min", extraData = {reason = "OVERHEAT", message = "ads_breakdowns_overheat_protection_stage3_message"} },
+                    { id = "ENGINE_LIMP_EFFECT", value = -0.8, aggregation = "min", extraData = {reason = "OVERHEAT", message = "ads_breakdowns_overheat_protection_stage3_message", disableAi = true } },
                 },
                 indicators = {
                     {  
@@ -187,7 +187,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.0,
                 repairPrice = 0.0,
                 effects = {
-                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = false, message = "ads_breakdowns_overheat_protection_stage4_message", reason = "OVERHEAT"} },
+                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = false, message = "ads_breakdowns_overheat_protection_stage4_message", reason = "OVERHEAT", disableAi = true } },
                 },
                 indicators = {
                     {  
@@ -216,7 +216,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.0,
                 repairPrice = 20.0,
                 effects = {
-                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = false, message = "ads_breakdowns_engine_jam_stage1_message", reason = "OVERHEAT"} },
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = false, message = "ads_breakdowns_engine_jam_stage1_message", reason = "OVERHEAT", disableAi = true} },
                 },
                 indicators = {
                     {  
@@ -291,7 +291,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = { 
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.5, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min",  extraData = {message = "ads_breakdowns_engine_stalled_message"} },
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}}
                 },
                 indicators = {
@@ -305,7 +305,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 4.0, 
                 effects = { 
-                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or",  extraData = {starter = true, message = "ads_breakdowns_ecu_malfunction_stage4_message", reason = "BREAKDOWN"}} 
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or",  extraData = {starter = true, message = "ads_breakdowns_ecu_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true}} 
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -364,7 +364,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.45, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.40, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min", extraData = {message = "ads_breakdowns_engine_stalled_message"}}
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" }
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -379,7 +379,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.50, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.40, aggregation = "sum" },
-                    { id = "ENGINE_LIMP_EFFECT", value = -0.5, aggregation = "min", extraData = {reason = "TURBO_FAIL"}}
+                    { id = "ENGINE_LIMP_EFFECT", value = -0.5, aggregation = "min", extraData = {reason = "TURBO_FAIL"}, disableAi = true}
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false },
@@ -418,7 +418,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.4, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min", extraData = {message = "ads_breakdowns_engine_stalled_message"}},
+                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.5, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.8} }
                 },
@@ -445,7 +445,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = { 
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 1.0, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min", extraData = {message = "ads_breakdowns_engine_stalled_message"}},
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 1.0, motorLoad = 0.6} }
                 },
@@ -460,7 +460,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 3.2, 
                 effects = { 
-                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_pump_malfunction_stage4_message", reason = "BREAKDOWN"} } 
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_pump_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} } 
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -497,7 +497,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.20, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min", extraData = {message = "ads_breakdowns_engine_stalled_message"}},
+                    { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min" },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.8} }
                 },
                 indicators = {
@@ -527,7 +527,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 4.8,
                 effects = {
-                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_injector_malfunction_stage4_message", reason = "BREAKDOWN"} }
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_injector_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} }
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -590,7 +590,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 2.4, 
                 effects = { 
-                    { id = "BRAKE_FORCE_MODIFIER", value = -1.0, aggregation = "min", extraData = {message = "ads_breakdowns_brake_malfunction_stage4_message"} }
+                    { id = "BRAKE_FORCE_MODIFIER", value = -1.0, aggregation = "min", extraData = {message = "ads_breakdowns_brake_malfunction_stage4_message", disableAi = true} }
                 },
                 indicators = {
                     { id = db.BRAKES, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -653,7 +653,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 11.2, 
                 effects = { 
-                     { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_transmission_slip_stage4_message"}, aggregation = "max" }
+                     { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_transmission_slip_stage4_message", disableAi = true}, aggregation = "max" }
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -679,7 +679,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.2,
                 effects = {
                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max"},
-                    { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000, message = 'ads_breakdowns_gear_disengage_message'}, aggregation = "min"}
+                    { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             {
@@ -690,7 +690,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.4,
                 effects = {
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.20, extraData = {timer = 0, status = 'IDLE', duration = 1800}, aggregation = "max"},
-                     { id = "GEAR_REJECTION_CHANCE", value = 5.0, extraData = {timer = 0, status = 'IDLE', duration = 2000, message = 'ads_breakdowns_gear_disengage_message'}, aggregation = "min"}
+                     { id = "GEAR_REJECTION_CHANCE", value = 5.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             { 
@@ -701,7 +701,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 4.8, 
                 effects = { 
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.50, extraData = {timer = 0, status = 'IDLE', duration = 2200}, aggregation = "max"},
-                     { id = "GEAR_REJECTION_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 2000, message = 'ads_breakdowns_gear_disengage_message'}, aggregation = "min"}
+                     { id = "GEAR_REJECTION_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             { 
@@ -711,7 +711,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 9.6, 
                 effects = { 
-                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 1.00, extraData = {timer = 0, status = 'IDLE', duration = 2200, message = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_message"}, aggregation = "max"}
+                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 1.00, extraData = {timer = 0, status = 'IDLE', duration = 2200, message = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_message", disableAi = true}, aggregation = "max"}
                 }
             }
         }
@@ -756,7 +756,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.5,
                 repairPrice = 8.0, 
                 effects = { 
-                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.99, extraData = {timer = 0, status = "IDLE", duration = 1000, backup = 0}, aggregation = "max"}
+                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.99, extraData = {timer = 0, status = "IDLE", duration = 1200, backup = 0}, aggregation = "max"}
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -769,7 +769,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 16.0, 
                 effects = { 
-                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0}, aggregation = "max"}
+                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0, disableAi = true}, aggregation = "max"}
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -955,7 +955,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 5.6, 
                 effects = { 
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'Hydraulic failure'}, aggregation = "min" }
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'Hydraulic failure', disableAi = true}, aggregation = "min" }
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -992,7 +992,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 0.72,
                 effects = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, extraData = {message = "ads_breakdowns_engine_stalled_message"}, aggregation = "min"},
+                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
                     { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
                 },
@@ -1009,7 +1009,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = { 
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
                     { id = "LIGHTS_FAILURE", value = 1.0, extraData = {message = "ads_breakdowns_electrical_system_malfunction_stage3_message"}, aggregation = "boolean_or" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, extraData = {message = "ads_breakdowns_engine_stalled_message"}, aggregation = "min"},
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
                     { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.3, aggregation = "min"}
                 },
@@ -1025,7 +1025,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.88, 
                 effects = { 
                     { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
-                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_electrical_system_malfunction_stage4_message", reason = "BREAKDOWN"}, aggregation = "boolean_or"} 
+                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_electrical_system_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1074,7 +1074,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 0.8, 
                 effects = { 
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.8}, aggregation = "max" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 8.0, extraData = {message = "ads_breakdowns_engine_stalled_message"}, aggregation = "min"},
+                    { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
                 },
                 indicators = {
@@ -1088,7 +1088,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 1.6, 
                 effects = { 
-                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN"}, aggregation = "boolean_or"} 
+                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1149,7 +1149,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 1.92, 
                 effects = { 
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.4, aggregation = "sum", extraData = {message = 'ads_breakdowns_yield_sensor_malfunction_stage4_message'} },
+                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.4, aggregation = "sum", extraData = {message = 'ads_breakdowns_yield_sensor_malfunction_stage4_message', disableAi = true} },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1209,7 +1209,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 1.92, 
                 effects = { 
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.80, aggregation = "sum", extraData = {message = "ads_breakdowns_material_flow_system_wear_stage4_message"}},
+                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.80, aggregation = "sum", extraData = {message = "ads_breakdowns_material_flow_system_wear_stage4_message", disableAi = true}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.30, aggregation = "sum"},
                 },
                 indicators = {
@@ -1253,20 +1253,6 @@ local function removeFuncFromActive(v, effectName)
     end
 end
 
-local function showMessage(v, effectData)
-    if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
-        if v.getIsControlled ~= nil and v:getIsControlled() then
-            g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 10000)
-        else
-            g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, v:getFullName() .. ": " .. g_i18n:getText(effectData.extraData.message))
-        end
-    end
-end
-
-local function stopAi(v, effectData)
-    if v:getIsAIActive() and math.abs(effectData.value) >= 1.0 then v:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) end
-end
-
 --- ENGINE_FAILURE
 ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
     getOriginalFunctionName = function()
@@ -1277,12 +1263,9 @@ ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
         if vehicle:getIsMotorStarted() then
             vehicle:stopMotor()
         end
-        stopAi(vehicle, effectData)
-        vehicle.isBroken = true
     end,
     remove = function(vehicle)
         log_dbg("Removing ENGINE_FAILURE effect.")
-        vehicle.isBroken = false
     end,
 }
 
@@ -1294,7 +1277,6 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FAILURE = {
         if currentLightMask ~= 0 then
             vehicle:setLightsTypesMask(0, true, true)
         end
-        showMessage(vehicle, effectData)
     end,
 
     remove = function(vehicle, handler)
@@ -1319,7 +1301,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_LIMP_EFFECT = {
             local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
             return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
         end
-        stopAi(vehicle, effectData)
     end,
     remove = function(vehicle, handler)
         log_dbg("Removing ENGINE_LIMP_EFFECT effect.")
@@ -1381,8 +1362,6 @@ ADS_Breakdowns.EffectApplicators.BRAKE_FORCE_MODIFIER = {
 
         local originalFuncName = handler.getOriginalFunctionName()
         saveOrigFunc(vehicle, originalFuncName)
-        showMessage(vehicle, effectData)
-        stopAi(vehicle, effectData)
 
         vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
             local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
@@ -1444,9 +1423,6 @@ ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
         end
 
         motor.clutchSlippingTime = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] * (1 + effectData.value) ^ 3
-
-        showMessage(vehicle, effectData)
-        stopAi(vehicle, effectData)
 
         motor.getMinMaxGearRatio = function(m)
             
@@ -1553,9 +1529,6 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
         local motor = vehicle:getMotor()
         if motor == nil then return end
 
-        showMessage(vehicle, effectData)
-        stopAi(vehicle, effectData)
-
         local originalApplyFuncName = "applyTargetGear"
         if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName] == nil then
             vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName] = motor.applyTargetGear
@@ -1634,8 +1607,6 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
 ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_SPEED_MODIFIER effect")
-        showMessage(vehicle, effectData)
-        stopAi(vehicle, effectData)
     end,
 
     remove = function(vehicle, handler)
@@ -1651,7 +1622,6 @@ ADS_Breakdowns.EffectApplicators.YIELD_REDUCTION_MODIFIER = {
     end,
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying YIELD_REDUCTION_MODIFIER effect")
-        showMessage(vehicle, effectData)
         local originalFuncName = handler.getOriginalFunctionName()
         saveOrigFunc(vehicle, originalFuncName)
 
@@ -1688,7 +1658,9 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
                     if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                         if v.stopMotor then
                             v:stopMotor()
-                            showMessage(vehicle, effectData)
+                            if v.getIsControlled ~= nil and v:getIsControlled() then
+                                g_currentMission:showBlinkingWarning(g_i18n:getText(v:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdowns_engine_stalled_message", 5000)) 
+                            end
                         end
                     end
                 end
@@ -1746,8 +1718,6 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         log_dbg("Applying GEAR_SHIFT_FAILURE_CHANCE:", effectData.value)
         local motor = vehicle:getMotor()
         if motor == nil then return end
-
-        showMessage(vehicle, effectData)
 
         local function playRandomSample()
             local x = math.random()
@@ -1915,7 +1885,9 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
                             effect.extraData.timer = 0
                             if motor and motor.setGear then
                                 motor:setGear(0, false)
-                                showMessage(vehicle, effectData)
+                                if v.getIsControlled ~= nil and v:getIsControlled() then
+                                    g_currentMission:showBlinkingWarning(g_i18n:getText(v:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdowns_gear_disengage_message", 3000)) 
+                                end
                             end
                         end
                     end
@@ -2042,9 +2014,6 @@ end
 function ADS_Breakdowns.getCanMotorRun(self, superFunc)
     local spec = self.spec_AdvancedDamageSystem
     if (spec and spec.activeEffects.ENGINE_FAILURE) then
-        if spec.activeEffects.ENGINE_FAILURE.extraData.message then
-            g_currentMission:showBlinkingWarning(g_i18n:getText(spec.activeEffects.ENGINE_FAILURE.extraData.message), 100)
-        end
         if spec.activeEffects.ENGINE_FAILURE.extraData.starter  then
             return true
         else
