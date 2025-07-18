@@ -254,7 +254,6 @@ function ADS_Hud:drawDashboard()
 
     renderText(posX + self.engineTempText.offsetX, posY + self.engineTempText.offsetY, self.engineTempText.size, tempText)
 
-    setTextAlignment(RenderText.ALIGN_LEFT)
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
     setTextBold(false)
 end
