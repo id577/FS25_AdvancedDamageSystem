@@ -137,6 +137,7 @@
         <text name="ads_breakdowns_transmission_slip_stage2_description" text="Significant clutch wear. Noticeable transmission slipping, especially during acceleration."/>
         <text name="ads_breakdowns_transmission_slip_stage3_description" text="Heavily worn clutch. Severe slipping makes it difficult to transfer power to the wheels."/>
         <text name="ads_breakdowns_transmission_slip_stage4_description" text="Clutch completely burned out. The vehicle is unable to move."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="Transmission failure."/>
 
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Worn synchronizers. Occasional grinding or difficulty when shifting gears."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Damaged synchronizers. Shifting gears is frequently difficult and may fail."/>

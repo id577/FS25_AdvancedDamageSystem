@@ -5,8 +5,8 @@
         <text name="ads_serviceWear_tooltip" text="Определяет скорость износа 'Обслуживания' за моточас. Например, при 10% уровень полностью исчерпается за 10 часов работы. Чем выше значение, тем чаще требуется техобслуживание."/>
         <text name="ads_conditionWear_label" text="Износ (Состояние)"/>
         <text name="ads_conditionWear_tooltip" text="Определяет скорость износа 'Состояния' за моточас. Например, при 1% состояние техники полностью ухудшится за 100 часов работы. Чем выше значение, тем быстрее ухудшается общее состояние техники."/>
-        <text name="ads_breakdownProbability_label" text="Базовая вероятность поломки"/>
-        <text name="ads_breakdownProbability_tooltip" text="Задает базовую вероятность поломки в час при 100% 'Состояния'. По мере ухудшения состояния техники, фактический шанс поломки будет расти. Эта настройка является отправной точкой для всех расчетов."/>
+        <text name="ads_breakdownProbability_label" text="Базовое среднее время между отказами"/>
+        <text name="ads_breakdownProbability_tooltip" text="Устанавливает базовое среднее время между отказами (MTBF) в минутах, когда состояние техники составляет 100%. По мере ухудшения состояния техники фактическое значение MTBF также будет уменьшаться. Эта настройка служит отправной точкой для расчетов поломок."/>
         <text name="ads_maintenancePrice_label" text="Множитель стоимости обслуживания"/>
         <text name="ads_maintenancePrice_tooltip" text="Изменяет стоимость всех работ в мастерской, включая осмотры, ремонт и капитальный ремонт. Чем выше значение, тем дороже будут услуги."/>
         <text name="ads_maintenanceDuration_label" text="Множитель длительности обслуживания"/>
@@ -24,6 +24,10 @@
         <text name="ads_ws_label_condition" text="Состояние"/>
         <text name="ads_ws_label_last_maintenance" text="Последнее ТО"/>
         <text name="ads_ws_label_last_inspection" text="Последний осмотр"/>
+        <text name="ads_ws_label_current_power" text="Текущая мощность"/>
+        <text name="ads_ws_label_brake_efficiency" text="Эффективность тормозов"/>
+        <text name="ads_ws_label_harvest_efficiency" text="Эффективность уборки"/>
+        <text name="ads_ws_label_maintainability" text="Ремонтопригодность"/>
 
         <text name="ads_ws_table_header_part" text="Деталь"/>
         <text name="ads_ws_table_header_description" text="Описание"/>
@@ -131,6 +135,7 @@
         <text name="ads_breakdowns_transmission_slip_stage2_description" text="Значительный износ сцепления. Заметное проскальзывание трансмиссии, особенно при ускорении."/>
         <text name="ads_breakdowns_transmission_slip_stage3_description" text="Сильно изношенное сцепление. Серьезное проскальзывание затрудняет передачу мощности на колеса."/>
         <text name="ads_breakdowns_transmission_slip_stage4_description" text="Сцепление полностью сгорело. Техника не может двигаться."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="Отказ трансмиссии."/>
         
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Изношенные синхронизаторы. Периодический скрежет или затруднения при переключении передач."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Поврежденные синхронизаторы. Переключение передач часто затруднено и может не удаться."/>
@@ -230,5 +235,16 @@
         <text name="ads_spec_state_average" text="Средняя"/>
         <text name="ads_spec_state_high" text="Высокая"/>
         <text name="ads_spec_state_workhorse" text="Экстримальная"/>
+
+
+        <text name="ads_spec_months_ago" text="месяцев назад"/>
+        <text name="ads_spec_and" text="и"/>
+        <text name="ads_spec_months_ago" text="месяцев назад"/>
+        <text name="ads_spec_and" text="и"/>
+        <text name="ads_spec_state_repair" text="Ремонт"/>
+        <text name="ads_spec_state_complex" text="Комплексное"/>
+        <text name="ads_spec_state_robust" text="Надежное"/>
+        <text name="ads_spec_state_extreme" text="Экстремальное"/>
+        <text name="ads_spec_state_workhorse" text="Рабочая лошадка"/>
     </texts>
 </l10n>

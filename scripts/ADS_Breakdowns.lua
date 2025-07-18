@@ -653,7 +653,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 11.2, 
                 effects = { 
-                     { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0}, aggregation = "max" }
+                     { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_transmission_slip_stage4_message"}, aggregation = "max" }
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1257,7 +1257,9 @@ local function showMessage(v, effectData)
     if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
         if v.getIsControlled ~= nil and v:getIsControlled() then
             g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 10000)
-        end 
+        else
+            g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, v:getFullName() .. ": " .. g_i18n:getText(effectData.extraData.message))
+        end
     end
 end
 
