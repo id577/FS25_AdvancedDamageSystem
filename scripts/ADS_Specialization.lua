@@ -516,7 +516,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
        end
     end
     if self:getIsAIActive() and (spec.transmissionTemperature > 105 or spec.engineTemperature > 105) then
-        self:stopCurrentAIJob()     
+        self:stopCurrentAIJob(AIMessageErrorVehicleBroken.new())     
     end
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
@@ -1352,6 +1352,7 @@ function AdvancedDamageSystem:processMaintenance(dt)
             end
         end
 
+        g_currentMission.hud:addSideNotification({1, 1, 1, 1}, self:getFullName() .. ": " .. g_i18n:getText(spec.currentState) .. " " .. g_i18n:getText(ads_spec_maintenance_complete))
         spec.maintenanceTimer = 0
         spec.currentState = states.READY
         ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))

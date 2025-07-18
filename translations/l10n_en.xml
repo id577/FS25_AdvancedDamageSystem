@@ -194,6 +194,7 @@
         <text name="ads_breakdowns_engine_stalled_message" text="Engine stalled"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Gear disengage"/>
         <text name="ads_breakdown_at_progress_message" text="at progress"/>
+        
 
         <text name="ads_spec_this_month" text="This month"/>
         <text name="ads_spec_months_ago" text="months ago"/>
@@ -213,6 +214,7 @@
         <text name="ads_spec_months_ago_format" text="%s %s"/>
         <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s until %s"/>
+        <text name="ads_spec_maintenance_complete" text="completed"/>
 
         <text name="ads_spec_state_ready" text="Ready"/>
         <text name="ads_spec_state_inspection" text="Inspection"/>

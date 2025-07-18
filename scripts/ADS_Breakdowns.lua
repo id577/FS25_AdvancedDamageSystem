@@ -93,7 +93,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { 
                         id = "ENGINE_START_FAILURE_CHANCE", 
                         value = function(vehicle)
-                            local baseEffect = 0.80
+                            local baseEffect = 0.66
                             local condition = vehicle:getConditionLevel()
                             local multiplier = (1 - condition) ^ 3
                             return baseEffect * multiplier
@@ -1263,6 +1263,10 @@ local function showMessage(v, effectData)
     end
 end
 
+local function stopAi(v, effectData)
+    if v:getIsAIActive() and math.abs(effectData.value) >= 1.0 then v:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) end
+end
+
 --- ENGINE_FAILURE
 ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
     getOriginalFunctionName = function()
@@ -1273,9 +1277,12 @@ ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
         if vehicle:getIsMotorStarted() then
             vehicle:stopMotor()
         end
+        stopAi(vehicle, effectData)
+        vehicle.isBroken = true
     end,
     remove = function(vehicle)
         log_dbg("Removing ENGINE_FAILURE effect.")
+        vehicle.isBroken = false
     end,
 }
 
@@ -1312,6 +1319,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_LIMP_EFFECT = {
             local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
             return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
         end
+        stopAi(vehicle, effectData)
     end,
     remove = function(vehicle, handler)
         log_dbg("Removing ENGINE_LIMP_EFFECT effect.")
@@ -1374,6 +1382,7 @@ ADS_Breakdowns.EffectApplicators.BRAKE_FORCE_MODIFIER = {
         local originalFuncName = handler.getOriginalFunctionName()
         saveOrigFunc(vehicle, originalFuncName)
         showMessage(vehicle, effectData)
+        stopAi(vehicle, effectData)
 
         vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
             local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
@@ -1437,6 +1446,7 @@ ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
         motor.clutchSlippingTime = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] * (1 + effectData.value) ^ 3
 
         showMessage(vehicle, effectData)
+        stopAi(vehicle, effectData)
 
         motor.getMinMaxGearRatio = function(m)
             
@@ -1544,6 +1554,7 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
         if motor == nil then return end
 
         showMessage(vehicle, effectData)
+        stopAi(vehicle, effectData)
 
         local originalApplyFuncName = "applyTargetGear"
         if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName] == nil then
@@ -1624,6 +1635,7 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_SPEED_MODIFIER effect")
         showMessage(vehicle, effectData)
+        stopAi(vehicle, effectData)
     end,
 
     remove = function(vehicle, handler)

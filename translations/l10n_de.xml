@@ -209,7 +209,8 @@
         <text name="ads_spec_duration_format_combined" text="%s und %s"/>
         <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s bis %s"/>
-
+        <text name="ads_spec_maintenance_complete" text="vollendet"/>
+        
         <text name="ads_spec_state_ready" text="Bereit"/>
         <text name="ads_spec_state_inspection" text="Inspektion"/>
         <text name="ads_spec_state_maintenance" text="Wartung"/>
