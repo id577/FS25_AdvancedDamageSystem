@@ -251,7 +251,7 @@ ADS_Config = {
         CHALLENGER      = {1.10, 0.90},
         AGCO            = {1.10, 0.90},
         MERCEDES        = {1.10, 0.90},
-        KRAMER          = {1.10, 0.95}, -- Качественные немецкие погрузчики, надежные
+        KRAMER          = {1.10, 0.95},
         
         -- Standard, baseline brands representing the industry average
         LINDNER         = {1.05, 1.00},
