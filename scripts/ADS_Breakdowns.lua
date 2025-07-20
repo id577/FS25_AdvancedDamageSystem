@@ -54,7 +54,6 @@ ADS_Breakdowns.BreakdownRegistry = {
 
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
 
-
 -- additional debuffs for aging equipment, in addition to the standard ones (torque for motorized, fillDelta for combine)
     GENERAL_WEAR_AND_TEAR = {
         isSelectable = false,

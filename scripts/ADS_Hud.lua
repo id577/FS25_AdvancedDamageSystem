@@ -342,7 +342,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     currentY = currentY - panel.lineHeight
 
     renderText(col1_x, currentY, textSettings.normalSize, string.format("Reliability/Maintainability:"))
-    renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f / %.2f)", spec.reliability, spec.maintainability))
+    renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f / %.2f", spec.reliability, spec.maintainability))
     renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
     currentY = currentY - panel.lineHeight   
 

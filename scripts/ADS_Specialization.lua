@@ -1591,14 +1591,14 @@ function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
 
         local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
         if storeItem.specs ~= nil and storeItem.specs.year ~= nil then
-            year = storeItem.specs.year
+            year = tonumber(storeItem.specs.year)
         end
         brandName = brand.name
 
     elseif storeItem ~= nil then
         brandName = storeItem.brandNameRaw
         if storeItem.specs ~= nil and storeItem.specs.year ~= nil then
-            year = storeItem.specs.year
+            year = tonumber(storeItem.specs.year)
         end
     end
 
