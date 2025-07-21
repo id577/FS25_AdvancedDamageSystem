@@ -405,7 +405,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8} }
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8, cruiseState = 0} }
                 }
             },
             {
@@ -419,7 +419,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.4, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.5, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.8} }
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
                 },
                 indicators = {
                     {  
@@ -446,7 +446,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 1.0, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 1.0, motorLoad = 0.6} }
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0} }
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
@@ -484,7 +484,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.08, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8} }
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.9, cruiseState = 0} }
                 }
             },
             {
@@ -497,7 +497,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.20, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min" },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.8} }
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 0.8, motorLoad = 0.8, cruiseState = 0} }
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
@@ -513,7 +513,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.8} }
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1048,7 +1048,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.2,
                 effects = {
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8}, aggregation = "max" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
                 }
             },
             {
@@ -1058,7 +1058,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0,
                 repairPrice = 0.4,
                 effects = {
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.8}, aggregation = "max" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" }
                 },
                 indicators = {
@@ -1072,7 +1072,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0,
                 repairPrice = 0.8, 
                 effects = { 
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.8}, aggregation = "max" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
                     { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
                 },
@@ -1971,17 +1971,24 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
 
         local effectName = handler.getEffectName()
         local activeFunc = function(v, dt)
-            local spec_ads = v.spec_AdvancedDamageSystem
             local extra = effectData.extraData
 
             if extra.status == "CHOKING" then
                 extra.timer = extra.timer + dt
                 if extra.timer > extra.duration then
+                    if extra.cruiseState ~= 0 then
+                        vehicle:setCruiseControlState(extra.cruiseState, true)
+                    end
                     extra.status = "IDLE"
                     extra.timer = 0
                 end
             elseif vehicle:getMotorLoadPercentage() > extra.motorLoad then
                 if effectData.value > 0 and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effectData.value) and extra.status == "IDLE" then
+                    local cruiseState = vehicle:getCruiseControlState()
+                    if cruiseState ~= 0 then
+                        extra.cruiseState = cruiseState
+                        vehicle:setCruiseControlState(0, true)
+                    end
                     extra.status = "CHOKING"
                 end
             end
