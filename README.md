@@ -139,13 +139,16 @@ With each new stage, the cost of repair increases. A critical breakdown can be v
 #### It Pays to Be Attentive!
 The cheapest repair is a preventive one. If you notice that something is "off" with your vehicle (e.g., a slight loss of power) at the first, hidden stage, and immediately take it for an Inspection, you can fix the issue for a minimal price.
 
+#### General Wear and Tear
+Beyond random failures, very low condition will trigger a permanent "General Wear and Tear" effect, reducing engine power and braking effectiveness to simulate the sluggishness of old machinery.
+
 ## 3. Workshop Repairs and Service
 
 New options are available to you in the workshop menu:
 
 #### Inspection
 
-- **What it does:** Mechanics perform a full diagnostic. This allows you to detect hidden faults, determine the approximate Condition level, and see if Service is needed.
+- **What it does:** Mechanics perform a full diagnostic. This allows you to detect hidden faults, determine the approximate Condition level, and see if Service is needed.It also generates a performance report, showing you exactly how much power, braking force, or yield has been lost due to "General Wear and Tear" effect.
 
 - **When to use:** Whenever you feel something is "wrong" with the vehicle, or when a warning light is on the dashboard.
 
