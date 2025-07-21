@@ -106,6 +106,13 @@ It decreases with engine operating hours, simulating the natural wear of consuma
 - **How to restore it?**
 It is restored to 100% through the Maintenance procedure in the workshop.
 
+### A Note on Player Knowledge: Hidden Values
+A key feature of ADS is that the exact percentage values for Condition and Service are hidden from the player. This encourages you to pay attention to your vehicle's behavior rather than just numbers.
+
+So, how do you know when to act?
+- **Estimation through Inspection:** An Inspection at the workshop will give you a general assessment of your vehicle's health (e.g., "Condition is Good," "Service is Recommended").
+- **The Logbook Feature:** To help you plan, the mod acts like a vehicle's logbook. It records and displays the date of the last service and the operating hours at that time. By comparing this to the current operating hours, you can accurately track how long it has been and determine when your next maintenance is due.
+
 ## 2. Breakdowns
 
 The most interesting part of the mod. As the vehicle's Condition drops, the probability of random breakdowns increases.
