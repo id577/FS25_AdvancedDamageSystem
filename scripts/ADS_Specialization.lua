@@ -454,7 +454,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     --- Registration in ADS_Main.vehicles
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil then
-        if (self.propertyState == 2 or self.propertyState == 3 or self.propertyState == 4) and self.ownerFarmId ~= 0 and self.ownerFarmId <= 10 then
+        if (self.propertyState == 2 or self.propertyState == 3 or self.propertyState == 4) and self.ownerFarmId ~= 0 and self.ownerFarmId < 10 then
             log_dbg(" -> Registering vehicle in ADS_Main.vehicles list. ID:", self.uniqueId)
             --- Registration in ADS_Main.vehicles
             ADS_Main.vehicles[self.uniqueId] = self

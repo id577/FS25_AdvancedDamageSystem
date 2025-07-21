@@ -232,7 +232,7 @@
         <text name="ads_spec_state_recommended" text="Recommended"/>
         <text name="ads_spec_state_legendary" text="Legendary"/>
         <text name="ads_spec_state_premium" text="Premium"/>
-        <text name="ads_spec_state_standart" text="Standart"/>
+        <text name="ads_spec_state_standart" text="Standard"/>
         <text name="ads_spec_state_budget" text="Budget"/>
         <text name="ads_spec_state_complex" text="Complex"/>
         <text name="ads_spec_state_robust" text="Robust"/>
