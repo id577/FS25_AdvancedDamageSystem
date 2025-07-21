@@ -2181,28 +2181,6 @@ end
 
 -- VEHICLE PHYSICS (BRAKES)
 function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, axisSide, doHandbrake, dt)
-    local spec_drivable = vehicle.spec_drivable
-    local acceleration = 0
-    
-    if vehicle:getIsMotorStarted() and vehicle:getMotorStartTime() <= g_currentMission.time then
-        acceleration = axisForward
-        
-        if math.abs(acceleration) > 0 then
-            vehicle:setCruiseControlState(Drivable.CRUISECONTROL_STATE_OFF)
-        end
-        
-        if spec_drivable.cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF then
-            acceleration = 1
-        end
-    end
-    
-    if not vehicle:getCanMotorRun() then
-        acceleration = 0
-        if vehicle:getIsMotorStarted() then
-            vehicle:stopMotor()
-        end
-    end
-
     local spec_ads = vehicle.spec_AdvancedDamageSystem
     local brakeEffect = spec_ads and spec_ads.activeEffects.BRAKE_FORCE_MODIFIER
     local limpEffect = spec_ads and spec_ads.activeEffects.ENGINE_LIMP_EFFECT
@@ -2211,22 +2189,22 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
     local drivingMode = vehicle:getDirectionChangeMode()
 
     if hesitationEffect and hesitationEffect.extraData and hesitationEffect.extraData.status == "CHOKING" then
-        acceleration = acceleration * math.max(1 - hesitationEffect.extraData.amplitude, 0)
+        axisForward = axisForward * math.max(1 - hesitationEffect.extraData.amplitude, 0)
     end
 
     if limpEffect and limpEffect.value then
         local maxAllowedAcceleration = math.max(1 + limpEffect.value, 0.2)
-        if math.abs(acceleration) > maxAllowedAcceleration then
+        if math.abs(axisForward) > maxAllowedAcceleration then
             if drivingMode == 2 then
-                if acceleration > maxAllowedAcceleration then
-                    acceleration = maxAllowedAcceleration
+                if axisForward > maxAllowedAcceleration then
+                    axisForward = maxAllowedAcceleration
                 end
             else
-                if math.sign(vehicle.movingDirection) == math.sign(acceleration) then
-                    if acceleration > 0 then
-                        acceleration = maxAllowedAcceleration
+                if math.sign(vehicle.movingDirection) == math.sign(axisForward) then
+                    if axisForward > 0 then
+                        axisForward = maxAllowedAcceleration
                     else
-                        acceleration = -1 * maxAllowedAcceleration
+                        axisForward = -1 * maxAllowedAcceleration
                     end
                 end   
             end
@@ -2235,34 +2213,18 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
 
     if brakeEffect and brakeEffect.value ~= 0 then
         if drivingMode == 2 then
-            isBraking = acceleration < -0.01
+            isBraking = axisForward < -0.01
         else
-            isBraking = vehicle.movingDirection ~= 0 and acceleration ~= 0 and math.sign(vehicle.movingDirection) ~= math.sign(acceleration)
+            isBraking = vehicle.movingDirection ~= 0 and axisForward ~= 0 and math.sign(vehicle.movingDirection) ~= math.sign(axisForward)
         end
         
         if isBraking then
             local modifier = math.max(0.01, 1 + brakeEffect.value) 
-            acceleration = acceleration * modifier
+            axisForward = axisForward * modifier
         end
     end
 
-    if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
-        local targetRotatedTime = 0
-        if vehicle.maxRotTime ~= nil and vehicle.minRotTime ~= nil then
-            if axisSide < 0 then
-                targetRotatedTime = math.min(-vehicle.maxRotTime * axisSide, vehicle.maxRotTime)
-            else
-                targetRotatedTime = math.max(vehicle.minRotTime * axisSide, vehicle.minRotTime)
-            end
-        end
-        vehicle.rotatedTime = targetRotatedTime
-    end
-
-    if vehicle.finishedFirstUpdate and vehicle.spec_wheels ~= nil and #vehicle.spec_wheels.wheels > 0 then
-        WheelsUtil.updateWheelsPhysics(vehicle, dt, vehicle.lastSpeedReal * vehicle.movingDirection, acceleration, doHandbrake, g_currentMission.missionInfo.stopAndGoBraking)
-    end
-    
-    return acceleration
+    return superFunc(vehicle, axisForward, axisSide, doHandbrake, dt)
 end
 
 
