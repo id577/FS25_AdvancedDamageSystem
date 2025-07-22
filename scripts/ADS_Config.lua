@@ -123,8 +123,8 @@ ADS_Config = {
         -- The base time in milliseconds required to perform a complete Overhaul.
         OVERHAUL_TIME = 43200000, -- (12 GAME hours)
 
-        OVERHAUL_MIN_CONDITION_RESTORE = 0.6,
-        OVERHAUL_MAX_CONDITION_RESTORE = 0.9,
+        OVERHAUL_MIN_CONDITION_RESTORE = 0.5,
+        OVERHAUL_MAX_CONDITION_RESTORE = 0.8,
 
         AFTERMARKETS_PARTS_BREAKDOWN_CHANCE = 0.33,
         AFTERMARKETS_PARTS_BREAKDOWN_DURATION = 18000000,
