@@ -384,3 +384,19 @@ Examples: Premium European and American brands are generally more reliable than 
 - **What it affects:** A vehicle with high maintainability requires less money and time for all workshop operations and restores its Condition better after an overhaul.
 
 Examples: Simple, older vehicles are often more maintainable than modern machines packed with electronics.
+
+> [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for technical details on characteristic values</strong></summary>
+>
+> ### Value Ranges
+> For most brands, the values for both **Reliability** and **Maintainability** typically range from **`0.8`** (less reliable/maintainable) to **`1.2`** (very reliable/maintainable), with rare exceptions.
+>
+> ### Production Year Bonus
+> The **Maintainability** rating also receives a bonus based on the vehicle's production year.
+> - If a vehicle was produced **before the year 2000**, it receives a bonus to its maintainability rating. This simulates the simpler construction and electronics of older machinery, resulting in cheaper and faster service.
+>
+> ### Configuration File
+> All brand-specific values for `Reliability` and `Maintainability` can be viewed and even customized in the `ADS_Config.lua` file, located in the mod's folder.
+>
+> </details>
