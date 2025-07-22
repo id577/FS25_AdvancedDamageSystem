@@ -186,6 +186,105 @@ So, how do you know when to act?
 
 The most interesting part of the mod. As the vehicle's Condition drops, the probability of random breakdowns increases.
 
+> [!NOTE]
+> <details>
+> <summary><strong>📋 Click here for a full list of breakdowns and their effects</strong></summary>
+> 
+> This is a comprehensive list of all possible malfunctions in the mod. Each breakdown has several stages, with the effects becoming more severe over time. The "Critical Effect" listed is the final stage of the malfunction.
+>
+> ---
+> 
+> ### ⚙️ Engine Systems
+> 
+> #### ECU Malfunction
+> * *Applicable to:* Modern vehicles (Year 2000+) with combustion engines.
+> * *Symptoms:* Progressive power loss, increased fuel consumption, engine stalls, difficulty starting.
+> * *Critical Effect:* **Complete engine failure.** The vehicle will not start.
+> 
+> #### Turbocharger Wear
+> * *Applicable to:* Modern, powerful tractors (Year 2005+).
+> * *Symptoms:* Progressive power loss, increased fuel consumption, and risk of engine stalls under load.
+> * *Critical Effect:* **Severe power loss (Limp Mode).** The engine loses about 50% of its power to prevent catastrophic damage.
+> 
+> #### Fuel Pump Malfunction
+> * *Applicable to:* All vehicles with combustion engines.
+> * *Symptoms:* Engine hesitation, occasional stalls, difficulty starting, progressive power loss, and increased fuel consumption.
+> * *Critical Effect:* **Complete engine failure.** Fuel is not supplied, and the engine cannot be started.
+> 
+> #### Fuel Injector Malfunction
+> * *Applicable to:* All vehicles with combustion engines.
+> * *Symptoms:* Rough engine operation, misfires under load, significant power loss, and unreliable starting.
+> * *Critical Effect:* **Complete engine failure.** The engine will not run correctly and may not start at all.
+>
+> #### Cooling System Thermostat Malfunctio
+> * *Applicable to:* All vehicles with combustion engines.
+> * *Symptoms:* Engine takes longer to warm up or runs hotter than normal, leading to increased wear and risk of overheating.
+> * *Critical Effect:* **Rapid and severe engine overheating,** as the thermostat fails completely and blocks coolant circulation.
+>
+> #### Carburetor Clogging
+> * *Applicable to:* Older vehicles (Pre-1980) with combustion engines.
+> * *Symptoms:* Engine hesitation, sputtering, frequent stalls, and difficulty maintaining power.
+> * *Critical Effect:* **Engine will not run** due to complete fuel starvation.
+> 
+> ---
+> 
+> ### 🔩 Transmission Systems
+> 
+> #### Transmission Slip
+> * *Applicable to:* Vehicles with conventional (non-CVT) transmissions.
+> * *Symptoms:* Occasional power loss as the transmission slips under load, especially during acceleration.
+> * *Critical Effect:* **Vehicle is unable to move.** The clutch is completely burned out.
+> 
+> #### Transmission Synchronizer Malfunction
+> * *Applicable to:* Vehicles with manual or synchro-shift transmissions.
+> * *Symptoms:* Grinding noises, difficulty shifting gears, and a high chance of failed shifts or gear rejection under load.
+> * *Critical Effect:* **Impossible to shift gears.**
+> 
+> #### Powershift Hydraulic Pump Malfunction
+> * *Applicable to:* Vehicles with Powershift transmissions.
+> * *Symptoms:* Delays, harshness, and violent shocks when shifting gears.
+> * *Critical Effect:* **Transmission is stuck in neutral** and cannot engage any gear.
+> 
+> #### CVT Cooling System Malfunction
+> * *Applicable to:* Modern vehicles (Year 2000+) with CVT transmissions.
+> * *Symptoms:* CVT temperature becomes unstable, leading to a high risk of overheating and internal damage during prolonged work.
+> * *Critical Effect:* **Rapid and dangerous overheating of the CVT** due to a complete cooling failure.
+> 
+> ---
+> 
+> ###  अन्य Systems
+> 
+> #### Brake Malfunction
+> * *Applicable to:* All wheeled vehicles.
+> * *Symptoms:* Increased braking distance, weak and unreliable brakes.
+> * *Critical Effect:* **Complete brake system failure.** Braking is impossible.
+> 
+> #### Hydraulic Pump Malfunction
+> * *Applicable to:* Most non-truck vehicles (tractors, combines, etc.) from 1960 onwards.
+> * *Symptoms:* Hydraulic implements become progressively slower and weaker.
+> * *Critical Effect:* **The hydraulic system is completely inoperable.**
+> 
+> #### Electrical System Malfunction
+> * *Applicable to:* Modern vehicles (Year 2000+) with lights.
+> * *Symptoms:* Flickering lights, unreliable engine starting, occasional stalls.
+> * *Critical Effect:* **Complete electrical failure.** Lights do not work and the starter does not respond.
+> 
+> ---
+> 
+> ### 🚜 Harvester-Specific Systems
+> 
+> #### Yield Sensor Malfunction
+> * *Applicable to:* Modern combines (Year 2000+).
+> * *Symptoms:* The automatic threshing system becomes less efficient, leading to progressively higher crop losses as the combine fails to separate grain correctly.
+> * *Critical Effect:* **Severe crop loss (-40%)** as the monitoring system fails completely.
+> 
+> #### Material Flow System Wear
+> * *Applicable to:* All combines.
+> * *Symptoms:* Minor crop loss during internal transport, grinding noises, and a risk of major clogs.
+> * *Critical Effect:* **Severe material flow blockage** and massive crop loss (-80%) as a major component fails. The engine is placed under extreme strain.
+> 
+> </details>
+
 #### Chance and Severity of Breakdowns
 The lower the vehicle's Condition, the higher the chance of a new malfunction occurring. Additionally, the vehicle's brand Reliability now plays a role: premium, more reliable brands have a lower base probability of developing faults. Moreover, for a heavily worn vehicle, the probability that a breakdown will appear immediately at a major or even critical stage, skipping the minor phases, increases significantly.
 
