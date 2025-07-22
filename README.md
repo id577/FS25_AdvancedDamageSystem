@@ -292,6 +292,32 @@ Manufacturer's recommendation: Every 5 operating hours. Experienced farmers migh
 
 **Important:** This procedure is expensive and does not fully restore Condition to 100%. The amount of condition restored depends on the vehicle's age, its maintainability, and a random factor (repair success).
 
+> [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for technical details on the Overhaul mechanic</strong></summary>
+>
+> The amount of `Condition` restored during an overhaul is not a fixed value. It is calculated based on several factors, ensuring that bringing an old machine back to life is possible, but never makes it "as good as new."
+>
+> ### 1. Base Restoration Amount
+> The core of the calculation is the percentage of **lost `Condition`** that gets restored. This value is randomized within a specific range, which shifts downward as the vehicle gets older.
+>
+> - **For a new vehicle (up to 1 year old):** The overhaul will restore between **50% and 80%** of the `Condition` that has been lost.
+>   - *Example: A vehicle with 30% Condition (30% lost) will be restored to somewhere between 65% and 86% Condition.*
+>
+> - **For a 10-year-old vehicle:** This range shifts down significantly to approximately **20% to 50%** of lost `Condition`.
+>
+> ### 2. Maintainability Multiplier
+> The final amount of restored `Condition` is then multiplied by the vehicle's **Maintainability** rating.
+> - A vehicle with high maintainability will receive the full calculated restoration or even a slight bonus.
+> - A vehicle with low maintainability (e.g., a complex, modern machine) will have the restored amount reduced, making overhauls less effective.
+>
+> ### 3. Aftermarket Parts Risk
+> Choosing to perform an overhaul with cheaper **Aftermarket Parts** introduces an additional risk to the restoration quality.
+> - This option **halves the minimum possible restoration amount**. The maximum potential outcome remains the same.
+> - *Example: For a new vehicle, the restoration range of **60%-90%** becomes **30%-90%** when using aftermarket parts. You might get a great result, or a very poor one.*
+>
+> </details>
+
 #### Genuine vs. Aftermarket Parts: A New Strategic Choice
 
 For Maintenance, Repair, and Overhaul procedures, you now have a choice between two types of spare parts, creating a classic risk-reward scenario:
