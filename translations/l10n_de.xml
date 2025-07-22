@@ -231,6 +231,7 @@
         <text name="ads_spec_state_terrible" text="Schrecklich"/>
         <text name="ads_spec_state_unknown" text="Unbekannt"/>
         <text name="ads_spec_state_not_required" text="Nicht nötig"/>
+        <text name="ads_spec_state_required" text="Erforderlich"/>
         <text name="ads_spec_state_recommended" text="Empfohlen"/>
         <text name="ads_spec_state_legendary" text="Legendär"/>
         <text name="ads_spec_state_premium" text="Premium"/>

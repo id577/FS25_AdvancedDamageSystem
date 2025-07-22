@@ -487,6 +487,9 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
         end
     end
 
+    --- just in case
+    if self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
+
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
     if spec.year >= 2000 then
         local overheatProtection = spec.activeBreakdowns['OVERHEAT_PROTECTION']

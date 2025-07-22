@@ -233,6 +233,7 @@
         <text name="ads_spec_state_unknown" text="Неизвестно"/>
         <text name="ads_spec_state_not_required" text="Не требуется"/>
         <text name="ads_spec_state_recommended" text="Рекомендуется"/>
+        <text name="ads_spec_state_required" text="Требуется"/>
         <text name="ads_spec_state_legendary" text="Легендарная"/>
         <text name="ads_spec_state_premium" text="Премиум"/>
         <text name="ads_spec_state_standart" text="Стандарт"/>
