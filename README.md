@@ -254,6 +254,21 @@ The cheapest repair is a preventive one. If you notice that something is "off" w
 #### General Wear and Tear
 Beyond random failures, very low condition will trigger a permanent "General Wear and Tear" effect, reducing engine power and braking effectiveness to simulate the sluggishness of old machinery.
 
+> [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for technical details on the "General Wear and Tear" effect</strong></summary>
+>
+> The "General Wear and Tear" effect begins to apply once a vehicle's `Condition` drops below **66%**. However, its impact is calculated using a cubic formula, meaning the effects are barely noticeable at first but become very significant as the `Condition` approaches zero (especially below 33%).
+>
+> This effect applies several penalties, which reach their maximum values at 0% `Condition`:
+>
+> - **Engine Power Reduction:** Up to **-30%**.
+> - **Braking Effectiveness Reduction:** Up to **-40%**.
+> - **Engine Start Difficulty:** The engine becomes harder to start, especially when cold.
+> - **Harvesting Efficiency Loss (for harvesters):** Up to **-20%**, simulating increased crop loss from worn-out components.
+>
+> </details>
+
 ## 3. Workshop Repairs and Service
 
 New options are available to you in the workshop menu:
