@@ -189,6 +189,9 @@ For Maintenance, Repair, and Overhaul procedures, you now have a choice between 
 
 - **💸 Aftermarket Parts:** A budget-friendly alternative, costing **50% less** than genuine parts. However, this saving comes with a significant risk.
 
+<details>
+<summary>⚙️ Click here for technical details on the "Defective Parts" mechanic</summary>
+
 > [!NOTE]
 > **The Risk of Defective Parts**
 >
@@ -198,6 +201,8 @@ For Maintenance, Repair, and Overhaul procedures, you now have a choice between 
 > - **Increased Breakdown Chance:** The probability of a random breakdown is doubled.
 > 
 > This choice adds another strategic layer: do you save money now and risk future problems, or do you pay for reliability?
+
+</details>
 
 #### ⏱️ Time and Planning: A New Layer of Strategy
 Beyond money, all workshop procedures require time. The duration of a service or repair depends on the vehicle's Maintainability (simpler machines are fixed faster).
