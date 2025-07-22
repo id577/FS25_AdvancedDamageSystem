@@ -87,10 +87,10 @@
                     </ListItem>
                 </SmoothList>
 
-                <ThreePartBitmap profile="fs25_listSliderBox" position="-50px 0px" size="12px 330px" with="anchorTopRight">
+                <ThreePartBitmap profile="fs25_listSliderBox" position="-50px 0px" size="12px 300px" with="anchorTopRight">
                     <Slider profile="fs25_listSlider" size="6px 30px" dataElementId="breakdownTable" id="tableSlider" />
                 </ThreePartBitmap>
-                <Text profile="ads_textHeaderGrey" id="emptyTableText" text="$l10n_ads_ws_info_no_breakdowns" position="0px 250px" size="100% 50px"/>
+                <Text profile="ads_textHeaderGrey" id="emptyTableText" text="$l10n_ads_ws_info_no_breakdowns" position="0px 200px" size="100% 50px"/>
             </GuiElement>
 
             <!-- =============================================================== -->`   
@@ -128,7 +128,7 @@
 
         <Profile name="ads_dialogBg" extends="fs25_dialogBg">
             <width value="1200px"/>
-            <height value="980px"/> 
+            <height value="880px"/> 
         </Profile>
 
         <Profile name="ads_vehicleInfoContainer" extends="emptyPanel" with="anchorTopCenter">
@@ -137,13 +137,13 @@
         </Profile>
 
         <Profile name="ads_breakdownTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
-            <size value="1170px 545px"/>
+            <size value="1170px 440px"/>
             <position value="0px -300px"/>
         </Profile>
 
         <Profile name="ads_statusBarContainer" extends="emptyPanel" with="anchorTopStretchingX">
             <size value="1170px 70px"/>
-            <position value="0px -830px"/>
+            <position value="0px -730px"/>
         </Profile>
         
         <Profile name="ads_vehicleImage" extends="baseReference" with="anchorMiddleLeft">
