@@ -92,8 +92,8 @@ function ADS_InGameSettings:initSettingsGui()
         self.ads_breakdownProbability.onClickCallback = ADS_InGameSettings.onValueChanged
         self.ads_breakdownProbability.buttonLRChange = ADS_InGameSettings.onValueChanged
         self.ads_breakdownProbability.texts = {}
-        for i = 0, 11 do
-            local value = 100 + i * 100
+        for i = 0, 10 do
+            local value = 200 + i * 100
             table.insert(self.ads_breakdownProbability.texts, tostring(value))
         end
         local currentBreakdownProbText = tostring(ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF)

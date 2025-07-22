@@ -31,7 +31,7 @@
                 <Text profile="ads_textBold" id="valueTitle" text="$l10n_ads_ws_label_value" position="395px 240px"/>
                 <Text profile="ads_textBold" id="ageTitle" text="$l10n_ads_ws_label_age" position="395px 200px"/>
                 <Text profile="ads_textBold" id="operatingHoursTitle" text="$l10n_ads_ws_label_operating_hours" position="395px 160px"/>
-                <Text profile="ads_textBold" id="relAndMainTitle" text="$l10n_ads_ws_label_maintainability" position="395px 120px"/>
+                <Text profile="ads_textBold" id="relAndMainTitle" text="$l10n_ads_ws_label_service_interval" position="395px 120px"/>
                 <Text profile="ads_textBold" id="lastInspectionTitle" text="$l10n_ads_ws_label_last_maintenance" position="395px 80px"/>
                 
                 <Text profile="fs25_textDefault" id="valueValue" text="-" position="550px 240px" textBold="false"/>

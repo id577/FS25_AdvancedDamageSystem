@@ -25,6 +25,7 @@
         <text name="ads_ws_label_brake_efficiency" text="Brake efficiency"/>
         <text name="ads_ws_label_harvest_efficiency" text="Harvest efficiency"/>
         <text name="ads_ws_label_maintainability" text="Maintainability"/>
+        <text name="ads_ws_label_service_interval" text="Service Interval"/>
 
         <text name="ads_ws_label_last_maintenance" text="Last maintenance"/>
         <text name="ads_ws_label_last_inspection" text="Last inspection"/>
@@ -62,12 +63,16 @@
         <text name="ads_ws_confirm_inspection_title" text="Confirm Inspection"/>
         <text name="ads_ws_confirm_inspection_text" text="The inspection will allow you to identify hidden faults, as well as roughly assess the level of its technical condition.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
         <text name="ads_ws_confirm_maintenance_title" text="Confirm Maintenance"/>
-        <text name="ads_ws_confirm_maintenance_text" text="Maintenance will restore the level of technical service to the maximum. In addition, the technical condition of the vehicle will be inspected.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
+        <text name="ads_ws_confirm_maintenance_text" text="Maintenance will restore the level of technical service to the maximum. In addition, the technical condition of the vehicle will be inspected.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}\n
+        Choose the quality of spare parts for this procedure. Using cheaper aftermarket parts comes with a risk of defects.\n\n Aftermarket parts price: {aftermarket_price}"/>
         <text name="ads_ws_confirm_repair_title" text="Confirm Repair"/>
-        <text name="ads_ws_confirm_repair_text" text="This will eliminate the selected faults ({price}).\n\nDuration: {duration}\nFinishes at: {time}"/>
+        <text name="ads_ws_confirm_repair_text" text="This will eliminate the selected faults ({price}).\n\nDuration: {duration}\nFinishes at: {time}\n
+        Choose the quality of spare parts for this procedure. Using cheaper aftermarket parts comes with a risk of defects.\n\n Aftermarket parts price: {aftermarket_price}"/>
         <text name="ads_ws_confirm_overhaul_title" text="Confirm Overhaul"/>
-        <text name="ads_ws_confirm_overhaul_text" text="Overhaul will fix all faults, perform maintenance and improve the technical condition of the vehicle.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
-
+        <text name="ads_ws_confirm_overhaul_text" text="Overhaul will fix all faults, perform maintenance and improve the technical condition of the vehicle.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}\n
+        Choose the quality of spare parts for this procedure. Using cheaper aftermarket parts comes with a risk of defects.\n\n Aftermarket parts price: {aftermarket_price}"/>
+        <text name="ads_ws_option_genuine_parts" text="Genuine Parts"/>
+        <text name="ads_ws_option_aftermarket_parts" text="Aftermarket Parts"/>
 
         <text name="ads_breakdowns_part_vehicle" text="Vehicle"/>
         <text name="ads_breakdowns_part_engine" text="Engine"/>
@@ -214,6 +219,7 @@
         <text name="ads_spec_months_ago_format" text="%s %s"/>
         <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s until %s"/>
+        <text name="ads_spec_service_interval_format" text="%s o/h"/>
         <text name="ads_spec_maintenance_complete" text="completed"/>
 
         <text name="ads_spec_state_ready" text="Ready"/>

@@ -79,10 +79,7 @@ function ADS_WorkshopDialog:updateScreen()
     self.serviceLastInspectionDeltaValue:setText(monthsSinceInspectionText)
     self.condtionLastInspectionDelataValue:setText(monthsSinceInspectionText)
 
-    --local relText = AdvancedDamageSystem.reliabilityValueToText(spec.reliability)
-    local mainText = AdvancedDamageSystem.maintainabilityValueToText(spec.maintainability)
-    local relAndMainText = string.format('%s', mainText)
-    self.relAndMainValue:setText(relAndMainText)
+    self.relAndMainValue:setText(self.vehicle:getFormattedServiceIntervalText())
 
     local motor = self.vehicle:getMotor()
     local defaultPower = motor.peakMotorPower * 1.36 or 0
@@ -140,15 +137,15 @@ function ADS_WorkshopDialog:updateScreen()
         if spec.currentState ~= STATUS.REPAIR then
             local inspectingText = g_i18n:getText("ads_ws_inspecting_status")
             self.serviceValue:setText(inspectingText)
-            self.serviceValue:setTextColor(0.5, 0.5, 0.5, 1)
+            self.serviceValue:setTextColor(0.5, 0.5, 0.5, 1.0)
             self.condtionValue:setText(inspectingText)
-            self.condtionValue:setTextColor(0.5, 0.5, 0.5, 1)
+            self.condtionValue:setTextColor(0.5, 0.5, 0.5, 1.0)
             self.powerValue:setText(inspectingText)
-            self.powerValue:setTextColor(0.5, 0.5, 0.5, 1)
+            self.powerValue:setTextColor(0.5, 0.5, 0.5, 1.0)
             self.brakeValue:setText(inspectingText)
-            self.brakeValue:setTextColor(0.5, 0.5, 0.5, 1)
+            self.brakeValue:setTextColor(0.5, 0.5, 0.5, 1.0)
             self.yieldReductionValue:setText(inspectingText)
-            self.yieldReductionValue:setTextColor(0.5, 0.5, 0.5, 1)
+            self.yieldReductionValue:setTextColor(0.5, 0.5, 0.5, 1.0)
         end
     else
         statusText = g_i18n:getText("ads_ws_status_open")
@@ -188,7 +185,15 @@ function ADS_WorkshopDialog:updateScreen()
     local isListEmpty = #self.visibleBreakdowns == 0
     self.breakdownTable:setVisible(not isListEmpty)
     self.tableSlider:setVisible(not isListEmpty)
-    self.emptyTableText:setVisible(isListEmpty)
+    if self.vehicle:getCurrentStatus() == STATUS.READY then
+        self.emptyTableText:setVisible(isListEmpty)
+        self.emptyTableText:setText(g_i18n:getText("ads_ws_info_no_breakdowns"))
+    else
+        self.emptyTableText:setVisible(true)
+        self.breakdownTable:setVisible(false)
+        self.tableSlider:setVisible(false)
+        self.emptyTableText:setText(g_i18n:getText(self.vehicle:getCurrentStatus()) .. "...")
+    end
 
     if self.maintanceInProgressSpinner.visible then
         self.statusText:setPosition(0, 0)
@@ -196,7 +201,6 @@ function ADS_WorkshopDialog:updateScreen()
         self.statusText:setPosition(0, 0.015)
     end
 end
-
 
 function ADS_WorkshopDialog:getNumberOfItemsInSection(list, section)
     return #self.visibleBreakdowns
@@ -236,6 +240,7 @@ function ADS_WorkshopDialog:populateCellForItemInSection(list, section, index, c
     cell:getAttribute("ads_tableBreakdownSelect"):setText(selectedText)
 end
 
+
 function ADS_WorkshopDialog:onRowClick(item)
     if self.vehicle:getCurrentStatus() ~= AdvancedDamageSystem.STATUS.READY then return end
     if item == nil or self.visibleBreakdowns[item.indexInSection] == nil then return end
@@ -248,34 +253,49 @@ function ADS_WorkshopDialog:onRowClick(item)
     end
 end
 
+
 function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, dialogTitleKey, dialogTextKey)
     local price = self.vehicle:getMaintenancePriceByType(maintenanceType)
-
     local finalDialogText = g_i18n:getText(dialogTextKey)
 
     finalDialogText = string.gsub(finalDialogText, "\\n", "\n")
-
     finalDialogText = string.gsub(finalDialogText, "{price}", g_i18n:formatMoney(price))
+    finalDialogText = string.gsub(finalDialogText, "{aftermarket_price}", g_i18n:formatMoney(price / 2))
     finalDialogText = string.gsub(finalDialogText, "{time}", self.vehicle:getFormattedMaintenanceFinishTimeText(maintenanceType))
     finalDialogText = string.gsub(finalDialogText, "{duration}", self.vehicle:getFormattedMaintenanceDurationText(maintenanceType))
-    
-    YesNoDialog.show(
-        ADS_WorkshopDialog.maintanceCallback,
-        nil,
-        finalDialogText,
-        g_i18n:getText(dialogTitleKey),
-        nil, nil, nil, nil, nil,
-        { maintenanceType }
-    )
+
+
+    if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
+        YesNoDialog.show(
+            ADS_WorkshopDialog.maintanceCallback,
+            nil,
+            finalDialogText,
+            g_i18n:getText(dialogTitleKey),
+            nil, nil, nil, nil, nil,
+            { maintenanceType }
+        )
+    else
+        local options = { g_i18n:getText('ads_ws_option_genuine_parts'), g_i18n:getText('ads_ws_option_aftermarket_parts') }        
+        local optionDialog = g_gui:showDialog("OptionDialog")
+        if optionDialog ~= nil then
+            optionDialog.target:setText(finalDialogText)
+            optionDialog.target:setTitle(g_i18n:getText(dialogTitleKey))
+            optionDialog.target:setOptions(options)
+            optionDialog.target:setCallback(ADS_WorkshopDialog.maintanceCallback, nil, { maintenanceType })
+        end
+    end
 end
+
 
 function ADS_WorkshopDialog:onClickInspection()
     self:showMaintenanceConfirmationDialog(AdvancedDamageSystem.STATUS.INSPECTION, "ads_ws_confirm_inspection_title", "ads_ws_confirm_inspection_text")
 end
 
+
 function ADS_WorkshopDialog:onClickService()
     self:showMaintenanceConfirmationDialog(AdvancedDamageSystem.STATUS.MAINTENANCE, "ads_ws_confirm_maintenance_title", "ads_ws_confirm_maintenance_text")
 end
+
 
 function ADS_WorkshopDialog:onClickRepair()
     local selectedBreakdowns = {}
@@ -297,8 +317,8 @@ function ADS_WorkshopDialog:onClickOverhaul()
     self:showMaintenanceConfirmationDialog(AdvancedDamageSystem.STATUS.OVERHAUL, "ads_ws_confirm_overhaul_title", "ads_ws_confirm_overhaul_text")
 end
 
-function ADS_WorkshopDialog.maintanceCallback(clickYes, args)
-    if not clickYes or args == nil then return end
+function ADS_WorkshopDialog.maintanceCallback(option, args)
+    if not option or option == 0 or args == nil then return end
     local dialog = ADS_WorkshopDialog.INSTANCE
     if dialog == nil or dialog.vehicle == nil then return end
 
@@ -314,17 +334,19 @@ function ADS_WorkshopDialog.maintanceCallback(clickYes, args)
         end
     end
 
+    local isAftermarketParts = (option == 2)
     local price = AdvancedDamageSystem.calculateMaintenancePrice(vehicle, type)
-
+    if isAftermarketParts then price = price / 2 end
+    
     if g_currentMission:getMoney() < price then
         InfoDialog.show(g_i18n:getText("shop_messageNotEnoughMoneyToBuy"))
         return
     end
 
     local breakdownCount = #selectedBreakdowns
-    vehicle:initMaintenance(type, breakdownCount)
+    vehicle:initMaintenance(type, breakdownCount, isAftermarketParts)
 
-    g_farmManager:getFarmById(vehicle:getOwnerFarmId()):changeBalance(price * -1, MoneyType.VEHICLE_RUNNING_COSTS)
+    g_currentMission:addMoney(-1 * price, vehicle:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
     dialog:updateScreen()
 end
 
@@ -349,15 +371,17 @@ function ADS_WorkshopDialog:onOpen(superFunc)
         self:updateScreen()
     end
 
-
     g_messageCenter:subscribe(MessageType.MONEY_CHANGED, self.updateScreen, self)
     g_messageCenter:subscribe(MessageType.ADS_VEHICLE_CHANGE_STATUS, onVehicleChangeStatusEvent, self)
     g_messageCenter:subscribe(MessageType.ADS_WORKSHOP_CHANGE_STATUS, onWorkshopChangeStatusEvent, self)
 end
 
 function ADS_WorkshopDialog:onClose(superFunc)
+    self.vehicle = nil
     g_messageCenter:unsubscribeAll(self)
     g_currentMission:showMoneyChange(MoneyType.VEHICLE_RUNNING_COSTS)
+    g_currentMission:showMoneyChange(MoneyType.SHOP_VEHICLE_BUY)
+	g_currentMission:showMoneyChange(MoneyType.SHOP_VEHICLE_SELL)
 end
 
 function ADS_WorkshopDialog:onClickBack()

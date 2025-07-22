@@ -117,6 +117,47 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    POOR_QUALITY_PARTS = {
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        stages = {
+            {
+                severity = "",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    { id = "BREAKDOWN_PROBABILITY_MODIFIER", value = 1.0, aggregation = 'sum' }
+                }
+            },     
+            {
+                severity = "",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    { id = "CONDITION_WEAR_MODIFIER", value = 0.5, aggregation = 'sum' }
+                }
+            },     
+            {
+                severity = "",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    { id = "SERVICE_WEAR_MODIFIER", value = 0.5, aggregation = 'sum' }
+                }
+            },    
+        },
+    },
+
+
     OVERHEAT_PROTECTION = {
         isSelectable = false,
         part = "ads_breakdowns_part_engine",
@@ -313,7 +354,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    TURBOCHARGER_WEAR = { -- x4.0
+    TURBOCHARGER_WEAR = {
         isSelectable = false,
         part = "ads_breakdowns_part_turbocharger",
         isApplicable = function(vehicle)
@@ -388,7 +429,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    FUEL_PUMP_MALFUNCTION = { -- x2.0
+    FUEL_PUMP_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_fuel_pump",
         isApplicable = function(vehicle)
@@ -468,7 +509,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    FUEL_INJECTOR_MALFUNCTION = { -- x3.0
+    FUEL_INJECTOR_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_fuel_injectors",
         isApplicable = function(vehicle)
@@ -535,7 +576,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    BRAKE_MALFUNCTION = { -- x1.5
+    BRAKE_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_brake_system",
         isApplicable = function(vehicle)
@@ -598,7 +639,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    TRANSMISSION_SLIP = { -- x7.0
+    TRANSMISSION_SLIP = {
         isSelectable = true,
         part = "ads_breakdowns_part_transmission",
         isApplicable = function(vehicle)
@@ -661,7 +702,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    TRANSMISSION_SYNCHRONIZER_MALFUNCTION = { -- x6.0
+    TRANSMISSION_SYNCHRONIZER_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_transmission",
         isApplicable = function(vehicle)
@@ -716,7 +757,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = { -- x10.0
+    POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_transmission",
         isApplicable = function(vehicle)
@@ -777,7 +818,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    CVT_THERMOSTAT_MALFUNCTION = { -- x2.2
+    CVT_THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_cvt_cooling_system",
         isApplicable = function(vehicle)
@@ -840,7 +881,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    THERMOSTAT_MALFUNCTION = { -- x2.2
+    THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_cooling_system",
         isApplicable = function(vehicle)
@@ -900,7 +941,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    HYDRAULIC_PUMP_MALFUNCTION = { -- x3.5
+    HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_hydraulic_lift_system",
         isApplicable = function(vehicle)
@@ -963,7 +1004,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    ELECTRICAL_SYSTEM_MALFUNCTION = { -- x1.8
+    ELECTRICAL_SYSTEM_MALFUNCTION = {
         isSelectable = true,
         part = "ads_breakdowns_part_electrical_system",
         isApplicable = function(vehicle)
@@ -1640,6 +1681,52 @@ ADS_Breakdowns.EffectApplicators.YIELD_REDUCTION_MODIFIER = {
 }
 
 
+----------------- CONDITION_WEAR_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.CONDITION_WEAR_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying CONDITION_WEAR_MODIFIER:", effectData.value)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraConditionWear = effectData.value
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing CONDITION_WEAR_MODIFIER effect.")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraConditionWear = 0
+    end
+}
+
+----------------- SERVICE_WEAR_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.SERVICE_WEAR_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying SERVICE_WEAR_MODIFIER:", effectData.value)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraServiceWear = effectData.value
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing SERVICE_WEAR_MODIFIER effect.")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraServiceWear = 0
+    end
+}
+
+
+----------------- BREAKDOWN_PROBABILITY_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.BREAKDOWN_PROBABILITY_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying BREAKDOWN_PROBABILITY_MODIFIER:", effectData.value)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraBreakdownProbability = effectData.value
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing BREAKDOWN_PROBABILITY_MODIFIER effect.")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraBreakdownProbability = 0
+    end
+}
+
 -- ==========================================================
 --                 EFFECTS WITH PROBABILITY
 -- ==========================================================
@@ -2057,7 +2144,7 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
 
 
             if startFailureEffect and startFailureEffect.value > 0 then
-                local tempModifier = math.clamp(spec.engineTemperature / 90, 0.5, 1.0)
+                local tempModifier = math.clamp(spec.engineTemperature / 90, 0.7, 1.0)
                 local chance = math.min(startFailureEffect.value / tempModifier , 0.8)
                 if math.random() < chance then
                     spec.activeEffects.ENGINE_START_FAILURE_CHANCE.extraData.status = "CRANKING"

@@ -645,6 +645,8 @@ function ADS_Hud:showInfoVehicle(box)
         box:addLine(g_i18n:getText('ads_ws_label_condition'), g_i18n:getText(spec.lastInspectedConditionState))
         box:addLine(g_i18n:getText("ads_ws_label_last_inspection"), self:getFormattedLastInspectionText())
         box:addLine(g_i18n:getText("ads_ws_label_last_maintenance"), self:getFormattedLastMaintenanceText())
+        box:addLine(g_i18n:getText("ads_ws_label_service_interval"), self:getFormattedServiceIntervalText())
+
         
         if spec.currentState ~= AdvancedDamageSystem.STATUS.READY and spec.currentState ~= AdvancedDamageSystem.STATUS.BROKEN then
             local maintenanceStatusText = string.format(g_i18n:getText("ads_spec_last_maintenance_until_format"), g_i18n:getText(spec.currentState), self:getFormattedMaintenanceFinishTimeText())

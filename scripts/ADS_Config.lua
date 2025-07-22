@@ -38,6 +38,10 @@ ADS_Config = {
         -- Higher value means faster condition degradation.
         BASE_CONDITION_WEAR = 0.01, -- (0.01 = 1% wear per hour at base rate)
 
+        DOWNTIME_MULTIPLIER = 0.05,
+
+        MOTOR_IDLING_MULTIPLIER = 0.5,
+        MOTOR_IDLING_THRESHOLD = 0.3,
         -- --- Wear Multipliers (these add to the base wear rate) ---
 
         -- The maximum penalty applied to CONDITION wear when the Service level is very low (e.g., 0%).
@@ -115,10 +119,15 @@ ADS_Config = {
         -- The base time in milliseconds required to perform a full Maintenance (Service).
         MAINTENANCE_TIME = 14400000, -- (4 GAME hours)
         -- The base time in milliseconds required to repair a SINGLE breakdown. This is multiplied by the number of selected breakdowns.
-        REPAIR_TIME = 14400000, -- (4 GAME hourы per breakdown)
+        REPAIR_TIME = 14400000, -- (4 GAME hours per breakdown)
         -- The base time in milliseconds required to perform a complete Overhaul.
         OVERHAUL_TIME = 43200000, -- (12 GAME hours)
 
+        OVERHAUL_MIN_CONDITION_RESTORE = 0.6,
+        OVERHAUL_MAX_CONDITION_RESTORE = 0.9,
+
+        AFTERMARKETS_PARTS_BREAKDOWN_CHANCE = 0.33,
+        AFTERMARKETS_PARTS_BREAKDOWN_DURATION = 18000000,
         -- These are global price multipliers. 1.0 is default. 2.0 would double the price of that service.
         -- The final price is calculated based on vehicle price, age, and brand maintainability.
         MAINTENANCE_PRICE_MULTIPLIER = 1.0,

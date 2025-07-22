@@ -195,7 +195,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getRandomBreakdown", AdvancedDamageSystem.getRandomBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "processBreakdowns", AdvancedDamageSystem.processBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "advanceBreakdown", AdvancedDamageSystem.advanceBreakdown)
-    SpecializationUtil.registerFunction(vehicleType, "processGeneralWearEffect", AdvancedDamageSystem.processGeneralWearEffect)
+    SpecializationUtil.registerFunction(vehicleType, "processPermanentEffects", AdvancedDamageSystem.processPermanentEffects)
     SpecializationUtil.registerFunction(vehicleType, "processMaintenance", AdvancedDamageSystem.processMaintenance)
     SpecializationUtil.registerFunction(vehicleType, "getServiceLevel", AdvancedDamageSystem.getServiceLevel)
     SpecializationUtil.registerFunction(vehicleType, "getConditionLevel", AdvancedDamageSystem.getConditionLevel)
@@ -219,6 +219,8 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getFormattedMaintenanceDurationText", AdvancedDamageSystem.getFormattedMaintenanceDurationText)
     SpecializationUtil.registerFunction(vehicleType, "getFormattedLastInspectionText", AdvancedDamageSystem.getFormattedLastInspectionText)
     SpecializationUtil.registerFunction(vehicleType, "getFormattedLastMaintenanceText", AdvancedDamageSystem.getFormattedLastMaintenanceText)
+    SpecializationUtil.registerFunction(vehicleType, "getFormattedServiceIntervalText", AdvancedDamageSystem.getFormattedServiceIntervalText)
+    
 end
 
 
@@ -257,6 +259,10 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.baseConditionLevel = 1.0
     self.spec_AdvancedDamageSystem.serviceLevel = self.spec_AdvancedDamageSystem.baseServiceLevel
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
+
+    self.spec_AdvancedDamageSystem.extraConditionWear = 0
+    self.spec_AdvancedDamageSystem.extraServiceWear = 0
+    self.spec_AdvancedDamageSystem.extraBreakdownProbability = 0
     
     self.spec_AdvancedDamageSystem.reliability = 1.0
     self.spec_AdvancedDamageSystem.maintainability = 1.0
@@ -671,8 +677,8 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
             end
         end
 
-        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp(self:getLastSpeed() / speedLimit , 0.2, 1.0)) end
-        heat = C.TRANS_MIN_HEAT + motorLoad * (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * slipFactor
+        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp(speed / speedLimit , 0.2, 1.0)) end
+        heat = C.TRANS_MIN_HEAT + motorRpm * (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * slipFactor
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * dirt)
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
@@ -760,17 +766,17 @@ function AdvancedDamageSystem:calculateWearRates()
             conditionWearRate = conditionWearRate + hotTransFactor
         end
 
-        if motorLoad < 0.3 and self:getLastSpeed() < 0.003 then
-            conditionWearRate = conditionWearRate * 0.5
-            serviceWearRate = serviceWearRate * 0.5
+        if motorLoad < C.MOTOR_IDLING_THRESHOLD and self:getLastSpeed() < 0.003 then
+            conditionWearRate = conditionWearRate * C.MOTOR_IDLING_MULTIPLIER
+            serviceWearRate = serviceWearRate * C.MOTOR_IDLING_MULTIPLIER
         end
     else
-        conditionWearRate = 0.05
-        serviceWearRate = 0.05
+        conditionWearRate = C.DOWNTIME_MULTIPLIER
+        serviceWearRate = C.DOWNTIME_MULTIPLIER
     end
 
-    conditionWearRate = conditionWearRate / spec.reliability
-    serviceWearRate = serviceWearRate
+    conditionWearRate = (conditionWearRate + spec.extraConditionWear) / spec.reliability
+    serviceWearRate = (serviceWearRate + spec.extraServiceWear) / spec.reliability
     
     if ADS_Config.DEBUG then
         spec.debugData.condition = {totalWearRate = conditionWearRate, motorLoadFactor = motorLoadFactor, expiredServiceFactor = expiredServiceFactor, coldMotorFactor = coldMotorFactor, hotMotorFactor = hotMotorFactor, hotTransFactor = hotTransFactor}
@@ -801,6 +807,7 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt)
     local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITY
 
     local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(spec.conditionLevel, probability, dt)
+    failureChancePerFrame = (failureChancePerFrame + (failureChancePerFrame * spec.extraBreakdownProbability)) / spec.reliability
     
     local random = math.random()
 
@@ -963,32 +970,32 @@ function AdvancedDamageSystem:processBreakdowns(dt)
         return
     end
     local C = ADS_Config.CORE
-
     local effectsNeedRecalculation = false
 
-    for id, breakdown in pairs(spec.activeBreakdowns) do -- Стало: pairs
+    for id, breakdown in pairs(spec.activeBreakdowns) do
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
-        
-        if registryEntry and registryEntry.stages[breakdown.stage] then
-            local stageData = registryEntry.stages[breakdown.stage]
-            
-            if stageData.progressMultiplier and stageData.progressMultiplier > 0 then
-                breakdown.progressTimer = breakdown.progressTimer or 0
-                breakdown.progressTimer = breakdown.progressTimer + dt
-                local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
+        if registryEntry.isSelectable then
+            if registryEntry and registryEntry.stages[breakdown.stage] then
+                local stageData = registryEntry.stages[breakdown.stage]
+                
+                if stageData.progressMultiplier and stageData.progressMultiplier > 0 then
+                    breakdown.progressTimer = breakdown.progressTimer or 0
+                    breakdown.progressTimer = breakdown.progressTimer + dt
+                    local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
 
-                if breakdown.progressTimer >= stageDuration then
-                    local maxStages = #registryEntry.stages
-                    
-                    if breakdown.stage < maxStages then
-                        breakdown.stage = breakdown.stage + 1
-                        breakdown.progressTimer = 0
+                    if breakdown.progressTimer >= stageDuration then
+                        local maxStages = #registryEntry.stages
                         
-                        effectsNeedRecalculation = true
+                        if breakdown.stage < maxStages then
+                            breakdown.stage = breakdown.stage + 1
+                            breakdown.progressTimer = 0
+                            
+                            effectsNeedRecalculation = true
 
-                        log_dbg(string.format("ADS: Breakdown '%s' on vehicle '%s' advanced to stage %d.", id, self:getFullName(), breakdown.stage))
-                    else
-                        breakdown.progressTimer = stageDuration
+                            log_dbg(string.format("ADS: Breakdown '%s' on vehicle '%s' advanced to stage %d.", id, self:getFullName(), breakdown.stage))
+                        else
+                            breakdown.progressTimer = stageDuration
+                        end
                     end
                 end
             end
@@ -1001,28 +1008,29 @@ function AdvancedDamageSystem:processBreakdowns(dt)
 end
 
 
-function AdvancedDamageSystem:processGeneralWearEffect(dt)
-    log_dbg("processGeneralWearEffect TICK for vehicle:", self:getFullName())
+function AdvancedDamageSystem:processPermanentEffects(dt)
+    log_dbg("processPermanentEffects TICK for vehicle:", self:getFullName())
     local spec = self.spec_AdvancedDamageSystem
     if not spec then
         return
     end
 
-    local permanentBreakdownExist = false
-    for id, _ in pairs(spec.activeBreakdowns) do
-        if id == 'GENERAL_WEAR_AND_TEAR' then
-            permanentBreakdownExist = true
-            break
-        end
+    for _, breakdownData in pairs(spec.activeBreakdowns) do
+        breakdownData.progressTimer = breakdownData.progressTimer + dt
     end
-    if permanentBreakdownExist and spec.conditionLevel > 0.67 then
+
+    if spec.activeBreakdowns['GENERAL_WEAR_AND_TEAR'] ~= nil and spec.conditionLevel > 0.67 then
         log_dbg("Condition improved. Removing GENERAL_WEAR_AND_TEAR.")
         self:removeBreakdown('GENERAL_WEAR_AND_TEAR')
-    
-    elseif not permanentBreakdownExist and spec.conditionLevel < 0.66 then
+    elseif spec.activeBreakdowns['GENERAL_WEAR_AND_TEAR'] == nil and spec.conditionLevel < 0.66 then
         log_dbg("Condition degraded. Adding GENERAL_WEAR_AND_TEAR.")
         self:addBreakdown('GENERAL_WEAR_AND_TEAR', 1)
     end
+    if spec.activeBreakdowns['POOR_QUALITY_PARTS'] ~= nil and spec.activeBreakdowns['POOR_QUALITY_PARTS'].progressTimer >= ADS_Config.MAINTENANCE.AFTERMARKETS_PARTS_BREAKDOWN_DURATION then
+        self:removeBreakdown('POOR_QUALITY_PARTS')
+    end
+
+    self:recalculateAndApplyEffects()
 end
 
 local function shallow_copy(original)
@@ -1222,7 +1230,7 @@ end
 
 --------------------- maintenance --------------------------------
 
-function AdvancedDamageSystem:initMaintenance(type, breadownsCount)
+function AdvancedDamageSystem:initMaintenance(type, breadownsCount, isAftermarketParts)
     local spec = self.spec_AdvancedDamageSystem
     local states = AdvancedDamageSystem.STATUS
     local vehicleState = self:getCurrentStatus()
@@ -1233,24 +1241,102 @@ function AdvancedDamageSystem:initMaintenance(type, breadownsCount)
             self:stopMotor()
         end
         local totalTimeMs = 0
-        
+        spec.currentState = type
+
         if type == states.INSPECTION then
             totalTimeMs = C.INSPECTION_TIME
-            spec.currentState = states.INSPECTION
+            local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
+            for id, breakdown in pairs(spec.activeBreakdowns) do
+                if not breakdown.isVisible then
+                    local chance = breakdownRegistry[id].stages[breakdown.stage].detectionChance
+                    if math.random() < chance then
+                        breakdown.isVisible = true
+                    end
+                end
+            end
+
         elseif type == states.MAINTENANCE then
             totalTimeMs = C.MAINTENANCE_TIME
-            spec.currentState = states.MAINTENANCE
+            spec.serviceLevel = 1.0
+
         elseif type == states.REPAIR then
             totalTimeMs = C.REPAIR_TIME * (breadownsCount or 0)
-            spec.currentState = states.REPAIR
+            local idsToRepair = {}
+            for id, breakdown in pairs(spec.activeBreakdowns) do
+                if breakdown.isSelectedForRepair then
+                    table.insert(idsToRepair, id)
+                end
+            end
+            if #idsToRepair > 0 then
+                self:removeBreakdown(table.unpack(idsToRepair))
+            end
+
         elseif type == states.OVERHAUL then
             totalTimeMs = C.OVERHAUL_TIME
-            spec.currentState = states.OVERHAUL
+            
+            if next(spec.activeBreakdowns) ~= nil then
+                local idsToRepair = {}
+                for id, _ in pairs(spec.activeBreakdowns) do
+                    if ADS_Breakdowns.BreakdownRegistry[id] and ADS_Breakdowns.BreakdownRegistry[id].isSelectable then
+                        table.insert(idsToRepair, id)
+                    end
+                end
+                if #idsToRepair > 0 then
+                    self:removeBreakdown(table.unpack(idsToRepair))
+                end
+            end
+            
+            spec.serviceLevel = 1.0
+            
+            if spec.conditionLevel < spec.baseConditionLevel then
+                local missingCondition = spec.baseConditionLevel - spec.conditionLevel
+                local minRestore, maxRestore = C.OVERHAUL_MIN_CONDITION_RESTORE, C.OVERHAUL_MAX_CONDITION_RESTORE
+                if isAftermarketParts then
+                    minRestore = minRestore / 2
+                end
+                local ageFactor = math.max(math.log10(self.age), 1)
+                local randomFactor = minRestore + math.random() * (maxRestore - minRestore)
+                local restoredAmount = math.min(missingCondition * randomFactor * spec.maintainability, missingCondition) / ageFactor 
+                spec.conditionLevel = math.min(spec.baseConditionLevel, spec.conditionLevel + restoredAmount)
+            end
+            
+        end
+
+        if type ~= states.REPAIR then
+            AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
+            spec.lastServiceOperatingHours = self:getFormattedOperatingTime()
+
+            spec.lastInspectedPower = (spec.activeEffects.ENGINE_TORQUE_MODIFIER and (1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value)) or 1
+            spec.lastInspectedBrake = (spec.activeEffects.BRAKE_FORCE_MODIFIER and (1 + spec.activeEffects.BRAKE_FORCE_MODIFIER.value)) or 1
+            spec.lastInspectedYieldReduction = (spec.activeEffects.YIELD_REDUCTION_MODIFIER and (1 + spec.activeEffects.YIELD_REDUCTION_MODIFIER.value)) or 1
+
+            local env = g_currentMission.environment
+            spec.lastInspectionDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
+
+            if type ~= states.INSPECTION then
+                spec.lastServiceDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
+            end
+        end
+
+        if isAftermarketParts then
+            local chance = C.AFTERMARKETS_PARTS_BREAKDOWN_CHANCE
+            if type == AdvancedDamageSystem.STATUS.REPAIR then
+                chance = chance + (breadownsCount * 0.33)
+            end
+            if math.random() < chance then
+                if spec.activeBreakdowns['POOR_QUALITY_PARTS'] ~= nil then
+                    self:removeBreakdown('POOR_QUALITY_PARTS')
+                end
+                local stage = math.random(3)
+                self:addBreakdown('POOR_QUALITY_PARTS', stage) 
+            end
         end
 
         if totalTimeMs > 0 then
             spec.maintenanceTimer = totalTimeMs
-            log_dbg(string.format('%s initiated for %s, will take %s ms real time', spec.currentState, self:getFullName(), totalTimeMs))
+            log_dbg(string.format('%s initiated for %s, will take %s ms. Aftermarket: %s', spec.currentState, self:getFullName(), totalTimeMs, tostring(isAftermarketParts)))
+        else
+            spec.currentState = states.READY
         end
     end
 end
@@ -1259,7 +1345,6 @@ end
 function AdvancedDamageSystem:processMaintenance(dt)
     local spec = self.spec_AdvancedDamageSystem
     local states = AdvancedDamageSystem.STATUS
-
     local vehicleState = self:getCurrentStatus()
 
     if vehicleState == states.READY then
@@ -1270,104 +1355,7 @@ function AdvancedDamageSystem:processMaintenance(dt)
     spec.maintenanceTimer = spec.maintenanceTimer - dt * timeScale
 
     if spec.maintenanceTimer <= 0 then
-        local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
-        if vehicleState == states.INSPECTION then
-            for id, breakdown in pairs(spec.activeBreakdowns) do
-                if not breakdown.isVisible then
-                    local chance = breakdownRegistry[id].stages[breakdown.stage].detectionChance
-                    if math.random() < chance then
-                        breakdown.isVisible = true
-                    end
-                end
-            end
-        elseif vehicleState == states.MAINTENANCE then
-            spec.serviceLevel = 1.0
-        elseif vehicleState == states.REPAIR then
-            local idsToRepair = {}
-            for id, breakdown in pairs(spec.activeBreakdowns) do
-                if breakdown.isSelectedForRepair then
-                    table.insert(idsToRepair, id)
-                end
-            end
-            
-            if #idsToRepair > 0 then
-                log_dbg("Finishing repair. Removing breakdowns with IDs:", table.concat(idsToRepair, ", "))
-                self:removeBreakdown(table.unpack(idsToRepair))
-            end
-
-        elseif vehicleState == states.OVERHAUL then
-            if next(spec.activeBreakdowns) ~= nil then
-                local idsToRepair = {}
-                for id, _ in pairs(spec.activeBreakdowns) do
-                    if id ~= "GENERAL_WEAR_AND_TEAR" then
-                        table.insert(idsToRepair, id)
-                    end
-                end
-                self:removeBreakdown(table.unpack(idsToRepair))
-            end
-            spec.serviceLevel = 1.0
-            if spec.conditionLevel < spec.baseConditionLevel then
-                local missingCondition = spec.baseConditionLevel - spec.conditionLevel
-                
-                local minRestore = 0.6
-                local maxRestore = 0.9
-                local ageFactor = math.max(math.log10(self.age), 1)
-                local randomFactor = minRestore + math.random() * (maxRestore - minRestore)
-                local restoredAmount = math.min(missingCondition * randomFactor * spec.maintainability, missingCondition) / ageFactor 
-                
-                log_dbg("OVERHAUL: Restoring condition. Current:", spec.conditionLevel, "Missing:", missingCondition, "Factor:", randomFactor, "Restoring:", restoredAmount)
-                
-                spec.conditionLevel = math.min(spec.baseConditionLevel, spec.conditionLevel + restoredAmount)
-            else
-                log_dbg("OVERHAUL: Condition is already at max. No changes needed.")
-            end
-            
-        end
-
-        if spec.currentState ~= states.REPAIR then
-            AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
-            spec.lastServiceOperatingHours = self:getFormattedOperatingTime()
-
-            if spec.activeEffects.ENGINE_TORQUE_MODIFIER and spec.activeEffects.ENGINE_TORQUE_MODIFIER.value then
-                spec.lastInspectedPower = 1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value
-            else
-                spec.lastInspectedPower = 1
-            end
-            
-            if spec.activeEffects.BRAKE_FORCE_MODIFIER and spec.activeEffects.BRAKE_FORCE_MODIFIER.value then
-                spec.lastInspectedBrake = 1 + spec.activeEffects.BRAKE_FORCE_MODIFIER.value
-            else
-                spec.lastInspectedBrake = 1
-            end
-
-            if spec.activeEffects.YIELD_REDUCTION_MODIFIER and spec.activeEffects.YIELD_REDUCTION_MODIFIER.value then
-                spec.lastInspectedYieldReduction = 1 + spec.activeEffects.YIELD_REDUCTION_MODIFIER.value
-            else
-                spec.lastInspectedYieldReduction = 1
-            end
-
-            local day = g_currentMission.environment.currentDay
-            local month = g_currentMission.environment.currentPeriod
-            local year = g_currentMission.environment.currentYear
-
-            spec.lastInspectionDate = {
-                        day = day,
-                        month = month,
-                        year = year
-                    }
-
-            if spec.currentState ~= states.INSPECTION then
-                if g_currentMission ~= nil then
-                    spec.lastServiceDate = {
-                        day = day,
-                        month = month,
-                        year = year
-                    }
-                end
-            end
-        end
-
-        g_currentMission.hud:addSideNotification({1, 1, 1, 1}, self:getFullName() .. ": " .. g_i18n:getText(spec.currentState) .. " " .. g_i18n:getText(ads_spec_maintenance_complete))
+        g_currentMission.hud:addSideNotification({1, 1, 1, 1}, self:getFullName() .. ": " .. g_i18n:getText(spec.currentState) .. " " .. g_i18n:getText("ads_spec_maintenance_complete"))
         spec.maintenanceTimer = 0
         spec.currentState = states.READY
         ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
@@ -1551,28 +1539,38 @@ function AdvancedDamageSystem:getFormattedLastMaintenanceText()
     return maintenanceText
 end
 
+function AdvancedDamageSystem:getFormattedServiceIntervalText()
+    local spec = self.spec_AdvancedDamageSystem
+    local interval = ((spec.baseServiceLevel / ADS_Config.CORE.BASE_SERVICE_WEAR) / 2) * spec.reliability
+    local roundedInterval = math.floor(interval * 2 + 0.5) / 2
+    if roundedInterval % 1 == 0 then
+        return string.format(g_i18n:getText('ads_spec_service_interval_format'), string.format("%.0f", roundedInterval))
+    end
+    return string.format(g_i18n:getText('ads_spec_service_interval_format'), string.format("%.1f", roundedInterval))
+end
+
 
 function AdvancedDamageSystem.getTextColour(value)
     if value == AdvancedDamageSystem.STATES.UNKNOWN then
-        return 0.5, 0.5, 0.5, 1
+        return 0.5, 0.5, 0.5, 1.0
     elseif value == AdvancedDamageSystem.STATES.TERRIBLE then
-        return 0.88, 0.12, 0, 1
+        return 0.88, 0.12, 0.0, 1.0
     elseif value == AdvancedDamageSystem.STATES.BAD then
-        return 0.7, 0.3, 0, 1
+        return 0.7, 0.3, 0.0, 1.0
     elseif value == AdvancedDamageSystem.STATES.NORMAL then
-        return 0.5, 0.5, 0, 1
+        return 0.5, 0.5, 0.0, 1.0
     elseif value == AdvancedDamageSystem.STATES.GOOD then 
-        return 0.3, 0.7, 0, 1
+        return 0.3, 0.7, 0.0, 1.0
     elseif value == AdvancedDamageSystem.STATES.EXCELLENT then
-        return 0.12, 0.88, 0, 1
+        return 0.12, 0.88, 0.0, 1.0
     elseif value == AdvancedDamageSystem.STATES.REQUIRED then
-        return 0.88, 0.12, 0, 1
+        return 0.88, 0.12, 0.0, 1.0
     elseif value == AdvancedDamageSystem.STATES.RECOMMENDED then
-        return 0.5, 0.5, 0, 1
+        return 0.5, 0.5, 0.0, 1.0
     elseif value == AdvancedDamageSystem.STATES.NOT_REQUIRED then 
-        return 0.3, 0.7, 0, 1
+        return 0.3, 0.7, 0.0, 1.0
     end
-    return 1, 1, 1, 1
+    return 1.0, 1.0, 1.0, 1.0
 end
 
 -- ==========================================================
@@ -2074,7 +2072,7 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
 
     local breakdownCount = tonumber(args[2]) or 1
 
-    vehicle:initMaintenance(maintenanceType, breakdownCount)
+    vehicle:initMaintenance(maintenanceType, breakdownCount, false)
     print(string.format("ADS: Attempted to start '%s' for '%s'.", maintenanceType, vehicle:getFullName()))
 end
 

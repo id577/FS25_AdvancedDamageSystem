@@ -96,7 +96,7 @@ function ADS_Main:onStartMission()
             local origFunc = spec.getValueFunc
             spec.getValueFunc = function(s, v)
                 if v ~= nil and v.spec_AdvancedDamageSystem ~= nil then
-                    return v:getFormattedLastMaintenanceText()
+                    return v:getFormattedLastMaintenanceText() 
                 else
                     return origFunc(s, v)
                 end
@@ -124,8 +124,6 @@ function ADS_Main.hookRepairButton(screenInstance, vehicle)
         screenInstance.repairButton.onClickCallback = screenInstance.ads_originalRepairCallback
     end
 end
-
-
 
 
 local function getReliability(storeItem)
@@ -267,14 +265,11 @@ function ADS_Main:update(dt)
             vehicle:adsUpdate(ADS_Config.CORE_UPDATE_DELAY, self.isWorkshopOpen)
 
             --- meta
-            if vehicle:getConditionLevel() < 0.666 or vehicle.spec_AdvancedDamageSystem.activeBreakdowns['GENERAL_WEAR_AND_TEAR'] ~= nil then
-                local spec = vehicle.spec_AdvancedDamageSystem
-                spec.metaUpdateTimer = spec.metaUpdateTimer + ADS_Config.CORE_UPDATE_DELAY
-                if spec.metaUpdateTimer > ADS_Config.META_UPDATE_DELAY then
-                    vehicle:processGeneralWearEffect()
-                    vehicle:recalculateAndApplyEffects()
-                    spec.metaUpdateTimer = spec.metaUpdateTimer - ADS_Config.META_UPDATE_DELAY
-                end
+            local spec = vehicle.spec_AdvancedDamageSystem
+            spec.metaUpdateTimer = spec.metaUpdateTimer + ADS_Config.CORE_UPDATE_DELAY
+            if spec.metaUpdateTimer > ADS_Config.META_UPDATE_DELAY then
+                vehicle:processPermanentEffects(spec.metaUpdateTimer)
+                spec.metaUpdateTimer = spec.metaUpdateTimer - ADS_Config.META_UPDATE_DELAY
             end
         end
     end
