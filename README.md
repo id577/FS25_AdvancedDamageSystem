@@ -252,7 +252,7 @@ The most interesting part of the mod. As the vehicle's Condition drops, the prob
 > 
 > ---
 > 
-> ###  अन्य Systems
+> ###  Other Systems
 > 
 > #### Brake Malfunction
 > * *Applicable to:* All wheeled vehicles.
