@@ -90,9 +90,50 @@ It decreases as the vehicle is used. With default settings and for a vehicle of 
   - Overheating: Operating at critical engine or transmission temperatures will rapidly "kill" your vehicle.
 
   - Vehicle Reliability: Each brand and model has its own reliability rating. Premium brand vehicles wear out more slowly.
-
+ 
 - **How to restore Condition?**
 It can only be partically restored through the Overhaul procedure in the workshop.
+
+> [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for a detailed breakdown of Condition wear mechanics</strong></summary>
+>
+> The final wear rate is calculated using a formula that combines a base rate with several dynamic multipliers.
+> 
+> ### 1. Base Wear Rate
+> This is the starting point for wear calculation:
+> - **Standard Operation:** `1%` per operating hour.
+> - **Engine Idling:** `0.5%` per operating hour (wear is halved).
+> - **Passive Wear (Engine Off):** `0.05%` per hour, simulating natural degradation from environmental factors.
+> 
+> ### 2. Wear Multipliers (Cumulative)
+> These factors are applied on top of the base rate. They are designed with a quadratic curve, meaning their effect grows exponentially as the situation worsens.
+> 
+> - **Working Under Load:**
+>   - **Threshold:** Activates above 80% engine load.
+>   - **Max Penalty:** `+100%` wear at full load (effectively doubling the wear rate).
+> 
+> - **Overdue Service:**
+>   - **Threshold:** Activates when `Service` level drops below 66%.
+>   - **Max Penalty:** `+400%` wear at 0% service. This is a major penalty for neglecting maintenance!
+> 
+> - **Operating a Cold Engine:**
+>   - **Threshold:** Activates when engine temperature is below 70°C.
+>   - **Max Penalty:** `+1000%` wear at 0°C. This is one of the most significant wear factors, so always warm up your engines!
+> 
+> - **Overheating:**
+>   - **Threshold:** Activates above 95°C engine temperature.
+>   - **Max Penalty:** `+3000%` wear at 120°C. This penalty is extremely high and is designed to rapidly degrade a vehicle if overheating is ignored.
+>
+> ### 3. Vehicle Reliability Modifier
+> This is a final divisor applied to the total calculated wear rate. The reliability rating for brands varies from `0.8` (less reliable) to `1.2` (very reliable).
+> 
+> - **Reliability of 1.2 (Premium Brand):** The final wear rate is divided by 1.2, resulting in a **~17% reduction** in wear.
+> - **Reliability of 1.0 (Average Brand):** The final wear rate is divided by 1.0, resulting in **no change**.
+> - **Reliability of 0.8 (Budget Brand):** The final wear rate is divided by 0.8, resulting in a **25% increase** in wear.
+>
+> </details>
+
 
 ### 💧 Service
 
@@ -107,6 +148,33 @@ It decreases with engine operating hours, simulating the natural wear of consuma
 - **How to restore it?**
 It is restored to 100% through the Maintenance procedure in the workshop.
 
+> [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for technical details on Service wear and its impact</strong></summary>
+> 
+> ### 1. Service Wear Rate
+> The base wear rate for the `Service` level is much faster than for `Condition`, as it simulates consumable usage.
+> - **Standard Operation:** `10%` per operating hour.
+> - **Engine Idling:** `5%` per operating hour (wear is halved).
+> - **Passive Wear (Engine Off):** `0.5%` per hour.
+> 
+> The only modifier affecting this rate is the vehicle's **Reliability**. Just like with `Condition`, the brand's reliability rating acts as a final divisor for the total `Service` wear.
+>
+> ### 2. The Penalty for Overdue Service
+> The mod calculates a recommended service interval for each vehicle based on its brand quality. While you are free to choose your own schedule, delaying maintenance has severe consequences. The table below shows how the penalty multiplier applied to `Condition` wear grows exponentially as > the `Service` level drops below the 66% threshold.
+> 
+> | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear |
+> | :-----------: | :-------------------------: | :-----------: | :-------------------------: | :-----------: | :-------------------------: |
+> | **100% - 67%**| **`+0%`**                   | **50%**       | `+25%`                      | **20%**       | `+196%`                     |
+> | **65%**       | `+1%`                       | **45%**       | `+42%`                      | **15%**       | `+240%`                     |
+> | **60%**       | `+4%`                       | **40%**       | `+64%`                      | **10%**       | `+289%`                     |
+> | **55%**       | `+12%`                      | **35%**       | `+92%`                      | **5%**        | `+342%`                     |
+> |               |                             | **30%**       | `+121%`                     | **0%**        | **`+400%`**                 |
+> |               |                             | **25%**       | `+156%`                     |               |                             |
+>
+>
+> </details>
+
 ### A Note on Player Knowledge: Hidden Values
 A key feature of ADS is that the exact percentage values for Condition and Service are hidden from the player. This encourages you to pay attention to your vehicle's behavior rather than just numbers.
 
@@ -120,6 +188,30 @@ The most interesting part of the mod. As the vehicle's Condition drops, the prob
 
 #### Chance and Severity of Breakdowns
 The lower the vehicle's Condition, the higher the chance of a new malfunction occurring. Additionally, the vehicle's brand Reliability now plays a role: premium, more reliable brands have a lower base probability of developing faults. Moreover, for a heavily worn vehicle, the probability that a breakdown will appear immediately at a major or even critical stage, skipping the minor phases, increases significantly.
+
+> [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for technical details on breakdown probability</strong></summary>
+>
+> The probability of breakdowns is calculated using a formula designed to create a very noticeable difference between new and heavily-used equipment. Here are the key metrics for a vehicle of average quality:
+>
+> ### 1. Breakdown Frequency (MTBF)
+> The system uses **Mean Time Between Failures (MTBF)** to determine breakdown frequency.
+> - **New Vehicle (100% Condition):** The MTBF is **600 minutes (10 hours)**. This means a breakdown occurs, on average, once every 10 operating hours.
+> - **Worn-Out Vehicle (0% Condition):** The MTBF drops to **60 minutes (1 hour)**.
+>
+> ### 2. Critical Failure Chance
+> This is the probability that a new breakdown will skip the minor stages and appear immediately as a **critical** failure.
+> - **New Vehicle (100% Condition):** The chance is only **5%**.
+> - **Worn-Out Vehicle (0% Condition):** The chance rises to **33%**.
+>
+> ### 3. Lifetime Breakdown Distribution
+> This data illustrates how wear impacts long-term reliability. For a vehicle's full lifecycle (100% -> 0% Condition) without any overhauls:
+> - **Total Expected Breakdowns:** Approximately **30**.
+> - **First Half of Life (100% -> 50% Condition):** Only **~5** breakdowns are expected.
+> - **Second Half of Life (50% -> 0% Condition):** The remaining **~25** breakdowns occur as the vehicle's condition rapidly deteriorates.
+>
+> </details>
 
 #### Stages and Progression
 Most breakdowns go through several stages, gradually getting worse:
@@ -139,6 +231,25 @@ With each new stage, the cost of repair increases. A critical breakdown can be v
 
 #### It Pays to Be Attentive!
 The cheapest repair is a preventive one. If you notice that something is "off" with your vehicle (e.g., a slight loss of power) at the first, hidden stage, and immediately take it for an Inspection, you can fix the issue for a minimal price.
+
+> [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for technical details on progression and repair costs</strong></summary>
+>
+> ### 1. Dashboard Indicators
+> In modern tractors, any deviation from the norm would typically trigger a dashboard warning. However, to make gameplay more engaging, indicators are intentionally disabled for the **first (Minor) stage** of a breakdown. This is designed to reward attentive players who can detect subtle changes in their vehicle's performance, allowing them to save significantly on repair costs. Most indicators will activate starting from the **second (Moderate) stage**.
+>
+> ### 2. Repair Cost Scaling
+> The cost of fixing a breakdown scales exponentially with its progression:
+> - Each subsequent stage **doubles (x2)** the repair cost of the previous one.
+> - The base repair cost for a new breakdown is unique for each type of malfunction, but it generally hovers around **1% of the vehicle's total value**. The logic is based on realism: fixing the electrical system will naturally be much cheaper than repairing the transmission.
+>
+> ### 3. Breakdown Progression Speed
+> The time it takes for a breakdown to advance to the next stage is not static.
+> - For a vehicle in good shape (`Condition > 66%`), the average progression time is **5-6 operating hours**.
+> - For a heavily worn-out vehicle (`Condition` approaching 0%), this time is reduced by up to **3 times**, meaning a breakdown can become critical much faster.
+>
+> </details>
 
 #### General Wear and Tear
 Beyond random failures, very low condition will trigger a permanent "General Wear and Tear" effect, reducing engine power and braking effectiveness to simulate the sluggishness of old machinery.
@@ -189,20 +300,22 @@ For Maintenance, Repair, and Overhaul procedures, you now have a choice between 
 
 - **💸 Aftermarket Parts:** A budget-friendly alternative, costing **50% less** than genuine parts. However, this saving comes with a significant risk.
 
-<details>
-<summary>⚙️ Click here for technical details on the "Defective Parts" mechanic</summary>
-
 > [!NOTE]
+> <details>
+> <summary><strong>⚙️ Click here for technical details on the "Defective Parts" mechanic</strong></summary>
+>
+>
 > **The Risk of Defective Parts**
 >
+> 
 > Every time you use Aftermarket Parts, there is a **1 in 3 chance (≈33%)** that they are of poor quality. If you are unlucky, a random negative effect (debuff) will be applied to the vehicle for **5 operating hours**:
 > - **Increased Maintenance Wear:** The `Service` level will decrease 50% faster.
 > - **Increased Condition Wear:** The vehicle's `Condition` will decrease 50% faster.
 > - **Increased Breakdown Chance:** The probability of a random breakdown is doubled.
 > 
-> This choice adds another strategic layer: do you save money now and risk future problems, or do you pay for reliability?
+> </details>
 
-</details>
+This choice adds another strategic layer: do you save money now and risk future problems, or do you pay for reliability?
 
 #### ⏱️ Time and Planning: A New Layer of Strategy
 Beyond money, all workshop procedures require time. The duration of a service or repair depends on the vehicle's Maintainability (simpler machines are fixed faster).
