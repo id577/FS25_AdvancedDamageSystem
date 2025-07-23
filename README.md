@@ -45,7 +45,7 @@ Demonstration of some breakdown's effects: https://www.youtube.com/watch?v=Npnlv
 # Console Commands
 For testing and debugging purposes, the mod includes several console commands. To use them, you must be inside a vehicle that supports the mod.
 Command	Description	Usage Example
-- **ads_debug**	Toggles the global debug mode for the mod, which prints detailed logs to the console and debug panel.	ads_debug
+- **ads_debug**	Toggles the global debug mode for the mod, which prints detailed logs to the console and draw debug panel.	ads_debug
 - **ads_listBreakdowns**	Lists all available breakdown IDs that can be added.	ads_listBreakdowns
 - **ads_addBreakdown**	Adds a specific breakdown to the current vehicle. If no ID is provided, a random breakdown is added.	ads_addBreakdown ECU_MALFUNCTION 2
 - **ads_removeBreakdown**	Removes a specific breakdown. If no ID is provided, removes all active breakdowns from the current vehicle.	ads_removeBreakdown ECU_MALFUNCTION
