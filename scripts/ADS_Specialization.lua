@@ -334,7 +334,9 @@ function AdvancedDamageSystem:onLoad(savegame)
             radiatorCooling = 0, 
             speedCooling = 0, 
             convectionCooling = 0,
-            slipFactor = 0
+            loadFactor = 0,
+            slipFactor = 0,
+            accFactor = 0
         }
     }
 
@@ -394,9 +396,42 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.lastInspectedPower == nil then spec.lastInspectedPower = 1 end
         if spec.lastInspectedBrake == nil then spec.lastInspectedBrake = 1 end
         if spec.lastInspectedYieldReduction == nil then spec.lastInspectedYieldReduction = 1 end
-    
-        log_dbg("Loaded service:", tostring(spec.serviceLevel), "condition:", tostring(spec.conditionLevel))
-        log_dbg("Loaded breakdowns:", tableToString(spec.activeBreakdowns))
+
+        local debugLines = {}
+        table.insert(debugLines, string.format("--- [AdvancedDamageSystem] Full State Loaded for: %s ---", self:getFullName()))
+        table.insert(debugLines, string.format("  - Service Level: %s", tostring(spec.serviceLevel)))
+        table.insert(debugLines, string.format("  - Condition Level: %s", tostring(spec.conditionLevel)))
+        table.insert(debugLines, string.format("  - Current State: %s", tostring(spec.currentState)))
+        table.insert(debugLines, string.format("  - Maintenance Timer: %s", tostring(spec.maintenanceTimer)))
+        table.insert(debugLines, string.format("  - Last Service Operating Hours: %.2f", spec.lastServiceOperatingHours))
+        
+        table.insert(debugLines, string.format("  - Engine Temperature: %.2f", spec.engineTemperature))
+        table.insert(debugLines, string.format("  - Transmission Temperature: %.2f", spec.transmissionTemperature))
+
+        table.insert(debugLines, string.format("  - Last Inspected Condition State: %s", tostring(spec.lastInspectedConditionState)))
+        table.insert(debugLines, string.format("  - Last Inspected Service State: %s", tostring(spec.lastInspectedServiceState)))
+        table.insert(debugLines, string.format("  - Last Inspected Power: %.2f", spec.lastInspectedPower))
+        table.insert(debugLines, string.format("  - Last Inspected Brake: %.2f", spec.lastInspectedBrake))
+        table.insert(debugLines, string.format("  - Last Inspected Yield Reduction: %.2f", spec.lastInspectedYieldReduction))
+
+        table.insert(debugLines, string.format("  - Active Breakdowns: %s", tableToString(spec.activeBreakdowns)))
+        
+        local serviceDateStr = "Not set"
+        if spec.lastServiceDate and next(spec.lastServiceDate) ~= nil then
+
+            serviceDateStr = string.format("%04d-%02d-%02d", spec.lastServiceDate.year or 0, spec.lastServiceDate.month or 0, spec.lastServiceDate.day or 0)
+        end
+        table.insert(debugLines, string.format("  - Last Service Date: %s", serviceDateStr))
+        
+        local inspectionDateStr = "Not set"
+        if spec.lastInspectionDate and next(spec.lastInspectionDate) ~= nil then
+            inspectionDateStr = string.format("%04d-%02d-%02d", spec.lastInspectionDate.year or 0, spec.lastInspectionDate.month or 0, spec.lastInspectionDate.day or 0)
+        end
+        table.insert(debugLines, string.format("  - Last Inspection Date: %s", inspectionDateStr))
+
+        table.insert(debugLines, "-------------------------------------------------------------")
+
+        log_dbg(table.concat(debugLines, "\n"))
     end
 
     local xmlSoundFile = loadXMLFile("ads_sounds", AdvancedDamageSystem.modDirectory .. "sounds/ads_sounds.xml")
@@ -416,6 +451,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     end
 
     spec.rawEngineTemperature = spec.engineTemperature
+    spec.rawTransmissionTemperature = spec.transmissionTemperature
 
     local function getIsElectricVehicle(vehicle)
         for _, consumer in pairs(vehicle.spec_motorized.consumers) do
@@ -425,7 +461,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         end
     end
     spec.isElectricVehicle = getIsElectricVehicle(self)
-
     self:recalculateAndApplyEffects()
 end
 
@@ -659,29 +694,37 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     local C = ADS_Config.THERMAL
     local heat, cooling = 0, 0
     local radiatorCooling, convectionCooling = 0, 0
+    local motor = self:getMotor()
+    local loadFactor = motorLoad - motor.motorExternalTorque / motor.peakMotorTorque
     local slipFactor = 1.0
+    local accFactor = 1.0
     local speedLimit = math.huge
     
     local deltaTemp = math.max(0, spec.rawTransmissionTemperature - eviromentTemp)
     convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
 
     if isMotorStarted then
-        if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
-            for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
-                if implementData.object ~= nil then
-                    local implement = implementData.object
-                    local currentSpeedLimit = implement.speedLimit
-                    if currentSpeedLimit ~= nil and implement:getIsLowered() then
-                        if currentSpeedLimit < speedLimit then
-                            speedLimit = currentSpeedLimit
+        if (self:getAccelerationAxis() > 0 or self:getCruiseControlAxis() > 0) then
+            if motor.motorRotAccelerationSmoothed > 1 then
+                accFactor = math.max(5 * motorRpm, 1.5)
+            end
+            if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
+                for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
+                    if implementData.object ~= nil then
+                        local implement = implementData.object
+                        local currentSpeedLimit = implement.speedLimit
+                        if currentSpeedLimit ~= nil and implement:getIsLowered() then
+                            if currentSpeedLimit < speedLimit then
+                                speedLimit = currentSpeedLimit
+                            end
                         end
                     end
                 end
             end
         end
 
-        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp(speed / speedLimit , 0.2, 1.0)) end
-        heat = C.TRANS_MIN_HEAT + motorRpm * (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * slipFactor
+        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp((speed / speedLimit) * 1.1, 0.2, 1.0)) end
+        heat = C.TRANS_MIN_HEAT + (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * dirt)
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
@@ -703,7 +746,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         spec.transTermPID.lastError = 0
     end
     
-    return {totalHeat = heat, totalCooling = cooling, radiatorCooling = radiatorCooling, speedCooling = speedCooling, convectionCooling = convectionCooling, slipFactor = slipFactor}
+    return {totalHeat = heat, totalCooling = cooling, radiatorCooling = radiatorCooling, speedCooling = speedCooling, convectionCooling = convectionCooling, loadFactor = loadFactor, slipFactor = slipFactor, accFactor = accFactor}
 end
 
 
@@ -1305,21 +1348,21 @@ function AdvancedDamageSystem:initMaintenance(type, breadownsCount, isAftermarke
             
         end
 
-        if type ~= states.REPAIR then
-            AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
-            spec.lastServiceOperatingHours = self:getFormattedOperatingTime()
 
-            spec.lastInspectedPower = (spec.activeEffects.ENGINE_TORQUE_MODIFIER and (1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value)) or 1
-            spec.lastInspectedBrake = (spec.activeEffects.BRAKE_FORCE_MODIFIER and (1 + spec.activeEffects.BRAKE_FORCE_MODIFIER.value)) or 1
-            spec.lastInspectedYieldReduction = (spec.activeEffects.YIELD_REDUCTION_MODIFIER and (1 + spec.activeEffects.YIELD_REDUCTION_MODIFIER.value)) or 1
+        AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
+        spec.lastServiceOperatingHours = self:getFormattedOperatingTime()
 
-            local env = g_currentMission.environment
-            spec.lastInspectionDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
+        spec.lastInspectedPower = (spec.activeEffects.ENGINE_TORQUE_MODIFIER and (1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value)) or 1
+        spec.lastInspectedBrake = (spec.activeEffects.BRAKE_FORCE_MODIFIER and (1 + spec.activeEffects.BRAKE_FORCE_MODIFIER.value)) or 1
+        spec.lastInspectedYieldReduction = (spec.activeEffects.YIELD_REDUCTION_MODIFIER and (1 + spec.activeEffects.YIELD_REDUCTION_MODIFIER.value)) or 1
 
-            if type ~= states.INSPECTION then
-                spec.lastServiceDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
-            end
+        local env = g_currentMission.environment
+        spec.lastInspectionDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
+
+        if type ~= states.INSPECTION and type ~= states.MAINTENANCE then
+            spec.lastServiceDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
         end
+        
 
         if isAftermarketParts then
             local chance = C.AFTERMARKETS_PARTS_BREAKDOWN_CHANCE
@@ -1665,7 +1708,7 @@ function AdvancedDamageSystem.calculateMaintenancePrice(vehicle, maintenanceType
         return math.ceil(math.max((C.MAINTENANCE_PRICE_MULTIPLIER * price * ageFactor * 0.01 / 100) / spec.maintainability, 2)) * 100
     
     elseif maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
-        return (C.MAINTENANCE_PRICE_MULTIPLIER * price * 0.001) / spec.maintainability
+        return math.ceil(math.clamp((C.MAINTENANCE_PRICE_MULTIPLIER * price * 0.0005) / spec.maintainability, 10, 100) / 10) * 10
     
     elseif maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
         local breakdownOverhaulPrice = 0
@@ -2141,6 +2184,37 @@ function AdvancedDamageSystem.ConsoleCommands:getDebugVehicleInfo(rawArgs)
     end
 end
 
+function AdvancedDamageSystem.ConsoleCommands:setDirtAmount(rawArgs)
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then
+        print("ADS Error: No target vehicle found. Please enter a vehicle.")
+        return 
+    end
+
+    if vehicle.spec_washable == nil then
+        print(string.format("ADS Error: Vehicle '%s' is not washable.", vehicle:getFullName()))
+        return
+    end
+
+    local args = parseArguments(rawArgs)
+    
+    if not args or not args[1] then
+        print("ADS Error: Missing argument. Usage: ads_setDirtAmount <amount>")
+        print("Please provide a dirt amount between 0.0 (clean) and 1.0 (fully dirty).")
+        return
+    end
+
+    local value = tonumber(args[1])
+    if value == nil or value < 0 or value > 1 then
+        print("ADS Error: Invalid value. Please provide a number between 0.0 and 1.0.")
+        return
+    end
+    
+    vehicle:setDirtAmount(value)
+    
+    print(string.format("ADS: Set Dirt amount for '%s' to %.2f.", vehicle:getFullName(), value))
+end
+
 function AdvancedDamageSystem.ConsoleCommands:debug()
     if ADS_Config.DEBUG then
         ADS_Config.DEBUG = false
@@ -2159,4 +2233,5 @@ addConsoleCommand("ads_resetVehicle", "Resets vehicle state.", "resetVehicle", A
 addConsoleCommand("ads_startMaintance", "Starts maintenance. Usage: ads_startMaintance <type>", "startMaintance", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_finishMaintance", "Instantly finishes current maintenance.", "finishMaintance", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_getDebugVehicleInfo", "Vehicle debug info", "getDebugVehicleInfo", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_setDirtAmount [0.0-1.0]", "setDirtAmount", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)

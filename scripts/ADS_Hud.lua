@@ -436,7 +436,7 @@ function ADS_Hud:drawActiveVehicleHUD()
 
         setTextColor(1, 1, 1, 1)
         renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total heat:"))
-        renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% | %.2f",  spec.debugData.transmissionTemp.totalHeat * 100, spec.debugData.transmissionTemp.slipFactor))
+        renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% | %.2f | %.2f | %.2f",  spec.debugData.transmissionTemp.totalHeat * 100, spec.debugData.transmissionTemp.loadFactor, spec.debugData.transmissionTemp.slipFactor, spec.debugData.transmissionTemp.accFactor))
         setTextColor(1, 1, 1, 1)
         renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
         currentY = currentY - panel.lineHeight
