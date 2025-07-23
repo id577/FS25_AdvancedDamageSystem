@@ -703,11 +703,11 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     local deltaTemp = math.max(0, spec.rawTransmissionTemperature - eviromentTemp)
     convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
 
+
     if isMotorStarted then
         if (self:getAccelerationAxis() > 0 or self:getCruiseControlAxis() > 0) then
-            if motor.motorRotAccelerationSmoothed > 1 then
-                accFactor = math.max(5 * motorRpm, 1.5)
-            end
+            accFactor = math.max(5 * motorRpm * math.max(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0), 1.0)
+
             if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
                 for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
                     if implementData.object ~= nil then
@@ -723,7 +723,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
             end
         end
 
-        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp((speed / speedLimit) * 1.1, 0.2, 1.0)) end
+        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2 end
         heat = C.TRANS_MIN_HEAT + (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * dirt)
         
@@ -1401,6 +1401,9 @@ function AdvancedDamageSystem:processMaintenance(dt)
     spec.maintenanceTimer = spec.maintenanceTimer - dt * timeScale
 
     if spec.maintenanceTimer <= 0 then
+        if spec.currentState ~= states.INSPECTION then
+            self:setDirtAmount(0)
+        end
         g_currentMission.hud:addSideNotification({1, 1, 1, 1}, self:getFullName() .. ": " .. g_i18n:getText(spec.currentState) .. " " .. g_i18n:getText("ads_spec_maintenance_complete"))
         spec.maintenanceTimer = 0
         spec.currentState = states.READY
