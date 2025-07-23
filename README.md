@@ -499,3 +499,20 @@ Examples: Simple, older vehicles are often more maintainable than modern machine
 > All brand-specific values for `Reliability` and `Maintainability` can be viewed and even customized in the `ADS_Config.lua` file, located in the mod's folder.
 >
 > </details>
+
+## 5. Thermal Dynamics: More Than Just a Gauge
+What started as a simple feature for a single breakdown (a faulty thermostat) has evolved into a fully-fledged thermal simulation system. Now, temperature is a critical factor you must manage, adding another layer of realism and challenge.
+#### 🔥 Engine Overheating
+Pushing your tractor to its limits with a dirty radiator on a hot day is a recipe for disaster. An overheated engine will suffer rapid Condition loss.
+
+- **Modern Tractors (Limp Mode):** Newer vehicles are equipped with a self-preservation system. If the engine gets too hot, it will enter "Limp Mode," progressively reducing power to prevent further temperature rise and catastrophic damage.
+- **Older Tractors (No Safety Net):** Be extremely careful with older equipment! These machines lack modern electronic protections. If you ignore the temperature gauge, the engine can seize, leading to a critical and very expensive failure.
+
+#### ❄️ The Importance of Warming Up
+Just like in real life, putting a heavy load on a cold engine is one of the fastest ways to wear it out. The mod simulates this by applying a significant wear penalty when the engine temperature is low. Always let your engine warm up for a minute before tackling demanding tasks—it's a small habit that will save you a fortune in the long run.
+#### ⚙️ CVT Transmission: A Unique Challenge
+Vehicles with Continuously Variable Transmissions (CVT) have their own dedicated thermal model. CVTs are highly efficient but are also sensitive to specific types of stress that can cause them to overheat, even if the engine temperature is normal:
+- **Lugging at Low Speed:** This is the ultimate CVT killer. It occurs when you pair a tractor with an implement that's too large, forcing it to work at maximum torque but at a very low speed (e.g., pulling a massive plow up a hill). This puts immense strain on the CVT's hydraulic system, generating extreme heat with very little airflow to cool it down.
+- **Constant Acceleration/Deceleration:** A "jerky" driving style with frequent stops and starts (like when working on a small, awkward field) forces the CVT's hydraulics to constantly work to change ratios. This continuous activity generates a steady stream of heat.
+> [!NOTE]
+> The thermal models for both the engine and transmissions are constantly being refined to achieve a realistic and balanced effect. Your feedback during this development process is invaluable
