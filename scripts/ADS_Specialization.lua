@@ -723,7 +723,12 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
             end
         end
 
-        if speedLimit ~= math.huge then slipFactor = 1 + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2 end
+        if speedLimit ~= math.huge then 
+            if self:getCruiseControlState() ~= 0 then
+                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
+            end
+            slipFactor = 1 + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2
+        end
         heat = C.TRANS_MIN_HEAT + (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * dirt)
         
