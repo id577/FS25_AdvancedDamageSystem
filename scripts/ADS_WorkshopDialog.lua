@@ -133,6 +133,7 @@ function ADS_WorkshopDialog:updateScreen()
         local localizedStatus = g_i18n:getText(spec.currentState)
         statusText = string.format(g_i18n:getText("ads_ws_status_in_progress_format"), localizedStatus, finishTimeText)
         self.maintanceInProgressSpinner:setVisible(true)
+        self.maintanceInProgressSpinner:setPosition(0, 0.25)
         
         if spec.currentState ~= STATUS.REPAIR then
             local inspectingText = g_i18n:getText("ads_ws_inspecting_status")
@@ -194,12 +195,7 @@ function ADS_WorkshopDialog:updateScreen()
         self.tableSlider:setVisible(false)
         self.emptyTableText:setText(g_i18n:getText(self.vehicle:getCurrentStatus()) .. "...")
     end
-
-    if self.maintanceInProgressSpinner.visible then
-        self.statusText:setPosition(0, 0)
-    else
-        self.statusText:setPosition(0, 0.015)
-    end
+    --self.statusText:setPosition(0, 0.015)
 end
 
 function ADS_WorkshopDialog:getNumberOfItemsInSection(list, section)
@@ -233,19 +229,31 @@ function ADS_WorkshopDialog:populateCellForItemInSection(list, section, index, c
     cell:getAttribute("ads_tableBreakdownStage"):setText(g_i18n:getText(stage_key))
     cell:getAttribute("ads_tableBreakdownPrice"):setText(g_i18n:formatMoney(price))
     
+    
     local selectedText = g_i18n:getText("ads_ws_option_no")
     if selected then 
-        selectedText = g_i18n:getText("ads_ws_option_yes") 
+        selectedText = g_i18n:getText("ads_ws_option_yes")
+        cell:getAttribute("ads_tableBreakdownName"):setDisabled(false)
+        cell:getAttribute("ads_tableBreakdownDisc"):setDisabled(false)
+        cell:getAttribute("ads_tableBreakdownStage"):setDisabled(false)
+        cell:getAttribute("ads_tableBreakdownPrice"):setDisabled(false)
+        cell:getAttribute("ads_tableBreakdownSelect"):setTextColor(0.3, 0.7, 0.0, 1.0)
+    else
+        cell:getAttribute("ads_tableBreakdownName"):setDisabled(true)
+        cell:getAttribute("ads_tableBreakdownDisc"):setDisabled(true)
+        cell:getAttribute("ads_tableBreakdownStage"):setDisabled(true)
+        cell:getAttribute("ads_tableBreakdownPrice"):setDisabled(true)
+        cell:getAttribute("ads_tableBreakdownSelect"):setTextColor(0.2, 0.2, 0.2, 1)
     end
     cell:getAttribute("ads_tableBreakdownSelect"):setText(selectedText)
 end
 
 
-function ADS_WorkshopDialog:onRowClick(item)
+function ADS_WorkshopDialog:onRowClick(button)
     if self.vehicle:getCurrentStatus() ~= AdvancedDamageSystem.STATUS.READY then return end
-    if item == nil or self.visibleBreakdowns[item.indexInSection] == nil then return end
+    if button == nil or self.visibleBreakdowns[button.parent.indexInSection] == nil then return end
     
-    local id = self.visibleBreakdowns[item.indexInSection]
+    local id = self.visibleBreakdowns[button.parent.indexInSection]
     local breakdown = self.activeBreakdowns[id]
     if breakdown then
         breakdown.isSelectedForRepair = not breakdown.isSelectedForRepair

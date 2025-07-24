@@ -995,7 +995,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 5.6, 
                 effects = { 
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'Hydraulic failure', disableAi = true}, aggregation = "min" }
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'ads_breakdowns_hydraulic_pump_malfunction_stage4_message', disableAi = true}, aggregation = "min" }
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }

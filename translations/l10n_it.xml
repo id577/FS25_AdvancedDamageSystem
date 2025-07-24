@@ -1,0 +1,250 @@
+<?xml version='1.0' encoding='utf-8'?>
+<l10n>
+    <texts>
+        <text name="ads_serviceWear_label" text="Tasso di Usura d'Utilizzo" />
+        <text name="ads_serviceWear_tooltip" text="Controlla il tasso di usura del livello 'Utilizzo' per ogni ora di funzionamento. Ad esempio, con un valore del 10%, il livello di utilizzo si esaurirà completamente in 10 ore. Un valore più alto richiederà una manutenzione più frequente." />
+        <text name="ads_conditionWear_label" text="Tasso di Usura delle Condizioni" />
+        <text name="ads_conditionWear_tooltip" text="Controlla il tasso di usura del livello 'Condizione' per ogni ora di funzionamento. Ad esempio, con un valore dell'1%, le condizioni del veicolo si degraderanno completamente in 100 ore. Un valore più alto porterà a un degrado più rapido delle condizioni generali del veicolo." />
+        <text name="ads_breakdownProbability_label" text="Tempo Medio Tra i Guasti (MTTG) di Base" />
+        <text name="ads_breakdownProbability_tooltip" text="Imposta il Tempo Medio Tra i Guasti (MTTG) base per i guasti in minuti quando le condizioni del veicolo sono al 100%. Con il peggiorare delle condizioni, il MTTG reale diminuirà. Questo parametro rappresenta il punto di partenza per il calcolo dei guasti." />
+        <text name="ads_maintenancePrice_label" text="Moltiplicatore del Costo Manutenzione" />
+        <text name="ads_maintenancePrice_tooltip" text="Regola il costo di tutti i servizi dell’officina, comprese ispezioni, riparazioni e revisioni. Un valore più alto rende tutte le attività di manutenzione più costose." />
+        <text name="ads_maintenanceDuration_label" text="Moltiplicatore della Durata della Manutenzione" />
+        <text name="ads_maintenanceDuration_tooltip" text="Regola la durata di tutti i servizi dell’officina. Un valore più alto aumenta il tempo che il veicolo passerà in manutenzione o riparazione." />
+        <text name="ads_workshopOpenHour_label" text="Orario di Apertura dell'Officina" />
+        <text name="ads_workshopOpenHour_tooltip" text="L’ora del giorno in cui l’officina apre. Le riparazioni sono attive solo durante l’orario di lavoro." />
+        <text name="ads_workshopCloseHour_label" text="Orario di Chiusura dell'Officina" />
+        <text name="ads_workshopCloseHour_tooltip" text="L’ora del giorno in cui l’officina chiude. Le riparazioni verranno sospese dopo quest’orario." />
+        <text name="ads_ws_header_title" text="Officina" />
+
+        <text name="ads_ws_label_value" text="Valore" />
+        <text name="ads_ws_label_age" text="Età" />
+        <text name="ads_ws_label_operating_hours" text="Ore di funzionamento" />
+        <text name="ads_ws_label_service" text="Manutenzione" />
+        <text name="ads_ws_label_condition" text="Condizione" />
+        <text name="ads_ws_label_current_power" text="Potenza attuale" />
+        <text name="ads_ws_label_brake_efficiency" text="Efficienza frenante" />
+        <text name="ads_ws_label_harvest_efficiency" text="Efficienza di raccolta" />
+        <text name="ads_ws_label_maintainability" text="Manutenibilità" />
+        <text name="ads_ws_label_service_interval" text="Intervallo di manutenzione" />
+
+        <text name="ads_ws_label_last_maintenance" text="Ultima manutenzione" />
+        <text name="ads_ws_label_last_inspection" text="Ultima ispezione" />
+
+        <text name="ads_ws_table_header_part" text="Componente" />
+        <text name="ads_ws_table_header_description" text="Descrizione" />
+        <text name="ads_ws_table_header_stage" text="Grado" />
+        <text name="ads_ws_table_header_price" text="Prezzo" />
+        <text name="ads_ws_table_header_repair_select" text="Ripara" />
+
+        <text name="ads_ws_info_no_breakdowns" text="Non ci sono guasti o non sono ancora stati rilevati." />
+        <text name="ads_ws_status_initial" text="Caricamento dello stato..." />
+
+        <text name="ads_ws_action_inspection" text="Ispezione" />
+        <text name="ads_ws_action_maintenance" text="Manutenzione" />
+        <text name="ads_ws_action_repair" text="Riparazione" />
+        <text name="ads_ws_action_overhaul" text="Revisione" />
+
+        <text name="ads_ws_age_unit" text="mesi" />
+        <text name="ads_ws_hours_unit" text="ore" />
+        <text name="ads_ws_button_ok" text="OK" />
+        <text name="ads_ws_option_yes" text="Si" />
+        <text name="ads_ws_option_no" text="No" />
+        <text name="ads_ws_status_open" text="L'officina è aperta" />
+        <text name="ads_ws_status_closed" text="L'officina è chiusa" />
+        <text name="ads_ws_inspecting_status" text="Ispezionando..." />
+        <text name="ads_ws_status_in_progress_format" text="%s in corso fino a/alle %s..." />
+        <text name="ads_ws_task_inspection" text="Ispezione" />
+        <text name="ads_ws_task_maintenance" text="Manutenzione" />
+        <text name="ads_ws_task_repair" text="Riparazione" />
+        <text name="ads_ws_task_overhaul" text="Revisione" />
+        <text name="ads_ws_button_price_format" text="%s (%s)" />
+        <text name="ads_ws_info_nothing_to_repair_title" text="Niente da riparare" />
+        <text name="ads_ws_info_nothing_to_repair_text" text="Seleziona dall'elenco uno o più elementi da riparare." />
+        <text name="ads_ws_confirm_inspection_title" text="Confermare l'ispezione" />
+        <text name="ads_ws_confirm_inspection_text" text="L'ispezione ti consentirà di individuare guasti nascosti e di valutare approssimativamente il livello delle condizioni tecniche.\n\nPrezzo: {price}\nDurata: {duration}\nTermine: {time}" />
+        <text name="ads_ws_confirm_maintenance_title" text="Conferma manutenzione" />
+        <text name="ads_ws_confirm_maintenance_text" text="La manutenzione ripristinerà il livello di assistenza tecnica al massimo. Inoltre, verranno ispezionate le condizioni tecniche del veicolo.\n\nPrezzo: {price}\nDurata: {duration}\nTermine: {time}\n Seleziona la qualità dei ricambi per questa procedura. L'utilizzo di ricambi aftermarket più economici comporta il rischio di minore affidabilità.\n\n Prezzo dei ricambi aftermarket: {aftermarket_price}" />
+        <text name="ads_ws_confirm_repair_title" text="Conferma riparazione" />
+        <text name="ads_ws_confirm_repair_text" text="Questo eliminerà i guasti selezionati ({price}).\n\nDurata: {duration}\nTermine: {time}\nScegli la qualità dei pezzi di ricambio per questa procedura. L'utilizzo di ricambi aftermarket più economici comporta il rischio di minore affidabilità.\n\n Prezzo dei ricambi aftermarket: {aftermarket_price}" />
+        <text name="ads_ws_confirm_overhaul_title" text="Conferma revisione" />
+        <text name="ads_ws_confirm_overhaul_text" text="La revisione risolverà tutti i guasti, eseguirà la manutenzione e migliorerà le condizioni tecniche del veicolo.\n\nPrezzo: {price}\nDurata: {duration}\nTermine: {time}\n Scegli la qualità dei ricambi per questa procedura. L'utilizzo di ricambi aftermarket più economici comporta il rischio di minore affidabilità.\n\n Prezzo dei ricambi aftermarket: {aftermarket_price}" />
+        <text name="ads_ws_option_genuine_parts" text="Ricambi originali" />
+        <text name="ads_ws_option_aftermarket_parts" text="Ricambi aftermarket" />
+
+        <text name="ads_breakdowns_part_vehicle" text="Veicolo" />
+        <text name="ads_breakdowns_part_engine" text="Motore" />
+        <text name="ads_breakdowns_part_turbocharger" text="Turbocompressore" />
+        <text name="ads_breakdowns_part_fuel_pump" text="Pompa del carburante" />
+        <text name="ads_breakdowns_part_fuel_injectors" text="Iniettori del carburante" />
+        <text name="ads_breakdowns_part_brake_system" text="Sistema frenante" />
+        <text name="ads_breakdowns_part_transmission" text="Trasmissione" />
+        <text name="ads_breakdowns_part_cvt_cooling_system" text="Sistema di raffreddamento CVT" />
+        <text name="ads_breakdowns_part_cooling_system" text="Sistema di raffreddamento" />
+        <text name="ads_breakdowns_part_hydraulic_lift_system" text="Sistema di sollevamento idraulico" />
+        <text name="ads_breakdowns_part_electrical_system" text="Impianto elettrico" />
+        <text name="ads_breakdowns_part_carburetor" text="Carburatore" />
+
+        <text name="ads_breakdowns_severity_permanent" text="Permanente" />
+        <text name="ads_breakdowns_severity_reduce_power" text="Ridurre la potenza" />
+        <text name="ads_breakdowns_severity_shutdown" text="Spegnimento" />
+        <text name="ads_breakdowns_severity_minor" text="Basso" />
+        <text name="ads_breakdowns_severity_moderate" text="Moderato" />
+        <text name="ads_breakdowns_severity_major" text="Grave" />
+        <text name="ads_breakdowns_severity_critical" text="Critico" />
+
+        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Lo stress accumulato in anni di duro lavoro. Una lieve usura irreversibile dei componenti principali riduce leggermente le prestazioni complessive." />
+
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="Modalità di protezione del motore" />
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Modalità di emergenza del motore attiva! Potenza ridotta!" />
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="Modalità di protezione del motore" />
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Modalità di emergenza del motore attiva! Potenza ridotta!" />
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="Modalità di protezione del motore" />
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Modalità di emergenza del motore attiva! Potenza ridotta!" />
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="Modalità di protezione del motore" />
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Il motore viene spento per proteggerlo dal surriscaldamento" />
+
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="Il motore è completamente rotto" />
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="Motore inceppato" />
+
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="Errori della centralina (ECU). Potenza del motore leggermente ridotta." />
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="Malfunzionamento della centralina (ECU). Notevole perdita di potenza e aumento del consumo di carburante." />
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Malfunzionamento critico della centralina (ECU). Significativa perdita di potenza, elevato consumo di carburante e rischio di spegnimento del motore." />
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Guasto completo della centralina (ECU). Il motore non può essere controllato e non si avvierà." />
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Il motore è difettoso" />
+
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Cuscinetti del turbocompressore usurati. Si sente un leggero fischio e si nota una leggera perdita di potenza agli alti regimi." />
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Guarnizioni del turbo che perdono. Notevole perdita di potenza, aumento del consumo di carburante." />
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Pale della turbina danneggiate. Grave perdita di potenza e rischio di spegnimento del motore sotto carico elevato." />
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Guasto critico al turbocompressore. Il motore ha perso gran parte della sua potenza ed è a rischio di gravi danni interni." />
+
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Usura precoce della pompa del carburante. Potenza del motore leggermente ridotta e consumo di carburante aumentato." />
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Calo della pressione del carburante. Perdita di potenza evidente, maggiore consumo di carburante e occasionali spegnimenti del motore." />
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Pressione critica del carburante. Grave perdita di potenza, consumo di carburante molto elevato e frequenti spegnimenti del motore." />
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Guasto completo della pompa del carburante. Il carburante non viene fornito al motore." />
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Avviamento del motore impossibile" />
+
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Uno o più iniettori hanno gli ugelli leggermente ostruiti. Il motore potrebbe funzionare in modo irregolare, con una leggera perdita di potenza." />
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Scarsa atomizzazione del carburante. Il motore non si accende sotto carico, con conseguente notevole perdita di potenza e esitazione del motore." />
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Un iniettore di carburante è bloccato. Il motore funziona molto male, con una significativa perdita di potenza e un avviamento inaffidabile." />
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Un iniettore è completamente guasto. Il motore non funzionerà correttamente e potrebbe non avviarsi affatto." />
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Avviamento del motore impossibile" />
+
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Pastiglie dei freni usurate. Leggera diminuzione dell'efficacia frenante." />
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Perdita di liquido freni o dischi usurati. Lo spazio di frenata aumenta notevolmente." />
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Grave perdita di pressione dei freni. I freni sono molto deboli e inaffidabili." />
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Guasto totale all'impianto frenante. Continuare a lavorare è estremamente pericoloso." />
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Guasto ai freni" />
+
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Dischi della frizione usurati. Perdita di potenza occasionale dovuta allo slittamento della trasmissione sotto carico." />
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Notevole usura della frizione. Slittamento evidente della trasmissione, soprattutto in accelerazione." />
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Frizione molto usurata. Il forte slittamento rende difficile la trasmissione della potenza alle ruote." />
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="Frizione completamente bruciata. Il veicolo non riesce a muoversi." />
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="Guasto alla trasmissione." />
+
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Sincronizzatori usurati. Occasionali stridii o difficoltà nel cambio marcia." />
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Sincronizzatori danneggiati. Cambiare marcia è spesso difficile e può rompersi." />
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Denti del sincronizzatore rotti. Elevata probabilità di mancata riuscita del cambio o di rifiuto della marcia sotto carico." />
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="I sincronizzatori sono completamente fuori uso. È impossibile cambiare marcia." />
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Guasto alla trasmissione" />
+
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Bassa pressione idraulica in Powershift. Lieve ritardo e durezza nell'innesto delle marce." />
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Guarnizioni della pompa idraulica usurate. Ritardi e scossoni evidenti durante il cambio marcia." />
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Pompa idraulica difettosa. Forte ritardo e scosse violente durante il cambio marcia." />
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Guasto alla pompa idraulica del cambio Powershift. La trasmissione è bloccata in folle." />
+
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Il termostato inizia a bloccarsi. Il CVT potrebbe riscaldarsi lentamente o funzionare leggermente più caldo del normale sotto carico." />
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Il termostato è parzialmente bloccato. La temperatura del CVT è instabile, con il rischio di surriscaldamento in caso di utilizzo prolungato." />
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="Il termostato è per lo più fuori uso. Il CVT è soggetto a forti surriscaldamenti, che possono causare danni interni." />
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Il termostato è completamente guasto, probabilmente bloccato in posizione chiusa. Il raffreddamento è minimo, il che porta a un rapido e pericoloso surriscaldamento del CVT." />
+
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Il termostato del motore inizia a guastarsi. Il motore impiega più tempo a raggiungere la temperatura ottimale o si surriscalda leggermente." />
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="La risposta del termostato è scarsa. La regolazione della temperatura del motore è instabile, con conseguente aumento dell'usura." />
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Il termostato è bloccato chiuso. Il motore si surriscalda costantemente sotto carico." />
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Guasto completo del termostato. Il liquido di raffreddamento del motore non riesce a circolare correttamente, causando un surriscaldamento imminente e grave." />
+
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Piccola perdita interna alla pompa. Gli attrezzi idraulici sono leggermente più lenti." />
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Guarnizioni della pompa usurate. Funzionamento idraulico notevolmente più lento." />
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Pompa idraulica danneggiata. Gli attrezzi sono estremamente lenti e deboli." />
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Guasto alla pompa idraulica. Il sistema idraulico non funziona." />
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Guasto idraulico" />
+
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Isolamento usurato, occasionali cadute di tensione. Si possono osservare piccoli guasti elettrici." />
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Contatti corrosi e uscita instabile dell'alternatore. Le luci potrebbero non funzionare, l'avviamento del motore è inaffidabile." />
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Rischio di cortocircuito. I sistemi critici non sono affidabili e le luci potrebbero guastarsi completamente." />
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Guasto alle luci" />
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Cablaggio principale guasto. L'impianto elettrico del veicolo è fuori uso." />
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Il motorino di avviamento non risponde" />
+
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Lieve contaminazione del carburatore. Il motore occasionalmente esita sotto carico pesante." />
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Getti intasati. Il motore scoppietta spesso e perde potenza, soprattutto quando si accelera bruscamente." />
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Grave ostruzione del carburatore. Il motore gira in modo irregolare, si spegne spesso e fa fatica a mantenere la potenza." />
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Mancanza di carburante a causa di un carburatore completamente intasato. Il motore non funziona." />
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Il carburatore è intasato" />
+
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Lieve contaminazione del sensore o deriva della calibrazione. Il sistema di trebbiatura automatica è leggermente meno efficiente, provocando una perdita minima di raccolto." />
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="Le letture imprecise dei sensori causano regolazioni non ottimali dei sistemi di trebbiatura e separazione. La perdita di resa è evidente." />
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="Malfunzionamento critico del sensore. L'unità di controllo riceve dati altamente errati, che causano perdite significative poiché il grano viene separato in modo errato dalla pula." />
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="Guasto totale del sistema di monitoraggio della resa. La mietitrebbia funziona 'alla cieca', con conseguente enorme inefficienza e gravi perdite di raccolto." />
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="Guasto del sistema di monitoraggio della resa" />
+
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Lieve usura delle coclee interne e delle catene dell'elevatore. Una piccola quantità di raccolto viene persa durante il trasporto interno." />
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Le coclee usurate e i nastri trasportatori che slittano causano maggiori perdite all'interno della macchina. Si potrebbero udire occasionalmente dei rumori di sfregamento." />
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Le pale dell'elevatore e le coclee danneggiate fanno fatica a spostare la massa del raccolto, causando perdite significative e il rischio di gravi intasamenti." />
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Un componente importante del sistema di flusso dei materiali si è guastato, causando un grave blocco. Il motore è sottoposto a sforzi estremi." />
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Blocco del flusso di materiale" />
+
+        <text name="ads_breakdowns_engine_stalled_message" text="Motore spento" />
+        <text name="ads_breakdowns_gear_disengage_message" text="Disinnesto marcia" />
+        <text name="ads_breakdown_at_progress_message" text="In corso" />
+        
+
+        <text name="ads_spec_this_month" text="Questo mese" />
+        <text name="ads_spec_months_ago" text="mesi fa" />
+        <text name="ads_spec_never" text="Mai" />
+        <text name="ads_spec_op_hurs_short" text="o/h" />
+        <text name="ads_spec_tomorrow_at" text="domani alle " />
+        <text name="ads_spec_day_after_tommorow_at" text="dopodomani alle " />
+        <text name="ads_spec_in_days_at" text="tra {giorni} giorni a " />
+        <text name="ads_spec_day_s" text="giorno/i" />
+        <text name="ads_spec_hour_s" text="ora/e" />
+        <text name="ads_spec_minute_s" text="minuto/i" />
+        <text name="ads_spec_and" text="e" />
+        <text name="ads_spec_duration_format_hours" text="%d %s" />
+        <text name="ads_spec_duration_format_minutes" text="%d %s" />
+        <text name="ads_spec_duration_format_combined" text="%s e %s" />
+        <text name="ads_spec_months_ago_unit" text="mesi" />
+        <text name="ads_spec_months_ago_format" text="%s %s" />
+        <text name="ads_spec_last_maintenance_format" text="%s (%s)" />
+        <text name="ads_spec_last_maintenance_until_format" text="%s fino alle %s" />
+        <text name="ads_spec_service_interval_format" text="%s o/h" />
+        <text name="ads_spec_maintenance_complete" text="completata" />
+
+        <text name="ads_spec_state_ready" text="Pronto" />
+        <text name="ads_spec_state_inspection" text="Ispezione" />
+        <text name="ads_spec_state_maintenance" text="Manutenzione" />
+        <text name="ads_spec_state_repair" text="Riparazione" />
+        <text name="ads_spec_state_overhaul" text="Revisione" />
+        <text name="ads_spec_state_broken" text="Rotto" />
+        <text name="ads_spec_state_excellent" text="Eccellente" />
+        <text name="ads_spec_state_good" text="Buono" />
+        <text name="ads_spec_state_normal" text="Normale" />
+        <text name="ads_spec_state_bad" text="Cattivo" />
+        <text name="ads_spec_state_terrible" text="Terribile" />
+        <text name="ads_spec_state_unknown" text="Sconosciuto" />
+        <text name="ads_spec_state_not_required" text="Non necessario" />
+        <text name="ads_spec_state_required" text="Necessario" />
+        <text name="ads_spec_state_recommended" text="Consigliato" />
+        <text name="ads_spec_state_legendary" text="Leggendario" />
+        <text name="ads_spec_state_premium" text="Premium" />
+        <text name="ads_spec_state_standart" text="Standard" />
+        <text name="ads_spec_state_budget" text="Economico" />
+        <text name="ads_spec_state_complex" text="Complesso" />
+        <text name="ads_spec_state_robust" text="Robusto" />
+        <text name="ads_spec_state_extreme" text="Estremo" />
+        <text name="ads_spec_state_low" text="Basso" />
+        <text name="ads_spec_state_average" text="Medio" />
+        <text name="ads_spec_state_high" text="Alto" />
+        <text name="ads_spec_state_workhorse" text="MasterPiece" />
+    </texts>
+</l10n>

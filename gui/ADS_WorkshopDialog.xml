@@ -34,31 +34,31 @@
                 <Text profile="ads_textBold" id="relAndMainTitle" text="$l10n_ads_ws_label_service_interval" position="395px 120px"/>
                 <Text profile="ads_textBold" id="lastInspectionTitle" text="$l10n_ads_ws_label_last_maintenance" position="395px 80px"/>
                 
-                <Text profile="fs25_textDefault" id="valueValue" text="-" position="550px 240px" textBold="false"/>
-                <Text profile="fs25_textDefault" id="ageValue" text="-" position="550px 200px"/>
-                <Text profile="fs25_textDefault" id="operatingHoursValue" text="-" position="550px 160px"/>
-                <Text profile="fs25_textDefault" id="relAndMainValue" text="- / -" position="550px 120px"/>
-                <Text profile="fs25_textDefault" id="lastServiceValue" text="-" position="550px 80px"/>
+                <Text profile="fs25_textDefault" id="valueValue" text="-" position="670px 240px" textBold="false"/>
+                <Text profile="fs25_textDefault" id="ageValue" text="-" position="670px 200px"/>
+                <Text profile="fs25_textDefault" id="operatingHoursValue" text="-" position="670px 160px"/>
+                <Text profile="fs25_textDefault" id="relAndMainValue" text="- / -" position="670px 120px"/>
+                <Text profile="fs25_textDefault" id="lastServiceValue" text="-" position="670px 80px"/>
 
-                <Text profile="ads_textBold" id="serviceTitle" text="$l10n_ads_ws_label_service" position="730px 240px"/>
-                <Text profile="ads_textBold" id="conditionTitle" text="$l10n_ads_ws_label_condition" position="730px 200px"/>
-                <Text profile="ads_textBold" id="powerTitle" text="$l10n_ads_ws_label_current_power" position="730px 160px"/>
-                <Text profile="ads_textBold" id="brakeTitle" text="$l10n_ads_ws_label_brake_efficiency" position="730px 120px"/>
-                <Text profile="ads_textBold" id="yieldReductionTitle" text="$l10n_ads_ws_label_harvest_efficiency" position="730px 80px"/>
+                <Text profile="ads_textBold" id="serviceTitle" text="$l10n_ads_ws_label_service" position="850px 240px"/>
+                <Text profile="ads_textBold" id="conditionTitle" text="$l10n_ads_ws_label_condition" position="850px 200px"/>
+                <Text profile="ads_textBold" id="powerTitle" text="$l10n_ads_ws_label_current_power" position="850px 160px"/>
+                <Text profile="ads_textBold" id="brakeTitle" text="$l10n_ads_ws_label_brake_efficiency" position="850px 120px"/>
+                <Text profile="ads_textBold" id="yieldReductionTitle" text="$l10n_ads_ws_label_harvest_efficiency" position="850px 80px"/>
 
-                <Text profile="fs25_textDefault" id="serviceValue" text="-" position="890px 240px"/>
-                <Text profile="fs25_textDefault" id="condtionValue" text="-" position="890px 200px"/>
-                <Text profile="fs25_textDefault" id="powerValue" text="-" position="890px 160px"/>
-                <Text profile="fs25_textDefault" id="brakeValue" text="-" position="890px 120px"/>
-                <Text profile="fs25_textDefault" id="yieldReductionValue" text="-" position="890px 80px"/>
+                <Text profile="fs25_textDefault" id="serviceValue" text="-" position="1125px 240px"/>
+                <Text profile="fs25_textDefault" id="condtionValue" text="-" position="1125px 200px"/>
+                <Text profile="fs25_textDefault" id="powerValue" text="-" position="1125px 160px"/>
+                <Text profile="fs25_textDefault" id="brakeValue" text="-" position="1125px 120px"/>
+                <Text profile="fs25_textDefault" id="yieldReductionValue" text="-" position="1125px 80px"/>
 
-                <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1010px 240px" textColor="0.5, 0.5, 0.5, 1"/>
-                <Text profile="fs25_textDefault" id="condtionLastInspectionDelataValue" text="-" position="1010px 200px" textColor="0.5, 0.5, 0.5, 1"/>
+                <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1260px 240px" textColor="0.5, 0.5, 0.5, 1.0"/>
+                <Text profile="fs25_textDefault" id="condtionLastInspectionDelataValue" text="-" position="1260px 200px" textColor="0.5, 0.5, 0.5, 1.0"/>
 
-                <ThreePartBitmap profile="ads_textSeporator" position="145px 228px" />
-                <ThreePartBitmap profile="ads_textSeporator" position="145px 188px" />
-                <ThreePartBitmap profile="ads_textSeporator" position="145px 148px" />
-                <ThreePartBitmap profile="ads_textSeporator" position="145px 108px" />
+                <ThreePartBitmap profile="ads_textSeporator" position="155px 228px" />
+                <ThreePartBitmap profile="ads_textSeporator" position="155px 188px" />
+                <ThreePartBitmap profile="ads_textSeporator" position="155px 148px" />
+                <ThreePartBitmap profile="ads_textSeporator" position="155px 108px" />
             </GuiElement>
 
 
@@ -68,22 +68,22 @@
             <GuiElement profile="ads_breakdownTableContainer">
                <ThreePartBitmap profile="ads_containerFrame"/>
                 
-                <Bitmap profile="ads_tableList" id="tableHeaderBox" position="50px -30px" size="1050px 50px">
-                    <Text profile="ads_tableDlgHeaderLeft" position="30px -0px" size="200px 40.77px" text="$l10n_ads_ws_table_header_part"/>
-                    <Text profile="ads_tableDlgHeaderLeft" position="230px -0px" size="500px 40.77px" text="$l10n_ads_ws_table_header_description"/>
-                    <Text profile="ads_tableDlgHeaderLeft" position="750px -0px" size="100px 40.77px" text="$l10n_ads_ws_table_header_stage"/>
-                    <Text profile="ads_tableDlgHeaderLeft" position="850px -0px" size="200px 40.77px" text="$l10n_ads_ws_table_header_price"/>
-                    <Text profile="ads_tableDlgHeaderLeft" position="950px -0px" size="200px 40.77px" text="$l10n_ads_ws_table_header_repair_select"/>
+                <Bitmap profile="ads_tableList" id="tableHeaderBox" position="50px -30px" size="1290px 50px">
+                    <Text profile="ads_tableHeaderLeft" position="30px -0px" size="190px 40.77px" text="$l10n_ads_ws_table_header_part"/>
+                    <Text profile="ads_tableHeaderLeft" position="230px -0px" size="720px 40.77px" text="$l10n_ads_ws_table_header_description"/>
+                    <Text profile="ads_tableHeaderLeft" position="960px -0px" size="110px 40.77px" text="$l10n_ads_ws_table_header_stage"/>
+                    <Text profile="ads_tableHeaderLeft" position="1080px -0px" size="100px 40.77px" text="$l10n_ads_ws_table_header_price"/>
+                    <Text profile="ads_tableHeaderLeft" position="1190px -0px" size="90px 40.77px" text="$l10n_ads_ws_table_header_repair_select"/>
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 
-                <SmoothList profile="ads_tableList" id="breakdownTable" position="50px -85px" size="1050px 320px" onSelectionChange="onSelectionChange" focusInit="onOpen" focusChangeTop="nil" focusChangeBottom="nil" visible="false">
-                    <ListItem profile="ads_tableListItem"  name="orderRowTemplate" size="1050px 40.77px" onClick="onRowClick">
-                        <Text profile="ads_tableDlgRowCellLeft" position="30px -0px" size="200px 40.77px" name="ads_tableBreakdownName" textLayoutMode="scrolling"/>
-                        <Text profile="ads_tableDlgRowCellLeft" position="230px -0px" size="500px 40.77px" name="ads_tableBreakdownDisc" textLayoutMode="scrolling"/>
-                        <Text profile="ads_tableDlgRowCellLeft" position="750px -0px" size="100px 40.77px" name="ads_tableBreakdownStage" />
-                        <Text profile="ads_tableDlgRowCellLeft" position="850px -0px" size="200px 40.77px" name="ads_tableBreakdownPrice" />
-                        <Text profile="ads_tableDlgRowCellLeft" position="950px -0px" size="200px 40.77px" name="ads_tableBreakdownSelect" />
+                <SmoothList profile="ads_tableList" id="breakdownTable" position="50px -85px" size="1290px 320px"  visible="false">
+                    <ListItem profile="ads_tableListItem"  name="orderRowTemplate" size="1290px 40.77px" >
+                        <Text profile="ads_tableRowCellLeft" position="30px -0px" size="190px 40.77px" name="ads_tableBreakdownName" textLayoutMode="scrolling"/>
+                        <Text profile="ads_tableRowCellLeft" position="230px -0px" size="720px 40.77px" name="ads_tableBreakdownDisc" textLayoutMode="scrolling"/>
+                        <Text profile="ads_tableRowCellLeftUpper" position="960px -0px" size="110px 40.77px" name="ads_tableBreakdownStage" />
+                        <Text profile="ads_tableRowCellLeft" position="1080px -0px" size="100px 40.77px" name="ads_tableBreakdownPrice" />
+                        <Button profile="ads_tableRowCellButton" position="1190px -0px" size="90px 40.77px" name="ads_tableBreakdownSelect" onClick="onRowClick" /> 
                     </ListItem>
                 </SmoothList>
 
@@ -98,8 +98,9 @@
             <!-- =============================================================== -->
             
             <GuiElement profile="ads_statusBarContainer">
+                    <ThreePartBitmap profile="ads_containerFrame"/>
                     <Animation profile="fs25_dialogLoading" id="maintanceInProgressSpinner" size="32px 32px" position="0px 40px"/>
-                    <Text profile="emptyPanel" id="statusText" textSize="22px" text="$l10n_ads_ws_status_initial" textColor="1 1 1 1" textAlignment="center"/>
+                    <Text profile="emptyPanel" id="statusText" textSize="20px" text="$l10n_ads_ws_status_initial" textColor="1 1 1 1" textAlignment="center"/>
             </GuiElement>
         </GuiElement> 
 
@@ -127,22 +128,22 @@
         </Presets>
 
         <Profile name="ads_dialogBg" extends="fs25_dialogBg">
-            <width value="1200px"/>
-            <height value="880px"/> 
+            <width value="1440px"/>
+            <height value="900px"/> 
         </Profile>
 
         <Profile name="ads_vehicleInfoContainer" extends="emptyPanel" with="anchorTopCenter">
-            <size value="1170px 350px"/>
+            <size value="1410px 350px"/>
             <position value="0px 0px"/>
         </Profile>
 
         <Profile name="ads_breakdownTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
-            <size value="1170px 440px"/>
+            <size value="1410px 470px"/>
             <position value="0px -300px"/>
         </Profile>
 
         <Profile name="ads_statusBarContainer" extends="emptyPanel" with="anchorTopStretchingX">
-            <size value="1170px 70px"/>
+            <size value="1410px 80px"/>
             <position value="0px -730px"/>
         </Profile>
         
@@ -153,7 +154,7 @@
         </Profile>
 
         <Profile name="ads_textSeporator" extends="baseReference" with="anchorBottomCenter">
-            <size value="700px 1dp" />
+            <size value="950px 1dp" />
             <absoluteSizeOffset value="0px 0px" />
             <imageColor value="$preset_fs25_colorGreyLight_50" />
             <startImageSize value="30px 0px" />
@@ -182,7 +183,7 @@
             <textAlignment value="center"/>
         </Profile>
 
-        <Profile name="ads_tableDlgHeaderLeft" extends="baseReference">
+        <Profile name="ads_tableHeaderLeft" extends="baseReference">
             <imageColor value="0 0 0 0" />
             <textFocusedColor value="$preset_fs25_colorMainHighlight" />
             <textHighlightedColor value="$preset_fs25_colorMainHighlight" />
@@ -199,18 +200,43 @@
         
         <Profile name="ads_tableListItem" extends="baseReference" with="anchorTopStretchingX alternating">
             <height value="32px"/>
+            <textSelectedColor value="$preset_fs25_colorMainLight" />
             <imageColor value="$preset_fs25_colorGrey" />
-            <imageSelectedColor value="$preset_fs25_colorMainHighlight" />
             <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
         </Profile> 
 
-        <Profile name="ads_tableDlgRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
+        <Profile name="ads_tableRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
             <textBold value="false" />
-            <textSize value="15px" />
+            <textSize value="16px" />
             <textAlignment value="left" />
             <textColor value="$preset_fs25_colorMainLight" />
-            <textSelectedColor value="$preset_fs25_colorMainDark" />
             <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+
+        <Profile name="ads_tableRowCellLeftUpper" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false" />
+            <textSize value="16px" />
+            <textUpperCase value="true" />
+            <textAlignment value="left" />
+            <textColor value="$preset_fs25_colorMainLight" />
+            <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+
+        <Profile name="ads_tableRowCellButton" extends="emptyPanel" with="anchorStretchingYLeft">
+            <size value="90px 32px"/>
+            <focusOnHighlight value="true"/>
+            <textResizeWidth value="200px"/>
+            <textSize value="16px"/>
+            <iconColor value="$preset_fs25_colorMainDark"/>
+            <iconFocusedColor value="$preset_colorTransparent"/>
+            <iconTextOffset value="30px 0px"/>
+            <iconHighlightedColor value="$preset_colorTransparent"/>
+            <textBold value="true"/>
+            <textUpperCase value="true"/>
+            <textAlignment value="center"/>
+            <textColor value="$preset_fs25_colorMainLight"/>
+            <textFocusedColor value="$preset_fs25_colorMainLight"/>
+            <textDisabledColor value="$preset_colorDisabled"/>
         </Profile>
 
         <Profile name="ads_containerFrame" extends="baseReference" with="anchorTopStretchingX">    
