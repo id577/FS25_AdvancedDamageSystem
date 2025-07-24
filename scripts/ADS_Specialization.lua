@@ -445,6 +445,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.transmissionShiftFailed1 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed1", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         spec.samples.transmissionShiftFailed2 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed2", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         spec.samples.transmissionShiftFailed3 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed3", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+        spec.samples.brakes1 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes1", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+        spec.samples.brakes2 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes2", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         delete(xmlSoundFile)
     else
         log_dbg("ERROR: AdvancedDamageSystem - Could not load ads_sounds.xml")
