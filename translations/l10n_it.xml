@@ -202,7 +202,7 @@
         <text name="ads_spec_this_month" text="Questo mese" />
         <text name="ads_spec_months_ago" text="mesi fa" />
         <text name="ads_spec_never" text="Mai" />
-        <text name="ads_spec_op_hurs_short" text="o/h" />
+        <text name="ads_spec_op_hours_short" text="o/h" />
         <text name="ads_spec_tomorrow_at" text="domani alle " />
         <text name="ads_spec_day_after_tommorow_at" text="dopodomani alle " />
         <text name="ads_spec_in_days_at" text="tra {giorni} giorni a " />

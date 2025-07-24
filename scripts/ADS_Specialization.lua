@@ -1363,7 +1363,6 @@ function AdvancedDamageSystem:initMaintenance(type, breadownsCount, isAftermarke
 
         AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
         spec.lastServiceOperatingHours = self:getFormattedOperatingTime()
-
         spec.lastInspectedPower = (spec.activeEffects.ENGINE_TORQUE_MODIFIER and (1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value)) or 1
         spec.lastInspectedBrake = (spec.activeEffects.BRAKE_FORCE_MODIFIER and (1 + spec.activeEffects.BRAKE_FORCE_MODIFIER.value)) or 1
         spec.lastInspectedYieldReduction = (spec.activeEffects.YIELD_REDUCTION_MODIFIER and (1 + spec.activeEffects.YIELD_REDUCTION_MODIFIER.value)) or 1
@@ -1371,7 +1370,7 @@ function AdvancedDamageSystem:initMaintenance(type, breadownsCount, isAftermarke
         local env = g_currentMission.environment
         spec.lastInspectionDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
 
-        if type ~= states.INSPECTION and type ~= states.MAINTENANCE then
+        if type ~= states.INSPECTION and type ~= states.REPAIR then
             spec.lastServiceDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
         end
         
