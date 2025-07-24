@@ -21,14 +21,14 @@
         <text name="ads_ws_label_operating_hours" text="Наработка"/>
         <text name="ads_ws_label_service" text="Обслуживание"/>
         <text name="ads_ws_label_condition" text="Состояние"/>
-        <text name="ads_ws_label_current_power" text="Тек. мощность"/>
-        <text name="ads_ws_label_brake_efficiency" text="Эфф. тормозов"/>
-        <text name="ads_ws_label_harvest_efficiency" text="Эфф. уборки"/>
+        <text name="ads_ws_label_current_power" text="Текущая мощность"/>
+        <text name="ads_ws_label_brake_efficiency" text="Эффективность тормозов"/>
+        <text name="ads_ws_label_harvest_efficiency" text="Эффективность уборки"/>
         <text name="ads_ws_label_maintainability" text="Ремон-сть"/>
         <text name="ads_ws_label_service_interval" text="Интервал ТО"/>
 
-        <text name="ads_ws_label_last_maintenance" text="Посл. ТО"/>
-        <text name="ads_ws_label_last_inspection" text="Посл. осмотр"/>
+        <text name="ads_ws_label_last_maintenance" text="Последнее ТО"/>
+        <text name="ads_ws_label_last_inspection" text="Последний осмотр"/>
 
         <text name="ads_ws_table_header_part" text="Компонент"/>
         <text name="ads_ws_table_header_description" text="Описание"/>

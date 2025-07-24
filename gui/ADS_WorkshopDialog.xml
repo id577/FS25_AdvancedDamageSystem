@@ -81,7 +81,7 @@
                     <ListItem profile="ads_tableListItem"  name="orderRowTemplate" size="1290px 40.77px" >
                         <Text profile="ads_tableRowCellLeft" position="30px -0px" size="190px 40.77px" name="ads_tableBreakdownName" textLayoutMode="scrolling"/>
                         <Text profile="ads_tableRowCellLeft" position="230px -0px" size="720px 40.77px" name="ads_tableBreakdownDisc" textLayoutMode="scrolling"/>
-                        <Text profile="ads_tableRowCellLeftUpper" position="960px -0px" size="110px 40.77px" name="ads_tableBreakdownStage" />
+                        <Text profile="ads_tableRowCellLeft" position="960px -0px" size="110px 40.77px" name="ads_tableBreakdownStage" />
                         <Text profile="ads_tableRowCellLeft" position="1080px -0px" size="100px 40.77px" name="ads_tableBreakdownPrice" />
                         <Button profile="ads_tableRowCellButton" position="1190px -0px" size="90px 40.77px" name="ads_tableBreakdownSelect" onClick="onRowClick" /> 
                     </ListItem>
@@ -90,7 +90,8 @@
                 <ThreePartBitmap profile="fs25_listSliderBox" position="-50px 0px" size="12px 300px" with="anchorTopRight">
                     <Slider profile="fs25_listSlider" size="6px 30px" dataElementId="breakdownTable" id="tableSlider" />
                 </ThreePartBitmap>
-                <Text profile="ads_textHeaderGrey" id="emptyTableText" text="$l10n_ads_ws_info_no_breakdowns" position="0px 200px" size="100% 50px"/>
+                <Animation profile="fs25_dialogLoading" id="maintanceInProgressSpinner" size="200px 200px" position="0px 0px"/>
+                <Text profile="ads_textHeaderGrey" id="emptyTableText" text="$l10n_ads_ws_info_no_breakdowns" position="0px 210px" size="100% 50px"/>
             </GuiElement>
 
             <!-- =============================================================== -->`   
@@ -99,7 +100,6 @@
             
             <GuiElement profile="ads_statusBarContainer">
                     <ThreePartBitmap profile="ads_containerFrame"/>
-                    <Animation profile="fs25_dialogLoading" id="maintanceInProgressSpinner" size="32px 32px" position="0px 40px"/>
                     <Text profile="emptyPanel" id="statusText" textSize="20px" text="$l10n_ads_ws_status_initial" textColor="1 1 1 1" textAlignment="center"/>
             </GuiElement>
         </GuiElement> 
@@ -178,7 +178,7 @@
 
         <Profile name="ads_textHeaderGrey" extends="fs25_textDefault">
             <textBold value="true" />
-            <textSize value="24px" />
+            <textSize value="20px" />
             <textColor value="$preset_colorDisabled"/>
             <textAlignment value="center"/>
         </Profile>

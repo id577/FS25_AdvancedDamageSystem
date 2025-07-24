@@ -835,7 +835,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.44,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.05, aggregation = "min"}
                 }
             },
             {
@@ -845,7 +845,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.5,
                 repairPrice = 0.88,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
@@ -858,7 +858,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.5,
                 repairPrice = 1.76,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -871,7 +871,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 3.52,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.5, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false },
@@ -895,7 +895,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.44,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.05, aggregation = "min"}
                 }
             },
             {
@@ -905,7 +905,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.5,
                 repairPrice = 0.88,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
@@ -918,7 +918,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.5,
                 repairPrice = 1.76,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -931,7 +931,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 3.52,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.5, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false },
@@ -1034,7 +1034,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.05, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
@@ -1051,7 +1051,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "LIGHTS_FAILURE", value = 1.0, extraData = {message = "ads_breakdowns_electrical_system_malfunction_stage3_message"}, aggregation = "boolean_or" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.3, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }

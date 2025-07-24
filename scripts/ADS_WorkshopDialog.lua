@@ -133,7 +133,7 @@ function ADS_WorkshopDialog:updateScreen()
         local localizedStatus = g_i18n:getText(spec.currentState)
         statusText = string.format(g_i18n:getText("ads_ws_status_in_progress_format"), localizedStatus, finishTimeText)
         self.maintanceInProgressSpinner:setVisible(true)
-        self.maintanceInProgressSpinner:setPosition(0, 0.25)
+        --self.maintanceInProgressSpinner:setPosition(0, 0.25)
         
         if spec.currentState ~= STATUS.REPAIR then
             local inspectingText = g_i18n:getText("ads_ws_inspecting_status")
