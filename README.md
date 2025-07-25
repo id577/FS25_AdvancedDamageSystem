@@ -141,7 +141,7 @@ It can only be partically restored through the Overhaul procedure in the worksho
 This parameter reflects the state of consumables: oil, filters, technical fluids, etc.
 
 - **What does Service affect?**
-This is a critically important parameter. A low Service level significantly accelerates the decline of Condition. Timely maintenance is the best way to save money on expensive repairs in the future.
+This is a critically important parameter. A low Service level significantly accelerates the decline of Condition. Furthermore, it drastically increases the probability of random component failures. Timely maintenance is the best way to save money on expensive repairs in the future.
 
 - **How does it decrease?**
 It decreases with engine operating hours, simulating the natural wear of consumables.
