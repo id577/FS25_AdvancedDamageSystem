@@ -386,7 +386,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.8,
                 effects = {
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" }
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
+                    { id = "TURBOCHARGER_GRINDING_EFFECT", value = 0.2, aggregation = "max", extraData = {timer = 0, soundPlayed = false} },
                 }
             },
             {
@@ -397,7 +398,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.6,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" }
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
+                    { id = "TURBOCHARGER_GRINDING_EFFECT", value = 0.3, aggregation = "max", extraData = {timer = 0, soundPlayed = false} },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
@@ -412,7 +414,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.45, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.40, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" }
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
+                    { id = "TURBOCHARGER_GRINDING_EFFECT", value = 0.5, aggregation = "max", extraData = {timer = 0, soundPlayed = false} },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -733,7 +736,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.2,
                 effects = {
                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max"},
-                    { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                    { id = "GEAR_REJECTION_CHANCE", value = 0.05, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             {
@@ -1839,6 +1842,46 @@ ADS_Breakdowns.EffectApplicators.DARK_EXHAUST_EFFECT = {
     end
 }
 
+-------------TURBOCHARGER_GRINDING_EFFECT -----------------
+ADS_Breakdowns.EffectApplicators.TURBOCHARGER_GRINDING_EFFECT = { 
+    getEffectName = function()
+        return "TURBOCHARGER_GRINDING_EFFECT" 
+    end,
+    
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying TURBOCHARGER_GRINDING_EFFECT effect")
+        local motor = vehicle:getMotor()
+        local effectName = handler.getEffectName()
+
+        local activeFunc = function(v, dt)
+            if motor.lastTurboScale > 0.1 and not effectData.extraData.soundPlayed then
+                if math.random() < effectData.value then
+                    g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples['turbocharger' .. math.random(4)])
+                end
+                effectData.extraData.soundPlayed = true
+                effectData.extraData.timer = 10000
+            end
+
+            if effectData.extraData.timer > 0 then
+                effectData.extraData.timer = effectData.extraData.timer - dt
+            end
+
+            if effectData.extraData.timer <= 0 and effectData.extraData.soundPlayed and motor.lastTurboScale < 0.01 then
+                effectData.extraData.timer = 0
+                effectData.extraData.soundPlayed = false
+            end
+        end
+        addFuncToActive(vehicle, effectName, activeFunc)
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing TURBOCHARGER_GRINDING_EFFECT effect")
+        removeFuncFromActive(vehicle, handler.getEffectName())
+    end
+}
+
+
+
 
 -- ==========================================================
 --                 EFFECTS WITH PROBABILITY
@@ -1858,7 +1901,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
                         if v.stopMotor then
                             v:stopMotor()
                             if v.getIsControlled ~= nil and v:getIsControlled() then
-                                g_currentMission:showBlinkingWarning(g_i18n:getText(v:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdowns_engine_stalled_message", 5000)) 
+                                g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message", 5000)) 
                             end
                         end
                     end
@@ -1918,16 +1961,6 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         local motor = vehicle:getMotor()
         if motor == nil then return end
 
-        local function playRandomSample()
-            local x = math.random()
-            if x < 0.333 then 
-                g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples.transmissionShiftFailed1)
-            elseif x < 0.666 then
-                g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples.transmissionShiftFailed2)
-            else
-                g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples.transmissionShiftFailed3)
-            end
-        end
 
         local originalShiftFuncName = "shiftGear"
         if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalShiftFuncName] == nil then
@@ -1940,7 +1973,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
                 log_dbg("GEAR SHIFT FAILED! (shiftGear)")
                 effectData.extraData.status = "FAILED"
                 if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
-                    playRandomSample()
+                    g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                 end
                 return
             end
@@ -1961,7 +1994,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
                     effectData.extraData.status = "FAILED"
                     log_dbg("GEAR SHIFT FAILED! (selectGear)")
                     if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
-                       playRandomSample()
+                       g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                     end
                     return
                 end
@@ -1992,7 +2025,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
                     m.autoGearChangeTimer = effectData.extraData.duration
                     
                     if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
-                        playRandomSample()
+                        g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                     end
                     
                     if effectData.value >= 1.0 then
@@ -2077,6 +2110,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
                         effect.extraData.timer = effect.extraData.timer + dt
                         if effect.extraData.timer >= effect.extraData.duration then
                             effect.extraData.status = 'IDLE'
+                            g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                         end
                     elseif v:getMotorLoadPercentage() > 0.8 and effect.extraData.status == 'IDLE' then
                         if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
@@ -2085,7 +2119,8 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
                             if motor and motor.setGear then
                                 motor:setGear(0, false)
                                 if v.getIsControlled ~= nil and v:getIsControlled() then
-                                    g_currentMission:showBlinkingWarning(g_i18n:getText(v:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdowns_gear_disengage_message", 3000)) 
+                                    g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples.gearDisengage1)
+                                    g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_gear_disengage_message", 3000)) 
                                 end
                             end
                         end
@@ -2243,7 +2278,9 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
         if self.spec_AdvancedDamageSystem.activeEffects.ENGINE_FAILURE then
             local engineFailureEffect = spec.activeEffects.ENGINE_FAILURE
             if (engineFailureEffect and engineFailureEffect.value >= 1.0) then
-                g_soundManager:playSample(spec.samples.starter)
+                if not g_soundManager:getIsSamplePlaying(spec.samples.starter) then
+                    g_soundManager:playSample(spec.samples.starter)
+                end 
                 return
             end
         end
@@ -2431,7 +2468,9 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
             axisForward = axisForward * modifier
             if brakeEffect.extraData ~= nil and vehicle:getLastSpeed() < 15 then
                 if not brakeEffect.extraData.soundPlayed and math.abs(origAxisForward) > 0.999 then
-                    g_soundManager:playSample(spec_ads.samples['brakes' .. math.random(3)])
+                    if math.random() < brakeEffect.value then
+                        g_soundManager:playSample(spec_ads.samples['brakes' .. math.random(3)])
+                    end
                     brakeEffect.extraData.soundPlayed = true
                     brakeEffect.extraData.timer = 1500
                 end
