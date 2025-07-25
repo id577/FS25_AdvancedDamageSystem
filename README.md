@@ -329,7 +329,7 @@ If not addressed, a breakdown will progress over time. For a vehicle in good con
 With each new stage, the cost of repair increases. A critical breakdown can be very costly. For modern vehicles, the mod adds dashboard indicators that usually report a problem starting from the second stage.
 
 #### It Pays to Be Attentive!
-The cheapest repair is a preventive one. If you notice that something is "off" with your vehicle (e.g., a slight loss of power) at the first, hidden stage, and immediately take it for an Inspection, you can fix the issue for a minimal price.
+The cheapest repair is a preventive one. Keep an eye on—and an ear out for—your equipment. The initial stages of a breakdown are accompanied by various visual and audio cues that serve as early warning signs. This might manifest as fluctuating engine RPMs, dark exhaust smoke, or other unusual noises like knocking or squeaking during operation. If you catch these symptoms during the first, hidden stage and promptly take your vehicle for an Inspection, you can fix the problem for a minimal price.
 
 > [!NOTE]
 > <details>
