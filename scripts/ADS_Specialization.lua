@@ -447,6 +447,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.transmissionShiftFailed3 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed3", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         spec.samples.brakes1 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes1", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         spec.samples.brakes2 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes2", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+        spec.samples.brakes3 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes3", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         delete(xmlSoundFile)
     else
         log_dbg("ERROR: AdvancedDamageSystem - Could not load ads_sounds.xml")
@@ -668,7 +669,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     if isMotorStarted then
         heat = C.ENGINE_MIN_HEAT + motorLoad * (C.ENGINE_MAX_HEAT - C.ENGINE_MIN_HEAT)
         
-        local dirtRadiatorMaxCooling = C.ENGINE_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 3))
+        local dirtRadiatorMaxCooling = C.ENGINE_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
     else
@@ -732,7 +733,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
             slipFactor = 1 + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2
         end
         heat = C.TRANS_MIN_HEAT + (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor
-        local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 3))
+        local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)

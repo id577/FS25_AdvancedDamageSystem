@@ -300,12 +300,17 @@ ADS_Breakdowns.BreakdownRegistry = {
                         id = db.ENGINE,
                         color = color.WARNING,
                         switchOn = function(vehicle)
-                            if vehicle.spec_motorized and vehicle:getIsMotorStarted() and vehicle:getMotorLoadPercentage() > 1.0 then
+                            if vehicle.spec_motorized and vehicle:getIsMotorStarted() and vehicle:getMotorLoadPercentage() > 0.95 then
                                 return true
                             end
                             return false
                         end,
-                        switchOff = false
+                        switchOff = function(vehicle)
+                            if vehicle.spec_motorized and vehicle:getIsMotorStarted() and vehicle:getMotorLoadPercentage() <= 0.50 then
+                                return true
+                            end
+                            return false
+                        end,
                     }
                 }
             },
@@ -446,7 +451,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.4,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.1, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
@@ -460,7 +465,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0,
                 repairPrice = 0.8,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.15, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.4, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
@@ -488,7 +493,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.2,
                 repairPrice = 1.6, 
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.20, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} }, 
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} }, 
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 1.0, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
@@ -529,7 +534,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.5,
                 repairPrice = 0.6,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.1, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.08, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.4, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.9, cruiseState = 0} }
@@ -542,7 +547,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.5,
                 repairPrice = 1.2,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.15, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.20, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min" },
@@ -559,7 +564,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.2,
                 repairPrice = 2.4,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.20, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
@@ -1098,7 +1103,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.2,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
                 }
             },
@@ -1109,7 +1114,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0,
                 repairPrice = 0.4,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.15, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" }
                 },
@@ -1124,7 +1129,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0,
                 repairPrice = 0.8, 
                 effects = { 
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.20, aggregation = "max", extraData = { timer = 0, status = 'IDLE', rpmBackup = 0} },
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
                     { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
@@ -1754,20 +1759,15 @@ ADS_Breakdowns.EffectApplicators.IDLE_HUNTING_EFFECT = {
 
         local activeFunc = function(v, dt)
             if v:getIsMotorStarted() and v:getLastSpeed() < 0.01 then
-                effectData.extraData.timer = effectData.extraData.timer + dt
-                if effectData.extraData.timer >= 800 then
-                    if effectData.extraData.status == 'HUNTING' then
-                        effectData.extraData.status = 'IDLE'
-                        motor.minRpm = effectData.extraData.rpmBackup
-                    else
-                        effectData.extraData.status = 'HUNTING'
-                        motor.minRpm = motor.minRpm * (1 + math.random() * effectData.value)
-                    end
-                    effectData.extraData.timer = 0
+                if effectData.extraData.rpmBackup == 0 then
+                    effectData.extraData.rpmBackup = motor.minRpm
                 end
+                effectData.extraData.timer = effectData.extraData.timer + dt
+                motor.minRpm = effectData.extraData.rpmBackup * (1 + effectData.value * math.sin(2 * math.pi * effectData.extraData.timer / effectData.extraData.period))
             else
-                if motor.minRpm ~= effectData.extraData.rpmBackup then
+                if effectData.extraData.rpmBackup ~= 0 and  effectData.extraData.rpmBackup ~= motor.minRpm then
                     motor.minRpm = effectData.extraData.rpmBackup
+                    effectData.extraData.timer = 0
                 end
             end
         end
@@ -2429,23 +2429,20 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
             local modifier = math.max(0.01, 1 + brakeEffect.value) 
             local origAxisForward = axisForward
             axisForward = axisForward * modifier
-            if brakeEffect.extraData ~= nil then
-                local lastSpeed = vehicle:getLastSpeed()
-                print(origAxisForward)
-                if math.random() < 0.33 and not brakeEffect.extraData.soundPlayed and lastSpeed < 20 and lastSpeed > 15 and origAxisForward < -0.99 then
-                    g_soundManager:playSample(spec_ads.samples['brakes' .. math.random(2)])
+            if brakeEffect.extraData ~= nil and vehicle:getLastSpeed() < 15 then
+                if not brakeEffect.extraData.soundPlayed and math.abs(origAxisForward) > 0.999 then
+                    g_soundManager:playSample(spec_ads.samples['brakes' .. math.random(3)])
                     brakeEffect.extraData.soundPlayed = true
-                    brakeEffect.extraData.timer = 2000
+                    brakeEffect.extraData.timer = 1500
                 end
             end
         end
-        if brakeEffect.extraData ~= nil then
-            if brakeEffect.extraData.timer > 0 then
-                brakeEffect.extraData.timer = brakeEffect.extraData.timer - dt
-            else
-                brakeEffect.extraData.soundPlayed = false
-                brakeEffect.extraData.timer = 0
-            end
+
+        if brakeEffect.extraData ~= nil and brakeEffect.extraData.timer > 0 then
+            brakeEffect.extraData.timer = brakeEffect.extraData.timer - dt
+        elseif brakeEffect.extraData ~= nil and brakeEffect.extraData.soundPlayed == true then
+            brakeEffect.extraData.soundPlayed = false
+            brakeEffect.extraData.timer = 0
         end
     end
 

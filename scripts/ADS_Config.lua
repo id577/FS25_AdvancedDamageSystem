@@ -163,7 +163,7 @@ ADS_Config = {
 
         -- The maximum reduction in radiator effectiveness due to dirt.
         -- 0.2 means a fully dirty vehicle's radiator is 20% less effective.
-        MAX_DIRT_INFLUENCE = 0.15,
+        MAX_DIRT_INFLUENCE = 0.20,
         
         -- The time constant for the low-pass filter on the temperature gauge.
         -- Higher value means the needle on the dashboard will move more slowly and smoothly,

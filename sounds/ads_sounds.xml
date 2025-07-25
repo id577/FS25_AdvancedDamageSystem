@@ -36,17 +36,24 @@
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </transmissionShiftFailed3>
     <brakes1 file="sounds/brakes_1.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
-        <volume indoor="2.1" outdoor="2.2" />
+        <volume indoor="2.4" outdoor="2.5" />
         <pitch indoor="1.0" outdoor="1.0" />
         <lowpassGain indoor="0.5" outdoor="1.0" />
         <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </brakes1>
     <brakes2 file="sounds/brakes_2.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
-        <volume indoor="1.5" outdoor="1.6" />
+        <volume indoor="0.25" outdoor="0.35" />
         <pitch indoor="1.0" outdoor="1.0" />
         <lowpassGain indoor="0.5" outdoor="1.0" />
         <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </brakes2>
+    <brakes3 file="sounds/brakes_3.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="0.25" outdoor="0.35" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </brakes3>
 </sounds>
