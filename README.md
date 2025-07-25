@@ -162,7 +162,7 @@ It is restored to 100% through the Maintenance procedure in the workshop.
 > The only modifier affecting this rate is the vehicle's **Reliability**. Just like with `Condition`, the brand's reliability rating acts as a final divisor for the total `Service` wear.
 >
 > ### 2. The Penalty for Overdue Service
-> The mod calculates a recommended service interval for each vehicle based on its brand quality. While you are free to choose your own schedule, delaying maintenance has severe consequences. The table below shows how the penalty multiplier applied to `Condition` wear grows exponentially as > the `Service` level drops below the 66% threshold.
+> The mod calculates a recommended service interval for each vehicle based on its brand quality. While you are free to choose your own schedule, delaying maintenance has severe consequences. The table below shows how the penalty multiplier applied to `Condition` wear (same penalty to breakdown probability) grows exponentially as > the `Service` level drops below the 66% threshold.
 > 
 > | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear |
 > | :-----------: | :-------------------------: | :-----------: | :-------------------------: | :-----------: | :-------------------------: |
@@ -172,8 +172,8 @@ It is restored to 100% through the Maintenance procedure in the workshop.
 > | **55%**       | `+12%`                      | **35%**       | `+92%`                      | **5%**        | `+342%`                     |
 > |               |                             | **30%**       | `+121%`                     | **0%**        | **`+400%`**                 |
 > |               |                             | **25%**       | `+156%`                     |               |                             |
->
->
+
+> 
 > </details>
 
 ### A Note on Player Knowledge: Hidden Values
