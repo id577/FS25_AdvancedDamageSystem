@@ -198,7 +198,7 @@ The most interesting part of the mod. As the vehicle's Condition drops, the prob
 > 
 > #### ECU Malfunction
 > * *Applicable to:* Modern vehicles (Year 2000+) with combustion engines.
-> * *Symptoms:* Progressive power loss, increased fuel consumption, engine stalls, difficulty starting.
+> * *Symptoms:* Progressive power loss, increased fuel consumption, engine stalls, difficulty starting, dark exhaust smoke.
 > * *Critical Effect:* **Complete engine failure.** The vehicle will not start.
 > 
 > #### Turbocharger Wear
@@ -208,12 +208,12 @@ The most interesting part of the mod. As the vehicle's Condition drops, the prob
 > 
 > #### Fuel Pump Malfunction
 > * *Applicable to:* All vehicles with combustion engines.
-> * *Symptoms:* Engine hesitation, occasional stalls, difficulty starting, progressive power loss, and increased fuel consumption.
+> * *Symptoms:* Engine hesitation, occasional stalls, difficulty starting, progressive power loss, increased fuel consumption and fluctuating idle.
 > * *Critical Effect:* **Complete engine failure.** Fuel is not supplied, and the engine cannot be started.
 > 
 > #### Fuel Injector Malfunction
 > * *Applicable to:* All vehicles with combustion engines.
-> * *Symptoms:* Rough engine operation, misfires under load, significant power loss, and unreliable starting.
+> * *Symptoms:* Rough engine operation, misfires under load, significant power loss, unreliable starting, fluctuating idle.
 > * *Critical Effect:* **Complete engine failure.** The engine will not run correctly and may not start at all.
 >
 > #### Cooling System Thermostat Malfunctio
@@ -223,7 +223,7 @@ The most interesting part of the mod. As the vehicle's Condition drops, the prob
 >
 > #### Carburetor Clogging
 > * *Applicable to:* Older vehicles (Pre-1980) with combustion engines.
-> * *Symptoms:* Engine hesitation, sputtering, frequent stalls, and difficulty maintaining power.
+> * *Symptoms:* Engine hesitation, sputtering, frequent stalls, difficulty maintaining power and fluctuating idle.
 > * *Critical Effect:* **Engine will not run** due to complete fuel starvation.
 > 
 > ---
@@ -256,7 +256,7 @@ The most interesting part of the mod. As the vehicle's Condition drops, the prob
 > 
 > #### Brake Malfunction
 > * *Applicable to:* All wheeled vehicles.
-> * *Symptoms:* Increased braking distance, weak and unreliable brakes.
+> * *Symptoms:* Increased braking distance, weak and unreliable brakes, unusual noises when braking.
 > * *Critical Effect:* **Complete brake system failure.** Braking is impossible.
 > 
 > #### Hydraulic Pump Malfunction
