@@ -478,8 +478,12 @@ function ADS_Hud:drawActiveVehicleHUD()
     renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f%% / %.2f%%", vehicle:getDamageAmount() * 100, vehicle:getDirtAmount() * 100))
     currentY = currentY - panel.lineHeight
 
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("State/Timer:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%s / %.1f s", g_i18n:getText(spec.currentState), spec.maintenanceTimer / 1000))
+    renderText(col3_x, currentY, textSettings.normalSize, string.format("State/Workshop:"))
+    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%s / %s", g_i18n:getText(spec.currentState), spec.workshopType))
+    currentY = currentY - panel.lineHeight
+
+    renderText(col3_x, currentY, textSettings.normalSize, string.format("Timer:"))
+    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%0.f s", spec.maintenanceTimer / 1000))
     currentY = currentY - panel.lineHeight
 
     -- BOTTOM

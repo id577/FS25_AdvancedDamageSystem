@@ -52,8 +52,8 @@
                 <Text profile="fs25_textDefault" id="brakeValue" text="-" position="1125px 120px"/>
                 <Text profile="fs25_textDefault" id="yieldReductionValue" text="-" position="1125px 80px"/>
 
-                <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1260px 240px" textColor="0.5, 0.5, 0.5, 1.0"/>
-                <Text profile="fs25_textDefault" id="condtionLastInspectionDelataValue" text="-" position="1260px 200px" textColor="0.5, 0.5, 0.5, 1.0"/>
+                <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1260px 240px" />
+                <Text profile="fs25_textDefault" id="condtionLastInspectionDelataValue" text="-" position="1260px 200px" />
 
                 <ThreePartBitmap profile="ads_textSeporator" position="155px 228px" />
                 <ThreePartBitmap profile="ads_textSeporator" position="155px 188px" />

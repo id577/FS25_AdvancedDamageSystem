@@ -40,6 +40,10 @@ function ADS_WorkshopDialog.show(vehicle)
     dialog.activeBreakdowns = vehicle:getActiveBreakdowns()
     dialog.visibleBreakdowns = {}
     dialog.breakdonRegistry = ADS_Breakdowns.BreakdownRegistry
+    dialog.workshopType = AdvancedDamageSystem.WORKSHOP.DEALER
+
+    if g_workshopScreen.isMobileWorkshop then  dialog.workshopType = AdvancedDamageSystem.WORKSHOP.MOBILE end
+    if g_workshopScreen.isOwnWorkshop then  dialog.workshopType = AdvancedDamageSystem.WORKSHOP.OWN end
 
     dialog:updateScreen()
     g_gui:showDialog("ADS_WorkshopDialog")
@@ -121,20 +125,25 @@ function ADS_WorkshopDialog:updateScreen()
     local buttonsDisabled = false
     local statusText = ""
     local statusColor = {1, 1, 1, 1}
+    
     self.maintanceInProgressSpinner:setVisible(false)
+    if g_workshopScreen.isDealer or g_workshopScreen.isOwnWorkshop then
+        if not ADS_Main.isWorkshopOpen then
+            buttonsDisabled = true
+            statusText = g_i18n:getText("ads_ws_status_closed")
+            statusColor = {0.6, 0.6, 0.6, 1}
+        else
+            statusText = g_i18n:getText("ads_ws_status_open")
+            buttonsDisabled = false
+        end
+    end
 
-    if not ADS_Main.isWorkshopOpen then
-        buttonsDisabled = true
-        statusText = g_i18n:getText("ads_ws_status_closed")
-        statusColor = {0.6, 0.6, 0.6, 1}
-    elseif spec.currentState ~= STATUS.READY and spec.currentState ~= STATUS.BROKEN then
+    if spec.currentState ~= STATUS.READY then
+        self.maintanceInProgressSpinner:setVisible(true)
         buttonsDisabled = true
         local finishTimeText = self.vehicle:getFormattedMaintenanceFinishTimeText()
         local localizedStatus = g_i18n:getText(spec.currentState)
         statusText = string.format(g_i18n:getText("ads_ws_status_in_progress_format"), localizedStatus, finishTimeText)
-        self.maintanceInProgressSpinner:setVisible(true)
-        --self.maintanceInProgressSpinner:setPosition(0, 0.25)
-        
         if spec.currentState ~= STATUS.REPAIR then
             local inspectingText = g_i18n:getText("ads_ws_inspecting_status")
             self.serviceValue:setText(inspectingText)
@@ -148,26 +157,31 @@ function ADS_WorkshopDialog:updateScreen()
             self.yieldReductionValue:setText(inspectingText)
             self.yieldReductionValue:setTextColor(0.5, 0.5, 0.5, 1.0)
         end
-    else
-        statusText = g_i18n:getText("ads_ws_status_open")
     end
 
     self.statusText:setText(statusText)
     self.statusText:setTextColor(statusColor[1], statusColor[2], statusColor[3], statusColor[4])
 
-    self.inscpectionButton.disabled = buttonsDisabled
-    self.maintenanceButton.disabled = buttonsDisabled
-    self.repairButton.disabled = buttonsDisabled
-    self.overhaulButton.disabled = buttonsDisabled
-
     -- ====================================================================
     -- 4: Action Buttons
     -- ====================================================================
-    
-    local inspectionPrice = self.vehicle:getInspectionPrice()
-    local maintenancePrice = self.vehicle:getMaintenancePrice()
-    local repairPrice = self.vehicle:getADSRepairPrice()
-    local overhaulPrice = self.vehicle:getOverhaulPrice()
+
+    if g_workshopScreen.isDealer or g_workshopScreen.isOwnWorkshop then
+        self.inscpectionButton.disabled = buttonsDisabled 
+        self.maintenanceButton.disabled = buttonsDisabled
+        self.repairButton.disabled = buttonsDisabled
+        self.overhaulButton.disabled = buttonsDisabled 
+    else
+        self.inscpectionButton.disabled = false or spec.currentState ~= STATUS.READY
+        self.maintenanceButton.disabled = not (g_workshopScreen.isMobileWorkshop and spec.maintainability >= 1.1) or spec.currentState ~= STATUS.READY
+        self.repairButton.disabled = not (g_workshopScreen.isMobileWorkshop and spec.maintainability >= 1.2) or spec.currentState ~= STATUS.READY
+        self.overhaulButton.disabled = true
+    end
+
+    local inspectionPrice = self.vehicle:getInspectionPrice() * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
+    local maintenancePrice = self.vehicle:getMaintenancePrice() * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
+    local repairPrice = self.vehicle:getADSRepairPrice() * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
+    local overhaulPrice = self.vehicle:getOverhaulPrice() * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
 
     if repairPrice == 0 then
         self.repairButton.disabled = true
@@ -263,14 +277,14 @@ end
 
 
 function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, dialogTitleKey, dialogTextKey)
-    local price = self.vehicle:getMaintenancePriceByType(maintenanceType)
+    local price = self.vehicle:getMaintenancePriceByType(maintenanceType) * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
     local finalDialogText = g_i18n:getText(dialogTextKey)
 
     finalDialogText = string.gsub(finalDialogText, "\\n", "\n")
     finalDialogText = string.gsub(finalDialogText, "{price}", g_i18n:formatMoney(price))
-    finalDialogText = string.gsub(finalDialogText, "{aftermarket_price}", g_i18n:formatMoney(price / 2))
-    finalDialogText = string.gsub(finalDialogText, "{time}", self.vehicle:getFormattedMaintenanceFinishTimeText(maintenanceType))
-    finalDialogText = string.gsub(finalDialogText, "{duration}", self.vehicle:getFormattedMaintenanceDurationText(maintenanceType))
+    finalDialogText = string.gsub(finalDialogText, "{aftermarket_price}", g_i18n:formatMoney(price / 1.8))
+    finalDialogText = string.gsub(finalDialogText, "{time}", self.vehicle:getFormattedMaintenanceFinishTimeText(maintenanceType, self.workshopType))
+    finalDialogText = string.gsub(finalDialogText, "{duration}", self.vehicle:getFormattedMaintenanceDurationText(maintenanceType, self.workshopType))
 
 
     if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
@@ -280,7 +294,7 @@ function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, d
             finalDialogText,
             g_i18n:getText(dialogTitleKey),
             nil, nil, nil, nil, nil,
-            { maintenanceType }
+            { maintenanceType, self.workshopType }
         )
     else
         local options = { g_i18n:getText('ads_ws_option_genuine_parts'), g_i18n:getText('ads_ws_option_aftermarket_parts') }        
@@ -289,7 +303,7 @@ function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, d
             optionDialog.target:setText(finalDialogText)
             optionDialog.target:setTitle(g_i18n:getText(dialogTitleKey))
             optionDialog.target:setOptions(options)
-            optionDialog.target:setCallback(ADS_WorkshopDialog.maintanceCallback, nil, { maintenanceType })
+            optionDialog.target:setCallback(ADS_WorkshopDialog.maintanceCallback, nil, { maintenanceType, self.workshopType })
         end
     end
 end
@@ -331,6 +345,7 @@ function ADS_WorkshopDialog.maintanceCallback(option, args)
     if dialog == nil or dialog.vehicle == nil then return end
 
     local type = args[1]
+    local workshopType = args[2]
     local vehicle = dialog.vehicle
 
     local selectedBreakdowns = {}
@@ -343,8 +358,8 @@ function ADS_WorkshopDialog.maintanceCallback(option, args)
     end
 
     local isAftermarketParts = (option == 2)
-    local price = AdvancedDamageSystem.calculateMaintenancePrice(vehicle, type)
-    if isAftermarketParts then price = price / 2 end
+    local price = AdvancedDamageSystem.calculateMaintenancePrice(vehicle, type) * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
+    if isAftermarketParts then price = price / 1.8 end
     
     if g_currentMission:getMoney() < price then
         InfoDialog.show(g_i18n:getText("shop_messageNotEnoughMoneyToBuy"))
@@ -352,7 +367,7 @@ function ADS_WorkshopDialog.maintanceCallback(option, args)
     end
 
     local breakdownCount = #selectedBreakdowns
-    vehicle:initMaintenance(type, breakdownCount, isAftermarketParts)
+    vehicle:initMaintenance(type, workshopType, breakdownCount, isAftermarketParts)
 
     g_currentMission:addMoney(-1 * price, vehicle:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
     dialog:updateScreen()

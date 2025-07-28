@@ -61,6 +61,12 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             return true
         end,
+        probability = function(vehicle)
+            return 0.0   
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_permanent",
@@ -123,6 +129,12 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             return true
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            return true
+        end,
         stages = {
             {
                 severity = "",
@@ -164,7 +176,12 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             return true
         end,
-
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_reduce_power",
@@ -247,7 +264,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             return true
         end,
-
+        probability = function(vehicle)
+            return 1.0   
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_critical",
@@ -283,7 +302,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             end
             return false
         end,
-
+        probability = function(vehicle)
+            return 1.0 
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
@@ -378,6 +399,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 return false
             end
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
@@ -445,6 +469,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         part = "ads_breakdowns_part_fuel_pump",
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
         end,
         stages = {
             {
@@ -529,6 +556,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
@@ -603,12 +633,26 @@ ADS_Breakdowns.BreakdownRegistry = {
                 return true
             end
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            local spec_drivable = vehicle.spec_drivable
+            local drivingMode = vehicle:getDirectionChangeMode()
+            local isBraking = false
+            if drivingMode == 2 then
+                isBraking = spec_drivable.axisForward < -0.01
+            else
+                isBraking = vehicle.movingDirection ~= 0 and spec_drivable.axisForward ~= 0 and math.sign(vehicle.movingDirection) ~= math.sign(spec_drivable.axisForward)
+            end
+            return isBraking
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_brake_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.5,
+                progressMultiplier = 0.2,
                 repairPrice = 0.3,
                 effects = {
                     { id = "BRAKE_FORCE_MODIFIER", value = -0.30, aggregation = "min",  extraData = {timer = 0, soundPlayed = false} }
@@ -618,7 +662,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_brake_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
+                progressMultiplier = 0.1,
                 repairPrice = 0.6,
                 effects = {
                     { id = "BRAKE_FORCE_MODIFIER", value = -0.45, aggregation = "min",  extraData = {timer = 0, soundPlayed = false} }
@@ -631,7 +675,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_brake_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
+                progressMultiplier = 0.05,
                 repairPrice = 1.2, 
                 effects = { 
                     { id = "BRAKE_FORCE_MODIFIER", value = -0.70, aggregation = "min",  extraData = {timer = 0, soundPlayed = false} }
@@ -664,12 +708,19 @@ ADS_Breakdowns.BreakdownRegistry = {
             if not motor then return false end
             return motor.minForwardGearRatio == nil
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            return vehicle:getLastSpeed() > 0.01
+        end,
+
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_transmission_slip_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 4.0,
+                progressMultiplier = 3.0,
                 repairPrice = 1.4,
                 effects = {
                     { id = "TRANSMISSION_SLIP_EFFECT", value = 0.20, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
@@ -679,7 +730,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_transmission_slip_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
+                progressMultiplier = 2.0,
                 repairPrice = 2.8,
                 effects = {
                      { id = "TRANSMISSION_SLIP_EFFECT", value = 0.40, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
@@ -727,23 +778,30 @@ ADS_Breakdowns.BreakdownRegistry = {
             if not motor then return false end
             return motor.minForwardGearRatio == nil and motor.gearType ~= VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            local motor = vehicle:getMotor()
+            return (motor.gear == 0 and motor.gearChangeTimer > 0)
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 4.0,
+                progressMultiplier = 0.2,
                 repairPrice = 1.2,
                 effects = {
                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max"},
-                    { id = "GEAR_REJECTION_CHANCE", value = 0.05, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                    { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
+                progressMultiplier = 0.1,
                 repairPrice = 2.4,
                 effects = {
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.20, extraData = {timer = 0, status = 'IDLE', duration = 1800}, aggregation = "max"},
@@ -754,7 +812,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.2,
+                progressMultiplier = 0.05,
                 repairPrice = 4.8, 
                 effects = { 
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.50, extraData = {timer = 0, status = 'IDLE', duration = 2200}, aggregation = "max"},
@@ -781,6 +839,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             local motor = vehicle:getMotor()
             if not motor then return false end
             return motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
+        end,
+        isCanProgress = function(vehicle)
+            return (vehicle:getLastSpeed() > 0.01)
         end,
         stages = {
             {
@@ -844,6 +905,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             if not motor or getIsElectricVehicle(vehicle) then return false end
             return motor.minForwardGearRatio ~= nil and spec.year >= 2000
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
@@ -903,6 +967,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         part = "ads_breakdowns_part_cooling_system",
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
         end,
         stages = {
             {
@@ -968,6 +1035,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             local spec = vehicle.spec_AdvancedDamageSystem
             return vtype ~= "car" and vtype ~= "carFillable" and vtype ~= "motorbike" and spec.year >= 1960
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
@@ -1027,6 +1097,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
             return spec.year >= 2000 and vehicle.spec_lights ~= nil
+        end,
+        probability = function(vehicle)
+            return 1.0   
         end,
         stages = {
             {
@@ -1098,6 +1171,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             local spec = vehicle.spec_AdvancedDamageSystem
             return spec.year < 1980 and not getIsElectricVehicle(vehicle)
         end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
@@ -1165,6 +1241,13 @@ ADS_Breakdowns.BreakdownRegistry = {
             local vtype = vehicle.type.name
             return spec.year > 2000 and (vtype == 'combineDrivable' or vtype == 'combineCutter')
         end,
+        probability = function(vehicle)
+            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
+                return 100.0
+            else
+                return 1.0
+            end
+        end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
@@ -1222,26 +1305,39 @@ ADS_Breakdowns.BreakdownRegistry = {
         isSelectable = true,
         part = "",
         isApplicable = function(vehicle)
-            local spec = vehicle.spec_AdvancedDamageSystem
             local vtype = vehicle.type.name
             return (vtype == 'combineDrivable' or vtype == 'combineCutter')
+        end,
+        probability = function(vehicle)
+            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
+                return 100.0
+            else
+                return 1.0
+            end
+        end,
+        isCanProgress = function(vehicle)
+            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
+                return true
+            else
+                return false
+            end
         end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_material_flow_system_wear_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 4.0,
+                progressMultiplier = 2.0,
                 repairPrice = 0.24,
                 effects = {
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.02, aggregation = "sum" }
+                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.5, aggregation = "sum" }
                 }
             },
             {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_material_flow_system_wear_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
+                progressMultiplier = 1.0,
                 repairPrice = 0.48,
                 effects = {
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.05, aggregation = "sum" },
@@ -1252,7 +1348,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_material_flow_system_wear_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
+                progressMultiplier = 0.5,
                 repairPrice = 0.96, 
                 effects = { 
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.10, aggregation = "sum" },
@@ -1275,6 +1371,81 @@ ADS_Breakdowns.BreakdownRegistry = {
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false },
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    UNLOADING_AUGER_MALFUNCTION = {
+        isSelectable = true,
+        part = "",
+        isApplicable = function(vehicle)
+            local vtype = vehicle.type.name
+            return (vtype == 'combineDrivable' or vtype == 'combineCutter') and vehicle.spec_pipe ~= nil
+        end,
+        probability = function(vehicle)
+            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
+                if vehicle.spec_dischargeable.currentDischargeState ~= Dischargeable.DISCHARGE_STATE_OFF then
+                    return 200.0
+                else
+                    return 50.0
+                end
+            else
+                return 1.0
+            end
+        end,
+        isCanProgress = function(vehicle)
+            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
+                if vehicle.spec_dischargeable.currentDischargeState ~= Dischargeable.DISCHARGE_STATE_OFF then
+                    return true
+                end
+            end
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_unloading_auger_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.4,
+                repairPrice = 0.24,
+                effects = {
+                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.20, aggregation = "min" }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_unloading_auger_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.2,
+                repairPrice = 0.48,
+                effects = {
+                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.40, aggregation = "min" }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_unloading_auger_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.1,
+                repairPrice = 0.96, 
+                effects = { 
+                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.60, aggregation = "min" }
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_unloading_auger_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 1.92, 
+                effects = { 
+                     { id = "UNLOADING_AUGER_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {message = "Unloading auger failure"} }
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false },
                 }
             }
         }
@@ -1341,6 +1512,26 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FAILURE = {
 
     remove = function(vehicle, handler)
         log_dbg("Removing LIGHTS_FAILURE effect")
+    end
+}
+
+--- UNLOADING_AUGER_FAILURE
+ADS_Breakdowns.EffectApplicators.UNLOADING_AUGER_FAILURE = {
+    getOriginalFunctionName = function() return "getIsDischargeNodeActive" end,
+    apply = function(vehicle, effectData, handler)
+
+        log_dbg("Applying UNLOADING_AUGER_FAILURE:", effectData.value)
+        local originalFuncName = handler.getOriginalFunctionName()
+        saveOrigFunc(vehicle, originalFuncName)
+ 
+        vehicle.getIsDischargeNodeActive = function(v, dischargeNode, ...)
+            return false
+        end
+    end,
+    remove = function(vehicle, handler)
+        log_dbg("Removing UNLOADING_AUGER_FAILURE effect.")
+        local originalFuncName = handler.getOriginalFunctionName()
+        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
@@ -1687,14 +1878,51 @@ ADS_Breakdowns.EffectApplicators.YIELD_REDUCTION_MODIFIER = {
 
         vehicle.addCutterArea = function(v, area, realArea, ...)
             local origFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            local modifiedRealArea = realArea * math.max(1 + effectData.value, 0.2)
-            return origFunc(v, area, modifiedRealArea, ...)
+            
+            local spec_combine = v.spec_combine
+            local originalScale = spec_combine.threshingScale
+            
+            local modifiedScale = originalScale * (1 + effectData.value)
+            print(originalScale .. " " .. modifiedScale)
+            spec_combine.threshingScale = math.max(modifiedScale, 0)
+            
+            local result = origFunc(v, area, realArea, ...)
+            spec_combine.threshingScale = originalScale
+            
+            return result
         end
 
     end,
 
     remove = function(vehicle, handler)
         log_dbg("Removing YIELD_REDUCTION_MODIFIER effect.")
+        local originalFuncName = handler.getOriginalFunctionName()
+        restoreOrigFunc(vehicle, originalFuncName)
+    end
+}
+
+
+---------------- UNLOADING_SPEED_MODIFIER -------------------
+ADS_Breakdowns.EffectApplicators.UNLOADING_SPEED_MODIFIER = {
+    getOriginalFunctionName = function()
+        return "getDischargeNodeEmptyFactor"
+    end,
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying UNLOADING_SPEED_MODIFIER effect")
+        local originalFuncName = handler.getOriginalFunctionName()
+        saveOrigFunc(vehicle, originalFuncName)
+
+        vehicle.getDischargeNodeEmptyFactor = function(v, dischargeNode, ...)
+            local origFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+            local originalFactor = origFunc(v, dischargeNode, ...)
+            local modifiedFactor = originalFactor * (1 + effectData.value)
+            return modifiedFactor
+        end
+
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing UNLOADING_SPEED_MODIFIER effect.")
         local originalFuncName = handler.getOriginalFunctionName()
         restoreOrigFunc(vehicle, originalFuncName)
     end

@@ -87,6 +87,10 @@
         <text name="ads_breakdowns_part_electrical_system" text="Electrical System"/>
         <text name="ads_breakdowns_part_carburetor" text="Carburetor"/>
 
+        <text name="ads_breakdowns_part_yield_sensor" text="Yield Sensor"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="Material Flow System"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Unloading Auger"/>
+
         <text name="ads_breakdowns_severity_permanent" text="Permanent"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Reduce Power"/>
         <text name="ads_breakdowns_severity_shutdown" text="Shutdown"/>
@@ -196,11 +200,16 @@
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="A major component in the material flow system has failed, causing a severe blockage. The engine is under extreme strain."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Material Flow Blockage"/>
 
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Stretched drive belt. Occasional slipping results in a slight decrease in unloading speed."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Worn drive belt and pulleys. Significant slipping under load noticeably reduces unloading speed."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Damaged gearbox or heavily worn belt. The auger struggles to turn, operating at a very low speed."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Drive belt snapped or gearbox seized. The unloading auger is completely jammed."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Unloading Auger Jammed"/>
+
         <text name="ads_breakdowns_engine_stalled_message" text="Engine stalled"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Gear disengage"/>
-        <text name="ads_breakdown_at_progress_message" text="at progress"/>
+        <text name="ads_breakdown_at_progress_message" text="in progress"/>
         
-
         <text name="ads_spec_this_month" text="This month"/>
         <text name="ads_spec_months_ago" text="months ago"/>
         <text name="ads_spec_never" text="Never"/>

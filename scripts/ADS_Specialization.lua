@@ -30,7 +30,13 @@ AdvancedDamageSystem = {
         LOW = "ads_spec_state_low",
         AVERAGE = "ads_spec_state_average",
         HIGH = "ads_spec_state_high",
-        WORKHORSE = "ads_spec_state_workhorse",
+        WORKHORSE = "ads_spec_state_workhorse"
+    },
+
+    WORKSHOP = {
+        MOBILE = "ads_spec_workshop_mobile",
+        OWN = "ads_spec_workshop_own",
+        DEALER = "ads_spec_workshop_dealer"
     }
 };
 
@@ -344,6 +350,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.metaUpdateTimer = math.random() * ADS_Config.META_UPDATE_DELAY
     self.spec_AdvancedDamageSystem.maintenanceTimer = 0
     self.spec_AdvancedDamageSystem.currentState = AdvancedDamageSystem.STATUS.READY
+    self.spec_AdvancedDamageSystem.workshopType = AdvancedDamageSystem.WORKSHOP.DEALER
     self.spec_AdvancedDamageSystem.isElectricVehicle = false
 end
 
@@ -599,13 +606,13 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
 
     self:updateThermalSystems(dt)
 
-    if self:isUnderMaintenance() and isWorkshopOpen then
+    if self:isUnderMaintenance() then
         self:processMaintenance(dt)
     else
         local serviceWearRate, conditionWearRate = self:calculateWearRates()
         if self:getIsOperating() then
             self:processBreakdowns(dt)
-            self:checkForNewBreakdown(dt)
+            self:checkForNewBreakdown(dt, conditionWearRate)
         end
         self:updateConditionLevel(conditionWearRate, dt)
         self:updateServiceLevel(serviceWearRate, dt)
@@ -858,7 +865,7 @@ end
 
 ---------------------- breakdowns ----------------------
 
-function AdvancedDamageSystem:checkForNewBreakdown(dt)
+function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
     local spec = self.spec_AdvancedDamageSystem
     if not spec or dt == 0 then
         return
@@ -866,8 +873,9 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt)
     local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITY
 
     local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(spec.conditionLevel, probability, dt)
-    failureChancePerFrame = (failureChancePerFrame + (failureChancePerFrame * spec.extraBreakdownProbability)) / spec.reliability
-    
+    failureChancePerFrame = (failureChancePerFrame * conditionWearRate + (failureChancePerFrame * spec.extraBreakdownProbability))
+    failureChancePerFrame = failureChancePerFrame / spec.reliability
+
     local random = math.random()
 
     if random < failureChancePerFrame then
@@ -916,36 +924,49 @@ function AdvancedDamageSystem:getRandomBreakdown()
     end
 
     local activeBreakdowns = self.spec_AdvancedDamageSystem.activeBreakdowns
+    local applicableBreakdowns = {}
+    local totalProbability = 0
 
-    local activeBreakdownsCount = 0
-    for _, _ in pairs(activeBreakdowns) do
-        activeBreakdownsCount = activeBreakdownsCount + 1
-    end
-
-    if activeBreakdownsCount >= ADS_Config.CORE.CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE then return nil end
-
-    local availableBreakdowns = {}
     for id, breakdownData in pairs(ADS_Breakdowns.BreakdownRegistry) do
         if not activeBreakdowns[id] and breakdownData.isSelectable then
             local isApplicable = true
             if breakdownData.isApplicable ~= nil then
                 isApplicable = breakdownData.isApplicable(self)
             end
+
             if isApplicable then
-                table.insert(availableBreakdowns, id)
+                local probability = 1.0 
+                if breakdownData.probability ~= nil then
+                    probability = breakdownData.probability(self)
+                end
+
+                if probability > 0 then
+                    table.insert(applicableBreakdowns, {id = id, probability = probability})
+                    totalProbability = totalProbability + probability
+                end
             end
         end
     end
 
-    if #availableBreakdowns > 0 then
-        local randomIndex = math.random(#availableBreakdowns)
-        local chosenId = availableBreakdowns[randomIndex]
-        log_dbg("-> Found", #availableBreakdowns, "applicable breakdowns. Chose:", chosenId)
-        return chosenId
-    else
-        log_dbg("-> No new applicable breakdowns available.")
+    if #applicableBreakdowns == 0 or totalProbability <= 0 then
+        log_dbg("-> No new applicable breakdowns available with positive probability.")
         return nil
     end
+
+    log_dbg("-> Found "..#applicableBreakdowns.." applicable breakdowns. Total probability weight:", totalProbability)
+
+    local randomNumber = math.random() * totalProbability
+
+    local cumulativeProbability = 0
+    for _, breakdown in ipairs(applicableBreakdowns) do
+        cumulativeProbability = cumulativeProbability + breakdown.probability
+        if randomNumber <= cumulativeProbability then
+            log_dbg("-> Weighted random choice selected:", breakdown.id, "with probability", breakdown.probability)
+            return breakdown.id
+        end
+    end
+
+    return nil
 end
 
 
@@ -953,6 +974,17 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
     log_dbg("addBreakdown called for", self:getFullName(), "with ID:", breakdownId, "and stage:", stage)
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
+
+    local activeBreakdowns = self.spec_AdvancedDamageSystem.activeBreakdowns
+    local activeBreakdownsCount = 0
+    for _, _ in pairs(activeBreakdowns) do
+        activeBreakdownsCount = activeBreakdownsCount + 1
+    end
+
+    if activeBreakdownsCount >= ADS_Config.CORE.CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE then
+        log_dbg("-> Concurrent breakdown limit reached for vehicle:", self:getFullName())
+        return nil 
+    end
     
     local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
 
@@ -1035,32 +1067,44 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     if not spec or not spec.activeBreakdowns or next(spec.activeBreakdowns) == nil then
         return
     end
+
     local C = ADS_Config.CORE
     local effectsNeedRecalculation = false
 
     for id, breakdown in pairs(spec.activeBreakdowns) do
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
-        if registryEntry.isSelectable then
-            if registryEntry and registryEntry.stages[breakdown.stage] then
+
+        if registryEntry then
+            
+            if registryEntry.stages[breakdown.stage] then
                 local stageData = registryEntry.stages[breakdown.stage]
                 
                 if stageData.progressMultiplier and stageData.progressMultiplier > 0 then
-                    breakdown.progressTimer = breakdown.progressTimer or 0
-                    breakdown.progressTimer = breakdown.progressTimer + dt
-                    local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
+                    
+                    local canProgress = true
+                    if registryEntry.isCanProgress ~= nil then
+                        canProgress = registryEntry.isCanProgress(self)
+                    end
 
-                    if breakdown.progressTimer >= stageDuration then
-                        local maxStages = #registryEntry.stages
+                    if canProgress then
+                        breakdown.progressTimer = breakdown.progressTimer or 0
+                        breakdown.progressTimer = breakdown.progressTimer + dt
                         
-                        if breakdown.stage < maxStages then
-                            breakdown.stage = breakdown.stage + 1
-                            breakdown.progressTimer = 0
-                            
-                            effectsNeedRecalculation = true
+                        local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
 
-                            log_dbg(string.format("ADS: Breakdown '%s' on vehicle '%s' advanced to stage %d.", id, self:getFullName(), breakdown.stage))
-                        else
-                            breakdown.progressTimer = stageDuration
+                        if breakdown.progressTimer >= stageDuration then
+                            local maxStages = #registryEntry.stages
+                            
+                            if breakdown.stage < maxStages then
+                                breakdown.stage = breakdown.stage + 1
+                                breakdown.progressTimer = 0
+                                
+                                effectsNeedRecalculation = true
+
+                                log_dbg(string.format("ADS: Breakdown '%s' on vehicle '%s' advanced to stage %d.", id, self:getFullName(), breakdown.stage))
+                            else
+                                breakdown.progressTimer = stageDuration
+                            end
                         end
                     end
                 end
@@ -1079,10 +1123,6 @@ function AdvancedDamageSystem:processPermanentEffects(dt)
     local spec = self.spec_AdvancedDamageSystem
     if not spec then
         return
-    end
-
-    for _, breakdownData in pairs(spec.activeBreakdowns) do
-        breakdownData.progressTimer = breakdownData.progressTimer + dt
     end
 
     if spec.activeBreakdowns['GENERAL_WEAR_AND_TEAR'] ~= nil and spec.conditionLevel > 0.67 then
@@ -1296,7 +1336,7 @@ end
 
 --------------------- maintenance --------------------------------
 
-function AdvancedDamageSystem:initMaintenance(type, breadownsCount, isAftermarketParts)
+function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount, isAftermarketParts)
     local spec = self.spec_AdvancedDamageSystem
     local states = AdvancedDamageSystem.STATUS
     local vehicleState = self:getCurrentStatus()
@@ -1308,6 +1348,7 @@ function AdvancedDamageSystem:initMaintenance(type, breadownsCount, isAftermarke
         end
         local totalTimeMs = 0
         spec.currentState = type
+        spec.workshopType = workshopType
 
         if type == states.INSPECTION then
             totalTimeMs = C.INSPECTION_TIME
@@ -1412,8 +1453,10 @@ function AdvancedDamageSystem:processMaintenance(dt)
     local states = AdvancedDamageSystem.STATUS
     local vehicleState = self:getCurrentStatus()
 
-    if vehicleState == states.READY then
-        return
+    if vehicleState == states.READY 
+        or (spec.workshopType == AdvancedDamageSystem.WORKSHOP.DEALER and not ADS_Main.isWorkshopOpen)
+        or (spec.workshopType == AdvancedDamageSystem.WORKSHOP.OWN and not ADS_Main.isWorkshopOpen) then
+            return
     end
 
     local timeScale = g_currentMission.missionInfo.timeScale
@@ -1499,7 +1542,7 @@ end
 -- ==========================================================
 
 
-function AdvancedDamageSystem:getFormattedMaintenanceFinishTimeText(maintenanceType)
+function AdvancedDamageSystem:getFormattedMaintenanceFinishTimeText(maintenanceType, workshopType)
     local currentStatus = self:getCurrentStatus()
     if currentStatus == AdvancedDamageSystem.STATUS.READY or currentStatus == AdvancedDamageSystem.STATUS.BROKEN then
         if maintenanceType == nil then
@@ -1507,7 +1550,7 @@ function AdvancedDamageSystem:getFormattedMaintenanceFinishTimeText(maintenanceT
         end     
     end
 
-    local finishTime, daysToAdd = AdvancedDamageSystem.calculateMaintenanceFinishTime(self, maintenanceType)
+    local finishTime, daysToAdd = AdvancedDamageSystem.calculateMaintenanceFinishTime(self, maintenanceType, nil, workshopType)
     local finishTimeHours, finishTimeMinutes = AdvancedDamageSystem.convertHoursToHoursAndMinutes(finishTime)
     local daysText = ""
 
@@ -1523,14 +1566,14 @@ function AdvancedDamageSystem:getFormattedMaintenanceFinishTimeText(maintenanceT
     return string.format("%s%02d:%02d", daysText, finishTimeHours, finishTimeMinutes)
 end
 
-function AdvancedDamageSystem:getFormattedMaintenanceDurationText(maintenanceType)
+function AdvancedDamageSystem:getFormattedMaintenanceDurationText(maintenanceType, workshopType)
     local currentStatus = self:getCurrentStatus()
     if currentStatus == AdvancedDamageSystem.STATUS.READY or currentStatus == AdvancedDamageSystem.STATUS.BROKEN then
         if maintenanceType == nil then
             return ""
         end     
     end
-    local duration = AdvancedDamageSystem.calculateMaintenanceDuration(self, maintenanceType)
+    local duration = AdvancedDamageSystem.calculateMaintenanceDuration(self, maintenanceType, nil, workshopType)
     local durationHours, durationMinutes = AdvancedDamageSystem.convertHoursToHoursAndMinutes(duration)
     local days = math.floor(durationHours / 24)
     local daysText = ""
@@ -1773,7 +1816,7 @@ function AdvancedDamageSystem.calculateMaintenancePrice(vehicle, maintenanceType
 end
 
 
-function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceType, selectedBreakdowns)
+function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceType, selectedBreakdowns, workshopType)
     if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
         return 0
     end
@@ -1781,21 +1824,24 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
     local spec = vehicle.spec_AdvancedDamageSystem
     local C = ADS_Config.MAINTENANCE
     local workDurationHours = 0
+    if workshopType == nil then
+        workshopType = spec.workshopType
+    end
 
     if spec.currentState ~= AdvancedDamageSystem.STATUS.READY and spec.currentState ~= AdvancedDamageSystem.STATUS.BROKEN then
         workDurationHours = spec.maintenanceTimer / 3600000
     else
         local totalDurationMs = 0
         if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
-            totalDurationMs = C.INSPECTION_TIME
+            totalDurationMs = C.INSPECTION_TIME / spec.maintainability
         elseif maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
-            totalDurationMs = C.MAINTENANCE_TIME
+            totalDurationMs = C.MAINTENANCE_TIME / spec.maintainability
         elseif maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
-            totalDurationMs = C.OVERHAUL_TIME
+            totalDurationMs = C.OVERHAUL_TIME / spec.maintainability
         elseif maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
             local repairCount = 0
             local breakdowns = selectedBreakdowns or vehicle:getActiveBreakdowns()
-            
+
             if breakdowns ~= nil and next(breakdowns) ~= nil then
                 for _, breakdown in pairs(breakdowns) do
                     if breakdown.isSelectedForRepair then
@@ -1803,7 +1849,7 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
                     end
                 end
             end
-            totalDurationMs = C.REPAIR_TIME * repairCount
+            totalDurationMs = (C.REPAIR_TIME * repairCount) / spec.maintainability
         end
         workDurationHours = totalDurationMs / 3600000
     end
@@ -1812,53 +1858,57 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
         return 0
     end
 
-    local WORKSHOP = ADS_Config.WORKSHOP
-    local currentHour = (g_currentMission.environment.dayTime / 3600000) % 24 
+    local totalElapsedHours
 
-    local totalElapsedHours = 0
-    local timeRemaining = workDurationHours
+    if workshopType == AdvancedDamageSystem.WORKSHOP.MOBILE then
+        totalElapsedHours = workDurationHours
+    else
+        local WORKSHOP_HOURS = ADS_Config.WORKSHOP
+        local currentHour = (g_currentMission.environment.dayTime / 3600000) % 24
 
-    local workStartTimeToday = math.max(currentHour, WORKSHOP.OPEN_HOUR)
+        totalElapsedHours = 0
+        local timeRemaining = workDurationHours
 
-    if workStartTimeToday >= WORKSHOP.CLOSE_HOUR then
-        local hoursUntilNextOpen = (24 - currentHour) + WORKSHOP.OPEN_HOUR
-        totalElapsedHours = totalElapsedHours + hoursUntilNextOpen
-        currentHour = WORKSHOP.OPEN_HOUR
-    end
-    
-    if currentHour < WORKSHOP.OPEN_HOUR then
-        local hoursUntilOpen = WORKSHOP.OPEN_HOUR - currentHour
-        totalElapsedHours = totalElapsedHours + hoursUntilOpen
-        currentHour = WORKSHOP.OPEN_HOUR
-    end
-    
-    while timeRemaining > 0 do
-        local remainingWorkHoursToday = WORKSHOP.CLOSE_HOUR - currentHour
-        
-        if timeRemaining <= remainingWorkHoursToday then
-            totalElapsedHours = totalElapsedHours + timeRemaining
-            timeRemaining = 0
-        else
-            totalElapsedHours = totalElapsedHours + remainingWorkHoursToday
-            timeRemaining = timeRemaining - remainingWorkHoursToday
-            
-            local overnightBreak = (24 - WORKSHOP.CLOSE_HOUR) + WORKSHOP.OPEN_HOUR
-            totalElapsedHours = totalElapsedHours + overnightBreak
-            
-            currentHour = WORKSHOP.OPEN_HOUR
+        local workStartTimeToday = math.max(currentHour, WORKSHOP_HOURS.OPEN_HOUR)
+
+        if workStartTimeToday >= WORKSHOP_HOURS.CLOSE_HOUR then
+            local hoursUntilNextOpen = (24 - currentHour) + WORKSHOP_HOURS.OPEN_HOUR
+            totalElapsedHours = totalElapsedHours + hoursUntilNextOpen
+            currentHour = WORKSHOP_HOURS.OPEN_HOUR
+        elseif currentHour < WORKSHOP_HOURS.OPEN_HOUR then
+            local hoursUntilOpen = WORKSHOP_HOURS.OPEN_HOUR - currentHour
+            totalElapsedHours = totalElapsedHours + hoursUntilOpen
+            currentHour = WORKSHOP_HOURS.OPEN_HOUR
+        end
+
+        while timeRemaining > 0 do
+            local remainingWorkHoursToday = WORKSHOP_HOURS.CLOSE_HOUR - currentHour
+
+            if timeRemaining <= remainingWorkHoursToday then
+                totalElapsedHours = totalElapsedHours + timeRemaining
+                timeRemaining = 0
+            else
+                totalElapsedHours = totalElapsedHours + remainingWorkHoursToday
+                timeRemaining = timeRemaining - remainingWorkHoursToday
+
+                local overnightBreak = (24 - WORKSHOP_HOURS.CLOSE_HOUR) + WORKSHOP_HOURS.OPEN_HOUR
+                totalElapsedHours = totalElapsedHours + overnightBreak
+
+                currentHour = WORKSHOP_HOURS.OPEN_HOUR
+            end
         end
     end
-    
-    return (totalElapsedHours * C.MAINTENANCE_DURATION_MULTIPLIER) / spec.maintainability
+
+    return (totalElapsedHours * C.MAINTENANCE_DURATION_MULTIPLIER)
 end
 
 
-function AdvancedDamageSystem.calculateMaintenanceFinishTime(vehicle, maintenanceType, selectedBreakdowns)
+function AdvancedDamageSystem.calculateMaintenanceFinishTime(vehicle, maintenanceType, selectedBreakdowns, workshopType)
     if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
         return 0, 0
     end
 
-    local totalCalendarDuration = AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceType, selectedBreakdowns)
+    local totalCalendarDuration = AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceType, selectedBreakdowns, workshopType)
 
     if totalCalendarDuration <= 0 then
         local currentTime = (g_currentMission.environment.dayTime / 3600000) % 24
@@ -2140,7 +2190,7 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
 
     local breakdownCount = tonumber(args[2]) or 1
 
-    vehicle:initMaintenance(maintenanceType, breakdownCount, false)
+    vehicle:initMaintenance(maintenanceType, AdvancedDamageSystem.WORKSHOP.OWN, breakdownCount, false)
     print(string.format("ADS: Attempted to start '%s' for '%s'.", maintenanceType, vehicle:getFullName()))
 end
 
