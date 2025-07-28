@@ -58,8 +58,9 @@ Command	Description	Usage Example
 
 # Screenshots
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-29-33_123" src="https://github.com/user-attachments/assets/c7fcaecf-2814-4ac8-a12e-631be8617d18" />
-<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-30-36_675" src="https://github.com/user-attachments/assets/7a76ced6-0c00-49d0-a780-7b8f3d564408" />
-<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-33-54_459" src="https://github.com/user-attachments/assets/3f4eba44-0214-4a5b-aaa0-7fe897d299bd" />
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-36-16_097" src="https://github.com/user-attachments/assets/c0fa45b0-4f33-472e-97a8-9a65eecc5271" />
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-36-27_235" src="https://github.com/user-attachments/assets/f1ceab6c-ae12-45d7-a5af-fce820fda9a3" />
+<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-34-21_276" src="https://github.com/user-attachments/assets/dd90e4d0-87f8-4e86-bb98-6583257efe4c" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-34-40_109" src="https://github.com/user-attachments/assets/39c982bc-034d-4f9f-a025-6802d63f201f" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-35-23_442" src="https://github.com/user-attachments/assets/956f21c7-f022-42e5-8599-b0adcd9614e0" />
 
@@ -140,7 +141,7 @@ It can only be partically restored through the Overhaul procedure in the worksho
 This parameter reflects the state of consumables: oil, filters, technical fluids, etc.
 
 - **What does Service affect?**
-This is a critically important parameter. A low Service level significantly accelerates the decline of Condition. Timely maintenance is the best way to save money on expensive repairs in the future.
+This is a critically important parameter. A low Service level significantly accelerates the decline of Condition. Furthermore, it drastically increases the probability of random component failures. Timely maintenance is the best way to save money on expensive repairs in the future.
 
 - **How does it decrease?**
 It decreases with engine operating hours, simulating the natural wear of consumables.
@@ -161,7 +162,7 @@ It is restored to 100% through the Maintenance procedure in the workshop.
 > The only modifier affecting this rate is the vehicle's **Reliability**. Just like with `Condition`, the brand's reliability rating acts as a final divisor for the total `Service` wear.
 >
 > ### 2. The Penalty for Overdue Service
-> The mod calculates a recommended service interval for each vehicle based on its brand quality. While you are free to choose your own schedule, delaying maintenance has severe consequences. The table below shows how the penalty multiplier applied to `Condition` wear grows exponentially as > the `Service` level drops below the 66% threshold.
+> The mod calculates a recommended service interval for each vehicle based on its brand quality. While you are free to choose your own schedule, delaying maintenance has severe consequences. The table below shows how the penalty multiplier applied to `Condition` wear (same penalty to breakdown probability) grows exponentially as > the `Service` level drops below the 66% threshold.
 > 
 > | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear |
 > | :-----------: | :-------------------------: | :-----------: | :-------------------------: | :-----------: | :-------------------------: |
@@ -171,8 +172,8 @@ It is restored to 100% through the Maintenance procedure in the workshop.
 > | **55%**       | `+12%`                      | **35%**       | `+92%`                      | **5%**        | `+342%`                     |
 > |               |                             | **30%**       | `+121%`                     | **0%**        | **`+400%`**                 |
 > |               |                             | **25%**       | `+156%`                     |               |                             |
->
->
+
+> 
 > </details>
 
 ### A Note on Player Knowledge: Hidden Values
