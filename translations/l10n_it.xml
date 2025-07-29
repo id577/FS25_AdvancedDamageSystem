@@ -84,6 +84,9 @@
         <text name="ads_breakdowns_part_hydraulic_lift_system" text="Sistema di sollevamento idraulico" />
         <text name="ads_breakdowns_part_electrical_system" text="Impianto elettrico" />
         <text name="ads_breakdowns_part_carburetor" text="Carburatore" />
+        <text name="ads_breakdowns_part_yield_sensor" text="Sensore di rendimento"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="Sistema di flusso del materiale"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Coclea di scarico"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Permanente" />
         <text name="ads_breakdowns_severity_reduce_power" text="Ridurre la potenza" />
@@ -193,6 +196,12 @@
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Le pale dell'elevatore e le coclee danneggiate fanno fatica a spostare la massa del raccolto, causando perdite significative e il rischio di gravi intasamenti." />
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Un componente importante del sistema di flusso dei materiali si è guastato, causando un grave blocco. Il motore è sottoposto a sforzi estremi." />
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Blocco del flusso di materiale" />
+
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Cinghia di trasmissione allentata. Lo slittamento occasionale comporta una leggera diminuzione della velocità di scarico."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Cinghia di trasmissione e pulegge usurate. Uno slittamento significativo sotto carico riduce notevolmente la velocità di scarico."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Scatola ingranaggi danneggiata o cinghia molto usurata. La coclea fatica a girare, funzionando a una velocità molto bassa."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Cinghia di trasmissione spezzata o scatola ingranaggi bloccata. La coclea di scarico è completamente inceppata."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Coclea di scarico inceppata"/>
 
         <text name="ads_breakdowns_engine_stalled_message" text="Motore spento" />
         <text name="ads_breakdowns_gear_disengage_message" text="Disinnesto marcia" />

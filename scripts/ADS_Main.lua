@@ -228,6 +228,7 @@ ADS_Main.isWorkshopOpen = true
 
 function ADS_Main:update(dt)
     if not g_currentMission:getIsServer() or self.numVehicles == 0 then
+        self.previousKey = nil 
         return
     end
         

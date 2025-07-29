@@ -489,6 +489,9 @@ function AdvancedDamageSystem:onDelete()
     end
 
     if ADS_Main and ADS_Main.vehicles and self.uniqueId and ADS_Main.vehicles[self.uniqueId] then
+        if ADS_Main.previousKey == self.uniqueId then
+            ADS_Main.previousKey = nil
+        end
         ADS_Main.vehicles[self.uniqueId] = nil
         ADS_Main.numVehicles = ADS_Main.numVehicles - 1
         log_dbg(" -> Removed from ADS_Main.vehicles list.")
@@ -905,6 +908,10 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
 
         local hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
         local criticalChance = math.clamp((1 - spec.conditionLevel) ^ probability.CRITICAL_DEGREE, probability.CRITICAL_MIN, probability.CRITICAL_MAX)
+
+        if self:getIsControlled() then
+            print(failureChancePerFrame .. " " .. hourlyProb)
+        end
         
         spec.debugData.breakdown = {
             failureChancePerFrame = failureChancePerFrame,
@@ -1104,6 +1111,7 @@ function AdvancedDamageSystem:processBreakdowns(dt)
                                 log_dbg(string.format("ADS: Breakdown '%s' on vehicle '%s' advanced to stage %d.", id, self:getFullName(), breakdown.stage))
                             else
                                 breakdown.progressTimer = stageDuration
+                                breakdown.isVisible = true
                             end
                         end
                     end

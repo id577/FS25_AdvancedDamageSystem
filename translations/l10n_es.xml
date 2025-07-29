@@ -86,6 +86,9 @@
         <text name="ads_breakdowns_part_hydraulic_lift_system" text="Sistema Hidráulico de Elevación"/>
         <text name="ads_breakdowns_part_electrical_system" text="Sistema Eléctrico"/>
         <text name="ads_breakdowns_part_carburetor" text="Carburador"/>
+        <text name="ads_breakdowns_part_yield_sensor" text="Sensor de rendimiento"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="Sistema de flujo de material"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Sinfín de descarga"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Permanente"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Reducción de Potencia"/>
@@ -195,6 +198,13 @@
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Paletas de elevador y sinfines dañados luchan por mover la masa del cultivo, causando pérdidas significativas y riesgo de atasco grave."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Un componente principal del sistema de flujo de material ha fallado, causando un bloqueo severo. El motor está bajo extrema tensión."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Bloqueo del Flujo de Material"/>
+
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Correa de transmisión estirada. El deslizamiento ocasional resulta en una ligera disminución de la velocidad de descarga."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Correa de transmisión y poleas desgastadas. El deslizamiento significativo bajo carga reduce notablemente la velocidad de descarga."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Caja de engranajes dañada o correa muy desgastada. El sinfín lucha por girar, operando a una velocidad muy baja."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="La correa de transmisión se rompió o la caja de engranajes se atascó. El sinfín de descarga está completamente atascado."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Sinfín de descarga atascado"/>
+
 
         <text name="ads_breakdowns_engine_stalled_message" text="Motor calado"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Marcha desengranada"/>

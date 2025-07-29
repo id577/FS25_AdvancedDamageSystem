@@ -1330,7 +1330,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0,
                 repairPrice = 0.24,
                 effects = {
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.5, aggregation = "sum" }
+                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.02, aggregation = "sum" }
                 }
             },
             {
@@ -1883,7 +1883,6 @@ ADS_Breakdowns.EffectApplicators.YIELD_REDUCTION_MODIFIER = {
             local originalScale = spec_combine.threshingScale
             
             local modifiedScale = originalScale * (1 + effectData.value)
-            print(originalScale .. " " .. modifiedScale)
             spec_combine.threshingScale = math.max(modifiedScale, 0)
             
             local result = origFunc(v, area, realArea, ...)

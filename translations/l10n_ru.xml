@@ -83,6 +83,9 @@
         <text name="ads_breakdowns_part_hydraulic_lift_system" text="Гидравлическая система"/>
         <text name="ads_breakdowns_part_electrical_system" text="Электросистема"/>
         <text name="ads_breakdowns_part_carburetor" text="Карбюратор"/>
+        <text name="ads_breakdowns_part_yield_sensor" text="Датчик урожайности"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="Система подачи"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Выгрузной шнек"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Постоянная"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Снижение мощности"/>
@@ -192,6 +195,24 @@
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Поврежденные лопатки элеватора и шнеки с трудом перемещают массу урожая, что ведет к значительным потерям и риску крупного затора."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Крупный компонент системы подачи материала вышел из строя, вызвав серьезный затор. Двигатель находится под экстремальной нагрузкой."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Затор системы подачи материала"/>
+
+                <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Небольшое загрязнение датчика или сбой калибровки. Автоматическая система обмолота работает менее эффективно, вызывая минимальные потери урожая."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="Неточные показания датчика вызывают неоптимальную настройку систем обмолота и сепарации. Потери урожая заметны."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="Критический сбой датчика. Блок управления получает сильно искаженные данные, что ведет к значительным потерям зерна."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="Полный отказ системы контроля урожайности. Комбайн работает 'вслепую', что приводит к огромной неэффективности и серьезным потерям урожая."/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="Отказ системы контроля урожайности"/>
+
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Небольшой износ внутренних шнеков и цепей элеватора. Небольшое количество урожая теряется при внутренней транспортировке."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Изношенные витки шнеков и проскальзывающие транспортерные ленты вызывают увеличение просыпей внутри машины. Слышен периодический скрежет."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Поврежденные лопатки элеватора и шнеки с трудом перемещают массу урожая, что ведет к значительным потерям и риску крупного затора."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Крупный компонент системы подачи массы вышел из строя, вызвав серьезный затор. Двигатель находится под экстремальной нагрузкой."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Затор системы подачи массы"/>
+
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Растянутый приводной ремень. Периодическое проскальзывание приводит к небольшому снижению скорости выгрузки."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Износ приводного ремня и шкивов. Значительное проскальзывание под нагрузкой заметно снижает скорость выгрузки."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Поврежден редуктор или сильно изношен ремень. Шнек с трудом вращается, работая на очень низкой скорости."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Порвался приводной ремень или заклинило редуктор. Выгрузной шнек полностью заблокирован."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Выгрузной шнек заклинило"/>
 
         <text name="ads_breakdowns_engine_stalled_message" text="Двигатель заглох"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Передача выключена"/>

@@ -117,7 +117,7 @@ ADS_Config = {
     -- ====================================================================================
     MAINTENANCE = {
         -- The base time in milliseconds required to perform an Inspection.
-        INSPECTION_TIME = 7200000, -- (2 GAME hour)
+        INSPECTION_TIME = 3600000, -- (1 GAME hour)
         -- The base time in milliseconds required to perform a full Maintenance (Service).
         MAINTENANCE_TIME = 14400000, -- (4 GAME hours)
         -- The base time in milliseconds required to repair a SINGLE breakdown. This is multiplied by the number of selected breakdowns.

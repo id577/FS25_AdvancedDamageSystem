@@ -86,6 +86,9 @@ Choisissez la qualité des pièces détachées pour cette procédure. L'utilisat
         <text name="ads_breakdowns_part_hydraulic_lift_system" text="Système de levage hydraulique"/>
         <text name="ads_breakdowns_part_electrical_system" text="Système électrique"/>
         <text name="ads_breakdowns_part_carburetor" text="Carburateur"/>
+        <text name="ads_breakdowns_part_yield_sensor" text="Capteur de rendement"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="Système de flux de matière"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Vis de déchargement"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Permanent"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Réduit la puissance"/>
@@ -195,6 +198,12 @@ Choisissez la qualité des pièces détachées pour cette procédure. L'utilisat
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Les pales et les vis sans fin endommagées de l'élévateur ont du mal à déplacer la masse de récolte, ce qui entraîne des pertes importantes et un risque de bourrage majeur."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Un composant majeur du système de flux des matériaux est tombé en panne, provoquant un blocage important. Le moteur est soumis à une forte contrainte."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Blocage du flux des matériaux."/>
+
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Courroie d'entraînement détendue. Un glissement occasionnel entraîne une légère diminution de la vitesse de déchargement."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Courroie d'entraînement et poulies usées. Un glissement important sous charge réduit sensiblement la vitesse de déchargement."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Boîte de vitesses endommagée ou courroie très usée. La vis peine à tourner, fonctionnant à très basse vitesse."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Courroie d'entraînement cassée ou boîte de vitesses grippée. La vis de déchargement est complètement bloquée."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Vis de déchargement bloquée"/>
 
         <text name="ads_breakdowns_engine_stalled_message" text="Moteur calé"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Transmission désactivée"/>

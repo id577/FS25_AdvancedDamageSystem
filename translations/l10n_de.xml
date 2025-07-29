@@ -83,6 +83,9 @@
         <text name="ads_breakdowns_part_hydraulic_lift_system" text="Hydrauliksystem"/>
         <text name="ads_breakdowns_part_electrical_system" text="Elektrisches System"/>
         <text name="ads_breakdowns_part_carburetor" text="Vergaser"/>
+        <text name="ads_breakdowns_part_yield_sensor" text="Ertragssensor"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="Materialflusssystem"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Abtankschnecke"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Dauerhaft"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Leistungsreduzierung"/>
@@ -192,6 +195,12 @@
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Beschädigte Elevatorpaddel und Schnecken haben Schwierigkeiten, die Erntemasse zu bewegen, was zu erheblichen Verlusten und der Gefahr einer großen Verstopfung führt."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Ein Hauptbestandteil des Materialflusssystems ist ausgefallen und hat eine schwere Verstopfung verursacht. Der Motor steht unter extremer Belastung."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Materialfluss blockiert"/>
+
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Gedehnter Antriebsriemen. Gelegentliches Rutschen führt zu einer leichten Verringerung der Entladegeschwindigkeit."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Verschlissener Antriebsriemen und Riemenscheiben. Deutliches Rutschen unter Last verringert die Entladegeschwindigkeit merklich."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Beschädigtes Getriebe oder stark verschlissener Riemen. Die Schnecke dreht sich nur schwer und arbeitet mit sehr niedriger Geschwindigkeit."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Antriebsriemen gerissen oder Getriebe festgefressen. Die Abtankschnecke ist komplett blockiert."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Abtankschnecke blockiert"/>
 
         <text name="ads_breakdowns_engine_stalled_message" text="Motor abgewürgt"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Gang ausgelegt"/>

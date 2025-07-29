@@ -86,6 +86,9 @@
         <text name="ads_breakdowns_part_hydraulic_lift_system" text="Układ hydrauliczny podnoszenia"/>
         <text name="ads_breakdowns_part_electrical_system" text="Układ elektryczny"/>
         <text name="ads_breakdowns_part_carburetor" text="Gaźnik"/>
+        <text name="ads_breakdowns_part_yield_sensor" text="Czujnik plonu"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="System przepływu materiału"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Ślimak wyładowczy"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Trwałe"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Zmniejszona moc"/>
@@ -195,6 +198,12 @@
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Uszkodzone łopatki podnośnika i ślimaki mają trudności z przemieszczaniem masy plonów, prowadząc do znacznych strat i ryzyka poważnego zablokowania."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Główny komponent systemu przepływu materiału uległ awarii, powodując poważne zablokowanie. Silnik jest pod ekstremalnym obciążeniem."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Zablokowanie przepływu materiału"/>
+
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Rozciągnięty pas napędowy. Sporadyczne ślizganie skutkuje niewielkim spadkiem prędkości wyładunku."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Zużyty pas napędowy i koła pasowe. Znaczne ślizganie pod obciążeniem zauważalnie zmniejsza prędkość wyładunku."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Uszkodzona skrzynia biegów lub mocno zużyty pas. Ślimak ma problemy z obracaniem się, działając z bardzo niską prędkością."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Zerwany pas napędowy lub zablokowana skrzynia biegów. Ślimak wyładowczy jest całkowicie zablokowany."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Zablokowany ślimak wyładowczy"/>
 
         <text name="ads_breakdowns_engine_stalled_message" text="Silnik zgasł"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Wyłączenie biegu"/>
