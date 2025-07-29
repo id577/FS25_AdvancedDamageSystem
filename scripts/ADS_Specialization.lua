@@ -908,10 +908,6 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
 
         local hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
         local criticalChance = math.clamp((1 - spec.conditionLevel) ^ probability.CRITICAL_DEGREE, probability.CRITICAL_MIN, probability.CRITICAL_MAX)
-
-        if self:getIsControlled() then
-            print(failureChancePerFrame .. " " .. hourlyProb)
-        end
         
         spec.debugData.breakdown = {
             failureChancePerFrame = failureChancePerFrame,
