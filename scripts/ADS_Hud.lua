@@ -596,7 +596,7 @@ SpeedMeterDisplay.draw = function(self, ...)
     local customDamageAmount = 0
 
     for _, implement in ipairs(vehicle.rootVehicle.childVehicles) do
-        if implement:getIsSelected() and implement:getDamageShowOnHud() then
+        if implement:getIsSelected() and implement.getDamageShowOnHud ~= nil and implement:getDamageShowOnHud() then
             selectedTool = implement
             break
         end
