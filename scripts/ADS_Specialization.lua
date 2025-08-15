@@ -876,10 +876,13 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
     local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITY
 
     local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(spec.conditionLevel, probability, dt)
-    failureChancePerFrame = (failureChancePerFrame * conditionWearRate + (failureChancePerFrame * spec.extraBreakdownProbability))
+    failureChancePerFrame = failureChancePerFrame + (failureChancePerFrame * math.max(((conditionWearRate - 1) / 10), 0)) + (failureChancePerFrame * spec.extraBreakdownProbability)
     failureChancePerFrame = failureChancePerFrame / spec.reliability
 
     local random = math.random()
+    if self:getIsOperating() then
+        log_dbg(string.format("%.6f %.6f", random, failureChancePerFrame))
+    end
 
     if random < failureChancePerFrame then
         

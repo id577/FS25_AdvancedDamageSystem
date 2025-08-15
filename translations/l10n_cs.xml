@@ -1,0 +1,261 @@
+<l10n>
+    <texts>
+        <text name="ads_serviceWear_label" text="服务磨损率"/>
+        <text name="ads_serviceWear_tooltip" text="控制“服务”等级每运行小时的磨损率。例如，设为10%时，服务等级将在运行10小时后完全耗尽。值越高意味着需要更频繁地进行维护。"/>
+        <text name="ads_conditionWear_label" text="状况磨损率"/>
+        <text name="ads_conditionWear_tooltip" text="控制“状况”等级每运行小时的磨损率。例如，设为1%时，车辆状况将在运行100小时后完全恶化。值越高导致车辆整体状况恶化越快。"/>
+        <text name="ads_breakdownProbability_label" text="基础平均故障间隔时间"/>
+        <text name="ads_breakdownProbability_tooltip" text="设置当车辆状况为100%时发生故障的基础平均故障间隔时间（MTBF），单位为分钟。随着车辆状况下降，实际的平均故障间隔时间也会减少。此设置为故障计算的起点。"/>
+        <text name="ads_maintenancePrice_label" text="维护价格系数"/>
+        <text name="ads_maintenancePrice_tooltip" text="调整所有车间服务的成本，包括检测、修理和全面检修。值越高会使所有维护活动更昂贵。"/>
+        <text name="ads_maintenanceDuration_label" text="维护时长系数"/>
+        <text name="ads_maintenanceDuration_tooltip" text="调整所有车间服务的时长。值越高会增加您的车辆进行维护或修理所需的时间。"/>
+        <text name="ads_workshopOpenHour_label" text="车间开放时间"/>
+        <text name="ads_workshopOpenHour_tooltip" text="车间在一天中开门营业的小时数。修理仅在工间时段内有效。"/>
+        <text name="ads_workshopCloseHour_label" text="车间关闭时间"/>
+        <text name="ads_workshopCloseHour_tooltip" text="车间在一天中关门歇业的小时数。修理将在此时间后暂停。"/>
+        <text name="ads_ws_header_title" text="车间"/>
+
+        <text name="ads_ws_label_value" text="价值"/>
+        <text name="ads_ws_label_age" text="使用时长"/>
+        <text name="ads_ws_label_operating_hours" text="运行小时"/>
+        <text name="ads_ws_label_service" text="服务等级"/>
+        <text name="ads_ws_label_condition" text="状况等级"/>
+        <text name="ads_ws_label_current_power" text="当前功率"/>
+        <text name="ads_ws_label_brake_efficiency" text="刹车效率"/>
+        <text name="ads_ws_label_harvest_efficiency" text="收获效率"/>
+        <text name="ads_ws_label_maintainability" text="可维护性"/>
+        <text name="ads_ws_label_service_interval" text="维护间隔"/>
+
+        <text name="ads_ws_label_last_maintenance" text="上次维护"/>
+        <text name="ads_ws_label_last_inspection" text="上次检测"/>
+
+        <text name="ads_ws_table_header_part" text="部件"/>
+        <text name="ads_ws_table_header_description" text="描述"/>
+        <text name="ads_ws_table_header_stage" text="阶段"/>
+        <text name="ads_ws_table_header_price" text="价格"/>
+        <text name="ads_ws_table_header_repair_select" text="修理"/>
+
+        <text name="ads_ws_info_no_breakdowns" text="没有故障，或者尚未检测到故障。"/>
+        <text name="ads_ws_status_initial" text="正在加载状态..."/>
+
+        <text name="ads_ws_action_inspection" text="检测"/>
+        <text name="ads_ws_action_maintenance" text="维护"/>
+        <text name="ads_ws_action_repair" text="修理"/>
+        <text name="ads_ws_action_overhaul" text="全面检修"/>
+
+        <text name="ads_ws_age_unit" text="个月"/>
+        <text name="ads_ws_hours_unit" text="小时"/>
+        <text name="ads_ws_button_ok" text="确定"/>
+        <text name="ads_ws_option_yes" text="是"/>
+        <text name="ads_ws_option_no" text="否"/>
+        <text name="ads_ws_status_open" text="车间已开放"/>
+        <text name="ads_ws_status_closed" text="车间已关闭"/>
+        <text name="ads_ws_inspecting_status" text="检测中..."/>
+        <text name="ads_ws_status_in_progress_format" text="%s 进行中，预计完成 %s..."/>
+        <text name="ads_ws_task_inspection" text="检测"/>
+        <text name="ads_ws_task_maintenance" text="维护"/>
+        <text name="ads_ws_task_repair" text="修理"/>
+        <text name="ads_ws_task_overhaul" text="全面检修"/>
+        <text name="ads_ws_button_price_format" text="%s (%s)"/>
+        <text name="ads_ws_info_nothing_to_repair_title" text="无需修理"/>
+        <text name="ads_ws_info_nothing_to_repair_text" text="请从列表中选择一个或多个项目进行修理。"/>
+        <text name="ads_ws_confirm_inspection_title" text="确认检测"/>
+        <text name="ads_ws_confirm_inspection_text" text="检测将允许您识别隐藏故障，并粗略评估其技术状况等级。\n\n价格：{price}\n时长：{duration}\n完成时间：{time}"/>
+        <text name="ads_ws_confirm_maintenance_title" text="确认维护"/>
+        <text name="ads_ws_confirm_maintenance_text" text="维护将使技术服务等级恢复到最大值。此外，将对车辆的技术状况进行检测。\n\n价格：{price}\n时长：{duration}\n完成时间：{time}\n
+        请为此过程选择备件质量。使用更便宜的副厂零件存在缺陷风险。\n\n 副厂零件价格：{aftermarket_price}"/>
+        <text name="ads_ws_confirm_repair_title" text="确认修理"/>
+        <text name="ads_ws_confirm_repair_text" text="这将消除选定的故障（{price}）。\n\n时长：{duration}\n完成时间：{time}\n
+        请为此过程选择备件质量。使用更便宜的副厂零件存在缺陷风险。\n\n 副厂零件价格：{aftermarket_price}"/>
+        <text name="ads_ws_confirm_overhaul_title" text="确认全面检修"/>
+        <text name="ads_ws_confirm_overhaul_text" text="全面检修将修复所有故障，执行维护并改善车辆的技术状况。\n\n价格：{price}\n时长：{duration}\n完成时间：{time}\n
+        请为此过程选择备件质量。使用更便宜的副厂零件存在缺陷风险。\n\n 副厂零件价格：{aftermarket_price}"/>
+        <text name="ads_ws_option_genuine_parts" text="原厂零件"/>
+        <text name="ads_ws_option_aftermarket_parts" text="副厂零件"/>
+
+        <text name="ads_breakdowns_part_vehicle" text="整车"/>
+        <text name="ads_breakdowns_part_engine" text="发动机"/>
+        <text name="ads_breakdowns_part_turbocharger" text="涡轮增压器"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="燃油泵"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="喷油器"/>
+        <text name="ads_breakdowns_part_brake_system" text="刹车系统"/>
+        <text name="ads_breakdowns_part_transmission" text="变速箱"/>
+        <text name="ads_breakdowns_part_cvt_cooling_system" text="CVT冷却系统"/>
+        <text name="ads_breakdowns_part_cooling_system" text="冷却系统"/>
+        <text name="ads_breakdowns_part_hydraulic_lift_system" text="液压升降系统"/>
+        <text name="ads_breakdowns_part_electrical_system" text="电气系统"/>
+        <text name="ads_breakdowns_part_carburetor" text="化油器"/>
+
+        <text name="ads_breakdowns_part_yield_sensor" text="产量传感器"/>
+        <text name="ads_breakdowns_part_material_flow_system" text="物料流系统"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="卸料螺旋输送器"/>
+
+        <text name="ads_breakdowns_severity_permanent" text="永久性"/>
+        <text name="ads_breakdowns_severity_reduce_power" text="降低功率"/>
+        <text name="ads_breakdowns_severity_shutdown" text="停机"/>
+        <text name="ads_breakdowns_severity_minor" text="轻微"/>
+        <text name="ads_breakdowns_severity_moderate" text="中度"/>
+        <text name="ads_breakdowns_severity_major" text="严重"/>
+        <text name="ads_breakdowns_severity_critical" text="危急"/>
+
+        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="多年繁重工作累积的压力。核心部件的轻微、不可逆磨损略微降低了整体性能。"/>
+
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="发动机保护模式"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="发动机跛行模式激活！功率降低！"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="发动机保护模式"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="发动机跛行模式激活！功率降低！"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="发动机保护模式"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="发动机跛行模式激活！功率降低！"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="发动机保护模式"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="发动机已关闭以防过热"/>
+
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="发动机完全故障"/>
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="发动机卡死"/>
+
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="ECU错误。发动机功率略微降低。"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="ECU故障。明显的功率损失和油耗增加。"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="严重ECU故障。显著的功率损失、高油耗以及熄火风险。"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="ECU完全失效。发动机无法控制且无法启动。"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="发动机故障"/>
+
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="涡轮轴承磨损。可听到微弱的哨音，高转速时功率略有损失。"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="涡轮密封泄漏。明显的功率损失，油耗增加。"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="涡轮叶片损坏。严重的功率损失，重载下有熄火风险。"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="灾难性涡轮故障。发动机损失大部分功率，面临严重内部损坏风险。"/>
+
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="燃油泵早期磨损。发动机功率略微降低，油耗增加。"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="燃油压力下降。明显的功率损失，油耗更高，偶发熄火。"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="临界燃油压力。严重的功率损失，油耗极高，频繁熄火。"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="燃油泵完全故障。燃油无法供应至发动机。"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="发动机无法启动"/>
+
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="一个或多个喷油器喷嘴轻微堵塞。发动机可能运行稍有顿挫，功率略有损失。"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="燃油雾化不良。发动机在负载下缺火，导致明显的功率损失和运行犹豫。"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="喷油器卡滞。发动机运行非常差，功率损失显著且启动不可靠。"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="喷油器完全失效。发动机无法正常运行，可能完全无法启动。"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="发动机无法启动"/>
+
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="刹车片磨损。刹车效能轻微下降。"/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="刹车液泄漏或刹车盘磨损。刹车距离明显增加。"/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="刹车压力严重损失。刹车非常弱且不可靠。"/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="刹车系统完全失效。继续操作极其危险。"/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="刹车故障"/>
+
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="离合器片磨损。变速箱在负载下偶尔打滑导致功率损失。"/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="离合器显著磨损。变速箱打滑明显，尤其在加速时。"/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="离合器严重磨损。剧烈的打滑使得向车轮传递动力变得困难。"/>
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="离合器完全烧毁。车辆无法移动。"/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="变速箱故障。"/>
+
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="同步器磨损。换挡时偶尔有摩擦声或困难。"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="同步器损坏。换挡经常困难并可能失败。"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="同步器齿断裂。负载下换挡失败或挡位脱开几率高。"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="同步器完全失效。无法换挡。"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="变速箱故障"/>
+
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="动力换挡(Powershift)液压压力低。接合挡位时有轻微延迟和顿挫。"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="液压泵密封件磨损。换挡时有明显的迟滞和冲击。"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="液压泵故障。换挡时有严重的迟滞和剧烈震动。"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="动力换挡(Powershift)液压泵故障。变速箱卡在空挡。"/>
+
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="节温器开始卡滞。CVT可能升温缓慢或在负载下运行温度略高于正常。"/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="节温器部分卡滞。CVT温度不稳定，长时间工作有过热风险。"/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="节温器基本失效。CVT易严重过热，可能导致内部损坏。"/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="节温器完全失效，很可能卡在关闭位置。冷却效果极微，导致CVT快速且危险地过热。"/>
+
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="发动机节温器开始失效。发动机需要更长时间达到最佳温度或运行温度略高。"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="节温器响应不良。发动机温度调节不稳定，增加磨损。"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="节温器卡在关闭位置。发动机在负载下将持续过热。"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="节温器完全失效。发动机冷却液无法正确循环，导致即将发生严重过热。"/>
+
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="液压泵内部轻微泄漏。液压执行机构动作稍慢。"/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="泵密封件磨损。液压操作明显变慢。"/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="液压泵损坏。执行机构动作极其缓慢无力。"/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="液压泵故障。液压系统无法操作。"/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="液压故障"/>
+
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="绝缘磨损，偶发电压下降。可观察到轻微的电气故障。"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="触点腐蚀，发电机输出不稳定。车灯可能失效，发动机启动不可靠。"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="短路风险。关键系统不可靠，车灯可能完全失效。"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="车灯故障"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="主线束故障。车辆电气系统瘫痪。"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="起动机无响应"/>
+
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="化油器轻微污染。发动机在重载下偶尔运行犹豫。"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="喷嘴堵塞。发动机经常运转不稳并损失功率，尤其在快速踩油门时。"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="化油器严重堵塞。发动机运行非常不稳，频繁熄火，难以维持功率。"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="化油器完全堵塞导致燃油供应不足。发动机无法运行。"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="化油器堵塞"/>
+
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="传感器轻微污染或校准漂移。自动脱粒系统效率略有下降，造成最小作物损失。"/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="传感器读数不准确导致脱粒和分离系统调整不理想。产量损失明显。"/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="严重传感器故障。控制单元接收到高度错误的数据，导致谷物与谷壳分离错误，造成显著损失。"/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="产量监测系统完全失效。联合收割机在“盲操作”，导致效率低下和严重的作物损失。"/>
+        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="产量监测系统故障"/>
+
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="内部螺旋输送器和提升机链条轻微磨损。作物在内部运输过程中有少量损失。"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="螺旋叶片磨损和传送带打滑导致机器内部溢料增加。您可能会听到偶尔的摩擦声。"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="提升机刮板和螺旋输送器损坏，难以移动作物，导致显著损失并有严重堵塞风险。"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="物料流系统的主要部件故障，导致严重堵塞。发动机承受极大压力。"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="物料流堵塞"/>
+
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="传动皮带拉伸。偶尔打滑导致卸料速度轻微下降。"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="传动皮带和皮带轮磨损。负载下明显打滑显著降低卸料速度。"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="变速箱损坏或皮带严重磨损。螺旋输送器转动困难，以非常低的速度运行。"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="传动皮带断裂或变速箱卡死。卸料螺旋输送器完全卡住。"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="卸料螺旋输送器卡住"/>
+
+        <text name="ads_breakdowns_engine_stalled_message" text="发动机熄火"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="挡位脱开"/>
+        <text name="ads_breakdown_at_progress_message" text="进行中"/>
+        
+        <text name="ads_spec_this_month" text="本月"/>
+        <text name="ads_spec_months_ago" text="个月前"/>
+        <text name="ads_spec_never" text="从未"/>
+        <text name="ads_spec_op_hours_short" text="小时"/>
+        <text name="ads_spec_tomorrow_at" text="明日"/>
+        <text name="ads_spec_day_after_tommorow_at" text="后天"/>
+        <text name="ads_spec_in_days_at" text="{days}天后"/>
+        <text name="ads_spec_day_s" text="天"/>
+        <text name="ads_spec_hour_s" text="小时"/>
+        <text name="ads_spec_minute_s" text="分钟"/>
+        <text name="ads_spec_and" text="和"/>
+        <text name="ads_spec_duration_format_hours" text="%d %s"/>
+        <text name="ads_spec_duration_format_minutes" text="%d %s"/>
+        <text name="ads_spec_duration_format_combined" text="%s %s"/>
+        <text name="ads_spec_months_ago_unit" text="个月前"/>
+        <text name="ads_spec_months_ago_format" text="%s %s"/>
+        <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s 直到 %s"/>
+        <text name="ads_spec_service_interval_format" text="%s 小时"/>
+        <text name="ads_spec_maintenance_complete" text="已完成"/>
+
+        <text name="ads_spec_state_ready" text="就绪"/>
+        <text name="ads_spec_state_inspection" text="检测中"/>
+        <text name="ads_spec_state_maintenance" text="维护中"/>
+        <text name="ads_spec_state_repair" text="修理中"/>
+        <text name="ads_spec_state_overhaul" text="全面检修中"/>
+        <text name="ads_spec_state_broken" text="已损坏"/>
+        <text name="ads_spec_state_excellent" text="极佳"/>
+        <text name="ads_spec_state_good" text="良好"/>
+        <text name="ads_spec_state_normal" text="正常"/>
+        <text name="ads_spec_state_bad" text="差"/>
+        <text name="ads_spec_state_terrible" text="极差"/>
+        <text name="ads_spec_state_unknown" text="未知"/>
+        <text name="ads_spec_state_not_required" text="无需"/>
+        <text name="ads_spec_state_required" text="需要"/>
+        <text name="ads_spec_state_recommended" text="建议"/>
+        <text name="ads_spec_state_legendary" text="传奇级"/>
+        <text name="ads_spec_state_premium" text="高级"/>
+        <text name="ads_spec_state_standart" text="标准"/>
+        <text name="ads_spec_state_budget" text="经济型"/>
+        <text name="ads_spec_state_complex" text="复杂"/>
+        <text name="ads_spec_state_robust" text="耐用"/>
+        <text name="ads_spec_state_extreme" text="极端"/>
+        <text name="ads_spec_state_low" text="低"/>
+        <text name="ads_spec_state_average" text="中等"/>
+        <text name="ads_spec_state_high" text="高"/>
+        <text name="ads_spec_state_workhorse" text="主力级"/>
+    </texts>
+</l10n>
