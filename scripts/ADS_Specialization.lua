@@ -649,11 +649,11 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
         speedCooling = C.SPEED_COOLING_MAX_EFFECT * speedRatio
     end
 
-    if spec.engineTemperature < eviromentTemp then spec.engineTemperature = eviromentTemp end
-    if spec.rawEngineTemperature < eviromentTemp then spec.rawEngineTemperature = eviromentTemp end
+    if spec.engineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.engineTemperature = eviromentTemp end
+    if spec.rawEngineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawEngineTemperature = eviromentTemp end
     if vehicleHaveCVT then
-        if spec.transmissionTemperature < eviromentTemp then spec.transmissionTemperature = eviromentTemp end
-        if spec.rawTransmissionTemperature < eviromentTemp then spec.rawTransmissionTemperature = eviromentTemp end
+        if spec.transmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.transmissionTemperature = eviromentTemp end
+        if spec.rawTransmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
     end
 
     local engineDebugData = {}
@@ -796,6 +796,7 @@ end
 
 function AdvancedDamageSystem:calculateWearRates()
     local spec = self.spec_AdvancedDamageSystem
+    local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE
     local conditionWearRate = 1.0
     local serviceWearRate = 1.0
@@ -803,6 +804,10 @@ function AdvancedDamageSystem:calculateWearRates()
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
+        local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
+        local maxRpm = spec_motorized.motor.maxRpm
+        local rpmLoad = lastRpm / maxRpm
+
         if motorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
             motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, C.MOTOR_OVERLOADED_THRESHOLD, false)
             motorLoadFactor = motorLoadFactor * C.MOTOR_OVERLOADED_MAX_MULTIPLIER
@@ -815,11 +820,15 @@ function AdvancedDamageSystem:calculateWearRates()
             conditionWearRate = conditionWearRate + expiredServiceFactor
         end
 
-        if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
+        if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.5 and not spec.isElectricVehicle then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
-            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.3, false)
+            if self:getIsOperating() then
+                print(rpmLoad) 
+            end
+            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.5, false)
             coldMotorFactor = coldMotorFactor * C.COLD_MOTOR_MAX_MULTIPLIER * motorLoadInf
             conditionWearRate = conditionWearRate + coldMotorFactor
+
 
         elseif spec.engineTemperature > C.OVERHEAT_MOTOR_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
             hotMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_MOTOR_THRESHOLD, false, 120)
@@ -907,7 +916,7 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
     end
 
     if ADS_Config.DEBUG then
-        if spec.debugDate == nil then spec.debugDate = {} end
+        if spec.debugData == nil then spec.debugData = {} end
 
         local hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
         local criticalChance = math.clamp((1 - spec.conditionLevel) ^ probability.CRITICAL_DEGREE, probability.CRITICAL_MIN, probability.CRITICAL_MAX)
