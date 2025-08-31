@@ -822,9 +822,6 @@ function AdvancedDamageSystem:calculateWearRates()
 
         if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.5 and not spec.isElectricVehicle then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
-            if self:getIsOperating() then
-                print(rpmLoad) 
-            end
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.5, false)
             coldMotorFactor = coldMotorFactor * C.COLD_MOTOR_MAX_MULTIPLIER * motorLoadInf
             conditionWearRate = conditionWearRate + coldMotorFactor
