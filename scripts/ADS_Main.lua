@@ -33,15 +33,16 @@ function ADS_Main.registerSpecializationToVehicles()
 	local specName = "AdvancedDamageSystem"
 	for vehicleType, vehicle in pairs(g_vehicleTypeManager.types) do
 		if vehicle ~= nil and 
+            not string.find(string.lower(vehicleType), "handtool") and
+            not string.find(string.lower(vehicleType), "pushable") and
+            not string.find(vehicleType, "FS25_lsfmFarmEquipmentPack") and
             vehicleType ~= "locomotive" and 
             vehicleType ~= "сonveyorBelt" and 
             vehicleType ~= "pickupConveyorBelt" and 
             vehicleType ~= "woodCrusherTrailermotorized" and 
             vehicleType ~= "baleWrapper" and 
             vehicleType ~= "craneTrailer" and
-            vehicleType ~= "highPressureWasher" and
-            vehicleType ~= "handToolWindrower" and
-            vehicleType ~= "handToolMower" then
+            vehicleType ~= "highPressureWasher" then
 
 			local ismotorized = false;
 			local hasNotADS = true;
