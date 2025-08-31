@@ -1358,7 +1358,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
         spec.workshopType = workshopType
 
         if type == states.INSPECTION then
-            totalTimeMs = C.INSPECTION_TIME
+            totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER
             local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
             for id, breakdown in pairs(spec.activeBreakdowns) do
                 if not breakdown.isVisible then
@@ -1370,11 +1370,11 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
             end
 
         elseif type == states.MAINTENANCE then
-            totalTimeMs = C.MAINTENANCE_TIME
+            totalTimeMs = C.MAINTENANCE_TIME * C.MAINTENANCE_DURATION_MULTIPLIER
             spec.serviceLevel = 1.0
 
         elseif type == states.REPAIR then
-            totalTimeMs = C.REPAIR_TIME * (breadownsCount or 0)
+            totalTimeMs = C.REPAIR_TIME * (breadownsCount or 0) * C.MAINTENANCE_DURATION_MULTIPLIER
             local idsToRepair = {}
             for id, breakdown in pairs(spec.activeBreakdowns) do
                 if breakdown.isSelectedForRepair then
@@ -1386,7 +1386,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
             end
 
         elseif type == states.OVERHAUL then
-            totalTimeMs = C.OVERHAUL_TIME
+            totalTimeMs = C.OVERHAUL_TIME * C.MAINTENANCE_DURATION_MULTIPLIER
             
             if next(spec.activeBreakdowns) ~= nil then
                 local idsToRepair = {}
@@ -1858,7 +1858,7 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
             end
             totalDurationMs = (C.REPAIR_TIME * repairCount) / spec.maintainability
         end
-        workDurationHours = totalDurationMs / 3600000
+        workDurationHours = (totalDurationMs / 3600000) * C.MAINTENANCE_DURATION_MULTIPLIER
     end
 
     if workDurationHours <= 0 then
@@ -1906,7 +1906,7 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
         end
     end
 
-    return (totalElapsedHours * C.MAINTENANCE_DURATION_MULTIPLIER)
+    return totalElapsedHours
 end
 
 

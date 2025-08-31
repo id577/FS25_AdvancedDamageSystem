@@ -234,7 +234,7 @@
         <text name="ads_spec_state_ready" text="Ready"/>
         <text name="ads_spec_state_inspection" text="Inspection"/>
         <text name="ads_spec_state_maintenance" text="Maintenance"/>
-        <text name="ads_spec_state_repair" text="Rapair"/>
+        <text name="ads_spec_state_repair" text="Repair"/>
         <text name="ads_spec_state_overhaul" text="Overhaul"/>
         <text name="ads_spec_state_broken" text="Broken"/>
         <text name="ads_spec_state_excellent" text="Excellent"/>
