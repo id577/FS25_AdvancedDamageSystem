@@ -1704,8 +1704,10 @@ end
 function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
     local year = 2000
     local brandName = 'LIZARD'
+    local name = 'LIZARD'
 
     if vehicle ~= nil then
+        name = vehicle:getName()
         local brand = g_brandManager:getBrandByIndex(vehicle:getBrand())
         if not brand then
             return 1.0, 1.0
@@ -1721,6 +1723,7 @@ function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
         brandName = brand.name
 
     elseif storeItem ~= nil then
+        name = storeItem.name
         brandName = storeItem.brandNameRaw
         if storeItem.specs ~= nil and storeItem.specs.year ~= nil then
             local newYear =  tonumber(storeItem.specs.year)
@@ -1730,10 +1733,19 @@ function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
         end
     end
 
+    print(name)
+
     local yearFactor = 0
     if year < 2000 then
         yearFactor = math.max(2000 - year, 0) * 0.01
     end
+
+    local modelData = ADS_Config.BRANDS[name]
+
+    if modelData ~= nil then
+        return modelData[1], modelData[2]
+    end
+
     local brandData = ADS_Config.BRANDS[brandName]
 
     if brandData ~= nil then

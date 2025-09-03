@@ -1,3 +1,4 @@
+
 ADS_Config = {
     -- Enables or disables extensive debug logging in the console.
     -- When true, the mod will print detailed information about its calculations,
@@ -309,6 +310,7 @@ ADS_Config = {
     }      
 }
 
+
 ADS_Config.savegameFile = "advancedDamageSystem.xml"
 
 function ADS_Config.saveToXMLFile()
@@ -316,23 +318,60 @@ function ADS_Config.saveToXMLFile()
         return false
     end
 
-    local xmlFileName = g_currentMission.missionInfo.savegameDirectory .. "/".. ADS_Config.savegameFile
+    local xmlFileName = g_currentMission.missionInfo.savegameDirectory .. "/" .. ADS_Config.savegameFile
     local xmlFile = createXMLFile("advancedDamageSystem", xmlFileName, "advancedDamageSystem")
 
     if xmlFile == nil then
-        return false     
+        print("ADS_Config: ERROR - Could not create config XML file.")
+        return false
     end
 
-    setXMLFloat(xmlFile, "advancedDamageSystem.baseServiceWear", ADS_Config.CORE.BASE_SERVICE_WEAR);
-    setXMLFloat(xmlFile, "advancedDamageSystem.baseCondtitionWear", ADS_Config.CORE.BASE_CONDITION_WEAR);
-    setXMLFloat(xmlFile, "advancedDamageSystem.breakdownProbabolityMin", ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF);
-    setXMLFloat(xmlFile, "advancedDamageSystem.maintenancePriceMultiplier", ADS_Config.MAINTENANCE.MAINTENANCE_PRICE_MULTIPLIER);
-    setXMLFloat(xmlFile, "advancedDamageSystem.maintenanceDurationMultiplier", ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER);
-    setXMLFloat(xmlFile, "advancedDamageSystem.workshopOpenHour", ADS_Config.WORKSHOP.OPEN_HOUR);
-    setXMLFloat(xmlFile, "advancedDamageSystem.workshopCloseHour", ADS_Config.WORKSHOP.CLOSE_HOUR);
+    print("ADS_Config: Saving settings to " .. xmlFileName)
 
-	saveXMLFile(xmlFile);
-	delete(xmlFile);
+    local function saveNode(tbl, path)
+        for k, v in pairs(tbl) do
+            if type(v) ~= "function" and k ~= "savegameFile" then
+                local currentPath = path .. "." .. tostring(k)
+
+                if type(v) == "table" then
+
+                    if k == "BRANDS" then
+                        removeXMLProperty(xmlFile, currentPath)
+                        
+                        local i = 0
+                        local sortedBrands = {}
+                        for brandName in pairs(v) do
+                            table.insert(sortedBrands, brandName)
+                        end
+                        table.sort(sortedBrands)
+
+                        for _, brandName in ipairs(sortedBrands) do
+                            local brandValues = v[brandName]
+                            local brandPath = currentPath .. ".brand(" .. i .. ")"
+                            setXMLString(xmlFile, brandPath .. "#name", brandName)
+                            setXMLFloat(xmlFile, brandPath .. "#reliability", brandValues[1])
+                            setXMLFloat(xmlFile, brandPath .. "#maintainability", brandValues[2])
+                            i = i + 1
+                        end
+                    else
+                        saveNode(v, currentPath)
+                    end
+                elseif type(v) == "number" then
+                    setXMLFloat(xmlFile, currentPath, v)
+                elseif type(v) == "boolean" then
+                    setXMLBool(xmlFile, currentPath, v)
+                elseif type(v) == "string" then
+                    setXMLString(xmlFile, currentPath, v)
+                end
+            end
+        end
+    end
+
+    saveNode(ADS_Config, "advancedDamageSystem")
+
+    saveXMLFile(xmlFile)
+    delete(xmlFile)
+    return true
 end
 
 function ADS_Config.loadFromXMLFile(mission)
@@ -347,40 +386,73 @@ function ADS_Config.loadFromXMLFile(mission)
         return
     end
 
-    local xmlFile = loadXMLFile('advancedDamageSystem', xmlFileName);
-    
+    local xmlFile = loadXMLFile('advancedDamageSystem', xmlFileName)
+
     if xmlFile == nil then
-        print("ADS_Config: Failed to load config file.")
+        print("ADS_Config: ERROR - Failed to load config file.")
         return
     end
 
     print("ADS_Config: Loading settings from " .. xmlFileName)
 
-    
-    local serviceWear = getXMLFloat(xmlFile, "advancedDamageSystem.baseServiceWear")
-    if serviceWear ~= nil then ADS_Config.CORE.BASE_SERVICE_WEAR = serviceWear end
+    local function loadNode(targetTbl, path)
+        for k, v in pairs(targetTbl) do
+            if type(v) ~= "function" and k ~= "savegameFile" then
+                local currentPath = path .. "." .. tostring(k)
 
-    local conditionWear = getXMLFloat(xmlFile, "advancedDamageSystem.baseCondtitionWear")
-    if conditionWear ~= nil then ADS_Config.CORE.BASE_CONDITION_WEAR = conditionWear end
+                if type(v) == "table" then
+                    if k == "BRANDS" then
+                        local loadedBrands = {}
+                        local i = 0
+                        while true do
+                            local brandPath = currentPath .. ".brand(" .. i .. ")"
+                            if not hasXMLProperty(xmlFile, brandPath .. "#name") then
+                                break
+                            end
 
-    local breakdownProb = getXMLFloat(xmlFile, "advancedDamageSystem.breakdownProbabolityMin")
-    if breakdownProb ~= nil then ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF = breakdownProb end
+                            local name = getXMLString(xmlFile, brandPath .. "#name")
+                            local reliability = getXMLFloat(xmlFile, brandPath .. "#reliability")
+                            local maintainability = getXMLFloat(xmlFile, brandPath .. "#maintainability")
 
-    local priceMult = getXMLFloat(xmlFile, "advancedDamageSystem.maintenancePriceMultiplier")
-    if priceMult ~= nil then ADS_Config.MAINTENANCE.MAINTENANCE_PRICE_MULTIPLIER = priceMult end
+                            if name ~= nil and reliability ~= nil and maintainability ~= nil then
+                                loadedBrands[name] = { reliability, maintainability }
+                            end
+                            i = i + 1
+                        end
+                        
+                        if next(loadedBrands) ~= nil then
+                            for brandName, brandValues in pairs(loadedBrands) do
+                                targetTbl[k][brandName] = brandValues
+                            end
+                            print(string.format("ADS_Config: Loaded/updated %d brand(s) from XML.", i))
+                        else
+                            print("ADS_Config: No brand list found in XML, using default brand settings.")
+                        end
+                    else
+                        loadNode(v, currentPath)
+                    end
+                else
+                    local loadedValue = nil
+                    if type(v) == "number" then
+                        loadedValue = getXMLFloat(xmlFile, currentPath)
+                    elseif type(v) == "boolean" then
+                        loadedValue = getXMLBool(xmlFile, currentPath)
+                    elseif type(v) == "string" then
+                        loadedValue = getXMLString(xmlFile, currentPath)
+                    end
+                    
+                    if loadedValue ~= nil then
+                        targetTbl[k] = loadedValue
+                    end
+                end
+            end
+        end
+    end
 
-    local durationMult = getXMLFloat(xmlFile, "advancedDamageSystem.maintenanceDurationMultiplier")
-    if durationMult ~= nil then ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER = durationMult end
+    loadNode(ADS_Config, "advancedDamageSystem")
 
-    local openHour = getXMLFloat(xmlFile, "advancedDamageSystem.workshopOpenHour")
-    if openHour ~= nil then ADS_Config.WORKSHOP.OPEN_HOUR = openHour end
-
-    local closeHour = getXMLFloat(xmlFile, "advancedDamageSystem.workshopCloseHour")
-    if closeHour ~= nil then ADS_Config.WORKSHOP.CLOSE_HOUR = closeHour end
-    
     delete(xmlFile)
 end
-
 
 Mission00.loadMission00Finished = Utils.appendedFunction(
     Mission00.loadMission00Finished, ADS_Config.loadFromXMLFile)
