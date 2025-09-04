@@ -170,7 +170,7 @@ function ADS_WorkshopDialog:updateScreen()
         self.inscpectionButton.disabled = buttonsDisabled 
         self.maintenanceButton.disabled = buttonsDisabled
         self.repairButton.disabled = buttonsDisabled
-        self.overhaulButton.disabled = buttonsDisabled 
+        self.overhaulButton.disabled = buttonsDisabled or self.vehicle:getConditionLevel() >= 0.5
     else
         self.inscpectionButton.disabled = false or spec.currentState ~= STATUS.READY
         self.maintenanceButton.disabled = not (g_workshopScreen.isMobileWorkshop and spec.maintainability >= 1.1) or spec.currentState ~= STATUS.READY
