@@ -215,6 +215,8 @@
         <text name="ads_breakdowns_engine_stalled_message" text="Engine stalled"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Gear disengage"/>
         <text name="ads_breakdown_at_progress_message" text="in progress"/>
+
+        <text name="ads_cold_engine_message" text="Engine is cold! High revs cause wear!"/>
         
         <text name="ads_spec_this_month" text="This month"/>
         <text name="ads_spec_months_ago" text="months ago"/>

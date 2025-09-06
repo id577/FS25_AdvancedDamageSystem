@@ -215,6 +215,8 @@
         <text name="ads_breakdowns_engine_stalled_message" text="发动机熄火"/>
         <text name="ads_breakdowns_gear_disengage_message" text="挡位脱开"/>
         <text name="ads_breakdown_at_progress_message" text="进行中"/>
+
+        <text name="ads_cold_engine_message" text="发动机未预热！高转速会导致磨损！"/>
         
         <text name="ads_spec_this_month" text="本月"/>
         <text name="ads_spec_months_ago" text="个月前"/>

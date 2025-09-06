@@ -216,6 +216,8 @@
     <text name="ads_breakdowns_engine_stalled_message" text="Motor zhasl"/>
     <text name="ads_breakdowns_gear_disengage_message" text="Vyřazena rychlost"/>
     <text name="ads_breakdown_at_progress_message" text="probíhá"/>
+
+    <text name="ads_cold_engine_message" text="Studený motor! Vysoké otáčky způsobují opotřebení!"/>
     
     <text name="ads_spec_this_month" text="Tento měsíc"/>
     <text name="ads_spec_months_ago" text="měsíce zpět"/>

@@ -211,11 +211,11 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="La correa de transmisión se rompió o la caja de engranajes se atascó. El sinfín de descarga está completamente atascado."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Sinfín de descarga atascado"/>
 
-
         <text name="ads_breakdowns_engine_stalled_message" text="Motor calado"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Marcha desengranada"/>
         <text name="ads_breakdown_at_progress_message" text="en progreso"/>
         
+        <text name="ads_cold_engine_message" text="¡Motor frío! ¡Las altas revoluciones causan desgaste!"/>
 
         <text name="ads_spec_this_month" text="Este mes"/>
         <text name="ads_spec_months_ago" text="meses atrás"/>
