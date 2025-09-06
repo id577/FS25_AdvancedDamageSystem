@@ -212,6 +212,8 @@
         <text name="ads_breakdowns_engine_stalled_message" text="Двигатель заглох"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Передача выключена"/>
         <text name="ads_breakdown_at_progress_message" text="в процессе"/>
+
+        <text name="ads_cold_engine_message" text="Двигатель холодный! Высокие обороты вызывают износ!"/>
         
 
         <text name="ads_spec_this_month" text="В этом месяце"/>

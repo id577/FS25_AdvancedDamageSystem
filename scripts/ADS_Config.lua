@@ -4,6 +4,8 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
+    VER = 1,
+
     DEBUG = false,
 
     -- How often quick, interactive effects are updated, in milliseconds.
@@ -59,7 +61,7 @@ ADS_Config = {
         -- The maximum penalty for operating the engine under load while it's cold.
         COLD_MOTOR_MAX_MULTIPLIER = 10.0, -- (up to 10x extra wear)
         -- The engine temperature in Celsius below which it is considered "cold" and the penalty applies.
-        COLD_MOTOR_THRESHOLD = 70,
+        COLD_MOTOR_THRESHOLD = 50,
 
         -- The maximum penalty for operating the engine while it's overheating.
         OVERHEAT_MOTOR_MAX_MULTIPLIER = 30.0, -- (up to 30x extra wear)
@@ -374,6 +376,67 @@ function ADS_Config.saveToXMLFile()
     return true
 end
 
+function ADS_Config.saveToXMLFile()
+    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then
+        return false
+    end
+
+    local xmlFileName = g_currentMission.missionInfo.savegameDirectory .. "/" .. ADS_Config.savegameFile
+    local xmlFile = createXMLFile("advancedDamageSystem", xmlFileName, "advancedDamageSystem")
+
+    if xmlFile == nil then
+        print("ADS_Config: ERROR - Could not create config XML file.")
+        return false
+    end
+
+    print("ADS_Config: Saving settings to " .. xmlFileName)
+
+    local function saveNode(tbl, path)
+        for k, v in pairs(tbl) do
+            -- Исключаем функции и служебные поля из сохранения
+            if type(v) ~= "function" and k ~= "savegameFile" then
+                local currentPath = path .. "." .. tostring(k)
+
+                if type(v) == "table" then
+                    if k == "BRANDS" then
+                        removeXMLProperty(xmlFile, currentPath)
+                        
+                        local i = 0
+                        local sortedBrands = {}
+                        for brandName in pairs(v) do
+                            table.insert(sortedBrands, brandName)
+                        end
+                        table.sort(sortedBrands)
+
+                        for _, brandName in ipairs(sortedBrands) do
+                            local brandValues = v[brandName]
+                            local brandPath = currentPath .. ".brand(" .. i .. ")"
+                            setXMLString(xmlFile, brandPath .. "#name", brandName)
+                            setXMLFloat(xmlFile, brandPath .. "#reliability", brandValues[1])
+                            setXMLFloat(xmlFile, brandPath .. "#maintainability", brandValues[2])
+                            i = i + 1
+                        end
+                    else
+                        saveNode(v, currentPath)
+                    end
+                elseif type(v) == "number" then
+                    setXMLFloat(xmlFile, currentPath, v)
+                elseif type(v) == "boolean" then
+                    setXMLBool(xmlFile, currentPath, v)
+                elseif type(v) == "string" then
+                    setXMLString(xmlFile, currentPath, v)
+                end
+            end
+        end
+    end
+
+    saveNode(ADS_Config, "advancedDamageSystem")
+
+    saveXMLFile(xmlFile)
+    delete(xmlFile)
+    return true
+end
+
 function ADS_Config.loadFromXMLFile(mission)
     if mission == nil or mission.missionInfo == nil or mission.missionInfo.savegameDirectory == nil then
         return
@@ -393,63 +456,74 @@ function ADS_Config.loadFromXMLFile(mission)
         return
     end
 
-    print("ADS_Config: Loading settings from " .. xmlFileName)
+    local savedVersion = getXMLFloat(xmlFile, "advancedDamageSystem.VER")
 
-    local function loadNode(targetTbl, path)
-        for k, v in pairs(targetTbl) do
-            if type(v) ~= "function" and k ~= "savegameFile" then
-                local currentPath = path .. "." .. tostring(k)
+    if savedVersion ~= nil and savedVersion == ADS_Config.VER then
+        print("ADS_Config: Config file version match. Loading settings from " .. xmlFileName)
 
-                if type(v) == "table" then
-                    if k == "BRANDS" then
-                        local loadedBrands = {}
-                        local i = 0
-                        while true do
-                            local brandPath = currentPath .. ".brand(" .. i .. ")"
-                            if not hasXMLProperty(xmlFile, brandPath .. "#name") then
-                                break
+        local function loadNode(targetTbl, path)
+            for k, v in pairs(targetTbl) do
+                if type(v) ~= "function" and k ~= "savegameFile" and k ~= "VER" then
+                    local currentPath = path .. "." .. tostring(k)
+                    if type(v) == "table" then
+                        if k == "BRANDS" then
+                            local loadedBrands = {}
+                            local i = 0
+                            while true do
+                                local brandPath = currentPath .. ".brand(" .. i .. ")"
+                                if not hasXMLProperty(xmlFile, brandPath .. "#name") then
+                                    break
+                                end
+
+                                local name = getXMLString(xmlFile, brandPath .. "#name")
+                                local reliability = getXMLFloat(xmlFile, brandPath .. "#reliability")
+                                local maintainability = getXMLFloat(xmlFile, brandPath .. "#maintainability")
+
+                                if name ~= nil and reliability ~= nil and maintainability ~= nil then
+                                    loadedBrands[name] = { reliability, maintainability }
+                                end
+                                i = i + 1
                             end
-
-                            local name = getXMLString(xmlFile, brandPath .. "#name")
-                            local reliability = getXMLFloat(xmlFile, brandPath .. "#reliability")
-                            local maintainability = getXMLFloat(xmlFile, brandPath .. "#maintainability")
-
-                            if name ~= nil and reliability ~= nil and maintainability ~= nil then
-                                loadedBrands[name] = { reliability, maintainability }
+                            
+                            if next(loadedBrands) ~= nil then
+                                for brandName, brandValues in pairs(loadedBrands) do
+                                    targetTbl[k][brandName] = brandValues
+                                end
+                                print(string.format("ADS_Config: Loaded/updated %d brand(s) from XML.", i))
+                            else
+                                print("ADS_Config: No brand list found in XML, using default brand settings.")
                             end
-                            i = i + 1
-                        end
-                        
-                        if next(loadedBrands) ~= nil then
-                            for brandName, brandValues in pairs(loadedBrands) do
-                                targetTbl[k][brandName] = brandValues
-                            end
-                            print(string.format("ADS_Config: Loaded/updated %d brand(s) from XML.", i))
                         else
-                            print("ADS_Config: No brand list found in XML, using default brand settings.")
+                            loadNode(v, currentPath)
                         end
                     else
-                        loadNode(v, currentPath)
-                    end
-                else
-                    local loadedValue = nil
-                    if type(v) == "number" then
-                        loadedValue = getXMLFloat(xmlFile, currentPath)
-                    elseif type(v) == "boolean" then
-                        loadedValue = getXMLBool(xmlFile, currentPath)
-                    elseif type(v) == "string" then
-                        loadedValue = getXMLString(xmlFile, currentPath)
-                    end
-                    
-                    if loadedValue ~= nil then
-                        targetTbl[k] = loadedValue
+                        local loadedValue = nil
+                        if type(v) == "number" then
+                            loadedValue = getXMLFloat(xmlFile, currentPath)
+                        elseif type(v) == "boolean" then
+                            loadedValue = getXMLBool(xmlFile, currentPath)
+                        elseif type(v) == "string" then
+                            loadedValue = getXMLString(xmlFile, currentPath)
+                        end
+                        
+                        if loadedValue ~= nil then
+                            targetTbl[k] = loadedValue
+                        end
                     end
                 end
             end
         end
-    end
 
-    loadNode(ADS_Config, "advancedDamageSystem")
+        loadNode(ADS_Config, "advancedDamageSystem")
+
+    else
+        if savedVersion == nil then
+            print("ADS_Config: Old config file detected (no version). Using default settings to prevent errors.")
+        else
+            print(string.format("ADS_Config: Config file version mismatch (File: %s, Mod: %s). Using default settings.", tostring(savedVersion), tostring(ADS_Config.VER)))
+        end
+    end
+    
 
     delete(xmlFile)
 end

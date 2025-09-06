@@ -578,6 +578,17 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
        end
     end
 
+    --- Cold engine message
+    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.COLD_MOTOR_THRESHOLD then
+            local spec_motorized = self.spec_motorized
+            local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
+            local maxRpm = spec_motorized.motor.maxRpm
+            local rpmLoad = lastRpm / maxRpm
+            if rpmLoad > 0.75 then
+                g_currentMission:showBlinkingWarning(g_i18n:getText('ads_cold_engine_message'), 2800)
+            end
+    end
+
     --- Messages, Ai worker
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
@@ -820,9 +831,9 @@ function AdvancedDamageSystem:calculateWearRates()
             conditionWearRate = conditionWearRate + expiredServiceFactor
         end
 
-        if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.5 and not spec.isElectricVehicle then
+        if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
-            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.5, false)
+            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldMotorFactor = coldMotorFactor * C.COLD_MOTOR_MAX_MULTIPLIER * motorLoadInf
             conditionWearRate = conditionWearRate + coldMotorFactor
 
