@@ -14,6 +14,12 @@
         <text name="ads_workshopOpenHour_tooltip" text="La hora del día en que el taller abre. Las reparaciones solo están activas durante el horario laboral."/>
         <text name="ads_workshopCloseHour_label" text="Hora de Cierre del Taller"/>
         <text name="ads_workshopCloseHour_tooltip" text="La hora del día en que el taller cierra. Las reparaciones se pausarán después de esta hora."/>
+        <text name="ads_engineMaxHeat_label" text="Calor máx. del motor"/>
+        <text name="ads_engineMaxHeat_tooltip" text="La tasa base de calor generado por el motor a carga máxima. Valores más altos harán que el motor se caliente más rápido."/>
+        <text name="ads_transMaxHeat_label" text="Calor máx. de la transmisión"/>
+        <text name="ads_transMaxHeat_tooltip" text="La tasa base de calor generado por la transmisión a carga máxima. Valores más altos harán que la transmisión se caliente más rápido."/>
+        <text name="ads_dirtInfluence_label" text="Influencia de la suciedad en la refrigeración"/>
+        <text name="ads_dirtInfluence_tooltip" text="La reducción máxima en la eficiencia del radiador debido a la suciedad. 20 % significa que la refrigeración de un vehículo completamente sucio es un 20 % menos efectiva."/>
         <text name="ads_ws_header_title" text="Taller"/>
 
         <text name="ads_ws_label_value" text="Valor"/>

@@ -14,6 +14,12 @@
         <text name="ads_workshopOpenHour_tooltip" text="Heure d'ouverture de l'atelier. Les réparations sont effectuées uniquement pendant les heures ouvrables."/>
         <text name="ads_workshopCloseHour_label" text="Heure de fermeture de l'atelier"/>
         <text name="ads_workshopCloseHour_tooltip" text="Heure de fermeture de l'atelier. Les réparations seront suspendues après cette heure."/>
+        <text name="ads_engineMaxHeat_label" text="Chaleur max. moteur"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Le taux de base de chaleur générée par le moteur à charge maximale. Des valeurs plus élevées feront chauffer le moteur plus rapidement."/>
+        <text name="ads_transMaxHeat_label" text="Chaleur max. transmission"/>
+        <text name="ads_transMaxHeat_tooltip" text="Le taux de base de chaleur générée par la transmission à charge maximale. Des valeurs plus élevées feront chauffer la transmission plus rapidement."/>
+        <text name="ads_dirtInfluence_label" text="Influence de la saleté sur le refroidissement"/>
+        <text name="ads_dirtInfluence_tooltip" text="La réduction maximale de l'efficacité du radiateur due à la saleté. 20 % signifie que le refroidissement d'un véhicule entièrement sale est 20 % moins efficace."/>
         <text name="ads_ws_header_title" text="Atelier"/>
 
         <text name="ads_ws_label_value" text="Valeur"/>

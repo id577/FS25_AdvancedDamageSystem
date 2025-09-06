@@ -14,7 +14,14 @@
         <text name="ads_workshopOpenHour_tooltip" text="Час, в который открывается мастерская. Ремонтные работы проводятся только в рабочее время."/>
         <text name="ads_workshopCloseHour_label" text="Время закрытия мастерской"/>
         <text name="ads_workshopCloseHour_tooltip" text="Час, в который закрывается мастерская. Ремонтные работы будут приостановлены после этого времени."/>
+        <text name="ads_engineMaxHeat_label" text="Макс. нагрев двигателя"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого двигателем при максимальной нагрузке. Более высокие значения заставят двигатель нагреваться быстрее."/> 
+        <text name="ads_transMaxHeat_label" text="Макс. нагрев трансмиссии"/>
+        <text name="ads_transMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого трансмиссией при максимальной нагрузке. Более высокие значения заставят трансмиссию нагреваться быстрее."/>
+        <text name="ads_dirtInfluence_label" text="Влияние грязи на охлаждение"/>
+        <text name="ads_dirtInfluence_tooltip" text="Максимальное снижение эффективности радиатора из-за грязи. 20% означает, что полностью грязная техника охлаждается на 20% хуже."/>
         <text name="ads_ws_header_title" text="Мастерская"/>
+        
 
         <text name="ads_ws_label_value" text="Стоимость"/>
         <text name="ads_ws_label_age" text="Возраст"/>

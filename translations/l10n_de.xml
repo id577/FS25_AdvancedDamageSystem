@@ -14,6 +14,12 @@
         <text name="ads_workshopOpenHour_tooltip" text="Die Stunde des Tages, zu der die Werkstatt öffnet. Reparaturen sind nur während der Arbeitszeiten aktiv."/>
         <text name="ads_workshopCloseHour_label" text="Werkstatt Schließzeit"/>
         <text name="ads_workshopCloseHour_tooltip" text="Die Stunde des Tages, zu der die Werkstatt schließt. Reparaturen werden nach dieser Zeit pausiert."/>
+        <text name="ads_engineMaxHeat_label" text="Max. Motorhitze"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Die Basiswärmeerzeugung des Motors bei maximaler Last. Höhere Werte lassen den Motor schneller aufheizen."/>
+        <text name="ads_transMaxHeat_label" text="Max. Getriebehitze"/>
+        <text name="ads_transMaxHeat_tooltip" text="Die Basiswärmeerzeugung des Getriebes bei maximaler Last. Höhere Werte lassen das Getriebe schneller aufheizen."/>
+        <text name="ads_dirtInfluence_label" text="Schmutzeinfluss auf Kühlung"/>
+        <text name="ads_dirtInfluence_tooltip" text="Die maximale Reduzierung der Kühlereffizienz durch Schmutz. 20 % bedeutet, dass die Kühlung eines vollständig verschmutzten Fahrzeugs um 20 % weniger effektiv ist."/>
         <text name="ads_ws_header_title" text="Werkstatt"/>
 
         <text name="ads_ws_label_value" text="Wert"/>

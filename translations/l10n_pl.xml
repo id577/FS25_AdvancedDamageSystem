@@ -14,6 +14,12 @@
         <text name="ads_workshopOpenHour_tooltip" text="Godzina dnia, o której warsztat się otwiera. Naprawy są aktywne tylko w godzinach pracy."/>
         <text name="ads_workshopCloseHour_label" text="Godzina zamknięcia warsztatu"/>
         <text name="ads_workshopCloseHour_tooltip" text="Godzina dnia, o której warsztat się zamyka. Naprawy zostaną wstrzymane po tym czasie."/>
+        <text name="ads_engineMaxHeat_label" text="Maks. ciepło silnika"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Podstawowa ilość ciepła generowanego przez silnik przy maksymalnym obciążeniu. Wyższe wartości spowodują szybsze nagrzewanie się silnika."/>
+        <text name="ads_transMaxHeat_label" text="Maks. ciepło skrzyni biegów"/>
+        <text name="ads_transMaxHeat_tooltip" text="Podstawowa ilość ciepła generowanego przez skrzynię biegów przy maksymalnym obciążeniu. Wyższe wartości spowodują szybsze nagrzewanie się skrzyni biegów."/>
+        <text name="ads_dirtInfluence_label" text="Wpływ brudu na chłodzenie"/>
+        <text name="ads_dirtInfluence_tooltip" text="Maksymalne zmniejszenie wydajności chłodnicy z powodu brudu. 20% oznacza, że chłodzenie całkowicie zabrudzonego pojazdu jest o 20% mniej skuteczne."/>
         <text name="ads_ws_header_title" text="Warsztat"/>
 
         <text name="ads_ws_label_value" text="Wartość"/>

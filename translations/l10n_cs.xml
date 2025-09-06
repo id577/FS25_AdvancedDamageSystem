@@ -14,6 +14,12 @@
         <text name="ads_workshopOpenHour_tooltip" text="车间在一天中开门营业的小时数。修理仅在工间时段内有效。"/>
         <text name="ads_workshopCloseHour_label" text="车间关闭时间"/>
         <text name="ads_workshopCloseHour_tooltip" text="车间在一天中关门歇业的小时数。修理将在此时间后暂停。"/>
+        <text name="ads_engineMaxHeat_label" text="最大发动机热量"/>
+        <text name="ads_engineMaxHeat_tooltip" text="发动机在最大负载下产生的基本热量。更高的数值会导致发动机升温更快。"/>
+        <text name="ads_transMaxHeat_label" text="最大变速箱热量"/>
+        <text name="ads_transMaxHeat_tooltip" text="变速箱在最大负载下产生的基本热量。更高的数值会导致变速箱升温更快。"/>
+        <text name="ads_dirtInfluence_label" text="污垢对冷却的影响"/>
+        <text name="ads_dirtInfluence_tooltip" text="因污垢导致散热器效率的最大降低幅度。20%意味着完全脏污的车辆冷却效果降低20%。"/>
         <text name="ads_ws_header_title" text="车间"/>
 
         <text name="ads_ws_label_value" text="价值"/>

@@ -15,6 +15,13 @@
         <text name="ads_workshopOpenHour_tooltip" text="L’ora del giorno in cui l’officina apre. Le riparazioni sono attive solo durante l’orario di lavoro." />
         <text name="ads_workshopCloseHour_label" text="Orario di Chiusura dell'Officina" />
         <text name="ads_workshopCloseHour_tooltip" text="L’ora del giorno in cui l’officina chiude. Le riparazioni verranno sospese dopo quest’orario." />
+        <text name="ads_engineMaxHeat_label" text="Calore max. motore"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Il tasso base di calore generato dal motore al massimo carico. Valori più alti faranno riscaldare il motore più velocemente."/>
+        <text name="ads_transMaxHeat_label" text="Calore max. trasmissione"/>
+        <text name="ads_transMaxHeat_tooltip" text="Il tasso base di calore generato dalla trasmissione al massimo carico. Valori più alti faranno riscaldare la trasmissione più velocemente."/>
+        <text name="ads_dirtInfluence_label" text="Influenza sporco sul raffreddamento"/>
+        <text name="ads_dirtInfluence_tooltip" text="La riduzione massima dell'efficienza del radiatore a causa dello sporco. 20% significa che il raffreddamento di un veicolo completamente sporco è del 20% meno efficace."/>
+
         <text name="ads_ws_header_title" text="Officina" />
 
         <text name="ads_ws_label_value" text="Valore" />

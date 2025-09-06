@@ -14,6 +14,13 @@
 		<text name="ads_workshopOpenHour_tooltip" text="Hodina dne, kdy se dílna otevírá. Opravy jsou aktivní pouze během pracovní doby."/>
 		<text name="ads_workshopCloseHour_label" text="Zavírací doba dílny"/>
 		<text name="ads_workshopCloseHour_tooltip" text="Hodina dne, kdy se dílna zavírá. Opravy se po této době pozastaví."/>
+    <text name="ads_engineMaxHeat_label" text="Max. zahřívání motoru"/>
+    <text name="ads_engineMaxHeat_tooltip" text="Základní míra tepla generovaného motorem při maximálním zatížení. Vyšší hodnoty způsobí, že se motor bude zahřívat rychleji."/>
+    <text name="ads_transMaxHeat_label" text="Max. zahřívání převodovky"/>
+    <text name="ads_transMaxHeat_tooltip" text="Základní míra tepla generovaného převodovkou při maximálním zatížení. Vyšší hodnoty způsobí, že se převodovka bude zahřívat rychleji."/>
+    <text name="ads_dirtInfluence_label" text="Vliv nečistot na chlazení"/>
+    <text name="ads_dirtInfluence_tooltip" text="Maximální snížení účinnosti chladiče v důsledku nečistot. 20 % znamená, že chlazení zcela znečištěného vozidla je o 20 % méně účinné."/>
+
 		<text name="ads_ws_header_title" text="Dílna"/>
 
 		<text name="ads_ws_label_value" text="Hodnota"/>

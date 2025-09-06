@@ -141,6 +141,38 @@ function ADS_InGameSettings:initSettingsGui()
         local currentCloseHourText = getTextForHour(ADS_Config.WORKSHOP.CLOSE_HOUR)
         self.ads_workshopCloseHour:setState(findStateIndexByValue(self.ads_workshopCloseHour.texts, currentCloseHourText))
 
+        self.ads_engineMaxHeat = self.economicDifficulty:clone()
+        self.ads_engineMaxHeat.onClickCallback = ADS_InGameSettings.onValueChanged
+        self.ads_engineMaxHeat.buttonLRChange = ADS_InGameSettings.onValueChanged
+        self.ads_engineMaxHeat.texts = {}
+        for i = 0, 20 do
+            local value = 0.9 + (i * 0.01)
+            table.insert(self.ads_engineMaxHeat.texts, string.format("%.2f", value))
+        end
+        local currentEngineMaxHeatText = string.format("%.2f", ADS_Config.THERMAL.ENGINE_MAX_HEAT)
+        self.ads_engineMaxHeat:setState(findStateIndexByValue(self.ads_engineMaxHeat.texts, currentEngineMaxHeatText))
+
+        self.ads_transMaxHeat = self.economicDifficulty:clone()
+        self.ads_transMaxHeat.onClickCallback = ADS_InGameSettings.onValueChanged
+        self.ads_transMaxHeat.buttonLRChange = ADS_InGameSettings.onValueChanged
+        self.ads_transMaxHeat.texts = {}
+        for i = 0, 20 do
+            local value = 0.9 + (i * 0.01)
+            table.insert(self.ads_transMaxHeat.texts, string.format("%.2f", value))
+        end
+        local currentTransMaxHeatText = string.format("%.2f", ADS_Config.THERMAL.TRANS_MAX_HEAT)
+        self.ads_transMaxHeat:setState(findStateIndexByValue(self.ads_transMaxHeat.texts, currentTransMaxHeatText))
+
+        self.ads_dirtInfluence = self.economicDifficulty:clone()
+        self.ads_dirtInfluence.onClickCallback = ADS_InGameSettings.onValueChanged
+        self.ads_dirtInfluence.buttonLRChange = ADS_InGameSettings.onValueChanged
+        self.ads_dirtInfluence.texts = {}
+        for i = 0, 30 do
+            local value = i * 0.01
+            table.insert(self.ads_dirtInfluence.texts, getTextByValue(value))
+        end
+        local currentDirtInfluenceText = getTextByValue(ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
+        self.ads_dirtInfluence:setState(findStateIndexByValue(self.ads_dirtInfluence.texts, currentDirtInfluenceText))
 
         ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_serviceWear, "ads_serviceWear", self.gameSettingsLayout.elements[5])
         ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_conditionWear, "ads_conditionWear", self.gameSettingsLayout.elements[5])
@@ -149,6 +181,9 @@ function ADS_InGameSettings:initSettingsGui()
         ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_maintenanceDuration, "ads_maintenanceDuration", self.gameSettingsLayout.elements[5])
         ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_workshopOpenHour, "ads_workshopOpenHour", self.gameSettingsLayout.elements[5])
         ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_workshopCloseHour, "ads_workshopCloseHour", self.gameSettingsLayout.elements[5])
+        ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_engineMaxHeat, "ads_engineMaxHeat", self.gameSettingsLayout.elements[5])
+        ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_transMaxHeat, "ads_transMaxHeat", self.gameSettingsLayout.elements[5])
+        ADS_InGameSettings:addOptionToLayout(self.gameSettingsLayout, self.ads_dirtInfluence, "ads_dirtInfluence", self.gameSettingsLayout.elements[5])
 
         self.gameSettingsLayout:invalidateLayout()
         ADS_InGameSettings.initialized = true
@@ -160,6 +195,9 @@ function ADS_InGameSettings:initSettingsGui()
         self.ads_maintenanceDuration:setState(findStateIndexByValue(self.ads_maintenanceDuration.texts, getTextForMultiplier(ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER)))
         self.ads_workshopOpenHour:setState(findStateIndexByValue(self.ads_workshopOpenHour.texts, getTextForHour(ADS_Config.WORKSHOP.OPEN_HOUR)))
         self.ads_workshopCloseHour:setState(findStateIndexByValue(self.ads_workshopCloseHour.texts, getTextForHour(ADS_Config.WORKSHOP.CLOSE_HOUR)))
+        self.ads_engineMaxHeat:setState(findStateIndexByValue(self.ads_engineMaxHeat.texts, string.format("%.2f", ADS_Config.THERMAL.ENGINE_MAX_HEAT)))
+        self.ads_transMaxHeat:setState(findStateIndexByValue(self.ads_transMaxHeat.texts, string.format("%.2f", ADS_Config.THERMAL.TRANS_MAX_HEAT)))
+        self.ads_dirtInfluence:setState(findStateIndexByValue(self.ads_dirtInfluence.texts, getTextByValue(ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)))
     end
 end
 
@@ -223,6 +261,21 @@ function ADS_InGameSettings:onValueChanged(newStateIndex, uiElement, loadFromSav
         local newValue = getValueFromMultiplierText(newValueText)
         if newValue ~= nil and newValue ~= ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER then
             ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER = newValue
+        end
+    elseif uiId == "ads_engineMaxHeat" then
+        local newValue = tonumber(newValueText)
+        if newValue ~= nil and newValue ~= ADS_Config.THERMAL.ENGINE_MAX_HEAT then
+            ADS_Config.THERMAL.ENGINE_MAX_HEAT = newValue
+        end
+    elseif uiId == "ads_transMaxHeat" then
+        local newValue = tonumber(newValueText)
+        if newValue ~= nil and newValue ~= ADS_Config.THERMAL.TRANS_MAX_HEAT then
+            ADS_Config.THERMAL.TRANS_MAX_HEAT = newValue
+        end
+    elseif uiId == "ads_dirtInfluence" then
+        local newValue = getValueByText(newValueText)
+        if newValue ~= nil and newValue ~= ADS_Config.THERMAL.MAX_DIRT_INFLUENCE then
+            ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = newValue
         end
     end
 end
