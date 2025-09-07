@@ -226,7 +226,11 @@ function ADS_Hud:drawDashboard()
 
         icon:setColor(unpack(targetColor))
         icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
-        icon:setVisible(hudIndicatorData.year < spec.year)
+        if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle then 
+            icon:setVisible(false)
+        else
+            icon:setVisible(hudIndicatorData.year < spec.year)
+        end
         icon:render()
         end
 
