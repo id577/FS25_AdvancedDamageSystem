@@ -903,6 +903,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             local motor = vehicle:getMotor()
             local spec = vehicle.spec_AdvancedDamageSystem
             if not motor or getIsElectricVehicle(vehicle) then return false end
+            if spec.isElectricVehicle then return false end
             return motor.minForwardGearRatio ~= nil and spec.year >= 2000
         end,
         probability = function(vehicle)

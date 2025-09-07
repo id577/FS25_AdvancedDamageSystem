@@ -393,7 +393,6 @@ function ADS_Config.saveToXMLFile()
 
     local function saveNode(tbl, path)
         for k, v in pairs(tbl) do
-            -- Исключаем функции и служебные поля из сохранения
             if type(v) ~= "function" and k ~= "savegameFile" then
                 local currentPath = path .. "." .. tostring(k)
 

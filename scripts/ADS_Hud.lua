@@ -247,12 +247,13 @@ function ADS_Hud:drawDashboard()
         tempText = string.format("%.1f%s", engineTemp, tempSign)
     end
 
-    setTextColor(1, 1, 1, 1)
-	setTextAlignment(RenderText.ALIGN_CENTER)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
-	setTextBold(true)
-
-    renderText(posX + self.engineTempText.offsetX, posY + self.engineTempText.offsetY, self.engineTempText.size, tempText)
+    if not spec.isElectricVehicle then
+        setTextColor(1, 1, 1, 1)
+        setTextAlignment(RenderText.ALIGN_CENTER)
+        setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
+        setTextBold(true)
+        renderText(posX + self.engineTempText.offsetX, posY + self.engineTempText.offsetY, self.engineTempText.size, tempText)
+    end
 
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
     setTextBold(false)

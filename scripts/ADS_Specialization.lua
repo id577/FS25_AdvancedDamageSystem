@@ -579,7 +579,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- Cold engine message
-    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.COLD_MOTOR_THRESHOLD then
+    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.COLD_MOTOR_THRESHOLD and not spec.isElectricVehicle then
             local spec_motorized = self.spec_motorized
             local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
             local maxRpm = spec_motorized.motor.maxRpm
@@ -673,13 +673,18 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     end
     
     local transDebugData = {}
-    if vehicleHaveCVT then
+    if vehicleHaveCVT and not spec.isElectricVehicle then
         transDebugData = self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
     end
 
     if ADS_Config.DEBUG then
-        spec.debugData.engineTemp = engineDebugData
-        spec.debugData.transmissionTemp = transDebugData
+        if next(engineDebugData) then
+            spec.debugData.engineTemp = engineDebugData
+        end
+
+        if next(transDebugData) then
+            spec.debugData.transmissionTemp = transDebugData
+        end
     end
 end
 
@@ -845,7 +850,7 @@ function AdvancedDamageSystem:calculateWearRates()
             conditionWearRate = conditionWearRate + hotMotorFactor
         end
 
-        if spec.transmissionTemperature > C.OVERHEAT_TRANSMISSION_THRESHOLD then
+        if spec.transmissionTemperature > C.OVERHEAT_TRANSMISSION_THRESHOLD and not spec.isElectricVehicle then
             hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.3, false)
             hotTransFactor = hotTransFactor * C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER * motorLoadInf * self:getMotorRpmPercentage()
