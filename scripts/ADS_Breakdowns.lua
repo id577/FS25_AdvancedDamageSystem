@@ -2023,6 +2023,10 @@ ADS_Breakdowns.EffectApplicators.DARK_EXHAUST_EFFECT = {
         local originalMinRpmColorName = "exhaustEffectsMinRpmColor"
         local originalMaxRpmColorName = "exhaustEffectsMaxRpmColor"
         local effect = vehicle.spec_motorized.exhaustEffects[#vehicle.spec_motorized.exhaustEffects]
+
+        if effect == nil or effect.minRpmColor == nil or effect.maxRpmColor == nil then
+            return
+        end
         
         if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalMinRpmColorName] == nil then
             vehicle.spec_AdvancedDamageSystem.originalFunctions[originalMinRpmColorName] = { 
