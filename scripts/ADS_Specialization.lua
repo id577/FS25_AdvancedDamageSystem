@@ -603,6 +603,11 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
         end
     end
 
+    --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
+    if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
+        self:updateThermalSystems(spec.effectsUpdateTimer)
+    end
+
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeFunctions) ~= nil then
         for _ , func in pairs(spec.activeFunctions) do
