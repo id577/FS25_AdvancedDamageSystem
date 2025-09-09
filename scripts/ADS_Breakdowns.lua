@@ -1487,17 +1487,22 @@ end
 
 --- ENGINE_FAILURE
 ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
-    getOriginalFunctionName = function()
+    getEffectName = function()
         return "ENGINE_FAILURE"
     end,
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying ENGINE_FAILURE effect.")
-        if vehicle:getIsMotorStarted() then
-            vehicle:stopMotor()
+        local effectName = handler.getEffectName()
+        local activeFunc = function(v, dt)
+            if v:getIsMotorStarted() then
+                v:stopMotor()
+            end
         end
+        addFuncToActive(vehicle, effectName, activeFunc)
     end,
-    remove = function(vehicle)
+    remove = function(vehicle, handler)
         log_dbg("Removing ENGINE_FAILURE effect.")
+        removeFuncFromActive(vehicle, handler.getEffectName())
     end,
 }
 
