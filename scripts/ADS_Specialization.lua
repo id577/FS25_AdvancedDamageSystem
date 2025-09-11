@@ -907,9 +907,10 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
     failureChancePerFrame = failureChancePerFrame / spec.reliability
 
     local random = math.random()
-    if self:getIsOperating() then
-        log_dbg(string.format("%.6f %.6f", random, failureChancePerFrame))
-    end
+    
+    --if self:getIsOperating() then
+        --log_dbg(string.format("%.6f %.6f", random, failureChancePerFrame))
+    --end
 
     if random < failureChancePerFrame then
         
