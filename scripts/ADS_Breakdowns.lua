@@ -1443,8 +1443,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 1.92, 
                 effects = { 
-                     { id = "UNLOADING_AUGER_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {message = "ads_breakdowns_unloading_auger_malfunction_stage4_message
-							"} }
+                     { id = "UNLOADING_AUGER_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {message = "ads_breakdowns_unloading_auger_malfunction_stage4_message"} }
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false },
