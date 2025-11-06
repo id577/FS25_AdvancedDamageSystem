@@ -2221,8 +2221,9 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
 
     local maintenanceType = string.lower(args[1])
     local isValidType = false
-    for _, state in pairs(AdvancedDamageSystem.STATUS) do
-        if string.lower(state) == maintenanceType then
+
+    for stateName, state in pairs(AdvancedDamageSystem.STATUS) do
+        if string.lower(stateName) == maintenanceType then
             isValidType = true
             maintenanceType = state
             break
