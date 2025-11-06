@@ -44,7 +44,9 @@ function ADS_Main.registerSpecializationToVehicles()
             vehicleType ~= "woodCrusherTrailermotorized" and 
             vehicleType ~= "baleWrapper" and 
             vehicleType ~= "craneTrailer" and
-            vehicleType ~= "highPressureWasher" then
+            vehicleType ~= "highPressureWasher" and
+            vehicleType ~= "pdlc_highlandsFishingPack.cargoBoat" and
+            vehicleType ~= "pdlc_highlandsFishingPack.boat" then
 
 			local ismotorized = false;
 			local hasNotADS = true;
