@@ -552,20 +552,28 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
         if self:getIsMotorStarted() then
             if (spec.transmissionTemperature > 105 or spec.engineTemperature > 105) and not overheatProtection then
                 self:addBreakdown('OVERHEAT_PROTECTION', 1)
-                g_soundManager:playSample(spec.samples.alarm)
+                if self.getIsControlled ~= nil and self:getIsControlled() then
+                    g_soundManager:playSample(spec.samples.alarm)
+                end
             elseif overheatProtection then
                 if self:getCruiseControlState() ~= 0 then
                     self:setCruiseControlState(0, true)
                 end
                 if (spec.transmissionTemperature > 125 or spec.engineTemperature > 125) and overheatProtection.stage < 4 then
                     self:advanceBreakdown('OVERHEAT_PROTECTION')
-                    g_soundManager:playSample(spec.samples.alarm)
+                    if self.getIsControlled ~= nil and self:getIsControlled() then
+                        g_soundManager:playSample(spec.samples.alarm)
+                    end
                 elseif (spec.transmissionTemperature > 115 or spec.engineTemperature > 115) and overheatProtection.stage < 3 then
                     self:advanceBreakdown('OVERHEAT_PROTECTION')
-                    g_soundManager:playSample(spec.samples.alarm)
+                    if self.getIsControlled ~= nil and self:getIsControlled() then
+                        g_soundManager:playSample(spec.samples.alarm)
+                    end
                 elseif (spec.transmissionTemperature > 110 or spec.engineTemperature > 110) and overheatProtection.stage < 2 then
                     self:advanceBreakdown('OVERHEAT_PROTECTION')
-                    g_soundManager:playSample(spec.samples.alarm)
+                    if self.getIsControlled ~= nil and self:getIsControlled() then
+                        g_soundManager:playSample(spec.samples.alarm)
+                    end
                 end
             end
         end
@@ -579,7 +587,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- Cold engine message
-    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.COLD_MOTOR_THRESHOLD and not spec.isElectricVehicle then
+    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
             local spec_motorized = self.spec_motorized
             local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
             local maxRpm = spec_motorized.motor.maxRpm
@@ -842,7 +850,7 @@ function AdvancedDamageSystem:calculateWearRates()
             conditionWearRate = conditionWearRate + expiredServiceFactor
         end
 
-        if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle then
+        if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldMotorFactor = coldMotorFactor * C.COLD_MOTOR_MAX_MULTIPLIER * motorLoadInf
