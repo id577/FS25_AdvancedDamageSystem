@@ -53,6 +53,7 @@ function ADS_Hud:new()
         }
     }
     self.engineTempText = {}
+    self.motorLoadText = {}
     self.tsTempText = {
         year = 2000
     }
@@ -127,7 +128,7 @@ end
 
 function ADS_Hud:storeScaledValues()
 
-    self.indicators.battery.offsetX, self.indicators.battery.offsetY = self:scalePixelValuesToScreenVector(-45, -30)
+    self.indicators.battery.offsetX, self.indicators.battery.offsetY = self:scalePixelValuesToScreenVector(23, -33)
     local batteryWidth, batteryHeight = self:scalePixelValuesToScreenVector(19, 19)
     self.indicators.battery.icon:setDimension(batteryWidth, batteryHeight)
 
@@ -135,19 +136,19 @@ function ADS_Hud:storeScaledValues()
     local oilWidth, oilHeight = self:scalePixelValuesToScreenVector(19, 19)
     self.indicators.oil.icon:setDimension(oilWidth, oilHeight)
 
-    self.indicators.engine.offsetX, self.indicators.engine.offsetY = self:scalePixelValuesToScreenVector(-50, -11)
+    self.indicators.engine.offsetX, self.indicators.engine.offsetY = self:scalePixelValuesToScreenVector(-45, 10)
     local engineWidth, engineHeight = self:scalePixelValuesToScreenVector(16, 16)
     self.indicators.engine.icon:setDimension(engineWidth, engineHeight)
 
-    self.indicators.transmission.offsetX, self.indicators.transmission.offsetY = self:scalePixelValuesToScreenVector(30, -14)
+    self.indicators.transmission.offsetX, self.indicators.transmission.offsetY = self:scalePixelValuesToScreenVector(30, -13)
     local transmissionWidth, transmissionHeight = self:scalePixelValuesToScreenVector(19, 19)
     self.indicators.transmission.icon:setDimension(transmissionWidth, transmissionHeight)
 
-    self.indicators.brakes.offsetX, self.indicators.brakes.offsetY = self:scalePixelValuesToScreenVector(-47, 5)
+    self.indicators.brakes.offsetX, self.indicators.brakes.offsetY = self:scalePixelValuesToScreenVector(-45, -32)
     local brakesWidth, brakesHeight = self:scalePixelValuesToScreenVector(19, 19)
     self.indicators.brakes.icon:setDimension(brakesWidth, brakesHeight)
 
-    self.indicators.warning.offsetX, self.indicators.warning.offsetY = self:scalePixelValuesToScreenVector(25, 7)
+    self.indicators.warning.offsetX, self.indicators.warning.offsetY = self:scalePixelValuesToScreenVector(25, 8)
     local warningWidth, warningHeight = self:scalePixelValuesToScreenVector(19, 19)
     self.indicators.warning.icon:setDimension(warningWidth, warningHeight)
 
@@ -161,6 +162,9 @@ function ADS_Hud:storeScaledValues()
 
     self.engineTempText.offsetX, self.engineTempText.offsetY = self:scalePixelValuesToScreenVector(0, 36)
 	self.engineTempText.size = self:scalePixelToScreenHeight(9)
+
+    self.motorLoadText.offsetX, self.motorLoadText.offsetY = self:scalePixelValuesToScreenVector(-39, 4)
+	self.motorLoadText.size = self:scalePixelToScreenHeight(9)
 
     self.tsTempText.offsetX, self.tsTempText.offsetY = self:scalePixelValuesToScreenVector(38, 3)
 	self.tsTempText.size = self:scalePixelToScreenHeight(8)
@@ -217,6 +221,7 @@ function ADS_Hud:drawDashboard()
 
             if hudIndicatorId == self.indicators.service.name and spec.serviceLevel < 0.333 then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
+
         else
             local activeData = activeIndicators[hudIndicatorId]
             if activeData then
@@ -226,7 +231,7 @@ function ADS_Hud:drawDashboard()
 
         icon:setColor(unpack(targetColor))
         icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
-        if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle then 
+        if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle or hudIndicatorId == self.indicators.oil.name then 
             icon:setVisible(false)
         else
             icon:setVisible(hudIndicatorData.year < spec.year)
@@ -234,7 +239,7 @@ function ADS_Hud:drawDashboard()
         icon:render()
         end
 
-    local engineTemp, transTemp = spec.engineTemperature, spec.transmissionTemperature
+    local engineTemp, transTemp, motorLoad = spec.engineTemperature, spec.transmissionTemperature, vehicle:getMotorLoadPercentage()
     local tempSign = "°C"
 
     if g_gameSettings:getValue(GameSettings.SETTING.USE_FAHRENHEIT) then
@@ -246,9 +251,16 @@ function ADS_Hud:drawDashboard()
     local tempText = ""
 
     if transTemp > -90 and spec.year >= self.tsTempText.year then
-        tempText = string.format("%.0f%s | %.0f%s", engineTemp, tempSign, transTemp, tempSign)
+        tempText = string.format("%.0f%s | %.0f%s" , engineTemp, tempSign, transTemp, tempSign)
     else
         tempText = string.format("%.1f%s", engineTemp, tempSign)
+    end
+
+    local motorText = string.format("%.0f%%", math.abs(motorLoad * 100))
+
+    local motorLoadTextColor = {1, 1, 1, 1}
+    if motorLoad > ADS_Config.CORE.MOTOR_OVERLOADED_THRESHOLD then
+        motorLoadTextColor = colors.WARNING
     end
 
     if not spec.isElectricVehicle then
@@ -257,6 +269,8 @@ function ADS_Hud:drawDashboard()
         setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
         setTextBold(true)
         renderText(posX + self.engineTempText.offsetX, posY + self.engineTempText.offsetY, self.engineTempText.size, tempText)
+        setTextColor(motorLoadTextColor[1], motorLoadTextColor[2], motorLoadTextColor[3], motorLoadTextColor[4])
+        renderText(posX + self.motorLoadText.offsetX, posY + self.motorLoadText.offsetY, self.motorLoadText.size, motorText)
     end
 
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
@@ -467,8 +481,11 @@ function ADS_Hud:drawActiveVehicleHUD()
     renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%d hp / %d hp", motorPower / 735.5, motor.peakMotorPower * 1.36 or 0))
     currentY = currentY - panel.lineHeight
 
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("Load:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%.0f%%", vehicle:getMotorLoadPercentage() * 100))
+    local lastRpm = motor:getLastModulatedMotorRpm()
+    local maxRpm = motor.maxRpm
+    local rpmLoad = lastRpm / maxRpm
+    renderText(col3_x, currentY, textSettings.normalSize, string.format("MotorLoad/RPMLoad:"))
+    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%.0f%% / %.0f%%", vehicle:getMotorLoadPercentage() * 100, rpmLoad * 100))
     currentY = currentY - panel.lineHeight
 
     renderText(col3_x, currentY, textSettings.normalSize, string.format("Gear:"))
@@ -510,7 +527,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     setTextColor(1, 1, 1, 1)
     renderText(textStartX, currentY, textSettings.normalSize, "Active Breakdowns:")
     currentY = currentY - panel.lineHeight
-    setTextColor(1, 0.8, 0.8, 1) -- Светло-красный для поломок
+    setTextColor(1, 0.8, 0.8, 1)
     for _, line in ipairs(breakdownLines) do
         renderText(textStartX + 0.01, currentY, textSettings.normalSize, line)
         currentY = currentY - panel.lineHeight
@@ -519,7 +536,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     setTextColor(1, 1, 1, 1)
     renderText(textStartX, currentY, textSettings.normalSize, "Active Effects:")
     currentY = currentY - panel.lineHeight
-    setTextColor(0.8, 0.8, 1, 1) -- Светло-синий для эффектов
+    setTextColor(0.8, 0.8, 1, 1)
     for _, line in ipairs(effectLines) do
         renderText(textStartX + 0.01, currentY, textSettings.normalSize, line)
         currentY = currentY - panel.lineHeight

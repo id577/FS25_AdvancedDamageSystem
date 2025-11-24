@@ -629,7 +629,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:processMaintenance(dt)
     else
         local serviceWearRate, conditionWearRate = self:calculateWearRates()
-        if self:getIsOperating() then
+        if self:getIsOperating() and self.propertyState ~= 4 then
             self:processBreakdowns(dt)
             self:checkForNewBreakdown(dt, conditionWearRate)
         end
@@ -713,6 +713,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     end
     
     local alpha = dt / (C.TAU + dt)
+
     spec.rawEngineTemperature = spec.rawEngineTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
     spec.rawEngineTemperature = math.max(spec.rawEngineTemperature, eviromentTemp)
     spec.engineTemperature = math.max(spec.engineTemperature + alpha * (spec.rawEngineTemperature - spec.engineTemperature), eviromentTemp)
@@ -904,15 +905,15 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
 
     local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(spec.conditionLevel, probability, dt)
     failureChancePerFrame = failureChancePerFrame + (failureChancePerFrame * math.max(((conditionWearRate - 1) / 10), 0)) + (failureChancePerFrame * spec.extraBreakdownProbability)
-    failureChancePerFrame = failureChancePerFrame / spec.reliability
+    failureChancePerFrame = failureChancePerFrame * conditionWearRate
 
     local random = math.random()
     
-    --if self:getIsOperating() then
-        --log_dbg(string.format("%.6f %.6f", random, failureChancePerFrame))
-    --end
+    if self:getIsOperating() then
+        log_dbg(string.format("Random: %.6f Prob: %.6f", random, failureChancePerFrame))
+    end
 
-    if random < failureChancePerFrame then
+    if self:getFormattedOperatingTime() > probability.VEHICLE_HONEYMOON_HOURS and random < failureChancePerFrame then
         
         local breakdownId = self:getRandomBreakdown()
         if breakdownId == nil then return end
@@ -1385,8 +1386,8 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
         spec.currentState = type
         spec.workshopType = workshopType
 
-        if type == states.INSPECTION then
-            totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER
+        if type == states.INSPECTION or type == states.MAINTENANCE then
+            if type == states.INSPECTION then totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER end
             local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
             for id, breakdown in pairs(spec.activeBreakdowns) do
                 if not breakdown.isVisible then
@@ -1396,8 +1397,9 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
                     end
                 end
             end
+        end
 
-        elseif type == states.MAINTENANCE then
+        if type == states.MAINTENANCE then
             totalTimeMs = C.MAINTENANCE_TIME * C.MAINTENANCE_DURATION_MULTIPLIER
             spec.serviceLevel = 1.0
 

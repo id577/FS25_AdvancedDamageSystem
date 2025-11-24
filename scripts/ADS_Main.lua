@@ -37,6 +37,7 @@ function ADS_Main.registerSpecializationToVehicles()
             not string.find(string.lower(vehicleType), "pushable") and
             not string.find(vehicleType, "FS25_lsfmFarmEquipmentPack") and
             not string.find(vehicleType, "FS25_FillablePallet")  and
+            vehicleType ~= "motorbike" and 
             vehicleType ~= "inlineWrapper" and 
             vehicleType ~= "locomotive" and 
             vehicleType ~= "сonveyorBelt" and 

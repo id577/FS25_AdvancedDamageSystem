@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 1,
+    VER = 2,
 
     DEBUG = false,
 
@@ -56,7 +56,7 @@ ADS_Config = {
         -- The maximum penalty applied to CONDITION wear when the motor is under heavy load.
         MOTOR_OVERLOADED_MAX_MULTIPLIER = 1.0, -- (up to 1x extra wear)
         -- The engine load percentage (from 0.0 to 1.0) above which the 'MOTOR_OVERLOADED' penalty applies.
-        MOTOR_OVERLOADED_THRESHOLD = 0.8, -- (Penalty starts when engine load is above 80%)
+        MOTOR_OVERLOADED_THRESHOLD = 0.9, -- (Penalty starts when engine load is above 80%)
 
         -- The maximum penalty for operating the engine under load while it's cold.
         COLD_MOTOR_MAX_MULTIPLIER = 10.0, -- (up to 10x extra wear)
@@ -83,12 +83,13 @@ ADS_Config = {
 
         -- Defines the probability of a new breakdown occurring.
         BREAKDOWN_PROBABILITY = {
+            VEHICLE_HONEYMOON_HOURS = 5,
             -- The min MTBF in minutes at 0% condition.
-            MIN_MTBF = 60,
+            MIN_MTBF = 120,
             -- The max MTBF in minutes at 100% condition
-            MAX_MTBF = 600,
+            MAX_MTBF = 800,
 
-            DEGREE = 2.5,
+            DEGREE = 3.0,
 
             -- When a breakdown occurs, this defines the chance it will be "critical" (worst stage).
             -- Minimum chance of a critical outcome (at high vehicle condition).
