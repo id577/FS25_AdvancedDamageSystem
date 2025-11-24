@@ -1236,7 +1236,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     YIELD_SENSOR_MALFUNCTION = {
         isSelectable = true,
-        part = "",
+        part = "ads_breakdowns_part_yield_sensor",
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
             local vtype = vehicle.type.name
@@ -1304,7 +1304,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     MATERIAL_FLOW_SYSTEM_WEAR = {
         isSelectable = true,
-        part = "",
+        part = "ads_breakdowns_part_material_flow_system",
         isApplicable = function(vehicle)
             local vtype = vehicle.type.name
             return (vtype == 'combineDrivable' or vtype == 'combineCutter')
@@ -1379,7 +1379,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     UNLOADING_AUGER_MALFUNCTION = {
         isSelectable = true,
-        part = "",
+        part = "ads_breakdowns_part_unloading_auger",
         isApplicable = function(vehicle)
             local vtype = vehicle.type.name
             return (vtype == 'combineDrivable' or vtype == 'combineCutter') and vehicle.spec_pipe ~= nil
