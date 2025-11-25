@@ -597,7 +597,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
     end
 
-    --- Messages, Ai worker
+    --- Messages, stop ai worker
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
             if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
@@ -608,6 +608,31 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
                     self:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) 
                 end
             end
+        end
+    end
+
+    --- ai worker overload, temp control
+    if self:getIsAIActive() and self:getIsMotorStarted() then
+        local motorLoad = self:getMotorLoadPercentage()
+        if motorLoad > 0.95 or spec.rawEngineTemperature > 95 and self:getCruiseControlSpeed() > 5 then
+
+            if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
+                for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
+                    if implementData.object ~= nil then
+                        local implement = implementData.object
+                        local currentSpeedLimit = implement.speedLimit
+                        if currentSpeedLimit ~= nil and implement:getIsLowered() then
+                            if currentSpeedLimit < self:getCruiseControlSpeed() then
+                                self:setCruiseControlMaxSpeed(currentSpeedLimit)
+                            end
+                        end
+                    end
+                end
+            end
+    
+            self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() - 1, nil)
+        elseif motorLoad < 0.75 and spec.rawEngineTemperature < 94  then
+            self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() + 1, nil)
         end
     end
 
@@ -717,7 +742,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
     else
-        cooling = convectionCooling
+        cooling = convectionCooling / 10
     end
     
     local alpha = dt / (C.TAU + dt)
@@ -783,7 +808,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)
     else
-        cooling = convectionCooling
+        cooling = convectionCooling / 10
     end
 
     local alpha = dt / (C.TAU + dt)

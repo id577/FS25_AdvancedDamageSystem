@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 2,
+    VER = 3,
 
     DEBUG = false,
 
@@ -87,7 +87,7 @@ ADS_Config = {
             -- The min MTBF in minutes at 0% condition.
             MIN_MTBF = 120,
             -- The max MTBF in minutes at 100% condition
-            MAX_MTBF = 800,
+            MAX_MTBF = 1200,
 
             DEGREE = 3.0,
 
