@@ -614,7 +614,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- ai worker overload, temp control
     if self:getIsAIActive() and self:getIsMotorStarted() then
         local motorLoad = self:getMotorLoadPercentage()
-        if motorLoad > 0.95 or spec.rawEngineTemperature > 95 and self:getCruiseControlSpeed() > 5 then
+        if (motorLoad > 0.95 or spec.rawEngineTemperature > 95 or spec.rawTransmissionTemperature > 95) and self:getCruiseControlSpeed() > 5 then
 
             if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
                 for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
@@ -623,7 +623,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
                         local currentSpeedLimit = implement.speedLimit
                         if currentSpeedLimit ~= nil and implement:getIsLowered() then
                             if currentSpeedLimit < self:getCruiseControlSpeed() then
-                                self:setCruiseControlMaxSpeed(currentSpeedLimit)
+                                self:setCruiseControlMaxSpeed(currentSpeedLimit, nil)
                             end
                         end
                     end
@@ -631,7 +631,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
     
             self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() - 1, nil)
-        elseif motorLoad < 0.75 and spec.rawEngineTemperature < 94  then
+        elseif motorLoad < 0.75 and spec.rawEngineTemperature < 94 and spec.rawTransmissionTemperature < 94  then
             self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() + 1, nil)
         end
     end
@@ -1410,7 +1410,11 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
     local states = AdvancedDamageSystem.STATUS
     local vehicleState = self:getCurrentStatus()
     local C = ADS_Config.MAINTENANCE
-    
+
+    if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil then 
+        self.spec_enterable:setIsTabbable(false)
+    end
+
     if vehicleState == states.READY and spec.maintenanceTimer == 0 then
         if self:getIsOperating() then
             self:stopMotor()
@@ -1533,6 +1537,11 @@ function AdvancedDamageSystem:processMaintenance(dt)
     spec.maintenanceTimer = spec.maintenanceTimer - dt * timeScale
 
     if spec.maintenanceTimer <= 0 then
+
+        if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil then 
+            self.spec_enterable:setIsTabbable(true)
+        end
+        
         if spec.currentState ~= states.INSPECTION then
             self:setDirtAmount(0)
         end
