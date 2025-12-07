@@ -20,6 +20,14 @@
     <text name="ads_transMaxHeat_tooltip" text="Základní míra tepla generovaného převodovkou při maximálním zatížení. Vyšší hodnoty způsobí, že se převodovka bude zahřívat rychleji."/>
     <text name="ads_dirtInfluence_label" text="Vliv nečistot na chlazení"/>
     <text name="ads_dirtInfluence_tooltip" text="Maximální snížení účinnosti chladiče v důsledku nečistot. 20 % znamená, že chlazení zcela znečištěného vozidla je o 20 % méně účinné."/>
+    <text name="ads_workshopAvailable_label" text="Dílna otevřena nonstop"/>
+    <text name="ads_workshopAvailable_tooltip" text="Povolí nebo zakáže nepřetržitý provoz dílny (24/7)."/>
+    <text name="ads_instantInspection_label" text="Okamžitá kontrola"/>
+    <text name="ads_instantInspection_tooltip" text="Povolí nebo zakáže okamžitou kontrolu vozidla bez čekání."/>
+    <text name="ads_parkVehicle_label" text="Zaparkovat vozidlo během údržby"/>
+    <text name="ads_parkVehicle_tooltip" text="Pokud je zapnuto, vozidla v servisu budou vynechána při přepínání klávesou TAB."/>
+    <text name="ads_aiOverloadAndOverheatControl_label" text="Kontrola přetížení a přehřátí UI"/>
+    <text name="ads_aiOverloadAndOverheatControl_tooltip" text="UI pracovník sníží zatížení motoru v případě přetížení nebo přehřátí."/>
 
 		<text name="ads_ws_header_title" text="Dílna"/>
 

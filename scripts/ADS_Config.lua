@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 3,
+    VER = 6,
 
     DEBUG = false,
 
@@ -80,6 +80,7 @@ ADS_Config = {
         BASE_BREAKDOWN_PROGRESS_TIME = 3600000,
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 8,
+        AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
 
         -- Defines the probability of a new breakdown occurring.
         BREAKDOWN_PROBABILITY = {
@@ -108,6 +109,7 @@ ADS_Config = {
     -- Controls workshop operating hours, which affects maintenance/repair completion times.
     -- ====================================================================================
     WORKSHOP = {
+        ALWAYS_AVAILABLE = false,
         -- The hour of the day (0-23) when the workshop opens. Repairs will not progress before this time.
         OPEN_HOUR = 8,  -- (8 AM)
         -- The hour of the day (0-23) when the workshop closes. Repairs will pause at this time.
@@ -120,7 +122,9 @@ ADS_Config = {
     -- Controls the time and cost of all service types.
     -- ====================================================================================
     MAINTENANCE = {
+        PARK_VEHICLE = true,
         -- The base time in milliseconds required to perform an Inspection.
+        INSTANT_INSPECTION = false,
         INSPECTION_TIME = 3600000, -- (1 GAME hour)
         -- The base time in milliseconds required to perform a full Maintenance (Service).
         MAINTENANCE_TIME = 14400000, -- (4 GAME hours)

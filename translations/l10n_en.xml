@@ -21,6 +21,14 @@
         <text name="ads_dirtInfluence_label" text="Dirt Influence on Cooling"/>
         <text name="ads_dirtInfluence_tooltip" text="The maximum reduction in radiator efficiency due to dirt. 20% means a fully dirty vehicle's cooling is 20% less effective."/>
         <text name="ads_ws_header_title" text="Workshop"/>
+        <text name="ads_workshopAvailable_label" text="Workshop Open 24/7"/>
+        <text name="ads_workshopAvailable_tooltip" text="Enables or disables 24/7 workshop operation."/>
+        <text name="ads_instantInspection_label" text="Instant Inspection"/>
+        <text name="ads_instantInspection_tooltip" text="Enables instant vehicle inspection without waiting time."/>
+        <text name="ads_parkVehicle_label" text="Park Vehicle During Maintenance"/>
+        <text name="ads_parkVehicle_tooltip" text="If enabled, vehicles undergoing maintenance are skipped when cycling with TAB."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="AI Overload &amp; Overheat Control"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="If enabled, the AI worker reduces load to prevent engine overload or overheating."/>
 
         <text name="ads_ws_label_value" text="Value"/>
         <text name="ads_ws_label_age" text="Age"/>

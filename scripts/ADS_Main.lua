@@ -244,7 +244,7 @@ function ADS_Main:update(dt)
     --- workshop
     if self.workshopCheckTimer >= ADS_Config.CORE_UPDATE_DELAY then
         local currentDayHour = g_currentMission.environment.dayTime / (60 * 60 * 1000)
-        local isWorkshopOpen = currentDayHour >= ADS_Config.WORKSHOP.OPEN_HOUR and currentDayHour < ADS_Config.WORKSHOP.CLOSE_HOUR
+        local isWorkshopOpen = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE or (currentDayHour >= ADS_Config.WORKSHOP.OPEN_HOUR and currentDayHour < ADS_Config.WORKSHOP.CLOSE_HOUR)
         if isWorkshopOpen ~= self.isWorkshopOpen then
             self.isWorkshopOpen = isWorkshopOpen
             ADS_WorkshopChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self.isWorkshopOpen))

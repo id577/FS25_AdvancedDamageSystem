@@ -21,6 +21,14 @@
         <text name="ads_dirtInfluence_label" text="Influencia de la suciedad en la refrigeración"/>
         <text name="ads_dirtInfluence_tooltip" text="La reducción máxima en la eficiencia del radiador debido a la suciedad. 20 % significa que la refrigeración de un vehículo completamente sucio es un 20 % menos efectiva."/>
         <text name="ads_ws_header_title" text="Taller"/>
+        <text name="ads_workshopAvailable_label" text="Taller abierto 24/7"/>
+        <text name="ads_workshopAvailable_tooltip" text="Activa o desactiva el funcionamiento del taller las 24 horas."/>
+        <text name="ads_instantInspection_label" text="Inspección instantánea"/>
+        <text name="ads_instantInspection_tooltip" text="Activa la inspección inmediata del vehículo sin tiempo de espera."/>
+        <text name="ads_parkVehicle_label" text="Aparcar vehículo en mantenimiento"/>
+        <text name="ads_parkVehicle_tooltip" text="Si está activado, los vehículos en mantenimiento se omiten al cambiar con TAB."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="Control de sobrecarga/calentamiento (IA)"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="El trabajador de la IA reducirá la carga en caso de sobrecarga o sobrecalentamiento del motor."/>
 
         <text name="ads_ws_label_value" text="Valor"/>
         <text name="ads_ws_label_age" text="Antigüedad"/>

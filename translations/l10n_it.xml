@@ -21,8 +21,15 @@
         <text name="ads_transMaxHeat_tooltip" text="Il tasso base di calore generato dalla trasmissione al massimo carico. Valori più alti faranno riscaldare la trasmissione più velocemente."/>
         <text name="ads_dirtInfluence_label" text="Influenza sporco sul raffreddamento"/>
         <text name="ads_dirtInfluence_tooltip" text="La riduzione massima dell'efficienza del radiatore a causa dello sporco. 20% significa che il raffreddamento di un veicolo completamente sporco è del 20% meno efficace."/>
-
         <text name="ads_ws_header_title" text="Officina" />
+        <text name="ads_workshopAvailable_label" text="Officina aperta 24/7"/>
+        <text name="ads_workshopAvailable_tooltip" text="Abilita o disabilita l'apertura dell'officina 24 ore su 24."/>
+        <text name="ads_instantInspection_label" text="Ispezione immediata"/>
+        <text name="ads_instantInspection_tooltip" text="Abilita l'ispezione immediata del veicolo senza tempi di attesa."/>
+        <text name="ads_parkVehicle_label" text="Parcheggia veicolo in manutenzione"/>
+        <text name="ads_parkVehicle_tooltip" text="Se attivato, i veicoli in manutenzione vengono saltati quando si usa il tasto TAB."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="Controllo sovraccarico/surriscaldamento IA"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="L'operaio IA ridurrà il carico in caso di sovraccarico o surriscaldamento del motore."/>
 
         <text name="ads_ws_label_value" text="Valore" />
         <text name="ads_ws_label_age" text="Età" />

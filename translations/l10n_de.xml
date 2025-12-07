@@ -21,6 +21,14 @@
         <text name="ads_dirtInfluence_label" text="Schmutzeinfluss auf Kühlung"/>
         <text name="ads_dirtInfluence_tooltip" text="Die maximale Reduzierung der Kühlereffizienz durch Schmutz. 20 % bedeutet, dass die Kühlung eines vollständig verschmutzten Fahrzeugs um 20 % weniger effektiv ist."/>
         <text name="ads_ws_header_title" text="Werkstatt"/>
+        <text name="ads_workshopAvailable_label" text="Werkstatt rund um die Uhr geöffnet"/>
+        <text name="ads_workshopAvailable_tooltip" text="Aktiviert oder deaktiviert den 24/7-Betrieb der Werkstatt."/>
+        <text name="ads_instantInspection_label" text="Sofortige Inspektion"/>
+        <text name="ads_instantInspection_tooltip" text="Aktiviert oder deaktiviert die sofortige Fahrzeuginspektion ohne Wartezeit."/>
+        <text name="ads_parkVehicle_label" text="Fahrzeug während Wartung parken"/>
+        <text name="ads_parkVehicle_tooltip" text="Wenn aktiviert, werden Fahrzeuge während der Wartung beim Durchschalten (TAB) übersprungen."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="KI-Überlastungs- und Überhitzungskontrolle"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Der KI-Helfer reduziert die Motorlast bei drohender Überlastung oder Überhitzung."/>
 
         <text name="ads_ws_label_value" text="Wert"/>
         <text name="ads_ws_label_age" text="Alter"/>

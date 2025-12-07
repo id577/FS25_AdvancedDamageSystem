@@ -612,7 +612,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- ai worker overload, temp control
-    if self:getIsAIActive() and self:getIsMotorStarted() then
+    if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL and self:getIsAIActive() and self:getIsMotorStarted() then
         local motorLoad = self:getMotorLoadPercentage()
         if (motorLoad > 0.95 or spec.rawEngineTemperature > 95 or spec.rawTransmissionTemperature > 95) and self:getCruiseControlSpeed() > 5 then
 
@@ -1411,7 +1411,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
     local vehicleState = self:getCurrentStatus()
     local C = ADS_Config.MAINTENANCE
 
-    if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil then 
+    if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil and C.PARK_VEHICLE then 
         self.spec_enterable:setIsTabbable(false)
     end
 
@@ -1424,7 +1424,13 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
         spec.workshopType = workshopType
 
         if type == states.INSPECTION or type == states.MAINTENANCE then
-            if type == states.INSPECTION then totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER end
+            if type == states.INSPECTION then
+                if C.INSTANT_INSPECTION then
+                    totalTimeMs = 1000
+                else
+                    totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER 
+                end
+            end
             local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
             for id, breakdown in pairs(spec.activeBreakdowns) do
                 if not breakdown.isVisible then
@@ -1541,7 +1547,7 @@ function AdvancedDamageSystem:processMaintenance(dt)
         if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil then 
             self.spec_enterable:setIsTabbable(true)
         end
-        
+
         if spec.currentState ~= states.INSPECTION then
             self:setDirtAmount(0)
         end
@@ -1856,6 +1862,8 @@ end
 
 function AdvancedDamageSystem.calculateMaintenancePrice(vehicle, maintenanceType, selectedBreakdown)
     local price = vehicle:getPrice()
+
+    print(price)
     local spec = vehicle.spec_AdvancedDamageSystem
     local ageFactor = math.min(math.max(math.log10(vehicle.age), 1), 2)
     local C = ADS_Config.MAINTENANCE
@@ -1924,7 +1932,11 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
     else
         local totalDurationMs = 0
         if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
-            totalDurationMs = C.INSPECTION_TIME / spec.maintainability
+            if C.INSTANT_INSPECTION then
+                totalDurationMs = 60000
+            else
+                totalDurationMs = C.INSPECTION_TIME / spec.maintainability
+            end
         elseif maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
             totalDurationMs = C.MAINTENANCE_TIME / spec.maintainability
         elseif maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
@@ -1951,7 +1963,7 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
 
     local totalElapsedHours
 
-    if workshopType == AdvancedDamageSystem.WORKSHOP.MOBILE then
+    if workshopType == AdvancedDamageSystem.WORKSHOP.MOBILE or ADS_Config.WORKSHOP.ALWAYS_AVAILABLE then
         totalElapsedHours = workDurationHours
     else
         local WORKSHOP_HOURS = ADS_Config.WORKSHOP

@@ -21,6 +21,14 @@
         <text name="ads_dirtInfluence_label" text="污垢对冷却的影响"/>
         <text name="ads_dirtInfluence_tooltip" text="因污垢导致散热器效率的最大降低幅度。20%意味着完全脏污的车辆冷却效果降低20%。"/>
         <text name="ads_ws_header_title" text="车间"/>
+        <text name="ads_workshopAvailable_label" text="维修车间全天候开放"/>
+        <text name="ads_workshopAvailable_tooltip" text="启用/禁用维修车间的全天候（24/7）工作模式。"/>
+        <text name="ads_instantInspection_label" text="即时检查"/>
+        <text name="ads_instantInspection_tooltip" text="启用后，车辆检查将无需等待，立即完成。"/>
+        <text name="ads_parkVehicle_label" text="维护期间停放车辆"/>
+        <text name="ads_parkVehicle_tooltip" text="启用后，正在进行维护的车辆将无法通过 TAB 键切换。"/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="AI 过载与过热控制"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="启用后，当发动机过载或过热时，AI 工人会自动降低负载。"/>
 
         <text name="ads_ws_label_value" text="价值"/>
         <text name="ads_ws_label_age" text="使用时长"/>

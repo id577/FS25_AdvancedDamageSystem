@@ -21,7 +21,14 @@
         <text name="ads_dirtInfluence_label" text="Влияние грязи на охлаждение"/>
         <text name="ads_dirtInfluence_tooltip" text="Максимальное снижение эффективности радиатора из-за грязи. 20% означает, что полностью грязная техника охлаждается на 20% хуже."/>
         <text name="ads_ws_header_title" text="Мастерская"/>
-        
+        <text name="ads_workshopAvailable_label" text="Мастерская доступна круглосуточно"/>
+        <text name="ads_workshopAvailable_tooltip" text="Если включено, мастерская работает 24/7 без перерывов."/>
+        <text name="ads_instantInspection_label" text="Мгновенный осмотр"/>
+        <text name="ads_instantInspection_tooltip" text="Если включено, диагностика техники выполняется мгновенно."/>
+        <text name="ads_parkVehicle_label" text="Парковать технику при обслуживании"/>
+        <text name="ads_parkVehicle_tooltip" text="Если включено, техника исключается из переключения (TAB) на время ремонта."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="Контроль перегрева/перегрузки (ИИ)"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Если включено, наемный работник будет снижать нагрузку при перегреве или перегрузке двигателя."/>
 
         <text name="ads_ws_label_value" text="Стоимость"/>
         <text name="ads_ws_label_age" text="Возраст"/>

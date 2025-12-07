@@ -21,6 +21,14 @@
         <text name="ads_dirtInfluence_label" text="Wpływ brudu na chłodzenie"/>
         <text name="ads_dirtInfluence_tooltip" text="Maksymalne zmniejszenie wydajności chłodnicy z powodu brudu. 20% oznacza, że chłodzenie całkowicie zabrudzonego pojazdu jest o 20% mniej skuteczne."/>
         <text name="ads_ws_header_title" text="Warsztat"/>
+        <text name="ads_workshopAvailable_label" text="Warsztat czynny 24/7"/>
+        <text name="ads_workshopAvailable_tooltip" text="Włącza lub wyłącza całodobowy tryb pracy warsztatu."/>
+        <text name="ads_instantInspection_label" text="Natychmiastowa inspekcja"/>
+        <text name="ads_instantInspection_tooltip" text="Włącza natychmiastową inspekcję pojazdu bez czasu oczekiwania."/>
+        <text name="ads_parkVehicle_label" text="Parkuj pojazd podczas serwisu"/>
+        <text name="ads_parkVehicle_tooltip" text="Jeśli włączone, pojazdy w serwisie są pomijane przy przełączaniu klawiszem TAB."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="Kontrola przeciążenia/przegrzania (SI)"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Pracownik SI zmniejszy obciążenie silnika w przypadku przeciążenia lub przegrzania."/>
 
         <text name="ads_ws_label_value" text="Wartość"/>
         <text name="ads_ws_label_age" text="Wiek"/>

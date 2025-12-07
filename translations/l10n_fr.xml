@@ -21,6 +21,14 @@
         <text name="ads_dirtInfluence_label" text="Influence de la saleté sur le refroidissement"/>
         <text name="ads_dirtInfluence_tooltip" text="La réduction maximale de l'efficacité du radiateur due à la saleté. 20 % signifie que le refroidissement d'un véhicule entièrement sale est 20 % moins efficace."/>
         <text name="ads_ws_header_title" text="Atelier"/>
+        <text name="ads_workshopAvailable_label" text="Atelier ouvert 24h/24"/>
+        <text name="ads_workshopAvailable_tooltip" text="Active ou désactive l'ouverture de l'atelier 24h/24 et 7j/7."/>
+        <text name="ads_instantInspection_label" text="Inspection instantanée"/>
+        <text name="ads_instantInspection_tooltip" text="Active l'inspection immédiate du véhicule sans temps d'attente."/>
+        <text name="ads_parkVehicle_label" text="Garer le véhicule pendant la maintenance"/>
+        <text name="ads_parkVehicle_tooltip" text="Si activé, les véhicules en maintenance sont ignorés lors du changement avec TAB."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="Contrôle surcharge/surchauffe IA"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="L'ouvrier IA réduira la charge moteur en cas de surcharge ou de surchauffe."/>
 
         <text name="ads_ws_label_value" text="Valeur"/>
         <text name="ads_ws_label_age" text="Âge"/>
