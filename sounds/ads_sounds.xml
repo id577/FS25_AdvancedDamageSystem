@@ -91,4 +91,11 @@
         <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </gearDisengage1>
+    <maintenanceCompleted file="sounds/maintenanceCompleted.ogg" linkNode="0" innerRadius="9999999.0" outerRadius="9999999.0" >
+        <volume indoor="1.0" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </maintenanceCompleted>
 </sounds>

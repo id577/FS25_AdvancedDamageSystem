@@ -240,6 +240,11 @@ function ADS_Hud:drawDashboard()
         end
 
     local engineTemp, transTemp, motorLoad = spec.engineTemperature, spec.transmissionTemperature, vehicle:getMotorLoadPercentage()
+
+    if vehicle.spec_CVTaddon ~= nil and vehicle.spec_CVTaddon.CVTcfgExists then
+        transTemp = vehicle.spec_motorized.motorTemperature.value
+    end
+
     local tempSign = "°C"
 
     if g_gameSettings:getValue(GameSettings.SETTING.USE_FAHRENHEIT) then
@@ -256,7 +261,7 @@ function ADS_Hud:drawDashboard()
         tempText = string.format("%.1f%s", engineTemp, tempSign)
     end
 
-    local motorText = string.format("%.0f%%", math.abs(motorLoad * 100))
+    local motorText = string.format("%.0f%%", math.max(motorLoad * 100, 0))
 
     local motorLoadTextColor = {1, 1, 1, 1}
     if motorLoad > ADS_Config.CORE.MOTOR_OVERLOADED_THRESHOLD then
@@ -313,7 +318,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         table.insert(effectLines, "None")
     end
 
-    local baseLines = 12
+    local baseLines = 13
     local dynamicHeight = (panel.padding * 2) + textSettings.headerSize + (baseLines * panel.lineHeight) + (#breakdownLines * panel.lineHeight) + (#effectLines * panel.lineHeight) + 0.04
 
 
@@ -377,12 +382,13 @@ function ADS_Hud:drawActiveVehicleHUD()
 
 
 
-    local col1_titles = { '  Motor overload factor', '  Service expired factor', '  Cold motor factor', '  Overheat motor factor', '  Overheat CVT factor'}
+    local col1_titles = { '  Motor overload factor', '  Service expired factor', '  Cold motor factor', '  Overheat motor factor', '  Cold CVT factor',  '  Overheat CVT factor'}
     local col1_data = {
         spec.debugData.condition.motorLoadFactor * bcw,
         spec.debugData.condition.expiredServiceFactor * bcw,
         spec.debugData.condition.coldMotorFactor * bcw,
         spec.debugData.condition.hotMotorFactor * bcw,
+        spec.debugData.condition.coldTransFactor * bcw,
         spec.debugData.condition.hotTransFactor * bcw
     }
 
@@ -394,12 +400,18 @@ function ADS_Hud:drawActiveVehicleHUD()
         renderText(col2_x - 0.01, currentY, textSettings.normalSize * 0.9, "|")
         currentY = currentY - panel.lineHeight
     end
-    
+
+    if vehicle.spec_CVTaddon ~= nil and vehicle.spec_CVTaddon.CVTcfgExists then
+        renderText(col1_x, currentY, textSettings.normalSize, string.format("CVT Addon:"))
+        renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("-%.2f%% | -%.2f%% (%s|%s|%s|%s|%s) ", spec.debugData.cvtAddon.totalWearRate * bcw, spec.debugData.cvtAddon.reducedAmount * bcw, spec.debugData.cvtAddon.warnheat, spec.debugData.cvtAddon.warndamage, spec.debugData.cvtAddon.critheat, spec.debugData.cvtAddon.critdamage, spec.debugData.cvtAddon.highpressure))
+        renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
+        currentY = currentY - panel.lineHeight   
+    end
+
     renderText(col1_x, currentY, textSettings.normalSize, string.format("Failure chance:"))
     renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f%% (%.2f%%)", spec.debugData.breakdown.failureChanceInHour * 100, spec.debugData.breakdown.criticalFailureInHour * 100))
     renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
     currentY = currentY - panel.lineHeight
-    
 
     -- COLUMN 2
     currentY = startY
@@ -510,7 +522,7 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     -- BOTTOM
     
-    currentY = startY - (9 * panel.lineHeight) 
+    currentY = startY - (11 * panel.lineHeight) 
 
     local separator = "________________________________________________________________________________________________________________________________________________________________"
     local function drawSeparator()

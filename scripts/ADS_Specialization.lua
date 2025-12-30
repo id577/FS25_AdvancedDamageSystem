@@ -207,6 +207,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getConditionLevel", AdvancedDamageSystem.getConditionLevel)
     SpecializationUtil.registerFunction(vehicleType, "updateServiceLevel", AdvancedDamageSystem.updateServiceLevel)
     SpecializationUtil.registerFunction(vehicleType, "updateConditionLevel", AdvancedDamageSystem.updateConditionLevel)
+    SpecializationUtil.registerFunction(vehicleType, "updateConditionLevelCVTAddon", AdvancedDamageSystem.updateConditionLevelCVTAddon)
     SpecializationUtil.registerFunction(vehicleType, "getActiveBreakdowns", AdvancedDamageSystem.getActiveBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "isUnderMaintenance", AdvancedDamageSystem.isUnderMaintenance)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
@@ -317,7 +318,18 @@ function AdvancedDamageSystem:onLoad(savegame)
             expiredServiceFactor = 0,
             coldMotorFactor = 0,
             hotMotorFactor = 0,
+            coldTransFactor = 0,
             hotTransFactor = 0
+        },
+        cvtAddon = {
+            warnheat = 0,
+            warndamage = 0,
+            critheat = 0,
+            critdamage = 0,
+            highpressure = 0,
+            totalWearRate = 0,
+            reducedAmount = 0,
+            resetTimer = 0
         },
         breakdown = {
             failureChancePerFrame = 0,
@@ -460,6 +472,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.turbocharger3 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turbocharger3", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         spec.samples.turbocharger4 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turbocharger4", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         spec.samples.gearDisengage1 = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "gearDisengage1", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+        spec.samples.maintenanceCompleted = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "maintenanceCompleted", AdvancedDamageSystem.modDirectory, self.rootNode, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
         delete(xmlSoundFile)
     else
         log_dbg("ERROR: AdvancedDamageSystem - Could not load ads_sounds.xml")
@@ -542,6 +555,9 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     --- just in case
     if self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
+    if self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists then
+        self.spec_CVTaddon.CVTdamage = 0
+    end
 
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
     if spec.year >= 2000 then
@@ -614,7 +630,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- ai worker overload, temp control
     if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL and self:getIsAIActive() and self:getIsMotorStarted() then
         local motorLoad = self:getMotorLoadPercentage()
-        if (motorLoad > 0.95 or spec.rawEngineTemperature > 95 or spec.rawTransmissionTemperature > 95) and self:getCruiseControlSpeed() > 5 then
+        if (motorLoad > 0.95 or spec.rawEngineTemperature > 97 or spec.rawTransmissionTemperature > 97) and self:getCruiseControlSpeed() > 5 then
 
             if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
                 for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
@@ -631,7 +647,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
     
             self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() - 1, nil)
-        elseif motorLoad < 0.75 and spec.rawEngineTemperature < 94 and spec.rawTransmissionTemperature < 94  then
+        elseif motorLoad < 0.75 and spec.rawEngineTemperature < 92 and spec.rawTransmissionTemperature < 92  then
             self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() + 1, nil)
         end
     end
@@ -682,7 +698,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     if not motor then return end
 
     local spec = self.spec_AdvancedDamageSystem
-    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000)
+    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle) or (self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists)
     
     local isMotorStarted = self:getIsMotorStarted()
     local motorLoad = math.max(self:getMotorLoadPercentage(), 0.0)
@@ -700,7 +716,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
 
     if spec.engineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.engineTemperature = eviromentTemp end
     if spec.rawEngineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawEngineTemperature = eviromentTemp end
-    if vehicleHaveCVT then
+    if vehicleHaveCVT and not (self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists) then
         if spec.transmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.transmissionTemperature = eviromentTemp end
         if spec.rawTransmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
     end
@@ -711,8 +727,16 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     end
     
     local transDebugData = {}
-    if vehicleHaveCVT and not spec.isElectricVehicle then
-        transDebugData = self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
+    if vehicleHaveCVT then
+        if self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists then
+            spec.transmissionTemperature = self.spec_motorized.motorTemperature.value
+            spec.rawTransmissionTemperature = self.spec_motorized.motorTemperature.value
+        else
+            transDebugData = self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
+        end
+    else
+        spec.transmissionTemperature = -99
+        spec.rawTransmissionTemperature = -99
     end
 
     if ADS_Config.DEBUG then
@@ -855,7 +879,8 @@ function AdvancedDamageSystem:calculateWearRates()
     local C = ADS_Config.CORE
     local conditionWearRate = 1.0
     local serviceWearRate = 1.0
-    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, hotTransFactor = 0, 0, 0, 0, 0
+    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0
+    local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle) and not (self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -863,24 +888,26 @@ function AdvancedDamageSystem:calculateWearRates()
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
 
+        -- overload
         if motorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
             motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, C.MOTOR_OVERLOADED_THRESHOLD, false)
             motorLoadFactor = motorLoadFactor * C.MOTOR_OVERLOADED_MAX_MULTIPLIER
             conditionWearRate = conditionWearRate + motorLoadFactor
         end
 
+        -- service
         if spec.serviceLevel < C.SERVICE_EXPIRED_THRESHOLD then
             expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_THRESHOLD, true)
             expiredServiceFactor = expiredServiceFactor * C.SERVICE_EXPIRED_MAX_MULTIPLIER
             conditionWearRate = conditionWearRate + expiredServiceFactor
         end
 
+        -- engine temperature
         if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldMotorFactor = coldMotorFactor * C.COLD_MOTOR_MAX_MULTIPLIER * motorLoadInf
             conditionWearRate = conditionWearRate + coldMotorFactor
-
 
         elseif spec.engineTemperature > C.OVERHEAT_MOTOR_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
             hotMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_MOTOR_THRESHOLD, false, 120)
@@ -889,13 +916,24 @@ function AdvancedDamageSystem:calculateWearRates()
             conditionWearRate = conditionWearRate + hotMotorFactor
         end
 
-        if spec.transmissionTemperature > C.OVERHEAT_TRANSMISSION_THRESHOLD and not spec.isElectricVehicle then
-            hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
-            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.3, false)
-            hotTransFactor = hotTransFactor * C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER * motorLoadInf * self:getMotorRpmPercentage()
-            conditionWearRate = conditionWearRate + hotTransFactor
+        -- cvt temperature
+        if vehicleHaveCVT then
+            if spec.transmissionTemperature < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
+                coldTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.COLD_TRANSMISSION_THRESHOLD, true)
+                local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
+                coldTransFactor = coldTransFactor * C.COLD_TRANSMISSION_MULTIPLIER * motorLoadInf
+                conditionWearRate = conditionWearRate + coldTransFactor
+
+            elseif spec.transmissionTemperature > C.OVERHEAT_TRANSMISSION_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
+                local transTemp = spec.transmissionTemperature
+                hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(transTemp, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
+                local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
+                hotTransFactor = hotTransFactor * C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER * motorLoadInf
+                conditionWearRate = conditionWearRate + hotTransFactor
+            end
         end
 
+        -- idling
         if motorLoad < C.MOTOR_IDLING_THRESHOLD and self:getLastSpeed() < 0.003 then
             conditionWearRate = conditionWearRate * C.MOTOR_IDLING_MULTIPLIER
             serviceWearRate = serviceWearRate * C.MOTOR_IDLING_MULTIPLIER
@@ -909,7 +947,7 @@ function AdvancedDamageSystem:calculateWearRates()
     serviceWearRate = (serviceWearRate + spec.extraServiceWear) / spec.reliability
     
     if ADS_Config.DEBUG then
-        spec.debugData.condition = {totalWearRate = conditionWearRate, motorLoadFactor = motorLoadFactor, expiredServiceFactor = expiredServiceFactor, coldMotorFactor = coldMotorFactor, hotMotorFactor = hotMotorFactor, hotTransFactor = hotTransFactor}
+        spec.debugData.condition = {totalWearRate = conditionWearRate, motorLoadFactor = motorLoadFactor, expiredServiceFactor = expiredServiceFactor, coldMotorFactor = coldMotorFactor, hotMotorFactor = hotMotorFactor, coldTransFactor = coldTransFactor, hotTransFactor = hotTransFactor}
         spec.debugData.service.totalWearRate = serviceWearRate
     end
     return serviceWearRate, conditionWearRate
@@ -927,6 +965,43 @@ function AdvancedDamageSystem:updateConditionLevel(wearRate, dt)
     spec.conditionLevel = math.clamp(newLevel, 0.001, 1)
 end
 
+function AdvancedDamageSystem:updateConditionLevelCVTAddon(wearRate, amount, dt)
+    local spec = self.spec_AdvancedDamageSystem
+    if wearRate ~= nil and wearRate > 0 then
+        local newLevel = spec.conditionLevel - (wearRate * ADS_Config.CORE.BASE_CONDITION_WEAR / (60 * 60 * 1000) * dt)
+        spec.conditionLevel = math.clamp(newLevel, 0.001, 1)
+    end
+    if amount ~= nil and amount > 0 then
+        local newLevel = spec.conditionLevel - amount
+        spec.conditionLevel = math.clamp(newLevel, 0.001, 1)
+        spec.debugData.cvtAddon.reducedAmount = amount
+    end
+
+    if ADS_Config.DEBUG then
+        local cvtSpec = self.spec_CVTaddon
+        spec.debugData.cvtAddon = {
+            warnheat = cvtSpec.forDBL_warnheat,
+            warndamage = cvtSpec.forDBL_warndamage,
+            critheat = cvtSpec.forDBL_critheat,
+            critdamage = cvtSpec.forDBL_critdamage,
+            highpressure = cvtSpec.forDBL_highpressure,
+            totalWearRate = wearRate or 0.0,
+            reducedAmount = spec.debugData.cvtAddon.reducedAmount,
+            resetTimer = spec.debugData.cvtAddon.resetTimer,
+        }
+
+        if spec.debugData.cvtAddon.reducedAmount > 0 then
+            local resetTimer = spec.debugData.cvtAddon.resetTimer + dt
+            if resetTimer >= 5000 then
+                spec.debugData.cvtAddon.reducedAmount = 0
+                spec.debugData.cvtAddon.resetTimer = 0
+            else
+                spec.debugData.cvtAddon.resetTimer = resetTimer
+            end
+        end
+    end
+end
+
 ---------------------- breakdowns ----------------------
 
 function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
@@ -942,9 +1017,9 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
 
     local random = math.random()
     
-    if self:getIsOperating() then
-        log_dbg(string.format("Random: %.6f Prob: %.6f", random, failureChancePerFrame))
-    end
+    --if self:getIsOperating() then
+        --log_dbg(string.format("Random: %.6f Prob: %.6f", random, failureChancePerFrame))
+    --end
 
     if self:getFormattedOperatingTime() > probability.VEHICLE_HONEYMOON_HOURS and random < failureChancePerFrame then
         
@@ -1491,7 +1566,6 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
 
 
         AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
-        spec.lastServiceOperatingHours = self:getFormattedOperatingTime()
         spec.lastInspectedPower = (spec.activeEffects.ENGINE_TORQUE_MODIFIER and (1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value)) or 1
         spec.lastInspectedBrake = (spec.activeEffects.BRAKE_FORCE_MODIFIER and (1 + spec.activeEffects.BRAKE_FORCE_MODIFIER.value)) or 1
         spec.lastInspectedYieldReduction = (spec.activeEffects.YIELD_REDUCTION_MODIFIER and (1 + spec.activeEffects.YIELD_REDUCTION_MODIFIER.value)) or 1
@@ -1501,6 +1575,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
 
         if type ~= states.INSPECTION and type ~= states.REPAIR then
             spec.lastServiceDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
+            spec.lastServiceOperatingHours = self:getFormattedOperatingTime()
         end
         
 
@@ -1551,7 +1626,25 @@ function AdvancedDamageSystem:processMaintenance(dt)
         if spec.currentState ~= states.INSPECTION then
             self:setDirtAmount(0)
         end
-        g_currentMission.hud:addSideNotification({1, 1, 1, 1}, self:getFullName() .. ": " .. g_i18n:getText(spec.currentState) .. " " .. g_i18n:getText("ads_spec_maintenance_complete"))
+        local maintenanceCompletedText = self:getFullName() .. ": " .. g_i18n:getText(spec.currentState) .. " " .. g_i18n:getText("ads_spec_maintenance_complete")
+
+        if spec.currentState == states.INSPECTION then
+            local activeBreakdowns = self:getActiveBreakdowns()
+            local activeBreakdownsCount = 0
+            for id, value in pairs(activeBreakdowns) do
+                if value.isVisible then
+                    activeBreakdownsCount = activeBreakdownsCount + 1
+                end
+            end
+            if activeBreakdownsCount == 0 then
+                maintenanceCompletedText = maintenanceCompletedText .. ". " .. g_i18n:getText("ads_spec_inspection_no_issues_detected")
+            else
+                maintenanceCompletedText = maintenanceCompletedText .. ". " .. string.format(g_i18n:getText("ads_spec_inspection_issues_detected"), activeBreakdownsCount)
+            end
+        end
+
+        g_currentMission.hud:addSideNotification({1, 1, 1, 1}, maintenanceCompletedText)
+        g_soundManager:playSample(spec.samples.maintenanceCompleted)
         spec.maintenanceTimer = 0
         spec.currentState = states.READY
         ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
@@ -1863,7 +1956,6 @@ end
 function AdvancedDamageSystem.calculateMaintenancePrice(vehicle, maintenanceType, selectedBreakdown)
     local price = vehicle:getPrice()
 
-    print(price)
     local spec = vehicle.spec_AdvancedDamageSystem
     local ageFactor = math.min(math.max(math.log10(vehicle.age), 1), 2)
     local C = ADS_Config.MAINTENANCE

@@ -222,7 +222,6 @@
 
         <text name="ads_cold_engine_message" text="Двигатель холодный! Высокие обороты вызывают износ!"/>
         
-
         <text name="ads_spec_this_month" text="В этом месяце"/>
         <text name="ads_spec_months_ago" text="мес. назад"/>
         <text name="ads_spec_never" text="Никогда"/>
@@ -241,8 +240,10 @@
         <text name="ads_spec_months_ago_format" text="%s %s"/>
         <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s до %s"/>
-        <text name="ads_spec_maintenance_complete" text="завершено"/>
+        <text name="ads_spec_maintenance_complete" text="завершен(о)"/>
         <text name="ads_spec_service_interval_format" text="%s м/ч"/>
+        <text name="ads_spec_inspection_issues_detected" text="Обнаружено %s неисправность(ей)"/>
+        <text name="ads_spec_inspection_no_issues_detected" text="Неисправности не обнаружены"/>
 
         <text name="ads_spec_state_ready" text="Готов"/>
         <text name="ads_spec_state_inspection" text="Осмотр"/>

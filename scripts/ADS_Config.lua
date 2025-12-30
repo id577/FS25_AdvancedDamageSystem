@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 6,
+    VER = 11,
 
     DEBUG = false,
 
@@ -21,7 +21,7 @@ ADS_Config = {
     -- How often the main simulation logic (wear, temperature, etc.) updates, in milliseconds.
     -- This handles the slow-burning processes. A higher value is better for performance
     -- as these calculations do not need to run every frame.
-    CORE_UPDATE_DELAY = 1000, -- (1000ms = 1 time per second)
+    CORE_UPDATE_DELAY = 500, -- (500ms = 2 times per second)
 
     -- How often non-critical, background tasks are updated, in milliseconds.
     -- This is for very infrequent checks, like the chance of permanent wear appearing.
@@ -49,19 +49,23 @@ ADS_Config = {
 
         -- The maximum penalty applied to CONDITION wear when the Service level is very low (e.g., 0%).
         -- A value of 4.0 means condition can degrade up to 4x faster if service is neglected.
-        SERVICE_EXPIRED_MAX_MULTIPLIER = 4.0,
+        SERVICE_EXPIRED_MAX_MULTIPLIER = 5.0,
         -- The Service level (from 1.0 to 0.0) below which the 'SERVICE_EXPIRED' penalty starts to apply.
-        SERVICE_EXPIRED_THRESHOLD = 0.66, -- (Penalty starts when service is below 66%)
+        SERVICE_EXPIRED_THRESHOLD = 0.5, -- (Penalty starts when service is below 50%)
 
         -- The maximum penalty applied to CONDITION wear when the motor is under heavy load.
         MOTOR_OVERLOADED_MAX_MULTIPLIER = 1.0, -- (up to 1x extra wear)
         -- The engine load percentage (from 0.0 to 1.0) above which the 'MOTOR_OVERLOADED' penalty applies.
-        MOTOR_OVERLOADED_THRESHOLD = 0.9, -- (Penalty starts when engine load is above 80%)
+        MOTOR_OVERLOADED_THRESHOLD = 0.95, -- (Penalty starts when engine load is above 95%)
 
         -- The maximum penalty for operating the engine under load while it's cold.
-        COLD_MOTOR_MAX_MULTIPLIER = 10.0, -- (up to 10x extra wear)
+        COLD_MOTOR_MAX_MULTIPLIER = 30.0, -- (up to 30x extra wear)
         -- The engine temperature in Celsius below which it is considered "cold" and the penalty applies.
         COLD_MOTOR_THRESHOLD = 50,
+
+        COLD_TRANSMISSION_MULTIPLIER = 30.0, -- (up to 30x extra wear)
+
+        COLD_TRANSMISSION_THRESHOLD = 55,
 
         -- The maximum penalty for operating the engine while it's overheating.
         OVERHEAT_MOTOR_MAX_MULTIPLIER = 30.0, -- (up to 30x extra wear)
@@ -69,9 +73,12 @@ ADS_Config = {
         OVERHEAT_MOTOR_THRESHOLD = 95,
 
         -- The maximum penalty for operating the transmission while it's overheating.
-        OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 30, -- (up to 30x extra wear)
+        OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 30.0, -- (up to 30x extra wear)
         -- The transmission temperature in Celsius above which the 'OVERHEAT_TRANSMISSION' penalty applies.
         OVERHEAT_TRANSMISSION_THRESHOLD = 95,
+
+        CVT_SHIFT_SPEED_THRESHOLD = 1.0,
+        CVT_SHOCK_MULTIPLIER = 100.0,
 
         -- --- Breakdown Mechanics ---
 
