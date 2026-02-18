@@ -57,6 +57,7 @@
         <text name="ads_ws_action_maintenance" text="Wartung"/>
         <text name="ads_ws_action_repair" text="Reparatur"/>
         <text name="ads_ws_action_overhaul" text="Generalüberholung"/>
+        <text name="ads_ws_button_log" text="Wartungsprotokoll"/>
 
         <text name="ads_ws_age_unit" text="Monate"/>
         <text name="ads_ws_hours_unit" text="h"/>
@@ -74,8 +75,13 @@
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
         <text name="ads_ws_info_nothing_to_repair_title" text="Nichts zu reparieren"/>
         <text name="ads_ws_info_nothing_to_repair_text" text="Bitte wählen Sie ein oder mehrere zu reparierende Teile aus der Liste aus."/>
+        
+        <text name="ads_ws_confirm_instant_inspection_title" text="Sofortige Inspektion bestätigen"/>
+        <text name="ads_ws_confirm_instant_inspection_text" text="Dadurch wird das Fahrzeug sofort überprüft und alle versteckten Mängel aufgedeckt.\n\nPreis: {price}\nDauer: {duration}\nFertig um: {time}"/>
+
         <text name="ads_ws_confirm_inspection_title" text="Inspektion bestätigen"/>
-        <text name="ads_ws_confirm_inspection_text" text="Die Inspektion ermöglicht es, versteckte Mängel zu erkennen sowie den technischen Zustand grob einzuschätzen.\n\nPreis: {price}\nDauer: {duration}\nFertig um: {time}"/>
+        <text name="ads_ws_confirm_inspection_text" text="Die Inspektion ermöglicht es, versteckte Mängel zu erkennen sowie den technischen Zustand grob einzuschätzen.\n\nPreis: {price}\nDauer: {duration}\nFertig um: {time}\n\nDie Schnellinspektion dauert nur kurz, kann aber im Gegensatz zur gründlichen Inspektion Mängel in frühen Stadien nicht erkennen.\n\nPreis: {q_price}\nDauer: {q_duration}\nFertig um: {q_time}\n"/>
+
         <text name="ads_ws_confirm_maintenance_title" text="Wartung bestätigen"/>
         <text name="ads_ws_confirm_maintenance_text" text="Die Wartung stellt den technischen Servicelevel wieder auf das Maximum her. Zusätzlich wird der technische Zustand des Fahrzeugs überprüft.\n\nPreis: {price}\nDauer: {duration}\nFertig um: {time}\n\nWählen Sie die Qualität der Ersatzteile. Die Verwendung günstigerer Zubehörteile birgt das Risiko von Mängeln.\n\nPreis für Zubehörteile: {aftermarket_price}"/>
         <text name="ads_ws_confirm_repair_title" text="Reparatur bestätigen"/>
@@ -85,7 +91,33 @@
         <text name="ads_ws_option_genuine_parts" text="Originalteile"/>
         <text name="ads_ws_option_aftermarket_parts" text="Zubehörteile"/>
 
+        <text name="ads_ws_option_quick_inspection" text="Schnellinspektion"/>
+        <text name="ads_ws_option_thorough_inspection" text="Gründliche Inspektion"/>
+
+        <text name="ads_log_header_title" text="Wartungsprotokoll"/>
+        <text name="ads_log_title" text="Technisches Wartungsprotokoll"/>
+        <text name="ads_log_total_cost_title" text="Gesamtausgaben"/>
+        <text name="ads_log_cost_per_month_title" text="Monatliche Kosten"/>
+        <text name="ads_log_ownership_months_title" text="Besitzdauer"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Gesamtzahl behobener Pannen"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Ø Pannenintervall"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Ø Wartungsintervall"/>
+
+        <text name="ads_log_overhaul_desc" text="Generalüberholung durchgeführt"/>
+        <text name="ads_log_maintenance_desc" text="Geplante Wartung durchgeführt (%.1f h)"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Keine Fehler gefunden"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Fehler gefunden: %s"/>
+        <text name="ads_log_repair_desc_generic" text="Reparatur"/>
+
+        <text name="ads_log_date" text="Datum"/>
+        <text name="ads_log_hours" text="Betriebsstunden"/>
+        <text name="ads_log_type" text="Arbeitsart"/>
+        <text name="ads_log_description" text="Beschreibung"/>
+        <text name="ads_log_price" text="Kosten"/>
+        <text name="ads_log_empty" text="Protokoll ist leer"/>
+
         <text name="ads_breakdowns_part_vehicle" text="Fahrzeug"/>
+        <!-- ... (standard breakdown parts remain the same) ... -->
         <text name="ads_breakdowns_part_engine" text="Motor"/>
         <text name="ads_breakdowns_part_turbocharger" text="Turbolader"/>
         <text name="ads_breakdowns_part_fuel_pump" text="Kraftstoffpumpe"/>
@@ -122,94 +154,80 @@
 
         <text name="ads_breakdowns_engine_jam_stage1_description" text="Der Motor ist komplett ausgefallen"/>
         <text name="ads_breakdowns_engine_jam_stage1_message" text="Motor blockiert"/>
-
+        
+        <!-- ... (all breakdown descriptions remain the same) ... -->
         <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="Fehler im Steuergerät. Leicht reduzierte Motorleistung."/>
         <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="Fehlfunktion des Steuergeräts. Spürbarer Leistungsverlust und erhöhter Kraftstoffverbrauch."/>
         <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Kritische Fehlfunktion des Steuergeräts. Erheblicher Leistungsverlust, hoher Kraftstoffverbrauch und Gefahr des Motorabwürgens."/>
         <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Totalausfall des Steuergeräts. Der Motor kann nicht gesteuert werden und startet nicht."/>
         <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Motorfehler"/>
-
         <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Verschlissene Turbolager. Ein leises Pfeifen ist zu hören, und es gibt einen leichten Leistungsverlust bei hohen Drehzahlen."/>
         <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Undichte Turboladerdichtungen. Spürbarer Leistungsverlust, erhöhter Kraftstoffverbrauch."/>
         <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Beschädigte Turbinenschaufeln. Starker Leistungsverlust und Gefahr des Motorabwürgens unter hoher Last."/>
         <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Katastrophaler Turboschaden. Der Motor hat den größten Teil seiner Leistung verloren und ist in Gefahr, schwere interne Schäden zu erleiden."/>
-
         <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Früher Verschleiß der Kraftstoffpumpe. Leicht reduzierte Motorleistung und erhöhter Kraftstoffverbrauch."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Kraftstoffdruck fällt ab. Spürbarer Leistungsverlust, höherer Kraftstoffverbrauch und gelegentliches Abwürgen des Motors."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kritischer Kraftstoffdruck. Starker Leistungsverlust, sehr hoher Kraftstoffverbrauch und häufiges Abwürgen des Motors."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Totalausfall der Kraftstoffpumpe. Es wird kein Kraftstoff zum Motor gefördert."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Motorstart unmöglich"/>
-
         <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Eine oder mehrere Einspritzdüsen haben leicht verstopfte Düsen. Der Motor läuft möglicherweise etwas unrund, mit einem geringen Leistungsverlust."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Schlechte Kraftstoffzerstäubung. Der Motor hat Zündaussetzer unter Last, was zu spürbarem Leistungsverlust und Motorruckeln führt."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Eine Einspritzdüse klemmt. Der Motor läuft sehr schlecht, mit erheblichem Leistungsverlust und unzuverlässigem Startverhalten."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Eine Einspritzdüse ist komplett ausgefallen. Der Motor läuft nicht korrekt und startet möglicherweise gar nicht."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Motorstart unmöglich"/>
-
         <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Verschlissene Bremsbeläge. Eine leichte Verringerung der Bremswirkung."/>
         <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Undichte Bremsflüssigkeit oder verschlissene Scheiben. Der Bremsweg ist merklich verlängert."/>
         <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Starker Verlust des Bremsdrucks. Die Bremsen sind sehr schwach und unzuverlässig."/>
         <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Totalausfall des Bremssystems. Der weitere Betrieb ist extrem gefährlich."/>
         <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Bremsversagen"/>
-
         <text name="ads_breakdowns_transmission_slip_stage1_description" text="Verschlissene Kupplungsscheiben. Gelegentlicher Leistungsverlust durch rutschendes Getriebe unter Last."/>
         <text name="ads_breakdowns_transmission_slip_stage2_description" text="Erheblicher Kupplungsverschleiß. Spürbares Rutschen des Getriebes, besonders beim Beschleunigen."/>
         <text name="ads_breakdowns_transmission_slip_stage3_description" text="Stark verschlissene Kupplung. Starkes Rutschen erschwert die Kraftübertragung auf die Räder."/>
         <text name="ads_breakdowns_transmission_slip_stage4_description" text="Kupplung komplett durchgebrannt. Das Fahrzeug kann sich nicht mehr bewegen."/>
         <text name="ads_breakdowns_transmission_slip_stage4_message" text="Getriebeausfall"/>
-
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Verschlissene Synchronringe. Gelegentliches Krachen oder Schwierigkeiten beim Schalten."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Beschädigte Synchronringe. Das Schalten ist häufig schwierig und kann fehlschlagen."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Gebrochene Zähne am Synchronring. Hohe Wahrscheinlichkeit von fehlgeschlagenen Schaltvorgängen oder Herausspringen des Gangs unter Last."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Synchronringe komplett ausgefallen. Das Schalten ist unmöglich."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Getriebeausfall"/>
-
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Niedriger Hydraulikdruck im Lastschaltgetriebe. Leichte Verzögerung und Härte beim Einlegen der Gänge."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Verschlissene Dichtungen der Hydraulikpumpe. Spürbare Verzögerung und Ruckeln beim Schalten."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Ausfallende Hydraulikpumpe. Starke Verzögerung und heftige Stöße beim Schalten."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Hydraulikpumpe des Lastschaltgetriebes ausgefallen. Getriebe steckt im Leerlauf fest."/>
-        
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Thermostat beginnt zu klemmen. Das CVT-Getriebe erwärmt sich langsam oder läuft unter Last etwas heißer als normal."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Der Thermostat klemmt teilweise. Die Temperatur des CVT ist instabil, was bei längerer Arbeit zu Überhitzungsgefahr führt."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="Der Thermostat ist größtenteils funktionslos. Das CVT neigt zu starker Überhitzung, was zu internen Schäden führen kann."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Der Thermostat ist vollständig ausgefallen, wahrscheinlich in geschlossener Position. Die Kühlung ist minimal, was zu einer schnellen und gefährlichen Überhitzung des CVT führt."/>
-
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Motorthermostat beginnt auszufallen. Der Motor braucht länger, um die optimale Temperatur zu erreichen, oder läuft etwas zu heiß."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Schlechte Reaktion des Thermostats. Die Motortemperaturregelung ist instabil, was den Verschleiß erhöht."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Der Thermostat klemmt in geschlossener Position. Der Motor wird unter Last ständig überhitzen."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Totalausfall des Thermostats. Das Kühlmittel kann nicht richtig zirkulieren, was zu einer bevorstehenden und schweren Überhitzung führt."/>
-
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Geringfügiges internes Leck in der Pumpe. Hydraulische Anbaugeräte sind etwas langsamer."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Verschlissene Pumpendichtungen. Merklich langsamere Hydraulikfunktionen."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Beschädigte Hydraulikpumpe. Anbaugeräte sind extrem langsam und schwach."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Ausfall der Hydraulikpumpe. Das Hydrauliksystem ist außer Betrieb."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hydraulikausfall"/>
-
         <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Verschlissene Isolierung, gelegentliche Spannungsabfälle. Kleinere elektrische Störungen können beobachtet werden."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Korrodierte Kontakte und instabile Leistung der Lichtmaschine. Lichter können ausfallen, der Motorstart ist unzuverlässig."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Gefahr von Kurzschlüssen. Kritische Systeme sind unzuverlässig und die Lichter können komplett ausfallen."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Lichtausfall"/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Hauptkabelbaum ausgefallen. Die Elektrik des Fahrzeugs ist tot."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Anlasser reagiert nicht"/>
-
         <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Leichte Vergaserverschmutzung. Der Motor zögert gelegentlich unter starker Last."/>
         <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Verstopfte Düsen. Der Motor stottert häufig und verliert an Leistung, besonders bei schnellem Gasgeben."/>
         <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Starke Vergaserblockade. Der Motor läuft sehr unrund, geht häufig aus und hat Mühe, die Leistung zu halten."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Kraftstoffmangel durch einen komplett verstopften Vergaser. Der Motor läuft nicht."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Vergaser verstopft"/>
-        
         <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Leichte Sensorverschmutzung oder Kalibrierungsabweichung. Das automatische Dreschsystem ist etwas weniger effizient, was zu minimalen Ernteverlusten führt."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="Ungenauigkeiten der Sensormessungen führen zu suboptimalen Einstellungen der Dresch- und Abscheidesysteme. Der Ertragsverlust ist spürbar."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="Kritische Sensorfehlfunktion. Die Steuereinheit erhält stark fehlerhafte Daten, was zu erheblichen Verlusten führt, da das Korn falsch von der Spreu getrennt wird."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="Totalausfall des Ertragsüberwachungssystems. Der Mähdrescher arbeitet 'blind', was zu massiver Ineffizienz und schweren Ernteverlusten führt."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="Ausfall der Ertragsüberwachung"/>
-
         <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Leichter Verschleiß an internen Schnecken und Aufzugsketten. Eine geringe Menge Erntegut geht beim internen Transport verloren."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Verschlissene Schneckenwindungen und rutschende Förderbänder verursachen erhöhten Verlust im Inneren der Maschine. Gelegentlich sind Schleifgeräusche zu hören."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Beschädigte Elevatorpaddel und Schnecken haben Schwierigkeiten, die Erntemasse zu bewegen, was zu erheblichen Verlusten und der Gefahr einer großen Verstopfung führt."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Ein Hauptbestandteil des Materialflusssystems ist ausgefallen und hat eine schwere Verstopfung verursacht. Der Motor steht unter extremer Belastung."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Materialfluss blockiert"/>
-
         <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Gedehnter Antriebsriemen. Gelegentliches Rutschen führt zu einer leichten Verringerung der Entladegeschwindigkeit."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Verschlissener Antriebsriemen und Riemenscheiben. Deutliches Rutschen unter Last verringert die Entladegeschwindigkeit merklich."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Beschädigtes Getriebe oder stark verschlissener Riemen. Die Schnecke dreht sich nur schwer und arbeitet mit sehr niedriger Geschwindigkeit."/>
@@ -242,6 +260,13 @@
         <text name="ads_spec_last_maintenance_until_format" text="%s bis %s"/>
         <text name="ads_spec_maintenance_complete" text="abgeschlossen"/>
         <text name="ads_spec_service_interval_format" text="%s Bst."/>
+
+        <text name="ads_spec_inspection_issues_detected" text="%s Problem(e) erkannt"/>
+        <text name="ads_spec_inspection_no_issues_detected" text="Keine Probleme erkannt"/>
+
+        <text name="ads_spec_workshop_dealer" text="Händler"/>
+        <text name="ads_spec_workshop_own" text="Eigen"/>
+        <text name="ads_spec_workshop_mobile" text="Mobil"/>
 
         <text name="ads_spec_state_ready" text="Bereit"/>
         <text name="ads_spec_state_inspection" text="Inspektion"/>

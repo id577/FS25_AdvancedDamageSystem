@@ -57,6 +57,7 @@
         <text name="ads_ws_action_maintenance" text="维护"/>
         <text name="ads_ws_action_repair" text="修理"/>
         <text name="ads_ws_action_overhaul" text="全面检修"/>
+        <text name="ads_ws_button_log" text="维护日志"/>
 
         <text name="ads_ws_age_unit" text="个月"/>
         <text name="ads_ws_hours_unit" text="小时"/>
@@ -74,8 +75,13 @@
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
         <text name="ads_ws_info_nothing_to_repair_title" text="无需修理"/>
         <text name="ads_ws_info_nothing_to_repair_text" text="请从列表中选择一个或多个项目进行修理。"/>
+        
+        <text name="ads_ws_confirm_instant_inspection_title" text="确认即时检查"/>
+        <text name="ads_ws_confirm_instant_inspection_text" text="这将立即检查车辆并揭示所有隐藏的故障。\n\n价格：{price}\n时长：{duration}\n完成时间：{time}"/>
+
         <text name="ads_ws_confirm_inspection_title" text="确认检测"/>
-        <text name="ads_ws_confirm_inspection_text" text="检测将允许您识别隐藏故障，并粗略评估其技术状况等级。\n\n价格：{price}\n时长：{duration}\n完成时间：{time}"/>
+        <text name="ads_ws_confirm_inspection_text" text="检测将允许您识别隐藏故障，并粗略评估其技术状况等级。\n\n价格：{price}\n时长：{duration}\n完成时间：{time}\n\n快速检查耗时较短，但与全面检查不同，它无法在早期阶段发现故障。\n\n价格：{q_price}\n时长：{q_duration}\n完成时间：{q_time}\n"/>
+        
         <text name="ads_ws_confirm_maintenance_title" text="确认维护"/>
         <text name="ads_ws_confirm_maintenance_text" text="维护将使技术服务等级恢复到最大值。此外，将对车辆的技术状况进行检测。\n\n价格：{price}\n时长：{duration}\n完成时间：{time}\n
         请为此过程选择备件质量。使用更便宜的副厂零件存在缺陷风险。\n\n 副厂零件价格：{aftermarket_price}"/>
@@ -87,6 +93,31 @@
         请为此过程选择备件质量。使用更便宜的副厂零件存在缺陷风险。\n\n 副厂零件价格：{aftermarket_price}"/>
         <text name="ads_ws_option_genuine_parts" text="原厂零件"/>
         <text name="ads_ws_option_aftermarket_parts" text="副厂零件"/>
+
+        <text name="ads_ws_option_quick_inspection" text="快速检查"/>
+        <text name="ads_ws_option_thorough_inspection" text="全面检查"/>
+
+        <text name="ads_log_header_title" text="维护日志"/>
+        <text name="ads_log_title" text="技术维护日志"/>
+        <text name="ads_log_total_cost_title" text="总费用"/>
+        <text name="ads_log_cost_per_month_title" text="每月成本"/>
+        <text name="ads_log_ownership_months_title" text="拥有时长"/>
+        <text name="ads_log_total_breakdowns_count_title" text="已修复故障总数"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="平均故障间隔"/>
+        <text name="ads_log_average_maintenance_interval_title" text="平均维护间隔"/>
+
+        <text name="ads_log_overhaul_desc" text="已执行全面检修"/>
+        <text name="ads_log_maintenance_desc" text="已执行计划维护 (%.1f h)"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="未检测到故障"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="检测到故障：%s"/>
+        <text name="ads_log_repair_desc_generic" text="修理"/>
+
+        <text name="ads_log_date" text="日期"/>
+        <text name="ads_log_hours" text="运行小时"/>
+        <text name="ads_log_type" text="工作类型"/>
+        <text name="ads_log_description" text="描述"/>
+        <text name="ads_log_price" text="成本"/>
+        <text name="ads_log_empty" text="日志为空"/>
 
         <text name="ads_breakdowns_part_vehicle" text="整车"/>
         <text name="ads_breakdowns_part_engine" text="发动机"/>
@@ -246,6 +277,13 @@
         <text name="ads_spec_last_maintenance_until_format" text="%s 直到 %s"/>
         <text name="ads_spec_service_interval_format" text="%s 小时"/>
         <text name="ads_spec_maintenance_complete" text="已完成"/>
+
+        <text name="ads_spec_inspection_issues_detected" text="检测到 %s 个问题"/>
+        <text name="ads_spec_inspection_no_issues_detected" text="未检测到问题"/>
+
+        <text name="ads_spec_workshop_dealer" text="经销商"/>
+        <text name="ads_spec_workshop_own" text="自有"/>
+        <text name="ads_spec_workshop_mobile" text="移动"/>
 
         <text name="ads_spec_state_ready" text="就绪"/>
         <text name="ads_spec_state_inspection" text="检测中"/>

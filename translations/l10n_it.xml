@@ -1,6 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
 <l10n>
     <texts>
+        <!-- Existing texts -->
         <text name="ads_serviceWear_label" text="Tasso di Usura d'Utilizzo" />
         <text name="ads_serviceWear_tooltip" text="Controlla il tasso di usura del livello 'Utilizzo' per ogni ora di funzionamento. Ad esempio, con un valore del 10%, il livello di utilizzo si esaurirà completamente in 10 ore. Un valore più alto richiederà una manutenzione più frequente." />
         <text name="ads_conditionWear_label" text="Tasso di Usura delle Condizioni" />
@@ -58,6 +58,7 @@
         <text name="ads_ws_action_maintenance" text="Manutenzione" />
         <text name="ads_ws_action_repair" text="Riparazione" />
         <text name="ads_ws_action_overhaul" text="Revisione" />
+        <text name="ads_ws_button_log" text="Registro" />
 
         <text name="ads_ws_age_unit" text="mesi" />
         <text name="ads_ws_hours_unit" text="ore" />
@@ -75,8 +76,13 @@
         <text name="ads_ws_button_price_format" text="%s (%s)" />
         <text name="ads_ws_info_nothing_to_repair_title" text="Niente da riparare" />
         <text name="ads_ws_info_nothing_to_repair_text" text="Seleziona dall'elenco uno o più elementi da riparare." />
+        
+        <text name="ads_ws_confirm_instant_inspection_title" text="Conferma ispezione immediata" />
+        <text name="ads_ws_confirm_instant_inspection_text" text="Ciò ispezionerà istantaneamente il veicolo e rivelerà tutti i guasti nascosti.\n\nPrezzo: {price}\nDurata: {duration}\nTermine: {time}" />
+
         <text name="ads_ws_confirm_inspection_title" text="Confermare l'ispezione" />
-        <text name="ads_ws_confirm_inspection_text" text="L'ispezione ti consentirà di individuare guasti nascosti e di valutare approssimativamente il livello delle condizioni tecniche.\n\nPrezzo: {price}\nDurata: {duration}\nTermine: {time}" />
+        <text name="ads_ws_confirm_inspection_text" text="L'ispezione ti consentirà di individuare guasti nascosti e di valutare approssimativamente il livello delle condizioni tecniche.\n\nPrezzo: {price}\nDurata: {duration}\nTermine: {time}\n\nL'ispezione rapida richiede poco tempo, ma a differenza di un'ispezione approfondita, non è in grado di rilevare guasti nelle fasi iniziali.\n\nPrezzo: {q_price}\nDurata: {q_duration}\nTermine: {q_time}\n" />
+        
         <text name="ads_ws_confirm_maintenance_title" text="Conferma manutenzione" />
         <text name="ads_ws_confirm_maintenance_text" text="La manutenzione ripristinerà il livello di assistenza tecnica al massimo. Inoltre, verranno ispezionate le condizioni tecniche del veicolo.\n\nPrezzo: {price}\nDurata: {duration}\nTermine: {time}\n\nSeleziona la qualità dei ricambi per questa procedura. L'utilizzo di ricambi aftermarket più economici può ridurre l’affidabilità del veicolo nel tempo.\n\n Prezzo dei ricambi aftermarket: {aftermarket_price}" />
         <text name="ads_ws_confirm_repair_title" text="Conferma riparazione" />
@@ -86,6 +92,33 @@
         <text name="ads_ws_option_genuine_parts" text="Ricambi originali" />
         <text name="ads_ws_option_aftermarket_parts" text="Ricambi aftermarket" />
 
+        <text name="ads_ws_option_quick_inspection" text="Ispezione rapida"/>
+        <text name="ads_ws_option_thorough_inspection" text="Ispezione approfondita"/>
+
+        <!-- LOG SECTION -->
+        <text name="ads_log_header_title" text="Registro manutenzione"/>
+        <text name="ads_log_title" text="Registro manutenzione tecnica"/>
+        <text name="ads_log_total_cost_title" text="Spese totali"/>
+        <text name="ads_log_cost_per_month_title" text="Costo mensile"/>
+        <text name="ads_log_ownership_months_title" text="Durata del possesso"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Totale guasti riparati"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Intervallo medio guasti"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Intervallo medio manutenzione"/>
+
+        <text name="ads_log_overhaul_desc" text="Revisione effettuata"/>
+        <text name="ads_log_maintenance_desc" text="Manutenzione programmata eseguita (%.1f h)"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Nessun difetto rilevato"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Difetti rilevati: %s"/>
+        <text name="ads_log_repair_desc_generic" text="Riparazione"/>
+
+        <text name="ads_log_date" text="Data"/>
+        <text name="ads_log_hours" text="Ore operative"/>
+        <text name="ads_log_type" text="Tipo di lavoro"/>
+        <text name="ads_log_description" text="Descrizione"/>
+        <text name="ads_log_price" text="Costo"/>
+        <text name="ads_log_empty" text="Il registro è vuoto"/>
+
+        <!-- Parts -->
         <text name="ads_breakdowns_part_vehicle" text="Veicolo" />
         <text name="ads_breakdowns_part_engine" text="Motore" />
         <text name="ads_breakdowns_part_turbocharger" text="Turbocompressore" />
@@ -243,6 +276,13 @@
         <text name="ads_spec_last_maintenance_until_format" text="%s fino alle %s" />
         <text name="ads_spec_service_interval_format" text="%s o/h" />
         <text name="ads_spec_maintenance_complete" text="completata" />
+
+        <text name="ads_spec_inspection_issues_detected" text="%s problema/i rilevato/i"/>
+        <text name="ads_spec_inspection_no_issues_detected" text="Nessun problema rilevato"/>
+
+        <text name="ads_spec_workshop_dealer" text="Concessionario"/>
+        <text name="ads_spec_workshop_own" text="Di proprietà"/>
+        <text name="ads_spec_workshop_mobile" text="Mobile"/>
 
         <text name="ads_spec_state_ready" text="Pronto" />
         <text name="ads_spec_state_inspection" text="Ispezione" />

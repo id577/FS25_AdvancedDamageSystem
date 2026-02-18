@@ -15,7 +15,7 @@
         <text name="ads_workshopCloseHour_label" text="Время закрытия мастерской"/>
         <text name="ads_workshopCloseHour_tooltip" text="Час, в который закрывается мастерская. Ремонтные работы будут приостановлены после этого времени."/>
         <text name="ads_engineMaxHeat_label" text="Макс. нагрев двигателя"/>
-        <text name="ads_engineMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого двигателем при максимальной нагрузке. Более высокие значения заставят двигатель нагреваться быстрее."/> 
+        <text name="ads_engineMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого двигателем при максимальной нагрузке. Более высокие значения заставят двигатель нагреваться быстрее."/>
         <text name="ads_transMaxHeat_label" text="Макс. нагрев трансмиссии"/>
         <text name="ads_transMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого трансмиссией при максимальной нагрузке. Более высокие значения заставят трансмиссию нагреваться быстрее."/>
         <text name="ads_dirtInfluence_label" text="Влияние грязи на охлаждение"/>
@@ -40,7 +40,6 @@
         <text name="ads_ws_label_harvest_efficiency" text="Эффективность уборки"/>
         <text name="ads_ws_label_maintainability" text="Ремон-сть"/>
         <text name="ads_ws_label_service_interval" text="Интервал ТО"/>
-
         <text name="ads_ws_label_last_maintenance" text="Последнее ТО"/>
         <text name="ads_ws_label_last_inspection" text="Последний осмотр"/>
 
@@ -57,6 +56,7 @@
         <text name="ads_ws_action_maintenance" text="Техобслуживание"/>
         <text name="ads_ws_action_repair" text="Ремонт"/>
         <text name="ads_ws_action_overhaul" text="Капитальный ремонт"/>
+        <text name="ads_ws_button_log" text="Журнал"/>
 
         <text name="ads_ws_age_unit" text="мес."/>
         <text name="ads_ws_hours_unit" text="ч"/>
@@ -71,20 +71,27 @@
         <text name="ads_ws_task_maintenance" text="Техобслуживание"/>
         <text name="ads_ws_task_repair" text="Ремонт"/>
         <text name="ads_ws_task_overhaul" text="Капремонт"/>
-        <text name="ads_ws_button_log" text="Журнал"/>
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
         <text name="ads_ws_info_nothing_to_repair_title" text="Нечего ремонтировать"/>
         <text name="ads_ws_info_nothing_to_repair_text" text="Пожалуйста, выберите один или несколько элементов для ремонта из списка."/>
+        
+        <text name="ads_ws_confirm_instant_inspection_title" text="Подтвердить мгновенный осмотр"/>
+        <text name="ads_ws_confirm_instant_inspection_text" text="Это мгновенно проверит технику и выявит все скрытые неисправности.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}"/>
+        
         <text name="ads_ws_confirm_inspection_title" text="Подтвердить осмотр"/>
-        <text name="ads_ws_confirm_inspection_text" text="Осмотр позволит выявить скрытые неисправности, а также примерно оценить уровень технического состояния.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}"/>
+        <text name="ads_ws_confirm_inspection_text" text="Осмотр позволит выявить скрытые неисправности, а также примерно оценить уровень технического состояния.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nБыстрый осмотр занимает мало времени, но в отличие от полного, не выявляет неисправности на ранних стадиях.\n\nЦена: {q_price}\nДлительность: {q_duration}\nЗавершится в: {q_time}\n"/>
+        
         <text name="ads_ws_confirm_maintenance_title" text="Подтвердить техобслуживание"/>
-        <text name="ads_ws_confirm_maintenance_text" text="Техобслуживание восстановит уровень технического осблуживания до максимума. Дополнительно будет проведена инспекция технического состояния.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
+        <text name="ads_ws_confirm_maintenance_text" text="Техобслуживание восстановит уровень технического обслуживания до максимума. Дополнительно будет проведена инспекция технического состояния.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
         <text name="ads_ws_confirm_repair_title" text="Подтвердить ремонт"/>
         <text name="ads_ws_confirm_repair_text" text="Будут устранены выбранные неисправности ({price}).\n\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
         <text name="ads_ws_confirm_overhaul_title" text="Подтвердить капитальный ремонт"/>
         <text name="ads_ws_confirm_overhaul_text" text="Капитальный ремонт устранит все неисправности, выполнит ТО и улучшит техническое состояние техники.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
         <text name="ads_ws_option_genuine_parts" text="Оригинальные запчасти"/>
         <text name="ads_ws_option_aftermarket_parts" text="Неоригинальные запчасти"/>
+        
+        <text name="ads_ws_option_quick_inspection" text="Быстрый осмотр"/>
+        <text name="ads_ws_option_thorough_inspection" text="Полный осмотр"/>
 
         <text name="ads_log_header_title" text="Журнал обслуживания"/>
         <text name="ads_log_title" text="Журнал технического обслуживания"/>
@@ -109,6 +116,7 @@
         <text name="ads_log_empty" text="В журнале нет записей"/>
 
         <text name="ads_breakdowns_part_vehicle" text="Техника"/>
+        <!-- ... (standard breakdown parts remain the same) ... -->
         <text name="ads_breakdowns_part_engine" text="Двигатель"/>
         <text name="ads_breakdowns_part_ecu" text="ЭБУ"/>
         <text name="ads_breakdowns_part_turbocharger" text="Турбокомпрессор"/>
@@ -135,6 +143,7 @@
 
         <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Накопленная усталость от многих лет тяжелой работы. Незначительный, необратимый износ ключевых компонентов немного снижает общую производительность."/>
 
+        <!-- Breakdowns descriptions retained from your Russian file -->
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Режим защиты двигателя"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="Аварийный режим двигателя! Мощность снижена!"/>
         <text name="ads_breakdowns_overheat_protection_stage2_description" text="Режим защиты двигателя"/>
@@ -194,9 +203,9 @@
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Отказ гидронасоса Powershift. Трансмиссия застряла в нейтральном положении."/>
 
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Термостат начинает залипать. Вариатор может медленно прогреваться или работать немного горячее нормы под нагрузкой."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Термостат сильно залипает. Температура вариатора нестабильна, что ведет к риску перегрева при длительной работе."/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Термостат частично заклинил. Температура вариатора нестабильна, что ведет к риску перегрева при длительной работе."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="Термостат практически не функционирует. Вариатор склонен к сильному перегреву, что может вызвать внутренние повреждения."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Термостат полностью отказал, вероятно, заклинил в случайном положении. Эксплуатация невозможна."/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Термостат полностью отказал, вероятно, заклинил в закрытом положении. Охлаждение минимально, что ведет к быстрому и опасному перегреву вариатора."/>
 
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Термостат двигателя начинает выходить из строя. Двигатель дольше прогревается до оптимальной температуры или работает немного горячее."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Плохая реакция термостата. Регулирование температуры двигателя нестабильно, что увеличивает износ."/>
@@ -245,7 +254,7 @@
         <text name="ads_breakdown_at_progress_message" text="в процессе"/>
 
         <text name="ads_cold_engine_message" text="Двигатель холодный! Высокие обороты вызывают износ!"/>
-        
+                 
         <text name="ads_spec_this_month" text="В этом месяце"/>
         <text name="ads_spec_months_ago" text="мес. назад"/>
         <text name="ads_spec_never" text="Никогда"/>
@@ -266,6 +275,7 @@
         <text name="ads_spec_last_maintenance_until_format" text="%s до %s"/>
         <text name="ads_spec_maintenance_complete" text="завершен(о)"/>
         <text name="ads_spec_service_interval_format" text="%s м/ч"/>
+
         <text name="ads_spec_inspection_issues_detected" text="Обнаружено %s неисправность(ей)"/>
         <text name="ads_spec_inspection_no_issues_detected" text="Неисправности не обнаружены"/>
 

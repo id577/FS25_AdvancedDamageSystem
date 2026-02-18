@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <l10n>
 	<texts>
 		<text name="ads_serviceWear_label" text="Servicenivå Slitagehastighet"/>
@@ -53,6 +52,7 @@
 		<text name="ads_ws_action_maintenance" text="Underhåll"/>
 		<text name="ads_ws_action_repair" text="Reparera"/>
 		<text name="ads_ws_action_overhaul" text="Total  översyn"/>
+		<text name="ads_ws_button_log" text="Underhållslogg"/>
 		<text name="ads_ws_age_unit" text="Månader"/>
 		<text name="ads_ws_hours_unit" text="t"/>
 		<text name="ads_ws_button_ok" text="OK"/>
@@ -69,8 +69,13 @@
 		<text name="ads_ws_button_price_format" text="%s (%s)"/>
 		<text name="ads_ws_info_nothing_to_repair_title" text="Inget att reparera"/>
 		<text name="ads_ws_info_nothing_to_repair_text" text="Vänligen välj en eller flera saker att reparera från listan."/>
+		
+		<text name="ads_ws_confirm_instant_inspection_title" text="Bekräfta direkt besiktning"/>
+		<text name="ads_ws_confirm_instant_inspection_text" text="Detta inspekterar fordonet omedelbart och avslöjar alla dolda fel.\n\nPris: {price}\ntidsåtgång: {duration}\nKlar: {time}"/>
+
 		<text name="ads_ws_confirm_inspection_title" text="Bekräfta besiktning"/>
-		<text name="ads_ws_confirm_inspection_text" text="Besiktningen identifierar gömda fel och gör även en grov uppskattning av generellt tekniskt skick.\n\nPris: {price}\ntidsåtgång: {duration}\nKlar: {time}"/>
+		<text name="ads_ws_confirm_inspection_text" text="Besiktningen identifierar gömda fel och gör även en grov uppskattning av generellt tekniskt skick.\n\nPris: {price}\ntidsåtgång: {duration}\nKlar: {time}\n\nEn snabb besiktning tar kort tid, men till skillnad från en grundlig besiktning kan den inte upptäcka fel i de tidigaste skedena.\n\nPris: {q_price}\ntidsåtgång: {q_duration}\nKlar: {q_time}\n"/>
+		
 		<text name="ads_ws_confirm_maintenance_title" text="Bekräfta underhåll"/>
 		<text name="ads_ws_confirm_maintenance_text" text="Underhåll kommer återställa teknisk servicenivå till  max. Dessutom kommer fordonets tekniska skick besiktigas.\n\nPris: {price}\nTidsåtgång: {duration}\nKlar: {time}\n&#xA;        Använd originaldelar för detta arbete. Användning av piratdelar innebär en risk för defekter.\n\n Piratdelar pris: {aftermarket_price}"/>
 		<text name="ads_ws_confirm_repair_title" text="Bekräfta reparation"/>
@@ -79,6 +84,32 @@
 		<text name="ads_ws_confirm_overhaul_text" text="Total översyn kommer åtgärda alla fel, utföra underhåll och förbättra det tekniska skicket på fordonet.\n\nPris: {price}\nTidsåtgång: {duration}\nKlar: {time}\n&#xA;        Använd originaldelar för detta arbete. Användning av piratdelar innebär en risk för defekter.\n\n Piratdelar pris: {aftermarket_price}"/>
 		<text name="ads_ws_option_genuine_parts" text="Originaldelar"/>
 		<text name="ads_ws_option_aftermarket_parts" text="Piratdelar"/>
+
+        <text name="ads_ws_option_quick_inspection" text="Snabb besiktning"/>
+        <text name="ads_ws_option_thorough_inspection" text="Grundlig besiktning"/>
+
+        <text name="ads_log_header_title" text="Underhållslogg"/>
+        <text name="ads_log_title" text="Teknisk underhållslogg"/>
+        <text name="ads_log_total_cost_title" text="Totala utgifter"/>
+        <text name="ads_log_cost_per_month_title" text="Månadskostnad"/>
+        <text name="ads_log_ownership_months_title" text="Ägandetid"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Totalt antal åtgärdade fel"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Genomsnittligt felintervall"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Genomsnittligt underhållsintervall"/>
+
+        <text name="ads_log_overhaul_desc" text="Översyn utförd"/>
+        <text name="ads_log_maintenance_desc" text="Planerat underhåll utfört (%.1f h)"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Inga fel upptäcktes"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Fel upptäckta: %s"/>
+        <text name="ads_log_repair_desc_generic" text="Reparera"/>
+
+        <text name="ads_log_date" text="Datum"/>
+        <text name="ads_log_hours" text="Driftstimmar"/>
+        <text name="ads_log_type" text="Arbetstyp"/>
+        <text name="ads_log_description" text="Beskrivning"/>
+        <text name="ads_log_price" text="Kostnad"/>
+        <text name="ads_log_empty" text="Loggen är tom"/>
+
 		<text name="ads_breakdowns_part_vehicle" text="Fordon"/>
 		<text name="ads_breakdowns_part_engine" text="Motor"/>
 		<text name="ads_breakdowns_part_turbocharger" text="Turbo"/>
@@ -213,6 +244,14 @@
 		<text name="ads_spec_last_maintenance_until_format" text="%s till %s"/>
 		<text name="ads_spec_service_interval_format" text="%s d/t"/>
 		<text name="ads_spec_maintenance_complete" text="slutförd"/>
+
+        <text name="ads_spec_inspection_issues_detected" text="%s problem upptäcktes"/>
+        <text name="ads_spec_inspection_no_issues_detected" text="Inga problem upptäcktes"/>
+
+        <text name="ads_spec_workshop_dealer" text="Återförsäljare"/>
+        <text name="ads_spec_workshop_own" text="Egen"/>
+        <text name="ads_spec_workshop_mobile" text="Mobil"/>
+
 		<text name="ads_spec_state_ready" text="Klar"/>
 		<text name="ads_spec_state_inspection" text="Besiktning"/>
 		<text name="ads_spec_state_maintenance" text="Underhåll"/>
