@@ -4,8 +4,8 @@ source(g_currentModDirectory .. "scripts/ADS_Config.lua")
 source(g_currentModDirectory .. "scripts/ADS_Utils.lua")
 source(g_currentModDirectory .. "scripts/ADS_Breakdowns.lua")
 source(g_currentModDirectory .. "scripts/ADS_WorkshopDialog.lua")
-source(g_currentModDirectory .. "scripts/ADS_maintenanceLogDialog.lua")
-source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
+source(g_currentModDirectory .. "scripts/ADS_MaintenanceLogDialog.lua")
+source(g_currentModDirectory .. "scripts/ADS_hud.lua")
 source(g_currentModDirectory .. "scripts/ADS_InGameSettings.lua")
 source(g_currentModDirectory .. "events/ADS_VehicleChangeStatusEvent.lua")
 source(g_currentModDirectory .. "events/ADS_WorkshopChangeStatusEvent.lua")
@@ -79,7 +79,7 @@ end
 function ADS_Main:onStartMission()
 
     ADS_WorkshopDialog.register()
-    ADS_maintenanceLogDialog.register()
+    ADS_MaintenanceLogDialog.register()
 
     local mission = g_currentMission
     ADS_Main.hud = ADS_Hud:new()

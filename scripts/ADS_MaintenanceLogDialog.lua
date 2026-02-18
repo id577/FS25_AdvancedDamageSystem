@@ -1,7 +1,7 @@
-ADS_maintenanceLogDialog = {}
-ADS_maintenanceLogDialog.INSTANCE = nil
+ADS_MaintenanceLogDialog = {}
+ADS_MaintenanceLogDialog.INSTANCE = nil
 
-local ADS_maintenanceLogDialog_mt = Class(ADS_maintenanceLogDialog, MessageDialog)
+local ADS_MaintenanceLogDialog_mt = Class(ADS_MaintenanceLogDialog, MessageDialog)
 local modDirectory = g_currentModDirectory
 
 local function log_dbg(...)
@@ -14,32 +14,32 @@ local function log_dbg(...)
     end
 end
 
-function ADS_maintenanceLogDialog.register()
-    local dialog = ADS_maintenanceLogDialog.new()
-    g_gui:loadGui(modDirectory .. "gui/ADS_maintenanceLogDialog.xml", "ADS_maintenanceLogDialog", dialog)
-    ADS_maintenanceLogDialog.INSTANCE = dialog
+function ADS_MaintenanceLogDialog.register()
+    local dialog = ADS_MaintenanceLogDialog.new()
+    g_gui:loadGui(modDirectory .. "gui/ADS_MaintenanceLogDialog.xml", "ADS_MaintenanceLogDialog", dialog)
+    ADS_MaintenanceLogDialog.INSTANCE = dialog
 end
 
-function ADS_maintenanceLogDialog.new(target, customMt)
-    local dialog = MessageDialog.new(target, customMt or ADS_maintenanceLogDialog_mt)
+function ADS_MaintenanceLogDialog.new(target, customMt)
+    local dialog = MessageDialog.new(target, customMt or ADS_MaintenanceLogDialog_mt)
     dialog.vehicle = nil
     return dialog
 end
 
-function ADS_maintenanceLogDialog.show(vehicle)
-    if ADS_maintenanceLogDialog.INSTANCE == nil then ADS_maintenanceLogDialog.register() end
+function ADS_MaintenanceLogDialog.show(vehicle)
+    if ADS_MaintenanceLogDialog.INSTANCE == nil then ADS_MaintenanceLogDialog.register() end
     if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then return end
     
-    local dialog = ADS_maintenanceLogDialog.INSTANCE
+    local dialog = ADS_MaintenanceLogDialog.INSTANCE
     dialog.vehicle = vehicle
     
     dialog.logData = vehicle.spec_AdvancedDamageSystem.maintenanceLog or {}
     
     dialog:updateScreen()
-    g_gui:showDialog("ADS_maintenanceLogDialog")
+    g_gui:showDialog("ADS_MaintenanceLogDialog")
 end
 
-function ADS_maintenanceLogDialog:updateScreen()
+function ADS_MaintenanceLogDialog:updateScreen()
     if self.vehicle == nil then return end
     log_dbg("Updating log Screen...")
 
@@ -109,11 +109,11 @@ end
 -- LIST DELEGATE METHODS
 -- ====================================================================
 
-function ADS_maintenanceLogDialog:getNumberOfItemsInSection(list, section)
+function ADS_MaintenanceLogDialog:getNumberOfItemsInSection(list, section)
     return #self.logData
 end
 
-function ADS_maintenanceLogDialog:populateCellForItemInSection(list, section, index, cell)
+function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, index, cell)
     local entryIndex = #self.logData - index + 1
     local entry = self.logData[entryIndex]
     local spec = self.vehicle.spec_AdvancedDamageSystem
@@ -221,15 +221,15 @@ end
 -- CALLBACKS & EVENTS
 -- ====================================================================
 
-function ADS_maintenanceLogDialog:onClickBack()
+function ADS_MaintenanceLogDialog:onClickBack()
     self:close()
 end
 
-function ADS_maintenanceLogDialog:onOpen(superFunc)
+function ADS_MaintenanceLogDialog:onOpen(superFunc)
     g_messageCenter:subscribe(MessageType.MONEY_CHANGED, self.updateScreen, self)
 end
 
-function ADS_maintenanceLogDialog:onClose(superFunc)
+function ADS_MaintenanceLogDialog:onClose(superFunc)
     self.vehicle = nil
     self.logData = nil
     g_messageCenter:unsubscribeAll(self)

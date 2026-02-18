@@ -72,7 +72,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_permanent",
                 description = "ads_breakdowns_general_wear_and_tear_stage1_description",
                 detectionChance = 0.0,
-                progressMultiplier = 0.007,
+                progressMultiplier = 0.2,
                 repairPrice = 0.0,
                 effects = {
                     { 

@@ -1742,6 +1742,8 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
 
         end
 
+        self:recalculateAndApplyEffects()
+
         AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
         spec.lastInspectedPower = (spec.activeEffects.ENGINE_TORQUE_MODIFIER and (1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value)) or 1
         spec.lastInspectedBrake = (spec.activeEffects.BRAKE_FORCE_MODIFIER and (1 + spec.activeEffects.BRAKE_FORCE_MODIFIER.value)) or 1
