@@ -7,6 +7,7 @@ AdvancedDamageSystem = {
     STATUS = {
         READY = 'ads_spec_state_ready',
         INSPECTION = 'ads_spec_state_inspection',
+        QUICK_INSPECTION = 'ads_spec_state_quick_inspection',
         MAINTENANCE = 'ads_spec_state_maintenance',
         REPAIR = 'ads_spec_state_repair',
         OVERHAUL = 'ads_spec_state_overhaul',
@@ -1651,7 +1652,7 @@ end
 
 --------------------- maintenance --------------------------------
 
-function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount, isAftermarketParts)
+function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount, selectedOption)
     local spec = self.spec_AdvancedDamageSystem
     local states = AdvancedDamageSystem.STATUS
     local vehicleState = self:getCurrentStatus()
@@ -1674,7 +1675,11 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
                 if C.INSTANT_INSPECTION then
                     totalTimeMs = 1000
                 else
-                    totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER 
+                    if selectedOption then
+                        totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER 
+                    else
+                        totalTimeMs = C.INSPECTION_TIME * C.MAINTENANCE_DURATION_MULTIPLIER / 10
+                    end
                 end
             end
             local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
@@ -1682,7 +1687,9 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
                 if not breakdown.isVisible then
                     local chance = breakdownRegistry[id].stages[breakdown.stage].detectionChance
                     if math.random() < chance then
-                        breakdown.isVisible = true
+                        if selectedOption or breakdown.stage > 1 then
+                            breakdown.isVisible = true
+                        end
                     end
                 end
             end
@@ -1724,7 +1731,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
             if self:getConditionLevel() < spec.baseConditionLevel then
                 local missingCondition = spec.baseConditionLevel - self:getConditionLevel()
                 local minRestore, maxRestore = C.OVERHAUL_MIN_CONDITION_RESTORE, C.OVERHAUL_MAX_CONDITION_RESTORE
-                if isAftermarketParts then
+                if selectedOption then
                     minRestore = minRestore / 3
                 end
                 local ageFactor = math.max(math.log10(self.age), 1)
@@ -1749,7 +1756,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
         end
         
 
-        if isAftermarketParts then
+        if selectedOption then
             local chance = C.AFTERMARKETS_PARTS_BREAKDOWN_CHANCE
             if type == AdvancedDamageSystem.STATUS.REPAIR then
                 chance = math.min(chance + (breadownsCount * 0.33), 0.8)
@@ -2230,12 +2237,17 @@ function AdvancedDamageSystem.calculateMaintenanceDuration(vehicle, maintenanceT
         workDurationHours = spec.maintenanceTimer / 3600000
     else
         local totalDurationMs = 0
-        if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
+        if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION or maintenanceType == AdvancedDamageSystem.STATUS.QUICK_INSPECTION then
             if C.INSTANT_INSPECTION then
                 totalDurationMs = 60000
             else
                 totalDurationMs = C.INSPECTION_TIME / spec.maintainability
             end
+
+            if maintenanceType == AdvancedDamageSystem.STATUS.QUICK_INSPECTION and not C.INSTANT_INSPECTION then
+                totalDurationMs = totalDurationMs / 8
+            end
+            
         elseif maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
             totalDurationMs = C.MAINTENANCE_TIME / spec.maintainability
         elseif maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then

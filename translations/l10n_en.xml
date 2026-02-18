@@ -75,8 +75,11 @@
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
         <text name="ads_ws_info_nothing_to_repair_title" text="Nothing to Repair"/>
         <text name="ads_ws_info_nothing_to_repair_text" text="Please select one or more items to repair from the list."/>
+        <text name="ads_ws_confirm_instant_inspection_title" text="Confirm Instant Inspection"/>
+        <text name="ads_ws_confirm_instant_inspection_text" text="This will instantly inspect the vehicle and reveal all hidden faults.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
         <text name="ads_ws_confirm_inspection_title" text="Confirm Inspection"/>
-        <text name="ads_ws_confirm_inspection_text" text="The inspection will allow you to identify hidden faults, as well as roughly assess the level of its technical condition.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}"/>
+        <text name="ads_ws_confirm_inspection_text" text="The inspection will allow you to identify hidden faults, as well as roughly assess the level of its technical condition.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}\n
+        Quick inspection takes a short time, but unlike a thorough inspection, it cannot detect faults at the earliest stages \n\nPrice: {q_price}\nDuration: {q_duration}\nFinishes at: {q_time}\n"/>
         <text name="ads_ws_confirm_maintenance_title" text="Confirm Maintenance"/>
         <text name="ads_ws_confirm_maintenance_text" text="Maintenance will restore the level of technical service to the maximum. In addition, the technical condition of the vehicle will be inspected.\n\nPrice: {price}\nDuration: {duration}\nFinishes at: {time}\n
         Choose the quality of spare parts for this procedure. Using cheaper aftermarket parts comes with a risk of defects.\n\n Aftermarket parts price: {aftermarket_price}"/>
@@ -88,6 +91,9 @@
         Choose the quality of spare parts for this procedure. Using cheaper aftermarket parts comes with a risk of defects.\n\n Aftermarket parts price: {aftermarket_price}"/>
         <text name="ads_ws_option_genuine_parts" text="Genuine Parts"/>
         <text name="ads_ws_option_aftermarket_parts" text="Aftermarket Parts"/>
+
+        <text name="ads_ws_option_quick_inspection" text="Quick Inspection"/>
+        <text name="ads_ws_option_thorough_inspection" text="Thorough Inspection"/>
 
         <text name="ads_log_header_title" text="Maintenance Log"/>
         <text name="ads_log_title" text="Technical Maintenance Log"/>

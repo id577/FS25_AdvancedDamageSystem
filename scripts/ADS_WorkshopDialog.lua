@@ -278,6 +278,7 @@ end
 
 function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, dialogTitleKey, dialogTextKey)
     local price = self.vehicle:getMaintenancePriceByType(maintenanceType) * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
+    local q_price = price / 8
     local finalDialogText = g_i18n:getText(dialogTextKey)
 
     finalDialogText = string.gsub(finalDialogText, "\\n", "\n")
@@ -285,17 +286,31 @@ function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, d
     finalDialogText = string.gsub(finalDialogText, "{aftermarket_price}", g_i18n:formatMoney(price / 1.8))
     finalDialogText = string.gsub(finalDialogText, "{time}", self.vehicle:getFormattedMaintenanceFinishTimeText(maintenanceType, self.workshopType))
     finalDialogText = string.gsub(finalDialogText, "{duration}", self.vehicle:getFormattedMaintenanceDurationText(maintenanceType, self.workshopType))
+    finalDialogText = string.gsub(finalDialogText, "{q_duration}", self.vehicle:getFormattedMaintenanceDurationText(AdvancedDamageSystem.STATUS.QUICK_INSPECTION, self.workshopType))
+    finalDialogText = string.gsub(finalDialogText, "{q_price}", g_i18n:formatMoney(q_price))
+    finalDialogText = string.gsub(finalDialogText, "{q_time}", self.vehicle:getFormattedMaintenanceFinishTimeText(AdvancedDamageSystem.STATUS.QUICK_INSPECTION, self.workshopType))
 
 
     if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
-        YesNoDialog.show(
-            ADS_WorkshopDialog.maintanceCallback,
-            nil,
-            finalDialogText,
-            g_i18n:getText(dialogTitleKey),
-            nil, nil, nil, nil, nil,
-            { maintenanceType, self.workshopType }
-        )
+        if ADS_Config.MAINTENANCE.INSTANT_INSPECTION then
+            YesNoDialog.show(
+                ADS_WorkshopDialog.maintanceCallback,
+                nil,
+                finalDialogText,
+                g_i18n:getText(dialogTitleKey),
+                nil, nil, nil, nil, nil,
+                { maintenanceType, self.workshopType }
+            )
+        else
+            local options = { g_i18n:getText('ads_ws_option_quick_inspection'), g_i18n:getText('ads_ws_option_thorough_inspection') }        
+            local optionDialog = g_gui:showDialog("OptionDialog")
+            if optionDialog ~= nil then
+                optionDialog.target:setText(finalDialogText)
+                optionDialog.target:setTitle(g_i18n:getText(dialogTitleKey))
+                optionDialog.target:setOptions(options)
+                optionDialog.target:setCallback(ADS_WorkshopDialog.maintanceCallback, nil, { maintenanceType, self.workshopType })
+            end
+        end
     else
         local options = { g_i18n:getText('ads_ws_option_genuine_parts'), g_i18n:getText('ads_ws_option_aftermarket_parts') }        
         local optionDialog = g_gui:showDialog("OptionDialog")
@@ -314,7 +329,11 @@ end
 
 
 function ADS_WorkshopDialog:onClickInspection()
-    self:showMaintenanceConfirmationDialog(AdvancedDamageSystem.STATUS.INSPECTION, "ads_ws_confirm_inspection_title", "ads_ws_confirm_inspection_text")
+    if ADS_Config.MAINTENANCE.INSTANT_INSPECTION then
+        self:showMaintenanceConfirmationDialog(AdvancedDamageSystem.STATUS.INSPECTION, "ads_ws_confirm_instant_inspection_title", "ads_ws_confirm_instant_inspection_text")
+    else
+        self:showMaintenanceConfirmationDialog(AdvancedDamageSystem.STATUS.INSPECTION, "ads_ws_confirm_inspection_title", "ads_ws_confirm_inspection_text")
+    end
 end
 
 
@@ -360,9 +379,9 @@ function ADS_WorkshopDialog.maintanceCallback(option, args)
         end
     end
 
-    local isAftermarketParts = (option == 2)
+    local selectedOption = (option == 2)
     local price = AdvancedDamageSystem.calculateMaintenancePrice(vehicle, type) * (g_workshopScreen.isOwnWorkshop and 0.8 or 1)
-    if isAftermarketParts then price = price / 1.8 end
+    if selectedOption then price = price / 1.8 end
     
     if g_currentMission:getMoney() < price then
         InfoDialog.show(g_i18n:getText("shop_messageNotEnoughMoneyToBuy"))
@@ -372,8 +391,8 @@ function ADS_WorkshopDialog.maintanceCallback(option, args)
     local breakdownCount = #selectedBreakdowns
     local info = ""
 
-    vehicle:addEntryToMaintenanceLog(type, price, selectedBreakdowns, isAftermarketParts, info)
-    vehicle:initMaintenance(type, workshopType, breakdownCount, isAftermarketParts)
+    vehicle:addEntryToMaintenanceLog(type, price, selectedBreakdowns, selectedOption, info)
+    vehicle:initMaintenance(type, workshopType, breakdownCount, selectedOption)
     g_currentMission:addMoney(-1 * price, vehicle:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
     dialog:updateScreen()
 end

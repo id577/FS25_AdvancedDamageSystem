@@ -961,7 +961,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.44,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.05, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.3, aggregation = "min"}
                 }
             },
             {
@@ -971,7 +971,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.5,
                 repairPrice = 0.88,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
@@ -984,7 +984,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.5,
                 repairPrice = 1.76,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.8, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -997,7 +997,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 3.52,
                 effects = {
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.5, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_STUCK_EFFECT", value = -1, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false },
@@ -1837,6 +1837,24 @@ ADS_Breakdowns.EffectApplicators.CVT_THERMOSTAT_HEALTH_MODIFIER = {
         log_dbg("Removing CVT_THERMOSTAT_HEALTH_MODIFIER effect.")
         local spec = vehicle.spec_AdvancedDamageSystem
         spec.transmissionThermostatHealth = 1.0
+    end
+}
+
+----------------- CVT_THERMOSTAT_STUCK_EFFECT --------------------
+ADS_Breakdowns.EffectApplicators.CVT_THERMOSTAT_STUCK_EFFECT = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying CVT_THERMOSTAT_STUCK_EFFECT")
+        local spec = vehicle.spec_AdvancedDamageSystem
+
+        if spec.transmissionThermostatStuckedPosition == nil or spec.transmissionThermostatStuckedPosition < 0 then
+            spec.transmissionThermostatStuckedPosition = spec.transmissionThermostatState
+        end
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing CVT_THERMOSTAT_STUCK_EFFECT")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.transmissionThermostatStuckedPosition = nil
     end
 }
 

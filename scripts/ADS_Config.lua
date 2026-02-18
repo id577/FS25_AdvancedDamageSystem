@@ -323,6 +323,7 @@ ADS_Config = {
             OLIVER          = {0.85, 1.25}, 
             ALLISCHALMERS   = {0.85, 1.25},
 
+
             LIZARD          = {1.00, 1.00},
             GIANTS          = {1.00, 1.00},
             NONE            = {1.00, 1.00}
