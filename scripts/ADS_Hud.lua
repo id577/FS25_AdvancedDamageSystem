@@ -240,6 +240,9 @@ function ADS_Hud:drawDashboard()
         end
 
     local engineTemp, transTemp, motorLoad = spec.engineTemperature, spec.transmissionTemperature, vehicle:getMotorLoadPercentage()
+    if not vehicle:getIsMotorStarted() then
+        motorLoad = 0
+    end
 
     if vehicle.spec_CVTaddon ~= nil and vehicle.spec_CVTaddon.CVTcfgExists then
         transTemp = vehicle.spec_motorized.motorTemperature.value
@@ -513,7 +516,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     currentY = currentY - panel.lineHeight
 
     renderText(col3_x, currentY, textSettings.normalSize, string.format("State/Workshop:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%s / %s", g_i18n:getText(spec.currentState), spec.workshopType))
+    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%s / %s", g_i18n:getText(spec.currentState), g_i18n:getText(spec.workshopType)))
     currentY = currentY - panel.lineHeight
 
     renderText(col3_x, currentY, textSettings.normalSize, string.format("Timer:"))

@@ -71,6 +71,7 @@
         <text name="ads_ws_task_maintenance" text="Техобслуживание"/>
         <text name="ads_ws_task_repair" text="Ремонт"/>
         <text name="ads_ws_task_overhaul" text="Капремонт"/>
+        <text name="ads_ws_button_log" text="Журнал"/>
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
         <text name="ads_ws_info_nothing_to_repair_title" text="Нечего ремонтировать"/>
         <text name="ads_ws_info_nothing_to_repair_text" text="Пожалуйста, выберите один или несколько элементов для ремонта из списка."/>
@@ -85,8 +86,31 @@
         <text name="ads_ws_option_genuine_parts" text="Оригинальные запчасти"/>
         <text name="ads_ws_option_aftermarket_parts" text="Неоригинальные запчасти"/>
 
+        <text name="ads_log_header_title" text="Журнал обслуживания"/>
+        <text name="ads_log_title" text="Журнал технического обслуживания"/>
+        <text name="ads_log_total_cost_title" text="Потрачено всего"/>
+        <text name="ads_log_cost_per_month_title" text="Стоим. содерж. в месяц"/>
+        <text name="ads_log_ownership_months_title" text="Срок владения"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Всего устранено поломок"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Сред. интервал поломок"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Сред. интервал ТО"/>
+
+        <text name="ads_log_overhaul_desc" text="Произведен капитальный ремонт"/>
+        <text name="ads_log_maintenance_desc" text="Произведено плановое ТО (%.1f м.ч.)"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Поломок не выявлено"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Обнаружены неисправности: %s"/>
+        <text name="ads_log_repair_desc_generic" text="Ремонт"/>
+
+        <text name="ads_log_date" text="Дата"/>
+        <text name="ads_log_hours" text="Рабочие часы"/>
+        <text name="ads_log_type" text="Вид работ"/>
+        <text name="ads_log_description" text="Описание"/>
+        <text name="ads_log_price" text="Стоим. работ"/>
+        <text name="ads_log_empty" text="В журнале нет записей"/>
+
         <text name="ads_breakdowns_part_vehicle" text="Техника"/>
         <text name="ads_breakdowns_part_engine" text="Двигатель"/>
+        <text name="ads_breakdowns_part_ecu" text="ЭБУ"/>
         <text name="ads_breakdowns_part_turbocharger" text="Турбокомпрессор"/>
         <text name="ads_breakdowns_part_fuel_pump" text="Топливный насос"/>
         <text name="ads_breakdowns_part_fuel_injectors" text="Топливные форсунки"/>
@@ -244,6 +268,10 @@
         <text name="ads_spec_service_interval_format" text="%s м/ч"/>
         <text name="ads_spec_inspection_issues_detected" text="Обнаружено %s неисправность(ей)"/>
         <text name="ads_spec_inspection_no_issues_detected" text="Неисправности не обнаружены"/>
+
+        <text name="ads_spec_workshop_dealer" text="Дилер"/>
+        <text name="ads_spec_workshop_own" text="Собственный"/>
+        <text name="ads_spec_workshop_mobile" text="Мобильный"/>
 
         <text name="ads_spec_state_ready" text="Готов"/>
         <text name="ads_spec_state_inspection" text="Осмотр"/>

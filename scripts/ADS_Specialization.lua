@@ -158,7 +158,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#condition", "Condition Level")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#breakdowns", "Active Breakdowns")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#state", "Current State")
-    schemaSavegame:register(XMLValueType.FLOAT, baseKey .. "#maintenanceTimer", "Maintenance Timer")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#maintenanceTimer", "Maintenance Timer")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#engineTemperature", "Engine Temperature")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionTemperature", "Transmission Temperature")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#lastServiceDate", "Last Service Date")
@@ -166,9 +166,21 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lastServiceOpHours", "Last Service Operating Hours")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#lastInspCond", "Last Inspected Condition State")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#lastInspServ", "Last Inspected Service State")
-    schemaSavegame:register(XMLValueType.FLOAT, baseKey .. "#lastInspPwr", "Last Inspected Power")
-    schemaSavegame:register(XMLValueType.FLOAT, baseKey .. "#lastInspBrk", "Last Inspected Brake")
-    schemaSavegame:register(XMLValueType.FLOAT, baseKey .. "#lastInspYld", "Last Inspected Yield Reduction")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lastInspPwr", "Last Inspected Power")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lastInspBrk", "Last Inspected Brake")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lastInspYld", "Last Inspected Yield Reduction")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#purchaseDate", "Purchase Month")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#purchaseHours", "Purchase Hours")
+
+    local logKey = baseKey .. ".maintenanceLog.entry(?)"
+    schemaSavegame:register(XMLValueType.INT,    logKey .. "#id", "Entry ID")
+    schemaSavegame:register(XMLValueType.STRING, logKey .. "#type", "Maintenance Type")
+    schemaSavegame:register(XMLValueType.FLOAT,  logKey .. "#price", "Price")
+    schemaSavegame:register(XMLValueType.STRING, logKey .. "#date", "Date")
+    schemaSavegame:register(XMLValueType.FLOAT,  logKey .. "#hours", "Operating Hours")
+    schemaSavegame:register(XMLValueType.BOOL,   logKey .. "#aftermarket", "Is Aftermarket Parts")
+    schemaSavegame:register(XMLValueType.STRING, logKey .. "#breakdowns", "Selected Breakdowns List")
+    schemaSavegame:register(XMLValueType.STRING, logKey .. "#info", "Additional Info")
     
     schema:setXMLSpecializationType()
 end
@@ -212,6 +224,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "isUnderMaintenance", AdvancedDamageSystem.isUnderMaintenance)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
     SpecializationUtil.registerFunction(vehicleType, "initMaintenance", AdvancedDamageSystem.initMaintenance)
+    SpecializationUtil.registerFunction(vehicleType, "addEntryToMaintenanceLog", AdvancedDamageSystem.addEntryToMaintenanceLog)
     SpecializationUtil.registerFunction(vehicleType, "calculateWearRates", AdvancedDamageSystem.calculateWearRates)
     SpecializationUtil.registerFunction(vehicleType, "checkForNewBreakdown", AdvancedDamageSystem.checkForNewBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "getMaintenancePrice", AdvancedDamageSystem.getMaintenancePrice)
@@ -252,6 +265,27 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower)
         xmlFile:setValue(key .. "#lastInspBrk", spec.lastInspectedBrake)
         xmlFile:setValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction)
+        xmlFile:setValue(key .. "#purchaseDate", AdvancedDamageSystem.serializeDate(spec.purchaseDate))
+        xmlFile:setValue(key .. "#purchaseHours", spec.purchaseHours)
+
+        if spec.maintenanceLog and #spec.maintenanceLog > 0 then
+            for i, entry in ipairs(spec.maintenanceLog) do
+                local entryKey = string.format("%s.maintenanceLog.entry(%d)", key, i - 1)
+                xmlFile:setValue(entryKey .. "#id", entry.id)
+                xmlFile:setValue(entryKey .. "#type", entry.type)
+                xmlFile:setValue(entryKey .. "#price", entry.price)
+                xmlFile:setValue(entryKey .. "#date", AdvancedDamageSystem.serializeDate(entry.date))
+                xmlFile:setValue(entryKey .. "#hours", entry.operatingHours)
+                xmlFile:setValue(entryKey .. "#aftermarket", entry.isAftermarketParts)
+                
+                if entry.selectedBreakdowns and #entry.selectedBreakdowns > 0 then
+                    xmlFile:setValue(entryKey .. "#breakdowns", table.concat(entry.selectedBreakdowns, ","))
+                end
+
+                xmlFile:setValue(entryKey .. "#info", entry.info or "")
+                
+            end
+        end
         
         log_dbg("Saved service:", spec.serviceLevel, "condition:", spec.conditionLevel)
         log_dbg("Saved breakdowns string:", breakdownString)
@@ -281,6 +315,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.activeFunctions = {}
     self.spec_AdvancedDamageSystem.originalFunctions = {}
 
+    self.spec_AdvancedDamageSystem.maintenanceLog = {}
     self.spec_AdvancedDamageSystem.lastServiceDate = {}
     self.spec_AdvancedDamageSystem.lastInspectionDate = {}
     self.spec_AdvancedDamageSystem.lastServiceOperatingHours = 0
@@ -289,6 +324,8 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.lastInspectedPower = 1
     self.spec_AdvancedDamageSystem.lastInspectedBrake = 1
     self.spec_AdvancedDamageSystem.lastInspectedYieldReduction = 1
+    self.spec_AdvancedDamageSystem.purchaseDate = {}
+    self.spec_AdvancedDamageSystem.purchaseHours = 0
     
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
@@ -389,7 +426,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
 
         local serviceDateString = savegame.xmlFile:getValue(key .. "#lastServiceDate", "")
         spec.lastServiceDate = AdvancedDamageSystem.deserializeDate(serviceDateString)
-        
         local inspectionDateString = savegame.xmlFile:getValue(key .. "#lastInspectionDate", "")
         spec.lastInspectionDate = AdvancedDamageSystem.deserializeDate(inspectionDateString)
         spec.lastServiceOperatingHours = savegame.xmlFile:getValue(key .. "#lastServiceOpHours", spec.lastServiceOperatingHours)
@@ -400,6 +436,38 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.lastInspectedPower = savegame.xmlFile:getValue(key .. "#lastInspPwr", spec.lastInspectedPower)
         spec.lastInspectedBrake = savegame.xmlFile:getValue(key .. "#lastInspBrk", spec.lastInspectedBrake)
         spec.lastInspectedYieldReduction = savegame.xmlFile:getValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction)
+        local purchaseDateString = savegame.xmlFile:getValue(key .. "#purchaseDate", "")
+        spec.purchaseDate = AdvancedDamageSystem.deserializeDate(purchaseDateString)
+        spec.purchaseHours = savegame.xmlFile:getValue(key .. "#purchaseHours", spec.purchaseHours)
+
+        spec.maintenanceLog = {}
+        local i = 0
+        while true do
+            local entryKey = string.format("%s.maintenanceLog.entry(%d)", key, i)
+            if not savegame.xmlFile:hasProperty(entryKey) then
+                break
+            end
+
+            local entry = {}
+            entry.id = savegame.xmlFile:getValue(entryKey .. "#id")
+            entry.type = savegame.xmlFile:getValue(entryKey .. "#type")
+            entry.price = savegame.xmlFile:getValue(entryKey .. "#price")
+            entry.date = AdvancedDamageSystem.deserializeDate(savegame.xmlFile:getValue(entryKey .. "#date"))
+            entry.operatingHours = savegame.xmlFile:getValue(entryKey .. "#hours")
+            entry.isAftermarketParts = savegame.xmlFile:getValue(entryKey .. "#aftermarket")
+            entry.info = savegame.xmlFile:getValue(entryKey .. "#info")
+            
+            entry.selectedBreakdowns = {}
+            local breakdownsStr = savegame.xmlFile:getValue(entryKey .. "#breakdowns")
+            if breakdownsStr and breakdownsStr ~= "" then
+                for item in string.gmatch(breakdownsStr, "([^,]+)") do
+                    table.insert(entry.selectedBreakdowns, item)
+                end
+            end
+
+            table.insert(spec.maintenanceLog, entry)
+            i = i + 1
+        end
 
         if spec.serviceLevel == nil then spec.serviceLevel = spec.baseServiceLevel end
         if spec.conditionLevel == nil then spec.conditionLevel = spec.baseConditionLevel end
@@ -415,6 +483,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.lastInspectedPower == nil then spec.lastInspectedPower = 1 end
         if spec.lastInspectedBrake == nil then spec.lastInspectedBrake = 1 end
         if spec.lastInspectedYieldReduction == nil then spec.lastInspectedYieldReduction = 1 end
+        if spec.purchaseDate == nil then spec.purchaseDate = {} end
+        if spec.purchaseHours == nil then spec.purchaseHours = 0 end
 
         local debugLines = {}
         table.insert(debugLines, string.format("--- [AdvancedDamageSystem] Full State Loaded for: %s ---", self:getFullName()))
@@ -434,10 +504,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         table.insert(debugLines, string.format("  - Last Inspected Yield Reduction: %.2f", spec.lastInspectedYieldReduction))
 
         table.insert(debugLines, string.format("  - Active Breakdowns: %s", tableToString(spec.activeBreakdowns)))
+        table.insert(debugLines, string.format("  - Maintenance Log Entries: %d", #spec.maintenanceLog))
         
         local serviceDateStr = "Not set"
         if spec.lastServiceDate and next(spec.lastServiceDate) ~= nil then
-
             serviceDateStr = string.format("%04d-%02d-%02d", spec.lastServiceDate.year or 0, spec.lastServiceDate.month or 0, spec.lastServiceDate.day or 0)
         end
         table.insert(debugLines, string.format("  - Last Service Date: %s", serviceDateStr))
@@ -539,7 +609,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
                 self:setDamageAmount(0.0, true)
                 AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
             elseif self:getDamageAmount() == 0 and self:getOperatingTime() == 0 and spec.serviceLevel == spec.baseServiceLevel and spec.conditionLevel == spec.baseConditionLevel then
-                AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
+                AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)   
             end
 
             --- Updating vehicle's year from Vehicle Years mod
@@ -550,14 +620,18 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
             --- Updating vehicle's reliability and maintainability
             spec.reliability, spec.maintainability = AdvancedDamageSystem.getBrandReliability(self)
+
+            --- Set purchase date for new or used vehicles
+            if spec.purchaseDate == nil or next(spec.purchaseDate) == nil then
+                local env = g_currentMission.environment
+                spec.purchaseDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
+                spec.purchaseHours = self:getFormattedOperatingTime()
+            end
         end
     end
 
-    --- just in case
+    --- just in case, reset damage amount to 0 if it's not
     if self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
-    if self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists then
-        self.spec_CVTaddon.CVTdamage = 0
-    end
 
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
     if spec.year >= 2000 then
@@ -671,7 +745,7 @@ end
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then return end
-
+ 
     self:updateThermalSystems(dt)
 
     if self:isUnderMaintenance() then
@@ -698,7 +772,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     if not motor then return end
 
     local spec = self.spec_AdvancedDamageSystem
-    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle) or (self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists)
+    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
     
     local isMotorStarted = self:getIsMotorStarted()
     local motorLoad = math.max(self:getMotorLoadPercentage(), 0.0)
@@ -716,7 +790,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
 
     if spec.engineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.engineTemperature = eviromentTemp end
     if spec.rawEngineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawEngineTemperature = eviromentTemp end
-    if vehicleHaveCVT and not (self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists) then
+    if vehicleHaveCVT then
         if spec.transmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.transmissionTemperature = eviromentTemp end
         if spec.rawTransmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
     end
@@ -728,12 +802,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     
     local transDebugData = {}
     if vehicleHaveCVT then
-        if self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists then
-            spec.transmissionTemperature = self.spec_motorized.motorTemperature.value
-            spec.rawTransmissionTemperature = self.spec_motorized.motorTemperature.value
-        else
-            transDebugData = self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
-        end
+        transDebugData = self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
     else
         spec.transmissionTemperature = -99
         spec.rawTransmissionTemperature = -99
@@ -776,7 +845,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     spec.engineTemperature = math.max(spec.engineTemperature + alpha * (spec.rawEngineTemperature - spec.engineTemperature), eviromentTemp)
     
     if isMotorStarted and spec.engineTemperature > C.ENGINE_THERMOSTAT_MIN_TEMP then
-        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth)
+        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth, spec.year)
     else
         spec.thermostatState = 0.0
         spec.engTermPID.integral = 0
@@ -841,7 +910,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     spec.transmissionTemperature = math.max(spec.transmissionTemperature + alpha * (spec.rawTransmissionTemperature - spec.transmissionTemperature), eviromentTemp)
 
     if isMotorStarted and spec.transmissionTemperature > C.TRANS_THERMOSTAT_MIN_TEMP then
-        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth)
+        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year)
     else
         spec.transmissionThermostatState = 0.0
         spec.transTermPID.integral = 0
@@ -852,23 +921,60 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
 end
 
 
-function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth)
+function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth, year)
     local C = ADS_Config.THERMAL
     local dtSeconds = dt / 1000
-    
-    local errorTemp = currentTemp - C.PID_TARGET_TEMP
-    local derivative = (errorTemp - pidData.lastError) / dtSeconds
-    local newIntegral = pidData.integral + errorTemp * dtSeconds
 
-    local controlSignal_temp = C.PID_KP * errorTemp + C.PID_KI * newIntegral + C.PID_KD * derivative
-    if not ((controlSignal_temp <= 0 and errorTemp < 0) or (controlSignal_temp >= 1 and errorTemp > 0)) then
-        pidData.integral = math.clamp(newIntegral, -C.PID_MAX_INTEGRAL, C.PID_MAX_INTEGRAL)
+    local isMechanical = year < 2000 
+
+if isMechanical then
+        local startOpenTemp = C.PID_TARGET_TEMP - 10 
+        local fullOpenTemp = C.PID_TARGET_TEMP + 3  
+        local targetPos = (currentTemp - startOpenTemp) / (fullOpenTemp - startOpenTemp)
+        targetPos = math.clamp(targetPos, 0.0, 1.0)
+
+        local waxSpeed = math.clamp(0.025 + (year - 1950) * 0.0006, 0.025, 0.05)
+        waxSpeed = waxSpeed * math.max(0.2, thermostatHealth)
+
+        local currentMechPos = pidData.mechPos or 0.0 
+        local delta = targetPos - currentMechPos
+        local maxMove = waxSpeed * dtSeconds
+            
+        if math.abs(delta) > maxMove then
+            delta = maxMove * (delta > 0 and 1 or -1)
+        end
+            
+        local newPos = math.clamp(currentMechPos + delta, 0.0, thermostatHealth)
+        pidData.mechPos = newPos
+        
+        pidData.integral = 0 
+        pidData.lastError = 0
+
+        local stiction = math.clamp(0.1 - (year - 1950) * 0.0016, 0.02, 0.1)
+
+        return math.clamp(math.floor(newPos / stiction) * stiction, 0.0, thermostatHealth) 
+
+    else
+        local pid_kp = math.clamp(0.01 + (year - 2000) * 0.015, 0.01, C.PID_KP)
+        
+        local errorTemp = currentTemp - C.PID_TARGET_TEMP
+        local derivative = (errorTemp - pidData.lastError) / dtSeconds
+        local newIntegral = pidData.integral + errorTemp * dtSeconds
+
+        local controlSignal = pid_kp * errorTemp + C.PID_KI * newIntegral + C.PID_KD * derivative
+        
+        if not ((controlSignal <= 0 and errorTemp < 0) or (controlSignal >= 1 and errorTemp > 0)) then
+            pidData.integral = math.clamp(newIntegral, -C.PID_MAX_INTEGRAL, C.PID_MAX_INTEGRAL)
+        end
+        
+        controlSignal = pid_kp * errorTemp + C.PID_KI * pidData.integral + C.PID_KD * derivative
+        
+        pidData.lastError = errorTemp
+
+        pidData.mechPos = math.clamp(controlSignal, 0.0, thermostatHealth) 
+        
+        return math.clamp(controlSignal, 0.0, thermostatHealth)
     end
-    
-    local controlSignal = C.PID_KP * errorTemp + C.PID_KI * pidData.integral + C.PID_KD * derivative
-    pidData.lastError = errorTemp
-    
-    return math.clamp(controlSignal, 0.0, thermostatHealth)
 end
 
 ------------------- service and condition-------------------
@@ -880,7 +986,7 @@ function AdvancedDamageSystem:calculateWearRates()
     local conditionWearRate = 1.0
     local serviceWearRate = 1.0
     local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0
-    local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle) and not (self.spec_CVTaddon ~= nil and self.spec_CVTaddon.CVTcfgExists)
+    local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1561,7 +1667,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
                 local restoredAmount = math.min(missingCondition * randomFactor * spec.maintainability, missingCondition) / ageFactor 
                 spec.conditionLevel = math.min(spec.baseConditionLevel, spec.conditionLevel + restoredAmount)
             end
-            
+
         end
 
 
@@ -1628,7 +1734,7 @@ function AdvancedDamageSystem:processMaintenance(dt)
         end
         local maintenanceCompletedText = self:getFullName() .. ": " .. g_i18n:getText(spec.currentState) .. " " .. g_i18n:getText("ads_spec_maintenance_complete")
 
-        if spec.currentState == states.INSPECTION then
+        if spec.currentState == states.INSPECTION or spec.currentState == states.MAINTENANCE then
             local activeBreakdowns = self:getActiveBreakdowns()
             local activeBreakdownsCount = 0
             for id, value in pairs(activeBreakdowns) do
@@ -1645,10 +1751,48 @@ function AdvancedDamageSystem:processMaintenance(dt)
 
         g_currentMission.hud:addSideNotification({1, 1, 1, 1}, maintenanceCompletedText)
         g_soundManager:playSample(spec.samples.maintenanceCompleted)
+
+        if spec.currentState == states.INSPECTION or spec.currentState == states.MAINTENANCE then
+           local lastEntry = spec.maintenanceLog[#spec.maintenanceLog]
+           local activeBreakdowns = self:getActiveBreakdowns()
+           local selectedBreakdowns = {}
+            for id, breakdown in pairs(activeBreakdowns) do
+                if breakdown.isVisible then
+                    table.insert(selectedBreakdowns, id)
+                end
+            end
+            lastEntry.selectedBreakdowns = selectedBreakdowns
+        end
+
         spec.maintenanceTimer = 0
         spec.currentState = states.READY
         ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
     end
+end
+
+function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, price, selectedBreakdowns, isAftermarketParts, info)
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec then return end
+
+    local entryId = (#spec.maintenanceLog or 0) + 1
+    local env = g_currentMission.environment
+
+    local entry = {
+        id = entryId,                     
+        type = maintenanceType,
+        price = price,
+        date = { 
+            day = env.currentDayInPeriod or 1, 
+            month = env.currentPeriod, 
+            year = env.currentYear 
+        },
+        operatingHours = self:getFormattedOperatingTime(), 
+        isAftermarketParts = isAftermarketParts,         
+        selectedBreakdowns = selectedBreakdowns,
+        info = info
+    }
+
+    table.insert(spec.maintenanceLog, entry)
 end
 
 -- ==========================================================
@@ -1897,8 +2041,6 @@ function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
             end
         end
     end
-
-    print(name)
 
     local yearFactor = 0
     if year < 2000 then

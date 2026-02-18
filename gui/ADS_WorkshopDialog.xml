@@ -88,7 +88,7 @@
                 </SmoothList>
 
                 <ThreePartBitmap profile="fs25_listSliderBox" position="-50px 0px" size="12px 300px" with="anchorTopRight">
-                    <Slider profile="fs25_listSlider" size="6px 30px" dataElementId="breakdownTable" id="tableSlider" />
+                    <Slider profile="fs25_listSlider"  dataElementId="breakdownTable" id="tableSlider" />
                 </ThreePartBitmap>
                 <Animation profile="fs25_dialogLoading" id="maintanceInProgressSpinner" size="200px 200px" position="0px 0px"/>
                 <Text profile="ads_textHeaderGrey" id="emptyTableText" text="$l10n_ads_ws_info_no_breakdowns" position="0px 210px" size="100% 50px"/>
@@ -106,6 +106,7 @@
 
         <!-- Buttons -->
         <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonActivate" text="$l10n_ads_ws_button_log" onClick="onClickShowLog" id="showLogButton"/>
             <Button profile="buttonMenuPrev" text="$l10n_ads_ws_action_inspection" onClick="onClickInspection" id="inscpectionButton"/>
             <Button profile="buttonMenuNext" text="$l10n_ads_ws_action_maintenance" onClick="onClickService" id="maintenanceButton"/>
             <Button profile="buttonOK" text="$l10n_button_repair" onClick="onClickRepair" id="repairButton"/>

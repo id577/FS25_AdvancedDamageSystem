@@ -308,6 +308,10 @@ function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, d
     end
 end
 
+function ADS_WorkshopDialog:onClickShowLog()
+    ADS_maintenanceLogDialog.show(self.vehicle)
+end
+
 
 function ADS_WorkshopDialog:onClickInspection()
     self:showMaintenanceConfirmationDialog(AdvancedDamageSystem.STATUS.INSPECTION, "ads_ws_confirm_inspection_title", "ads_ws_confirm_inspection_text")
@@ -349,11 +353,10 @@ function ADS_WorkshopDialog.maintanceCallback(option, args)
     local vehicle = dialog.vehicle
 
     local selectedBreakdowns = {}
-    if type == AdvancedDamageSystem.STATUS.REPAIR then
-        for _, id in ipairs(dialog.visibleBreakdowns) do
-            if dialog.activeBreakdowns[id].isSelectedForRepair then
-                table.insert(selectedBreakdowns, id)
-            end
+
+    for _, id in ipairs(dialog.visibleBreakdowns) do
+        if dialog.activeBreakdowns[id].isSelectedForRepair then
+            table.insert(selectedBreakdowns, id)
         end
     end
 
@@ -367,8 +370,10 @@ function ADS_WorkshopDialog.maintanceCallback(option, args)
     end
 
     local breakdownCount = #selectedBreakdowns
-    vehicle:initMaintenance(type, workshopType, breakdownCount, isAftermarketParts)
+    local info = ""
 
+    vehicle:addEntryToMaintenanceLog(type, price, selectedBreakdowns, isAftermarketParts, info)
+    vehicle:initMaintenance(type, workshopType, breakdownCount, isAftermarketParts)
     g_currentMission:addMoney(-1 * price, vehicle:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
     dialog:updateScreen()
 end

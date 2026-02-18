@@ -107,6 +107,16 @@ ADS_Breakdowns.BreakdownRegistry = {
                         extraData = {timer = 0, status = 'IDLE'}
                     },
                     { 
+                        id = "THERMOSTAT_HEALTH_MODIFIER", 
+                        value = function(vehicle)
+                            local baseEffect = -0.1
+                            local condition = vehicle:getConditionLevel()
+                            local multiplier = (1 - condition) ^ 3
+                            return baseEffect * multiplier
+                        end,
+                        aggregation = "min"
+                    },
+                    { 
                         id = "YIELD_REDUCTION_MODIFIER", 
                         value = function(vehicle)
                             local baseEffect = -0.20
@@ -294,7 +304,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     ECU_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_engine",
+        part = "ads_breakdowns_part_ecu",
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
             if spec.year >= 2000 and not getIsElectricVehicle(vehicle) then
@@ -790,33 +800,33 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.2,
+                progressMultiplier = 0.1,
                 repairPrice = 1.2,
                 effects = {
                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max"},
-                    { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                    { id = "GEAR_REJECTION_CHANCE", value = 20.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.1,
+                progressMultiplier = 0.05,
                 repairPrice = 2.4,
                 effects = {
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.20, extraData = {timer = 0, status = 'IDLE', duration = 1800}, aggregation = "max"},
-                     { id = "GEAR_REJECTION_CHANCE", value = 5.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                     { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             { 
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.05,
+                progressMultiplier = 0.03,
                 repairPrice = 4.8, 
                 effects = { 
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.50, extraData = {timer = 0, status = 'IDLE', duration = 2200}, aggregation = "max"},
-                     { id = "GEAR_REJECTION_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                     { id = "GEAR_REJECTION_CHANCE", value = 3.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
                 }
             },
             { 

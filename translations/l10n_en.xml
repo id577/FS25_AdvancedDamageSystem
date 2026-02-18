@@ -57,6 +57,7 @@
         <text name="ads_ws_action_maintenance" text="Maintenance"/>
         <text name="ads_ws_action_repair" text="Repair"/>
         <text name="ads_ws_action_overhaul" text="Overhaul"/>
+        <text name="ads_ws_button_log" text="Maintenance Log"/>
 
         <text name="ads_ws_age_unit" text="months"/>
         <text name="ads_ws_hours_unit" text="h"/>
@@ -87,6 +88,28 @@
         Choose the quality of spare parts for this procedure. Using cheaper aftermarket parts comes with a risk of defects.\n\n Aftermarket parts price: {aftermarket_price}"/>
         <text name="ads_ws_option_genuine_parts" text="Genuine Parts"/>
         <text name="ads_ws_option_aftermarket_parts" text="Aftermarket Parts"/>
+
+        <text name="ads_log_header_title" text="Maintenance Log"/>
+        <text name="ads_log_title" text="Technical Maintenance Log"/>
+        <text name="ads_log_total_cost_title" text="Total Expenses"/>
+        <text name="ads_log_cost_per_month_title" text="Monthly Cost"/>
+        <text name="ads_log_ownership_months_title" text="Ownership Duration"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Total Breakdowns Fixed"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Avg. Breakdown Interval"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Avg. Maintenance Interval"/>
+
+        <text name="ads_log_overhaul_desc" text="Overhaul performed"/>
+        <text name="ads_log_maintenance_desc" text="Scheduled maintenance performed (%.1f h)"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="No faults detected"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Faults detected: %s"/>
+        <text name="ads_log_repair_desc_generic" text="Repair"/>
+
+        <text name="ads_log_date" text="Date"/>
+        <text name="ads_log_hours" text="Operating Hours"/>
+        <text name="ads_log_type" text="Work Type"/>
+        <text name="ads_log_description" text="Description"/>
+        <text name="ads_log_price" text="Cost"/>
+        <text name="ads_log_empty" text="Log is empty"/>
 
         <text name="ads_breakdowns_part_vehicle" text="Vehicle"/>
         <text name="ads_breakdowns_part_engine" text="Engine"/>
@@ -246,6 +269,13 @@
         <text name="ads_spec_last_maintenance_until_format" text="%s until %s"/>
         <text name="ads_spec_service_interval_format" text="%s o/h"/>
         <text name="ads_spec_maintenance_complete" text="completed"/>
+
+        <text name="ads_spec_inspection_issues_detected" text="%s issue(s) detected"/>
+        <text name="ads_spec_inspection_no_issues_detected" text="No issues detected"/>
+
+        <text name="ads_spec_workshop_dealer" text="Dealer"/>
+        <text name="ads_spec_workshop_own" text="Owned"/>
+        <text name="ads_spec_workshop_mobile" text="Mobile"/>
 
         <text name="ads_spec_state_ready" text="Ready"/>
         <text name="ads_spec_state_inspection" text="Inspection"/>

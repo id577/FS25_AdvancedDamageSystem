@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<l10n>
+	<texts>
+		<text name="ads_serviceWear_label" text="Servicenivå Slitagehastighet"/>
+		<text name="ads_serviceWear_tooltip" text="Styr slitagehastighet för Servicenivå per driftstimme. Exempelvis, på 10% så kommer servicenivån vara helt uttömd på 10 timmars fortsatt drift. Ett högre värde betyder att underhåll krävs med tätare intervall"/>
+		<text name="ads_conditionWear_label" text="Skick"/>
+		<text name="ads_conditionWear_tooltip" text="Styr slitagehastighet för Skick per driftstimme. Exempelvis, på 1% så kommer fordonets skick vara helt förbrukat på 100 timmars drift.Ett högre värde leder till snabbare förbrukning av fordonets helhetsskick."/>
+		<text name="ads_breakdownProbability_label" text="Grundtid  mellan fel"/>
+		<text name="ads_breakdownProbability_tooltip" text="Sätter MTBF (Grundtid mellan fel) för haveri i minuter när fordonets skick är 100%. Allteftersom fordonets skick sjunker så sjunker även den faktiska MTBF. Denna inställning är startpunkten för haveriberäkningar."/>
+		<text name="ads_maintenancePrice_label" text="Underhållsprismultiplikator"/>
+		<text name="ads_maintenancePrice_tooltip" text="Justerar kostnaden för alla verkstadstjänster, inkluderat besiktning, reparationer och total översyn. Ett högre värde gör alla underhållsaktiviteter dyrare."/>
+		<text name="ads_maintenanceDuration_label" text="Underhållsvaraktighetsmultiplikator"/>
+		<text name="ads_maintenanceDuration_tooltip" text="Justerar tidsåtgång på alla verkstadstjänster. Ett högre värde ökar tiden ditt fordon kommer underhållas eller repareras."/>
+		<text name="ads_workshopOpenHour_label" text="Öppningstid för verkstaden"/>
+		<text name="ads_workshopOpenHour_tooltip" text="Tidpunkt på dagen då verkstaden öppnar. Reparationer är endast möjliga under verkstadens öppettider."/>
+		<text name="ads_workshopCloseHour_label" text="Stängningstid för verkstaden"/>
+		<text name="ads_workshopCloseHour_tooltip" text="Tidpunkt på dagen då verkstaden stänger. Reparationer kommer pausas efter denna tid."/>
+		<text name="ads_engineMaxHeat_label" text="Maximal motortemperatur"/>
+		<text name="ads_engineMaxHeat_tooltip" text="Grundhastighet för värme genererad av motorn vid maximal belastning. Högre värde innebär att motorn kommer värmas upp fortare."/>
+		<text name="ads_transMaxHeat_label" text="Maximal växellådstemperatur"/>
+		<text name="ads_transMaxHeat_tooltip" text="Grundhastighet för värme genererad av växellådan vid maximal belastning. Högre värde innebär att växellådan kommer värmas upp fortare."/>
+		<text name="ads_dirtInfluence_label" text="Smutsighets påverkan på nedkylning"/>
+		<text name="ads_dirtInfluence_tooltip" text="Maximal minskning av kylarens effektivitet på grund av smuts. 20% betyder att kylaren på ett fordon med maximal smuts är 20% mindre effekttiv."/>
+		<text name="ads_ws_header_title" text="Verkstad"/>
+		<text name="ads_workshopAvailable_label" text="Verkstad öppen dygnet runt"/>
+		<text name="ads_workshopAvailable_tooltip" text="Aktiverar eller deaktiverar verkstadsöppettider dygnet runt."/>
+		<text name="ads_instantInspection_label" text="Direkt besiktning"/>
+		<text name="ads_instantInspection_tooltip" text="Aktiverar direkt besiktning av fordon utan att behöva vänta."/>
+		<text name="ads_parkVehicle_label" text="Parkera fordon undertiden underhåll utförs"/>
+		<text name="ads_parkVehicle_tooltip" text="Om aktiverad så kommer fordon som underhålls hoppas över när man går till nästa fordon med TAB."/>
+		<text name="ads_aiOverloadAndOverheatControl_label" text="AI Överbelastning &amp; Överhettningskontroll"/>
+		<text name="ads_aiOverloadAndOverheatControl_tooltip" text="Om aktiverad så kommer AI-arbetare minska belastning för att undvika motoröverbelastning eller överhettning."/>
+		<text name="ads_ws_label_value" text="Värde"/>
+		<text name="ads_ws_label_age" text="Ålder"/>
+		<text name="ads_ws_label_operating_hours" text="Driftstimmar"/>
+		<text name="ads_ws_label_service" text="Service"/>
+		<text name="ads_ws_label_condition" text="Skick"/>
+		<text name="ads_ws_label_current_power" text="Nuvarande effekt"/>
+		<text name="ads_ws_label_brake_efficiency" text="Bromseffektivitet"/>
+		<text name="ads_ws_label_harvest_efficiency" text="Skördareffektivitet"/>
+		<text name="ads_ws_label_maintainability" text="Underhållsmått"/>
+		<text name="ads_ws_label_service_interval" text="Serviceintervall"/>
+		<text name="ads_ws_label_last_maintenance" text="Senaste underhåll"/>
+		<text name="ads_ws_label_last_inspection" text="Senaste besiktning"/>
+		<text name="ads_ws_table_header_part" text="Del"/>
+		<text name="ads_ws_table_header_description" text="Beskrivning"/>
+		<text name="ads_ws_table_header_stage" text="Steg"/>
+		<text name="ads_ws_table_header_price" text="Pris"/>
+		<text name="ads_ws_table_header_repair_select" text="Reparera"/>
+		<text name="ads_ws_info_no_breakdowns" text="Det finns inga fel eller så har felet ej blivit upptäckt än."/>
+		<text name="ads_ws_status_initial" text="Laddningsstatus…"/>
+		<text name="ads_ws_action_inspection" text="Besiktning"/>
+		<text name="ads_ws_action_maintenance" text="Underhåll"/>
+		<text name="ads_ws_action_repair" text="Reparera"/>
+		<text name="ads_ws_action_overhaul" text="Total  översyn"/>
+		<text name="ads_ws_age_unit" text="Månader"/>
+		<text name="ads_ws_hours_unit" text="t"/>
+		<text name="ads_ws_button_ok" text="OK"/>
+		<text name="ads_ws_option_yes" text="Ja"/>
+		<text name="ads_ws_option_no" text="Nej"/>
+		<text name="ads_ws_status_open" text="Verkstaden är öppen"/>
+		<text name="ads_ws_status_closed" text="Verkstaden är stängd"/>
+		<text name="ads_ws_inspecting_status" text="Besiktning pågår…"/>
+		<text name="ads_ws_status_in_progress_format" text="%s pågår till %s…"/>
+		<text name="ads_ws_task_inspection" text="Besiktning"/>
+		<text name="ads_ws_task_maintenance" text="Underhåll"/>
+		<text name="ads_ws_task_repair" text="Reparera"/>
+		<text name="ads_ws_task_overhaul" text="Total  översyn"/>
+		<text name="ads_ws_button_price_format" text="%s (%s)"/>
+		<text name="ads_ws_info_nothing_to_repair_title" text="Inget att reparera"/>
+		<text name="ads_ws_info_nothing_to_repair_text" text="Vänligen välj en eller flera saker att reparera från listan."/>
+		<text name="ads_ws_confirm_inspection_title" text="Bekräfta besiktning"/>
+		<text name="ads_ws_confirm_inspection_text" text="Besiktningen identifierar gömda fel och gör även en grov uppskattning av generellt tekniskt skick.\n\nPris: {price}\ntidsåtgång: {duration}\nKlar: {time}"/>
+		<text name="ads_ws_confirm_maintenance_title" text="Bekräfta underhåll"/>
+		<text name="ads_ws_confirm_maintenance_text" text="Underhåll kommer återställa teknisk servicenivå till  max. Dessutom kommer fordonets tekniska skick besiktigas.\n\nPris: {price}\nTidsåtgång: {duration}\nKlar: {time}\n&#xA;        Använd originaldelar för detta arbete. Användning av piratdelar innebär en risk för defekter.\n\n Piratdelar pris: {aftermarket_price}"/>
+		<text name="ads_ws_confirm_repair_title" text="Bekräfta reparation"/>
+		<text name="ads_ws_confirm_repair_text" text="Detta kommer åtgärda valda felaktigheter ({price}).\n\nTidsåtgång: {duration}\nKlar: {time}\n&#xA;        Använd originaldelar för detta arbete. Användning av piratdelar innebär en risk för defekter.\n\n Piratdelar pris: {aftermarket_price}"/>
+		<text name="ads_ws_confirm_overhaul_title" text="Bekräfta total översyn"/>
+		<text name="ads_ws_confirm_overhaul_text" text="Total översyn kommer åtgärda alla fel, utföra underhåll och förbättra det tekniska skicket på fordonet.\n\nPris: {price}\nTidsåtgång: {duration}\nKlar: {time}\n&#xA;        Använd originaldelar för detta arbete. Användning av piratdelar innebär en risk för defekter.\n\n Piratdelar pris: {aftermarket_price}"/>
+		<text name="ads_ws_option_genuine_parts" text="Originaldelar"/>
+		<text name="ads_ws_option_aftermarket_parts" text="Piratdelar"/>
+		<text name="ads_breakdowns_part_vehicle" text="Fordon"/>
+		<text name="ads_breakdowns_part_engine" text="Motor"/>
+		<text name="ads_breakdowns_part_turbocharger" text="Turbo"/>
+		<text name="ads_breakdowns_part_fuel_pump" text="Bränslepump"/>
+		<text name="ads_breakdowns_part_fuel_injectors" text="Bränsleinsprutare"/>
+		<text name="ads_breakdowns_part_brake_system" text="Bromssystem"/>
+		<text name="ads_breakdowns_part_transmission" text="Växellåda"/>
+		<text name="ads_breakdowns_part_cvt_cooling_system" text="CVT Kylsystem"/>
+		<text name="ads_breakdowns_part_cooling_system" text="Kylsystem"/>
+		<text name="ads_breakdowns_part_hydraulic_lift_system" text="Hydrauliskt lyftsystem"/>
+		<text name="ads_breakdowns_part_electrical_system" text="Elektriskt system"/>
+		<text name="ads_breakdowns_part_carburetor" text="Förgasare"/>
+		<text name="ads_breakdowns_part_yield_sensor" text="Avkastningsgivare"/>
+		<text name="ads_breakdowns_part_material_flow_system" text="Materialflödessystem"/>
+		<text name="ads_breakdowns_part_unloading_auger" text="Tömningsskruv"/>
+		<text name="ads_breakdowns_severity_permanent" text="Permanent"/>
+		<text name="ads_breakdowns_severity_reduce_power" text="Minska effekt"/>
+		<text name="ads_breakdowns_severity_shutdown" text="Nedstängning"/>
+		<text name="ads_breakdowns_severity_minor" text="Mindre"/>
+		<text name="ads_breakdowns_severity_moderate" text="Medel"/>
+		<text name="ads_breakdowns_severity_major" text="Större"/>
+		<text name="ads_breakdowns_severity_critical" text="Kritisk"/>
+		<text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Det sammanlagda slitaget från år av hårt arbete. Mindre, oreparerbara skador på grundkomponenter reducerar något den generella prestandan."/>
+		<text name="ads_breakdowns_overheat_protection_stage1_description" text="Motorskyddsläge"/>
+		<text name="ads_breakdowns_overheat_protection_stage1_message" text="Motorskyddsläge aktivt! Effekt reducerad!"/>
+		<text name="ads_breakdowns_overheat_protection_stage2_description" text="Motorskyddsläge"/>
+		<text name="ads_breakdowns_overheat_protection_stage2_message" text="Motorskyddsläge aktivt! Effekt reducerad!"/>
+		<text name="ads_breakdowns_overheat_protection_stage3_description" text="Motorskyddsläge"/>
+		<text name="ads_breakdowns_overheat_protection_stage3_message" text="Motorskyddsläge aktivt! Effekt reducerad!"/>
+		<text name="ads_breakdowns_overheat_protection_stage4_description" text="Motorskyddsläge"/>
+		<text name="ads_breakdowns_overheat_protection_stage4_message" text="Motorn har stängts av för att undvika överhettning"/>
+		<text name="ads_breakdowns_engine_jam_stage1_description" text="Motor är totalhavererad"/>
+		<text name="ads_breakdowns_engine_jam_stage1_message" text="Motorn har låst sig"/>
+		<text name="ads_breakdowns_ecu_malfunction_stage1_description" text="ECU-fel. Något reducerad motoreffekt."/>
+		<text name="ads_breakdowns_ecu_malfunction_stage2_description" text="ECU-krångel. Påtaglig effektförlust och ökad bensinförbrukning."/>
+		<text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Kritiskt ECU-fel. Betydande effekt förlust, hög bränsleförbrukning och risk för motorstopp."/>
+		<text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Totalt ECU-haveri. Motorn är ur bruk och kan inte startas."/>
+		<text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Motorn är trasig."/>
+		<text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Slitna turbolager. Ett svagt visslande ljud hörs och det finns en viss risk för effektförlust vid höga RPM."/>
+		<text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Läckande turbotätningar. Märkbar effektförlust, ökad bränsleförbrukning."/>
+		<text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Skadade turbinblad. Allvarlig effektförlust och en risk att motorn stannar vid hög belastning."/>
+		<text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Totalt turbohaveri. Motorn har tappat större delen av sin effekt och riskerar allvarliga interna skador."/>
+		<text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Lindringt bränslepumpsslitage. Något reducerad motoreffekt och ökad bränsleförbrukning."/>
+		<text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Bränsletryck sjunker. Påtaglig effektförlust, högre bränsleförbrukning och enstaka motorstopp."/>
+		<text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kritiskt bränsletryck. Allvarlig effektförlust, väldigt hög bränsleförbrukning och återkommande motorstopp."/>
+		<text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Komplett bränslepumpshaveri. Bränsle levereras inte till motorn."/>
+		<text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Start av motor är ej möjlig"/>
+		<text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="En eller flera injektorer har något igensatta munstycke. Motorn kan gå ojämnt och med en mindre effekt."/>
+		<text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Dålig bränslefinfördelning. Motorn snedtänder vid belastning vilket medför märkbart mindre effekt och hackande motor."/>
+		<text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="En bränsleinjektor har hängt sig. Motorn går dåligt med märkbar effektförlust och opålitlig uppstart."/>
+		<text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="En injektor har helt slutat fungera. Motorn går inte som den ska och kanske inte startar alls."/>
+		<text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Start av motor är ej möjlig"/>
+		<text name="ads_breakdowns_brake_malfunction_stage1_description" text="Slitna bromsbelägg. En viss reducering av bromseffekt."/>
+		<text name="ads_breakdowns_brake_malfunction_stage2_description" text="Läckande bromsvätska eller slita bromsskivor. Bromssträcka är märkbart förlängd."/>
+		<text name="ads_breakdowns_brake_malfunction_stage3_description" text="Allvarlig förlust av bromstryck. Bromseffekt är svag och opålitlig."/>
+		<text name="ads_breakdowns_brake_malfunction_stage4_description" text="Totalt bromshaveri. Fortsatt drift är extremt riskabelt."/>
+		<text name="ads_breakdowns_brake_malfunction_stage4_message" text="Bromsfel"/>
+		<text name="ads_breakdowns_transmission_slip_stage1_description" text="Slitna kopplingslameller. Tillfällig effektförlust på grund av slirningar vid belastning."/>
+		<text name="ads_breakdowns_transmission_slip_stage2_description" text="Avsevärt kopplingsslitage. Märkbara kopplingsslirningar, speciellt vid acceleration."/>
+		<text name="ads_breakdowns_transmission_slip_stage3_description" text="Tungt sliten koppling. Allvarliga slirningar gör det svårt att leverera effekt till hjulen."/>
+		<text name="ads_breakdowns_transmission_slip_stage4_description" text="Kopplingen är totalt utbränd. Fordonet kan ej förflyttas."/>
+		<text name="ads_breakdowns_transmission_slip_stage4_message" text="Växellådefel"/>
+		<text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Slitna synkringar.Tillfälligt skrapande eller svårigheter att byta växel."/>
+		<text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Skadade synkringar. Skifte av växel är ofta svårt och misslyckas stundtals helt."/>
+		<text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Trasiga synkringständer. Hög risk för misslyckade växlingar vid beslastning."/>
+		<text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Synkringar helt utslitna. Skifte av växel är inte möjligt."/>
+		<text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Växellådefel"/>
+		<text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Lågt hydraultryck i direktväxellåda. En viss fördröjning och hårdhet vid växelbyte."/>
+		<text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Slitna hydraulpumpstätningar. Märkbar fördröjning och stötar vid växelbyte."/>
+		<text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Felaktig hydraulpump. Stora fördröjningar och våldsamma stötar vid växelbyte."/>
+		<text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Direktväxellåda ur funktion. Växellåda har fastnat i läge neutral."/>
+		<text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Termostaten har börjat hänga sig. CVT kan värmas upp sakta eller med högre temperatur än normalt vid belastning."/>
+		<text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Termostaten sitter delvis fast. CVT-temperatur är ostabil vilket leder till en risk för överhettning vid längre användande."/>
+		<text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="Termostaten är till större delen ej funktionell. CVT är benägen att allvarligt överhettas vilket kan orsaka interna skador."/>
+		<text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Termostaten är ur funktion, förmodlingen fastnat i stängt läge. Kylning är minimal, vilket leder till snabb och farlig överhettning."/>
+		<text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Motortermostaten har börjat krångla. Motorn dröjer längre innan den når optimal temperatur eller blir varmare än normalt."/>
+		<text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Termostatåterkoppling är dålig. Motortemperaturstyrning är ostabil vilket ökar slitage."/>
+		<text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Termostaten har fastnat i stängt läge. Motorn överhettas hela tiden vid belastning."/>
+		<text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Totalt termostathaveri. Motorns kylvätska kan inte cirkulera korrekt vilket leder till omedelbar och allvarlig överhettning."/>
+		<text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Mindre läcka på den inbyggda pumpen. Hydrauliska redskap är något långsammare."/>
+		<text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Slita pumptätningar. Märkbart långsammare hydraulik."/>
+		<text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Skadad hydraulpump. Redskap är extremt långsamma och svaga."/>
+		<text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Hydraulpump ur funktion. Hydraulik är oanvändbar."/>
+		<text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hydraulikfel"/>
+		<text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Sliten isolering, tillfälligt spänningsfall. Mindre elektriska funktionsstörningar kan observeras."/>
+		<text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Rostiga kontakter och ostabil uteffekt från generatorn. Belysning kan sluta fungera, motorstart är opålitlig."/>
+		<text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Risk för kortslutning. Kritiska system är opålitliga och belysning kan sluta fungera helt."/>
+		<text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Belysningsfel"/>
+		<text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Ledningsnät ur funktion. Fordonets elektriska system är obrukbart."/>
+		<text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Startmotor svarar inte"/>
+		<text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Mindre förgasaravlagringar. Motorn hackar då och då vid hög belastning."/>
+		<text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Tilltäppta dysor. Motorn fräser ofta och tappar effekt, speciellt vid hastiga gasningar."/>
+		<text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Mycket igensatt förgasare. Motorn går väldigt hårt, stannar ofta och får arbeta hårt för att behålla effekt."/>
+		<text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Bränslebrist på grund av en helt igensatt förgasare. Motorn går ej att starta."/>
+		<text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Förgasaren är igensatt"/>
+		<text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Mindre sensorförorening eller kalibreringsavvikelse. Det automatiska trösksystemet är något mindre effektivt och orsakar ett mindre skördebortfall."/>
+		<text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="Felaktiga sensorvärde orsakar undermåliga justeringar av trösk och separationssystem. Skördebortfall är märbart."/>
+		<text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="Kritiskt sensorfel. Kontrollenheten får kraftigt felaktig data vilket leder till avsevärt skördebortfall när säden skiljs från agnarna."/>
+		<text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="Totalt haveri av skördeövervakningssystemet. Skördetröskan är &quot;blind&quot; vilket orsakar grov ineffektivitet och allvarligt skördebortfall."/>
+		<text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="Skördövervakningsfel"/>
+		<text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Mindre slitage av interna skruvtransportörer eller elevatorkedjor. En mindre mängd säd går förlorad under intern transport."/>
+		<text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Slitna skruvflänsar och slirande transportband orsakar ökat spill inne i maskinen. Det kan höras tillfälliga skrapande oljud."/>
+		<text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Skadade hissblad  och skruvtransportörer får arbeta hårt för att flytta säden, vilket leder till märkbart skördebortfall och risk för en större igensättning."/>
+		<text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="En grundläggande komponent i materialflödessystemet har gått sönder och orsakat en allvarlig igensättning. Motorn är under extrem belastning."/>
+		<text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Materialflödesblockering"/>
+		<text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Utsträckt drivrem. Enstaka slirningar resulterar i en svag försämring av lossningshastighet."/>
+		<text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Slitna drivremmar och remskivor. Påtagliga slirningar vid belastning orsakar märkbart reducerade lossningstider."/>
+		<text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Skadad växellåda eller hårt sliten drivrem. Skruvtransportören har svårt att vridas och fungerar med mycket sänkt hastighet."/>
+		<text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Drivrem har gått av eller växellåda har skurit. Skruvtransportören är totalt igensatt."/>
+		<text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Skruvtransportören är igensatt"/>
+		<text name="ads_breakdowns_engine_stalled_message" text="Motorstopp"/>
+		<text name="ads_breakdowns_gear_disengage_message" text="Koppla ur växeln"/>
+		<text name="ads_breakdown_at_progress_message" text="pågår"/>
+		<text name="ads_cold_engine_message" text="Motorn är kall! Höga varvtal orsakar slitage!"/>
+		<text name="ads_spec_this_month" text="Denna månaden"/>
+		<text name="ads_spec_months_ago" text="månader sedan"/>
+		<text name="ads_spec_never" text="Aldrig"/>
+		<text name="ads_spec_op_hours_short" text="d/t"/>
+		<text name="ads_spec_tomorrow_at" text="imorgon vid"/>
+		<text name="ads_spec_day_after_tommorow_at" text="dagen efter imorgon vid"/>
+		<text name="ads_spec_in_days_at" text="om {days} dagar vid"/>
+		<text name="ads_spec_day_s" text="dagar(s)"/>
+		<text name="ads_spec_hour_s" text="timmar(s)"/>
+		<text name="ads_spec_minute_s" text="minuter(s)"/>
+		<text name="ads_spec_and" text="och"/>
+		<text name="ads_spec_duration_format_hours" text="%d %s"/>
+		<text name="ads_spec_duration_format_minutes" text="%d %s"/>
+		<text name="ads_spec_duration_format_combined" text="%s och %s"/>
+		<text name="ads_spec_months_ago_unit" text="månader sedan"/>
+		<text name="ads_spec_months_ago_format" text="%s %s"/>
+		<text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
+		<text name="ads_spec_last_maintenance_until_format" text="%s till %s"/>
+		<text name="ads_spec_service_interval_format" text="%s d/t"/>
+		<text name="ads_spec_maintenance_complete" text="slutförd"/>
+		<text name="ads_spec_state_ready" text="Klar"/>
+		<text name="ads_spec_state_inspection" text="Besiktning"/>
+		<text name="ads_spec_state_maintenance" text="Underhåll"/>
+		<text name="ads_spec_state_repair" text="Reparation"/>
+		<text name="ads_spec_state_overhaul" text="Total översyn"/>
+		<text name="ads_spec_state_broken" text="Trasig"/>
+		<text name="ads_spec_state_excellent" text="Utomordentlig"/>
+		<text name="ads_spec_state_good" text="Väldigt bra"/>
+		<text name="ads_spec_state_normal" text="Bra"/>
+		<text name="ads_spec_state_bad" text="Dålig"/>
+		<text name="ads_spec_state_terrible" text="Väldigt dålig"/>
+		<text name="ads_spec_state_unknown" text="Okänd"/>
+		<text name="ads_spec_state_not_required" text="Ej nödvändig"/>
+		<text name="ads_spec_state_required" text="Nödvändig"/>
+		<text name="ads_spec_state_recommended" text="Rekommenderad"/>
+		<text name="ads_spec_state_legendary" text="Legendarisk"/>
+		<text name="ads_spec_state_premium" text="Premium"/>
+		<text name="ads_spec_state_standart" text="Standard"/>
+		<text name="ads_spec_state_budget" text="Budget"/>
+		<text name="ads_spec_state_complex" text="Komplex"/>
+		<text name="ads_spec_state_robust" text="Robust"/>
+		<text name="ads_spec_state_extreme" text="Extrem"/>
+		<text name="ads_spec_state_low" text="Låg"/>
+		<text name="ads_spec_state_average" text="Medel"/>
+		<text name="ads_spec_state_high" text="Hög"/>
+		<text name="ads_spec_state_workhorse" text="Trotjänare"/>
+	</texts>
+</l10n>

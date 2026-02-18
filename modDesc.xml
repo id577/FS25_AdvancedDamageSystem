@@ -1,21 +1,21 @@
 <modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="98" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
 <author>id577</author>
-<version>0.8.4.8</version>
+<version>0.8.5.0</version>
 <title>
-<en>Advanced Damage System</en>
-<fr>Système avancé de dégâts</fr>
-<cz>Pokročilý systém poškození</cz>
+    <en>Advanced Damage System</en>
+    <fr>Système avancé de dégâts</fr>
+    <cz>Pokročilý systém poškození</cz>
 </title>
 <description>
-<en>None.</en>
+    <en>None.</en>
 </description>
 <iconFilename>icon_ads.dds</iconFilename>
 <multiplayer supported="false"/>
 <extraSourceFiles>
-<sourceFile filename="scripts/ADS_Main.lua"/>
+    <sourceFile filename="scripts/ADS_Main.lua"/>
 </extraSourceFiles>
 <l10n filenamePrefix="translations/l10n"/>
 <dependencies>
-<dependency>FS25_Vehicle_Years</dependency>
+    <dependency>FS25_Vehicle_Years</dependency>
 </dependencies>
 </modDesc>
