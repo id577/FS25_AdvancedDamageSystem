@@ -194,9 +194,9 @@
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Отказ гидронасоса Powershift. Трансмиссия застряла в нейтральном положении."/>
 
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Термостат начинает залипать. Вариатор может медленно прогреваться или работать немного горячее нормы под нагрузкой."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Термостат частично заклинил. Температура вариатора нестабильна, что ведет к риску перегрева при длительной работе."/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Термостат сильно залипает. Температура вариатора нестабильна, что ведет к риску перегрева при длительной работе."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="Термостат практически не функционирует. Вариатор склонен к сильному перегреву, что может вызвать внутренние повреждения."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Термостат полностью отказал, вероятно, заклинил в закрытом положении. Охлаждение минимально, что ведет к быстрому и опасному перегреву вариатора."/>
+        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Термостат полностью отказал, вероятно, заклинил в случайном положении. Эксплуатация невозможна."/>
 
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Термостат двигателя начинает выходить из строя. Двигатель дольше прогревается до оптимальной температуры или работает немного горячее."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Плохая реакция термостата. Регулирование температуры двигателя нестабильно, что увеличивает износ."/>

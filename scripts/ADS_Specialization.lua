@@ -210,10 +210,10 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "recalculateAndApplyIndicators", AdvancedDamageSystem.recalculateAndApplyIndicators)
     SpecializationUtil.registerFunction(vehicleType, "addBreakdown", AdvancedDamageSystem.addBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "removeBreakdown", AdvancedDamageSystem.removeBreakdown)
+    SpecializationUtil.registerFunction(vehicleType, "hasBreakdown", AdvancedDamageSystem.hasBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "getRandomBreakdown", AdvancedDamageSystem.getRandomBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "processBreakdowns", AdvancedDamageSystem.processBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "advanceBreakdown", AdvancedDamageSystem.advanceBreakdown)
-    SpecializationUtil.registerFunction(vehicleType, "processPermanentEffects", AdvancedDamageSystem.processPermanentEffects)
     SpecializationUtil.registerFunction(vehicleType, "processMaintenance", AdvancedDamageSystem.processMaintenance)
     SpecializationUtil.registerFunction(vehicleType, "getServiceLevel", AdvancedDamageSystem.getServiceLevel)
     SpecializationUtil.registerFunction(vehicleType, "getConditionLevel", AdvancedDamageSystem.getConditionLevel)
@@ -331,18 +331,20 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
     self.spec_AdvancedDamageSystem.thermostatState = 0.0
     self.spec_AdvancedDamageSystem.thermostatHealth = 1.0
+    self.spec_AdvancedDamageSystem.thermostatStuckedPosition = nil
     self.spec_AdvancedDamageSystem.engTermPID = {
         integral = 0,
-        lastError = 0,
+        lastError = 0
     }
 
     self.spec_AdvancedDamageSystem.transmissionTemperature = -99
     self.spec_AdvancedDamageSystem.rawTransmissionTemperature = -99
     self.spec_AdvancedDamageSystem.transmissionThermostatState = 0.0
     self.spec_AdvancedDamageSystem.transmissionThermostatHealth = 1.0
+    self.spec_AdvancedDamageSystem.transmissionThermostatStuckedPosition = nil
     self.spec_AdvancedDamageSystem.transTermPID = {
         integral = 0,
-        lastError = 0,
+        lastError = 0
     }
 
     self.spec_AdvancedDamageSystem.debugData = {
@@ -380,7 +382,10 @@ function AdvancedDamageSystem:onLoad(savegame)
             totalCooling = 0, 
             radiatorCooling = 0, 
             speedCooling = 0, 
-            convectionCooling = 0
+            convectionCooling = 0,
+            stiction = 0,
+            waxSpeed = 0,
+            kp = 0
         },
 
         transmissionTemp = {
@@ -391,7 +396,10 @@ function AdvancedDamageSystem:onLoad(savegame)
             convectionCooling = 0,
             loadFactor = 0,
             slipFactor = 0,
-            accFactor = 0
+            accFactor = 0,
+            stiction = 0,
+            waxSpeed = 0,
+            kp = 0
         }
     }
 
@@ -625,7 +633,11 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             if spec.purchaseDate == nil or next(spec.purchaseDate) == nil then
                 local env = g_currentMission.environment
                 spec.purchaseDate = { day = env.currentDay, month = env.currentPeriod, year = env.currentYear }
-                spec.purchaseHours = self:getFormattedOperatingTime()
+                if spec.lastServiceOperatingHours > 0 then
+                    spec.purchaseHours = spec.lastServiceOperatingHours
+                else
+                    spec.purchaseHours = self:getOperatingTime()
+                end
             end
         end
     end
@@ -633,15 +645,21 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- just in case, reset damage amount to 0 if it's not
     if self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
 
+    --- general wear and tear
+    if self:getConditionLevel() < ADS_Config.CORE.GENERAL_WEAR_AND_TEAR_THRESHOLD and not self:hasBreakdown('GENERAL_WEAR_AND_TEAR') then
+        self:addBreakdown('GENERAL_WEAR_AND_TEAR', 1)
+    end
+
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
     if spec.year >= 2000 then
-        local overheatProtection = spec.activeBreakdowns['OVERHEAT_PROTECTION']
+        local overheatProtectionId = 'OVERHEAT_PROTECTION'
+        local overheatProtection = self:getActiveBreakdowns()[overheatProtectionId]
         if overheatProtection and spec.transmissionTemperature < 100 and spec.engineTemperature < 100 then
-            self:removeBreakdown('OVERHEAT_PROTECTION')    
+            self:removeBreakdown(overheatProtectionId)    
         end
         if self:getIsMotorStarted() then
             if (spec.transmissionTemperature > 105 or spec.engineTemperature > 105) and not overheatProtection then
-                self:addBreakdown('OVERHEAT_PROTECTION', 1)
+                self:addBreakdown(overheatProtectionId, 1)
                 if self.getIsControlled ~= nil and self:getIsControlled() then
                     g_soundManager:playSample(spec.samples.alarm)
                 end
@@ -650,17 +668,17 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
                     self:setCruiseControlState(0, true)
                 end
                 if (spec.transmissionTemperature > 125 or spec.engineTemperature > 125) and overheatProtection.stage < 4 then
-                    self:advanceBreakdown('OVERHEAT_PROTECTION')
+                    self:advanceBreakdown(overheatProtectionId)
                     if self.getIsControlled ~= nil and self:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
                     end
                 elseif (spec.transmissionTemperature > 115 or spec.engineTemperature > 115) and overheatProtection.stage < 3 then
-                    self:advanceBreakdown('OVERHEAT_PROTECTION')
+                    self:advanceBreakdown(overheatProtectionId)
                     if self.getIsControlled ~= nil and self:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
                     end
                 elseif (spec.transmissionTemperature > 110 or spec.engineTemperature > 110) and overheatProtection.stage < 2 then
-                    self:advanceBreakdown('OVERHEAT_PROTECTION')
+                    self:advanceBreakdown(overheatProtectionId)
                     if self.getIsControlled ~= nil and self:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
                     end
@@ -795,27 +813,15 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
         if spec.rawTransmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
     end
 
-    local engineDebugData = {}
     if not spec.isElectricVehicle then 
-        engineDebugData = self:updateEngineThermalModel(dt, spec, isMotorStarted, motorLoad, speedCooling, eviromentTemp, dirt)
+        self:updateEngineThermalModel(dt, spec, isMotorStarted, motorLoad, speedCooling, eviromentTemp, dirt)
     end
     
-    local transDebugData = {}
     if vehicleHaveCVT then
-        transDebugData = self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
+        self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
     else
         spec.transmissionTemperature = -99
         spec.rawTransmissionTemperature = -99
-    end
-
-    if ADS_Config.DEBUG then
-        if next(engineDebugData) then
-            spec.debugData.engineTemp = engineDebugData
-        end
-
-        if next(transDebugData) then
-            spec.debugData.transmissionTemp = transDebugData
-        end
     end
 end
 
@@ -835,7 +841,11 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
     else
-        cooling = convectionCooling / 10
+        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
+            cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
+        else
+            cooling = convectionCooling
+        end
     end
     
     local alpha = dt / (C.TAU + dt)
@@ -844,15 +854,27 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     spec.rawEngineTemperature = math.max(spec.rawEngineTemperature, eviromentTemp)
     spec.engineTemperature = math.max(spec.engineTemperature + alpha * (spec.rawEngineTemperature - spec.engineTemperature), eviromentTemp)
     
+    local dbg = spec.debugData.engineTemp
+
     if isMotorStarted and spec.engineTemperature > C.ENGINE_THERMOSTAT_MIN_TEMP then
-        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth, spec.year)
+        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
     else
         spec.thermostatState = 0.0
         spec.engTermPID.integral = 0
         spec.engTermPID.lastError = 0
+        
+        dbg.kp = 0
+        dbg.stiction = 0
+        dbg.waxSpeed = 0
     end
 
-    return {totalHeat = heat, totalCooling = cooling, radiatorCooling = radiatorCooling, speedCooling = speedCooling, convectionCooling = convectionCooling}
+    dbg.totalHeat = heat
+    dbg.totalCooling = cooling
+    dbg.radiatorCooling = radiatorCooling
+    dbg.speedCooling = speedCooling
+    dbg.convectionCooling = convectionCooling
+
+    return dbg 
 end
 
 
@@ -861,6 +883,9 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     local heat, cooling = 0, 0
     local radiatorCooling, convectionCooling = 0, 0
     local motor = self:getMotor()
+    
+    local dbg = spec.debugData.transmissionTemp
+
     local loadFactor = motorLoad - motor.motorExternalTorque / motor.peakMotorTorque
     local slipFactor = 1.0
     local accFactor = 1.0
@@ -868,7 +893,6 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     
     local deltaTemp = math.max(0, spec.rawTransmissionTemperature - eviromentTemp)
     convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
-
 
     if isMotorStarted then
         if (self:getAccelerationAxis() > 0 or self:getCruiseControlAxis() > 0) then
@@ -901,7 +925,11 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)
     else
-        cooling = convectionCooling / 10
+        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
+            cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
+        else
+            cooling = convectionCooling
+        end
     end
 
     local alpha = dt / (C.TAU + dt)
@@ -910,71 +938,110 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     spec.transmissionTemperature = math.max(spec.transmissionTemperature + alpha * (spec.rawTransmissionTemperature - spec.transmissionTemperature), eviromentTemp)
 
     if isMotorStarted and spec.transmissionTemperature > C.TRANS_THERMOSTAT_MIN_TEMP then
-        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year)
+        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
     else
         spec.transmissionThermostatState = 0.0
         spec.transTermPID.integral = 0
         spec.transTermPID.lastError = 0
+        
+        if dbg then
+            dbg.kp = 0
+            dbg.stiction = 0
+            dbg.waxSpeed = 0
+        end
     end
     
-    return {totalHeat = heat, totalCooling = cooling, radiatorCooling = radiatorCooling, speedCooling = speedCooling, convectionCooling = convectionCooling, loadFactor = loadFactor, slipFactor = slipFactor, accFactor = accFactor}
+    if dbg then
+        dbg.totalHeat = heat
+        dbg.totalCooling = cooling
+        dbg.radiatorCooling = radiatorCooling
+        dbg.speedCooling = speedCooling
+        dbg.convectionCooling = convectionCooling
+        dbg.loadFactor = loadFactor
+        dbg.slipFactor = slipFactor
+        dbg.accFactor = accFactor
+    end
+
+    return dbg
 end
 
 
-function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth, year)
+function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth, year, stuckedPosition, debugData)
+
+    if stuckedPosition ~= nil then
+        return stuckedPosition
+    end
+    
     local C = ADS_Config.THERMAL
-    local dtSeconds = dt / 1000
+    local dtSeconds = math.max(dt / 1000, 0.001)
 
-    local isMechanical = year < 2000 
-
-if isMechanical then
+    local isMechanical = year < C.THERMOSTAT_TYPE_YEAR_DIVIDER
+    local targetPos = 0
+    local maxOpening = 1.0
+    
+    if isMechanical then
         local startOpenTemp = C.PID_TARGET_TEMP - 10 
         local fullOpenTemp = C.PID_TARGET_TEMP + 3  
-        local targetPos = (currentTemp - startOpenTemp) / (fullOpenTemp - startOpenTemp)
-        targetPos = math.clamp(targetPos, 0.0, 1.0)
-
-        local waxSpeed = math.clamp(0.025 + (year - 1950) * 0.0006, 0.025, 0.05)
-        waxSpeed = waxSpeed * math.max(0.2, thermostatHealth)
-
-        local currentMechPos = pidData.mechPos or 0.0 
-        local delta = targetPos - currentMechPos
-        local maxMove = waxSpeed * dtSeconds
-            
-        if math.abs(delta) > maxMove then
-            delta = maxMove * (delta > 0 and 1 or -1)
-        end
-            
-        local newPos = math.clamp(currentMechPos + delta, 0.0, thermostatHealth)
-        pidData.mechPos = newPos
-        
-        pidData.integral = 0 
+        targetPos = (currentTemp - startOpenTemp) / (fullOpenTemp - startOpenTemp)
+        pidData.integral = 0
         pidData.lastError = 0
-
-        local stiction = math.clamp(0.1 - (year - 1950) * 0.0016, 0.02, 0.1)
-
-        return math.clamp(math.floor(newPos / stiction) * stiction, 0.0, thermostatHealth) 
-
+        if debugData then debugData.kp = 0 end
     else
-        local pid_kp = math.clamp(0.01 + (year - 2000) * 0.015, 0.01, C.PID_KP)
-        
+        local pidKpYearFactor = (year - C.THERMOSTAT_TYPE_YEAR_DIVIDER) / (C.ELECTRONIC_THERMOSTAT_MAX_YEAR - C.THERMOSTAT_TYPE_YEAR_DIVIDER)
+        local pid_kp = math.clamp(C.PID_KP_MIN + (C.PID_KP_MAX - C.PID_KP_MIN) * pidKpYearFactor, C.PID_KP_MIN, C.PID_KP_MAX)
         local errorTemp = currentTemp - C.PID_TARGET_TEMP
-        local derivative = (errorTemp - pidData.lastError) / dtSeconds
-        local newIntegral = pidData.integral + errorTemp * dtSeconds
-
+        
+        local derivative = 0
+        if dtSeconds > 0.001 then
+            derivative = (errorTemp - (pidData.lastError or 0)) / dtSeconds
+        end
+        
+        local newIntegral = (pidData.integral or 0) + errorTemp * dtSeconds
         local controlSignal = pid_kp * errorTemp + C.PID_KI * newIntegral + C.PID_KD * derivative
         
-        if not ((controlSignal <= 0 and errorTemp < 0) or (controlSignal >= 1 and errorTemp > 0)) then
+        if (controlSignal >= 0 and controlSignal <= maxOpening) or 
+           (controlSignal < 0 and errorTemp > 0) or 
+           (controlSignal > maxOpening and errorTemp < 0) then
+            
             pidData.integral = math.clamp(newIntegral, -C.PID_MAX_INTEGRAL, C.PID_MAX_INTEGRAL)
         end
         
-        controlSignal = pid_kp * errorTemp + C.PID_KI * pidData.integral + C.PID_KD * derivative
-        
+        targetPos = pid_kp * errorTemp + C.PID_KI * pidData.integral + C.PID_KD * derivative
         pidData.lastError = errorTemp
-
-        pidData.mechPos = math.clamp(controlSignal, 0.0, thermostatHealth) 
         
-        return math.clamp(controlSignal, 0.0, thermostatHealth)
+        if debugData then debugData.kp = pid_kp end
     end
+
+    targetPos = math.clamp(targetPos, 0.0, maxOpening)
+
+    local baseSpeed = isMechanical and C.MECHANIC_THERMOSTAT_MIN_WAX_SPEED or C.ELECTRONIC_THERMOSTAT_MIN_WAX_SPEED
+    local yearFactor = isMechanical and (year - 1950) * 0.0005 or (year - 2000) * 0.0016
+    
+    local waxSpeed = math.clamp(baseSpeed + yearFactor, C.MECHANIC_THERMOSTAT_MIN_WAX_SPEED, C.ELECTRONIC_THERMOSTAT_MAX_WAX_SPEED)
+    waxSpeed = waxSpeed * math.max(0.2, thermostatHealth)
+
+    local currentMechPos = pidData.mechPos or 0.0 
+    local delta = targetPos - currentMechPos
+    local maxMove = waxSpeed * dtSeconds
+        
+    if math.abs(delta) > maxMove then
+        delta = maxMove * (delta > 0 and 1 or -1)
+    end
+        
+    local newPos = math.clamp(currentMechPos + delta, 0.0, maxOpening)
+    pidData.mechPos = newPos
+
+    local baseStiction = isMechanical and (0.1 - (year - 1950) * 0.0016) or (0.05 - (year - 2000) * 0.0016)
+    local stiction = math.clamp(baseStiction, 0.01, 0.1)
+    
+    stiction = stiction * (2 - math.max(0.5, thermostatHealth))
+    
+    if debugData then
+        debugData.stiction = stiction
+        debugData.waxSpeed = waxSpeed
+    end
+
+    return math.clamp(math.floor(newPos / stiction) * stiction, 0.0, maxOpening)
 end
 
 ------------------- service and condition-------------------
@@ -1002,7 +1069,7 @@ function AdvancedDamageSystem:calculateWearRates()
         end
 
         -- service
-        if spec.serviceLevel < C.SERVICE_EXPIRED_THRESHOLD then
+        if self:getServiceLevel() < C.SERVICE_EXPIRED_THRESHOLD then
             expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_THRESHOLD, true)
             expiredServiceFactor = expiredServiceFactor * C.SERVICE_EXPIRED_MAX_MULTIPLIER
             conditionWearRate = conditionWearRate + expiredServiceFactor
@@ -1117,7 +1184,7 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
     end
     local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITY
 
-    local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(spec.conditionLevel, probability, dt)
+    local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(self:getConditionLevel(), probability, dt)
     failureChancePerFrame = failureChancePerFrame + (failureChancePerFrame * math.max(((conditionWearRate - 1) / 10), 0)) + (failureChancePerFrame * spec.extraBreakdownProbability)
     failureChancePerFrame = failureChancePerFrame * conditionWearRate
 
@@ -1132,7 +1199,7 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
         local breakdownId = self:getRandomBreakdown()
         if breakdownId == nil then return end
 
-        local criticalOutcomeChance = math.clamp((1 - spec.conditionLevel) ^ probability.CRITICAL_DEGREE, probability.CRITICAL_MIN, probability.CRITICAL_MAX)
+        local criticalOutcomeChance = math.clamp((1 - self:getConditionLevel()) ^ probability.CRITICAL_DEGREE, probability.CRITICAL_MIN, probability.CRITICAL_MAX)
 
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
         if not registryEntry then
@@ -1172,7 +1239,7 @@ function AdvancedDamageSystem:getRandomBreakdown()
         return nil
     end
 
-    local activeBreakdowns = self.spec_AdvancedDamageSystem.activeBreakdowns
+    local activeBreakdowns = self:getActiveBreakdowns()
     local applicableBreakdowns = {}
     local totalProbability = 0
 
@@ -1224,7 +1291,7 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
 
-    local activeBreakdowns = self.spec_AdvancedDamageSystem.activeBreakdowns
+    local activeBreakdowns = self:getActiveBreakdowns()
     local activeBreakdownsCount = 0
     for _, _ in pairs(activeBreakdowns) do
         activeBreakdownsCount = activeBreakdownsCount + 1
@@ -1242,7 +1309,7 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
         return
     end
     
-    if spec.activeBreakdowns[breakdownId] then
+    if self:hasBreakdown(breakdownId) then
         log_dbg("-> Breakdown already active. Aborting.")
         return
     end
@@ -1295,6 +1362,16 @@ function AdvancedDamageSystem:removeBreakdown(...)
     log_dbg("-> removeBreakdown finished.")
 end
 
+function AdvancedDamageSystem:hasBreakdown(breakdownId)
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec or not spec.activeBreakdowns or next(spec.activeBreakdowns) == nil then
+        return false
+    end
+
+    return spec.activeBreakdowns[breakdownId] ~= nil
+end
+
+
 function AdvancedDamageSystem:advanceBreakdown(breakdownId)
     local spec = self.spec_AdvancedDamageSystem
     if not spec or not spec.activeBreakdowns or next(spec.activeBreakdowns) == nil or spec.activeBreakdowns[breakdownId] == nil then
@@ -1320,7 +1397,7 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     local C = ADS_Config.CORE
     local effectsNeedRecalculation = false
 
-    for id, breakdown in pairs(spec.activeBreakdowns) do
+    for id, breakdown in pairs(self:getActiveBreakdowns()) do
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
 
         if registryEntry then
@@ -1347,13 +1424,18 @@ function AdvancedDamageSystem:processBreakdowns(dt)
                             if breakdown.stage < maxStages then
                                 breakdown.stage = breakdown.stage + 1
                                 breakdown.progressTimer = 0
-                                
                                 effectsNeedRecalculation = true
 
+                                if breakdown.stage == maxStages and registryEntry.stages[breakdown.stage].detectionChance > 0 then
+                                    breakdown.isVisible = true
+                                end
+
                                 log_dbg(string.format("ADS: Breakdown '%s' on vehicle '%s' advanced to stage %d.", id, self:getFullName(), breakdown.stage))
-                            else
-                                breakdown.progressTimer = stageDuration
-                                breakdown.isVisible = true
+                            end
+
+                            if id == "GENERAL_WEAR_AND_TEAR" then
+                                breakdown.progressTimer = 0
+                                effectsNeedRecalculation = true
                             end
                         end
                     end
@@ -1365,28 +1447,6 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     if effectsNeedRecalculation then
         self:recalculateAndApplyEffects()
     end
-end
-
-
-function AdvancedDamageSystem:processPermanentEffects(dt)
-    log_dbg("processPermanentEffects TICK for vehicle:", self:getFullName())
-    local spec = self.spec_AdvancedDamageSystem
-    if not spec then
-        return
-    end
-
-    if spec.activeBreakdowns['GENERAL_WEAR_AND_TEAR'] ~= nil and spec.conditionLevel > 0.67 then
-        log_dbg("Condition improved. Removing GENERAL_WEAR_AND_TEAR.")
-        self:removeBreakdown('GENERAL_WEAR_AND_TEAR')
-    elseif spec.activeBreakdowns['GENERAL_WEAR_AND_TEAR'] == nil and spec.conditionLevel < 0.66 then
-        log_dbg("Condition degraded. Adding GENERAL_WEAR_AND_TEAR.")
-        self:addBreakdown('GENERAL_WEAR_AND_TEAR', 1)
-    end
-    if spec.activeBreakdowns['POOR_QUALITY_PARTS'] ~= nil and spec.activeBreakdowns['POOR_QUALITY_PARTS'].progressTimer >= ADS_Config.MAINTENANCE.AFTERMARKETS_PARTS_BREAKDOWN_DURATION then
-        self:removeBreakdown('POOR_QUALITY_PARTS')
-    end
-
-    self:recalculateAndApplyEffects()
 end
 
 local function shallow_copy(original)
@@ -1406,8 +1466,14 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
     local previouslyActiveEffects = spec.activeEffects or {}
     local aggregatedEffects = {}
 
-    for id, breakdown in pairs(spec.activeBreakdowns) do
+    for id, breakdown in pairs(self:getActiveBreakdowns()) do
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
+
+        if registryEntry == nil then
+            log_dbg("Warning: Could not find registry entry for breakdown ID: ".. id ..". Removing breakdown from active list.")
+            self:removeBreakdown(id)
+        end
+
         if registryEntry and registryEntry.stages[breakdown.stage] then
             local stageData = registryEntry.stages[breakdown.stage]
 
@@ -1473,12 +1539,12 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
         local isCurrentlyActive = spec.activeEffects[effectId] ~= nil
         local wasPreviouslyActive = previouslyActiveEffects[effectId] ~= nil
 
-
         if isCurrentlyActive then
             if applicator.apply then
                 applicator.apply(self, spec.activeEffects[effectId], applicator)
-                if spec.activeEffects[effectId].extraData ~= nil and spec.activeEffects[effectId].extraData.message ~= nil and self.getIsControlled ~= nil and not self:getIsControlled() then
-                    g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, self:getFullName() .. ": " .. g_i18n:getText(spec.activeEffects[effectId].extraData.message))
+                local currentEffect = spec.activeEffects[effectId]
+                if currentEffect and currentEffect.extraData ~= nil and currentEffect.extraData.message ~= nil and self.getIsControlled ~= nil and not self:getIsControlled() then
+                    g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, self:getFullName() .. ": " .. g_i18n:getText(currentEffect.extraData.message))
                 end
             end
         elseif wasPreviouslyActive then
@@ -1501,7 +1567,7 @@ function AdvancedDamageSystem:recalculateAndApplyIndicators()
     spec.activeIndicators = {} 
     local aggregatedIndicatorData = {} 
 
-    for id, breakdown in pairs(spec.activeBreakdowns) do
+    for id, breakdown in pairs(self:getActiveBreakdowns()) do
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
         if registryEntry and registryEntry.stages[breakdown.stage] then
             local stageData = registryEntry.stages[breakdown.stage]
@@ -1583,7 +1649,6 @@ function AdvancedDamageSystem:recalculateAndApplyIndicators()
     log_dbg("-> recalculateAndApplyIndicators finished.")
 end
 
-
 --------------------- maintenance --------------------------------
 
 function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount, isAftermarketParts)
@@ -1613,7 +1678,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
                 end
             end
             local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
-            for id, breakdown in pairs(spec.activeBreakdowns) do
+            for id, breakdown in pairs(self:getActiveBreakdowns()) do
                 if not breakdown.isVisible then
                     local chance = breakdownRegistry[id].stages[breakdown.stage].detectionChance
                     if math.random() < chance then
@@ -1630,7 +1695,7 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
         elseif type == states.REPAIR then
             totalTimeMs = C.REPAIR_TIME * (breadownsCount or 0) * C.MAINTENANCE_DURATION_MULTIPLIER
             local idsToRepair = {}
-            for id, breakdown in pairs(spec.activeBreakdowns) do
+            for id, breakdown in pairs(self:getActiveBreakdowns()) do
                 if breakdown.isSelectedForRepair then
                     table.insert(idsToRepair, id)
                 end
@@ -1656,11 +1721,11 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
             
             spec.serviceLevel = 1.0
             
-            if spec.conditionLevel < spec.baseConditionLevel then
-                local missingCondition = spec.baseConditionLevel - spec.conditionLevel
+            if self:getConditionLevel() < spec.baseConditionLevel then
+                local missingCondition = spec.baseConditionLevel - self:getConditionLevel()
                 local minRestore, maxRestore = C.OVERHAUL_MIN_CONDITION_RESTORE, C.OVERHAUL_MAX_CONDITION_RESTORE
                 if isAftermarketParts then
-                    minRestore = minRestore / 2
+                    minRestore = minRestore / 3
                 end
                 local ageFactor = math.max(math.log10(self.age), 1)
                 local randomFactor = minRestore + math.random() * (maxRestore - minRestore)
@@ -1669,7 +1734,6 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
             end
 
         end
-
 
         AdvancedDamageSystem.setLastInspectionStates(self, spec.serviceLevel, spec.conditionLevel)
         spec.lastInspectedPower = (spec.activeEffects.ENGINE_TORQUE_MODIFIER and (1 + spec.activeEffects.ENGINE_TORQUE_MODIFIER.value)) or 1
@@ -1688,14 +1752,14 @@ function AdvancedDamageSystem:initMaintenance(type, workshopType, breadownsCount
         if isAftermarketParts then
             local chance = C.AFTERMARKETS_PARTS_BREAKDOWN_CHANCE
             if type == AdvancedDamageSystem.STATUS.REPAIR then
-                chance = chance + (breadownsCount * 0.33)
-            end
-            if math.random() < chance then
-                if spec.activeBreakdowns['POOR_QUALITY_PARTS'] ~= nil then
-                    self:removeBreakdown('POOR_QUALITY_PARTS')
+                chance = math.min(chance + (breadownsCount * 0.33), 0.8)
+                if math.random() < chance then
+                    self:addBreakdown('REPAIR_WITH_POOR_QUALITY_PARTS', 1) 
                 end
-                local stage = math.random(3)
-                self:addBreakdown('POOR_QUALITY_PARTS', stage) 
+            elseif type == AdvancedDamageSystem.STATUS.MAINTENANCE then
+                if math.random() < chance then
+                    self:addBreakdown('MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES', 1) 
+                end
             end
         end
 
@@ -2127,7 +2191,8 @@ function AdvancedDamageSystem.calculateMaintenancePrice(vehicle, maintenanceType
         if selectedBreakdown ~= nil then
             local registryEntry = ADS_Breakdowns.BreakdownRegistry[selectedBreakdown]
             if registryEntry ~= nil then
-                local repairPriceM = registryEntry.stages[spec.activeBreakdowns[selectedBreakdown].stage].repairPrice
+                local activeBreakdowns = vehicle:getActiveBreakdowns()
+                local repairPriceM = registryEntry.stages[activeBreakdowns[selectedBreakdown].stage].repairPrice
                 repairPrice = (repairPriceM * C.MAINTENANCE_PRICE_MULTIPLIER * (price / 100) * ageFactor)
             end
         else
@@ -2406,7 +2471,7 @@ function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
             return
         end
 
-        for id, breakdown in pairs(spec.activeBreakdowns) do
+        for id, breakdown in pairs(vehicle:getActiveBreakdowns()) do
             local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
             if registryEntry and breakdown.stage < #registryEntry.stages then
                 breakdown.stage = breakdown.stage + 1
@@ -2555,6 +2620,7 @@ function AdvancedDamageSystem.ConsoleCommands:getDebugVehicleInfo(rawArgs)
     local spec = vehicle.spec_AdvancedDamageSystem
 
     print("--- Vehicle Debug Info ---")
+    print(string.format("RawBrand: %s", g_brandManager:getBrandByIndex(vehicle:getBrand()).name))
     print(string.format("Name: %s", vehicle:getFullName()))
     print(string.format("Type: %s", vehicle.type.name))
     local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)

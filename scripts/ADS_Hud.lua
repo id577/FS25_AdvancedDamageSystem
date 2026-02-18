@@ -244,10 +244,6 @@ function ADS_Hud:drawDashboard()
         motorLoad = 0
     end
 
-    if vehicle.spec_CVTaddon ~= nil and vehicle.spec_CVTaddon.CVTcfgExists then
-        transTemp = vehicle.spec_motorized.motorTemperature.value
-    end
-
     local tempSign = "°C"
 
     if g_gameSettings:getValue(GameSettings.SETTING.USE_FAHRENHEIT) then
@@ -404,13 +400,6 @@ function ADS_Hud:drawActiveVehicleHUD()
         currentY = currentY - panel.lineHeight
     end
 
-    if vehicle.spec_CVTaddon ~= nil and vehicle.spec_CVTaddon.CVTcfgExists then
-        renderText(col1_x, currentY, textSettings.normalSize, string.format("CVT Addon:"))
-        renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("-%.2f%% | -%.2f%% (%s|%s|%s|%s|%s) ", spec.debugData.cvtAddon.totalWearRate * bcw, spec.debugData.cvtAddon.reducedAmount * bcw, spec.debugData.cvtAddon.warnheat, spec.debugData.cvtAddon.warndamage, spec.debugData.cvtAddon.critheat, spec.debugData.cvtAddon.critdamage, spec.debugData.cvtAddon.highpressure))
-        renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
-        currentY = currentY - panel.lineHeight   
-    end
-
     renderText(col1_x, currentY, textSettings.normalSize, string.format("Failure chance:"))
     renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f%% (%.2f%%)", spec.debugData.breakdown.failureChanceInHour * 100, spec.debugData.breakdown.criticalFailureInHour * 100))
     renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
@@ -426,28 +415,28 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     renderText(col2_x, currentY, textSettings.normalSize, "Engine:")
     drawTemp(spec.engineTemperature)
-    renderText(col3_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f°C", spec.engineTemperature))
+    renderText(col3_x - 0.09, currentY, textSettings.normalSize, string.format("%.2f°C", spec.engineTemperature))
     setTextColor(1, 1, 1, 1)
     renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
     currentY = currentY - panel.lineHeight
     
     setTextColor(1, 1, 1, 1)
     renderText(col2_x, currentY, textSettings.normalSize, string.format(" T-stat:"))
-    renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%%", spec.thermostatState * 100))
+    renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (k: %.2f | s: %.1f%% | w: %.1f%%)", spec.thermostatState * 100, spec.debugData.engineTemp.kp, spec.debugData.engineTemp.stiction * 100, spec.debugData.engineTemp.waxSpeed * 100))
     setTextColor(1, 1, 1, 1)
     renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
     currentY = currentY - panel.lineHeight
 
     setTextColor(1, 1, 1, 1)
     renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total heat:"))
-    renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%%",  spec.debugData.engineTemp.totalHeat * 100))
+    renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%%",  spec.debugData.engineTemp.totalHeat * 100))
     setTextColor(1, 1, 1, 1)
     renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
     currentY = currentY - panel.lineHeight
 
     setTextColor(1, 1, 1, 1)
     renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total cooling:"))
-    renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (%.0f%% | %.0f%% | %.0f%%)",  spec.debugData.engineTemp.totalCooling * 100, spec.debugData.engineTemp.radiatorCooling * 100, spec.debugData.engineTemp.speedCooling * 100, spec.debugData.engineTemp.convectionCooling * 100))
+    renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (r: %.0f%% | s: %.0f%% | c: %.0f%%)",  spec.debugData.engineTemp.totalCooling * 100, spec.debugData.engineTemp.radiatorCooling * 100, spec.debugData.engineTemp.speedCooling * 100, spec.debugData.engineTemp.convectionCooling * 100))
     setTextColor(1, 1, 1, 1)
     renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
     currentY = currentY - panel.lineHeight
@@ -456,28 +445,28 @@ function ADS_Hud:drawActiveVehicleHUD()
     if spec.transmissionTemperature > -30 and spec.year >= 2000 then
         renderText(col2_x, currentY, textSettings.normalSize, "Transmission:")
         drawTemp(spec.transmissionTemperature)
-        renderText(col3_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f°C", spec.transmissionTemperature))
+        renderText(col3_x - 0.09, currentY, textSettings.normalSize, string.format("%.2f°C", spec.transmissionTemperature))
         setTextColor(1, 1, 1, 1)
         renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
         currentY = currentY - panel.lineHeight
         
         setTextColor(1, 1, 1, 1)
         renderText(col2_x, currentY, textSettings.normalSize, string.format(" T-stat:"))
-        renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%%", spec.transmissionThermostatState * 100))
+        renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (k: %.2f | s: %.1f%% | w: %.1f%%)", spec.transmissionThermostatState * 100, spec.debugData.transmissionTemp.kp, spec.debugData.transmissionTemp.stiction * 100, spec.debugData.transmissionTemp.waxSpeed * 100))
         setTextColor(1, 1, 1, 1)
         renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
         currentY = currentY - panel.lineHeight
 
         setTextColor(1, 1, 1, 1)
         renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total heat:"))
-        renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% | %.2f | %.2f | %.2f",  spec.debugData.transmissionTemp.totalHeat * 100, spec.debugData.transmissionTemp.loadFactor, spec.debugData.transmissionTemp.slipFactor, spec.debugData.transmissionTemp.accFactor))
+        renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% | %.2f | %.2f | %.2f",  spec.debugData.transmissionTemp.totalHeat * 100, spec.debugData.transmissionTemp.loadFactor, spec.debugData.transmissionTemp.slipFactor, spec.debugData.transmissionTemp.accFactor))
         setTextColor(1, 1, 1, 1)
         renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
         currentY = currentY - panel.lineHeight
 
         setTextColor(1, 1, 1, 1)
         renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total cooling:"))
-        renderText(col3_x - 0.07, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (%.0f%% | %.0f%% | %.0f%%)",  spec.debugData.transmissionTemp.totalCooling * 100, spec.debugData.transmissionTemp.radiatorCooling * 100, spec.debugData.transmissionTemp.speedCooling * 100, spec.debugData.transmissionTemp.convectionCooling * 100))
+        renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (r: %.0f%% | s: %.0f%% | c: %.0f%%)",  spec.debugData.transmissionTemp.totalCooling * 100, spec.debugData.transmissionTemp.radiatorCooling * 100, spec.debugData.transmissionTemp.speedCooling * 100, spec.debugData.transmissionTemp.convectionCooling * 100))
         setTextColor(1, 1, 1, 1)
         renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
         currentY = currentY - panel.lineHeight

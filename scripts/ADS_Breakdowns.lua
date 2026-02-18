@@ -65,14 +65,14 @@ ADS_Breakdowns.BreakdownRegistry = {
             return 0.0   
         end,
         isCanProgress = function(vehicle)
-            return false
+            return true
         end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_permanent",
                 description = "ads_breakdowns_general_wear_and_tear_stage1_description",
                 detectionChance = 0.0,
-                progressMultiplier = 0.0,
+                progressMultiplier = 0.007,
                 repairPrice = 0.0,
                 effects = {
                     { 
@@ -109,7 +109,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { 
                         id = "THERMOSTAT_HEALTH_MODIFIER", 
                         value = function(vehicle)
-                            local baseEffect = -0.1
+                            local baseEffect = -0.30
                             local condition = vehicle:getConditionLevel()
                             local multiplier = (1 - condition) ^ 3
                             return baseEffect * multiplier
@@ -133,7 +133,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    POOR_QUALITY_PARTS = {
+    MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES = {
         isSelectable = false,
         part = "ads_breakdowns_part_vehicle",
         isApplicable = function(vehicle)
@@ -150,12 +150,13 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "",
                 description = "",
                 detectionChance = 0.0,
-                progressMultiplier = 0.0,
+                progressMultiplier = 5.0,
                 repairPrice = 0.0,
                 effects = {
-                    { id = "BREAKDOWN_PROBABILITY_MODIFIER", value = 1.0, aggregation = 'sum' }
+                    { id = "CONDITION_WEAR_MODIFIER", value = 0.33, aggregation = 'sum' },
+                    { id = "SERVICE_WEAR_MODIFIER", value = 0.33, aggregation = 'sum' }
                 }
-            },     
+            },
             {
                 severity = "",
                 description = "",
@@ -163,22 +164,55 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.0,
                 repairPrice = 0.0,
                 effects = {
-                    { id = "CONDITION_WEAR_MODIFIER", value = 0.5, aggregation = 'sum' }
+                    { id = "SELF_DISAPPEARING_BREAKDOWN_EFFECT", value = 1.0, aggregation = 'boolean_or', extraData = {breakdownId = "MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES"} }
                 }
-            },     
-            {
-                severity = "",
-                description = "",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {
-                    { id = "SERVICE_WEAR_MODIFIER", value = 0.5, aggregation = 'sum' }
-                }
-            },    
+            },   
         },
     },
 
+    REPAIR_WITH_POOR_QUALITY_PARTS = {
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            return true
+        end,
+        stages = {
+            {
+                severity = "",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 2.0,
+                repairPrice = 0.0,
+                effects = {}
+            },
+            {
+                severity = "",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.001,
+                repairPrice = 0.0,
+                effects = { 
+                    { id = "REPEATED_BREAKDOWN_EFFECT", value = 1.0, aggregation = 'boolean_or', extraData = {breakdownId = nil} },
+                },
+            },
+            {
+                severity = "",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = { 
+                    { id = "SELF_DISAPPEARING_BREAKDOWN_EFFECT", value = 1.0, aggregation = 'boolean_or', extraData = {breakdownId = "REPAIR_WITH_POOR_QUALITY_PARTS"} }
+                },
+            },
+        },
+    },
 
     OVERHEAT_PROTECTION = {
         isSelectable = false,
@@ -990,7 +1024,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 3.0,
                 repairPrice = 0.44,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.05, aggregation = "min"}
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.3, aggregation = "min"}
                 }
             },
             {
@@ -1000,7 +1034,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.5,
                 repairPrice = 0.88,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
@@ -1013,7 +1047,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.5,
                 repairPrice = 1.76,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.8, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1026,7 +1060,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 3.52,
                 effects = {
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.5, aggregation = "min"}
+                    { id = "THERMOSTAT_STUCK_EFFECT", value = -1.0, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false },
@@ -1495,6 +1529,44 @@ local function removeFuncFromActive(v, effectName)
     end
 end
 
+--- REPEATED_BREAKDOWN_EFFECT
+ADS_Breakdowns.EffectApplicators.REPEATED_BREAKDOWN_EFFECT = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying REPEATED_BREAKDOWN_EFFECT")
+        if effectData.extraData.breakdownId == nil then
+            local spec = vehicle.spec_AdvancedDamageSystem
+            for i = #spec.maintenanceLog, 1, -1 do
+                local logEntry = spec.maintenanceLog[i]
+                if logEntry and logEntry.type == AdvancedDamageSystem.STATUS.REPAIR and logEntry.isAftermarketParts then
+                    local random = math.random(1, #logEntry.selectedBreakdowns)
+                    local randomStage = math.random(1, #ADS_Breakdowns.BreakdownRegistry[logEntry.selectedBreakdowns[random]].stages)
+                    vehicle:addBreakdown(logEntry.selectedBreakdowns[random], 1)
+                    break
+                end
+            end
+        else
+            local randomStage = math.random(1, #ADS_Breakdowns.BreakdownRegistry[effectData.extraData.breakdownId].stages)
+            vehicle:addBreakdown(effectData.extraData.breakdownId, 1)
+        end
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing REPEATED_BREAKDOWN_EFFECT effect.")
+    end
+}
+
+--- SELF_DISAPPEARING_BREAKDOWN_EFFECT
+ADS_Breakdowns.EffectApplicators.SELF_DISAPPEARING_BREAKDOWN_EFFECT = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying SELF_DISAPPEARING_BREAKDOWN_EFFECT")
+        vehicle:removeBreakdown(effectData.extraData.breakdownId)
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing SELF_DISAPPEARING_BREAKDOWN_EFFECT effect.")
+    end
+}
+
 --- ENGINE_FAILURE
 ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
     getEffectName = function()
@@ -1781,6 +1853,25 @@ ADS_Breakdowns.EffectApplicators.THERMOSTAT_HEALTH_MODIFIER = {
         log_dbg("Removing THERMOSTAT_HEALTH_MODIFIER effect.")
         local spec = vehicle.spec_AdvancedDamageSystem
         spec.thermostatHealth = 1.0
+    end
+}
+
+----------------- THERMOSTAT_STUCK_EFFECT --------------------
+ADS_Breakdowns.EffectApplicators.THERMOSTAT_STUCK_EFFECT = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying THERMOSTAT_STUCK_EFFECT")
+        local spec = vehicle.spec_AdvancedDamageSystem
+
+
+        if spec.thermostatStuckedPosition == nil or spec.thermostatStuckedPosition < 0 then
+            spec.thermostatStuckedPosition = spec.thermostatState
+        end
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing THERMOSTAT_STUCK_EFFECT")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.thermostatStuckedPosition = nil
     end
 }
 

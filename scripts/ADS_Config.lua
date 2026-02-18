@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 11,
+    VER = 18,
 
     DEBUG = false,
 
@@ -86,8 +86,9 @@ ADS_Config = {
         -- This can be modified by individual breakdown definitions. 3,600,000ms = 1 hour.
         BASE_BREAKDOWN_PROGRESS_TIME = 3600000,
 
-        CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 8,
+        CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 5,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
+        GENERAL_WEAR_AND_TEAR_THRESHOLD = 0.5,
 
         -- Defines the probability of a new breakdown occurring.
         BREAKDOWN_PROBABILITY = {
@@ -218,13 +219,31 @@ ADS_Config = {
         -- The ideal operating temperature (in Celsius) the system tries to maintain.
         PID_TARGET_TEMP = 90,
         -- Proportional gain: How strongly the thermostat reacts to the *current* temperature error.
-        PID_KP = 0.4,
+        PID_KP_MAX = 0.4,
+        PID_KP_MIN = 0.01,
         -- Integral gain: Corrects for small, persistent errors over time to reach the target temperature.
         PID_KI = 0.02,
         -- Derivative gain: Dampens the reaction to prevent overshooting the target temperature.
         PID_KD = 1.8,
         -- A safety limit to prevent the Integral term from growing too large ("integral windup").
-        PID_MAX_INTEGRAL = 200
+        PID_MAX_INTEGRAL = 200,
+
+        COOLING_SLOWDOWN_THRESHOLD = 90,
+        COOLING_SLOWDOWN_POWER = 8,
+
+        THERMOSTAT_TYPE_YEAR_DIVIDER = 2000,
+        MECHANIC_THERMOSTAT_MIN_YEAR = 1950,
+        ELECTRONIC_THERMOSTAT_MAX_YEAR = 2025,
+
+        MECHANIC_THERMOSTAT_MIN_WAX_SPEED = 0.025,
+        MECHANIC_THERMOSTAT_MAX_WAX_SPEED = 0.05,
+        MECHANIC_THERMOSTAT_MIN_STICTION = 0.02,
+        MECHANIC_THERMOSTAT_MAX_STICTION = 0.1,
+
+        ELECTRONIC_THERMOSTAT_MIN_WAX_SPEED = 0.04,
+        ELECTRONIC_THERMOSTAT_MAX_WAX_SPEED = 0.08,
+        ELECTRONIC_THERMOSTAT_MIN_STICTION = 0.01,
+        ELECTRONIC_THERMOSTAT_MAX_STICTION = 0.05
     },
 
 
@@ -240,87 +259,73 @@ ADS_Config = {
     -- The BRAND_NAME must match the exact name used in the game's brand definitions.
     -- ====================================================================================
     BRANDS = {
-        -- Parameter 1: Reliability Multiplier
-        --  - This value affects the rate of Condition wear.
-        --  - > 1.0: The vehicle is more reliable. Wear rate is DIVIDED by this number, causing slower degradation.
-        --           Example: 1.20 means the vehicle is more robust and wears 16.7% slower than standard.
-        --  - < 1.0: The vehicle is less reliable. Wear rate is DIVIDED by this number, causing faster degradation.
-        --           Example: 0.90 means the vehicle is less robust and wears 11.1% faster than standard.
-        --
-        -- Parameter 2: Maintainability Multiplier (Repair Cost Factor)
-        --  - This value affects the final cost of all maintenance, repair, and overhaul actions.
-        --  - > 1.0: The vehicle is easier/cheaper to maintain. Final costs are DIVIDED by this number, making them LOWER.
-        --           Example: 1.30 (for Zetor) means repairs are significantly cheaper.
-        --  - < 1.0: The vehicle is more complex or has expensive parts. Final costs are DIVIDED by this number, making them HIGHER.
-        --           Example: 0.85 (for Fendt) means repairs are more expensive.
 
-        -- Premium, highly reliable, but expensive to repair brands
-        FENDT           = {1.20, 0.85},
-        JOHNDEERE       = {1.20, 0.90},
-        VOLVO           = {1.20, 0.95},
-        KOMATSU         = {1.20, 1.00},
-        PONSSE          = {1.20, 0.95},
-        ROTTNE          = {1.20, 0.95},
-        CATERPILLAR     = {1.20, 0.85},
-        KENWORTH        = {1.15, 0.90},
-        PETERBILT       = {1.15, 0.90},
-        SCHLUETER       = {1.15, 0.95}, 
+            FENDT           = {1.25, 0.80}, 
+            JOHNDEERE       = {1.25, 0.85},
+            VOLVO           = {1.25, 0.90},
+            KOMATSU         = {1.25, 0.95},
+            PONSSE          = {1.20, 0.90}, 
+            ROTTNE          = {1.20, 0.90},
+            CATERPILLAR     = {1.25, 0.80},
+            KENWORTH        = {1.20, 0.90},
+            PETERBILT       = {1.20, 0.90},
+            SCHLUETER       = {1.20, 0.95},
 
-        -- High-quality, reliable brands with varying repair costs
-        CLAAS           = {1.15, 0.95},
-        ROPA            = {1.15, 0.90},
-        HOLMER          = {1.15, 0.90},
-        MACK            = {1.15, 1.05},
-        KRONE           = {1.10, 1.00},
-        KUBOTA          = {1.10, 1.00},
-        MAN             = {1.10, 0.95},
-        CHALLENGER      = {1.10, 0.90},
-        AGCO            = {1.10, 0.90},
-        MERCEDES        = {1.10, 0.90},
-        KRAMER          = {1.10, 0.95},
-        
-        -- Standard, baseline brands representing the industry average
-        LINDNER         = {1.05, 1.00},
-        VALTRA          = {1.05, 1.10},
-        GMC             = {1.05, 1.05},
-        CASEIH          = {1.00, 1.00},
-        NEWHOLLAND      = {1.00, 1.00},
-        SDF             = {1.00, 1.00},
-        MASSEYFERGUSON  = {1.00, 1.05},
-        JCB             = {1.00, 0.95},
-        DEUTZFAHR       = {1.00, 1.00},
-        STEYR           = {1.00, 0.95},
-        VERSATILE       = {1.00, 1.15},
-        INTERNATIONAL   = {1.00, 1.15},
-        FORD            = {1.00, 1.10},
-        RENAULT         = {1.00, 1.05},
-        INTERNATIONALHARVESTER   = {1.00, 1.15},
-        LANDROVER       = {0.95, 0.95},
-        
-        -- Budget or older brands; less reliable but generally cheaper to maintain
-        ZETOR           = {0.90, 1.30},
-        FIAT            = {0.90, 1.00},
-        LANDINI         = {0.90, 1.00},
-        SAME            = {0.90, 1.00},
-        MCCORMICK       = {0.90, 1.00},
-        ARMATRAC        = {0.90, 1.05},
-        MAHINDRA        = {0.90, 1.10},
-        PTZKIROWEC      = {0.90, 1.20},
-        MTZ             = {0.85, 1.40},
-        STARA           = {0.85, 0.95},
-        SKODA           = {0.85, 1.00},
-        GAZ             = {0.85, 1.30},
-        MAZ             = {0.85, 1.25},
-        BUEHRER         = {0.80, 1.25},
-        PORSCHEDIESEL   = {0.75, 1.20},
-        LTZ             = {0.80, 1.35},
-        OLIVER          = {0.85, 1.20}, 
-        ALLISCHALMERS   = {0.85, 1.20},
-        
-        -- Generic / Mod brands        
-        LIZARD          = {0.90, 1.00},
-        GIANTS          = {1.00, 1.00},
-        NONE            = {1.00, 1.00}
+            CLAAS           = {1.15, 0.95},
+            ROPA            = {1.15, 0.85},
+            HOLMER          = {1.15, 0.85},
+            MACK            = {1.15, 1.00},
+            KRONE           = {1.10, 1.00},
+            KUBOTA          = {1.15, 1.10},
+            MAN             = {1.10, 0.95},
+            CHALLENGER      = {1.10, 0.90},
+            AGCO            = {1.10, 0.90},
+            MERCEDES        = {1.10, 0.90},
+            MERCEDESBENZ    = {1.10, 0.90},
+            MERCEDESBENZTRUCKS    = {1.10, 0.90},
+            KRAMER          = {1.10, 0.95},
+
+            VALTRA          = {1.10, 1.05},
+            LINDNER         = {1.05, 1.00},
+            GMC             = {1.05, 1.05},
+            CASEIH          = {1.00, 1.00},
+            NEWHOLLAND      = {1.00, 1.00},
+            SDF             = {1.00, 1.00},
+            MASSEYFERGUSON  = {1.00, 1.05},
+            JCB             = {1.00, 0.90},
+            DEUTZFAHR       = {1.00, 1.00},
+            STEYR           = {1.00, 0.95},
+            VERSATILE       = {1.00, 1.15}, 
+            INTERNATIONAL   = {1.00, 1.15},
+            FORD            = {1.00, 1.10},
+            RENAULT         = {1.00, 1.05},
+            INTERNATIONALHARVESTER = {1.00, 1.15},
+            LANDROVER       = {0.90, 0.90}, 
+            NEXAT           = {0.95, 0.65},
+
+            ZETOR           = {0.85, 1.35},
+            FIAT            = {0.90, 1.20},
+            LANDINI         = {0.90, 1.15},
+            SAME            = {0.90, 1.15},
+            MCCORMICK       = {0.90, 1.10},
+            ARMATRAC        = {0.85, 1.20},
+            MAHINDRA        = {0.85, 1.25},
+            STARA           = {0.85, 1.15},
+            
+            PTZKIROWEC      = {0.85, 1.30},
+            MTZ             = {0.80, 1.50},
+            SKODA           = {0.85, 1.20},
+            GAZ             = {0.80, 1.40},
+            MAZ             = {0.80, 1.35},
+            BUEHRER         = {0.80, 1.30},
+            LTZ             = {0.75, 1.55},
+            PORSCHEDIESEL   = {0.70, 1.30},
+            OLIVER          = {0.85, 1.25}, 
+            ALLISCHALMERS   = {0.85, 1.25},
+
+            LIZARD          = {1.00, 1.00},
+            GIANTS          = {1.00, 1.00},
+            NONE            = {1.00, 1.00}
     }      
 }
 
