@@ -61,6 +61,7 @@ Command	Description	Usage Example
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-36-16_097" src="https://github.com/user-attachments/assets/c0fa45b0-4f33-472e-97a8-9a65eecc5271" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-36-27_235" src="https://github.com/user-attachments/assets/f1ceab6c-ae12-45d7-a5af-fce820fda9a3" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-34-21_276" src="https://github.com/user-attachments/assets/dd90e4d0-87f8-4e86-bb98-6583257efe4c" />
+<img width="1253" height="763" alt="image" src="https://github.com/user-attachments/assets/18fe2f51-44f8-46fe-a1ac-8b892d25852c" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-34-40_109" src="https://github.com/user-attachments/assets/39c982bc-034d-4f9f-a025-6802d63f201f" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-35-23_442" src="https://github.com/user-attachments/assets/956f21c7-f022-42e5-8599-b0adcd9614e0" />
 
