@@ -324,7 +324,7 @@ function ADS_WorkshopDialog:showMaintenanceConfirmationDialog(maintenanceType, d
 end
 
 function ADS_WorkshopDialog:onClickShowLog()
-    ADS_maintenanceLogDialog.show(self.vehicle)
+    ADS_MaintenanceLogDialog.show(self.vehicle)
 end
 
 

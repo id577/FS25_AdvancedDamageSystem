@@ -1184,10 +1184,14 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
         return
     end
     local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITY
+    local minFailureChancePerFrame = 0.01 / 3600000 * ADS_Config.CORE_UPDATE_DELAY
 
     local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(self:getConditionLevel(), probability, dt)
-    failureChancePerFrame = failureChancePerFrame + (failureChancePerFrame * math.max(((conditionWearRate - 1) / 10), 0)) + (failureChancePerFrame * spec.extraBreakdownProbability)
-    failureChancePerFrame = failureChancePerFrame * conditionWearRate
+    if self:getFormattedOperatingTime() > probability.VEHICLE_HONEYMOON_HOURS then
+        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability) * conditionWearRate, minFailureChancePerFrame)
+    else
+        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability) * conditionWearRate - failureChancePerFrame * ((probability.VEHICLE_HONEYMOON_HOURS - self:getFormattedOperatingTime()) / probability.VEHICLE_HONEYMOON_HOURS), minFailureChancePerFrame)
+    end
 
     local random = math.random()
     
@@ -1195,7 +1199,7 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
         --log_dbg(string.format("Random: %.6f Prob: %.6f", random, failureChancePerFrame))
     --end
 
-    if self:getFormattedOperatingTime() > probability.VEHICLE_HONEYMOON_HOURS and random < failureChancePerFrame then
+    if random < failureChancePerFrame then
         
         local breakdownId = self:getRandomBreakdown()
         if breakdownId == nil then return end

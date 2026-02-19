@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 18,
+    VER = 20,
 
     DEBUG = false,
 
@@ -92,7 +92,7 @@ ADS_Config = {
 
         -- Defines the probability of a new breakdown occurring.
         BREAKDOWN_PROBABILITY = {
-            VEHICLE_HONEYMOON_HOURS = 5,
+            VEHICLE_HONEYMOON_HOURS = 10,
             -- The min MTBF in minutes at 0% condition.
             MIN_MTBF = 120,
             -- The max MTBF in minutes at 100% condition
@@ -220,7 +220,7 @@ ADS_Config = {
         PID_TARGET_TEMP = 90,
         -- Proportional gain: How strongly the thermostat reacts to the *current* temperature error.
         PID_KP_MAX = 0.4,
-        PID_KP_MIN = 0.01,
+        PID_KP_MIN = 0.1,
         -- Integral gain: Corrects for small, persistent errors over time to reach the target temperature.
         PID_KI = 0.02,
         -- Derivative gain: Dampens the reaction to prevent overshooting the target temperature.
@@ -240,8 +240,8 @@ ADS_Config = {
         MECHANIC_THERMOSTAT_MIN_STICTION = 0.02,
         MECHANIC_THERMOSTAT_MAX_STICTION = 0.1,
 
-        ELECTRONIC_THERMOSTAT_MIN_WAX_SPEED = 0.04,
-        ELECTRONIC_THERMOSTAT_MAX_WAX_SPEED = 0.08,
+        ELECTRONIC_THERMOSTAT_MIN_WAX_SPEED = 0.05,
+        ELECTRONIC_THERMOSTAT_MAX_WAX_SPEED = 0.10,
         ELECTRONIC_THERMOSTAT_MIN_STICTION = 0.01,
         ELECTRONIC_THERMOSTAT_MAX_STICTION = 0.05
     },
