@@ -70,6 +70,8 @@ function ADS_WorkshopDialog:updateScreen()
     self.operatingHoursValue:setText(string.format("%s %s", vehicle:getFormattedOperatingTime(), g_i18n:getText("ads_ws_hours_unit")))
     
     self.lastServiceValue:setText(ADS_Utils.formatTimeAgo(vehicle:getLastMaintenanceDate()))
+    self.maintainabilityValue:setText(string.format("%.1f%%", (spec.maintainability or 0) * 100))
+    self.maintainabilityValue:setTextColor(ADS_Utils.getValueColor(spec.maintainability, 1.2, 1.1, 1.1, 0.9, false))
 
     local monthsSinceInspectionText = ADS_Utils.formatTimeAgo(self.vehicle:getLastInspectionDate())
     local serviceText = ADS_Utils.formatService(self.vehicle:getLastInspectedService())
@@ -85,24 +87,6 @@ function ADS_WorkshopDialog:updateScreen()
     self.condtionLastInspectionDelataValue:setText(monthsSinceInspectionText)
 
     self.relAndMainValue:setText(ADS_Utils.formatOperatingHours(self.vehicle:getMaintenanceInterval()))
-
-    local motor = self.vehicle:getMotor()
-    local defaultPower = motor.peakMotorPower * 1.36 or 0
-    local powerText = string.format("%.1f%% (%.0f hp / %.0f hp)", spec.lastInspectedPower * 100, defaultPower * spec.lastInspectedPower, defaultPower)
-    local brakeText = string.format("%.1f%%", spec.lastInspectedBrake * 100)
-    local yieldReductionText = string.format("%.1f%%", spec.lastInspectedYieldReduction * 100)
-
-    self.powerValue:setTextColor(1.0, 1.0, 1.0, 1.0)
-    --self.yieldReductionValue:setTextColor(1.0, 1.0, 1.0, 1.0)
-    --self.brakeValue:setTextColor(1.0, 1.0, 1.0, 1.0)
-    self.powerValue:setText(powerText)
-    --self.brakeValue:setText(brakeText)
-
-    --if  (self.vehicle.type.name == 'combineDrivable' or self.vehicle.type.name == 'combineCutter') then
-        --self.yieldReductionValue:setText(yieldReductionText)
-    --else
-        --self.yieldReductionValue:setText('-')
-    --end
 
     -- ====================================================================
     -- 2: Breakdowns Table
@@ -151,8 +135,6 @@ function ADS_WorkshopDialog:updateScreen()
             self.serviceValue:setTextColor(0.5, 0.5, 0.5, 1.0)
             self.condtionValue:setText(inspectingText)
             self.condtionValue:setTextColor(0.5, 0.5, 0.5, 1.0)
-            self.powerValue:setText(inspectingText)
-            self.powerValue:setTextColor(0.5, 0.5, 0.5, 1.0)
         end
     end
 
@@ -205,6 +187,7 @@ function ADS_WorkshopDialog:updateScreen()
         self.tableSlider:setVisible(not isListEmpty)
         self.emptyTableText:setVisible(isListEmpty)
         self.emptyTableText:setText(g_i18n:getText("ads_ws_info_no_breakdowns"))
+        self.emptyTableText:setTextColor(0.5, 0.5, 0.5, 1)
     else
         self:updateServiceProgressText()
     end
@@ -233,23 +216,21 @@ function ADS_WorkshopDialog:updateServiceProgressText()
         return
     end
 
-    local status = self.vehicle:getCurrentStatus()
-    if status == AdvancedDamageSystem.STATUS.READY then
+    if self.vehicle:getCurrentStatus() == AdvancedDamageSystem.STATUS.READY then
         return
     end
 
-    local localizedStatus = g_i18n:getText(status)
     local progressPercent = self:getServiceProgressPercent()
-    local progressText = localizedStatus .. "..."
 
     if progressPercent ~= nil then
-        progressText = string.format("%s: %d%%", localizedStatus, progressPercent)
+        progressText = string.format("%d%%", progressPercent)
     end
 
     self.emptyTableText:setVisible(true)
     self.breakdownTable:setVisible(false)
     self.tableSlider:setVisible(false)
     self.emptyTableText:setText(progressText)
+    self.emptyTableText:setTextColor(0.455, 0.565, 0.115, 1)
 end
 
 function ADS_WorkshopDialog:getNumberOfItemsInSection(list, section)

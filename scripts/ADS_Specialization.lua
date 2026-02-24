@@ -128,6 +128,35 @@ local function normalizeBoolValue(value, defaultValue)
     return value and true or false
 end
 
+local function normalizeNumberValue(value, defaultValue)
+    if value == nil then
+        return defaultValue
+    end
+
+    local num = tonumber(value)
+    if num == nil then
+        return defaultValue
+    end
+
+    return num
+end
+
+local function parseCsvList(csvString)
+    local result = {}
+    if csvString == nil or csvString == "" then
+        return result
+    end
+
+    for item in string.gmatch(csvString, "([^,]+)") do
+        local trimmed = tostring(item):gsub("^%s+", ""):gsub("%s+$", "")
+        if trimmed ~= "" then
+            table.insert(result, trimmed)
+        end
+    end
+
+    return result
+end
+
 -- ==========================================================
 --                    SAVE/LOAD & REGISTRATION
 -- ==========================================================
@@ -189,6 +218,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.BOOL,   logKey .. "#optionThree", "Option Three")
     schemaSavegame:register(XMLValueType.STRING, logKey .. "#isVisible", "is Visible in Log")
     schemaSavegame:register(XMLValueType.BOOL,   logKey .. "#isCompleted", "Is Completed")
+    schemaSavegame:register(XMLValueType.BOOL,   logKey .. "#isLegacyEntry", "Legacy Migrated Entry Flag")
     local condKey = logKey .. ".conditionData"
     schemaSavegame:register(XMLValueType.INT,    condKey .. "#year", "Vehicle Year")
     schemaSavegame:register(XMLValueType.FLOAT,  condKey .. "#operatingHours", "Operating Hours")
@@ -325,6 +355,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
                 xmlFile:setValue(entryKey .. "#optionThree", entry.optionThree or false)
                 xmlFile:setValue(entryKey .. "#isVisible", normalizeBoolValue(entry.isVisible, true))
                 xmlFile:setValue(entryKey .. "#isCompleted", normalizeBoolValue(entry.isCompleted, true))
+                xmlFile:setValue(entryKey .. "#isLegacyEntry", normalizeBoolValue(entry.isLegacyEntry, false))
 
                 if entry.conditionData then
                     local condKey = entryKey .. ".conditionData"
@@ -570,6 +601,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.pendingMaintenanceServiceTarget = savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget)
         spec.pendingOverhaulConditionStart = savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart)
         spec.pendingOverhaulConditionTarget = savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget)
+        local hasTotalBreakdownsOccurred = savegame.xmlFile:hasProperty(key .. "#totalBreakdownsOccurred")
         spec.totalBreakdownsOccurred = savegame.xmlFile:getValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred)
 
         -- Load Maintenance Log
@@ -588,52 +620,108 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 date = ADS_Utils.deserializeDate(savegame.xmlFile:getValue(entryKey .. "#date")),
                 conditionData = {}
             }
-            
-            entry.location = savegame.xmlFile:getValue(entryKey .. "#location", "UNKNOWN")
-            entry.optionOne = savegame.xmlFile:getValue(entryKey .. "#optionOne", "NONE")
-            entry.optionTwo = savegame.xmlFile:getValue(entryKey .. "#optionTwo", "NONE")
-            entry.optionThree = savegame.xmlFile:getValue(entryKey .. "#optionThree", false)
-            entry.isVisible = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isVisible", true), true)
-            entry.isCompleted = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isCompleted", true), true)
-
             local condKey = entryKey .. ".conditionData"
-            entry.conditionData.year = savegame.xmlFile:getValue(condKey .. "#year", 0)
-            entry.conditionData.operatingHours = savegame.xmlFile:getValue(condKey .. "#operatingHours", 0)
-            entry.conditionData.age = savegame.xmlFile:getValue(condKey .. "#age", 0)
-            entry.conditionData.condition = savegame.xmlFile:getValue(condKey .. "#condition", 1)
-            entry.conditionData.service = savegame.xmlFile:getValue(condKey .. "#service", 1)
-            entry.conditionData.reliability = savegame.xmlFile:getValue(condKey .. "#reliability", 1)
-            entry.conditionData.maintainability = savegame.xmlFile:getValue(condKey .. "#maintainability", 1)
+            local hasConditionData = savegame.xmlFile:hasProperty(condKey)
 
-            local bdStr = savegame.xmlFile:getValue(condKey .. "#activeBreakdowns", "")
-            entry.conditionData.activeBreakdowns = ADS_Utils.deserializeBreakdowns(bdStr) or {}
+            if hasConditionData then
+                entry.location = savegame.xmlFile:getValue(entryKey .. "#location", "UNKNOWN")
+                entry.optionOne = savegame.xmlFile:getValue(entryKey .. "#optionOne", "NONE")
+                entry.optionTwo = savegame.xmlFile:getValue(entryKey .. "#optionTwo", "NONE")
+                entry.optionThree = savegame.xmlFile:getValue(entryKey .. "#optionThree", false)
+                entry.isVisible = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isVisible", true), true)
+                entry.isCompleted = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isCompleted", true), true)
+                entry.isLegacyEntry = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isLegacyEntry", false), false)
 
-            entry.conditionData.selectedBreakdowns = {}
-            local selBdStr = savegame.xmlFile:getValue(condKey .. "#selectedBreakdowns", "")
-            if selBdStr and selBdStr ~= "" then
-                for item in string.gmatch(selBdStr, "([^,]+)") do
-                    table.insert(entry.conditionData.selectedBreakdowns, item)
+                entry.conditionData.year = savegame.xmlFile:getValue(condKey .. "#year", 0)
+                entry.conditionData.operatingHours = savegame.xmlFile:getValue(condKey .. "#operatingHours", 0)
+                entry.conditionData.age = savegame.xmlFile:getValue(condKey .. "#age", 0)
+                entry.conditionData.condition = savegame.xmlFile:getValue(condKey .. "#condition", 1)
+                entry.conditionData.service = savegame.xmlFile:getValue(condKey .. "#service", 1)
+                entry.conditionData.reliability = savegame.xmlFile:getValue(condKey .. "#reliability", 1)
+                entry.conditionData.maintainability = savegame.xmlFile:getValue(condKey .. "#maintainability", 1)
+
+                local bdStr = savegame.xmlFile:getValue(condKey .. "#activeBreakdowns", "")
+                entry.conditionData.activeBreakdowns = ADS_Utils.deserializeBreakdowns(bdStr) or {}
+
+                local selBdStr = savegame.xmlFile:getValue(condKey .. "#selectedBreakdowns", "")
+                entry.conditionData.selectedBreakdowns = parseCsvList(selBdStr)
+
+                entry.conditionData.activeEffects = {}
+                local effectIds = parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeEffects", ""))
+                for _, effId in ipairs(effectIds) do
+                    entry.conditionData.activeEffects[effId] = true
                 end
-            end
 
-            entry.conditionData.activeEffects = {}
-            local effStr = savegame.xmlFile:getValue(condKey .. "#activeEffects", "")
-            if effStr and effStr ~= "" then
-                for effId in string.gmatch(effStr, "([^,]+)") do 
-                    entry.conditionData.activeEffects[effId] = true 
+                entry.conditionData.activeIndicators = {}
+                local indicatorIds = parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeIndicators", ""))
+                for _, indId in ipairs(indicatorIds) do
+                    entry.conditionData.activeIndicators[indId] = true
                 end
-            end
+            else
+                -- COMPAT(0.8.5.0): migrate legacy maintenance log entry format (hours/aftermarket/breakdowns/info).
+                -- Remove this migration branch after legacy save migration window is over.
+                local legacyAftermarket = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#aftermarket", false), false)
+                local legacyOperatingHours = normalizeNumberValue(savegame.xmlFile:getValue(entryKey .. "#hours", 0), 0)
+                local legacyBreakdowns = parseCsvList(savegame.xmlFile:getValue(entryKey .. "#breakdowns", ""))
 
-            entry.conditionData.activeIndicators = {}
-            local indStr = savegame.xmlFile:getValue(condKey .. "#activeIndicators", "")
-            if indStr and indStr ~= "" then
-                for indId in string.gmatch(indStr, "([^,]+)") do 
-                    entry.conditionData.activeIndicators[indId] = true 
+                local optionOne = "NONE"
+                local optionTwo = legacyAftermarket and AdvancedDamageSystem.PART_TYPES.AFTERMARKET or AdvancedDamageSystem.PART_TYPES.OEM
+                local optionThree = false
+
+                if entry.type == AdvancedDamageSystem.STATUS.INSPECTION then
+                    optionOne = AdvancedDamageSystem.INSPECTION_TYPES.STANDARD
+                    optionTwo = "NONE"
+                elseif entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE then
+                    optionOne = AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD
+                elseif entry.type == AdvancedDamageSystem.STATUS.REPAIR then
+                    optionOne = AdvancedDamageSystem.REPAIR_URGENCY.MEDIUM
+                elseif entry.type == AdvancedDamageSystem.STATUS.OVERHAUL then
+                    optionOne = AdvancedDamageSystem.OVERHAUL_TYPES.STANDARD
+                else
+                    optionTwo = "NONE"
                 end
+
+                entry.location = "UNKNOWN"
+                entry.optionOne = optionOne
+                entry.optionTwo = optionTwo
+                entry.optionThree = optionThree
+                entry.isVisible = true
+                entry.isCompleted = true
+                entry.isLegacyEntry = true
+
+                entry.conditionData.year = spec.year or 0
+                entry.conditionData.operatingHours = legacyOperatingHours
+                entry.conditionData.age = self.age or 0
+                entry.conditionData.condition = 1
+                entry.conditionData.service = 1
+                entry.conditionData.activeBreakdowns = {}
+                entry.conditionData.selectedBreakdowns = legacyBreakdowns
+                entry.conditionData.activeEffects = {}
+                entry.conditionData.activeIndicators = {}
+                entry.conditionData.reliability = spec.reliability or 1
+                entry.conditionData.maintainability = spec.maintainability or 1
             end
 
             table.insert(spec.maintenanceLog, entry)
             i = i + 1
+        end
+
+        if not hasTotalBreakdownsOccurred then
+            -- COMPAT(0.8.5.0): bootstrap totalBreakdownsOccurred for legacy saves lacking this field.
+            -- Remove this bootstrap after legacy save migration window is over.
+            local bootstrapOccurred = 0
+            for _, entry in ipairs(spec.maintenanceLog) do
+                if entry.type == AdvancedDamageSystem.STATUS.REPAIR then
+                    local selectedBreakdowns = entry.conditionData and entry.conditionData.selectedBreakdowns or {}
+                    for _, breakdownId in ipairs(selectedBreakdowns) do
+                        local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+                        if breakdownDef ~= nil and breakdownDef.isSelectable == true then
+                            bootstrapOccurred = bootstrapOccurred + 1
+                        end
+                    end
+                end
+            end
+            spec.totalBreakdownsOccurred = math.max(spec.totalBreakdownsOccurred or 0, bootstrapOccurred)
         end
 
         -- Fill defaults
@@ -901,6 +989,10 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:updateServiceLevel(serviceWearRate, dt)
     end
 end
+
+-- ==========================================================
+--                        AI WORKER
+-- ==========================================================
 
 -- ==========================================================
 --                      CORE FUNCTIONS
@@ -2222,6 +2314,7 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
         optionThree = optionThree,
         isVisible = false,
         isCompleted = isCompleted ~= false,
+        isLegacyEntry = false,
 
         conditionData = {
             year = spec.year,
@@ -2278,12 +2371,14 @@ end
 function AdvancedDamageSystem.getIsLogEntryHasReport(entry)
     local isVisible = normalizeBoolValue(entry.isVisible, true)
     local isCompleted = normalizeBoolValue(entry.isCompleted, true)
+    local isLegacyEntry = normalizeBoolValue(entry.isLegacyEntry, false)
 
     return (entry.type ~= AdvancedDamageSystem.STATUS.REPAIR 
     and entry.optionOne ~= AdvancedDamageSystem.INSPECTION_TYPES.VISUAL 
     and entry.optionOne ~= "NONE" 
     and isVisible
-    and isCompleted)
+    and isCompleted
+    and not isLegacyEntry)
 end
 
 function AdvancedDamageSystem.getIsCompleteReport(entry)

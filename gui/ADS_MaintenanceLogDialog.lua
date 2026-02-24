@@ -18,6 +18,27 @@ local function isLoggableRepairBreakdownId(breakdownId)
     return breakdownId ~= nil and breakdownId ~= "GENERAL_WEAR"
 end
 
+local function isLogEntryVisible(entry)
+    if entry == nil then
+        return false
+    end
+
+    local value = entry.isVisible
+    if value == nil then
+        return true
+    end
+
+    if type(value) == "string" then
+        local v = string.lower(value)
+        if v == "false" or v == "0" or v == "off" or v == "no" then
+            return false
+        end
+        return true
+    end
+
+    return value ~= false
+end
+
 function ADS_MaintenanceLogDialog.register()
     local dialog = ADS_MaintenanceLogDialog.new()
     g_gui:loadGui(modDirectory .. "gui/ADS_MaintenanceLogDialog.xml", "ADS_MaintenanceLogDialog", dialog)
@@ -27,7 +48,21 @@ end
 function ADS_MaintenanceLogDialog.new(target, customMt)
     local dialog = MessageDialog.new(target, customMt or ADS_MaintenanceLogDialog_mt)
     dialog.vehicle = nil
+    dialog.logDataAll = nil
     return dialog
+end
+
+function ADS_MaintenanceLogDialog:rebuildVisibleLogData()
+    self.logData = {}
+    if self.logDataAll == nil then
+        return
+    end
+
+    for _, entry in ipairs(self.logDataAll) do
+        if isLogEntryVisible(entry) then
+            table.insert(self.logData, entry)
+        end
+    end
 end
 
 function ADS_MaintenanceLogDialog.show(vehicle)
@@ -37,7 +72,8 @@ function ADS_MaintenanceLogDialog.show(vehicle)
     local dialog = ADS_MaintenanceLogDialog.INSTANCE
     dialog.vehicle = vehicle
     
-    dialog.logData = vehicle.spec_AdvancedDamageSystem.maintenanceLog or {}
+    dialog.logDataAll = vehicle.spec_AdvancedDamageSystem.maintenanceLog or {}
+    dialog:rebuildVisibleLogData()
     
     dialog:updateScreen()
     g_gui:showDialog("ADS_MaintenanceLogDialog")
@@ -48,6 +84,9 @@ function ADS_MaintenanceLogDialog:updateScreen()
     log_dbg("Updating log Screen...")
 
     local spec = self.vehicle.spec_AdvancedDamageSystem
+    self.logDataAll = spec.maintenanceLog or {}
+    self:rebuildVisibleLogData()
+
     self.balanceElement:setText(g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true))
     self.vehicleNameValue:setText(g_i18n:getText('ads_log_title') .. " " .. self.vehicle:getFullName())
 
@@ -56,7 +95,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
     local purchaseDate = {}
     local purchaseHours = 0
 
-    for _, entry in pairs(self.logData) do
+    for _, entry in pairs(self.logDataAll) do
         totalCost = totalCost + (entry.price or 0)
         if entry.id == 1 then
             purchaseDate = entry.date or {}
@@ -87,7 +126,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
     end
 
     local maintenanceCount = 0
-    for _, entry in pairs(self.logData) do
+    for _, entry in pairs(self.logDataAll) do
         if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE then
             maintenanceCount = maintenanceCount + 1
         end
@@ -96,8 +135,8 @@ function ADS_MaintenanceLogDialog:updateScreen()
     if maintenanceCount > 0 then
         local sumMaintenanceInterval = 0
         local lastServiceHours = purchaseHours or 0
-        for i = 1, #self.logData do
-            local nextEntry = self.logData[i]
+        for i = 1, #self.logDataAll do
+            local nextEntry = self.logDataAll[i]
             if nextEntry.type == AdvancedDamageSystem.STATUS.MAINTENANCE then
                 if nextEntry.conditionData and nextEntry.conditionData.operatingHours then
                     sumMaintenanceInterval = sumMaintenanceInterval + (nextEntry.conditionData.operatingHours - lastServiceHours)
@@ -238,10 +277,6 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
         end
     end
 
-    if entry.location == "UNKNOWN" then
-        descText = "NO DATA"
-    end
-
     cell:getAttribute("logDescription"):setText(descText)
     
     cell:getAttribute("logPrice"):setText(g_i18n:formatMoney(entry.price or 0, 0, true, true))
@@ -277,5 +312,6 @@ end
 function ADS_MaintenanceLogDialog:onClose(superFunc)
     self.vehicle = nil
     self.logData = nil
+    self.logDataAll = nil
     g_messageCenter:unsubscribeAll(self)
 end

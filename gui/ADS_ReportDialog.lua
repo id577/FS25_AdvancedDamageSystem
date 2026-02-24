@@ -151,6 +151,10 @@ function ADS_ReportDialog:updateScreen()
 
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_wear_rate',  wearRate})
 
+    -- nominalWearRate
+    local nominalWearRate = 1 / spec.reliability / 100
+    table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_nominal_wear_rate', nominalWearRate})
+
     -- expected residual life
     local rul = currentCondition / wearRate
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_rul', rul})
@@ -246,14 +250,14 @@ function ADS_ReportDialog:updateScreen()
 
     self.overallAssessmentTable:setDataSource(self)
     self.systemConditionTable:setDataSource(self)
-    --self.suspiciousSymptomsTable:setDataSource(self)
-    --self.breakdownsTable:setDataSource(self)
-    --self.recommendationsTable:setDataSource(self)
+    self.suspiciousSymptomsTable:setDataSource(self)
+    self.breakdownsTable:setDataSource(self)
+    self.recommendationsTable:setDataSource(self)
     self.overallAssessmentTable:reloadData()
     self.systemConditionTable:reloadData()
-    --self.suspiciousSymptomsTable:reloadData()
-    --self.breakdownsTable:reloadData()
-    --self.recommendationsTable:reloadData()
+    self.suspiciousSymptomsTable:reloadData()
+    self.breakdownsTable:reloadData()
+    self.recommendationsTable:reloadData()
 end
 
 function ADS_ReportDialog:getNumberOfItemsInSection(list, section)
@@ -289,14 +293,15 @@ function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
     local maxCrit = ADS_Config.CORE.BREAKDOWN_PROBABILITY.CRITICAL_MAX
     local critDiff = maxCrit - minCrit
     local rel = 1 / (ADS_Config.CORE.BASE_CONDITION_WEAR / spec.reliability)
-    local idealWearRate = 1 / spec.reliability
+    local nominalWearRate = 1 / spec.reliability / 100
 
     local assessmentConfig = {
         ads_report_overall_assessment_condition =  {inverted = false, ideal = 0.8, high = 0.6, mid = 0.4, low = 0.2, stdVisible = true, isPercent = true},
         ads_report_overall_assessment_service = {inverted = false, ideal = 0.9, high = 0.65, mid = 0.55, low = 0.45, stdVisible = true, isPercent = true},
         ads_report_overall_assessment_mtbf = {inverted = false, ideal = maxMtbf, high = diffMtbf * 0.66, mid = diffMtbf * 0.33, low = minMtbf, stdVisible = false, isPercent = false},
         ads_report_overall_assessment_rul = {inverted = false, ideal = rel, high = rel * 0.66, mid = rel * 0.33, low = minMtbf, stdVisible = false, isPercent = false},
-        ads_report_overall_assessment_wear_rate = {inverted = true, ideal = idealWearRate, high = idealWearRate * 1.1, mid = idealWearRate * 1.2, low = idealWearRate * 1.3, stdVisible = false, isPercent = true},
+        ads_report_overall_assessment_wear_rate = {inverted = true, ideal = nominalWearRate, high = nominalWearRate * 1.1, mid = nominalWearRate * 1.2, low = nominalWearRate * 1.3, stdVisible = false, isPercent = true},
+        ads_report_overall_assessment_nominal_wear_rate = {inverted = true, ideal = nominalWearRate, high = nominalWearRate * 1.1, mid = nominalWearRate * 1.2, low = nominalWearRate * 1.3, stdVisible = false, isPercent = true},
         ads_report_overall_assessment_crit_fail_risk = {inverted = true, ideal = minCrit, high = critDiff * 0.33, mid = critDiff * 0.66, low = maxCrit * 1.3, stdVisible = false, isPercent = true},
     }
     local defaultConfig = {inverted = false, ideal = 100, high = 95, mid = 90, low = 70, stdVisible = false, isPercent = true}
