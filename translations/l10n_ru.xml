@@ -56,6 +56,7 @@
         <text name="ads_ws_action_maintenance" text="Техобслуживание"/>
         <text name="ads_ws_action_repair" text="Ремонт"/>
         <text name="ads_ws_action_overhaul" text="Капитальный ремонт"/>
+        <text name="ads_ws_action_cancel_service" text="Прервать процедуру"/>
         <text name="ads_ws_button_log" text="Журнал"/>
 
         <text name="ads_ws_age_unit" text="мес."/>
@@ -87,6 +88,8 @@
         <text name="ads_ws_confirm_repair_text" text="Будут устранены выбранные неисправности ({price}).\n\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
         <text name="ads_ws_confirm_overhaul_title" text="Подтвердить капитальный ремонт"/>
         <text name="ads_ws_confirm_overhaul_text" text="Капитальный ремонт устранит все неисправности, выполнит ТО и улучшит техническое состояние техники.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
+        <text name="ads_ws_cancel_confirm_title" text="Прервать текущую процедуру?"/>
+        <text name="ads_ws_cancel_confirm_text" text="Текущий прогресс будет зафиксирован. Деньги за работу не возвращаются."/>
         <text name="ads_ws_option_genuine_parts" text="Оригинальные запчасти"/>
         <text name="ads_ws_option_aftermarket_parts" text="Неоригинальные запчасти"/>
         
@@ -106,7 +109,9 @@
         <text name="ads_log_maintenance_desc" text="Произведено плановое ТО (%.1f м.ч.)"/>
         <text name="ads_log_inspection_desc_no_breakdowns" text="Поломок не выявлено"/>
         <text name="ads_log_inspection_desc_with_breakdowns" text="Обнаружены неисправности: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="Обновлено лакокрасочное покрытие"/>
         <text name="ads_log_repair_desc_generic" text="Ремонт"/>
+        <text name="ads_log_cancelled_desc" text="Процедура прервана. Текущий прогресс зафиксирован."/>
 
         <text name="ads_log_date" text="Дата"/>
         <text name="ads_log_hours" text="Рабочие часы"/>
@@ -274,6 +279,12 @@
         <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s до %s"/>
         <text name="ads_spec_maintenance_complete" text="завершен(о)"/>
+        <text name="ads_spec_maintenance_complete_notification" text="завершено"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="прерван(о)"/>
+        <text name="ads_spec_inspection_issues_detected_notification" text="Обнаружено неисправностей: %s"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="Неисправности не обнаружены"/>
+        <text name="ads_spec_next_planned_service_notification" text="%s выполнено"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Запланированное %s отменено: недостаточно средств"/>
         <text name="ads_spec_service_interval_format" text="%s м/ч"/>
 
         <text name="ads_spec_inspection_issues_detected" text="Обнаружено %s неисправность(ей)"/>

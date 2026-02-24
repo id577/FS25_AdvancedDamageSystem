@@ -25,6 +25,7 @@ end
 function ADS_WorkshopDialog.new(target, customMt)
     local dialog = MessageDialog.new(target, customMt or ADS_WorkshopDialog_mt)
     dialog.vehicle = nil
+    dialog.isDialogOpen = false
     return dialog
 end
 
@@ -174,6 +175,10 @@ function ADS_WorkshopDialog:updateScreen()
         self.overhaulButton.disabled = true
     end
 
+    local isUnderService = spec.currentState ~= STATUS.READY
+    self.cancelServiceButton:setVisible(isUnderService)
+    self.cancelServiceButton.disabled = not isUnderService
+
     local inspectionPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false)
     local maintenancePrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.MAINTENANCE, AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD, AdvancedDamageSystem.PART_TYPES.OEM, false)
     local repairPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.REPAIR, AdvancedDamageSystem.REPAIR_URGENCY.MEDIUM, AdvancedDamageSystem.PART_TYPES.OEM, false)
@@ -194,18 +199,57 @@ function ADS_WorkshopDialog:updateScreen()
     -- ====================================================================
     
     local isListEmpty = #self.visibleBreakdowns == 0
-    self.breakdownTable:setVisible(not isListEmpty)
-    self.tableSlider:setVisible(not isListEmpty)
+
     if self.vehicle:getCurrentStatus() == STATUS.READY then
+        self.breakdownTable:setVisible(not isListEmpty)
+        self.tableSlider:setVisible(not isListEmpty)
         self.emptyTableText:setVisible(isListEmpty)
         self.emptyTableText:setText(g_i18n:getText("ads_ws_info_no_breakdowns"))
     else
-        self.emptyTableText:setVisible(true)
-        self.breakdownTable:setVisible(false)
-        self.tableSlider:setVisible(false)
-        self.emptyTableText:setText(g_i18n:getText(self.vehicle:getCurrentStatus()) .. "...")
+        self:updateServiceProgressText()
     end
     --self.statusText:setPosition(0, 0.015)
+end
+
+function ADS_WorkshopDialog:getServiceProgressPercent()
+    if self.vehicle == nil or self.vehicle.spec_AdvancedDamageSystem == nil then
+        return nil
+    end
+
+    local spec = self.vehicle.spec_AdvancedDamageSystem
+    local totalTime = spec.pendingProgressTotalTime or 0
+    local elapsedTime = spec.pendingProgressElapsedTime or 0
+
+    if totalTime <= 0 then
+        return nil
+    end
+
+    local ratio = math.max(0, math.min(elapsedTime / totalTime, 1))
+    return math.floor(ratio * 100)
+end
+
+function ADS_WorkshopDialog:updateServiceProgressText()
+    if self.vehicle == nil or self.vehicle.spec_AdvancedDamageSystem == nil then
+        return
+    end
+
+    local status = self.vehicle:getCurrentStatus()
+    if status == AdvancedDamageSystem.STATUS.READY then
+        return
+    end
+
+    local localizedStatus = g_i18n:getText(status)
+    local progressPercent = self:getServiceProgressPercent()
+    local progressText = localizedStatus .. "..."
+
+    if progressPercent ~= nil then
+        progressText = string.format("%s: %d%%", localizedStatus, progressPercent)
+    end
+
+    self.emptyTableText:setVisible(true)
+    self.breakdownTable:setVisible(false)
+    self.tableSlider:setVisible(false)
+    self.emptyTableText:setText(progressText)
 end
 
 function ADS_WorkshopDialog:getNumberOfItemsInSection(list, section)
@@ -308,12 +352,33 @@ function ADS_WorkshopDialog:onClickOverhaul()
     ADS_MaintenanceTwoOptionsDialog.show(self.vehicle, AdvancedDamageSystem.STATUS.OVERHAUL)
 end
 
+function ADS_WorkshopDialog:onClickCancelService()
+    if self.vehicle == nil then return end
+    local spec = self.vehicle.spec_AdvancedDamageSystem
+    if spec == nil or spec.currentState == AdvancedDamageSystem.STATUS.READY then return end
+
+    local title = string.format(g_i18n:getText("ads_ws_cancel_confirm_title"), g_i18n:getText(spec.currentStat))
+    local text = g_i18n:getText("ads_ws_cancel_confirm_text")
+
+    if YesNoDialog ~= nil and YesNoDialog.show ~= nil then
+        YesNoDialog.show(self.onCancelServiceConfirm, self, text, title, nil, nil)
+    end
+end
+
+function ADS_WorkshopDialog:onCancelServiceConfirm(yes)
+    if yes and self.vehicle ~= nil then
+        self.vehicle:cancelService()
+        self:updateScreen()
+    end
+end
+
 
 function ADS_WorkshopDialog:onCreate(superFunc)
     --
 end
 
 function ADS_WorkshopDialog:onOpen(superFunc)
+    self.isDialogOpen = true
 
     local function onVehicleChangeStatusEvent(vehicle)
         if self.vehicle.node == vehicle.node then
@@ -335,6 +400,7 @@ function ADS_WorkshopDialog:onOpen(superFunc)
 end
 
 function ADS_WorkshopDialog:onClose(superFunc)
+    self.isDialogOpen = false
     self.vehicle = nil
     g_messageCenter:unsubscribeAll(self)
     g_currentMission:showMoneyChange(MoneyType.VEHICLE_RUNNING_COSTS)

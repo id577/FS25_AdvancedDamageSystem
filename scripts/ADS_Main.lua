@@ -241,6 +241,10 @@ ADS_Main.workshopCheckTimer = 0
 ADS_Main.isWorkshopOpen = true
 
 function ADS_Main:update(dt)
+    if ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.isDialogOpen then
+        ADS_WorkshopDialog.INSTANCE:updateServiceProgressText()
+    end
+
     if not g_currentMission:getIsServer() or self.numVehicles == 0 then
         self.previousKey = nil 
         return

@@ -218,40 +218,44 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
         end
     end
    
-    -- repair 
-    if entry.type == S.REPAIR then     
-        local repairedPartsText = table.concat(partsNames, ", ")
-        if repairedPartsText == "" then
-            repairedPartsText = g_i18n:getText("ads_log_repair_desc_generic")
-        end
-        descText = repairedPartsText .. " (" .. g_i18n:getText(entry.optionTwo or "NONE") .. ")"
+    if entry.isCompleted == false then
+        descText = g_i18n:getText("ads_log_cancelled_desc")
+    else
+        -- repair
+        if entry.type == S.REPAIR then
+            local repairedPartsText = table.concat(partsNames, ", ")
+            if repairedPartsText == "" then
+                repairedPartsText = g_i18n:getText("ads_log_repair_desc_generic")
+            end
+            descText = repairedPartsText .. " (" .. g_i18n:getText(entry.optionTwo or "NONE") .. ")"
 
-    -- maintenance
-    elseif entry.type == S.MAINTENANCE then 
-        descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_maintenance"))
-        descText = descText .. " (" .. g_i18n:getText(entry.optionTwo) .. ")"
-        if #repairedParts > 0 then
-            descText = descText .. ". " .. string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
-        end
-
-    -- inspection
-    elseif entry.type == S.INSPECTION then
-        if spec.currentState == AdvancedDamageSystem.STATUS.INSPECTION and entry.id == #spec.maintenanceLog then
-            descText = g_i18n:getText("ads_ws_inspecting_status")
-        else
-            descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_inspection"))
+        -- maintenance
+        elseif entry.type == S.MAINTENANCE then
+            descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_maintenance"))
+            descText = descText .. " (" .. g_i18n:getText(entry.optionTwo) .. ")"
             if #repairedParts > 0 then
                 descText = descText .. ". " .. string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
-            else
-                descText = descText .. ". " .. g_i18n:getText("ads_log_inspection_desc_no_breakdowns")
             end
-        end
 
-    -- overhaul
-    elseif entry.type == S.OVERHAUL then
-        descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_overhaul"))
-        if entry.optionThree then
-            descText = descText .. ". " .. g_i18n:getText("ads_ws_option_overhaul_with_painting")
+        -- inspection
+        elseif entry.type == S.INSPECTION then
+            if spec.currentState == AdvancedDamageSystem.STATUS.INSPECTION and entry.id == #spec.maintenanceLog then
+                descText = g_i18n:getText("ads_ws_inspecting_status")
+            else
+                descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_inspection"))
+                if #repairedParts > 0 then
+                    descText = descText .. ". " .. string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
+                else
+                    descText = descText .. ". " .. g_i18n:getText("ads_log_inspection_desc_no_breakdowns")
+                end
+            end
+
+        -- overhaul
+        elseif entry.type == S.OVERHAUL then
+            descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_overhaul"))
+            if entry.optionThree then
+                descText = descText .. ". " .. g_i18n:getText("ads_log_overhaul_desc_with_painting")
+            end
         end
     end
 

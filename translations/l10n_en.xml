@@ -65,9 +65,9 @@
         <text name="ads_ws_action_maintenance" text="Maintenance"/>
         <text name="ads_ws_action_repair" text="Repair"/>
         <text name="ads_ws_action_overhaul" text="Overhaul"/>
+        <text name="ads_ws_action_cancel_service" text="Cancel Procedure"/>
         <text name="ads_ws_button_log" text="Maintenance Log"/>
         
-
         <text name="ads_ws_age_unit" text="months"/>
         <text name="ads_ws_hours_unit" text="h"/>
         <text name="ads_ws_button_ok" text="OK"/>
@@ -87,6 +87,8 @@
         <text name="ads_ws_no_last_report_message" text="There are no reports yet"/>
         <text name="ads_ws_no_report_message" text="There is no report"/>
         <text name="ads_ws_no_log_empty_message" text="Log is empty yet"/>
+        <text name="ads_ws_cancel_confirm_title" text="Cancel %s?"/>
+        <text name="ads_ws_cancel_confirm_text" text="Current progress will be saved as-is. No money will be refunded."/>
 
         <text name="ads_log_header_title" text="Maintenance Log"/>
         <text name="ads_log_title" text="Technical Maintenance Log"/>
@@ -99,7 +101,9 @@
         <text name="ads_log_performed" text="%s performed"/>
         <text name="ads_log_inspection_desc_no_breakdowns" text="No faults detected"/>
         <text name="ads_log_inspection_desc_with_breakdowns" text="Faults detected: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="Vehicle was repainted"/>
         <text name="ads_log_repair_desc_generic" text="Repair"/>
+        <text name="ads_log_cancelled_desc" text="Procedure cancelled. Current progress fixed."/>
         <text name="ads_log_date" text="Date"/>
         <text name="ads_log_hours" text="Operating Hours"/>
         <text name="ads_log_type" text="Work Type"/>
@@ -266,6 +270,7 @@
         <text name="ads_spec_service_interval_format" text="%s o/h"/>
 
         <text name="ads_spec_maintenance_complete_notification" text="completed"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="cancelled"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s issue(s) detected"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="No issues detected"/>
         <text name="ads_spec_next_planned_service_notification" text="%s performed"/>

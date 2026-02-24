@@ -106,6 +106,7 @@
 
         <!-- Buttons -->
         <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonActivate" text="$l10n_ads_ws_action_cancel_service" onClick="onClickCancelService" id="cancelServiceButton"/>
             <Button profile="buttonMenuPrev" text="$l10n_ads_ws_action_inspection" onClick="onClickInspection" id="inscpectionButton"/>
             <Button profile="buttonMenuNext" text="$l10n_ads_ws_action_maintenance" onClick="onClickService" id="maintenanceButton"/>
             <Button profile="buttonOK" text="$l10n_button_repair" onClick="onClickRepair" id="repairButton"/>
