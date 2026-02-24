@@ -672,14 +672,14 @@ function ADS_Hud:showInfoVehicle(box)
     if self.spec_AdvancedDamageSystem ~= nil then
         local spec = self.spec_AdvancedDamageSystem
         
-        box:addLine(g_i18n:getText('ads_ws_label_condition'), g_i18n:getText(spec.lastInspectedConditionState))
-        box:addLine(g_i18n:getText("ads_ws_label_last_inspection"), self:getFormattedLastInspectionText())
-        box:addLine(g_i18n:getText("ads_ws_label_last_maintenance"), self:getFormattedLastMaintenanceText())
-        box:addLine(g_i18n:getText("ads_ws_label_service_interval"), self:getFormattedServiceIntervalText())
+        box:addLine(g_i18n:getText('ads_ws_label_condition'), ADS_Utils.formatCondition(self:getLastInspectedCondition()))
+        box:addLine(g_i18n:getText("ads_ws_label_last_inspection"), ADS_Utils.formatTimeAgo(self:getLastInspectionDate()))
+        box:addLine(g_i18n:getText("ads_ws_label_last_maintenance"), ADS_Utils.formatTimeAgo(self:getLastMaintenanceDate()))
+        box:addLine(g_i18n:getText("ads_ws_label_service_interval"), ADS_Utils.formatOperatingHours(self:getMaintenanceInterval()))
 
         
         if spec.currentState ~= AdvancedDamageSystem.STATUS.READY and spec.currentState ~= AdvancedDamageSystem.STATUS.BROKEN then
-            local maintenanceStatusText = string.format(g_i18n:getText("ads_spec_last_maintenance_until_format"), g_i18n:getText(spec.currentState), self:getFormattedMaintenanceFinishTimeText())
+            local maintenanceStatusText = string.format(g_i18n:getText("ads_spec_last_maintenance_until_format"), g_i18n:getText(spec.currentState), ADS_Utils.formatFinishTime(self:getServiceFinishTime()))
             box:addLine(maintenanceStatusText)
         end
     end

@@ -144,7 +144,7 @@ Choisissez la qualité des pièces détachées pour cette procédure. L'utilisat
         <text name="ads_breakdowns_severity_major" text="Majeur"/>
         <text name="ads_breakdowns_severity_critical" text="Critique"/>
 
-        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Le stress accumulé après des années de travail acharné. Une usure mineure et irréversible des composants principaux réduit légèrement les performances globales."/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Le stress accumulé après des années de travail acharné. Une usure mineure et irréversible des composants principaux réduit légèrement les performances globales."/>
 
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Mode de protection du moteur"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="Mode dégradé du moteur activé ! Puissance réduite !"/>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer" />
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg" />
+    <GuiElement profile="dialogBg" id="dialogElement" size="600px 600px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle" />
+        <ThreePartBitmap profile="fs25_dialogBgTop" />
+        <ThreePartBitmap profile="fs25_dialogBgBottom" />
+        
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Animation profile="fs25_dialogLoading" id="iconLoadingElement" />
+
+            <!-- Title -->
+            <Text profile="fs25_dialogTitle" id="dialogTitleElement" position="0px -30px" text="Maintenance Options"/>
+
+            <!-- Option One -->
+            <Text profile="fs25_dialogText" id="optionOneText" position="0px -90px" text="Select the extent of maintenance:"/>
+            <MultiTextOption profile="ads_multiTextOption" id="optionOne" position="0px -120px" focusInit="onOpen" onClick="onClickOptionOne" texts="1|2|3|4" />
+                
+            <!-- Option Two -->
+            <Text profile="fs25_dialogText" id="optionTwoText" position="0px -170px" text="Choose consumables:"/>
+            <MultiTextOption profile="ads_multiTextOption" id="optionTwo" position="0px -200px" onClick="onClickOptionTwo" texts="1|2|3|4" />
+
+            <!-- Price, duration, finish time -->
+            <GuiElement position="-175px -130px">
+                <GuiElement position="150px 100px">
+                    <Text profile="ads_greenText" id="maintenancePrice" text="Price: $ 68500" position="0px -230px"/>
+                    <Text profile="ads_greenText" id="maintenanceDuration" text="Duration: 1 day(s) 14 hour(s)" position="0px -250px"/>
+                    <Text profile="ads_greenText" id="maintenanceFinishTime" text="Finish time: after tomorrow at 08:19" position="0px -270px"/>       
+                </GuiElement>
+            </GuiElement>
+
+            <!-- Disclaimers -->
+            <Text profile="ads_disclaimerText" position="40px -340px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
+            <Text profile="ads_disclaimerText" position="40px -380px" size="500px 30px" id="optionTwoDisclaimer" text="**Premium parts have no risk of defects, but their cost is higher."/>
+        
+            <!-- Option Three -->
+            <Text profile="fs25_dialogText" id="optionThreeText" position="0px -430px" text="Repair any faults found"/>
+            <BinaryOption profile="fs25_binaryOption" id="optionThree" onClick="onClickOptionThree" size="300px 30px" position="0px 30px"/>
+
+        </GuiElement>
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonBack" text="$l10n_button_close" onClick="onClickBack" />
+            <Button profile="buttonOK" text="$l10n_ads_option_menu_start_text" onClick="onClickStartService" />
+        </BoxLayout>
+    </GuiElement>
+</GUI>

@@ -141,7 +141,7 @@
         <text name="ads_breakdowns_severity_major" text="Серьезная"/>
         <text name="ads_breakdowns_severity_critical" text="Критическая"/>
 
-        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Накопленная усталость от многих лет тяжелой работы. Незначительный, необратимый износ ключевых компонентов немного снижает общую производительность."/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Накопленная усталость от многих лет тяжелой работы. Незначительный, необратимый износ ключевых компонентов немного снижает общую производительность."/>
 
         <!-- Breakdowns descriptions retained from your Russian file -->
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Режим защиты двигателя"/>

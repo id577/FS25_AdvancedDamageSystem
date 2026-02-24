@@ -143,7 +143,7 @@
         <text name="ads_breakdowns_severity_moderate" text="Mírná"/>
         <text name="ads_breakdowns_severity_major" text="Vážná"/>
         <text name="ads_breakdowns_severity_critical" text="Kritická"/>
-        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Nahromaděný stres z let tvrdé práce. Drobné, nevratné opotřebení hlavních komponent mírně snižuje celkový výkon."/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Nahromaděný stres z let tvrdé práce. Drobné, nevratné opotřebení hlavních komponent mírně snižuje celkový výkon."/>
 
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Nouzový režim motoru"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="Aktivní nouzový režim motoru! Snížený výkon!"/>

@@ -3,8 +3,11 @@ ADS_Main = {}
 source(g_currentModDirectory .. "scripts/ADS_Config.lua")
 source(g_currentModDirectory .. "scripts/ADS_Utils.lua")
 source(g_currentModDirectory .. "scripts/ADS_Breakdowns.lua")
-source(g_currentModDirectory .. "scripts/ADS_WorkshopDialog.lua")
-source(g_currentModDirectory .. "scripts/ADS_MaintenanceLogDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_WorkshopDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_MaintenanceLogDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_ReportDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_MaintenanceTwoOptionsDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_MaintenanceThreeOptionsDialog.lua")
 source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
 source(g_currentModDirectory .. "scripts/ADS_InGameSettings.lua")
 source(g_currentModDirectory .. "events/ADS_VehicleChangeStatusEvent.lua")
@@ -77,9 +80,12 @@ end
 -- ==========================================================
 
 function ADS_Main:onStartMission()
-
+    
     ADS_WorkshopDialog.register()
     ADS_MaintenanceLogDialog.register()
+    ADS_ReportDialog.register()
+    ADS_MaintenanceTwoOptionsDialog.register()
+    ADS_MaintenanceThreeOptionsDialog.register()
 
     local mission = g_currentMission
     ADS_Main.hud = ADS_Hud:new()
@@ -104,7 +110,7 @@ function ADS_Main:onStartMission()
             local origFunc = spec.getValueFunc
             spec.getValueFunc = function(s, v)
                 if v ~= nil and v.spec_AdvancedDamageSystem ~= nil then
-                    return v:getFormattedLastMaintenanceText() 
+                    return ADS_Utils.formatTimeAgo(v:getLastMaintenanceDate())
                 else
                     return origFunc(s, v)
                 end
@@ -137,14 +143,14 @@ end
 local function getReliability(storeItem)
     if storeItem.specs.power ~= nil then
         local reliability = AdvancedDamageSystem.getBrandReliability(nil, storeItem)
-        return AdvancedDamageSystem.reliabilityValueToText(reliability)
+        return ADS_Utils.formatReliability(reliability)
     end
 end
 
 local function getMaintainability(storeItem)
     if storeItem.specs.power ~= nil then
         local _, maintainability = AdvancedDamageSystem.getBrandReliability(nil, storeItem)
-        return AdvancedDamageSystem.maintainabilityValueToText(maintainability)
+        return ADS_Utils.formatMaintainability(maintainability)
     end
 end
 
@@ -162,7 +168,7 @@ function ADS_Main.processAttributeData(self, storeItem, vehicle, saleItem)
 
         local rel, mel = AdvancedDamageSystem.getBrandReliability(vehicle, nil)
         reliabilityIconElement:applyProfile("shopConfigAttributeIconReliability")
-        reliabilityTextElement:setText(AdvancedDamageSystem.reliabilityValueToText(rel))
+        reliabilityTextElement:setText(ADS_Utils.formatReliability(rel))
         self.attributesLayout:invalidateLayout()
 
         local maintainabilityItemElement = self.attributeItem:clone(self.attributesLayout)
@@ -170,7 +176,7 @@ function ADS_Main.processAttributeData(self, storeItem, vehicle, saleItem)
         local maintainabilityTextElement = maintainabilityItemElement:getDescendantByName("text")
 
         maintainabilityIconElement:applyProfile("shopConfigAttributeIconMaintainability")
-        maintainabilityTextElement:setText(AdvancedDamageSystem.maintainabilityValueToText(mel))
+        maintainabilityTextElement:setText(ADS_Utils.formatMaintainability(mel))
         self.attributesLayout:invalidateLayout()
     end
 end
@@ -202,9 +208,9 @@ function ADS_Main.populateCellForItemInSection(self, superFunc, list, section, i
         local vehicle = self.vehicles[index].vehicle
         if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
             superFunc(self, list, section, index, cell)
-            local condition = vehicle.spec_AdvancedDamageSystem.lastInspectedConditionState
-            cell:getAttribute("damage"):setText(g_i18n:getText(condition))
-            cell:getAttribute("damage"):setTextColor(AdvancedDamageSystem.getTextColour(condition))
+            local condition = vehicle:getLastInspectedCondition()
+            cell:getAttribute("damage"):setText(ADS_Utils.formatCondition(condition))
+            cell:getAttribute("damage"):setTextColor(ADS_Utils.getValueColor(condition, 0.8, 0.6, 0.4, 0.2, false))
         else
             superFunc(self, list, section, index, cell)
         end

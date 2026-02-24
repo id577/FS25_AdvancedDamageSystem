@@ -144,7 +144,7 @@
         <text name="ads_breakdowns_severity_major" text="严重"/>
         <text name="ads_breakdowns_severity_critical" text="危急"/>
 
-        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="多年繁重工作累积的压力。核心部件的轻微、不可逆磨损略微降低了整体性能。"/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="多年繁重工作累积的压力。核心部件的轻微、不可逆磨损略微降低了整体性能。"/>
 
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="发动机保护模式"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="发动机跛行模式激活！功率降低！"/>

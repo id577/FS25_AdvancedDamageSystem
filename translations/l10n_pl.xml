@@ -144,7 +144,7 @@
         <text name="ads_breakdowns_severity_major" text="Poważne"/>
         <text name="ads_breakdowns_severity_critical" text="Krytyczne"/>
 
-        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Skumulowane zużycie po latach ciężkiej pracy. Drobne, nieodwracalne zużycie podstawowych komponentów nieznacznie zmniejsza ogólną wydajność."/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Skumulowane zużycie po latach ciężkiej pracy. Drobne, nieodwracalne zużycie podstawowych komponentów nieznacznie zmniejsza ogólną wydajność."/>
 
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Tryb ochronny silnika"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="Tryb awaryjny silnika aktywny! Moc zmniejszona!"/>

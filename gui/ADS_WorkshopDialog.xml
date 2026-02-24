@@ -42,17 +42,17 @@
 
                 <Text profile="ads_textBold" id="serviceTitle" text="$l10n_ads_ws_label_service" position="850px 240px"/>
                 <Text profile="ads_textBold" id="conditionTitle" text="$l10n_ads_ws_label_condition" position="850px 200px"/>
-                <Text profile="ads_textBold" id="powerTitle" text="$l10n_ads_ws_label_current_power" position="850px 160px"/>
-                <Text profile="ads_textBold" id="brakeTitle" text="$l10n_ads_ws_label_brake_efficiency" position="850px 120px"/>
-                <Text profile="ads_textBold" id="yieldReductionTitle" text="$l10n_ads_ws_label_harvest_efficiency" position="850px 80px"/>
+                <Text profile="ads_textBold" id="powerTitle" text="$l10n_ads_ws_label_current_power" position="850px 160px"/>                                                  
+                <Text profile="ads_textBold" id="brakeTitle" text="Maintenance Logs" position="850px 120px"/>                 <!-- FIX -->
+                <Text profile="ads_textBold" id="yieldReductionTitle" text="Last Report" position="850px 80px"/>              <!-- FIX -->
 
                 <Text profile="fs25_textDefault" id="serviceValue" text="-" position="1125px 240px"/>
                 <Text profile="fs25_textDefault" id="condtionValue" text="-" position="1125px 200px"/>
                 <Text profile="fs25_textDefault" id="powerValue" text="-" position="1125px 160px"/>
-                <Text profile="fs25_textDefault" id="brakeValue" text="-" position="1125px 120px"/>
-                <Text profile="fs25_textDefault" id="yieldReductionValue" text="-" position="1125px 80px"/>
+                <Button profile="ads_infoButton" name="maintenceLogButton" text="Show" position="-220px -47px"  onClick="onClickShowLog"/>     <!-- FIX position="1125px 120px" -->
+                <Button profile="ads_infoButton" name="lastReportButton" text="Show" position="-220px -87px" onClick="onClickShowReport"/>     <!-- FIX position="1125px 80px" -->
 
-                <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1260px 240px" />
+                <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1260px 240px"/>
                 <Text profile="fs25_textDefault" id="condtionLastInspectionDelataValue" text="-" position="1260px 200px" />
 
                 <ThreePartBitmap profile="ads_textSeporator" position="155px 228px" />
@@ -106,7 +106,6 @@
 
         <!-- Buttons -->
         <BoxLayout profile="fs25_dialogButtonBox">
-            <Button profile="buttonActivate" text="$l10n_ads_ws_button_log" onClick="onClickShowLog" id="showLogButton"/>
             <Button profile="buttonMenuPrev" text="$l10n_ads_ws_action_inspection" onClick="onClickInspection" id="inscpectionButton"/>
             <Button profile="buttonMenuNext" text="$l10n_ads_ws_action_maintenance" onClick="onClickService" id="maintenanceButton"/>
             <Button profile="buttonOK" text="$l10n_button_repair" onClick="onClickRepair" id="repairButton"/>
@@ -165,7 +164,7 @@
             <endImageSliceId value="gui.list_divider" />
         </Profile>
 
-        <Profile name="ads_headerBoldText" extends="fs25_textDefault" with="anchorStretchingYLeft">
+        <Profile name="ads_headerBoldText" extends="fs25_textDefault" with="anchorStretchingYLeft"> 
             <textSize value="24px" />
             <textBold value="true" />
             <textUpperCase value="true" />
@@ -206,12 +205,46 @@
             <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
         </Profile> 
 
+        <Profile name="ads_tableListItemAlt" extends="baseReference" with="anchorTopStretchingX alternating">
+            <height value="32px"/>
+            <textSelectedColor value="$preset_fs25_colorMainLight" />
+            <imageColor value="$preset_fs25_colorGrey" />
+            <imageSelectedColor value="$preset_fs25_colorMainHighlight" />
+            <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
+        </Profile> 
+
         <Profile name="ads_tableRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
             <textBold value="false" />
             <textSize value="16px" />
             <textAlignment value="left" />
             <textColor value="$preset_fs25_colorMainLight" />
             <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+
+        <Profile name="ads_tableRowCellRight" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false" />
+            <textSize value="16px" />
+            <textAlignment value="right" />
+            <textColor value="$preset_fs25_colorMainLight" />
+            <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+
+        <Profile name="ads_tableRowCellLeftAlt" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false" />
+            <textSize value="16px" />
+            <textAlignment value="left" />
+            <textColor value="$preset_fs25_colorMainLight" />
+            <textDisabledColor value="$preset_colorDisabled" />
+            <textSelectedColor value="$preset_fs25_colorMainDark" />
+        </Profile>
+
+        <Profile name="ads_tableRowCellRightAlt" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false" />
+            <textSize value="16px" />
+            <textAlignment value="right" />
+            <textColor value="$preset_fs25_colorMainLight" />
+            <textDisabledColor value="$preset_colorDisabled" />
+             <textSelectedColor value="$preset_fs25_colorMainDark" />
         </Profile>
 
         <Profile name="ads_tableRowCellLeftUpper" extends="baseReference" with="anchorStretchingYLeft">
@@ -255,6 +288,24 @@
             <endImageHighlightedSliceId value="gui.savegame_hover_right"/>
         </Profile>
 
+        <Profile name="ads_infoButton" extends="emptyPanel" with="anchorMiddleRight">
+            <size value="80px 32px"/>
+            <position value="-10px 0px"/>
+            <focusOnHighlight value="true"/>
+            <textResizeWidth value="200px"/>
+            <textSize value="16px"/>
+            <iconColor value="$preset_colorTransparent"/>
+            <iconFocusedColor value="$preset_colorTransparent"/>
+            <iconTextOffset value="0px -1px"/>
+            <iconHighlightedColor value="$preset_colorTransparent"/>
+            <textBold value="true"/>
+            <textUpperCase value="true"/>
+            <textAlignment value="center"/>
+            <textColor value="$preset_fs25_colorMainLight"/>
+            <textFocusedColor value="$preset_fs25_colorMainHighlight"/>
+            <textDisabledColor value="$preset_colorDisabled"/>
+	    </Profile>
+
         <Profile name="shopListAttributeIconReliability" extends="shopListAttributeIconLifeTime">
             <imageSliceId value="ads_DashboardHud.reliability"/>
         </Profile>
@@ -266,6 +317,20 @@
         </Profile>
         <Profile name="shopConfigAttributeIconMaintainability" extends="shopConfigAttributeIconCapacity">
             <imageSliceId value="ads_DashboardHud.maintainability"/>
+        </Profile>
+
+        <Profile name="ads_multiTextOption" extends="fs25_multiTextOption" with="anchorTopCenter" />
+
+        <Profile name="ads_dialogText" extends="fs25_dialogText" with="anchorTopLeft" />
+
+        <Profile name="ads_greenText" extends="ads_dialogText">
+            <textSize value="14px" />        
+            <textColor value="$preset_fs25_colorGreen" />        
+        </Profile>
+
+        <Profile name="ads_disclaimerText" extends="ads_dialogText">
+            <textSize value="12px" />                
+            <textColor value="$preset_fs25_colorMainLight" />
         </Profile>
 
     </GUIProfiles>

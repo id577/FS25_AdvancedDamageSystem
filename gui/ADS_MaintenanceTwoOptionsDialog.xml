@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer" />
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg" />
+    
+    <GuiElement profile="dialogBg" id="dialogElement" size="600px 450px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle" />
+        <ThreePartBitmap profile="fs25_dialogBgTop" />
+        <ThreePartBitmap profile="fs25_dialogBgBottom" />
+        
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Animation profile="fs25_dialogLoading" id="iconLoadingElement" />
+
+            <!-- Title -->
+            <Text profile="fs25_dialogTitle" id="dialogTitleElement" position="0px -30px" text="Maintenance Options"/>
+
+            <!-- Option One -->
+            <Text profile="fs25_dialogText" id="optionOneText" position="0px -80px" text="Select the extent of maintenance:"/>
+            <MultiTextOption profile="ads_multiTextOption" id="optionOne" position="0px -110px" focusInit="onOpen" onClick="onClickOptionOne" texts="1|2|3|4" />
+                
+            <Text profile="ads_greenText" id="maintenancePrice" text="Price: $ 68500" position="-25px -160px"/>
+            <Text profile="ads_greenText" id="maintenanceDuration" text="Duration: 1 day(s) 14 hour(s)" position="-25px -180px"/>
+            <Text profile="ads_greenText" id="maintenanceFinishTime" text="Finish time: after tomorrow at 08:19" position="-25px -200px"/>       
+
+            <!-- Disclaimers -->
+            <Text profile="ads_disclaimerText" position="40px -240px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
+        
+            <!-- Option Three -->
+            <Text profile="fs25_dialogText" id="optionThreeText" position="0px -290px" text="Repair any faults found"/>
+            <BinaryOption profile="fs25_binaryOption" id="optionThree" onClick="onClickOptionThree" size="300px 30px" position="0px 20px"/>
+
+        </GuiElement>
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonBack" text="$l10n_button_close" onClick="onClickBack" />
+            <Button profile="buttonOK" text="$l10n_ads_option_menu_start_text" onClick="onClickStartService" />
+        </BoxLayout>
+    </GuiElement>
+</GUI>

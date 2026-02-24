@@ -143,7 +143,7 @@
         <text name="ads_breakdowns_severity_moderate" text="Moderado"/>
         <text name="ads_breakdowns_severity_major" text="Grave"/>
         <text name="ads_breakdowns_severity_critical" text="Crítico"/>
-        <text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="El estrés acumulado de años de trabajo duro. Desgaste menor e irreversible en componentes principales que reduce ligeramente el rendimiento general."/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="El estrés acumulado de años de trabajo duro. Desgaste menor e irreversible en componentes principales que reduce ligeramente el rendimiento general."/>
 
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Modo de protección del motor"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="¡Modo de emergencia activo! ¡Potencia reducida!"/>

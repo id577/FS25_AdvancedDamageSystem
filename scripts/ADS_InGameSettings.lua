@@ -19,31 +19,28 @@ function ADS_InGameSettings:onFrameOpen()
 
     ADS_InGameSettings:addSectionHeader(self, "Advanced Damage System")
 
-    -- Service Wear
+    -- Base Service Interval (ex.: Service Wear)
     self.ads_serviceWear = ADS_InGameSettings:addMultiTextOption(
-        self,
-        "onServiceWearChanged",
+        self, "onServiceWearChanged",
         ADS_InGameSettings.steps.serviceWear.texts,
-        g_i18n:getText("ads_serviceWear_label"),
-        g_i18n:getText("ads_serviceWear_tooltip")
+        g_i18n:getText("ads_serviceInterval_label"),
+        g_i18n:getText("ads_serviceInterval_tooltip")
     )
 
-    -- Condition Wear
+    -- Base Service Life (ex.: Condition Wear)
     self.ads_conditionWear = ADS_InGameSettings:addMultiTextOption(
-        self,
-        "onConditionWearChanged",
+        self, "onConditionWearChanged",
         ADS_InGameSettings.steps.conditionWear.texts,
-        g_i18n:getText("ads_conditionWear_label"),
-        g_i18n:getText("ads_conditionWear_tooltip")
+        g_i18n:getText("ads_vehicleLifespan_label"),
+        g_i18n:getText("ads_vehicleLifespan_tooltip")
     )
 
-    -- Breakdown Probability
-    self.ads_breakdownProbability = ADS_InGameSettings:addMultiTextOption(
-        self,
-        "onBreakdownProbabilityChanged",
+    -- Breakdown Frequency (ex.: Breakdown Probability)
+self.ads_breakdownProbability = ADS_InGameSettings:addMultiTextOption(
+        self, "onBreakdownProbabilityChanged",
         ADS_InGameSettings.steps.breakdown.texts,
-        g_i18n:getText("ads_breakdownProbability_label"),
-        g_i18n:getText("ads_breakdownProbability_tooltip")
+        g_i18n:getText("ads_breakdownFrequency_label"),
+        g_i18n:getText("ads_breakdownFrequency_tooltip")
     )
 
     -- Instant Inspection (Binary)
@@ -106,22 +103,12 @@ function ADS_InGameSettings:onFrameOpen()
         g_i18n:getText("ads_workshopCloseHour_tooltip")
     )
 
-    -- Engine Max Heat
-    self.ads_engineMaxHeat = ADS_InGameSettings:addMultiTextOption(
-        self,
-        "onEngineMaxHeatChanged",
-        ADS_InGameSettings.steps.engineHeat.texts,
-        g_i18n:getText("ads_engineMaxHeat_label"),
-        g_i18n:getText("ads_engineMaxHeat_tooltip")
-    )
-
-    -- Transmission Max Heat
-    self.ads_transMaxHeat = ADS_InGameSettings:addMultiTextOption(
-        self,
-        "onTransMaxHeatChanged",
-        ADS_InGameSettings.steps.transHeat.texts,
-        g_i18n:getText("ads_transMaxHeat_label"),
-        g_i18n:getText("ads_transMaxHeat_tooltip")
+    -- Thermal Sensitivity (engine + trans heat)
+    self.ads_thermalSensitivity = ADS_InGameSettings:addMultiTextOption(
+        self, "onThermalSensitivityChanged",
+        ADS_InGameSettings.steps.thermalSensitivity.texts,
+        g_i18n:getText("ads_thermalSensitivity_label"),
+        g_i18n:getText("ads_thermalSensitivity_tooltip")
     )
 
     -- Dirt Influence
@@ -139,6 +126,14 @@ function ADS_InGameSettings:onFrameOpen()
         "onAiOverloadAndOverheatControlChanged",
         g_i18n:getText("ads_aiOverloadAndOverheatControl_label"),
         g_i18n:getText("ads_aiOverloadAndOverheatControl_tooltip")
+    )
+
+    -- DEbug Mode (Binary)
+    self.ads_debugMode = ADS_InGameSettings:addBinaryOption(
+        self,
+        "onDebugModeChanged",
+        g_i18n:getText("ads_debugMode_label"),
+        g_i18n:getText("ads_debugMode_tooltip")
     )
 
     self.gameSettingsLayout:invalidateLayout()
@@ -169,23 +164,23 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
         element:setState(1)
     end
 
-    setIndex(currentPage.ads_serviceWear, steps.serviceWear.values, ADS_Config.CORE.BASE_SERVICE_WEAR)
-    setIndex(currentPage.ads_conditionWear, steps.conditionWear.values, ADS_Config.CORE.BASE_CONDITION_WEAR)
-    setIndex(currentPage.ads_breakdownProbability, steps.breakdown.values, ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF)
-    setIndex(currentPage.ads_maintenancePrice, steps.maintPrice.values, ADS_Config.MAINTENANCE.MAINTENANCE_PRICE_MULTIPLIER)
-    setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER)
+     local currentBreakdownPct = math.floor((1200 / ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF) * 100 + 0.5)
+    setIndex(currentPage.ads_breakdownProbability, steps.breakdown.values, currentBreakdownPct)
+    setIndex(currentPage.ads_serviceWear,       steps.serviceWear.values,    ADS_Config.CORE.BASE_SERVICE_WEAR)
+    setIndex(currentPage.ads_conditionWear,     steps.conditionWear.values,  ADS_Config.CORE.BASE_CONDITION_WEAR)
+    setIndex(currentPage.ads_maintenancePrice,    steps.maintPrice.values,    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER * 100)
+    setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER * 100)
+    setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, ADS_Config.THERMAL.ENGINE_MAX_HEAT)
+    setIndex(currentPage.ads_dirtInfluence,     steps.dirt.values,           ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
     
     currentPage.ads_instantInspection:setIsChecked(ADS_Config.MAINTENANCE.INSTANT_INSPECTION, false, false)
     currentPage.ads_parkVehicle:setIsChecked(ADS_Config.MAINTENANCE.PARK_VEHICLE, false, false)
     currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL, false, false)
     currentPage.ads_workshopAvailable:setIsChecked(ADS_Config.WORKSHOP.ALWAYS_AVAILABLE, false, false)
+    currentPage.ads_debugMode:setIsChecked(ADS_Config.DEBUG, false, false)
     
     setIndex(currentPage.ads_workshopOpenHour, steps.hours.values, ADS_Config.WORKSHOP.OPEN_HOUR)
     setIndex(currentPage.ads_workshopCloseHour, steps.hours.values, ADS_Config.WORKSHOP.CLOSE_HOUR)
-    
-    setIndex(currentPage.ads_engineMaxHeat, steps.engineHeat.values, ADS_Config.THERMAL.ENGINE_MAX_HEAT)
-    setIndex(currentPage.ads_transMaxHeat, steps.transHeat.values, ADS_Config.THERMAL.TRANS_MAX_HEAT)
-    setIndex(currentPage.ads_dirtInfluence, steps.dirt.values, ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
 
     local isAlwaysAvailable = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE
     currentPage.ads_workshopOpenHour:setDisabled(isAlwaysAvailable)
@@ -203,11 +198,6 @@ function ADS_InGameSettings:onConditionWearChanged(state)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
-function ADS_InGameSettings:onBreakdownProbabilityChanged(state)
-    ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF = ADS_InGameSettings.steps.breakdown.values[state]
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
-end
-
 function ADS_InGameSettings:onInstantInspectionChanged(state)
     ADS_Config.MAINTENANCE.INSTANT_INSPECTION = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
@@ -219,12 +209,12 @@ function ADS_InGameSettings:onParkVehicleChanged(state)
 end
 
 function ADS_InGameSettings:onMaintenancePriceChanged(state)
-    ADS_Config.MAINTENANCE.MAINTENANCE_PRICE_MULTIPLIER = ADS_InGameSettings.steps.maintPrice.values[state]
+    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER = ADS_InGameSettings.steps.maintPrice.values[state] / 100
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
 function ADS_InGameSettings:onMaintenanceDurationChanged(state)
-    ADS_Config.MAINTENANCE.MAINTENANCE_DURATION_MULTIPLIER = ADS_InGameSettings.steps.maintDuration.values[state]
+    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER = ADS_InGameSettings.steps.maintDuration.values[state] / 100
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
@@ -269,13 +259,16 @@ function ADS_InGameSettings:onWorkshopCloseHourChanged(state)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
-function ADS_InGameSettings:onEngineMaxHeatChanged(state)
-    ADS_Config.THERMAL.ENGINE_MAX_HEAT = ADS_InGameSettings.steps.engineHeat.values[state]
+function ADS_InGameSettings:onBreakdownProbabilityChanged(state)
+    local pct = ADS_InGameSettings.steps.breakdown.values[state]
+    ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF = math.floor(1200 / (pct / 100) + 0.5)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
-function ADS_InGameSettings:onTransMaxHeatChanged(state)
-    ADS_Config.THERMAL.TRANS_MAX_HEAT = ADS_InGameSettings.steps.transHeat.values[state]
+function ADS_InGameSettings:onThermalSensitivityChanged(state)
+    local val = ADS_InGameSettings.steps.thermalSensitivity.values[state]
+    ADS_Config.THERMAL.ENGINE_MAX_HEAT = val
+    ADS_Config.THERMAL.TRANS_MAX_HEAT  = val
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
@@ -287,6 +280,11 @@ end
 function ADS_InGameSettings:onAiOverloadAndOverheatControlChanged(state)
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+end
+
+function ADS_InGameSettings:onDebugModeChanged(state)
+    ADS_Config.DEBUG = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage) 
 end
 
 
@@ -380,46 +378,78 @@ end
 function ADS_InGameSettings:generateAllSteps()
     if self.steps.generated then return end
 
-    local function createSteps(startVal, count, stepSize, formatter, isFloat)
+    local function createSteps(startVal, count, stepSize, formatter)
         local data = { values = {}, texts = {} }
         for i = 0, count - 1 do
             local val = startVal + (i * stepSize)
             table.insert(data.values, val)
-            if formatter then
-                table.insert(data.texts, formatter(val))
-            else
-                table.insert(data.texts, tostring(val))
-            end
+            table.insert(data.texts, formatter and formatter(val) or tostring(val))
         end
         return data
     end
 
-    -- Service Wear: 1% to 30% (steps of 0.01)
-    self.steps.serviceWear = createSteps(0.01, 30, 0.01, formatPercent, true)
-    
-    -- Condition Wear: 0.1% to 3.0% (steps of 0.001) -> original code 1..30 * 0.001
-    self.steps.conditionWear = createSteps(0.001, 30, 0.001, formatPercentPrecise, true)
+    -- Service Interval
+    self.steps.serviceWear = createSteps(2.0, 37, 0.5, function(v)
+        return string.format("%.1f h", v)
+    end)
+    do
+        local data = { values = {}, texts = {} }
+        for i = 0, 36 do
+            local hours = 2.0 + i * 0.5
+            table.insert(data.values, 0.5 / hours)
+            table.insert(data.texts, string.format("%.1f h", hours))
+        end
+        self.steps.serviceWear = data
+    end
 
-    -- Breakdown: 200 to 2200 (steps of 100) -> original 0..20 * 100 + 200
-    self.steps.breakdown = createSteps(200, 21, 100, nil, false)
+    -- Vehicle Lifespan:
+    -- 0.001 = 1000h, 0.030 = ~33h
+    do
+        local data = { values = {}, texts = {} }
+        for i = 0, 36 do
+            local hours = 40 + i * 10
+            table.insert(data.values, 1.0 / hours)  -- конвертируем в wear
+            table.insert(data.texts, string.format("%d h", hours))
+        end
+        self.steps.conditionWear = data
+    end
 
-    -- Maint Price: 0.1x to 3.0x
-    self.steps.maintPrice = createSteps(0.1, 30, 0.1, formatMultiplier, true)
+    -- Breakdown Frequency:
+    -- 100% = 1200 MTBF (дефолт), 200% = 600, 50% = 2400
+    self.steps.breakdown = createSteps(20, 15, 20, function(v)
+        return string.format("%.0f%%", v)
+    end)
 
-    -- Maint Duration: 0.1x to 3.0x
-    self.steps.maintDuration = createSteps(0.1, 30, 0.1, formatMultiplier, true)
+-- Maint Price: 10% to 300%
+    self.steps.maintPrice = createSteps(10, 30, 10, function(v)
+        return string.format("%.0f%%", v)
+    end)
+
+    -- Maint Duration: 10% to 300%
+    self.steps.maintDuration = createSteps(10, 30, 10, function(v)
+        return string.format("%.0f%%", v)
+    end)
 
     -- Hours: 00:00 to 23:00
-    self.steps.hours = createSteps(0, 24, 1, formatHour, false)
+    self.steps.hours = createSteps(0, 24, 1, function(v)
+        return string.format("%02d:00", v)
+    end)
 
-    -- Engine Heat: 0.90 to 1.10
-    self.steps.engineHeat = createSteps(0.90, 21, 0.01, formatFloat2, true)
-
-    -- Trans Heat: 0.90 to 1.10
-    self.steps.transHeat = createSteps(0.90, 21, 0.01, formatFloat2, true)
+    -- Thermal Sensitivity:
+    self.steps.thermalSensitivity = {
+        values = {0.9, 1.0, 1.05, 1.1},
+        texts  = {
+            g_i18n:getText("ads_thermal_none"),
+            g_i18n:getText("ads_thermal_mild"),
+            g_i18n:getText("ads_thermal_default"),
+            g_i18n:getText("ads_thermal_aggressive"),
+        }
+    }
 
     -- Dirt Influence: 0% to 30%
-    self.steps.dirt = createSteps(0.00, 31, 0.01, formatPercent, true)
+    self.steps.dirt = createSteps(0.00, 31, 0.01, function(v)
+        return string.format("%.0f%%", v * 100)
+    end)
 
     self.steps.generated = true
 end

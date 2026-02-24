@@ -132,7 +132,7 @@
 		<text name="ads_breakdowns_severity_moderate" text="Medel"/>
 		<text name="ads_breakdowns_severity_major" text="Större"/>
 		<text name="ads_breakdowns_severity_critical" text="Kritisk"/>
-		<text name="ads_breakdowns_general_wear_and_tear_stage1_description" text="Det sammanlagda slitaget från år av hårt arbete. Mindre, oreparerbara skador på grundkomponenter reducerar något den generella prestandan."/>
+		<text name="ads_breakdowns_general_wear_stage1_description" text="Det sammanlagda slitaget från år av hårt arbete. Mindre, oreparerbara skador på grundkomponenter reducerar något den generella prestandan."/>
 		<text name="ads_breakdowns_overheat_protection_stage1_description" text="Motorskyddsläge"/>
 		<text name="ads_breakdowns_overheat_protection_stage1_message" text="Motorskyddsläge aktivt! Effekt reducerad!"/>
 		<text name="ads_breakdowns_overheat_protection_stage2_description" text="Motorskyddsläge"/>

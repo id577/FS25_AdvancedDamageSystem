@@ -55,7 +55,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
 
 -- additional debuffs for aging equipment, in addition to the standard ones (torque for motorized, fillDelta for combine)
-    GENERAL_WEAR_AND_TEAR = {
+    GENERAL_WEAR = {
         isSelectable = false,
         part = "ads_breakdowns_part_vehicle",
         isApplicable = function(vehicle)
@@ -70,7 +70,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         stages = {
             {
                 severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_and_tear_stage1_description",
+                description = "ads_breakdowns_general_wear_stage1_description",
                 detectionChance = 0.0,
                 progressMultiplier = 0.2,
                 repairPrice = 0.0,
@@ -88,7 +88,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { 
                         id = "BRAKE_FORCE_MODIFIER", 
                         value = function(vehicle)
-                            local baseEffect = -0.40
+                            local baseEffect = -0.3
                             local condition = vehicle:getConditionLevel()
                             local multiplier = (1 - condition) ^ 3
                             return baseEffect * multiplier
@@ -119,7 +119,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { 
                         id = "YIELD_REDUCTION_MODIFIER", 
                         value = function(vehicle)
-                            local baseEffect = -0.20
+                            local baseEffect = -0.30
                             local condition = vehicle:getConditionLevel()
                             local multiplier = (1 - condition) ^ 3
                             return baseEffect * multiplier
@@ -1169,7 +1169,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.05, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"},
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
@@ -1186,7 +1187,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "LIGHTS_FAILURE", value = 1.0, extraData = {message = "ads_breakdowns_electrical_system_malfunction_stage3_message"}, aggregation = "boolean_or" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"},
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1814,9 +1816,6 @@ ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
         local originalValueName = "clutchSlippingTime"
         local originalValue = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName]
 
-        motor.clutchSlippingTime = originalValue
-        vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] = nil
-
         if originalValue ~= nil then
             motor.clutchSlippingTime = originalValue
             vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] = nil
@@ -2257,7 +2256,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
                         if v.stopMotor then
                             v:stopMotor()
                             if v.getIsControlled ~= nil and v:getIsControlled() then
-                                g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message", 5000)) 
+                                g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000) 
                             end
                         end
                     end
@@ -2616,7 +2615,7 @@ function ADS_Breakdowns.getCanMotorRun(self, superFunc)
         else
             return false
         end
-    elseif self:isUnderMaintenance() then
+    elseif self:isUnderService() then
         if self.getIsControlled ~= nil and self:getIsControlled() then
             g_currentMission:showBlinkingWarning(g_i18n:getText(self:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdown_at_progress_message", 100)) 
         end

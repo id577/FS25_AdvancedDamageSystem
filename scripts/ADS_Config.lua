@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 20,
+    VER = 23,
 
     DEBUG = false,
 
@@ -88,7 +88,7 @@ ADS_Config = {
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 5,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
-        GENERAL_WEAR_AND_TEAR_THRESHOLD = 0.5,
+        GENERAL_WEAR_THRESHOLD = 0.5,
 
         -- Defines the probability of a new breakdown occurring.
         BREAKDOWN_PROBABILITY = {
@@ -129,29 +129,90 @@ ADS_Config = {
     -- MAINTENANCE & REPAIR PARAMETERS
     -- Controls the time and cost of all service types.
     -- ====================================================================================
-    MAINTENANCE = {
-        PARK_VEHICLE = true,
-        -- The base time in milliseconds required to perform an Inspection.
-        INSTANT_INSPECTION = false,
-        INSPECTION_TIME = 3600000, -- (1 GAME hour)
-        -- The base time in milliseconds required to perform a full Maintenance (Service).
-        MAINTENANCE_TIME = 14400000, -- (4 GAME hours)
-        -- The base time in milliseconds required to repair a SINGLE breakdown. This is multiplied by the number of selected breakdowns.
-        REPAIR_TIME = 14400000, -- (4 GAME hours per breakdown)
-        -- The base time in milliseconds required to perform a complete Overhaul.
-        OVERHAUL_TIME = 43200000, -- (12 GAME hours)
+MAINTENANCE = {
+    PARK_VEHICLE = true,
+    INSTANT_INSPECTION = false,
 
-        OVERHAUL_MIN_CONDITION_RESTORE = 0.5,
-        OVERHAUL_MAX_CONDITION_RESTORE = 0.8,
+    GLOBAL_SERVICE_PRICE_MULTIPLIER = 1.0,
+    GLOBAL_SERVICE_TIME_MULTIPLIER = 1.0,
 
-        AFTERMARKETS_PARTS_BREAKDOWN_CHANCE = 0.33,
-        AFTERMARKETS_PARTS_BREAKDOWN_DURATION = 18000000,
-        -- These are global price multipliers. 1.0 is default. 2.0 would double the price of that service.
-        -- The final price is calculated based on vehicle price, age, and brand maintainability.
-        MAINTENANCE_PRICE_MULTIPLIER = 1.0,
-        MAINTENANCE_DURATION_MULTIPLIER = 1.0
+    INSPECTION_TIME = 3600000,
+    INSPECTION_TIME_MULTIPLIERS = {
+        [1] = 1.0,  STANDARD = 1.0,
+        [2] = 0.1,  VISUAL   = 0.1,
+        [3] = 4.0,  COMPLETE = 4.0,
+    },
+    MAINTENANCE_TIME = 21600000,
+    MAINTENANCE_TIME_MULTIPLIERS = {
+        [1] = 1.0,  STANDARD = 1.0,
+        [2] = 0.25, MINIMAL  = 0.25,
+        [3] = 1.5,  EXTENDED = 1.5,
+    },
+    REPAIR_TIME = 14400000,
+    REPAIR_TIME_MULTIPLIERS = {
+        [1] = 1.0, MEDIUM = 1.0,
+        [2] = 1.5, LOW   = 1.5,
+        [3] = 0.5, HIGH    = 0.5,
+    },
+    OVERHAUL_TIME = 86400000,
+    OVERHAUL_TIME_MULTIPLIERS = {
+        [1] = 1.0, STANDARD = 1.0,
+        [2] = 0.5, PARTIAL  = 0.5,
+        [3] = 2.0, FULL     = 2.0,
     },
 
+    MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS = {
+        [1] = 1.0,  STANDARD = 1.0,
+        [2] = 0.75, MINIMAL  = 0.75,
+        [3] = 1.2,  EXTENDED = 1.2,
+    },
+    OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS = {
+        [1] = 0.61, STANDARD = 0.61,
+        [2] = 0.41, PARTIAL  = 0.41,
+        [3] = 0.81, FULL     = 0.81,
+    },
+    OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS = {
+        [1] = 0.79, STANDARD = 0.79,
+        [2] = 0.59, PARTIAL  = 0.59,
+        [3] = 0.99, FULL     = 0.99,
+    },
+
+    PARTS_BREAKDOWN_CHANCES = {
+        [1] = 0.1,  OEM         = 0.1,
+        [2] = 0.5,  USED        = 0.5,
+        [3] = 0.33, AFTERMARKET = 0.33,
+        [4] = 0.0,  PREMIUM     = 0.0,
+    },
+    PARTS_BREAKDOWN_TIME = 18000000,
+
+    PARTS_PRICE_MULTIPLIERS = {
+        [1] = 1.0,  OEM         = 1.0,
+        [2] = 0.33, USED        = 0.33,
+        [3] = 0.66, AFTERMARKET = 0.66,
+        [4] = 1.20, PREMIUM     = 1.20,
+    },
+    MAINTENANCE_PRICE_MULTIPLIERS = {
+        [1] = 1.0,  STANDARD = 1.0,
+        [2] = 0.60, MINIMAL  = 0.60,
+        [3] = 1.30, EXTENDED = 1.30,
+    },
+    REPAIR_PRICE_MULTIPLIERS = {
+        [1] = 1.0, MEDIUM = 1.0,
+        [2] = 0.8, LOW    = 0.8,
+        [3] = 1.2, HIGH   = 1.2,
+    },
+    OVERHAUL_PRICE_MULTIPLIERS = {
+        [1] = 0.5, STANDARD = 0.5,
+        [2] = 0.3, PARTIAL  = 0.3,
+        [3] = 0.8, FULL     = 0.8,
+    },
+    INSPECTION_PRICE_MULTIPLIERS = {
+        [1] = 1.0, STANDARD = 1.0,
+        [2] = 0.1, VISUAL   = 0.1,
+        [3] = 4.0, COMPLETE = 4.0,
+    },
+    OWN_WORKSHOP_PRICE_MULTIPLIER = 0.8,
+},
 
     -- ====================================================================================
     -- THERMAL DYNAMICS PARAMETERS
@@ -330,52 +391,97 @@ ADS_Config = {
     }      
 }
 
-
 ADS_Config.savegameFile = "advancedDamageSystem.xml"
 
+local function log_dbg(...)
+    if ADS_Config and ADS_Config.DEBUG then
+        local args = {...}
+        for i = 1, #args do
+            args[i] = tostring(args[i])
+        end
+        print("[ADS_CONFIG] " .. table.concat(args, " "))
+    end
+end
+
+local function isArray(tbl)
+    if type(tbl) ~= "table" then return false end
+    local count = 0
+    local maxIndex = 0
+
+    for k in pairs(tbl) do
+        if type(k) ~= "number" or k < 1 or k % 1 ~= 0 then
+            return false
+        end
+        count = count + 1
+        if k > maxIndex then
+            maxIndex = k
+        end
+    end
+
+    if count == 0 then return false end
+    return maxIndex == count
+end
+
+-- ============================================================
+-- SAVE
+-- ============================================================
 function ADS_Config.saveToXMLFile()
-    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then
+    if g_currentMission == nil or g_currentMission.missionInfo == nil
+       or g_currentMission.missionInfo.savegameDirectory == nil then
+        log_dbg("SAVE - mission or savegame directory is nil, skipping.")
         return false
     end
 
-    local xmlFileName = g_currentMission.missionInfo.savegameDirectory .. "/" .. ADS_Config.savegameFile
-    local xmlFile = createXMLFile("advancedDamageSystem", xmlFileName, "advancedDamageSystem")
-
-    if xmlFile == nil then
-        print("ADS_Config: ERROR - Could not create config XML file.")
+    local xmlFileName = g_currentMission.missionInfo.savegameDirectory
+                        .. "/" .. ADS_Config.savegameFile
+    local xmlFile = createXMLFile("advancedDamageSystem", xmlFileName,
+                                  "advancedDamageSystem")
+    if xmlFile == nil or xmlFile == 0 then
+        print("[ADS_CONFIG] SAVE ERROR - could not create XML file (handle=" .. tostring(xmlFile) .. ").")
         return false
     end
 
-    print("ADS_Config: Saving settings to " .. xmlFileName)
+    log_dbg("Saving ADS_Config to " .. xmlFileName)
 
+    -- --------------------------------------------------------
     local function saveNode(tbl, path)
         for k, v in pairs(tbl) do
-            if type(v) ~= "function" and k ~= "savegameFile" then
+            if type(k) == "string" and type(v) ~= "function" and k ~= "savegameFile" then
                 local currentPath = path .. "." .. tostring(k)
 
                 if type(v) == "table" then
-
                     if k == "BRANDS" then
-                        removeXMLProperty(xmlFile, currentPath)
-                        
-                        local i = 0
-                        local sortedBrands = {}
-                        for brandName in pairs(v) do
-                            table.insert(sortedBrands, brandName)
+                        -- brands
+                        local sorted = {}
+                        for name in pairs(v) do
+                            table.insert(sorted, name)
                         end
-                        table.sort(sortedBrands)
+                        table.sort(sorted)
+                        for i, name in ipairs(sorted) do
+                            local bp = currentPath .. ".brand(" .. (i - 1) .. ")"
+                            setXMLString(xmlFile, bp .. "#name",            name)
+                            setXMLFloat (xmlFile, bp .. "#reliability",     v[name][1])
+                            setXMLFloat (xmlFile, bp .. "#maintainability", v[name][2])
+                        end
 
-                        for _, brandName in ipairs(sortedBrands) do
-                            local brandValues = v[brandName]
-                            local brandPath = currentPath .. ".brand(" .. i .. ")"
-                            setXMLString(xmlFile, brandPath .. "#name", brandName)
-                            setXMLFloat(xmlFile, brandPath .. "#reliability", brandValues[1])
-                            setXMLFloat(xmlFile, brandPath .. "#maintainability", brandValues[2])
-                            i = i + 1
+                    elseif isArray(v) then
+                        -- array
+                        for i, val in ipairs(v) do
+                            local ip = currentPath .. ".item(" .. (i - 1) .. ")"
+                            if type(val) == "number" then
+                                setXMLFloat(xmlFile, ip .. "#value", val)
+                            elseif type(val) == "boolean" then
+                                setXMLBool(xmlFile, ip .. "#value", val)
+                            elseif type(val) == "string" then
+                                setXMLString(xmlFile, ip .. "#value", val)
+                            end
                         end
+
                     else
+                        -- nested table
                         saveNode(v, currentPath)
                     end
+
                 elseif type(v) == "number" then
                     setXMLFloat(xmlFile, currentPath, v)
                 elseif type(v) == "boolean" then
@@ -386,163 +492,161 @@ function ADS_Config.saveToXMLFile()
             end
         end
     end
+    -- --------------------------------------------------------
 
     saveNode(ADS_Config, "advancedDamageSystem")
-
     saveXMLFile(xmlFile)
     delete(xmlFile)
+    log_dbg("ADS_Config: Settings saved successfully to " .. xmlFileName)
     return true
 end
 
-function ADS_Config.saveToXMLFile()
-    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then
-        return false
-    end
-
-    local xmlFileName = g_currentMission.missionInfo.savegameDirectory .. "/" .. ADS_Config.savegameFile
-    local xmlFile = createXMLFile("advancedDamageSystem", xmlFileName, "advancedDamageSystem")
-
-    if xmlFile == nil then
-        print("ADS_Config: ERROR - Could not create config XML file.")
-        return false
-    end
-
-    print("ADS_Config: Saving settings to " .. xmlFileName)
-
-    local function saveNode(tbl, path)
-        for k, v in pairs(tbl) do
-            if type(v) ~= "function" and k ~= "savegameFile" then
-                local currentPath = path .. "." .. tostring(k)
-
-                if type(v) == "table" then
-                    if k == "BRANDS" then
-                        removeXMLProperty(xmlFile, currentPath)
-                        
-                        local i = 0
-                        local sortedBrands = {}
-                        for brandName in pairs(v) do
-                            table.insert(sortedBrands, brandName)
-                        end
-                        table.sort(sortedBrands)
-
-                        for _, brandName in ipairs(sortedBrands) do
-                            local brandValues = v[brandName]
-                            local brandPath = currentPath .. ".brand(" .. i .. ")"
-                            setXMLString(xmlFile, brandPath .. "#name", brandName)
-                            setXMLFloat(xmlFile, brandPath .. "#reliability", brandValues[1])
-                            setXMLFloat(xmlFile, brandPath .. "#maintainability", brandValues[2])
-                            i = i + 1
-                        end
-                    else
-                        saveNode(v, currentPath)
-                    end
-                elseif type(v) == "number" then
-                    setXMLFloat(xmlFile, currentPath, v)
-                elseif type(v) == "boolean" then
-                    setXMLBool(xmlFile, currentPath, v)
-                elseif type(v) == "string" then
-                    setXMLString(xmlFile, currentPath, v)
-                end
-            end
-        end
-    end
-
-    saveNode(ADS_Config, "advancedDamageSystem")
-
-    saveXMLFile(xmlFile)
-    delete(xmlFile)
-    return true
-end
-
+-- ============================================================
+-- LOAD
+-- ============================================================
 function ADS_Config.loadFromXMLFile(mission)
-    if mission == nil or mission.missionInfo == nil or mission.missionInfo.savegameDirectory == nil then
+    log_dbg("loadFromXMLFile called with mission: " .. tostring(mission))
+
+    local m = mission
+    if m == nil or m.missionInfo == nil or m.missionInfo.savegameDirectory == nil then
+        m = g_currentMission
+    end
+
+    if m == nil then
+        log_dbg("LOAD - mission is nil, using defaults.")
+        return
+    end
+    if m.missionInfo == nil then
+        log_dbg("LOAD - missionInfo is nil, using defaults.")
+        return
+    end
+    if m.missionInfo.savegameDirectory == nil then
+        log_dbg("LOAD - savegameDirectory is nil (new career?), using defaults.")
         return
     end
 
-    local xmlFileName = mission.missionInfo.savegameDirectory .. "/" .. ADS_Config.savegameFile
+    local xmlFileName = m.missionInfo.savegameDirectory
+                        .. "/" .. ADS_Config.savegameFile
+
+    log_dbg("LOAD - looking for config file at: " .. xmlFileName)
 
     if not fileExists(xmlFileName) then
-        print("ADS_Config: No config file found. Using default settings.")
+        log_dbg("LOAD - config file does not exist, using defaults.")
         return
     end
 
-    local xmlFile = loadXMLFile('advancedDamageSystem', xmlFileName)
+    local xmlFile = loadXMLFile("advancedDamageSystem", xmlFileName)
 
-    if xmlFile == nil then
-        print("ADS_Config: ERROR - Failed to load config file.")
+    if xmlFile == nil or xmlFile == 0 then
+        print("[ADS_CONFIG] ERROR - failed to parse XML (handle="
+              .. tostring(xmlFile) .. "). File may contain invalid XML.")
         return
     end
+
+    log_dbg("XML loaded successfully, handle=" .. tostring(xmlFile))
 
     local savedVersion = getXMLFloat(xmlFile, "advancedDamageSystem.VER")
+    log_dbg("Saved version: " .. tostring(savedVersion) .. ", Current version: " .. tostring(ADS_Config.VER))
 
-    if savedVersion ~= nil and savedVersion == ADS_Config.VER then
-        print("ADS_Config: Config file version match. Loading settings from " .. xmlFileName)
+    if savedVersion == nil or savedVersion ~= ADS_Config.VER then
+        log_dbg("Version mismatch or missing. Expected " .. tostring(ADS_Config.VER)
+                .. " but found " .. tostring(savedVersion) .. ".")
+        delete(xmlFile)
+        return
+    end
 
-        local function loadNode(targetTbl, path)
-            for k, v in pairs(targetTbl) do
-                if type(v) ~= "function" and k ~= "savegameFile" and k ~= "VER" then
-                    local currentPath = path .. "." .. tostring(k)
-                    if type(v) == "table" then
-                        if k == "BRANDS" then
-                            local loadedBrands = {}
-                            local i = 0
-                            while true do
-                                local brandPath = currentPath .. ".brand(" .. i .. ")"
-                                if not hasXMLProperty(xmlFile, brandPath .. "#name") then
-                                    break
-                                end
+    -- --------------------------------------------------------
+    local function loadNode(targetTbl, path)
+        for k, v in pairs(targetTbl) do
+            if type(k) == "string" and type(v) ~= "function" and k ~= "savegameFile" and k ~= "VER" then
+                local currentPath = path .. "." .. tostring(k)
 
-                                local name = getXMLString(xmlFile, brandPath .. "#name")
-                                local reliability = getXMLFloat(xmlFile, brandPath .. "#reliability")
-                                local maintainability = getXMLFloat(xmlFile, brandPath .. "#maintainability")
-
-                                if name ~= nil and reliability ~= nil and maintainability ~= nil then
-                                    loadedBrands[name] = { reliability, maintainability }
-                                end
-                                i = i + 1
+                if type(v) == "table" then
+                    if k == "BRANDS" then
+                        -- brands
+                        local loaded = {}
+                        local i = 0
+                        while true do
+                            local bp = currentPath .. ".brand(" .. i .. ")"
+                            if not hasXMLProperty(xmlFile, bp .. "#name") then
+                                break
                             end
-                            
-                            if next(loadedBrands) ~= nil then
-                                for brandName, brandValues in pairs(loadedBrands) do
-                                    targetTbl[k][brandName] = brandValues
-                                end
-                                print(string.format("ADS_Config: Loaded/updated %d brand(s) from XML.", i))
-                            else
-                                print("ADS_Config: No brand list found in XML, using default brand settings.")
+                            local name = getXMLString(xmlFile, bp .. "#name")
+                            local rel  = getXMLFloat (xmlFile, bp .. "#reliability")
+                            local mnt  = getXMLFloat (xmlFile, bp .. "#maintainability")
+                            if name and rel and mnt then
+                                loaded[name] = { rel, mnt }
                             end
-                        else
-                            loadNode(v, currentPath)
+                            i = i + 1
                         end
+                        if next(loaded) then
+                            for n, vals in pairs(loaded) do
+                                targetTbl[k][n] = vals
+                            end
+                            print("ADS_Config:   Loaded " .. i .. " brand(s).")
+                        end
+
+                    elseif isArray(v) then
+                        -- massive
+                        local arr = {}
+                        local i = 0
+                        while true do
+                            local ip = currentPath .. ".item(" .. i .. ")"
+                            if not hasXMLProperty(xmlFile, ip .. "#value") then
+                                break
+                            end
+                            local val
+                            if type(v[1]) == "number" then
+                                val = getXMLFloat(xmlFile, ip .. "#value")
+                            elseif type(v[1]) == "boolean" then
+                                val = getXMLBool(xmlFile, ip .. "#value")
+                            elseif type(v[1]) == "string" then
+                                val = getXMLString(xmlFile, ip .. "#value")
+                            end
+                            if val ~= nil then
+                                table.insert(arr, val)
+                            end
+                            i = i + 1
+                        end
+                        if #arr > 0 then
+                            targetTbl[k] = arr
+                            log_dbg(currentPath
+                                  .. " = [" .. table.concat(
+                                      (function()
+                                          local s = {}
+                                          for _, a in ipairs(arr) do
+                                              table.insert(s, tostring(a))
+                                          end
+                                          return s
+                                      end)(), ", ") .. "]")
+                        end
+
                     else
-                        local loadedValue = nil
-                        if type(v) == "number" then
-                            loadedValue = getXMLFloat(xmlFile, currentPath)
-                        elseif type(v) == "boolean" then
-                            loadedValue = getXMLBool(xmlFile, currentPath)
-                        elseif type(v) == "string" then
-                            loadedValue = getXMLString(xmlFile, currentPath)
-                        end
-                        
-                        if loadedValue ~= nil then
-                            targetTbl[k] = loadedValue
-                        end
+                        -- nested table
+                        loadNode(v, currentPath)
+                    end
+                else
+                    local loadedValue
+                    if type(v) == "number" then
+                        loadedValue = getXMLFloat(xmlFile, currentPath)
+                    elseif type(v) == "boolean" then
+                        loadedValue = getXMLBool(xmlFile, currentPath)
+                    elseif type(v) == "string" then
+                        loadedValue = getXMLString(xmlFile, currentPath)
+                    end
+
+                    if loadedValue ~= nil then
+                        targetTbl[k] = loadedValue
                     end
                 end
             end
         end
-
-        loadNode(ADS_Config, "advancedDamageSystem")
-
-    else
-        if savedVersion == nil then
-            print("ADS_Config: Old config file detected (no version). Using default settings to prevent errors.")
-        else
-            print(string.format("ADS_Config: Config file version mismatch (File: %s, Mod: %s). Using default settings.", tostring(savedVersion), tostring(ADS_Config.VER)))
-        end
     end
-    
+    -- --------------------------------------------------------
 
+    loadNode(ADS_Config, "advancedDamageSystem")
     delete(xmlFile)
+    log_dbg("Advanced Damage System settings loaded successfully.")
 end
 
 Mission00.loadMission00Finished = Utils.appendedFunction(

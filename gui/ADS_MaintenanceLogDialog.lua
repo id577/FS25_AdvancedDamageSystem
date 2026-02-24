@@ -10,8 +10,27 @@ local function log_dbg(...)
         for i = 1, #args do
             args[i] = tostring(args[i])
         end
-        print("[ADS_log_DIALOG] " .. table.concat(args, " "))
+        print(" " .. table.concat(args, " "))
     end
+end
+
+local function isLoggableRepairBreakdownId(breakdownId)
+    return breakdownId ~= nil and breakdownId ~= "GENERAL_WEAR"
+end
+
+local function getLoggableRepairBreakdownCount(entry)
+    if entry == nil or entry.conditionData == nil or entry.conditionData.selectedBreakdowns == nil then
+        return 0
+    end
+
+    local count = 0
+    for _, breakdownId in ipairs(entry.conditionData.selectedBreakdowns) do
+        if isLoggableRepairBreakdownId(breakdownId) then
+            count = count + 1
+        end
+    end
+
+    return count
 end
 
 function ADS_MaintenanceLogDialog.register()
@@ -49,11 +68,17 @@ function ADS_MaintenanceLogDialog:updateScreen()
 
     local totalCost = 0
     local totalBreakdowns = 0
+    local purchaseDate = {}
+    local purchaseHours = 0
+
     for _, entry in pairs(self.logData) do
         totalCost = totalCost + (entry.price or 0)
         if entry.type == AdvancedDamageSystem.STATUS.REPAIR then
-            local selectedBreakdownsCount = entry.selectedBreakdowns and #entry.selectedBreakdowns or 0
-            totalBreakdowns = totalBreakdowns + selectedBreakdownsCount
+            totalBreakdowns = totalBreakdowns + getLoggableRepairBreakdownCount(entry)
+        end
+        if entry.id == 1 then
+            purchaseDate = entry.date or {}
+            purchaseHours = entry.conditionData and entry.conditionData.operatingHours or 0
         end
     end
 
@@ -61,9 +86,13 @@ function ADS_MaintenanceLogDialog:updateScreen()
 
     local currentYear = g_currentMission.environment.currentYear
     local currentMonth = g_currentMission.environment.currentPeriod
-    local age = math.max(1, (currentMonth + (currentYear - 1) * 12) - (spec.purchaseDate.month + (spec.purchaseDate.year - 1) * 12))
+    
+    local pMonth = (purchaseDate and purchaseDate.month) or currentMonth
+    local pYear = (purchaseDate and purchaseDate.year) or currentYear
+    local age = math.max(1, (currentMonth + (currentYear - 1) * 12) - (pMonth + (pYear - 1) * 12))
+    
     local costPerMonth = totalCost / age
-    local avgBreakdownInterval = totalBreakdowns > 0 and ((self.vehicle:getFormattedOperatingTime()- (spec.purchaseHours or 0)) / totalBreakdowns)
+    local avgBreakdownInterval = totalBreakdowns > 0 and ((self.vehicle:getFormattedOperatingTime() - (purchaseHours or 0)) / totalBreakdowns) or 0
     local averageMaintenanceInterval = 0
 
     self.costPerMonthValue:setText(g_i18n:formatMoney(costPerMonth, 0, true, true) .. " / " .. g_i18n:getText("ads_ws_age_unit"))
@@ -84,12 +113,14 @@ function ADS_MaintenanceLogDialog:updateScreen()
 
     if maintenanceCount > 0 then
         local sumMaintenanceInterval = 0
-        local lastServiceHours = spec.purchaseHours or 0
+        local lastServiceHours = purchaseHours or 0
         for i = 1, #self.logData do
             local nextEntry = self.logData[i]
             if nextEntry.type == AdvancedDamageSystem.STATUS.MAINTENANCE then
-                sumMaintenanceInterval = sumMaintenanceInterval + (nextEntry.operatingHours - lastServiceHours)
-                lastServiceHours = nextEntry.operatingHours
+                if nextEntry.conditionData and nextEntry.conditionData.operatingHours then
+                    sumMaintenanceInterval = sumMaintenanceInterval + (nextEntry.conditionData.operatingHours - lastServiceHours)
+                    lastServiceHours = nextEntry.conditionData.operatingHours
+                end
             end
         end
         averageMaintenanceInterval = sumMaintenanceInterval / maintenanceCount
@@ -120,17 +151,25 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
 
     if entry == nil then return end
 
+    -- date
     local yearStr = "00"
-    if entry.date.year >= 10 then
-        yearStr = tostring(entry.date.year)
-    else
-        yearStr = "0" .. tostring(entry.date.year)
+    if entry.date and entry.date.year then
+        if entry.date.year >= 10 then
+            yearStr = tostring(entry.date.year)
+        else
+            yearStr = "0" .. tostring(entry.date.year)
+        end
     end
-    local dateStr = string.format("%s %s. '%s", entry.date.day, g_i18n:formatPeriod(entry.date.month, true), yearStr)
-
+    local dDay = (entry.date and entry.date.day) or 1
+    local dMonth = (entry.date and entry.date.month) or 1
+    local dateStr = string.format("%s %s. '%s", dDay, g_i18n:formatPeriod(dMonth, true), yearStr)
     cell:getAttribute("logDate"):setText(dateStr)
-    cell:getAttribute("logHours"):setText(string.format("%.1f", entry.operatingHours) .. " " .. g_i18n:getText("ads_spec_hour_s"))
+    
+    -- operating hours
+    local opHours = (entry.conditionData and entry.conditionData.operatingHours) or 0
+    cell:getAttribute("logHours"):setText(string.format("%.1f", opHours) .. " " .. g_i18n:getText("ads_spec_hour_s"))
 
+    -- maintenance type
     local typeText = "UNKNOWN"
     local color = {1, 1, 1, 1}
     
@@ -152,17 +191,22 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
     cell:getAttribute("logType"):setText(typeText)
     cell:getAttribute("logType"):setTextColor(unpack(color))
 
+    -- description
     local descText = ""
     local repairedParts = {}
     local seenParts = {}
-        
-    for _, breakdownId in ipairs(entry.selectedBreakdowns) do
-        local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
-            
-        if breakdownDef and breakdownDef.part then
-            if not seenParts[breakdownDef.part] then
-                table.insert(repairedParts, breakdownDef.part)
-                seenParts[breakdownDef.part] = true
+
+    if entry.conditionData and entry.conditionData.selectedBreakdowns then
+        for _, breakdownId in ipairs(entry.conditionData.selectedBreakdowns) do
+            if isLoggableRepairBreakdownId(breakdownId) then
+                local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+                 
+                if breakdownDef and breakdownDef.part then
+                    if not seenParts[breakdownDef.part] then
+                        table.insert(repairedParts, breakdownDef.part)
+                        seenParts[breakdownDef.part] = true
+                    end
+                end
             end
         end
     end
@@ -173,46 +217,51 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
             table.insert(partsNames, g_i18n:getText(partKey))
         end
     end
-    
+   
+    -- repair 
     if entry.type == S.REPAIR then     
-        descText = table.concat(partsNames, ", ")
-        if entry.isAftermarketParts then
-            descText = descText .. " (" .. g_i18n:getText("ads_ws_option_aftermarket_parts") .. ")"
+        local repairedPartsText = table.concat(partsNames, ", ")
+        if repairedPartsText == "" then
+            repairedPartsText = g_i18n:getText("ads_log_repair_desc_generic")
         end
+        descText = repairedPartsText .. " (" .. g_i18n:getText(entry.optionTwo or "NONE") .. ")"
 
-    elseif entry.type == S.MAINTENANCE then
-        local lastServiceHours = spec.purchaseHours or 0
-        for i = 1, entryIndex - 1 do
-            local nextEntry = self.logData[i]
-            if nextEntry.type == S.MAINTENANCE then
-                lastServiceHours = nextEntry.operatingHours
-            end
-        end
-        descText = string.format(g_i18n:getText("ads_log_maintenance_desc"), entry.operatingHours - lastServiceHours)
-        if entry.isAftermarketParts then
-            descText = descText .. " (" .. g_i18n:getText("ads_ws_option_aftermarket_parts") .. ")"
-        end
+    -- maintenance
+    elseif entry.type == S.MAINTENANCE then 
+        descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_maintenance"))
+        descText = descText .. " (" .. g_i18n:getText(entry.optionTwo) .. ")"
         if #repairedParts > 0 then
             descText = descText .. ". " .. string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
         end
 
+    -- inspection
     elseif entry.type == S.INSPECTION then
         if spec.currentState == AdvancedDamageSystem.STATUS.INSPECTION and entry.id == #spec.maintenanceLog then
             descText = g_i18n:getText("ads_ws_inspecting_status")
         else
+            descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_inspection"))
             if #repairedParts > 0 then
-                descText = string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
+                descText = descText .. ". " .. string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
             else
-                descText = g_i18n:getText("ads_log_inspection_desc_no_breakdowns")
+                descText = descText .. ". " .. g_i18n:getText("ads_log_inspection_desc_no_breakdowns")
             end
         end
 
+    -- overhaul
     elseif entry.type == S.OVERHAUL then
-        descText = g_i18n:getText("ads_log_overhaul_desc")
+        descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_overhaul"))
+        if entry.optionThree then
+            descText = descText .. ". " .. g_i18n:getText("ads_ws_option_overhaul_with_painting")
+        end
+    end
+
+    if entry.location == "UNKNOWN" then
+        descText = "NO DATA"
     end
 
     cell:getAttribute("logDescription"):setText(descText)
-    cell:getAttribute("logPrice"):setText(g_i18n:formatMoney(entry.price, 0, true, true))
+    
+    cell:getAttribute("logPrice"):setText(g_i18n:formatMoney(entry.price or 0, 0, true, true))
     color = {0.88, 0.12, 0.12, 1}
     cell:getAttribute("logPrice"):setTextColor(unpack(color))
 end
@@ -223,6 +272,19 @@ end
 
 function ADS_MaintenanceLogDialog:onClickBack()
     self:close()
+end
+
+function ADS_MaintenanceLogDialog:onRowClick(row)
+    if row == nil or row.indexInSection == nil then return end
+    local spec = self.vehicle.spec_AdvancedDamageSystem
+    
+    local entry = self.logData[#self.logData - row.indexInSection + 1]
+    if entry ~= nil and AdvancedDamageSystem.getIsLogEntryHasReport(entry) then
+        ADS_ReportDialog.show(self.vehicle, entry)
+        return
+    end
+    InfoDialog.show(g_i18n:getText("ads_ws_no_report_message"))
+    
 end
 
 function ADS_MaintenanceLogDialog:onOpen(superFunc)

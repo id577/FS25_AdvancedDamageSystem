@@ -67,12 +67,12 @@
                 </Bitmap>
                 
                 <SmoothList profile="ads_tableList" id="logTable" position="50px -85px" size="1290px 510px">
-                    <ListItem profile="ads_tableListItem" name="logRowTemplate" size="1290px 40.77px" >
-                        <Text profile="ads_tableRowCellLeft" position="20px 0px" size="100px 40.77px" name="logDate" />
-                        <Text profile="ads_tableRowCellLeft" position="120px 0px" size="160px 40.77px" name="logHours" />
+                    <ListItem profile="ads_tableListItemAlt" name="logRowTemplate" size="1290px 40.77px" onClick="onRowClick">
+                        <Text profile="ads_tableRowCellLeftAlt" position="20px 0px" size="100px 40.77px" name="logDate" />
+                        <Text profile="ads_tableRowCellLeftAlt" position="120px 0px" size="160px 40.77px" name="logHours" />
                         <Text profile="ads_tableRowCellLeftUpper" position="280px 0px" size="180px 40.77px" name="logType" />
-                        <Text profile="ads_tableRowCellLeft" position="460px 0px" size="700px 40.77px" name="logDescription" textLayoutMode="scrolling"/>
-                        <Text profile="ads_tableRowCellLeft" position="1160px 0px" size="120px 40.77px" name="logPrice" textAlignment="right"/>
+                        <Text profile="ads_tableRowCellLeftAlt" position="460px 0px" size="700px 40.77px" name="logDescription" textLayoutMode="scrolling"/>
+                        <Text profile="ads_tableRowCellLeftAlt" position="1160px 0px" size="120px 40.77px" name="logPrice" textAlignment="right"/>
                     </ListItem>
                 </SmoothList>
 
@@ -115,79 +115,6 @@
         <Profile name="ads_logTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
             <size value="1410px 700px"/>
             <position value="0px -160px"/>
-        </Profile>
-
-        <Profile name="ads_headerBoldText" extends="fs25_textDefault" with="anchorStretchingYLeft">
-            <textSize value="24px" />
-            <textBold value="true" />
-            <textUpperCase value="true" />
-            <textOffset value="0px 0px" />
-            <textColor value="$preset_colorWhite_50" />
-        </Profile>
-
-        <Profile name="ads_textBold" extends="fs25_textDefault">
-            <textBold value="true" />
-        </Profile>
-
-        <Profile name="ads_textHeaderGrey" extends="fs25_textDefault">
-            <textBold value="true" />
-            <textSize value="20px" />
-            <textColor value="$preset_colorDisabled"/>
-            <textAlignment value="center"/>
-        </Profile>
-
-        <Profile name="ads_tableHeaderLeft" extends="baseReference">
-            <imageColor value="0 0 0 0" />
-            <textFocusedColor value="$preset_fs25_colorMainHighlight" />
-            <textHighlightedColor value="$preset_fs25_colorMainHighlight" />
-            <textSize value="16px" />
-            <textBold value="true" />
-            <textUpperCase value="true" />
-            <textColor value="$preset_colorWhite_50" />
-            <textAlignment value="left" />
-            <textDisabledColor value="$preset_colorDisabled" />
-        </Profile>
-
-        <Profile name="ads_tableList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
-        </Profile>
-        
-        <Profile name="ads_tableListItem" extends="baseReference" with="anchorTopStretchingX alternating">
-            <height value="32px"/>
-            <textSelectedColor value="$preset_fs25_colorMainLight" />
-            <imageColor value="$preset_fs25_colorGrey" />
-            <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
-        </Profile> 
-
-        <Profile name="ads_tableRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
-            <textBold value="false" />
-            <textSize value="16px" />
-            <textAlignment value="left" />
-            <textColor value="$preset_fs25_colorMainLight" />
-            <textDisabledColor value="$preset_colorDisabled" />
-        </Profile>
-
-        <Profile name="ads_tableRowCellLeftUpper" extends="baseReference" with="anchorStretchingYLeft">
-            <textBold value="false" />
-            <textSize value="16px" />
-            <textUpperCase value="true" />
-            <textAlignment value="left" />
-            <textColor value="$preset_fs25_colorMainLight" />
-            <textDisabledColor value="$preset_colorDisabled" />
-        </Profile>
-
-        <Profile name="ads_containerFrame" extends="baseReference" with="anchorTopStretchingX">    
-            <size value="100% 100%"/>
-            <imageSliceId value="gui.savegame_middle"/>
-            <imageSelectedSliceId value="gui.savegame_selected_middle"/>
-            <imageHighlightedSliceId value="gui.savegame_hover_middle"/>
-            <startImageSize value="20px 0"/>
-            <startImageSliceId value="gui.savegame_left"/>
-            <startImageSelectedSliceId value="gui.savegame_selected_left"/>
-            <startImageHighlightedSliceId value="gui.savegame_hover_left"/>
-            <endImageSize value="20px 0"/>
-            <endImageSliceId value="gui.savegame_right"/>
-            <endImageSelectedSliceId value="gui.savegame_selected_right"/>
-            <endImageHighlightedSliceId value="gui.savegame_hover_right"/>
         </Profile>
 
     </GUIProfiles>
