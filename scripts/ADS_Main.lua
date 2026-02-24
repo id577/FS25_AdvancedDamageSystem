@@ -208,8 +208,8 @@ function ADS_Main.populateCellForItemInSection(self, superFunc, list, section, i
         local vehicle = self.vehicles[index].vehicle
         if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
             superFunc(self, list, section, index, cell)
-            local condition = vehicle:getLastInspectedCondition()
-            cell:getAttribute("damage"):setText(ADS_Utils.formatCondition(condition))
+            local condition, isCompleteInspection = vehicle:getLastInspectedCondition()
+            cell:getAttribute("damage"):setText(ADS_Utils.formatCondition(condition, isCompleteInspection))
             cell:getAttribute("damage"):setTextColor(ADS_Utils.getValueColor(condition, 0.8, 0.6, 0.4, 0.2, false))
         else
             superFunc(self, list, section, index, cell)

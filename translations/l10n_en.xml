@@ -335,6 +335,7 @@
         <text name="ads_option_menu_duration_text" text="Duration: "/>
         <text name="ads_option_menu_finish_time_text" text="Finish Time: "/>
         <text name="ads_option_menu_start_text" text="Start"/>
+        <text name="ads_option_menu_duration_instant" text="Instant"/>
 
         <text name="ads_option_menu_inspection_visual_description" text="* Quick external check. Low cost and immediate result. Detects only serious faults (moderate severity+) and provides no data on the vehicle's technical state."/>
         <text name="ads_option_menu_inspection_standard_description" text="* Routine diagnostic procedure. Identifies all active faults and generates a general report on the vehicle's condition."/>

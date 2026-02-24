@@ -1889,12 +1889,14 @@ function AdvancedDamageSystem:processService(dt)
             print(nextWork .. " " .. tostring(optionOne) .. " " .. tostring(optionTwo) .. " " .. tostring(optionThree) .. " " .. tostring(price))
             if g_currentMission:getMoney() >= price then
                 self:initService(nextWork, spec.workshopType, optionOne, optionTwo, optionThree)
+                ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
                 g_currentMission:addMoney(-1 * price, self:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
                 g_currentMission.hud:addSideNotification(
                     {1, 1, 1, 1},
                     string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_notification'), g_i18n:getText(nextWork)))
                 )
             else
+                ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
                 g_currentMission.hud:addSideNotification(
                     {1, 1, 1, 1},
                     string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_not_enouth_money_notification'), g_i18n:getText(nextWork)))
@@ -1902,6 +1904,7 @@ function AdvancedDamageSystem:processService(dt)
             end   
         else
             spec.currentState = states.READY
+            ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
         end
     end
 end
