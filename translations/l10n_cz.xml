@@ -325,6 +325,12 @@
         <text name="ads_option_menu_perform_maintenance" text="Po opravě proveďte údržbu"/>
         <text name="ads_option_menu_perform_renew_paint" text="Obnovit lak"/>
         <text name="ads_report_header_title" text="Inspekční zpráva"/>
+        <text name="ads_report_vehicle_name_title" text="Název vozidla"/>
+        <text name="ads_report_date_title" text="Datum"/>
+        <text name="ads_report_vehicle_age_title" text="Stáří"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Provozní hodiny"/>
+        <text name="ads_report_inspection_type_title" text="Typ inspekce"/>
+        <text name="ads_report_inspection_location_title" text="Místo"/>
         <text name="ads_report_state_optimal" text="Optimální"/>
         <text name="ads_report_state_normal" text="Normální"/>
         <text name="ads_report_state_degraded" text="Degradovaný"/>

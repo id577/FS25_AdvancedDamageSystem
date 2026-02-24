@@ -141,6 +141,30 @@ local function normalizeNumberValue(value, defaultValue)
     return num
 end
 
+local SAVEGAME_OPTIONAL_FLOAT_SENTINEL = -1
+
+local function encodeOptionalFloat(value)
+    if value == nil then
+        return SAVEGAME_OPTIONAL_FLOAT_SENTINEL
+    end
+
+    local num = tonumber(value)
+    if num == nil then
+        return SAVEGAME_OPTIONAL_FLOAT_SENTINEL
+    end
+
+    return num
+end
+
+local function decodeOptionalFloat(value)
+    local num = tonumber(value)
+    if num == nil or num < 0 then
+        return nil
+    end
+
+    return num
+end
+
 local function parseCsvList(csvString)
     local result = {}
     if csvString == nil or csvString == "" then
@@ -325,20 +349,20 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower)
         xmlFile:setValue(key .. "#lastInspBrk", spec.lastInspectedBrake)
         xmlFile:setValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction)
-        xmlFile:setValue(key .. "#serviceOptionOne", spec.serviceOptionOne)
-        xmlFile:setValue(key .. "#serviceOptionTwo", spec.serviceOptionTwo)
+        xmlFile:setValue(key .. "#serviceOptionOne", spec.serviceOptionOne or "")
+        xmlFile:setValue(key .. "#serviceOptionTwo", spec.serviceOptionTwo or "")
         xmlFile:setValue(key .. "#serviceOptionThree", spec.serviceOptionThree)
         xmlFile:setValue(key .. "#pendingSelectedBreakdowns", table.concat(spec.pendingSelectedBreakdowns or {}, ","))
-        xmlFile:setValue(key .. "#pendingServicePrice", spec.pendingServicePrice)
+        xmlFile:setValue(key .. "#pendingServicePrice", encodeOptionalFloat(spec.pendingServicePrice))
         xmlFile:setValue(key .. "#pendingInspectionQueue", table.concat(spec.pendingInspectionQueue or {}, ","))
         xmlFile:setValue(key .. "#pendingRepairQueue", table.concat(spec.pendingRepairQueue or {}, ","))
         xmlFile:setValue(key .. "#pendingProgressStepIndex", spec.pendingProgressStepIndex or 0)
         xmlFile:setValue(key .. "#pendingProgressTotalTime", spec.pendingProgressTotalTime or 0)
         xmlFile:setValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime or 0)
-        xmlFile:setValue(key .. "#pendingMaintenanceServiceStart", spec.pendingMaintenanceServiceStart)
-        xmlFile:setValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget)
-        xmlFile:setValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart)
-        xmlFile:setValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget)
+        xmlFile:setValue(key .. "#pendingMaintenanceServiceStart", encodeOptionalFloat(spec.pendingMaintenanceServiceStart))
+        xmlFile:setValue(key .. "#pendingMaintenanceServiceTarget", encodeOptionalFloat(spec.pendingMaintenanceServiceTarget))
+        xmlFile:setValue(key .. "#pendingOverhaulConditionStart", encodeOptionalFloat(spec.pendingOverhaulConditionStart))
+        xmlFile:setValue(key .. "#pendingOverhaulConditionTarget", encodeOptionalFloat(spec.pendingOverhaulConditionTarget))
         xmlFile:setValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred or 0)
 
         if spec.maintenanceLog and #spec.maintenanceLog > 0 then
@@ -353,7 +377,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
                 xmlFile:setValue(entryKey .. "#optionOne", entry.optionOne or "NONE")
                 xmlFile:setValue(entryKey .. "#optionTwo", entry.optionTwo or "NONE")
                 xmlFile:setValue(entryKey .. "#optionThree", entry.optionThree or false)
-                xmlFile:setValue(entryKey .. "#isVisible", normalizeBoolValue(entry.isVisible, true))
+                xmlFile:setValue(entryKey .. "#isVisible", tostring(normalizeBoolValue(entry.isVisible, true)))
                 xmlFile:setValue(entryKey .. "#isCompleted", normalizeBoolValue(entry.isCompleted, true))
                 xmlFile:setValue(entryKey .. "#isLegacyEntry", normalizeBoolValue(entry.isLegacyEntry, false))
 
@@ -569,8 +593,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.lastInspectedYieldReduction = savegame.xmlFile:getValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction)
         spec.serviceOptionOne = savegame.xmlFile:getValue(key .. "#serviceOptionOne", spec.serviceOptionOne)
         spec.serviceOptionTwo = savegame.xmlFile:getValue(key .. "#serviceOptionTwo", spec.serviceOptionTwo)
+        if spec.serviceOptionOne == "" then spec.serviceOptionOne = nil end
+        if spec.serviceOptionTwo == "" then spec.serviceOptionTwo = nil end
         spec.serviceOptionThree = savegame.xmlFile:getValue(key .. "#serviceOptionThree", spec.serviceOptionThree)
-        spec.pendingServicePrice = savegame.xmlFile:getValue(key .. "#pendingServicePrice", spec.pendingServicePrice)
+        spec.pendingServicePrice = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingServicePrice", spec.pendingServicePrice))
         spec.pendingSelectedBreakdowns = {}
         local pendingSelBdStr = savegame.xmlFile:getValue(key .. "#pendingSelectedBreakdowns", "")
         if pendingSelBdStr ~= nil and pendingSelBdStr ~= "" then
@@ -597,10 +623,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.pendingProgressStepIndex = savegame.xmlFile:getValue(key .. "#pendingProgressStepIndex", spec.pendingProgressStepIndex)
         spec.pendingProgressTotalTime = savegame.xmlFile:getValue(key .. "#pendingProgressTotalTime", spec.pendingProgressTotalTime)
         spec.pendingProgressElapsedTime = savegame.xmlFile:getValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime)
-        spec.pendingMaintenanceServiceStart = savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceStart", spec.pendingMaintenanceServiceStart)
-        spec.pendingMaintenanceServiceTarget = savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget)
-        spec.pendingOverhaulConditionStart = savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart)
-        spec.pendingOverhaulConditionTarget = savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget)
+        spec.pendingMaintenanceServiceStart = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceStart", spec.pendingMaintenanceServiceStart))
+        spec.pendingMaintenanceServiceTarget = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget))
+        spec.pendingOverhaulConditionStart = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart))
+        spec.pendingOverhaulConditionTarget = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget))
         local hasTotalBreakdownsOccurred = savegame.xmlFile:hasProperty(key .. "#totalBreakdownsOccurred")
         spec.totalBreakdownsOccurred = savegame.xmlFile:getValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred)
 

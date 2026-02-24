@@ -325,6 +325,12 @@
         <text name="ads_option_menu_perform_maintenance" text="Utför underhåll efter reparation"/>
         <text name="ads_option_menu_perform_renew_paint" text="Förnya lackering"/>
         <text name="ads_report_header_title" text="Besiktningsrapport"/>
+        <text name="ads_report_vehicle_name_title" text="Fordonsnamn"/>
+        <text name="ads_report_date_title" text="Datum"/>
+        <text name="ads_report_vehicle_age_title" text="Ålder"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Drifttimmar"/>
+        <text name="ads_report_inspection_type_title" text="Inspektionstyp"/>
+        <text name="ads_report_inspection_location_title" text="Plats"/>
         <text name="ads_report_state_optimal" text="Optimal"/>
         <text name="ads_report_state_normal" text="Normal"/>
         <text name="ads_report_state_degraded" text="Försämrad"/>

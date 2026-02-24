@@ -325,6 +325,12 @@
         <text name="ads_option_menu_perform_maintenance" text="Effectuer l'entretien après réparation"/>
         <text name="ads_option_menu_perform_renew_paint" text="Renouveler la peinture"/>
         <text name="ads_report_header_title" text="Rapport d'inspection"/>
+        <text name="ads_report_vehicle_name_title" text="Nom du véhicule"/>
+        <text name="ads_report_date_title" text="Date"/>
+        <text name="ads_report_vehicle_age_title" text="Âge"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Heures de fonctionnement"/>
+        <text name="ads_report_inspection_type_title" text="Type d&apos;inspection"/>
+        <text name="ads_report_inspection_location_title" text="Lieu"/>
         <text name="ads_report_state_optimal" text="Optimal"/>
         <text name="ads_report_state_normal" text="Normale"/>
         <text name="ads_report_state_degraded" text="Dégradé"/>

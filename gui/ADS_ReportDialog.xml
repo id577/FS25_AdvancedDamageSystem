@@ -28,22 +28,22 @@
                <ThreePartBitmap profile="ads_containerFrame"/>
                     <Text profile="ads_headerBoldText" id="reportTitle" text="$l10n_ads_report_header_title" position="30px 60px" size="100% 40px"/>
 
-                    <Text profile="ads_textBold" id="vehicleNameTitle" text="Name" position="30px 100px"/>
+                    <Text profile="ads_textBold" id="vehicleNameTitle" text="$l10n_ads_report_vehicle_name_title" position="30px 100px"/>
                     <Text profile="fs25_textDefault" id="vehicleNameValue" text="Fendt 500" position="250px 100px" textBold="false"/>
 
-                    <Text profile="ads_textBold" id="reportDateTitle" text="Date" position="500px 100px"/>
+                    <Text profile="ads_textBold" id="reportDateTitle" text="$l10n_ads_report_date_title" position="500px 100px"/>
                     <Text profile="fs25_textDefault" id="reportDateValue" text="01 Aug '01" position="750px 100px"/>
 
-                    <Text profile="ads_textBold" id="vehicleAgeTitle" text="Age" position="970px 100px"/>
+                    <Text profile="ads_textBold" id="vehicleAgeTitle" text="$l10n_ads_report_vehicle_age_title" position="970px 100px"/>
                     <Text profile="fs25_textDefault" id="vehicleAgeValue" text="12 months" position="1220px 100px"/>
 
-                    <Text profile="ads_textBold" id="vehicleOperatingHoursTitle" text="Operating Hours" position="30px 60px"/>
+                    <Text profile="ads_textBold" id="vehicleOperatingHoursTitle" text="$l10n_ads_report_vehicle_operating_hours_title" position="30px 60px"/>
                     <Text profile="fs25_textDefault" id="vehicleOperatingHoursValue" text="23.3 h." position="250px 60px"/>
 
-                    <Text profile="ads_textBold" id="inspectionTypeTitle" text="Inspection Type" position="500px 60px"/>
+                    <Text profile="ads_textBold" id="inspectionTypeTitle" text="$l10n_ads_report_inspection_type_title" position="500px 60px"/>
                     <Text profile="fs25_textDefault" id="inspectionTypeValue" text="Comprehensive" position="750px 60px"/>
 
-                    <Text profile="ads_textBold" id="inspectionLocationTitle" text="Location" position="970px 60px"/>
+                    <Text profile="ads_textBold" id="inspectionLocationTitle" text="$l10n_ads_report_inspection_location_title" position="970px 60px"/>
                     <Text profile="fs25_textDefault" id="inspectionLocationValue" text="Dealer" position="1220px 60px"/>
 
                     <ThreePartBitmap profile="ads_textSeporator" position="-5px 85px" size="1350px 1dp" />

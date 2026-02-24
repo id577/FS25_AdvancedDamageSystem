@@ -274,9 +274,9 @@
         <text name="ads_spec_state_average" text="Средняя"/>
         <text name="ads_spec_state_high" text="Высокая"/>
         <text name="ads_spec_state_workhorse" text="Рабочая лошадка"/>
-        <text name="ads_spec_part_types_used" text="Использовал"/>
-        <text name="ads_spec_part_types_aftermarket" text="вторичный рынок"/>
-        <text name="ads_spec_part_types_oem" text="OEM"/>
+        <text name="ads_spec_part_types_used" text="Б/У"/>
+        <text name="ads_spec_part_types_aftermarket" text="Аналоги"/>
+        <text name="ads_spec_part_types_oem" text="Оригинальные"/>
         <text name="ads_spec_part_types_premium" text="Премиум"/>
         <text name="ads_spec_inspection_visual" text="Визуальный"/>
         <text name="ads_spec_inspection_standard" text="Стандартный"/>
@@ -321,10 +321,16 @@
         <text name="ads_option_menu_part_aftermarket_description" text="* Бюджетные копии послепродажного обслуживания. Снижена стоимость, но существует умеренный риск возникновения дефектов (33%)."/>
         <text name="ads_option_menu_part_oem_description" text="* Оригинальные детали от производителя оборудования. Стандартная надежность (риск дефекта 10 %) по полной цене."/>
         <text name="ads_option_menu_part_premium_description" text="* Усиленные детали. Дорого, но со строгим контролем качества (риск брака 0%)."/>
-        <text name="ads_option_menu_perform_repair" text="Устраните все обнаруженные неисправности"/>
+        <text name="ads_option_menu_perform_repair" text="Устранить все обнаруженные неисправности"/>
         <text name="ads_option_menu_perform_maintenance" text="Проведение технического обслуживания после ремонта"/>
         <text name="ads_option_menu_perform_renew_paint" text="Обновить лакокрасочное покрытие"/>
         <text name="ads_report_header_title" text="Отчет об инспекции"/>
+        <text name="ads_report_vehicle_name_title" text="Название техники"/>
+        <text name="ads_report_date_title" text="Дата"/>
+        <text name="ads_report_vehicle_age_title" text="Возраст"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Наработка"/>
+        <text name="ads_report_inspection_type_title" text="Тип инспекции"/>
+        <text name="ads_report_inspection_location_title" text="Место инспекции"/>
         <text name="ads_report_state_optimal" text="Оптимальный"/>
         <text name="ads_report_state_normal" text="Нормальный"/>
         <text name="ads_report_state_degraded" text="Деградированный"/>

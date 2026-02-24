@@ -325,6 +325,12 @@
         <text name="ads_option_menu_perform_maintenance" text="维修后进行维护"/>
         <text name="ads_option_menu_perform_renew_paint" text="更新油漆"/>
         <text name="ads_report_header_title" text="检验报告"/>
+        <text name="ads_report_vehicle_name_title" text="车辆名称"/>
+        <text name="ads_report_date_title" text="日期"/>
+        <text name="ads_report_vehicle_age_title" text="车龄"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="工作小时"/>
+        <text name="ads_report_inspection_type_title" text="检查类型"/>
+        <text name="ads_report_inspection_location_title" text="地点"/>
         <text name="ads_report_state_optimal" text="最佳的"/>
         <text name="ads_report_state_normal" text="普通的"/>
         <text name="ads_report_state_degraded" text="降级"/>
