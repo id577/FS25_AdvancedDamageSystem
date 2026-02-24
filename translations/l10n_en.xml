@@ -103,7 +103,7 @@
         <text name="ads_log_inspection_desc_with_breakdowns" text="Faults detected: %s"/>
         <text name="ads_log_overhaul_desc_with_painting" text="Vehicle was repainted"/>
         <text name="ads_log_repair_desc_generic" text="Repair"/>
-        <text name="ads_log_cancelled_desc" text="Procedure cancelled. Current progress fixed."/>
+        <text name="ads_log_cancelled_desc" text="Procedure cancelled"/>
         <text name="ads_log_date" text="Date"/>
         <text name="ads_log_hours" text="Operating Hours"/>
         <text name="ads_log_type" text="Work Type"/>

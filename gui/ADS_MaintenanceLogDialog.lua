@@ -18,21 +18,6 @@ local function isLoggableRepairBreakdownId(breakdownId)
     return breakdownId ~= nil and breakdownId ~= "GENERAL_WEAR"
 end
 
-local function getLoggableRepairBreakdownCount(entry)
-    if entry == nil or entry.conditionData == nil or entry.conditionData.selectedBreakdowns == nil then
-        return 0
-    end
-
-    local count = 0
-    for _, breakdownId in ipairs(entry.conditionData.selectedBreakdowns) do
-        if isLoggableRepairBreakdownId(breakdownId) then
-            count = count + 1
-        end
-    end
-
-    return count
-end
-
 function ADS_MaintenanceLogDialog.register()
     local dialog = ADS_MaintenanceLogDialog.new()
     g_gui:loadGui(modDirectory .. "gui/ADS_MaintenanceLogDialog.xml", "ADS_MaintenanceLogDialog", dialog)
@@ -67,15 +52,12 @@ function ADS_MaintenanceLogDialog:updateScreen()
     self.vehicleNameValue:setText(g_i18n:getText('ads_log_title') .. " " .. self.vehicle:getFullName())
 
     local totalCost = 0
-    local totalBreakdowns = 0
+    local totalBreakdowns = spec.totalBreakdownsOccurred or 0
     local purchaseDate = {}
     local purchaseHours = 0
 
     for _, entry in pairs(self.logData) do
         totalCost = totalCost + (entry.price or 0)
-        if entry.type == AdvancedDamageSystem.STATUS.REPAIR then
-            totalBreakdowns = totalBreakdowns + getLoggableRepairBreakdownCount(entry)
-        end
         if entry.id == 1 then
             purchaseDate = entry.date or {}
             purchaseHours = entry.conditionData and entry.conditionData.operatingHours or 0
@@ -239,16 +221,13 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
 
         -- inspection
         elseif entry.type == S.INSPECTION then
-            if spec.currentState == AdvancedDamageSystem.STATUS.INSPECTION and entry.id == #spec.maintenanceLog then
-                descText = g_i18n:getText("ads_ws_inspecting_status")
+            descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_inspection"))
+            if #repairedParts > 0 then
+                descText = descText .. ". " .. string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
             else
-                descText = string.format(g_i18n:getText("ads_log_performed"), g_i18n:getText(entry.optionOne) .. " " .. g_i18n:getText("ads_ws_task_inspection"))
-                if #repairedParts > 0 then
-                    descText = descText .. ". " .. string.format(g_i18n:getText("ads_log_inspection_desc_with_breakdowns"), table.concat(partsNames, ", "))
-                else
-                    descText = descText .. ". " .. g_i18n:getText("ads_log_inspection_desc_no_breakdowns")
-                end
+                descText = descText .. ". " .. g_i18n:getText("ads_log_inspection_desc_no_breakdowns")
             end
+        
 
         -- overhaul
         elseif entry.type == S.OVERHAUL then

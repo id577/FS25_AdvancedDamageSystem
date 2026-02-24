@@ -41,7 +41,7 @@ ADS_Config = {
         -- Higher value means faster condition degradation.
         BASE_CONDITION_WEAR = 0.01, -- (0.01 = 1% wear per hour at base rate)
 
-        DOWNTIME_MULTIPLIER = 0.05,
+        DOWNTIME_MULTIPLIER = 0.0,
 
         MOTOR_IDLING_MULTIPLIER = 0.5,
         MOTOR_IDLING_THRESHOLD = 0.3,

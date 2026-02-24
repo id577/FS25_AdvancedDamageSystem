@@ -102,6 +102,32 @@ local function log_dbg(...)
     end
 end
 
+local function normalizeBoolValue(value, defaultValue)
+    if value == nil then
+        return defaultValue == true
+    end
+
+    if type(value) == "boolean" then
+        return value
+    end
+
+    if type(value) == "number" then
+        return value ~= 0
+    end
+
+    if type(value) == "string" then
+        local v = string.lower(value)
+        if v == "false" or v == "0" or v == "off" or v == "no" then
+            return false
+        end
+        if v == "true" or v == "1" or v == "on" or v == "yes" then
+            return true
+        end
+    end
+
+    return value and true or false
+end
+
 -- ==========================================================
 --                    SAVE/LOAD & REGISTRATION
 -- ==========================================================
@@ -145,6 +171,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingMaintenanceServiceTarget", "Pending Maintenance Service Target")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingOverhaulConditionStart", "Pending Overhaul Condition Start")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingOverhaulConditionTarget", "Pending Overhaul Condition Target")
+    schemaSavegame:register(XMLValueType.INT,    baseKey .. "#totalBreakdownsOccurred", "Total Breakdowns Occurred")
     
     local logKey = baseKey .. ".maintenanceLog.entry(?)"
     schemaSavegame:register(XMLValueType.INT,    logKey .. "#id", "Entry ID")
@@ -282,6 +309,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget)
         xmlFile:setValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart)
         xmlFile:setValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget)
+        xmlFile:setValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred or 0)
 
         if spec.maintenanceLog and #spec.maintenanceLog > 0 then
             for i, entry in ipairs(spec.maintenanceLog) do
@@ -295,8 +323,8 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
                 xmlFile:setValue(entryKey .. "#optionOne", entry.optionOne or "NONE")
                 xmlFile:setValue(entryKey .. "#optionTwo", entry.optionTwo or "NONE")
                 xmlFile:setValue(entryKey .. "#optionThree", entry.optionThree or false)
-                xmlFile:setValue(entryKey .. "#isVisible", entry.isVisible == false and "false" or "true") -- default to true if not set
-                xmlFile:setValue(entryKey .. "#isCompleted", entry.isCompleted == false and "false" or "true")
+                xmlFile:setValue(entryKey .. "#isVisible", normalizeBoolValue(entry.isVisible, true))
+                xmlFile:setValue(entryKey .. "#isCompleted", normalizeBoolValue(entry.isCompleted, true))
 
                 if entry.conditionData then
                     local condKey = entryKey .. ".conditionData"
@@ -469,6 +497,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.pendingMaintenanceServiceTarget = nil
     self.spec_AdvancedDamageSystem.pendingOverhaulConditionStart = nil
     self.spec_AdvancedDamageSystem.pendingOverhaulConditionTarget = nil
+    self.spec_AdvancedDamageSystem.totalBreakdownsOccurred = 0
     self.spec_AdvancedDamageSystem.isElectricVehicle = false
 end
 
@@ -541,6 +570,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.pendingMaintenanceServiceTarget = savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget)
         spec.pendingOverhaulConditionStart = savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart)
         spec.pendingOverhaulConditionTarget = savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget)
+        spec.totalBreakdownsOccurred = savegame.xmlFile:getValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred)
 
         -- Load Maintenance Log
         spec.maintenanceLog = {}
@@ -563,8 +593,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
             entry.optionOne = savegame.xmlFile:getValue(entryKey .. "#optionOne", "NONE")
             entry.optionTwo = savegame.xmlFile:getValue(entryKey .. "#optionTwo", "NONE")
             entry.optionThree = savegame.xmlFile:getValue(entryKey .. "#optionThree", false)
-            entry.isVisible = savegame.xmlFile:getValue(entryKey .. "#isVisible", true)
-            entry.isCompleted = savegame.xmlFile:getValue(entryKey .. "#isCompleted", true)
+            entry.isVisible = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isVisible", true), true)
+            entry.isCompleted = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isCompleted", true), true)
 
             local condKey = entryKey .. ".conditionData"
             entry.conditionData.year = savegame.xmlFile:getValue(condKey .. "#year", 0)
@@ -619,6 +649,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.pendingProgressStepIndex == nil then spec.pendingProgressStepIndex = 0 end
         if spec.pendingProgressTotalTime == nil then spec.pendingProgressTotalTime = 0 end
         if spec.pendingProgressElapsedTime == nil then spec.pendingProgressElapsedTime = 0 end
+        if spec.totalBreakdownsOccurred == nil then spec.totalBreakdownsOccurred = 0 end
     end
 
     -- Sounds Loading
@@ -1204,8 +1235,8 @@ function AdvancedDamageSystem:calculateWearRates()
             serviceWearRate = serviceWearRate * C.MOTOR_IDLING_MULTIPLIER
         end
     else
-        --conditionWearRate = C.DOWNTIME_MULTIPLIER
-        --serviceWearRate = C.DOWNTIME_MULTIPLIER
+        conditionWearRate = C.DOWNTIME_MULTIPLIER
+        serviceWearRate = C.DOWNTIME_MULTIPLIER
     end
 
     conditionWearRate = (conditionWearRate + spec.extraConditionWear) / spec.reliability
@@ -1405,6 +1436,10 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
     if self:hasBreakdown(breakdownId) then
         log_dbg("-> Breakdown already active. Aborting.")
         return
+    end
+
+    if registryEntry.isSelectable == true then
+        spec.totalBreakdownsOccurred = (spec.totalBreakdownsOccurred or 0) + 1
     end
 
     log_dbg("-> Creating new breakdown instance.")
@@ -1823,7 +1858,11 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.MAINTENANCE_TYPES, optionOne)
         totalTimeMs = C.MAINTENANCE_TIME * C.GLOBAL_SERVICE_TIME_MULTIPLIER * C.MAINTENANCE_TIME_MULTIPLIERS[key]
         spec.pendingMaintenanceServiceStart = spec.serviceLevel
-        spec.pendingMaintenanceServiceTarget = C.MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS[key]
+        spec.pendingMaintenanceServiceTarget = math.max(spec.pendingMaintenanceServiceStart, C.MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS[key])
+
+        if self:hasBreakdown("MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES") then
+            self:removeBreakdown("MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES")
+        end
 
     -- REPAIR
     elseif type == states.REPAIR then
@@ -1860,7 +1899,8 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         local maxRestore = C.OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS[key] - ageFactor
         local restoreAmount = math.min((minRestore + math.random() * (maxRestore - minRestore)) * spec.maintainability, spec.baseConditionLevel)
         spec.pendingOverhaulConditionStart = spec.conditionLevel
-        spec.pendingOverhaulConditionTarget = math.max(restoreAmount, ADS_Config.MAINTENANCE.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[2])
+        local desiredConditionTarget = math.max(restoreAmount, ADS_Config.MAINTENANCE.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[2])
+        spec.pendingOverhaulConditionTarget = math.max(spec.pendingOverhaulConditionStart, desiredConditionTarget)
     end
 
     spec.pendingSelectedBreakdowns = {}
@@ -1956,10 +1996,12 @@ function AdvancedDamageSystem:processService(dt)
 
     if serviceType == states.MAINTENANCE and spec.pendingMaintenanceServiceStart ~= nil and spec.pendingMaintenanceServiceTarget ~= nil and spec.pendingProgressTotalTime > 0 then
         local ratio = math.min(math.max(spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime, 0), 1)
-        spec.serviceLevel = spec.pendingMaintenanceServiceStart + (spec.pendingMaintenanceServiceTarget - spec.pendingMaintenanceServiceStart) * ratio
+        local interpolatedService = spec.pendingMaintenanceServiceStart + (spec.pendingMaintenanceServiceTarget - spec.pendingMaintenanceServiceStart) * ratio
+        spec.serviceLevel = math.max(spec.pendingMaintenanceServiceStart, interpolatedService)
     elseif serviceType == states.OVERHAUL and spec.pendingOverhaulConditionStart ~= nil and spec.pendingOverhaulConditionTarget ~= nil and spec.pendingProgressTotalTime > 0 then
         local ratio = math.min(math.max(spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime, 0), 1)
-        spec.conditionLevel = spec.pendingOverhaulConditionStart + (spec.pendingOverhaulConditionTarget - spec.pendingOverhaulConditionStart) * ratio
+        local interpolatedCondition = spec.pendingOverhaulConditionStart + (spec.pendingOverhaulConditionTarget - spec.pendingOverhaulConditionStart) * ratio
+        spec.conditionLevel = math.max(spec.pendingOverhaulConditionStart, interpolatedCondition)
     end
 
     -- work done
@@ -1983,12 +2025,14 @@ function AdvancedDamageSystem:completeService()
     local selectedBreakdowns = shallow_copy(spec.pendingSelectedBreakdowns or {})
 
     if serviceType == states.MAINTENANCE and spec.pendingMaintenanceServiceTarget ~= nil then
-        spec.serviceLevel = spec.pendingMaintenanceServiceTarget
+        local maintenanceStart = spec.pendingMaintenanceServiceStart or spec.serviceLevel
+        spec.serviceLevel = math.max(maintenanceStart, spec.pendingMaintenanceServiceTarget)
     end
 
     if serviceType == states.OVERHAUL then
         if spec.pendingOverhaulConditionTarget ~= nil then
-            spec.conditionLevel = spec.pendingOverhaulConditionTarget
+            local overhaulStart = spec.pendingOverhaulConditionStart or spec.conditionLevel
+            spec.conditionLevel = math.max(overhaulStart, spec.pendingOverhaulConditionTarget)
         end
         spec.serviceLevel = 1.0
 
@@ -2232,11 +2276,14 @@ end
 
 
 function AdvancedDamageSystem.getIsLogEntryHasReport(entry)
+    local isVisible = normalizeBoolValue(entry.isVisible, true)
+    local isCompleted = normalizeBoolValue(entry.isCompleted, true)
+
     return (entry.type ~= AdvancedDamageSystem.STATUS.REPAIR 
     and entry.optionOne ~= AdvancedDamageSystem.INSPECTION_TYPES.VISUAL 
     and entry.optionOne ~= "NONE" 
-    and entry.isVisible
-    and entry.isCompleted ~= false)
+    and isVisible
+    and isCompleted)
 end
 
 function AdvancedDamageSystem.getIsCompleteReport(entry)
@@ -2847,8 +2894,14 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec.currentState ~= AdvancedDamageSystem.STATUS.READY then
+        print(string.format("ADS Error: Vehicle '%s' is already under service (%s).", vehicle:getFullName(), spec.currentState))
+        return
+    end
+
     if not args or not args[1] then
-        print("ADS Error: Missing argument. Usage: ads_startMaintance <type>")
+        print("ADS Error: Missing argument. Usage: ads_startService <type> [count]")
         print("Available types: inspection, maintenance, repair, overhaul")
         return
     end
@@ -2886,14 +2939,30 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
         optionTwo = AdvancedDamageSystem.PART_TYPES.OEM
         optionThree = false
 
+        local visibleRepairableCount = 0
         local selected = 0
         for breakdownId, breakdown in pairs(vehicle:getActiveBreakdowns()) do
-            if selected < breakdownCount and breakdownId ~= "GENERAL_WEAR" and breakdown ~= nil and breakdown.isVisible == true then
+            local isRepairable = breakdownId ~= "GENERAL_WEAR" and breakdown ~= nil and breakdown.isVisible == true
+            if isRepairable then
+                visibleRepairableCount = visibleRepairableCount + 1
+            end
+
+            if selected < breakdownCount and isRepairable then
                 breakdown.isSelectedForRepair = true
                 selected = selected + 1
             else
                 breakdown.isSelectedForRepair = false
             end
+        end
+
+        if visibleRepairableCount == 0 then
+            print(string.format("ADS Error: Vehicle '%s' has no visible breakdowns for repair.", vehicle:getFullName()))
+            return
+        end
+
+        if selected == 0 then
+            print(string.format("ADS Error: No breakdowns selected for repair on '%s'.", vehicle:getFullName()))
+            return
         end
     elseif maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
         optionOne = AdvancedDamageSystem.OVERHAUL_TYPES.STANDARD
@@ -2902,7 +2971,13 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
     end
 
     vehicle:initService(maintenanceType, AdvancedDamageSystem.WORKSHOP.OWN, optionOne, optionTwo, optionThree)
-    print(string.format("ADS: Attempted to start '%s' for '%s'.", maintenanceType, vehicle:getFullName()))
+
+    if spec.currentState == maintenanceType and spec.maintenanceTimer > 0 then
+        local finishTime, days = vehicle:getServiceFinishTime()
+        print(string.format("ADS: Started '%s' for '%s'. Remaining time: %.1f sec. Finishes in %d day(s) at %.2f.", maintenanceType, vehicle:getFullName(), spec.maintenanceTimer / 1000, days or 0, finishTime or 0))
+    else
+        print(string.format("ADS Error: Failed to start '%s' for '%s'.", maintenanceType, vehicle:getFullName()))
+    end
 end
 
 
@@ -2912,12 +2987,155 @@ function AdvancedDamageSystem.ConsoleCommands:finishMaintance()
 
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec.currentState == AdvancedDamageSystem.STATUS.READY then
-        print(string.format("ADS: Vehicle '%s' is not under maintenance.", vehicle:getFullName()))
+        print(string.format("ADS: Vehicle '%s' is not under service.", vehicle:getFullName()))
         return
     end
-    
-    spec.maintenanceTimer = 1
-    print(string.format("ADS: Forcing maintenance completion for '%s'. It will finish on the next update tick.", vehicle:getFullName()))
+
+    local currentState = spec.currentState
+    local remainingMs = math.max(spec.maintenanceTimer or 0, 0)
+    local missionInfo = g_currentMission and g_currentMission.missionInfo or nil
+    local timeScale = (missionInfo and missionInfo.timeScale) or 1
+    if timeScale <= 0 then
+        timeScale = 1
+    end
+    local forceDt = math.max(math.ceil(remainingMs / timeScale) + 1, 1)
+
+    local previousWorkshopOpen = nil
+    if ADS_Main ~= nil then
+        previousWorkshopOpen = ADS_Main.isWorkshopOpen
+        ADS_Main.isWorkshopOpen = true
+    end
+
+    local ok, err = pcall(function()
+        vehicle:processService(forceDt)
+    end)
+
+    if ADS_Main ~= nil and previousWorkshopOpen ~= nil then
+        ADS_Main.isWorkshopOpen = previousWorkshopOpen
+    end
+
+    if not ok then
+        print(string.format("ADS Error: Failed to force-finish service for '%s': %s", vehicle:getFullName(), tostring(err)))
+        return
+    end
+
+    if spec.currentState ~= AdvancedDamageSystem.STATUS.READY then
+        -- Fallback for rare edge-cases where processService didn't finalize.
+        spec.pendingProgressElapsedTime = spec.pendingProgressTotalTime or 0
+        spec.maintenanceTimer = 0
+        vehicle:completeService()
+    end
+
+    print(string.format("ADS: Service '%s' force-finished for '%s'.", currentState, vehicle:getFullName()))
+end
+
+function AdvancedDamageSystem.ConsoleCommands:getServiceState()
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then return end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local progressPercent = 0
+    if (spec.pendingProgressTotalTime or 0) > 0 then
+        progressPercent = math.floor(math.max(0, math.min((spec.pendingProgressElapsedTime or 0) / spec.pendingProgressTotalTime, 1)) * 100)
+    end
+
+    local selectedForRepairCount = 0
+    local activeBreakdownsCount = 0
+    for _, breakdown in pairs(spec.activeBreakdowns or {}) do
+        activeBreakdownsCount = activeBreakdownsCount + 1
+        if breakdown ~= nil and breakdown.isSelectedForRepair then
+            selectedForRepairCount = selectedForRepairCount + 1
+        end
+    end
+
+    print("--- ADS Service State ---")
+    print(string.format("Vehicle: %s", vehicle:getFullName()))
+    print(string.format("State: current=%s planned=%s workshop=%s", tostring(spec.currentState), tostring(spec.plannedState), tostring(spec.workshopType)))
+    print(string.format("Timer: maintenanceTimer=%.0fms elapsed=%.0fms total=%.0fms progress=%d%% stepIndex=%d",
+        spec.maintenanceTimer or 0, spec.pendingProgressElapsedTime or 0, spec.pendingProgressTotalTime or 0, progressPercent, spec.pendingProgressStepIndex or 0))
+    print(string.format("Options: optionOne=%s optionTwo=%s optionThree=%s price=%s",
+        tostring(spec.serviceOptionOne), tostring(spec.serviceOptionTwo), tostring(spec.serviceOptionThree), tostring(spec.pendingServicePrice)))
+    print(string.format("Targets: serviceStart=%s serviceTarget=%s conditionStart=%s conditionTarget=%s",
+        tostring(spec.pendingMaintenanceServiceStart), tostring(spec.pendingMaintenanceServiceTarget), tostring(spec.pendingOverhaulConditionStart), tostring(spec.pendingOverhaulConditionTarget)))
+    print(string.format("Levels: service=%.4f condition=%.4f", spec.serviceLevel or 0, spec.conditionLevel or 0))
+    print(string.format("Queues: selected=%d inspection=%d repair=%d", #(spec.pendingSelectedBreakdowns or {}), #(spec.pendingInspectionQueue or {}), #(spec.pendingRepairQueue or {})))
+    print(string.format("Breakdowns: active=%d selectedForRepair=%d totalOccurred=%d", activeBreakdownsCount, selectedForRepairCount, spec.totalBreakdownsOccurred or 0))
+
+    if #(spec.pendingSelectedBreakdowns or {}) > 0 then
+        print("pendingSelectedBreakdowns: " .. table.concat(spec.pendingSelectedBreakdowns, ", "))
+    end
+    if #(spec.pendingInspectionQueue or {}) > 0 then
+        print("pendingInspectionQueue: " .. table.concat(spec.pendingInspectionQueue, ", "))
+    end
+    if #(spec.pendingRepairQueue or {}) > 0 then
+        print("pendingRepairQueue: " .. table.concat(spec.pendingRepairQueue, ", "))
+    end
+end
+
+function AdvancedDamageSystem.ConsoleCommands:showServiceLog(rawArgs)
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then return end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local log = spec.maintenanceLog or {}
+    local args = parseArguments(rawArgs)
+
+    if #log == 0 then
+        print("ADS: Service log is empty.")
+        return
+    end
+
+    local function formatDate(date)
+        if date == nil then
+            return "n/a"
+        end
+        return string.format("%02d/%02d/%04d", date.day or 0, date.month or 0, date.year or 0)
+    end
+
+    local function formatList(value)
+        if value == nil or #value == 0 then
+            return "-"
+        end
+        return table.concat(value, ", ")
+    end
+
+    local function printLogEntry(index, entry, verbose)
+        local cond = entry.conditionData or {}
+        local selectedBreakdowns = cond.selectedBreakdowns or {}
+        local activeBreakdownsCount = 0
+        for _, _ in pairs(cond.activeBreakdowns or {}) do
+            activeBreakdownsCount = activeBreakdownsCount + 1
+        end
+
+        print(string.format("[%d] id=%s type=%s date=%s price=%s visible=%s completed=%s",
+            index, tostring(entry.id), tostring(entry.type), formatDate(entry.date), tostring(entry.price), tostring(entry.isVisible), tostring(entry.isCompleted ~= false)))
+        print(string.format("    options: one=%s two=%s three=%s location=%s",
+            tostring(entry.optionOne), tostring(entry.optionTwo), tostring(entry.optionThree), tostring(entry.location)))
+
+        if verbose then
+            print(string.format("    conditionData: year=%s opHours=%s age=%s condition=%s service=%s reliability=%s maintainability=%s",
+                tostring(cond.year), tostring(cond.operatingHours), tostring(cond.age), tostring(cond.condition), tostring(cond.service), tostring(cond.reliability), tostring(cond.maintainability)))
+            print(string.format("    conditionData: activeBreakdowns=%d selectedBreakdowns=%d", activeBreakdownsCount, #selectedBreakdowns))
+            print("    selectedBreakdowns: " .. formatList(selectedBreakdowns))
+        end
+    end
+
+    if args ~= nil and args[1] ~= nil then
+        local index = tonumber(args[1])
+        if index == nil or index < 1 or index > #log then
+            print(string.format("ADS Error: Invalid log index '%s'. Valid range: 1..%d", tostring(args[1]), #log))
+            return
+        end
+
+        print(string.format("--- ADS Service Log Entry %d/%d ---", index, #log))
+        printLogEntry(index, log[index], true)
+        return
+    end
+
+    print(string.format("--- ADS Service Log (%d entries) ---", #log))
+    for i, entry in ipairs(log) do
+        printLogEntry(i, entry, false)
+    end
 end
 
 function AdvancedDamageSystem.ConsoleCommands:getDebugVehicleInfo(rawArgs)
@@ -3020,8 +3238,10 @@ addConsoleCommand("ads_advanceBreakdown", "Advances a breakdown to the next stag
 addConsoleCommand("ads_setCondition", "Sets vehicle condition. Usage: ads_setCondition [0.0-1.0]", "setCondition", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setService", "Sets vehicle service. Usage: ads_setService [0.0-1.0]", "setService", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_resetVehicle", "Resets vehicle state.", "resetVehicle", AdvancedDamageSystem.ConsoleCommands)
-addConsoleCommand("ads_startMaintance", "Starts maintenance. Usage: ads_startMaintance <type>", "startMaintance", AdvancedDamageSystem.ConsoleCommands)
-addConsoleCommand("ads_finishMaintance", "Instantly finishes current maintenance.", "finishMaintance", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_startService", "Starts service. Usage: ads_startService <type> [count]", "startMaintance", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_finishService", "Instantly finishes current service.", "finishMaintance", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_getServiceState", "Prints current service/workshop state variables.", "getServiceState", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_showServiceLog", "Shows service log. Usage: ads_showServiceLog [index]", "showServiceLog", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_getDebugVehicleInfo", "Vehicle debug info", "getDebugVehicleInfo", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_setDirtAmount [0.0-1.0]", "setDirtAmount", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)

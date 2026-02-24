@@ -357,7 +357,7 @@ function ADS_WorkshopDialog:onClickCancelService()
     local spec = self.vehicle.spec_AdvancedDamageSystem
     if spec == nil or spec.currentState == AdvancedDamageSystem.STATUS.READY then return end
 
-    local title = string.format(g_i18n:getText("ads_ws_cancel_confirm_title"), g_i18n:getText(spec.currentStat))
+    local title = string.format(g_i18n:getText("ads_ws_cancel_confirm_title"), g_i18n:getText(spec.currentState))
     local text = g_i18n:getText("ads_ws_cancel_confirm_text")
 
     if YesNoDialog ~= nil and YesNoDialog.show ~= nil then
