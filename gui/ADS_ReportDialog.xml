@@ -13,7 +13,7 @@
                 <Bitmap profile="fs25_menuHeaderIconBg">
                     <Bitmap profile="fs25_menuHeaderIcon" imageSliceId="gui.icon_vehicleDealer_machines" />
                 </Bitmap>
-                <Text profile="fs25_menuHeaderTitle" id="headerText" text="REPORT"/>
+                <Text profile="fs25_menuHeaderTitle" id="headerText" text="$l10n_ads_report_header_title"/>
                 <RoundCorner profile="fs25_shopMoneyBoxBg" id="moneyBoxBg"/>
                 <BoxLayout profile="fs25_shopMoneyBox" id="moneyBox">
                     <Text profile="fs25_shopBalance" text="$l10n_ui_balance" />
@@ -26,7 +26,7 @@
             <!-- =============================================================== -->
             <GuiElement profile="ads_logInfoContainer">
                <ThreePartBitmap profile="ads_containerFrame"/>
-                    <Text profile="ads_headerBoldText" id="reportTitle" text="Inspection Report" position="30px 60px" size="100% 40px"/>
+                    <Text profile="ads_headerBoldText" id="reportTitle" text="$l10n_ads_report_header_title" position="30px 60px" size="100% 40px"/>
 
                     <Text profile="ads_textBold" id="vehicleNameTitle" text="Name" position="30px 100px"/>
                     <Text profile="fs25_textDefault" id="vehicleNameValue" text="Fendt 500" position="250px 100px" textBold="false"/>
@@ -89,8 +89,8 @@
                 </Bitmap>
                 
                 <SmoothList profile="ads_tableList" id="suspiciousSymptomsTable" position="980px -75px" size="380px 510px">
-                    <ListItem profile="ads_tableListItem" name="suspiciousSymptomsRowTemplate" size="380px 40.77px" >
-                        <Text profile="ads_tableRowCellLeft" position="20px 0px" size="380px 40.77px" name="reportTableSuspiciousSymptomsTitle" />
+                    <ListItem profile="ads_tableListItemAlt" name="suspiciousSymptomsRowTemplate" size="380px 40.77px" >
+                        <Text profile="ads_tableRowCellLeftAlt" position="20px 0px" size="340px 40.77px" name="reportTableSuspiciousSymptomsTitle" textLayoutMode="scrolling" />
                     </ListItem>
                 </SmoothList>
                 
@@ -108,9 +108,9 @@
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 
-                <SmoothList profile="ads_tableList" id="breakdownsTable" position="50px -85px" size="650px 150px">
-                    <ListItem profile="ads_tableListItem" name="reportBreakdownsRowTemplate" size="650px 30.77px" >
-                        <Text profile="ads_tableRowCellLeft" position="20px 0px" size="650px 30.77px" name="reportBreakdownsRow" />
+                <SmoothList profile="ads_tableList" id="breakdownsTable" position="20px -60px" size="650px 123px">
+                    <ListItem profile="ads_tableListItemAlt" name="reportBreakdownsRowTemplate" size="650px 30.77px" >
+                        <Text profile="ads_tableRowCellLeftAlt" position="10px 0px" size="630px 30.77px" name="reportBreakdownsRow" textLayoutMode="scrolling" />
                     </ListItem>
                 </SmoothList>
             </GuiElement>
@@ -123,9 +123,9 @@
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 
-                <SmoothList profile="ads_tableList" id="recommendationsTable" position="50px -85px" size="650px 150px">
-                    <ListItem profile="ads_tableListItem" name="reportRecRowTemplate" size="650px 30.77px" >
-                        <Text profile="ads_tableRowCellLeft" position="20px 0px" size="650px 30.77px" name="reportRecRow" />
+                <SmoothList profile="ads_tableList" id="recommendationsTable" position="20px -60px" size="650px 123px">
+                    <ListItem profile="ads_tableListItemAlt" name="reportRecRowTemplate" size="650px 30.77px" >
+                        <Text profile="ads_tableRowCellLeftAlt" position="10px 0px" size="630px 30.77px" name="reportRecRow" textLayoutMode="scrolling" />
                     </ListItem>
                 </SmoothList>
             </GuiElement>

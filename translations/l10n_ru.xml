@@ -1,11 +1,5 @@
 <l10n>
     <texts>
-        <text name="ads_serviceWear_label" text="Скорость износа (Обслуживание)"/>
-        <text name="ads_serviceWear_tooltip" text="Определяет скорость износа уровня 'Обслуживание' за час работы. Например, при значении 10% уровень обслуживания полностью иссякнет за 10 часов работы. Более высокое значение означает, что ТО требуется чаще."/>
-        <text name="ads_conditionWear_label" text="Скорость износа (Состояние)"/>
-        <text name="ads_conditionWear_tooltip" text="Определяет скорость износа уровня 'Состояние' за час работы. Например, при значении 1% состояние техники полностью ухудшится за 100 часов работы. Более высокое значение приводит к более быстрому износу."/>
-        <text name="ads_breakdownProbability_label" text="Базовое время между поломками"/>
-        <text name="ads_breakdownProbability_tooltip" text="Устанавливает базовое среднее время между поломками (MTBF) в минутах, когда состояние техники равно 100%. По мере ухудшения состояния фактическое время между поломками будет уменьшаться."/>
         <text name="ads_maintenancePrice_label" text="Множитель стоимости обслуживания"/>
         <text name="ads_maintenancePrice_tooltip" text="Изменяет стоимость всех услуг мастерской, включая осмотр, ремонт и капитальный ремонт. Более высокое значение делает все виды обслуживания дороже."/>
         <text name="ads_maintenanceDuration_label" text="Множитель длительности обслуживания"/>
@@ -16,8 +10,6 @@
         <text name="ads_workshopCloseHour_tooltip" text="Час, в который закрывается мастерская. Ремонтные работы будут приостановлены после этого времени."/>
         <text name="ads_engineMaxHeat_label" text="Макс. нагрев двигателя"/>
         <text name="ads_engineMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого двигателем при максимальной нагрузке. Более высокие значения заставят двигатель нагреваться быстрее."/>
-        <text name="ads_transMaxHeat_label" text="Макс. нагрев трансмиссии"/>
-        <text name="ads_transMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого трансмиссией при максимальной нагрузке. Более высокие значения заставят трансмиссию нагреваться быстрее."/>
         <text name="ads_dirtInfluence_label" text="Влияние грязи на охлаждение"/>
         <text name="ads_dirtInfluence_tooltip" text="Максимальное снижение эффективности радиатора из-за грязи. 20% означает, что полностью грязная техника охлаждается на 20% хуже."/>
         <text name="ads_ws_header_title" text="Мастерская"/>
@@ -29,7 +21,20 @@
         <text name="ads_parkVehicle_tooltip" text="Если включено, техника исключается из переключения (TAB) на время ремонта."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Контроль перегрева/перегрузки (ИИ)"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Если включено, наемный работник будет снижать нагрузку при перегреве или перегрузке двигателя."/>
-
+        <text name="ads_debugMode_label" text="Режим отладки"/>
+        <text name="ads_debugMode_tooltip" text="Включает или отключает панель отладки и расширенное ведение журнала отладки в консоли."/>
+        <text name="ads_serviceInterval_label" text="Скорость износа (Обслуживание)"/>
+        <text name="ads_vehicleLifespan_label" text="Скорость износа (Состояние)"/>
+        <text name="ads_breakdownFrequency_label" text="Базовое время между поломками"/>
+        <text name="ads_thermalSensitivity_label" text="Термическая чувствительность"/>
+        <text name="ads_serviceInterval_tooltip" text="Определяет скорость износа уровня 'Обслуживание' за час работы. Например, при значении 10% уровень обслуживания полностью иссякнет за 10 часов работы. Более высокое значение означает, что ТО требуется чаще."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Определяет скорость износа уровня 'Состояние' за час работы. Например, при значении 1% состояние техники полностью ухудшится за 100 часов работы. Более высокое значение приводит к более быстрому износу."/>
+        <text name="ads_breakdownFrequency_tooltip" text="Устанавливает базовое среднее время между поломками (MTBF) в минутах, когда состояние техники равно 100%. По мере ухудшения состояния фактическое время между поломками будет уменьшаться."/>
+        <text name="ads_thermalSensitivity_tooltip" text="Регулирует поведение тепловой модели. Более высокие настройки делают двигатель и трансмиссию более чувствительными к нагрузке, температуре окружающей среды и загрязнению радиатора, выделяя больше тепла при тех же условиях."/>
+        <text name="ads_thermal_none" text="Пассивный"/>
+        <text name="ads_thermal_mild" text="Мягкий"/>
+        <text name="ads_thermal_default" text="По умолчанию"/>
+        <text name="ads_thermal_aggressive" text="Агрессивный"/>
         <text name="ads_ws_label_value" text="Стоимость"/>
         <text name="ads_ws_label_age" text="Возраст"/>
         <text name="ads_ws_label_operating_hours" text="Наработка"/>
@@ -38,27 +43,26 @@
         <text name="ads_ws_label_current_power" text="Текущая мощность"/>
         <text name="ads_ws_label_brake_efficiency" text="Эффективность тормозов"/>
         <text name="ads_ws_label_harvest_efficiency" text="Эффективность уборки"/>
-        <text name="ads_ws_label_maintainability" text="Ремон-сть"/>
+        <text name="ads_ws_label_maintainability" text="Ремонтопригодность"/>
+        <text name="ads_ws_label_maintenance_log" text="Журнал ТО"/>
+        <text name="ads_ws_label_last_report" text="Последний отчет"/>
         <text name="ads_ws_label_service_interval" text="Интервал ТО"/>
         <text name="ads_ws_label_last_maintenance" text="Последнее ТО"/>
         <text name="ads_ws_label_last_inspection" text="Последний осмотр"/>
-
         <text name="ads_ws_table_header_part" text="Компонент"/>
         <text name="ads_ws_table_header_description" text="Описание"/>
         <text name="ads_ws_table_header_stage" text="Стадия"/>
         <text name="ads_ws_table_header_price" text="Цена"/>
         <text name="ads_ws_table_header_repair_select" text="Ремонт"/>
-
         <text name="ads_ws_info_no_breakdowns" text="Поломки отсутствуют или еще не обнаружены."/>
         <text name="ads_ws_status_initial" text="Загрузка статуса..."/>
-
         <text name="ads_ws_action_inspection" text="Осмотр"/>
         <text name="ads_ws_action_maintenance" text="Техобслуживание"/>
         <text name="ads_ws_action_repair" text="Ремонт"/>
-        <text name="ads_ws_action_overhaul" text="Капитальный ремонт"/>
-        <text name="ads_ws_action_cancel_service" text="Прервать процедуру"/>
+        <text name="ads_ws_action_overhaul" text="Кап. ремонт"/>
+        <text name="ads_ws_action_cancel_service" text="Отменить процедуру"/>
         <text name="ads_ws_button_log" text="Журнал"/>
-
+        <text name="ads_ws_button_show" text="Показать"/>
         <text name="ads_ws_age_unit" text="мес."/>
         <text name="ads_ws_hours_unit" text="ч"/>
         <text name="ads_ws_button_ok" text="OK"/>
@@ -75,27 +79,11 @@
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
         <text name="ads_ws_info_nothing_to_repair_title" text="Нечего ремонтировать"/>
         <text name="ads_ws_info_nothing_to_repair_text" text="Пожалуйста, выберите один или несколько элементов для ремонта из списка."/>
-        
-        <text name="ads_ws_confirm_instant_inspection_title" text="Подтвердить мгновенный осмотр"/>
-        <text name="ads_ws_confirm_instant_inspection_text" text="Это мгновенно проверит технику и выявит все скрытые неисправности.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}"/>
-        
-        <text name="ads_ws_confirm_inspection_title" text="Подтвердить осмотр"/>
-        <text name="ads_ws_confirm_inspection_text" text="Осмотр позволит выявить скрытые неисправности, а также примерно оценить уровень технического состояния.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nБыстрый осмотр занимает мало времени, но в отличие от полного, не выявляет неисправности на ранних стадиях.\n\nЦена: {q_price}\nДлительность: {q_duration}\nЗавершится в: {q_time}\n"/>
-        
-        <text name="ads_ws_confirm_maintenance_title" text="Подтвердить техобслуживание"/>
-        <text name="ads_ws_confirm_maintenance_text" text="Техобслуживание восстановит уровень технического обслуживания до максимума. Дополнительно будет проведена инспекция технического состояния.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
-        <text name="ads_ws_confirm_repair_title" text="Подтвердить ремонт"/>
-        <text name="ads_ws_confirm_repair_text" text="Будут устранены выбранные неисправности ({price}).\n\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
-        <text name="ads_ws_confirm_overhaul_title" text="Подтвердить капитальный ремонт"/>
-        <text name="ads_ws_confirm_overhaul_text" text="Капитальный ремонт устранит все неисправности, выполнит ТО и улучшит техническое состояние техники.\n\nЦена: {price}\nДлительность: {duration}\nЗавершится в: {time}\n\nВыберите качество запчастей. Использование более дешевых неоригинальных запчастей сопряжено с риском дефектов.\n\nЦена неоригинальных запчастей: {aftermarket_price}"/>
-        <text name="ads_ws_cancel_confirm_title" text="Прервать текущую процедуру?"/>
+        <text name="ads_ws_no_last_report_message" text="Отчетов пока нет"/>
+        <text name="ads_ws_no_report_message" text="Отчет отсутствует"/>
+        <text name="ads_ws_no_log_empty_message" text="Журнал пока пуст"/>
+        <text name="ads_ws_cancel_confirm_title" text="Отменить %s?"/>
         <text name="ads_ws_cancel_confirm_text" text="Текущий прогресс будет зафиксирован. Деньги за работу не возвращаются."/>
-        <text name="ads_ws_option_genuine_parts" text="Оригинальные запчасти"/>
-        <text name="ads_ws_option_aftermarket_parts" text="Неоригинальные запчасти"/>
-        
-        <text name="ads_ws_option_quick_inspection" text="Быстрый осмотр"/>
-        <text name="ads_ws_option_thorough_inspection" text="Полный осмотр"/>
-
         <text name="ads_log_header_title" text="Журнал обслуживания"/>
         <text name="ads_log_title" text="Журнал технического обслуживания"/>
         <text name="ads_log_total_cost_title" text="Потрачено всего"/>
@@ -104,26 +92,21 @@
         <text name="ads_log_total_breakdowns_count_title" text="Всего устранено поломок"/>
         <text name="ads_log_average_breakdowns_interval_title" text="Сред. интервал поломок"/>
         <text name="ads_log_average_maintenance_interval_title" text="Сред. интервал ТО"/>
-
-        <text name="ads_log_overhaul_desc" text="Произведен капитальный ремонт"/>
-        <text name="ads_log_maintenance_desc" text="Произведено плановое ТО (%.1f м.ч.)"/>
+        <text name="ads_log_performed" text="%s выполнено"/>
         <text name="ads_log_inspection_desc_no_breakdowns" text="Поломок не выявлено"/>
         <text name="ads_log_inspection_desc_with_breakdowns" text="Обнаружены неисправности: %s"/>
         <text name="ads_log_overhaul_desc_with_painting" text="Обновлено лакокрасочное покрытие"/>
         <text name="ads_log_repair_desc_generic" text="Ремонт"/>
         <text name="ads_log_cancelled_desc" text="Процедура прервана. Текущий прогресс зафиксирован."/>
-
         <text name="ads_log_date" text="Дата"/>
         <text name="ads_log_hours" text="Рабочие часы"/>
         <text name="ads_log_type" text="Вид работ"/>
         <text name="ads_log_description" text="Описание"/>
         <text name="ads_log_price" text="Стоим. работ"/>
         <text name="ads_log_empty" text="В журнале нет записей"/>
-
-        <text name="ads_breakdowns_part_vehicle" text="Техника"/>
-        <!-- ... (standard breakdown parts remain the same) ... -->
-        <text name="ads_breakdowns_part_engine" text="Двигатель"/>
         <text name="ads_breakdowns_part_ecu" text="ЭБУ"/>
+        <text name="ads_breakdowns_part_vehicle" text="Техника"/>
+        <text name="ads_breakdowns_part_engine" text="Двигатель"/>
         <text name="ads_breakdowns_part_turbocharger" text="Турбокомпрессор"/>
         <text name="ads_breakdowns_part_fuel_pump" text="Топливный насос"/>
         <text name="ads_breakdowns_part_fuel_injectors" text="Топливные форсунки"/>
@@ -137,7 +120,6 @@
         <text name="ads_breakdowns_part_yield_sensor" text="Датчик урожайности"/>
         <text name="ads_breakdowns_part_material_flow_system" text="Система подачи"/>
         <text name="ads_breakdowns_part_unloading_auger" text="Выгрузной шнек"/>
-
         <text name="ads_breakdowns_severity_permanent" text="Постоянная"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Снижение мощности"/>
         <text name="ads_breakdowns_severity_shutdown" text="Остановка двигателя"/>
@@ -145,10 +127,7 @@
         <text name="ads_breakdowns_severity_moderate" text="Умеренная"/>
         <text name="ads_breakdowns_severity_major" text="Серьезная"/>
         <text name="ads_breakdowns_severity_critical" text="Критическая"/>
-
         <text name="ads_breakdowns_general_wear_stage1_description" text="Накопленная усталость от многих лет тяжелой работы. Незначительный, необратимый износ ключевых компонентов немного снижает общую производительность."/>
-
-        <!-- Breakdowns descriptions retained from your Russian file -->
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Режим защиты двигателя"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="Аварийный режим двигателя! Мощность снижена!"/>
         <text name="ads_breakdowns_overheat_protection_stage2_description" text="Режим защиты двигателя"/>
@@ -157,109 +136,89 @@
         <text name="ads_breakdowns_overheat_protection_stage3_message" text="Аварийный режим двигателя! Мощность снижена!"/>
         <text name="ads_breakdowns_overheat_protection_stage4_description" text="Режим защиты двигателя"/>
         <text name="ads_breakdowns_overheat_protection_stage4_message" text="Двигатель заглушен для защиты от перегрева"/>
-
         <text name="ads_breakdowns_engine_jam_stage1_description" text="Двигатель полностью вышел из строя"/>
         <text name="ads_breakdowns_engine_jam_stage1_message" text="Двигатель заклинило"/>
-
         <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="Ошибки ЭБУ. Незначительно снижена мощность двигателя."/>
         <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="Сбой ЭБУ. Заметная потеря мощности и повышенный расход топлива."/>
         <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Критический сбой ЭБУ. Значительная потеря мощности, высокий расход топлива и риск остановки двигателя."/>
         <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Полный отказ ЭБУ. Двигатель не поддается управлению и не запускается."/>
         <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Неисправность двигателя"/>
-
         <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Износ подшипников турбины. Слышен слабый свист, наблюдается небольшая потеря мощности на высоких оборотах."/>
         <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Утечка через уплотнения турбины. Заметная потеря мощности, повышенный расход топлива."/>
         <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Повреждение лопаток турбины. Серьезная потеря мощности и риск остановки двигателя под большой нагрузкой."/>
         <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Катастрофический отказ турбины. Двигатель потерял большую часть мощности и рискует получить серьезные внутренние повреждения."/>
-
         <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Начальный износ топливного насоса. Незначительно снижена мощность двигателя и повышен расход топлива."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Падение давления топлива. Заметная потеря мощности, повышенный расход топлива и случайные остановки двигателя."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Критическое давление топлива. Серьезная потеря мощности, очень высокий расход топлива и частые остановки двигателя."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Полный отказ топливного насоса. Топливо не подается в двигатель."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Невозможно запустить двигатель"/>
-
         <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Засорение сопел одной или нескольких форсунок. Двигатель может работать неровно, с небольшой потерей мощности."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Плохое распыление топлива. Пропуски зажигания под нагрузкой, что приводит к заметной потере мощности и рывкам."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Залипание топливной форсунки. Двигатель работает очень плохо, со значительной потерей мощности и ненадежным запуском."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Полный отказ форсунки. Двигатель не будет работать корректно и может вообще не запуститься."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Невозможно запустить двигатель"/>
-
         <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Износ тормозных колодок. Небольшое снижение эффективности торможения."/>
         <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Утечка тормозной жидкости или износ дисков. Тормозной путь заметно увеличен."/>
         <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Серьезная потеря давления в тормозной системе. Тормоза очень слабые и ненадежные."/>
         <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Полный отказ тормозной системы. Дальнейшая эксплуатация крайне опасна."/>
         <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Отказ тормозов"/>
-
         <text name="ads_breakdowns_transmission_slip_stage1_description" text="Износ дисков сцепления. Периодическая потеря мощности из-за пробуксовки трансмиссии под нагрузкой."/>
         <text name="ads_breakdowns_transmission_slip_stage2_description" text="Значительный износ сцепления. Заметная пробуксовка трансмиссии, особенно при ускорении."/>
         <text name="ads_breakdowns_transmission_slip_stage3_description" text="Сильный износ сцепления. Сильная пробуксовка затрудняет передачу мощности на колеса."/>
         <text name="ads_breakdowns_transmission_slip_stage4_description" text="Сцепление полностью сожжено. Техника не может двигаться."/>
         <text name="ads_breakdowns_transmission_slip_stage4_message" text="Отказ трансмиссии"/>
-
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Износ синхронизаторов. Периодический скрежет или затруднения при переключении передач."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Повреждение синхронизаторов. Переключение передач часто затруднено и может не удаваться."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Сломаны зубья синхронизатора. Высокая вероятность неудачного переключения или 'выбивания' передачи под нагрузкой."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Полный отказ синхронизаторов. Переключение передач невозможно."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Отказ трансмиссии"/>
-
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Низкое гидравлическое давление в Powershift. Небольшая задержка и резкость при включении передач."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Износ уплотнений гидронасоса. Заметное запаздывание и рывки при переключении передач."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Выход гидронасоса из строя. Сильная задержка и резкие удары при переключении."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Отказ гидронасоса Powershift. Трансмиссия застряла в нейтральном положении."/>
-
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Термостат начинает залипать. Вариатор может медленно прогреваться или работать немного горячее нормы под нагрузкой."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Термостат частично заклинил. Температура вариатора нестабильна, что ведет к риску перегрева при длительной работе."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="Термостат практически не функционирует. Вариатор склонен к сильному перегреву, что может вызвать внутренние повреждения."/>
         <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Термостат полностью отказал, вероятно, заклинил в закрытом положении. Охлаждение минимально, что ведет к быстрому и опасному перегреву вариатора."/>
-
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Термостат двигателя начинает выходить из строя. Двигатель дольше прогревается до оптимальной температуры или работает немного горячее."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Плохая реакция термостата. Регулирование температуры двигателя нестабильно, что увеличивает износ."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Термостат заклинил в закрытом положении. Двигатель будет постоянно перегреваться под нагрузкой."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Полный отказ термостата. Охлаждающая жидкость не может циркулировать должным образом, что ведет к неминуемому и сильному перегреву."/>
-
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Небольшая внутренняя утечка в насосе. Гидравлическое оборудование работает немного медленнее."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Износ уплотнений насоса. Заметно более медленная работа гидравлики."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Повреждение гидронасоса. Оборудование работает крайне медленно и слабо."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Отказ гидронасоса. Гидравлическая система неработоспособна."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Отказ гидравлики"/>
-
         <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Износ изоляции, периодические падения напряжения. Наблюдаются незначительные электрические сбои."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Коррозия контактов и нестабильная работа генератора. Освещение может отказывать, запуск двигателя ненадежен."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Риск коротких замыканий. Критически важные системы ненадежны, освещение может полностью отказать."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Отказ освещения"/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Отказ основного жгута проводки. Электросистема техники не работает."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Стартер не реагирует"/>
-
         <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Небольшое загрязнение карбюратора. Двигатель периодически 'захлебывается' под большой нагрузкой."/>
         <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Засорение жиклеров. Двигатель часто 'чихает' и теряет мощность, особенно при резком нажатии на газ."/>
         <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Сильное засорение карбюратора. Двигатель работает очень нестабильно, часто глохнет и с трудом поддерживает мощность."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Топливное голодание из-за полностью забитого карбюратора. Двигатель не будет работать."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Карбюратор засорен"/>
-
         <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Небольшое загрязнение датчика или сбой калибровки. Автоматическая система обмолота работает менее эффективно, вызывая минимальные потери урожая."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="Неточные показания датчика вызывают неоптимальную настройку систем обмолота и сепарации. Потери урожая заметны."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="Критический сбой датчика. Блок управления получает сильно искаженные данные, что ведет к значительным потерям зерна."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="Полный отказ системы контроля урожайности. Комбайн работает 'вслепую', что приводит к огромной неэффективности и серьезным потерям урожая."/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="Отказ системы контроля урожайности"/>
-
         <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Небольшой износ внутренних шнеков и цепей элеватора. Небольшое количество урожая теряется при внутренней транспортировке."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Изношенные витки шнеков и проскальзывающие транспортерные ленты вызывают увеличение просыпей внутри машины. Слышен периодический скрежет."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Поврежденные лопатки элеватора и шнеки с трудом перемещают массу урожая, что ведет к значительным потерям и риску крупного затора."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Крупный компонент системы подачи материала вышел из строя, вызвав серьезный затор. Двигатель находится под экстремальной нагрузкой."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Затор системы подачи материала"/>
-
         <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Растянутый приводной ремень. Периодическое проскальзывание приводит к небольшому снижению скорости выгрузки."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Износ приводного ремня и шкивов. Значительное проскальзывание под нагрузкой заметно снижает скорость выгрузки."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Поврежден редуктор или сильно изношен ремень. Шнек с трудом вращается, работая на очень низкой скорости."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Порвался приводной ремень или заклинило редуктор. Выгрузной шнек полностью заблокирован."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Выгрузной шнек заклинило"/>
-
         <text name="ads_breakdowns_engine_stalled_message" text="Двигатель заглох"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Передача выключена"/>
         <text name="ads_breakdown_at_progress_message" text="в процессе"/>
-
         <text name="ads_cold_engine_message" text="Двигатель холодный! Высокие обороты вызывают износ!"/>
-                 
         <text name="ads_spec_this_month" text="В этом месяце"/>
         <text name="ads_spec_months_ago" text="мес. назад"/>
         <text name="ads_spec_never" text="Никогда"/>
@@ -278,22 +237,16 @@
         <text name="ads_spec_months_ago_format" text="%s %s"/>
         <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s до %s"/>
-        <text name="ads_spec_maintenance_complete" text="завершен(о)"/>
+        <text name="ads_spec_service_interval_format" text="%s м/ч"/>
         <text name="ads_spec_maintenance_complete_notification" text="завершено"/>
         <text name="ads_spec_maintenance_cancelled_notification" text="прерван(о)"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="Обнаружено неисправностей: %s"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Неисправности не обнаружены"/>
         <text name="ads_spec_next_planned_service_notification" text="%s выполнено"/>
-        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Запланированное %s отменено: недостаточно средств"/>
-        <text name="ads_spec_service_interval_format" text="%s м/ч"/>
-
-        <text name="ads_spec_inspection_issues_detected" text="Обнаружено %s неисправность(ей)"/>
-        <text name="ads_spec_inspection_no_issues_detected" text="Неисправности не обнаружены"/>
-
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Запланированное %s отменено из-за недостатка средств"/>
         <text name="ads_spec_workshop_dealer" text="Дилер"/>
         <text name="ads_spec_workshop_own" text="Собственный"/>
         <text name="ads_spec_workshop_mobile" text="Мобильный"/>
-
         <text name="ads_spec_state_ready" text="Готов"/>
         <text name="ads_spec_state_inspection" text="Осмотр"/>
         <text name="ads_spec_state_maintenance" text="Обслуживание"/>
@@ -306,9 +259,10 @@
         <text name="ads_spec_state_bad" text="Плохое"/>
         <text name="ads_spec_state_terrible" text="Ужасное"/>
         <text name="ads_spec_state_unknown" text="Неизвестно"/>
-        <text name="ads_spec_state_not_required" text="Не требуется"/>
+        <text name="ads_spec_state_optimal" text="Оптимальный"/>
         <text name="ads_spec_state_recommended" text="Рекомендуется"/>
         <text name="ads_spec_state_required" text="Требуется"/>
+        <text name="ads_spec_state_overdue" text="Просрочено"/>
         <text name="ads_spec_state_legendary" text="Легендарная"/>
         <text name="ads_spec_state_premium" text="Премиум"/>
         <text name="ads_spec_state_standart" text="Стандарт"/>
@@ -320,5 +274,101 @@
         <text name="ads_spec_state_average" text="Средняя"/>
         <text name="ads_spec_state_high" text="Высокая"/>
         <text name="ads_spec_state_workhorse" text="Рабочая лошадка"/>
+        <text name="ads_spec_part_types_used" text="Использовал"/>
+        <text name="ads_spec_part_types_aftermarket" text="вторичный рынок"/>
+        <text name="ads_spec_part_types_oem" text="OEM"/>
+        <text name="ads_spec_part_types_premium" text="Премиум"/>
+        <text name="ads_spec_inspection_visual" text="Визуальный"/>
+        <text name="ads_spec_inspection_standard" text="Стандартный"/>
+        <text name="ads_spec_inspection_complete" text="Полная дефектоскопия"/>
+        <text name="ads_spec_maintenance_minimal" text="Минимальный"/>
+        <text name="ads_spec_maintenance_standard" text="Стандартный"/>
+        <text name="ads_spec_maintenance_extended" text="Расширенный"/>
+        <text name="ads_spec_overhaul_partial" text="Частичный"/>
+        <text name="ads_spec_overhaul_standard" text="Стандартный"/>
+        <text name="ads_spec_overhaul_full" text="Полный"/>
+        <text name="ads_spec_repair_urgency_low" text="Низкий приоритет"/>
+        <text name="ads_spec_repair_urgency_medium" text="Стандартная очередь"/>
+        <text name="ads_spec_repair_urgency_high" text="Срочный"/>
+        <text name="ads_option_menu_option_one_title_inspection" text="Выберите тип проверки"/>
+        <text name="ads_option_menu_option_two_title_inspection" text="Ремонт обнаруженных неисправностей"/>
+        <text name="ads_option_menu_option_one_title_maintenance" text="Выберите уровень обслуживания"/>
+        <text name="ads_option_menu_option_two_title_maintenance" text="Выбирайте качество расходных материалов"/>
+        <text name="ads_option_menu_option_three_title_maintenance" text="Ремонт обнаруженных неисправностей"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Выберите срочность ремонта"/>
+        <text name="ads_option_menu_option_two_title_repair" text="Выбирайте качество запчастей"/>
+        <text name="ads_option_menu_option_three_title_repair" text="Проведение технического обслуживания после ремонта"/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="Выберите объем работы"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="Обновить лакокрасочное покрытие"/>
+        <text name="ads_option_menu_price_text" text="Цена: "/>
+        <text name="ads_option_menu_duration_text" text="Продолжительность: "/>
+        <text name="ads_option_menu_finish_time_text" text="Время окончания: "/>
+        <text name="ads_option_menu_start_text" text="Начать"/>
+        <text name="ads_option_menu_duration_instant" text="Мгновенный"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Быстрая внешняя проверка. Низкая стоимость и мгновенный результат. Обнаруживает только серьезные неисправности (средней степени тяжести+) и не предоставляет данных о техническом состоянии техники."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* Стандартная диагностическая процедура. Выявляет все активные неисправности и формирует общий отчет о состоянии техники."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Глубокая диагностика. Гарантирует обнаружение всех неисправностей и предоставляет подробный отчет с точным процентом работоспособности всех компонентов."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Базовый сервис. Значительно дешевле и быстрее, но не восстанавливает полностью Уровень Сервиса."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Плановое техническое обслуживание согласно спецификациям производителя. Восстанавливает уровень обслуживания до нормального."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Комплексное обслуживание. Это занимает больше времени и стоит дороже, но повышает уровень обслуживания еще примерно на 20 %."/>
+        <text name="ads_option_menu_repair_urgency_low_description" text="* Заполняющие работы, когда механики свободны. Занимает на 50 % больше времени, но предлагает 10 % скидку на работу."/>
+        <text name="ads_option_menu_repair_urgency_medium_description" text="* Стандартный график семинаров. Сбалансированная стоимость рабочей силы и продолжительность ремонта."/>
+        <text name="ads_option_menu_repair_urgency_high_description" text="* Аварийно-ремонтная бригада. Сокращает время простоя на 50%, но увеличивает затраты на рабочую силу на 10%."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Восстанавливает состояние до нормального уровня и требует меньше времени и ресурсов, чем полный капитальный ремонт."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* Комплексная работа по всем основным компонентам. Восстанавливает состояние до хорошего уровня."/>
+        <text name="ads_option_menu_overhaul_full_description" text="* Полная переработка. Высокая стоимость и длительность, но восстанавливает Состояние до отличного уровня."/>
+        <text name="ads_option_menu_part_used_description" text="* Утилизированные детали. Очень дешево, но крайне рискованно (вероятность брака ~50%)"/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Бюджетные копии послепродажного обслуживания. Снижена стоимость, но существует умеренный риск возникновения дефектов (33%)."/>
+        <text name="ads_option_menu_part_oem_description" text="* Оригинальные детали от производителя оборудования. Стандартная надежность (риск дефекта 10 %) по полной цене."/>
+        <text name="ads_option_menu_part_premium_description" text="* Усиленные детали. Дорого, но со строгим контролем качества (риск брака 0%)."/>
+        <text name="ads_option_menu_perform_repair" text="Устраните все обнаруженные неисправности"/>
+        <text name="ads_option_menu_perform_maintenance" text="Проведение технического обслуживания после ремонта"/>
+        <text name="ads_option_menu_perform_renew_paint" text="Обновить лакокрасочное покрытие"/>
+        <text name="ads_report_header_title" text="Отчет об инспекции"/>
+        <text name="ads_report_state_optimal" text="Оптимальный"/>
+        <text name="ads_report_state_normal" text="Нормальный"/>
+        <text name="ads_report_state_degraded" text="Деградированный"/>
+        <text name="ads_report_state_impaired" text="Ослабленный"/>
+        <text name="ads_report_state_critical" text="Критический"/>
+        <text name="ads_report_state_not_available" text="Н/Д"/>
+        <text name="ads_report_overall_assessment_condition" text="Уровень состояния"/>
+        <text name="ads_report_overall_assessment_service" text="Уровень обслуживания"/>
+        <text name="ads_report_overall_assessment_mtbf" text="Наработка на отказ (часы)"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="Крит. Риск отказа"/>
+        <text name="ads_report_overall_assessment_rul" text="Остаточный срок службы (часы)"/>
+        <text name="ads_report_overall_assessment_wear_rate" text="Скорость износа (%/час)"/>
+        <text name="ads_report_overall_assessment_nominal_wear_rate" text="Номинальная скорость износа (%/ч)"/>
+        <text name="ads_report_overall_assessment_wear_index" text="Индекс износа"/>
+        <text name="ads_report_system_condition_title" text="Состояние системы"/>
+        <text name="ads_report_system_condition_power" text="Текущая мощность"/>
+        <text name="ads_report_system_condition_brakes" text="Эффективность тормозов"/>
+        <text name="ads_report_system_condition_transmission" text="Эффективность передачи"/>
+        <text name="ads_report_system_condition_harvest" text="Эффективность сбора урожая"/>
+        <text name="ads_report_system_condition_cooling" text="Эффективность охлаждения"/>
+        <text name="ads_report_system_condition_cvt_cooling" text="Эффективность охлаждения вариатора"/>
+        <text name="ads_report_system_condition_consumption" text="Расход топлива"/>
+        <text name="ads_report_system_condition_hydraulic" text="Гидравлический КПД"/>
+        <text name="ads_report_system_symptoms_none" text="Никаких аномальных симптомов при осмотре не выявлено."/>
+        <text name="ads_report_system_symptoms_dark_exhaust" text="Под нагрузкой прозрачность выхлопа увеличивается."/>
+        <text name="ads_report_system_symptoms_turbo_grinding" text="Турбокомпрессор издает периодический металлический скрежет."/>
+        <text name="ads_report_system_symptoms_lights_flicker" text="Цепь освещения показывает прерывистое мерцание."/>
+        <text name="ads_report_system_symptoms_lights_failure" text="Наружное освещение не работает."/>
+        <text name="ads_report_system_symptoms_engine_stalls" text="Во время работы двигатель периодически глохнет."/>
+        <text name="ads_report_system_symptoms_start_failure" text="Присутствует повторяющееся поведение при отсутствии запуска двигателя."/>
+        <text name="ads_report_system_symptoms_idle_hunting" text="Скорость холостого хода нестабильна с циклическими колебаниями оборотов в минуту."/>
+        <text name="ads_report_system_symptoms_engine_hesitation" text="Реакция дроссельной заслонки показывает временные колебания под нагрузкой."/>
+        <text name="ads_report_system_symptoms_engine_failure" text="Состояние остановки двигателя подтверждено."/>
+        <text name="ads_report_system_symptoms_transmission_slip" text="Под нагрузкой наблюдается пробуксовка коробки передач."/>
+        <text name="ads_report_system_symptoms_gear_shift_failure" text="Переключения передач периодически не завершаются."/>
+        <text name="ads_report_system_symptoms_gear_rejection" text="Коробка передач иногда падает на нейтраль под нагрузкой."/>
+        <text name="ads_report_system_symptoms_powershift_lag_harsh" text="Включение Powershift происходит с задержкой и резкостью."/>
+        <text name="ads_report_system_symptoms_unloading_speed" text="Производительность разгрузки ниже номинальной."/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Обнаружены неисправности. Устраните все активные неисправности."/>
+        <text name="ads_report_recommendation_service_due" text="Достигнут порог сервисного интервала. Выполните техническое обслуживание."/>
+        <text name="ads_report_recommendation_service_urgent" text="Нарушен сервисный интервал. Срочно проведите техническое обслуживание!"/>
+        <text name="ads_report_recommendation_overhaul" text="Обнаружена деградация основных компонентов. Провести капитальный ремонт."/>
+        <text name="ads_report_recommendation_operating_conditions" text="Обнаружены признаки интенсивного чрезмерного использования. Улучшить условия эксплуатации."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="Обнаружены дефектные расходные материалы. Повторите техническое обслуживание для замены неисправных компонентов."/>
+        <text name="ads_report_recommendation_all_ok" text="Критических рекомендаций нет. Техника находится в исправном состоянии."/>
     </texts>
 </l10n>

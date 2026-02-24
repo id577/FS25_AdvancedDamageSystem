@@ -3,6 +3,88 @@ ADS_ReportDialog.INSTANCE = nil
 
 local ADS_ReportDialog_mt = Class(ADS_ReportDialog, MessageDialog)
 local modDirectory = g_currentModDirectory
+local REPORT_TABLE_MIN_ROWS_MAIN = 10
+local REPORT_TABLE_MIN_ROWS_BOTTOM = 4
+local SUSPICIOUS_SYMPTOMS_BY_EFFECT = {
+    {id = "DARK_EXHAUST_EFFECT", l10nKey = "ads_report_system_symptoms_dark_exhaust"},
+    {id = "TURBOCHARGER_GRINDING_EFFECT", l10nKey = "ads_report_system_symptoms_turbo_grinding"},
+    {id = "LIGHTS_FLICKER_CHANCE", l10nKey = "ads_report_system_symptoms_lights_flicker"},
+    {id = "LIGHTS_FAILURE", l10nKey = "ads_report_system_symptoms_lights_failure"},
+    {id = "ENGINE_STALLS_CHANCE", l10nKey = "ads_report_system_symptoms_engine_stalls"},
+    {id = "ENGINE_START_FAILURE_CHANCE", l10nKey = "ads_report_system_symptoms_start_failure"},
+    {id = "IDLE_HUNTING_EFFECT", l10nKey = "ads_report_system_symptoms_idle_hunting"},
+    {id = "ENGINE_HESITATION_CHANCE", l10nKey = "ads_report_system_symptoms_engine_hesitation"},
+    {id = "ENGINE_FAILURE", l10nKey = "ads_report_system_symptoms_engine_failure"},
+    {id = "TRANSMISSION_SLIP_EFFECT", l10nKey = "ads_report_system_symptoms_transmission_slip"},
+    {id = "GEAR_SHIFT_FAILURE_CHANCE", l10nKey = "ads_report_system_symptoms_gear_shift_failure"},
+    {id = "GEAR_REJECTION_CHANCE", l10nKey = "ads_report_system_symptoms_gear_rejection"},
+    {id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", l10nKey = "ads_report_system_symptoms_powershift_lag_harsh"},
+    {id = "UNLOADING_SPEED_MODIFIER", l10nKey = "ads_report_system_symptoms_unloading_speed"}
+}
+local RECOMMENDATION_RULES = {
+    {
+        l10nKey = "ads_report_recommendation_service_due",
+        check = function(vehicle, reportEntry, metrics)
+            if reportEntry == nil or reportEntry.conditionData == nil then
+                return false
+            end
+            local service = reportEntry.conditionData.service
+            return type(service) == "number" and service > 0.45 and service < 0.65
+        end
+    },
+    {
+        l10nKey = "ads_report_recommendation_service_urgent",
+        check = function(vehicle, reportEntry, metrics)
+            if reportEntry == nil or reportEntry.conditionData == nil then
+                return false
+            end
+            local service = reportEntry.conditionData.service
+            return type(service) == "number" and service < 0.45
+        end
+    },
+    {
+        l10nKey = "ads_report_recommendation_repair_active_breakdowns",
+        check = function(vehicle, reportEntry, metrics)
+            if metrics == nil then
+                return false
+            end
+            return (metrics.visibleSelectableBreakdownsCount or 0) > 0
+        end
+    },
+    {
+        l10nKey = "ads_report_recommendation_overhaul",
+        check = function(vehicle, reportEntry, metrics)
+            if reportEntry == nil or reportEntry.conditionData == nil then
+                return false
+            end
+            local condition = reportEntry.conditionData.condition
+            return type(condition) == "number" and condition < 0.2
+        end
+    },
+    {
+        l10nKey = "ads_report_recommendation_operating_conditions",
+        check = function(vehicle, reportEntry, metrics)
+            if metrics == nil or not metrics.isCompleteInspection then
+                return false
+            end
+            local wearRate = metrics.wearRate
+            local nominalWearRate = metrics.nominalWearRate
+            if type(wearRate) ~= "number" or type(nominalWearRate) ~= "number" or nominalWearRate <= 0 then
+                return false
+            end
+            return (wearRate / nominalWearRate) > 1.1
+        end
+    },
+    {
+        l10nKey = "ads_report_recommendation_repeat_maintenance",
+        check = function(vehicle, reportEntry, metrics)
+            if metrics == nil or not metrics.isCompleteInspection then
+                return false
+            end
+            return metrics.hasPoorQualityConsumablesBreakdown == true
+        end
+    }
+}
 
 local function log_dbg(...)
     if ADS_Config and ADS_Config.DEBUG then
@@ -20,6 +102,48 @@ local function getEffectValue(activeEffects, effectId)
         return effect.value
     end
     return nil
+end
+
+local function hasActiveEffect(activeEffects, effectId)
+    local effect = activeEffects[effectId]
+    if effect == nil then
+        return false
+    end
+
+    if type(effect) ~= "table" then
+        return true
+    end
+
+    if type(effect.value) == "number" then
+        return math.abs(effect.value) > 0
+    end
+
+    return true
+end
+
+local function padRowsToCount(rows, minRows, makePaddingRow)
+    while #rows < minRows do
+        table.insert(rows, makePaddingRow())
+    end
+end
+
+local function buildRecommendationsData(vehicle, reportEntry, metrics)
+    local recommendations = {}
+
+    for _, rule in ipairs(RECOMMENDATION_RULES) do
+        if type(rule.check) == "function" then
+            local ok, shouldAdd = pcall(rule.check, vehicle, reportEntry, metrics)
+            if ok and shouldAdd then
+                table.insert(recommendations, "- " .. g_i18n:getText(rule.l10nKey))
+            end
+        end
+    end
+
+    if #recommendations == 0 then
+        table.insert(recommendations, "- " .. g_i18n:getText("ads_report_recommendation_all_ok"))
+    end
+
+    return recommendations
 end
 
 function ADS_ReportDialog.register()
@@ -66,6 +190,13 @@ function ADS_ReportDialog:updateScreen()
     if self.vehicle == nil then return end
     log_dbg("Updating log Screen...")
     local spec = self.vehicle.spec_AdvancedDamageSystem
+
+    self.overallAssessmentData = {}
+    self.systemConditionData = {}
+    self.suspiciousSymptomsData = {}
+    self.breakdownsData = {}
+    self.recommendationsData = {}
+
     self.balanceElement:setText(g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true))
 
 -- ==========================================================
@@ -248,6 +379,82 @@ function ADS_ReportDialog:updateScreen()
         table.insert(self.systemConditionData, {'ads_report_system_condition_hydraulic', hydraulicEfficiencyModifier})
     end
 
+-- ==========================================================
+--                   SUSPICIOUS_SYMPTOMS
+-- ==========================================================
+
+    for _, item in ipairs(SUSPICIOUS_SYMPTOMS_BY_EFFECT) do
+        if hasActiveEffect(activeEffects, item.id) then
+            table.insert(self.suspiciousSymptomsData, "- " .. g_i18n:getText(item.l10nKey))
+        end
+    end
+
+    if #self.suspiciousSymptomsData == 0 then
+        table.insert(self.suspiciousSymptomsData, "- " .. g_i18n:getText("ads_report_system_symptoms_none"))
+    end
+
+-- ==========================================================
+--             BREAKDOWNS and RECCOMENDATIONS 
+-- ==========================================================
+
+    local reportMetrics = {
+        visibleSelectableBreakdownsCount = 0,
+        wearRate = wearRate,
+        nominalWearRate = nominalWearRate,
+        hasPoorQualityConsumablesBreakdown = false,
+        isCompleteInspection = self.isCompleteInspection == true
+    }
+
+    local reportActiveBreakdowns = (self.lastReport.conditionData and self.lastReport.conditionData.activeBreakdowns) or {}
+    local breakdownIds = {}
+    for breakdownId, _ in pairs(reportActiveBreakdowns) do
+        table.insert(breakdownIds, breakdownId)
+    end
+    table.sort(breakdownIds)
+
+    for _, breakdownId in ipairs(breakdownIds) do
+        local breakdownData = reportActiveBreakdowns[breakdownId]
+        local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+
+        if breakdownId == "MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES" then
+            reportMetrics.hasPoorQualityConsumablesBreakdown = true
+        end
+
+        if breakdownData ~= nil and breakdownData.isVisible and registryEntry ~= nil and registryEntry.isSelectable then
+            reportMetrics.visibleSelectableBreakdownsCount = reportMetrics.visibleSelectableBreakdownsCount + 1
+            local stage = breakdownData.stage or 1
+            local stageData = registryEntry.stages and registryEntry.stages[stage]
+            if stageData ~= nil then
+                local partText = g_i18n:getText(registryEntry.part)
+                local severityText = g_i18n:getText(stageData.severity)
+                local descriptionText = g_i18n:getText(stageData.description)
+                table.insert(self.breakdownsData, string.format("- %s (%s): %s", partText, severityText, descriptionText))
+            end
+        end
+    end
+
+    if #self.breakdownsData == 0 then
+        table.insert(self.breakdownsData, "- " .. g_i18n:getText("ads_log_inspection_desc_no_breakdowns"))
+    end
+
+    self.recommendationsData = buildRecommendationsData(self.vehicle, self.lastReport, reportMetrics)
+
+    padRowsToCount(self.overallAssessmentData, REPORT_TABLE_MIN_ROWS_MAIN, function()
+        return {isPadding = true}
+    end)
+    padRowsToCount(self.systemConditionData, REPORT_TABLE_MIN_ROWS_MAIN, function()
+        return {isPadding = true}
+    end)
+    padRowsToCount(self.suspiciousSymptomsData, REPORT_TABLE_MIN_ROWS_MAIN, function()
+        return ""
+    end)
+    padRowsToCount(self.breakdownsData, REPORT_TABLE_MIN_ROWS_BOTTOM, function()
+        return ""
+    end)
+    padRowsToCount(self.recommendationsData, REPORT_TABLE_MIN_ROWS_BOTTOM, function()
+        return ""
+    end)
+
     self.overallAssessmentTable:setDataSource(self)
     self.systemConditionTable:setDataSource(self)
     self.suspiciousSymptomsTable:setDataSource(self)
@@ -266,11 +473,11 @@ function ADS_ReportDialog:getNumberOfItemsInSection(list, section)
     elseif list == self.systemConditionTable then
         return #self.systemConditionData
     elseif list == self.suspiciousSymptomsTable then
-        return 0
+        return #self.suspiciousSymptomsData
     elseif list == self.breakdownsTable then
-        return 0
+        return #self.breakdownsData
     elseif list == self.recommendationsTable then
-        return 0
+        return #self.recommendationsData
     end
 end
 
@@ -279,12 +486,29 @@ function ADS_ReportDialog:populateCellForItemInSection(list, section, index, cel
         self:populateOverallAssessmentCell(index, cell)
     elseif list == self.systemConditionTable then
         self:populateSystemConditionCell(index, cell)
+    elseif list == self.suspiciousSymptomsTable then
+        self:populateSuspiciousSymptomsCell(index, cell)
+    elseif list == self.breakdownsTable then
+        self:populateBreakdownsCell(index, cell)
+    elseif list == self.recommendationsTable then
+        self:populateRecommendationsCell(index, cell)
     end
 end
 
 function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
     local data = self.overallAssessmentData[index]
     if not data then return end
+
+    if data.isPadding then
+        local titleElement = cell:getAttribute("reportTableOverallAssessmentTitle")
+        local valueElement = cell:getAttribute("reportTableOverallAssessmentValue")
+        titleElement:setText("")
+        valueElement:setText("")
+        titleElement:setTextColor(1.0, 1.0, 1.0, 1.0)
+        valueElement:setTextColor(1.0, 1.0, 1.0, 1.0)
+        return
+    end
+
     local spec = self.vehicle.spec_AdvancedDamageSystem
     local maxMtbf = ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF / 60
     local minMtbf = ADS_Config.CORE.BREAKDOWN_PROBABILITY.MIN_MTBF / 60
@@ -368,6 +592,16 @@ function ADS_ReportDialog:populateSystemConditionCell(index, cell)
     local data = self.systemConditionData[index]
     if not data then return end
 
+    if data.isPadding then
+        local titleElement = cell:getAttribute("reportTableSystemConditionTitle")
+        local valueElement = cell:getAttribute("reportTableSystemConditionValue")
+        titleElement:setText("")
+        valueElement:setText("")
+        titleElement:setTextColor(1.0, 1.0, 1.0, 1.0)
+        valueElement:setTextColor(1.0, 1.0, 1.0, 1.0)
+        return
+    end
+
     local conditionConfig = {
         ads_report_system_condition_consumption = {inverted = true, ideal = 100, low = 105, mid = 110, high = 130, stdVisible = false},
         ads_report_system_condition_power = {inverted = false, ideal = 100, high = 95, mid = 90, low = 70, stdVisible = true},
@@ -421,6 +655,21 @@ function ADS_ReportDialog:populateSystemConditionCell(index, cell)
         end
         valueElement:setTextColor(getColor(false))
     end
+end
+
+function ADS_ReportDialog:populateSuspiciousSymptomsCell(index, cell)
+    local data = self.suspiciousSymptomsData[index]
+    cell:getAttribute("reportTableSuspiciousSymptomsTitle"):setText(data or "")
+end
+
+function ADS_ReportDialog:populateBreakdownsCell(index, cell)
+    local data = self.breakdownsData[index]
+    cell:getAttribute("reportBreakdownsRow"):setText(data or "")
+end
+
+function ADS_ReportDialog:populateRecommendationsCell(index, cell)
+    local data = self.recommendationsData[index]
+    cell:getAttribute("reportRecRow"):setText(data or "")
 end
 
 -- ====================================================================

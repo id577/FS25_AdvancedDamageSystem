@@ -49,8 +49,8 @@
                 <Text profile="fs25_textDefault" id="serviceValue" text="-" position="1125px 240px"/>
                 <Text profile="fs25_textDefault" id="condtionValue" text="-" position="1125px 200px"/>
                 <Text profile="fs25_textDefault" id="lastServiceValue" text="-" position="1125px 160px"/>
-                <Button profile="ads_infoButton" name="maintenceLogButton" text="Show" position="-220px -47px"  onClick="onClickShowLog"/>     <!-- FIX position="1125px 120px" -->
-                <Button profile="ads_infoButton" name="lastReportButton" text="Show" position="-220px -87px" onClick="onClickShowReport"/>     <!-- FIX position="1125px 80px" -->
+                <Button profile="ads_infoButton" name="maintenceLogButton" text="$l10n_ads_ws_button_show" position="-220px -47px"  onClick="onClickShowLog"/>     <!-- FIX position="1125px 120px" -->
+                <Button profile="ads_infoButton" name="lastReportButton" text="$l10n_ads_ws_button_show" position="-220px -87px" onClick="onClickShowReport"/>     <!-- FIX position="1125px 80px" -->
 
                 <Text profile="fs25_textDefault" id="serviceLastInspectionDeltaValue" text="-" position="1260px 240px"/>
                 <Text profile="fs25_textDefault" id="condtionLastInspectionDelataValue" text="-" position="1260px 200px" />

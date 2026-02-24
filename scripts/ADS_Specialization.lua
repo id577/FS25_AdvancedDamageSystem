@@ -859,6 +859,8 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- general wear and tear
     if self:getConditionLevel() < ADS_Config.CORE.GENERAL_WEAR_THRESHOLD and not self:hasBreakdown('GENERAL_WEAR') then
         self:addBreakdown('GENERAL_WEAR', 1)
+    elseif self:hasBreakdown('GENERAL_WEAR') and self:getConditionLevel() > ADS_Config.CORE.GENERAL_WEAR_THRESHOLD then
+        self:removeBreakdown('GENERAL_WEAR')
     end
 
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
@@ -1513,12 +1515,13 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
         activeBreakdownsCount = activeBreakdownsCount + 1
     end
 
-    if activeBreakdownsCount >= ADS_Config.CORE.CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE then
+    local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+
+    if activeBreakdownsCount >= ADS_Config.CORE.CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE and registryEntry.isSelectable then
         log_dbg("-> Concurrent breakdown limit reached for vehicle:", self:getFullName())
         return nil 
     end
-    
-    local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+
 
     if registryEntry == nil then
         log_dbg("-> Breakdown ID not found in registry. Aborting.")

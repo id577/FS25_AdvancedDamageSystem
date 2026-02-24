@@ -1,11 +1,5 @@
 <l10n>
     <texts>
-        <text name="ads_serviceWear_label" text="Tasa de Desgaste del Servicio"/>
-        <text name="ads_serviceWear_tooltip" text="Controla la tasa de desgaste del nivel 'Servicio' por hora de funcionamiento. Por ejemplo, al 10%, el nivel de servicio se agotará completamente en 10 horas de operación. Un valor más alto significa que se requiere mantenimiento con más frecuencia."/>
-        <text name="ads_conditionWear_label" text="Tasa de Desgaste de la Condición"/>
-        <text name="ads_conditionWear_tooltip" text="Controla la tasa de desgaste del nivel 'Condición' por hora de funcionamiento. Por ejemplo, al 1%, la condición del vehículo se degradará completamente en 100 horas de operación. Un valor más alto provoca una degradación más rápida de la condición general del vehículo."/>
-        <text name="ads_breakdownProbability_label" text="Tiempo Medio Entre Fallos Base"/>
-        <text name="ads_breakdownProbability_tooltip" text="Establece el TMEF base para averías en minutos cuando la condición del vehículo es del 100%. A medida que disminuye la condición del vehículo, el TMEF real también disminuirá. Este ajuste sirve como punto de partida para los cálculos de averías."/>
         <text name="ads_maintenancePrice_label" text="Multiplicador de Precio de Mantenimiento"/>
         <text name="ads_maintenancePrice_tooltip" text="Ajusta el costo de todos los servicios del taller, incluyendo inspecciones, reparaciones y revisiones. Un valor más alto encarece todas las actividades de mantenimiento."/>
         <text name="ads_maintenanceDuration_label" text="Multiplicador de Duración del Mantenimiento"/>
@@ -16,8 +10,6 @@
         <text name="ads_workshopCloseHour_tooltip" text="La hora del día en que el taller cierra. Las reparaciones se pausarán después de esta hora."/>
         <text name="ads_engineMaxHeat_label" text="Calor máx. del motor"/>
         <text name="ads_engineMaxHeat_tooltip" text="La tasa base de calor generado por el motor a carga máxima. Valores más altos harán que el motor se caliente más rápido."/>
-        <text name="ads_transMaxHeat_label" text="Calor máx. de la transmisión"/>
-        <text name="ads_transMaxHeat_tooltip" text="La tasa base de calor generado por la transmisión a carga máxima. Valores más altos harán que la transmisión se caliente más rápido."/>
         <text name="ads_dirtInfluence_label" text="Influencia de la suciedad en la refrigeración"/>
         <text name="ads_dirtInfluence_tooltip" text="La reducción máxima en la eficiencia del radiador debido a la suciedad. 20 % significa que la refrigeración de un vehículo completamente sucio es un 20 % menos efectiva."/>
         <text name="ads_ws_header_title" text="Taller"/>
@@ -29,7 +21,20 @@
         <text name="ads_parkVehicle_tooltip" text="Si está activado, los vehículos en mantenimiento se omiten al cambiar con TAB."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Control de sobrecarga/calentamiento (IA)"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="El trabajador de la IA reducirá la carga en caso de sobrecarga o sobrecalentamiento del motor."/>
-
+        <text name="ads_debugMode_label" text="Modo de depuración"/>
+        <text name="ads_debugMode_tooltip" text="Habilita o deshabilita el panel de depuración y el registro de depuración extenso en la consola."/>
+        <text name="ads_serviceInterval_label" text="Tasa de Desgaste del Servicio"/>
+        <text name="ads_vehicleLifespan_label" text="Tasa de Desgaste de la Condición"/>
+        <text name="ads_breakdownFrequency_label" text="Tiempo Medio Entre Fallos Base"/>
+        <text name="ads_thermalSensitivity_label" text="Sensibilidad térmica"/>
+        <text name="ads_serviceInterval_tooltip" text="Controla la tasa de desgaste del nivel 'Servicio' por hora de funcionamiento. Por ejemplo, al 10%, el nivel de servicio se agotará completamente en 10 horas de operación. Un valor más alto significa que se requiere mantenimiento con más frecuencia."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Controla la tasa de desgaste del nivel 'Condición' por hora de funcionamiento. Por ejemplo, al 1%, la condición del vehículo se degradará completamente en 100 horas de operación. Un valor más alto provoca una degradación más rápida de la condición general del vehículo."/>
+        <text name="ads_breakdownFrequency_tooltip" text="Establece el TMEF base para averías en minutos cuando la condición del vehículo es del 100%. A medida que disminuye la condición del vehículo, el TMEF real también disminuirá. Este ajuste sirve como punto de partida para los cálculos de averías."/>
+        <text name="ads_thermalSensitivity_tooltip" text="Ajusta el comportamiento del modelo térmico. Los ajustes más altos hacen que el motor y la transmisión sean más sensibles a la carga, la temperatura ambiente y la suciedad del radiador, generando más calor en las mismas condiciones."/>
+        <text name="ads_thermal_none" text="Pasivo"/>
+        <text name="ads_thermal_mild" text="Leve"/>
+        <text name="ads_thermal_default" text="Por defecto"/>
+        <text name="ads_thermal_aggressive" text="Agresivo"/>
         <text name="ads_ws_label_value" text="Valor"/>
         <text name="ads_ws_label_age" text="Antigüedad"/>
         <text name="ads_ws_label_operating_hours" text="Horas de operación"/>
@@ -39,26 +44,25 @@
         <text name="ads_ws_label_brake_efficiency" text="Eficiencia de frenos"/>
         <text name="ads_ws_label_harvest_efficiency" text="Eficiencia de cosecha"/>
         <text name="ads_ws_label_maintainability" text="Mantenibilidad"/>
+        <text name="ads_ws_label_maintenance_log" text="Registro de mantenimiento"/>
+        <text name="ads_ws_label_last_report" text="Último informe"/>
         <text name="ads_ws_label_service_interval" text="Intervalo de Servicio"/>
-
         <text name="ads_ws_label_last_maintenance" text="Último mantenimiento"/>
         <text name="ads_ws_label_last_inspection" text="Última inspección"/>
-
         <text name="ads_ws_table_header_part" text="Parte"/>
         <text name="ads_ws_table_header_description" text="Descripción"/>
         <text name="ads_ws_table_header_stage" text="Etapa"/>
         <text name="ads_ws_table_header_price" text="Precio"/>
         <text name="ads_ws_table_header_repair_select" text="Reparar"/>
-
         <text name="ads_ws_info_no_breakdowns" text="No hay averías o aún no se han detectado."/>
         <text name="ads_ws_status_initial" text="Cargando estado..."/>
-
         <text name="ads_ws_action_inspection" text="Inspección"/>
         <text name="ads_ws_action_maintenance" text="Mantenimiento"/>
         <text name="ads_ws_action_repair" text="Reparación"/>
         <text name="ads_ws_action_overhaul" text="Revisión General"/>
+        <text name="ads_ws_action_cancel_service" text="Cancelar procedimiento"/>
         <text name="ads_ws_button_log" text="Registro de Mantenimiento"/>
-
+        <text name="ads_ws_button_show" text="Mostrar"/>
         <text name="ads_ws_age_unit" text="meses"/>
         <text name="ads_ws_hours_unit" text="h"/>
         <text name="ads_ws_button_ok" text="Aceptar"/>
@@ -75,28 +79,11 @@
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
         <text name="ads_ws_info_nothing_to_repair_title" text="Nada que Reparar"/>
         <text name="ads_ws_info_nothing_to_repair_text" text="Seleccione uno o más elementos para reparar de la lista."/>
-        
-        <text name="ads_ws_confirm_instant_inspection_title" text="Confirmar inspección instantánea"/>
-        <text name="ads_ws_confirm_instant_inspection_text" text="Esto inspeccionará instantáneamente el vehículo y revelará todos los fallos ocultos.\n\nPrecio: {price}\nDuración: {duration}\nFinaliza a las: {time}"/>
-
-        <text name="ads_ws_confirm_inspection_title" text="Confirmar Inspección"/>
-        <text name="ads_ws_confirm_inspection_text" text="La inspección te permitirá identificar fallos ocultos y evaluar aproximadamente su nivel de condición técnica.\n\nPrecio: {price}\nDuración: {duration}\nFinaliza a las: {time}\n\nLa inspección rápida toma poco tiempo, pero a diferencia de una inspección exhaustiva, no puede detectar fallos en las etapas más tempranas.\n\nPrecio: {q_price}\nDuración: {q_duration}\nFinaliza a las: {q_time}\n"/>
-        
-        <text name="ads_ws_confirm_maintenance_title" text="Confirmar Mantenimiento"/>
-        <text name="ads_ws_confirm_maintenance_text" text="El mantenimiento restaurará el nivel de servicio técnico al máximo. Además, se inspeccionará la condición técnica del vehículo.\n\nPrecio: {price}\nDuración: {duration}\nFinaliza a las: {time}\n
-        Elija la calidad de las piezas de repuesto para este procedimiento. Usar piezas de reemplazo más baratas conlleva riesgo de defectos.\n\nPrecio piezas genéricas: {aftermarket_price}"/>
-        <text name="ads_ws_confirm_repair_title" text="Confirmar Reparación"/>
-        <text name="ads_ws_confirm_repair_text" text="Esto eliminará las fallas seleccionadas ({price}).\n\nDuración: {duration}\nFinaliza a las: {time}\n
-        Elija la calidad de las piezas de repuesto para este procedimiento. Usar piezas de reemplazo más baratas conlleva riesgo de defectos.\n\nPrecio piezas genéricas: {aftermarket_price}"/>
-        <text name="ads_ws_confirm_overhaul_title" text="Confirmar Revisión General"/>
-        <text name="ads_ws_confirm_overhaul_text" text="La revisión general corregirá todas las fallas, realizará mantenimiento y mejorará la condición técnica del vehículo.\n\nPrecio: {price}\nDuración: {duration}\nFinaliza a las: {time}\n
-        Elija la calidad de las piezas de repuesto para este procedimiento. Usar piezas de reemplazo más baratas conlleva riesgo de defectos.\n\nPrecio piezas genéricas: {aftermarket_price}"/>
-        <text name="ads_ws_option_genuine_parts" text="Piezas Originales"/>
-        <text name="ads_ws_option_aftermarket_parts" text="Piezas Genéricas"/>
-
-        <text name="ads_ws_option_quick_inspection" text="Inspección rápida"/>
-        <text name="ads_ws_option_thorough_inspection" text="Inspección exhaustiva"/>
-
+        <text name="ads_ws_no_last_report_message" text="Aún no hay informes"/>
+        <text name="ads_ws_no_report_message" text="No hay informes disponibles"/>
+        <text name="ads_ws_no_log_empty_message" text="El registro aún está vacío"/>
+        <text name="ads_ws_cancel_confirm_title" text="¿Cancelar %s?"/>
+        <text name="ads_ws_cancel_confirm_text" text="El progreso actual se guardará tal cual. No se reembolsará ningún dinero."/>
         <text name="ads_log_header_title" text="Registro de Mantenimiento"/>
         <text name="ads_log_title" text="Registro de Mantenimiento Técnico"/>
         <text name="ads_log_total_cost_title" text="Gastos Totales"/>
@@ -105,22 +92,20 @@
         <text name="ads_log_total_breakdowns_count_title" text="Total Averías Reparadas"/>
         <text name="ads_log_average_breakdowns_interval_title" text="Int. Medio Averías"/>
         <text name="ads_log_average_maintenance_interval_title" text="Int. Medio Mantenimiento"/>
-
-        <text name="ads_log_overhaul_desc" text="Revisión general realizada"/>
-        <text name="ads_log_maintenance_desc" text="Mantenimiento programado realizado (%.1f h)"/>
+        <text name="ads_log_performed" text="%s realizado"/>
         <text name="ads_log_inspection_desc_no_breakdowns" text="No se detectaron fallos"/>
         <text name="ads_log_inspection_desc_with_breakdowns" text="Fallos detectados: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="El vehículo fue repintado."/>
         <text name="ads_log_repair_desc_generic" text="Reparación"/>
-
+        <text name="ads_log_cancelled_desc" text="Procedimiento cancelado"/>
         <text name="ads_log_date" text="Fecha"/>
         <text name="ads_log_hours" text="Horas de Operación"/>
         <text name="ads_log_type" text="Tipo de Trabajo"/>
         <text name="ads_log_description" text="Descripción"/>
         <text name="ads_log_price" text="Costo"/>
         <text name="ads_log_empty" text="El registro está vacío"/>
-
+        <text name="ads_breakdowns_part_ecu" text="ECU"/>
         <text name="ads_breakdowns_part_vehicle" text="Vehículo"/>
-        <!-- ... (standard breakdown parts remain the same) ... -->
         <text name="ads_breakdowns_part_engine" text="Motor"/>
         <text name="ads_breakdowns_part_turbocharger" text="Turbocompresor"/>
         <text name="ads_breakdowns_part_fuel_pump" text="Bomba de Combustible"/>
@@ -135,7 +120,6 @@
         <text name="ads_breakdowns_part_yield_sensor" text="Sensor de rendimiento"/>
         <text name="ads_breakdowns_part_material_flow_system" text="Sistema de flujo de material"/>
         <text name="ads_breakdowns_part_unloading_auger" text="Sinfín de descarga"/>
-
         <text name="ads_breakdowns_severity_permanent" text="Permanente"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Reducción de Potencia"/>
         <text name="ads_breakdowns_severity_shutdown" text="Apagado"/>
@@ -144,7 +128,6 @@
         <text name="ads_breakdowns_severity_major" text="Grave"/>
         <text name="ads_breakdowns_severity_critical" text="Crítico"/>
         <text name="ads_breakdowns_general_wear_stage1_description" text="El estrés acumulado de años de trabajo duro. Desgaste menor e irreversible en componentes principales que reduce ligeramente el rendimiento general."/>
-
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Modo de protección del motor"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="¡Modo de emergencia activo! ¡Potencia reducida!"/>
         <text name="ads_breakdowns_overheat_protection_stage2_description" text="Modo de protección del motor"/>
@@ -153,11 +136,8 @@
         <text name="ads_breakdowns_overheat_protection_stage3_message" text="¡Modo de emergencia activo! ¡Potencia reducida!"/>
         <text name="ads_breakdowns_overheat_protection_stage4_description" text="Modo de protección del motor"/>
         <text name="ads_breakdowns_overheat_protection_stage4_message" text="Motor apagado para evitar sobrecalentamiento"/>
-
         <text name="ads_breakdowns_engine_jam_stage1_description" text="El motor falló por completo"/>
         <text name="ads_breakdowns_engine_jam_stage1_message" text="Motor bloqueado"/>
-        
-        <!-- ... (all breakdown descriptions remain the same) ... -->
         <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="Errores en la ECU. Potencia del motor ligeramente reducida."/>
         <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="Fallo en la ECU. Pérdida de potencia notable y mayor consumo de combustible."/>
         <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Fallo crítico en la ECU. Pérdida de potencia significativa, alto consumo de combustible y riesgo de calado del motor."/>
@@ -216,8 +196,8 @@
         <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Fallo del arnés principal. El sistema eléctrico del vehículo está muerto."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="El motor de arranque no responde"/>
         <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Ligera contaminación del carburador. El motor vacila ocasionalmente bajo carga pesada."/>
-        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Clogged jets. Engine frequently sputters and loses power, especially when throttle is applied quickly."/>
-        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Severe carburetor blockage. Engine runs very rough, stalls frequently, and struggles to maintain power."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Chiclés obstruidos. El motor ratea con frecuencia y pierde potencia, especialmente al acelerar bruscamente."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Obstrucción grave del carburador. El motor funciona muy irregular, se cala con frecuencia y le cuesta mantener la potencia."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Falta de combustible por carburador completamente obstruido. El motor no funcionará."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Carburador obstruido"/>
         <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Contaminación menor del sensor o desviación de calibración. El sistema automático de trillado es ligeramente menos eficiente, causando pérdidas mínimas de cultivo."/>
@@ -235,13 +215,10 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Caja de engranajes dañada o correa muy desgastada. El sinfín lucha por girar, operando a una velocidad muy baja."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="La correa de transmisión se rompió o la caja de engranajes se atascó. El sinfín de descarga está completamente atascado."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Sinfín de descarga atascado"/>
-
         <text name="ads_breakdowns_engine_stalled_message" text="Motor calado"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Marcha desengranada"/>
         <text name="ads_breakdown_at_progress_message" text="en progreso"/>
-        
         <text name="ads_cold_engine_message" text="¡Motor frío! ¡Las altas revoluciones causan desgaste!"/>
-
         <text name="ads_spec_this_month" text="Este mes"/>
         <text name="ads_spec_months_ago" text="meses atrás"/>
         <text name="ads_spec_never" text="Nunca"/>
@@ -261,15 +238,15 @@
         <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s hasta %s"/>
         <text name="ads_spec_service_interval_format" text="%s h/o"/>
-        <text name="ads_spec_maintenance_complete" text="completado"/>
-
-        <text name="ads_spec_inspection_issues_detected" text="%s problema(s) detectado(s)"/>
-        <text name="ads_spec_inspection_no_issues_detected" text="No se detectaron problemas"/>
-
+        <text name="ads_spec_maintenance_complete_notification" text="completado"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="cancelado"/>
+        <text name="ads_spec_inspection_issues_detected_notification" text="%s problema(s) detectado(s)"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="No se detectaron problemas"/>
+        <text name="ads_spec_next_planned_service_notification" text="%s realizado"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="El %s programado se canceló por fondos insuficientes"/>
         <text name="ads_spec_workshop_dealer" text="Distribuidor"/>
         <text name="ads_spec_workshop_own" text="Propio"/>
         <text name="ads_spec_workshop_mobile" text="Móvil"/>
-
         <text name="ads_spec_state_ready" text="Listo"/>
         <text name="ads_spec_state_inspection" text="Inspección"/>
         <text name="ads_spec_state_maintenance" text="Mantenimiento"/>
@@ -282,9 +259,10 @@
         <text name="ads_spec_state_bad" text="Malo"/>
         <text name="ads_spec_state_terrible" text="Pésimo"/>
         <text name="ads_spec_state_unknown" text="Desconocido"/>
-        <text name="ads_spec_state_not_required" text="No requerido"/>
-        <text name="ads_spec_state_required" text="Requerido"/>
+        <text name="ads_spec_state_optimal" text="Óptimo"/>
         <text name="ads_spec_state_recommended" text="Recomendado"/>
+        <text name="ads_spec_state_required" text="Requerido"/>
+        <text name="ads_spec_state_overdue" text="Atrasado"/>
         <text name="ads_spec_state_legendary" text="Legendario"/>
         <text name="ads_spec_state_premium" text="Premium"/>
         <text name="ads_spec_state_standart" text="Estándar"/>
@@ -296,5 +274,101 @@
         <text name="ads_spec_state_average" text="Medio"/>
         <text name="ads_spec_state_high" text="Alto"/>
         <text name="ads_spec_state_workhorse" text="Caballo de Batalla"/>
+        <text name="ads_spec_part_types_used" text="Usado"/>
+        <text name="ads_spec_part_types_aftermarket" text="Mercado de accesorios"/>
+        <text name="ads_spec_part_types_oem" text="OEM"/>
+        <text name="ads_spec_part_types_premium" text="De primera calidad"/>
+        <text name="ads_spec_inspection_visual" text="Visual"/>
+        <text name="ads_spec_inspection_standard" text="Estándar"/>
+        <text name="ads_spec_inspection_complete" text="Defectoscopia completa"/>
+        <text name="ads_spec_maintenance_minimal" text="Mínimo"/>
+        <text name="ads_spec_maintenance_standard" text="Estándar"/>
+        <text name="ads_spec_maintenance_extended" text="Extendido"/>
+        <text name="ads_spec_overhaul_partial" text="Parcial"/>
+        <text name="ads_spec_overhaul_standard" text="Estándar"/>
+        <text name="ads_spec_overhaul_full" text="Lleno"/>
+        <text name="ads_spec_repair_urgency_low" text="Prioridad baja"/>
+        <text name="ads_spec_repair_urgency_medium" text="Cola estándar"/>
+        <text name="ads_spec_repair_urgency_high" text="Urgente"/>
+        <text name="ads_option_menu_option_one_title_inspection" text="Seleccione el tipo de inspección"/>
+        <text name="ads_option_menu_option_two_title_inspection" text="Reparar fallas descubiertas"/>
+        <text name="ads_option_menu_option_one_title_maintenance" text="Seleccione el nivel de mantenimiento"/>
+        <text name="ads_option_menu_option_two_title_maintenance" text="Seleccione la calidad de los consumibles"/>
+        <text name="ads_option_menu_option_three_title_maintenance" text="Reparar fallas descubiertas"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Seleccione la urgencia de la reparación"/>
+        <text name="ads_option_menu_option_two_title_repair" text="Seleccione la calidad de los repuestos"/>
+        <text name="ads_option_menu_option_three_title_repair" text="Realizar mantenimiento después de la reparación."/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="Seleccionar alcance de trabajo"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="renovar pintura"/>
+        <text name="ads_option_menu_price_text" text="Precio: "/>
+        <text name="ads_option_menu_duration_text" text="Duración: "/>
+        <text name="ads_option_menu_finish_time_text" text="Hora de finalización: "/>
+        <text name="ads_option_menu_start_text" text="Iniciar"/>
+        <text name="ads_option_menu_duration_instant" text="Instante"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Comprobación externa rápida. Bajo costo y resultado inmediato. Detecta únicamente fallos graves (gravedad moderada+) y no proporciona datos sobre el estado técnico del vehículo."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* Procedimiento de diagnóstico de rutina. Identifica todas las averías activas y genera un informe general del estado del vehículo."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Diagnóstico profundo. Garantiza la detección de todas las fallas y proporciona un informe completo con porcentajes de salud exactos para todos los componentes."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="*Servicio básico. Significativamente más barato y más rápido, pero no restablece completamente el nivel de servicio."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="*Mantenimiento de rutina según especificaciones del fabricante. Restaura el nivel de servicio a la normalidad."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Servicio integral. Lleva más tiempo y cuesta más, pero aumenta el nivel de servicio en aproximadamente un 20 % adicional"/>
+        <text name="ads_option_menu_repair_urgency_low_description" text="* Trabajo de relleno cuando los mecánicos están libres. Tarda un 50% más, pero ofrece un 10% de descuento en mano de obra."/>
+        <text name="ads_option_menu_repair_urgency_medium_description" text="* Horario estándar del taller. Coste de mano de obra equilibrado y duración de la reparación."/>
+        <text name="ads_option_menu_repair_urgency_high_description" text="* Equipo de reparación de emergencia. Reduce el tiempo de inactividad en un 50%, pero aumenta el costo laboral en un 10%."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Restaura la condición al nivel normal y requiere menos tiempo y recursos que una revisión completa."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* Trabajo integral en todos los componentes principales. Restaura la condición a buen nivel."/>
+        <text name="ads_option_menu_overhaul_full_description" text="*Remanufactura completa. Alto costo y duración, pero restaura la condición a un nivel excelente."/>
+        <text name="ads_option_menu_part_used_description" text="*Piezas recuperadas. Muy barato, pero extremadamente riesgoso (~50% de probabilidad de defectos)"/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Copias económicas del mercado de accesorios. Coste reducido, pero conlleva un riesgo moderado de defectos (33%)."/>
+        <text name="ads_option_menu_part_oem_description" text="* Piezas del fabricante del equipo original. Fiabilidad estándar (10% de riesgo de defecto) a precio completo."/>
+        <text name="ads_option_menu_part_premium_description" text="* Piezas de rendimiento reforzadas. Caro, pero con estricto control de calidad (0% de riesgo de defectos)."/>
+        <text name="ads_option_menu_perform_repair" text="Reparar las averías encontradas."/>
+        <text name="ads_option_menu_perform_maintenance" text="Realizar mantenimiento después de la reparación."/>
+        <text name="ads_option_menu_perform_renew_paint" text="renovar pintura"/>
+        <text name="ads_report_header_title" text="Informe de inspección"/>
+        <text name="ads_report_state_optimal" text="Óptimo"/>
+        <text name="ads_report_state_normal" text="Normal"/>
+        <text name="ads_report_state_degraded" text="Degradado"/>
+        <text name="ads_report_state_impaired" text="Dañado"/>
+        <text name="ads_report_state_critical" text="Crítico"/>
+        <text name="ads_report_state_not_available" text="N / A"/>
+        <text name="ads_report_overall_assessment_condition" text="Nivel de condición"/>
+        <text name="ads_report_overall_assessment_service" text="Nivel de servicio"/>
+        <text name="ads_report_overall_assessment_mtbf" text="MTBF (horas)"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="Crítico. Riesgo de falla"/>
+        <text name="ads_report_overall_assessment_rul" text="Vida residual (horas)"/>
+        <text name="ads_report_overall_assessment_wear_rate" text="Tasa de desgaste (%/h)"/>
+        <text name="ads_report_overall_assessment_nominal_wear_rate" text="Tasa de desgaste nominal (%/h)"/>
+        <text name="ads_report_overall_assessment_wear_index" text="Índice de desgaste"/>
+        <text name="ads_report_system_condition_title" text="Condición del sistema"/>
+        <text name="ads_report_system_condition_power" text="Potencia actual"/>
+        <text name="ads_report_system_condition_brakes" text="Eficiencia de los frenos"/>
+        <text name="ads_report_system_condition_transmission" text="Eficiencia de transmisión"/>
+        <text name="ads_report_system_condition_harvest" text="Eficiencia de cosecha"/>
+        <text name="ads_report_system_condition_cooling" text="Eficiencia de enfriamiento"/>
+        <text name="ads_report_system_condition_cvt_cooling" text="Eficiencia de enfriamiento CVT"/>
+        <text name="ads_report_system_condition_consumption" text="Consumo de combustible"/>
+        <text name="ads_report_system_condition_hydraulic" text="Eficiencia hidráulica"/>
+        <text name="ads_report_system_symptoms_none" text="No se observaron síntomas anormales durante la inspección."/>
+        <text name="ads_report_system_symptoms_dark_exhaust" text="La opacidad del escape aumenta bajo carga."/>
+        <text name="ads_report_system_symptoms_turbo_grinding" text="El turbocompresor emite chirridos metálicos periódicos."/>
+        <text name="ads_report_system_symptoms_lights_flicker" text="El circuito de iluminación muestra un parpadeo intermitente."/>
+        <text name="ads_report_system_symptoms_lights_failure" text="La iluminación exterior no funciona."/>
+        <text name="ads_report_system_symptoms_engine_stalls" text="El motor se cala intermitentemente durante el funcionamiento."/>
+        <text name="ads_report_system_symptoms_start_failure" text="Hay un comportamiento repetido de arranque sin arranque."/>
+        <text name="ads_report_system_symptoms_idle_hunting" text="La velocidad de ralentí es inestable con fluctuaciones cíclicas de RPM."/>
+        <text name="ads_report_system_symptoms_engine_hesitation" text="La respuesta del acelerador muestra una vacilación transitoria bajo carga."/>
+        <text name="ads_report_system_symptoms_engine_failure" text="Condición de apagado del motor confirmada."/>
+        <text name="ads_report_system_symptoms_transmission_slip" text="El deslizamiento de la transmisión es evidente bajo carga."/>
+        <text name="ads_report_system_symptoms_gear_shift_failure" text="Los cambios de marcha intermitentemente no se completan."/>
+        <text name="ads_report_system_symptoms_gear_rejection" text="La transmisión ocasionalmente cae a neutral bajo carga."/>
+        <text name="ads_report_system_symptoms_powershift_lag_harsh" text="El compromiso de Powershift es demorado y severo."/>
+        <text name="ads_report_system_symptoms_unloading_speed" text="El rendimiento de descarga está por debajo del nominal."/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Fallos detectados. Reparar todas las fallas activas."/>
+        <text name="ads_report_recommendation_service_due" text="Se alcanzó el umbral del intervalo de servicio. Realizar mantenimiento."/>
+        <text name="ads_report_recommendation_service_urgent" text="Se ha violado el intervalo de servicio. ¡Realice mantenimiento urgentemente!"/>
+        <text name="ads_report_recommendation_overhaul" text="Se detectó degradación de los componentes centrales. Realizar una revisión."/>
+        <text name="ads_report_recommendation_operating_conditions" text="Se detectaron signos de uso excesivo intensivo. Mejorar las condiciones de operación."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="Se detectaron consumibles defectuosos. Repita el mantenimiento para reemplazar los componentes defectuosos."/>
+        <text name="ads_report_recommendation_all_ok" text="Sin recomendaciones críticas. El vehículo está en condiciones de funcionamiento."/>
     </texts>
 </l10n>
