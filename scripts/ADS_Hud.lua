@@ -263,7 +263,7 @@ function ADS_Hud:drawDashboard()
     local motorText = string.format("%.0f%%", math.max(motorLoad * 100, 0))
 
     local motorLoadTextColor = {1, 1, 1, 1}
-    if motorLoad > ADS_Config.CORE.MOTOR_OVERLOADED_THRESHOLD then
+    if motorLoad > ADS_Config.CORE.POWER_UNIT_SYSTEM_FACTORS_DATA.MOTOR_OVERLOADED_THRESHOLD then
         motorLoadTextColor = colors.WARNING
     end
 
@@ -450,7 +450,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         ), {0.75, 1, 0.85, 1}, 0.95)
     end
 
-    local bcw = ADS_Config.CORE.BASE_CONDITION_WEAR
+    local bcw = ADS_Config.CORE.BASE_SYSTEMS_WEAR
     local bsw = ADS_Config.CORE.BASE_SERVICE_WEAR
     local mf = spec.debugData.condition.motorLoadFactor * bcw
     local sf = spec.debugData.condition.expiredServiceFactor * bcw

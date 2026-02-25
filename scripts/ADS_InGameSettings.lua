@@ -175,7 +175,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
      local currentBreakdownPct = math.floor((1200 / ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF) * 100 + 0.5)
     setIndex(currentPage.ads_breakdownProbability, steps.breakdown.values, currentBreakdownPct)
     setIndex(currentPage.ads_serviceWear,       steps.serviceWear.values,    ADS_Config.CORE.BASE_SERVICE_WEAR)
-    setIndex(currentPage.ads_conditionWear,     steps.conditionWear.values,  ADS_Config.CORE.BASE_CONDITION_WEAR)
+    setIndex(currentPage.ads_conditionWear,     steps.conditionWear.values,  ADS_Config.CORE.BASE_SYSTEMS_WEAR)
     setIndex(currentPage.ads_maintenancePrice,    steps.maintPrice.values,    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER * 100)
     setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER * 100)
     setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, ADS_Config.THERMAL.ENGINE_MAX_HEAT)
@@ -203,7 +203,7 @@ function ADS_InGameSettings:onServiceWearChanged(state)
 end
 
 function ADS_InGameSettings:onConditionWearChanged(state)
-    ADS_Config.CORE.BASE_CONDITION_WEAR = ADS_InGameSettings.steps.conditionWear.values[state]
+    ADS_Config.CORE.BASE_SYSTEMS_WEAR = ADS_InGameSettings.steps.conditionWear.values[state]
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 

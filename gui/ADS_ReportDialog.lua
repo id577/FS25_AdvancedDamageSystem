@@ -253,7 +253,7 @@ function ADS_ReportDialog:updateScreen()
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_crit_fail_risk', critFailureRisk})
     
     -- wear rate
-    local wearRate = ADS_Config.CORE.BASE_CONDITION_WEAR
+    local wearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR
     local startOperatingTime = 0.0
     local startCondition = 1.0
     local currentOperatingTime = self.lastReport.conditionData.operatingHours or 0.0
@@ -275,7 +275,7 @@ function ADS_ReportDialog:updateScreen()
     local conditionDiff = math.max(startCondition - currentCondition, 0)
 
     if currentOperatingTime < 0.1 or operatingTimeDiff < 0.1 then 
-        wearRate = ADS_Config.CORE.BASE_CONDITION_WEAR
+        wearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR
     else
         wearRate = conditionDiff / operatingTimeDiff
     end
@@ -516,7 +516,7 @@ function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
     local minCrit = ADS_Config.CORE.BREAKDOWN_PROBABILITY.CRITICAL_MIN
     local maxCrit = ADS_Config.CORE.BREAKDOWN_PROBABILITY.CRITICAL_MAX
     local critDiff = maxCrit - minCrit
-    local rel = 1 / (ADS_Config.CORE.BASE_CONDITION_WEAR / spec.reliability)
+    local rel = 1 / (ADS_Config.CORE.BASE_SYSTEMS_WEAR / spec.reliability)
     local nominalWearRate = 1 / spec.reliability / 100
 
     local assessmentConfig = {

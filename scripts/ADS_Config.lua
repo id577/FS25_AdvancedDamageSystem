@@ -35,49 +35,44 @@ ADS_Config = {
         -- The base amount of 'Service' level decrease per real hour of engine operation.
         -- 'Service' represents consumables like oil and filters. Higher value means faster service wear.
         BASE_SERVICE_WEAR = 0.1, -- (0.1 = 10% wear per hour at base rate)
-
+        SERVICE_EXPIRED_THRESHOLD = 0.5,
         -- The base amount of 'Condition' level decrease per real hour of engine operation.
         -- 'Condition' represents the physical health of the vehicle's components.
         -- Higher value means faster condition degradation.
-        BASE_CONDITION_WEAR = 0.01, -- (0.01 = 1% wear per hour at base rate)
-
-        SYS_W = {eng=0.22, trn=0.16, hyd=0.12, col=0.12, ele=0.08, chs=0.10, wrk=0.08, flw=0.06, ene=0.06},
+        BASE_SYSTEMS_WEAR = 0.01, -- (0.01 = 1% wear per hour at base rate)
 
         DOWNTIME_MULTIPLIER = 0.0,
 
-        MOTOR_IDLING_MULTIPLIER = 0.5,
-        MOTOR_IDLING_THRESHOLD = 0.3,
-        -- --- Wear Multipliers (these add to the base wear rate) ---
+        SYSTEM_WEIGHTS = {
+            powerUnit=0.22, 
+            transmission=0.16, 
+            hydraullics=0.12, 
+            cooling=0.12, 
+            electrical=0.08, 
+            chassis=0.10, 
+            workProcess=0.08, 
+            materialFlow=0.06, 
+            energyStorage=0.06
+        },
 
-        -- The maximum penalty applied to CONDITION wear when the Service level is very low (e.g., 0%).
-        -- A value of 4.0 means condition can degrade up to 4x faster if service is neglected.
-        SERVICE_EXPIRED_MAX_MULTIPLIER = 10.0,
-        -- The Service level (from 1.0 to 0.0) below which the 'SERVICE_EXPIRED' penalty starts to apply.
-        SERVICE_EXPIRED_THRESHOLD = 0.5, -- (Penalty starts when service is below 50%)
+        POWER_UNIT_SYSTEM_FACTORS_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 10,
+            MOTOR_IDLING_MULTIPLIER = 0.5,
+            MOTOR_IDLING_THRESHOLD = 0.3,
+            MOTOR_OVERLOADED_MULTIPLIER = 1.0,
+            MOTOR_OVERLOADED_THRESHOLD = 0.95,
+            COLD_MOTOR_THRESHOLD = 50,
+            COLD_MOTOR_MULTIPLIER = 50.0,
+            OVERHEAT_MOTOR_MAX_MULTIPLIER = 50.0,
+            OVERHEAT_MOTOR_THRESHOLD = 95,
+        },
 
-        -- The maximum penalty applied to CONDITION wear when the motor is under heavy load.
-        MOTOR_OVERLOADED_MAX_MULTIPLIER = 1.0, -- (up to 1x extra wear)
-        -- The engine load percentage (from 0.0 to 1.0) above which the 'MOTOR_OVERLOADED' penalty applies.
-        MOTOR_OVERLOADED_THRESHOLD = 0.95, -- (Penalty starts when engine load is above 95%)
-
-        -- The maximum penalty for operating the engine under load while it's cold.
-        COLD_MOTOR_MAX_MULTIPLIER = 50.0, -- (up to 30x extra wear)
-        -- The engine temperature in Celsius below which it is considered "cold" and the penalty applies.
-        COLD_MOTOR_THRESHOLD = 50,
-
-        COLD_TRANSMISSION_MULTIPLIER = 50.0, -- (up to 30x extra wear)
-
-        COLD_TRANSMISSION_THRESHOLD = 55,
-
-        -- The maximum penalty for operating the engine while it's overheating.
-        OVERHEAT_MOTOR_MAX_MULTIPLIER = 50.0, -- (up to 30x extra wear)
-        -- The engine temperature in Celsius above which the 'OVERHEAT_MOTOR' penalty applies.
-        OVERHEAT_MOTOR_THRESHOLD = 95,
-
-        -- The maximum penalty for operating the transmission while it's overheating.
-        OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 50.0, -- (up to 30x extra wear)
-        -- The transmission temperature in Celsius above which the 'OVERHEAT_TRANSMISSION' penalty applies.
-        OVERHEAT_TRANSMISSION_THRESHOLD = 95,
+        TRANSMISSION_SYSTEM_FACTORS_DATA = {
+            COLD_TRANSMISSION_MULTIPLIER = 50.0,
+            COLD_TRANSMISSION_THRESHOLD = 55,
+            OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 50.0,
+            OVERHEAT_TRANSMISSION_THRESHOLD = 95,
+        },
 
         CVT_SHIFT_SPEED_THRESHOLD = 1.0,
         CVT_SHOCK_MULTIPLIER = 100.0,

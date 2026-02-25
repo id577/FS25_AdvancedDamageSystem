@@ -302,8 +302,9 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getConditionLevel", AdvancedDamageSystem.getConditionLevel)
     SpecializationUtil.registerFunction(vehicleType, "updateServiceLevel", AdvancedDamageSystem.updateServiceLevel)
     SpecializationUtil.registerFunction(vehicleType, "updateConditionLevel", AdvancedDamageSystem.updateConditionLevel)
-    SpecializationUtil.registerFunction(vehicleType, "updateConditionLevelCVTAddon", AdvancedDamageSystem.updateConditionLevelCVTAddon)
-    SpecializationUtil.registerFunction(vehicleType, "calculateWearRates", AdvancedDamageSystem.calculateWearRates)
+
+    SpecializationUtil.registerFunction(vehicleType, "updatePowerUnitSystem", AdvancedDamageSystem.updatePowerUnitSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateTransmissionSystem", AdvancedDamageSystem.updateTransmissionSystem)
     
     SpecializationUtil.registerFunction(vehicleType, "isUnderService", AdvancedDamageSystem.isUnderService)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
@@ -439,16 +440,17 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.serviceLevel = self.spec_AdvancedDamageSystem.baseServiceLevel
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
 
-    self.spec_AdvancedDamageSystem.powerUnitHealth = 1.0      
-    self.spec_AdvancedDamageSystem.transmissionHealth = 1.0
-    self.spec_AdvancedDamageSystem.hydraullicsHealth = 1.0
-    self.spec_AdvancedDamageSystem.coolingHealth = 1.0
-    self.spec_AdvancedDamageSystem.electricalHealth = 1.0
-    self.spec_AdvancedDamageSystem.chassisHealth = 1.0
-    self.spec_AdvancedDamageSystem.workProcessModuleHealth = 1.0
-    self.spec_AdvancedDamageSystem.materialFlowModuleHealth = 1.0
-    self.spec_AdvancedDamageSystem.energyStorage = 1.0
-
+    self.spec_AdvancedDamageSystem.systems = {
+        powerUnit = 1.0,
+        transmission = 1.0,
+        hydraullics = 1.0,
+        cooling = 1.0,
+        electrical = 1.0,
+        chassis = 1.0,
+        workProcess = 1.0,
+        materialFlow = 1.0,
+        energyStorage = 1.0
+    }
 
     self.spec_AdvancedDamageSystem.extraConditionWear = 0
     self.spec_AdvancedDamageSystem.extraServiceWear = 0
@@ -507,25 +509,22 @@ function AdvancedDamageSystem:onLoad(savegame)
         service = {
             totalWearRate = 0
         },
-        condition = {
-            totalWearRate = 0,
-            motorLoadFactor = 0,
-            expiredServiceFactor = 0,
+        condition = 0,
+
+        powerUnitSystem = {
+            totalWearRate = 0, 
+            motorLoadFactor = 0, 
+            expiredServiceFactor = 0, 
+            coldMotorFactor = 0, 
+            hotMotorFactor = 0
+        },
+
+        transmissionSystem = {
+            totalWearRate = 0, 
+            expiredServiceFactor = 0, 
             coldMotorFactor = 0,
-            hotMotorFactor = 0,
-            coldTransFactor = 0,
-            hotTransFactor = 0
         },
-        cvtAddon = {
-            warnheat = 0,
-            warndamage = 0,
-            critheat = 0,
-            critdamage = 0,
-            highpressure = 0,
-            totalWearRate = 0,
-            reducedAmount = 0,
-            resetTimer = 0
-        },
+
         breakdown = {
             failureChancePerFrame = 0,
             criticalOutcomeChance = 0,
@@ -986,7 +985,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- Cold engine message
-    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
+    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.POWER_UNIT_SYSTEM_FACTORS_DATA.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
             local spec_motorized = self.spec_motorized
             local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
             local maxRpm = spec_motorized.motor.maxRpm
@@ -1040,13 +1039,18 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     if self:isUnderService() then
         self:processService(dt)
     else
-        local serviceWearRate, conditionWearRate = self:calculateWearRates()
         if self:getIsOperating() and self.propertyState ~= 4 then
             self:processBreakdowns(dt)
-            self:checkForNewBreakdown(dt, conditionWearRate)
+            self:checkForNewBreakdown(dt)
         end
-        self:updateConditionLevel(conditionWearRate, dt)
-        self:updateServiceLevel(serviceWearRate, dt)
+        -- service
+        self:updateServiceLevel(dt)
+        -- systems
+        self:updatePowerUnitSystem(dt)
+        self:updateTransmissionSystem(dt)
+
+        --condtition
+        self:updateConditionLevel(dt)
     end
 end
 
@@ -1261,279 +1265,33 @@ end
 
 -- ==========================================================
 --                      CORE FUNCTIONS
--- ==========================================================
+-- =========================================================
 
-------------------- temperatures -------------------
-
-function AdvancedDamageSystem:updateThermalSystems(dt)
-    local motor = self:getMotor()
-    if not motor then return end
-
+-- service
+function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
-    
-    local isMotorStarted = self:getIsMotorStarted()
-    local motorLoad = math.max(self:getMotorLoadPercentage(), 0.0)
-    local motorRpm = self:getMotorRpmPercentage()
-    local speed = self:getLastSpeed()
-    local dirt = self:getDirtAmount()
-    local eviromentTemp = g_currentMission.environment.weather.forecast:getCurrentWeather().temperature
-    
-    local speedCooling = 0
-    local C = ADS_Config.THERMAL
-    if speed > C.SPEED_COOLING_MIN_SPEED then
-        local speedRatio = math.min((speed - C.SPEED_COOLING_MIN_SPEED) / (C.SPEED_COOLING_MAX_SPEED - C.SPEED_COOLING_MIN_SPEED), 1.0)
-        speedCooling = C.SPEED_COOLING_MAX_EFFECT * speedRatio
-    end
-
-    if spec.engineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.engineTemperature = eviromentTemp end
-    if spec.rawEngineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawEngineTemperature = eviromentTemp end
-    if vehicleHaveCVT then
-        if spec.transmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.transmissionTemperature = eviromentTemp end
-        if spec.rawTransmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
-    end
-
-    if not spec.isElectricVehicle then 
-        self:updateEngineThermalModel(dt, spec, isMotorStarted, motorLoad, speedCooling, eviromentTemp, dirt)
-    end
-    
-    if vehicleHaveCVT then
-        self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
-    else
-        spec.transmissionTemperature = -99
-        spec.rawTransmissionTemperature = -99
-    end
+    local newLevel = spec.serviceLevel - ADS_Config.CORE.BASE_SERVICE_WEAR / (60 * 60 * 1000) * dt
+    spec.serviceLevel = math.max(newLevel, 0)
 end
 
+-- condition
+function AdvancedDamageSystem:updateConditionLevel()
+    local spec = self.spec_AdvancedDamageSystem
+    local condition = 0
 
-function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted, motorLoad, speedCooling, eviromentTemp, dirt)
-    local C = ADS_Config.THERMAL
-    local heat, cooling = 0, 0
-    local radiatorCooling, convectionCooling = 0, 0
-    
-    local deltaTemp = math.max(0, spec.rawEngineTemperature - eviromentTemp)
-    convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
-
-    if isMotorStarted then
-        heat = C.ENGINE_MIN_HEAT + motorLoad * (C.ENGINE_MAX_HEAT - C.ENGINE_MIN_HEAT)
-        
-        local dirtRadiatorMaxCooling = C.ENGINE_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
-        radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
-        cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
-    else
-        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
-            cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
-        else
-            cooling = convectionCooling
-        end
+    for system, health in pairs(spec.systems) do
+        condition = condition + health * (ADS_Config.CORE.SYSTEM_WEIGHTS[system] or 0)
     end
-    
-    local alpha = dt / (C.TAU + dt)
-
-    spec.rawEngineTemperature = spec.rawEngineTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
-    spec.rawEngineTemperature = math.max(spec.rawEngineTemperature, eviromentTemp)
-    spec.engineTemperature = math.max(spec.engineTemperature + alpha * (spec.rawEngineTemperature - spec.engineTemperature), eviromentTemp)
-    
-    local dbg = spec.debugData.engineTemp
-
-    if isMotorStarted and spec.engineTemperature > C.ENGINE_THERMOSTAT_MIN_TEMP then
-        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
-    else
-        spec.thermostatState = 0.0
-        spec.engTermPID.integral = 0
-        spec.engTermPID.lastError = 0
-        
-        dbg.kp = 0
-        dbg.stiction = 0
-        dbg.waxSpeed = 0
-    end
-
-    dbg.totalHeat = heat
-    dbg.totalCooling = cooling
-    dbg.radiatorCooling = radiatorCooling
-    dbg.speedCooling = speedCooling
-    dbg.convectionCooling = convectionCooling
-
-    return dbg 
+    spec.conditionLevel = math.clamp(condition, 0.001, 1.0)
 end
 
-
-function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
-    local C = ADS_Config.THERMAL
-    local heat, cooling = 0, 0
-    local radiatorCooling, convectionCooling = 0, 0
-    local motor = self:getMotor()
-    
-    local dbg = spec.debugData.transmissionTemp
-
-    local loadFactor = motorLoad - motor.motorExternalTorque / motor.peakMotorTorque
-    local slipFactor = 1.0
-    local accFactor = 1.0
-    local speedLimit = math.huge
-    
-    local deltaTemp = math.max(0, spec.rawTransmissionTemperature - eviromentTemp)
-    convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
-
-    if isMotorStarted then
-        if (self:getAccelerationAxis() > 0 or self:getCruiseControlAxis() > 0) then
-            accFactor = math.max(5 * motorRpm * math.max(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0), 1.0)
-
-            if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
-                for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
-                    if implementData.object ~= nil then
-                        local implement = implementData.object
-                        local currentSpeedLimit = implement.speedLimit
-                        if currentSpeedLimit ~= nil and implement:getIsLowered() then
-                            if currentSpeedLimit < speedLimit then
-                                speedLimit = currentSpeedLimit
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        if speedLimit ~= math.huge then 
-            if self:getCruiseControlState() ~= 0 then
-                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
-            end
-            slipFactor = 1 + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2
-        end
-        heat = C.TRANS_MIN_HEAT + (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor
-        local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
-        
-        radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
-        cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)
-    else
-        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
-            cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
-        else
-            cooling = convectionCooling
-        end
-    end
-
-    local alpha = dt / (C.TAU + dt)
-    spec.rawTransmissionTemperature = spec.rawTransmissionTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
-    spec.rawTransmissionTemperature = math.max(spec.rawTransmissionTemperature, eviromentTemp)
-    spec.transmissionTemperature = math.max(spec.transmissionTemperature + alpha * (spec.rawTransmissionTemperature - spec.transmissionTemperature), eviromentTemp)
-
-    if isMotorStarted and spec.transmissionTemperature > C.TRANS_THERMOSTAT_MIN_TEMP then
-        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
-    else
-        spec.transmissionThermostatState = 0.0
-        spec.transTermPID.integral = 0
-        spec.transTermPID.lastError = 0
-        
-        if dbg then
-            dbg.kp = 0
-            dbg.stiction = 0
-            dbg.waxSpeed = 0
-        end
-    end
-    
-    if dbg then
-        dbg.totalHeat = heat
-        dbg.totalCooling = cooling
-        dbg.radiatorCooling = radiatorCooling
-        dbg.speedCooling = speedCooling
-        dbg.convectionCooling = convectionCooling
-        dbg.loadFactor = loadFactor
-        dbg.slipFactor = slipFactor
-        dbg.accFactor = accFactor
-    end
-
-    return dbg
-end
-
-
-function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth, year, stuckedPosition, debugData)
-
-    if stuckedPosition ~= nil then
-        return stuckedPosition
-    end
-    
-    local C = ADS_Config.THERMAL
-    local dtSeconds = math.max(dt / 1000, 0.001)
-
-    local isMechanical = year < C.THERMOSTAT_TYPE_YEAR_DIVIDER
-    local targetPos = 0
-    local maxOpening = 1.0
-    
-    if isMechanical then
-        local startOpenTemp = C.PID_TARGET_TEMP - 10 
-        local fullOpenTemp = C.PID_TARGET_TEMP + 3  
-        targetPos = (currentTemp - startOpenTemp) / (fullOpenTemp - startOpenTemp)
-        pidData.integral = 0
-        pidData.lastError = 0
-        if debugData then debugData.kp = 0 end
-    else
-        local pidKpYearFactor = (year - C.THERMOSTAT_TYPE_YEAR_DIVIDER) / (C.ELECTRONIC_THERMOSTAT_MAX_YEAR - C.THERMOSTAT_TYPE_YEAR_DIVIDER)
-        local pid_kp = math.clamp(C.PID_KP_MIN + (C.PID_KP_MAX - C.PID_KP_MIN) * pidKpYearFactor, C.PID_KP_MIN, C.PID_KP_MAX)
-        local errorTemp = currentTemp - C.PID_TARGET_TEMP
-        
-        local derivative = 0
-        if dtSeconds > 0.001 then
-            derivative = (errorTemp - (pidData.lastError or 0)) / dtSeconds
-        end
-        
-        local newIntegral = (pidData.integral or 0) + errorTemp * dtSeconds
-        local controlSignal = pid_kp * errorTemp + C.PID_KI * newIntegral + C.PID_KD * derivative
-        
-        if (controlSignal >= 0 and controlSignal <= maxOpening) or 
-           (controlSignal < 0 and errorTemp > 0) or 
-           (controlSignal > maxOpening and errorTemp < 0) then
-            
-            pidData.integral = math.clamp(newIntegral, -C.PID_MAX_INTEGRAL, C.PID_MAX_INTEGRAL)
-        end
-        
-        targetPos = pid_kp * errorTemp + C.PID_KI * pidData.integral + C.PID_KD * derivative
-        pidData.lastError = errorTemp
-        
-        if debugData then debugData.kp = pid_kp end
-    end
-
-    targetPos = math.clamp(targetPos, 0.0, maxOpening)
-
-    local baseSpeed = isMechanical and C.MECHANIC_THERMOSTAT_MIN_WAX_SPEED or C.ELECTRONIC_THERMOSTAT_MIN_WAX_SPEED
-    local yearFactor = isMechanical and (year - 1950) * 0.0005 or (year - 2000) * 0.0016
-    
-    local waxSpeed = math.clamp(baseSpeed + yearFactor, C.MECHANIC_THERMOSTAT_MIN_WAX_SPEED, C.ELECTRONIC_THERMOSTAT_MAX_WAX_SPEED)
-    waxSpeed = waxSpeed * math.max(0.2, thermostatHealth)
-
-    local currentMechPos = pidData.mechPos or 0.0 
-    local delta = targetPos - currentMechPos
-    local maxMove = waxSpeed * dtSeconds
-        
-    if math.abs(delta) > maxMove then
-        delta = maxMove * (delta > 0 and 1 or -1)
-    end
-        
-    local newPos = math.clamp(currentMechPos + delta, 0.0, maxOpening)
-    pidData.mechPos = newPos
-
-    local baseStiction = isMechanical and (0.1 - (year - 1950) * 0.0016) or (0.05 - (year - 2000) * 0.0016)
-    local stiction = math.clamp(baseStiction, 0.01, 0.1)
-    
-    stiction = stiction * (2 - math.max(0.5, thermostatHealth))
-    
-    if debugData then
-        debugData.stiction = stiction
-        debugData.waxSpeed = waxSpeed
-    end
-
-    return math.clamp(math.floor(newPos / stiction) * stiction, 0.0, maxOpening)
-end
-
-------------------- service and condition-------------------
-
-function AdvancedDamageSystem:calculateWearRates()
+-- power unit
+function AdvancedDamageSystem:updatePowerUnitSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
-    local C = ADS_Config.CORE
-    local conditionWearRate = 1.0
-    local serviceWearRate = 1.0
-    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0
-    local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+    local C = ADS_Config.CORE.POWER_UNIT_SYSTEM_FACTORS_DATA
+    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor = 0, 0, 0, 0, 0, 0
+    local wearRate = 1.0
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1545,119 +1303,108 @@ function AdvancedDamageSystem:calculateWearRates()
         if motorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
             motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, C.MOTOR_OVERLOADED_THRESHOLD, false)
             motorLoadFactor = motorLoadFactor * C.MOTOR_OVERLOADED_MAX_MULTIPLIER
-            conditionWearRate = conditionWearRate + motorLoadFactor
+            wearRate = wearRate + motorLoadFactor
         end
 
         -- service
         if self:getServiceLevel() < C.SERVICE_EXPIRED_THRESHOLD then
             expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_THRESHOLD, true)
             expiredServiceFactor = expiredServiceFactor * C.SERVICE_EXPIRED_MAX_MULTIPLIER
-            conditionWearRate = conditionWearRate + expiredServiceFactor
+            wearRate = wearRate + expiredServiceFactor
         end
 
-        -- engine temperature
+        -- engine cold
         if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldMotorFactor = coldMotorFactor * C.COLD_MOTOR_MAX_MULTIPLIER * motorLoadInf
-            conditionWearRate = conditionWearRate + coldMotorFactor
+            wearRate = wearRate + coldMotorFactor
 
+        -- engine overheating
         elseif spec.engineTemperature > C.OVERHEAT_MOTOR_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
             hotMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_MOTOR_THRESHOLD, false, 120)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.3, false)
             hotMotorFactor = hotMotorFactor * C.OVERHEAT_MOTOR_MAX_MULTIPLIER * motorLoadInf
-            conditionWearRate = conditionWearRate + hotMotorFactor
+            wearRate = wearRate + hotMotorFactor
         end
+        
+        -- TO-DO: any engine breakdowns increase wearRate
+        -- TO-DO: critical failure at 0 health
 
-        -- cvt temperature
+        -- idling
+        if motorLoad < C.MOTOR_IDLING_THRESHOLD and self:getLastSpeed() < 0.003 then
+            wearRate = wearRate * C.MOTOR_IDLING_MULTIPLIER
+        end
+    else
+        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+    end
+        wearRate = wearRate  / spec.reliability
+
+    spec.systems.powerUnit = spec.systems.powerUnit - wearRate * ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
+
+    if ADS_Config.DEBUG then
+        spec.debugData.powerUnitSystem = {totalWearRate = wearRate, motorLoadFactor = motorLoadFactor, expiredServiceFactor = expiredServiceFactor, coldMotorFactor = coldMotorFactor, hotMotorFactor = hotMotorFactor}
+    end
+
+end
+
+-- transmission
+function AdvancedDamageSystem:updateTransmissionSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local spec_motorized = self.spec_motorized
+    local C = ADS_Config.CORE.TRANSMISSION_SYSTEM_FACTORS_DATA
+    local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+    local coldTransFactor, hotTransFactor = 0, 0
+    local wearRate = 1.0
+
+    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+        local motorLoad = self:getMotorLoadPercentage()
+        local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
+        local maxRpm = spec_motorized.motor.maxRpm
+        local rpmLoad = lastRpm / maxRpm
+
         if vehicleHaveCVT then
             if spec.transmissionTemperature < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
                 coldTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.COLD_TRANSMISSION_THRESHOLD, true)
                 local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
                 coldTransFactor = coldTransFactor * C.COLD_TRANSMISSION_MULTIPLIER * motorLoadInf
-                conditionWearRate = conditionWearRate + coldTransFactor
+                wearRate = wearRate + coldTransFactor
 
             elseif spec.transmissionTemperature > C.OVERHEAT_TRANSMISSION_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
                 local transTemp = spec.transmissionTemperature
                 hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(transTemp, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
                 local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
                 hotTransFactor = hotTransFactor * C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER * motorLoadInf
-                conditionWearRate = conditionWearRate + hotTransFactor
-            end
-        end
-
-        -- idling
-        if motorLoad < C.MOTOR_IDLING_THRESHOLD and self:getLastSpeed() < 0.003 then
-            conditionWearRate = conditionWearRate * C.MOTOR_IDLING_MULTIPLIER
-            serviceWearRate = serviceWearRate * C.MOTOR_IDLING_MULTIPLIER
-        end
-    else
-        conditionWearRate = C.DOWNTIME_MULTIPLIER
-        serviceWearRate = C.DOWNTIME_MULTIPLIER
-    end
-
-    conditionWearRate = (conditionWearRate + spec.extraConditionWear) / spec.reliability
-    serviceWearRate = (serviceWearRate + spec.extraServiceWear) / spec.reliability
-    
-    if ADS_Config.DEBUG then
-        spec.debugData.condition = {totalWearRate = conditionWearRate, motorLoadFactor = motorLoadFactor, expiredServiceFactor = expiredServiceFactor, coldMotorFactor = coldMotorFactor, hotMotorFactor = hotMotorFactor, coldTransFactor = coldTransFactor, hotTransFactor = hotTransFactor}
-        spec.debugData.service.totalWearRate = serviceWearRate
-    end
-    return serviceWearRate, conditionWearRate
-end
-
-function AdvancedDamageSystem:updateServiceLevel(wearRate, dt)
-    local spec = self.spec_AdvancedDamageSystem
-    local newLevel = spec.serviceLevel - (wearRate * ADS_Config.CORE.BASE_SERVICE_WEAR / (60 * 60 * 1000) * dt)
-    spec.serviceLevel = math.max(newLevel, 0)
-end
-
-function AdvancedDamageSystem:updateConditionLevel(wearRate, dt)
-    local spec = self.spec_AdvancedDamageSystem
-    local newLevel = spec.conditionLevel - (wearRate * ADS_Config.CORE.BASE_CONDITION_WEAR / (60 * 60 * 1000) * dt)
-    spec.conditionLevel = math.clamp(newLevel, 0.001, 1)
-end
-
-function AdvancedDamageSystem:updateConditionLevelCVTAddon(wearRate, amount, dt)
-    local spec = self.spec_AdvancedDamageSystem
-    if wearRate ~= nil and wearRate > 0 then
-        local newLevel = spec.conditionLevel - (wearRate * ADS_Config.CORE.BASE_CONDITION_WEAR / (60 * 60 * 1000) * dt)
-        spec.conditionLevel = math.clamp(newLevel, 0.001, 1)
-    end
-    if amount ~= nil and amount > 0 then
-        local newLevel = spec.conditionLevel - amount
-        spec.conditionLevel = math.clamp(newLevel, 0.001, 1)
-        spec.debugData.cvtAddon.reducedAmount = amount
-    end
-
-    if ADS_Config.DEBUG then
-        local cvtSpec = self.spec_CVTaddon
-        spec.debugData.cvtAddon = {
-            warnheat = cvtSpec.forDBL_warnheat,
-            warndamage = cvtSpec.forDBL_warndamage,
-            critheat = cvtSpec.forDBL_critheat,
-            critdamage = cvtSpec.forDBL_critdamage,
-            highpressure = cvtSpec.forDBL_highpressure,
-            totalWearRate = wearRate or 0.0,
-            reducedAmount = spec.debugData.cvtAddon.reducedAmount,
-            resetTimer = spec.debugData.cvtAddon.resetTimer,
-        }
-
-        if spec.debugData.cvtAddon.reducedAmount > 0 then
-            local resetTimer = spec.debugData.cvtAddon.resetTimer + dt
-            if resetTimer >= 5000 then
-                spec.debugData.cvtAddon.reducedAmount = 0
-                spec.debugData.cvtAddon.resetTimer = 0
-            else
-                spec.debugData.cvtAddon.resetTimer = resetTimer
+                wearRate = wearRate + hotTransFactor
             end
         end
     end
+
+    wearRate = wearRate  / spec.reliability
+    spec.systems.transmission = spec.systems.powerUnit - wearRate * ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
+
+    if ADS_Config.DEBUG then
+        spec.debugData.transmissionSystem = {totalWearRate = wearRate, expiredServiceFactor = coldTransFactor, coldMotorFactor = hotTransFactor}
+    end
 end
+
+-- TO-DO: updateHydraulicsSystem
+
+-- TO-DO: updateCoolingSystem
+
+-- TO-DO: updateElecticalSystem
+
+-- TO-DO: updateChassisSytem
+
+-- TO-DO: updateEnergyStorageSystem
+
+-- TO-DO: updateWorkProcessSystem
+
+-- TO-DO: updateMaterialFlowSystem
 
 ---------------------- breakdowns ----------------------
 
-function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
+function AdvancedDamageSystem:checkForNewBreakdown(dt)
     local spec = self.spec_AdvancedDamageSystem
     if not spec or dt == 0 then
         return
@@ -1667,9 +1414,9 @@ function AdvancedDamageSystem:checkForNewBreakdown(dt, conditionWearRate)
 
     local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(self:getConditionLevel(), probability, dt)
     if self:getFormattedOperatingTime() > probability.VEHICLE_HONEYMOON_HOURS then
-        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability) * conditionWearRate, minFailureChancePerFrame)
+        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability), minFailureChancePerFrame)
     else
-        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability) * conditionWearRate - failureChancePerFrame * ((probability.VEHICLE_HONEYMOON_HOURS - self:getFormattedOperatingTime()) / probability.VEHICLE_HONEYMOON_HOURS), minFailureChancePerFrame)
+        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability) - failureChancePerFrame * ((probability.VEHICLE_HONEYMOON_HOURS - self:getFormattedOperatingTime()) / probability.VEHICLE_HONEYMOON_HOURS), minFailureChancePerFrame)
     end
 
     local random = math.random()
@@ -2639,6 +2386,269 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
     }
 
     table.insert(spec.maintenanceLog, entry)
+end
+
+-- ==========================================================
+--                       THERMAL
+-- ==========================================================
+
+function AdvancedDamageSystem:updateThermalSystems(dt)
+    local motor = self:getMotor()
+    if not motor then return end
+
+    local spec = self.spec_AdvancedDamageSystem
+    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+    
+    local isMotorStarted = self:getIsMotorStarted()
+    local motorLoad = math.max(self:getMotorLoadPercentage(), 0.0)
+    local motorRpm = self:getMotorRpmPercentage()
+    local speed = self:getLastSpeed()
+    local dirt = self:getDirtAmount()
+    local eviromentTemp = g_currentMission.environment.weather.forecast:getCurrentWeather().temperature
+    
+    local speedCooling = 0
+    local C = ADS_Config.THERMAL
+    if speed > C.SPEED_COOLING_MIN_SPEED then
+        local speedRatio = math.min((speed - C.SPEED_COOLING_MIN_SPEED) / (C.SPEED_COOLING_MAX_SPEED - C.SPEED_COOLING_MIN_SPEED), 1.0)
+        speedCooling = C.SPEED_COOLING_MAX_EFFECT * speedRatio
+    end
+
+    if spec.engineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.engineTemperature = eviromentTemp end
+    if spec.rawEngineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawEngineTemperature = eviromentTemp end
+    if vehicleHaveCVT then
+        if spec.transmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.transmissionTemperature = eviromentTemp end
+        if spec.rawTransmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
+    end
+
+    if not spec.isElectricVehicle then 
+        self:updateEngineThermalModel(dt, spec, isMotorStarted, motorLoad, speedCooling, eviromentTemp, dirt)
+    end
+    
+    if vehicleHaveCVT then
+        self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
+    else
+        spec.transmissionTemperature = -99
+        spec.rawTransmissionTemperature = -99
+    end
+end
+
+
+function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted, motorLoad, speedCooling, eviromentTemp, dirt)
+    local C = ADS_Config.THERMAL
+    local heat, cooling = 0, 0
+    local radiatorCooling, convectionCooling = 0, 0
+    
+    local deltaTemp = math.max(0, spec.rawEngineTemperature - eviromentTemp)
+    convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
+
+    if isMotorStarted then
+        heat = C.ENGINE_MIN_HEAT + motorLoad * (C.ENGINE_MAX_HEAT - C.ENGINE_MIN_HEAT)
+        
+        local dirtRadiatorMaxCooling = C.ENGINE_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
+        radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
+        cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
+    else
+        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
+            cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
+        else
+            cooling = convectionCooling
+        end
+    end
+    
+    local alpha = dt / (C.TAU + dt)
+
+    spec.rawEngineTemperature = spec.rawEngineTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
+    spec.rawEngineTemperature = math.max(spec.rawEngineTemperature, eviromentTemp)
+    spec.engineTemperature = math.max(spec.engineTemperature + alpha * (spec.rawEngineTemperature - spec.engineTemperature), eviromentTemp)
+    
+    local dbg = spec.debugData.engineTemp
+
+    if isMotorStarted and spec.engineTemperature > C.ENGINE_THERMOSTAT_MIN_TEMP then
+        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
+    else
+        spec.thermostatState = 0.0
+        spec.engTermPID.integral = 0
+        spec.engTermPID.lastError = 0
+        
+        dbg.kp = 0
+        dbg.stiction = 0
+        dbg.waxSpeed = 0
+    end
+
+    dbg.totalHeat = heat
+    dbg.totalCooling = cooling
+    dbg.radiatorCooling = radiatorCooling
+    dbg.speedCooling = speedCooling
+    dbg.convectionCooling = convectionCooling
+
+    return dbg 
+end
+
+
+function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
+    local C = ADS_Config.THERMAL
+    local heat, cooling = 0, 0
+    local radiatorCooling, convectionCooling = 0, 0
+    local motor = self:getMotor()
+    
+    local dbg = spec.debugData.transmissionTemp
+
+    local loadFactor = motorLoad - motor.motorExternalTorque / motor.peakMotorTorque
+    local slipFactor = 1.0
+    local accFactor = 1.0
+    local speedLimit = math.huge
+    
+    local deltaTemp = math.max(0, spec.rawTransmissionTemperature - eviromentTemp)
+    convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
+
+    if isMotorStarted then
+        if (self:getAccelerationAxis() > 0 or self:getCruiseControlAxis() > 0) then
+            accFactor = math.max(5 * motorRpm * math.max(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0), 1.0)
+
+            if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
+                for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
+                    if implementData.object ~= nil then
+                        local implement = implementData.object
+                        local currentSpeedLimit = implement.speedLimit
+                        if currentSpeedLimit ~= nil and implement:getIsLowered() then
+                            if currentSpeedLimit < speedLimit then
+                                speedLimit = currentSpeedLimit
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if speedLimit ~= math.huge then 
+            if self:getCruiseControlState() ~= 0 then
+                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
+            end
+            slipFactor = 1 + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2
+        end
+        heat = C.TRANS_MIN_HEAT + (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor
+        local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
+        
+        radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
+        cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)
+    else
+        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
+            cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
+        else
+            cooling = convectionCooling
+        end
+    end
+
+    local alpha = dt / (C.TAU + dt)
+    spec.rawTransmissionTemperature = spec.rawTransmissionTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
+    spec.rawTransmissionTemperature = math.max(spec.rawTransmissionTemperature, eviromentTemp)
+    spec.transmissionTemperature = math.max(spec.transmissionTemperature + alpha * (spec.rawTransmissionTemperature - spec.transmissionTemperature), eviromentTemp)
+
+    if isMotorStarted and spec.transmissionTemperature > C.TRANS_THERMOSTAT_MIN_TEMP then
+        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
+    else
+        spec.transmissionThermostatState = 0.0
+        spec.transTermPID.integral = 0
+        spec.transTermPID.lastError = 0
+        
+        if dbg then
+            dbg.kp = 0
+            dbg.stiction = 0
+            dbg.waxSpeed = 0
+        end
+    end
+    
+    if dbg then
+        dbg.totalHeat = heat
+        dbg.totalCooling = cooling
+        dbg.radiatorCooling = radiatorCooling
+        dbg.speedCooling = speedCooling
+        dbg.convectionCooling = convectionCooling
+        dbg.loadFactor = loadFactor
+        dbg.slipFactor = slipFactor
+        dbg.accFactor = accFactor
+    end
+
+    return dbg
+end
+
+
+function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth, year, stuckedPosition, debugData)
+
+    if stuckedPosition ~= nil then
+        return stuckedPosition
+    end
+    
+    local C = ADS_Config.THERMAL
+    local dtSeconds = math.max(dt / 1000, 0.001)
+
+    local isMechanical = year < C.THERMOSTAT_TYPE_YEAR_DIVIDER
+    local targetPos = 0
+    local maxOpening = 1.0
+    
+    if isMechanical then
+        local startOpenTemp = C.PID_TARGET_TEMP - 10 
+        local fullOpenTemp = C.PID_TARGET_TEMP + 3  
+        targetPos = (currentTemp - startOpenTemp) / (fullOpenTemp - startOpenTemp)
+        pidData.integral = 0
+        pidData.lastError = 0
+        if debugData then debugData.kp = 0 end
+    else
+        local pidKpYearFactor = (year - C.THERMOSTAT_TYPE_YEAR_DIVIDER) / (C.ELECTRONIC_THERMOSTAT_MAX_YEAR - C.THERMOSTAT_TYPE_YEAR_DIVIDER)
+        local pid_kp = math.clamp(C.PID_KP_MIN + (C.PID_KP_MAX - C.PID_KP_MIN) * pidKpYearFactor, C.PID_KP_MIN, C.PID_KP_MAX)
+        local errorTemp = currentTemp - C.PID_TARGET_TEMP
+        
+        local derivative = 0
+        if dtSeconds > 0.001 then
+            derivative = (errorTemp - (pidData.lastError or 0)) / dtSeconds
+        end
+        
+        local newIntegral = (pidData.integral or 0) + errorTemp * dtSeconds
+        local controlSignal = pid_kp * errorTemp + C.PID_KI * newIntegral + C.PID_KD * derivative
+        
+        if (controlSignal >= 0 and controlSignal <= maxOpening) or 
+           (controlSignal < 0 and errorTemp > 0) or 
+           (controlSignal > maxOpening and errorTemp < 0) then
+            
+            pidData.integral = math.clamp(newIntegral, -C.PID_MAX_INTEGRAL, C.PID_MAX_INTEGRAL)
+        end
+        
+        targetPos = pid_kp * errorTemp + C.PID_KI * pidData.integral + C.PID_KD * derivative
+        pidData.lastError = errorTemp
+        
+        if debugData then debugData.kp = pid_kp end
+    end
+
+    targetPos = math.clamp(targetPos, 0.0, maxOpening)
+
+    local baseSpeed = isMechanical and C.MECHANIC_THERMOSTAT_MIN_WAX_SPEED or C.ELECTRONIC_THERMOSTAT_MIN_WAX_SPEED
+    local yearFactor = isMechanical and (year - 1950) * 0.0005 or (year - 2000) * 0.0016
+    
+    local waxSpeed = math.clamp(baseSpeed + yearFactor, C.MECHANIC_THERMOSTAT_MIN_WAX_SPEED, C.ELECTRONIC_THERMOSTAT_MAX_WAX_SPEED)
+    waxSpeed = waxSpeed * math.max(0.2, thermostatHealth)
+
+    local currentMechPos = pidData.mechPos or 0.0 
+    local delta = targetPos - currentMechPos
+    local maxMove = waxSpeed * dtSeconds
+        
+    if math.abs(delta) > maxMove then
+        delta = maxMove * (delta > 0 and 1 or -1)
+    end
+        
+    local newPos = math.clamp(currentMechPos + delta, 0.0, maxOpening)
+    pidData.mechPos = newPos
+
+    local baseStiction = isMechanical and (0.1 - (year - 1950) * 0.0016) or (0.05 - (year - 2000) * 0.0016)
+    local stiction = math.clamp(baseStiction, 0.01, 0.1)
+    
+    stiction = stiction * (2 - math.max(0.5, thermostatHealth))
+    
+    if debugData then
+        debugData.stiction = stiction
+        debugData.waxSpeed = waxSpeed
+    end
+
+    return math.clamp(math.floor(newPos / stiction) * stiction, 0.0, maxOpening)
 end
 
 -- ==========================================================
