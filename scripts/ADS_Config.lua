@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 31,
+    VER = 32,
 
     DEBUG = false,
 
@@ -40,6 +40,8 @@ ADS_Config = {
         -- 'Condition' represents the physical health of the vehicle's components.
         -- Higher value means faster condition degradation.
         BASE_CONDITION_WEAR = 0.01, -- (0.01 = 1% wear per hour at base rate)
+
+        SYS_W = {eng=0.22, trn=0.16, hyd=0.12, col=0.12, ele=0.08, chs=0.10, wrk=0.08, flw=0.06, ene=0.06},
 
         DOWNTIME_MULTIPLIER = 0.0,
 

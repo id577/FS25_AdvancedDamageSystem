@@ -439,6 +439,17 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.serviceLevel = self.spec_AdvancedDamageSystem.baseServiceLevel
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
 
+    self.spec_AdvancedDamageSystem.powerUnitHealth = 1.0      
+    self.spec_AdvancedDamageSystem.transmissionHealth = 1.0
+    self.spec_AdvancedDamageSystem.hydraullicsHealth = 1.0
+    self.spec_AdvancedDamageSystem.coolingHealth = 1.0
+    self.spec_AdvancedDamageSystem.electricalHealth = 1.0
+    self.spec_AdvancedDamageSystem.chassisHealth = 1.0
+    self.spec_AdvancedDamageSystem.workProcessModuleHealth = 1.0
+    self.spec_AdvancedDamageSystem.materialFlowModuleHealth = 1.0
+    self.spec_AdvancedDamageSystem.energyStorage = 1.0
+
+
     self.spec_AdvancedDamageSystem.extraConditionWear = 0
     self.spec_AdvancedDamageSystem.extraServiceWear = 0
     self.spec_AdvancedDamageSystem.extraBreakdownProbability = 0
