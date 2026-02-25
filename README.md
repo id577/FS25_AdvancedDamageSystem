@@ -59,16 +59,17 @@ For testing and debugging, ADS includes console commands. Most commands require 
 
 # Screenshots
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-29-33_123" src="https://github.com/user-attachments/assets/c7fcaecf-2814-4ac8-a12e-631be8617d18" />
-<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-36-16_097" src="https://github.com/user-attachments/assets/c0fa45b0-4f33-472e-97a8-9a65eecc5271" />
+<img width="962" height="589" alt="2" src="https://github.com/user-attachments/assets/f002ea0d-cb21-4c9d-a513-c7f771cbd62e" />
 <img width="963" height="595" alt="1" src="https://github.com/user-attachments/assets/194ff2d1-a715-43cb-919e-92c648a2fad8" />
-<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-25 18-34-21_276" src="https://github.com/user-attachments/assets/dd90e4d0-87f8-4e86-bb98-6583257efe4c" />
+<img width="931" height="569" alt="3" src="https://github.com/user-attachments/assets/cda5e2a4-fa4b-491e-a817-078b8631470b" />
 <img width="1253" height="763" alt="image" src="https://github.com/user-attachments/assets/18fe2f51-44f8-46fe-a1ac-8b892d25852c" />
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-34-40_109" src="https://github.com/user-attachments/assets/39c982bc-034d-4f9f-a025-6802d63f201f" />
-<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-35-23_442" src="https://github.com/user-attachments/assets/956f21c7-f022-42e5-8599-b0adcd9614e0" />
+<img width="1967" height="1209" alt="Снимок экрана 2026-02-24 221501" src="https://github.com/user-attachments/assets/2c54b8a0-f5f6-4251-8ca5-397ac87be25b" />
 
 # Mod Guide
 The Advanced Damage System (ADS) mod completely replaces the standard damage system, offering a deep and detailed simulation of wear, breakdowns, and technical service.
 This guide will help you understand all aspects of the mod.
+
 
 ## 1. Core Mechanics: Condition and Service
 
