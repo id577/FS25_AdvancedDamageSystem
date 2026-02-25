@@ -19,6 +19,8 @@
         <text name="ads_instantInspection_tooltip" text="Если включено, диагностика техники выполняется мгновенно."/>
         <text name="ads_parkVehicle_label" text="Парковать технику при обслуживании"/>
         <text name="ads_parkVehicle_tooltip" text="Если включено, техника исключается из переключения (TAB) на время ремонта."/>
+        <text name="ads_warrantyEnabled_label" text="Гарантия на новую технику"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Включает гарантийный ремонт для новой техники (до 20 м/ч или 12 месяцев). Бесплатно только с оригинальными запчастями (OEM)."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Контроль перегрева/перегрузки (ИИ)"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Если включено, наемный работник будет снижать нагрузку при перегреве или перегрузке двигателя."/>
         <text name="ads_debugMode_label" text="Режим отладки"/>
@@ -301,6 +303,7 @@
         <text name="ads_option_menu_option_one_title_overhaul" text="Выберите объем работы"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="Обновить лакокрасочное покрытие"/>
         <text name="ads_option_menu_price_text" text="Цена: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="гарантийный ремонт"/>
         <text name="ads_option_menu_duration_text" text="Продолжительность: "/>
         <text name="ads_option_menu_finish_time_text" text="Время окончания: "/>
         <text name="ads_option_menu_start_text" text="Начать"/>
@@ -378,3 +381,4 @@
         <text name="ads_report_recommendation_all_ok" text="Критических рекомендаций нет. Техника находится в исправном состоянии."/>
     </texts>
 </l10n>
+

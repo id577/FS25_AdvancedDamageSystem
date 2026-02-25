@@ -19,6 +19,8 @@
         <text name="ads_instantInspection_tooltip" text="启用后，车辆检查将无需等待，立即完成。"/>
         <text name="ads_parkVehicle_label" text="维护期间停放车辆"/>
         <text name="ads_parkVehicle_tooltip" text="启用后，正在进行维护的车辆将无法通过 TAB 键切换。"/>
+        <text name="ads_warrantyEnabled_label" text="Warranty for New Equipment"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Applies warranty coverage to repairs on new vehicles (up to 20 operating hours or 12 months). Only OEM parts are covered at no cost."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="AI 过载与过热控制"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="启用后，当发动机过载或过热时，AI 工人会自动降低负载。"/>
         <text name="ads_debugMode_label" text="调试模式"/>
@@ -301,6 +303,7 @@
         <text name="ads_option_menu_option_one_title_overhaul" text="选择工作范围"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="更新油漆"/>
         <text name="ads_option_menu_price_text" text="价格："/>
+        <text name="ads_option_menu_warranty_repair_text" text="Warranty repair"/>
         <text name="ads_option_menu_duration_text" text="期间："/>
         <text name="ads_option_menu_finish_time_text" text="完成时间："/>
         <text name="ads_option_menu_start_text" text="开始"/>
@@ -378,3 +381,4 @@
         <text name="ads_report_recommendation_all_ok" text="无关键建议。车辆处于可正常作业状态。"/>
     </texts>
 </l10n>
+

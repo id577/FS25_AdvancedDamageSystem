@@ -19,6 +19,8 @@
         <text name="ads_instantInspection_tooltip" text="Activa la inspección inmediata del vehículo sin tiempo de espera."/>
         <text name="ads_parkVehicle_label" text="Aparcar vehículo en mantenimiento"/>
         <text name="ads_parkVehicle_tooltip" text="Si está activado, los vehículos en mantenimiento se omiten al cambiar con TAB."/>
+        <text name="ads_warrantyEnabled_label" text="Warranty for New Equipment"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Applies warranty coverage to repairs on new vehicles (up to 20 operating hours or 12 months). Only OEM parts are covered at no cost."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Control de sobrecarga/calentamiento (IA)"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="El trabajador de la IA reducirá la carga en caso de sobrecarga o sobrecalentamiento del motor."/>
         <text name="ads_debugMode_label" text="Modo de depuración"/>
@@ -301,6 +303,7 @@
         <text name="ads_option_menu_option_one_title_overhaul" text="Seleccionar alcance de trabajo"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="renovar pintura"/>
         <text name="ads_option_menu_price_text" text="Precio: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Warranty repair"/>
         <text name="ads_option_menu_duration_text" text="Duración: "/>
         <text name="ads_option_menu_finish_time_text" text="Hora de finalización: "/>
         <text name="ads_option_menu_start_text" text="Iniciar"/>
@@ -378,3 +381,4 @@
         <text name="ads_report_recommendation_all_ok" text="Sin recomendaciones críticas. El vehículo está en condiciones de funcionamiento."/>
     </texts>
 </l10n>
+

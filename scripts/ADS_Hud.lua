@@ -219,7 +219,7 @@ function ADS_Hud:drawDashboard()
             if hudIndicatorId == self.indicators.transmission.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.transmission.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
 
-            if hudIndicatorId == self.indicators.service.name and spec.serviceLevel < 0.333 then targetColor = colors.WARNING end
+            if hudIndicatorId == self.indicators.service.name and spec.serviceLevel < 0.45 then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
 
         else
@@ -293,259 +293,378 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
     local spec = vehicle.spec_AdvancedDamageSystem
     local motor = vehicle:getMotor()
+    if motor == nil then
+        return
+    end
 
     local panel = self.activeVehicleDebugPanel
     local textSettings = self.text
+    local fontStep = 0.001
+    local activeHeaderSize = textSettings.headerSize + fontStep
+    local activeNormalSize = textSettings.normalSize + fontStep
+    local activeLineHeight = panel.lineHeight + fontStep
+    local sectionGap = activeLineHeight * 0.65
 
-    local breakdownLines = {}
+    local function addLine(target, text, color, sizeScale)
+        table.insert(target, {
+            text = text,
+            color = color or {1, 1, 1, 1},
+            sizeScale = sizeScale or 1.0
+        })
+    end
+
+    local function getTempColor(temp)
+        if temp > 105 then
+            return {1, 0.6, 0.6, 1}
+        elseif temp > 95 then
+            return {1, 1, 0.6, 1}
+        end
+
+        return {0.6, 0.8, 1, 1}
+    end
+
+    local function packEntries(entries, maxPerLine, color, sizeScale)
+        local lines = {}
+        if #entries == 0 then
+            addLine(lines, "None", color, sizeScale)
+            return lines
+        end
+
+        local lineEntries = {}
+        for i, entry in ipairs(entries) do
+            table.insert(lineEntries, entry)
+            if #lineEntries >= maxPerLine or i == #entries then
+                addLine(lines, table.concat(lineEntries, ", "), color, sizeScale)
+                lineEntries = {}
+            end
+        end
+
+        return lines
+    end
+
+    local function listToString(list)
+        if list == nil or #list == 0 then
+            return "-"
+        end
+
+        return table.concat(list, ",")
+    end
+
+    local function localizeDebugValue(value)
+        if value == nil then
+            return "-"
+        end
+
+        if type(value) == "boolean" then
+            local key = value and "ads_ws_option_yes" or "ads_ws_option_no"
+            if g_i18n ~= nil and g_i18n.hasText ~= nil and g_i18n:hasText(key) then
+                return g_i18n:getText(key)
+            end
+            return tostring(value)
+        end
+
+        local key = tostring(value)
+        if key == "" then
+            return "-"
+        end
+
+        if g_i18n ~= nil and g_i18n.hasText ~= nil then
+            if g_i18n:hasText(key) then
+                return g_i18n:getText(key)
+            end
+            return key
+        end
+
+        return key
+    end
+
+    local function getConditionFactorColor(value)
+        local v = math.max(value or 0, 0)
+        local green = {0.72, 1.0, 0.72, 1}
+        local yellow = {1.0, 1.0, 0.62, 1}
+        local red = {1.0, 0.62, 0.62, 1}
+
+        if v <= 0.01 then
+            local t = math.max(math.min(v / 0.01, 1), 0)
+            return {
+                green[1] + (yellow[1] - green[1]) * t,
+                green[2] + (yellow[2] - green[2]) * t,
+                green[3] + (yellow[3] - green[3]) * t,
+                1
+            }
+        end
+
+        local t = math.max(math.min((v - 0.01) / 0.01, 1), 0)
+        return {
+            yellow[1] + (red[1] - yellow[1]) * t,
+            yellow[2] + (red[2] - yellow[2]) * t,
+            yellow[3] + (red[3] - yellow[3]) * t,
+            1
+        }
+    end
+
+    local breakdownEntries = {}
     if spec.activeBreakdowns and next(spec.activeBreakdowns) ~= nil then
         for id, breakdown in pairs(spec.activeBreakdowns) do
             local visible = breakdown.isVisible and "V" or "-"
             local selected = breakdown.isSelectedForRepair and "S" or "-"
-            table.insert(breakdownLines, string.format("%s [S%d] P:%.0fs [%s|%s]", id, breakdown.stage, breakdown.progressTimer / 1000, visible, selected))
+            table.insert(breakdownEntries, string.format("%s[S%d|%.0fs|%s%s]", id, breakdown.stage, breakdown.progressTimer / 1000, visible, selected))
         end
-    else
-        table.insert(breakdownLines, "None")
     end
+    table.sort(breakdownEntries)
+    local breakdownLines = packEntries(breakdownEntries, 4, {1, 0.8, 0.8, 1}, 0.95)
 
-    local effectLines = {}
+    local effectEntries = {}
     if spec.activeEffects and next(spec.activeEffects) ~= nil then
         for id, effect in pairs(spec.activeEffects) do
-            table.insert(effectLines, string.format("%s: %.2f", id, effect.value))
+            table.insert(effectEntries, string.format("%s:%.2f", id, effect.value))
         end
-    else
-        table.insert(effectLines, "None")
+    end
+    table.sort(effectEntries)
+    local effectLines = packEntries(effectEntries, 4, {0.8, 0.8, 1, 1}, 0.95)
+
+    local aiCruiseLines = {}
+    if vehicle:getIsAIActive() and spec.debugData and spec.debugData.aiWorker then
+        local dbg = spec.debugData.aiWorker
+        local pidState = spec.aiWorkerPid or {}
+        local cruiseSpeed = vehicle:getCruiseControlSpeed() or 0
+        local ccState = vehicle:getCruiseControlState() or 0
+
+        addLine(aiCruiseLines, string.format(
+            "cc: %.1f (s:%d) | stress: %.3f (f: %.3f | l/e/t: %.3f/%.3f/%.3f) | e/i/d: %.3f/%.3f/%.3f | red: %.2f | base/tgt/app: %.1f/%.1f/%.1f | t: %.0fms",
+            cruiseSpeed,
+            ccState,
+            dbg.stress or 0,
+            dbg.filteredStress or 0,
+            dbg.loadStress or 0,
+            dbg.engineStress or 0,
+            dbg.transStress or 0,
+            dbg.error or 0,
+            dbg.integral or 0,
+            dbg.derivative or 0,
+            dbg.reduction or 0,
+            dbg.baseCruiseSpeed or 0,
+            dbg.targetSpeed or 0,
+            dbg.appliedSpeed or 0,
+            pidState.applyTimer or 0
+        ), {0.75, 1, 0.85, 1}, 0.95)
     end
 
-    local baseLines = 13
-    local dynamicHeight = (panel.padding * 2) + textSettings.headerSize + (baseLines * panel.lineHeight) + (#breakdownLines * panel.lineHeight) + (#effectLines * panel.lineHeight) + 0.04
+    local bcw = ADS_Config.CORE.BASE_CONDITION_WEAR
+    local bsw = ADS_Config.CORE.BASE_SERVICE_WEAR
+    local mf = spec.debugData.condition.motorLoadFactor * bcw
+    local sf = spec.debugData.condition.expiredServiceFactor * bcw
+    local cmf = spec.debugData.condition.coldMotorFactor * bcw
+    local hmf = spec.debugData.condition.hotMotorFactor * bcw
+    local ctf = spec.debugData.condition.coldTransFactor * bcw
+    local htf = spec.debugData.condition.hotTransFactor * bcw
+    local maxConditionFactor = math.max(mf, sf, cmf, hmf, ctf, htf)
 
+    local statusLines = {}
+    addLine(statusLines, string.format(
+        "R/M: %.2f/%.2f | S: %.3f(-%.4f) | C: %.3f(-%.4f) | F/C: %.4f/%.4f | mf/sf/cmf/hmf/ctf/htf: -%.4f/-%.4f/-%.4f/-%.4f/-%.4f/-%.4f",
+        spec.reliability,
+        spec.maintainability,
+        spec.serviceLevel,
+        spec.debugData.service.totalWearRate * bsw,
+        spec.conditionLevel,
+        spec.debugData.condition.totalWearRate * bcw,
+        spec.debugData.breakdown.failureChanceInHour,
+        spec.debugData.breakdown.criticalFailureInHour,
+        mf,
+        sf,
+        cmf,
+        hmf,
+        ctf,
+        htf
+    ), getConditionFactorColor(maxConditionFactor), 0.95)
 
+    local engineTempLines = {}
+    addLine(engineTempLines, string.format(
+        "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h/c: %.3f/%.3f | r/s/c: %.3f/%.3f/%.3f",
+        spec.engineTemperature,
+        spec.thermostatState,
+        spec.debugData.engineTemp.kp,
+        spec.debugData.engineTemp.stiction,
+        spec.debugData.engineTemp.waxSpeed,
+        spec.debugData.engineTemp.totalHeat,
+        spec.debugData.engineTemp.totalCooling,
+        spec.debugData.engineTemp.radiatorCooling,
+        spec.debugData.engineTemp.speedCooling,
+        spec.debugData.engineTemp.convectionCooling
+    ), getTempColor(spec.engineTemperature), 0.95)
+
+    local vehicleHasCVT = motor.minForwardGearRatio ~= nil and spec.year >= self.tsTempText.year and not spec.isElectricVehicle
+    local showTransmissionSection = vehicleHasCVT and spec.transmissionTemperature > -30
+    local transmissionTempLines = {}
+    if showTransmissionSection then
+        addLine(transmissionTempLines, string.format(
+            "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a: %.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f)",
+            spec.transmissionTemperature,
+            spec.transmissionThermostatState,
+            spec.debugData.transmissionTemp.kp,
+            spec.debugData.transmissionTemp.stiction,
+            spec.debugData.transmissionTemp.waxSpeed,
+            spec.debugData.transmissionTemp.totalHeat,
+            spec.debugData.transmissionTemp.loadFactor,
+            spec.debugData.transmissionTemp.slipFactor,
+            spec.debugData.transmissionTemp.accFactor,
+            spec.debugData.transmissionTemp.totalCooling,
+            spec.debugData.transmissionTemp.radiatorCooling,
+            spec.debugData.transmissionTemp.speedCooling,
+            spec.debugData.transmissionTemp.convectionCooling
+        ), getTempColor(spec.transmissionTemperature), 0.95)
+    end
+
+    local motorPower = motor:getMotorRotSpeed() * (motor:getMotorAvailableTorque() - motor:getMotorExternalTorque()) * 1000
+    local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
+    local lastRpm = motor:getLastModulatedMotorRpm()
+    local maxRpm = math.max(motor.maxRpm or 1, 1)
+    local rpmLoad = lastRpm / maxRpm
+    local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
+    local drivetrainLines = {}
+    addLine(drivetrainLines, string.format(
+        "hp: %d/%d | ml/rpm: %.3f/%.3f | g: %d>%d(%d,%.2f) | fuel: %.2fl/h | d/dr: %.3f/%.3f" ,
+        motorPower / 735.5,
+        peakPowerHp,
+        vehicle:getMotorLoadPercentage(),
+        rpmLoad,
+        motor.gear or 0,
+        targetGear,
+        motor.activeGearGroupIndex or 0,
+        motor:getGearRatio() or 0,
+        vehicle.spec_motorized.lastFuelUsage or 0,
+        vehicle:getDamageAmount(),
+        vehicle:getDirtAmount()
+
+    ), {1, 1, 1, 1}, 0.95)
+
+    local serviceDataLines = {}
+    local states = AdvancedDamageSystem.STATUS
+    local isUnderService = spec.currentState ~= states.READY
+    if isUnderService then
+        local pendingInspectionQueue = spec.pendingInspectionQueue or {}
+        local pendingRepairQueue = spec.pendingRepairQueue or {}
+        local pendingSelectedBreakdowns = spec.pendingSelectedBreakdowns or {}
+        local progressPercent = 0
+        if (spec.pendingProgressTotalTime or 0) > 0 then
+            local progressRatio = math.min(math.max((spec.pendingProgressElapsedTime or 0) / spec.pendingProgressTotalTime, 0), 1)
+            progressPercent = math.floor(progressRatio * 100)
+        end
+
+        addLine(serviceDataLines, string.format(
+            "cur/pl/ws: %s/%s/%s | o1/o2/o3/price: %s/%s/%s/%s",
+            localizeDebugValue(spec.currentState),
+            localizeDebugValue(spec.plannedState),
+            localizeDebugValue(spec.workshopType),
+            localizeDebugValue(spec.serviceOptionOne),
+            localizeDebugValue(spec.serviceOptionTwo),
+            localizeDebugValue(spec.serviceOptionThree),
+            tostring(spec.pendingServicePrice)
+        ), {1, 0.95, 0.75, 1}, 0.95)
+        addLine(serviceDataLines, string.format(
+            "tm/el/tt(ms): %.0f/%.0f/%.0f | prg: %d%% | step: %d | q(sel/insp/rep): %d/%d/%d",
+            spec.maintenanceTimer or 0,
+            spec.pendingProgressElapsedTime or 0,
+            spec.pendingProgressTotalTime or 0,
+            progressPercent,
+            spec.pendingProgressStepIndex or 0,
+            #pendingSelectedBreakdowns,
+            #pendingInspectionQueue,
+            #pendingRepairQueue
+        ), {1, 0.95, 0.75, 1}, 0.95)
+        addLine(serviceDataLines, string.format(
+            "svc s->t: %s->%s | cond s->t: %s->%s | cur s/c: %.4f/%.4f",
+            tostring(spec.pendingMaintenanceServiceStart),
+            tostring(spec.pendingMaintenanceServiceTarget),
+            tostring(spec.pendingOverhaulConditionStart),
+            tostring(spec.pendingOverhaulConditionTarget),
+            spec.serviceLevel or 0,
+            spec.conditionLevel or 0
+        ), {1, 0.95, 0.75, 1}, 0.95)
+        addLine(serviceDataLines, "sel: " .. listToString(pendingSelectedBreakdowns), {1, 0.95, 0.75, 1}, 0.95)
+        addLine(serviceDataLines, "insp: " .. listToString(pendingInspectionQueue), {1, 0.95, 0.75, 1}, 0.95)
+        addLine(serviceDataLines, "rep: " .. listToString(pendingRepairQueue), {1, 0.95, 0.75, 1}, 0.95)
+    end
+
+    local sections = {
+        {title = "Status", lines = statusLines},
+        {title = "Engine Temp", lines = engineTempLines}
+    }
+
+    if showTransmissionSection then
+        table.insert(sections, {title = "CVT Temp", lines = transmissionTempLines})
+    end
+
+    table.insert(sections, {title = "Drivetrain", lines = drivetrainLines})
+    if isUnderService then
+        table.insert(sections, {title = "Service Data", lines = serviceDataLines})
+    end
+    table.insert(sections, {title = "Active Breakdowns", lines = breakdownLines})
+    table.insert(sections, {title = "Active Effects", lines = effectLines})
+
+    if #aiCruiseLines > 0 then
+        table.insert(sections, {title = "AI Cruise Control", lines = aiCruiseLines})
+    end
+
+    local totalSectionHeight = 0
+    for _, section in ipairs(sections) do
+        totalSectionHeight = totalSectionHeight + (math.max(#section.lines, 1) * activeLineHeight)
+    end
+    totalSectionHeight = totalSectionHeight + (math.max(#sections - 1, 0) * sectionGap)
+
+    local dynamicHeight = (panel.padding * 2) + activeHeaderSize + totalSectionHeight + 0.02
     if panel.background ~= nil then
         local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
         overlay:setColor(1, 1, 1, 0.7)
         overlay:render()
     end
-    
+
     local textStartX = panel.x + panel.padding
-    local textEndX = panel.x + panel.width - panel.padding
     local currentY = panel.y + dynamicHeight - panel.padding
 
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
     setTextBold(true)
-    renderText(textStartX, currentY, textSettings.headerSize, vehicle:getFullName() .. " " .. spec.year)
+    setTextColor(1, 1, 1, 1)
+    renderText(textStartX, currentY, activeHeaderSize, vehicle:getFullName() .. " " .. spec.year)
     setTextBold(false)
-    currentY = currentY - textSettings.headerSize - 0.01
-    currentY = currentY - panel.lineHeight
-    
+    currentY = currentY - activeHeaderSize - activeLineHeight
 
-    local function drawValueWithColorHigh(value)
-        setTextColor(1, math.max(1 - value, 0.1), math.max(1 - value, 0.1), 1)
+    local function drawSection(section)
+        local sectionLines = section.lines or {}
+        if #sectionLines == 0 then
+            setTextColor(1, 1, 1, 1)
+            renderText(textStartX, currentY, activeNormalSize, section.title .. ":")
+            currentY = currentY - activeLineHeight
+            return
+        end
+
+        local firstLine = sectionLines[1]
+        local firstColor = firstLine.color or {1, 1, 1, 1}
+        local firstSize = activeNormalSize * (firstLine.sizeScale or 1.0)
+        setTextColor(firstColor[1], firstColor[2], firstColor[3], firstColor[4] or 1)
+        renderText(textStartX, currentY, firstSize, section.title .. ": " .. (firstLine.text or ""))
+        currentY = currentY - activeLineHeight
+
+        for index = 2, #sectionLines do
+            local line = sectionLines[index]
+            local lineText = line.text or ""
+            local lineColor = line.color or {1, 1, 1, 1}
+            local lineSize = activeNormalSize * (line.sizeScale or 1.0)
+            setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
+            renderText(textStartX + 0.01, currentY, lineSize, lineText)
+            currentY = currentY - activeLineHeight
+        end
     end
 
-    local function drawTemp(temp)
-        if temp > 105 then setTextColor(1, 0.6, 0.6, 1)
-        elseif temp > 95 then setTextColor(1, 1, 0.6, 1)
-        else setTextColor(0.6, 0.8, 1, 1) end
+    for index, section in ipairs(sections) do
+        drawSection(section)
+        if index < #sections then
+            currentY = currentY - sectionGap
+        end
     end
 
-    local col1_x = textStartX
-    local col2_x = textStartX + (panel.width * 0.33)
-    local col3_x = textStartX + (panel.width * 0.66)
-    local col4_x = textStartX + panel.width
-    local startY = currentY
-
-    local bcw = ADS_Config.CORE.BASE_CONDITION_WEAR * 100
-    local bsw = ADS_Config.CORE.BASE_SERVICE_WEAR * 100
-
-    -- COLUMN 1
-    setTextColor(1, 1, 1, 1)
-    setTextBold(true)
-    renderText(col1_x, currentY, textSettings.normalSize, string.format("STATUS"))
-    setTextBold(false)
-    currentY = currentY - panel.lineHeight
-
-    renderText(col1_x, currentY, textSettings.normalSize, string.format("Reliability/Maintainability:"))
-    renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f / %.2f", spec.reliability, spec.maintainability))
-    renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight   
-
-    renderText(col1_x, currentY, textSettings.normalSize, string.format("Service:"))
-    renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f%% (-%.2f%%)", spec.serviceLevel * 100, spec.debugData.service.totalWearRate * bsw))
-    renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight   
-
-    renderText(col1_x, currentY, textSettings.normalSize, string.format("Condtion:"))
-    renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f%% (-%.2f%%)", spec.conditionLevel * 100, spec.debugData.condition.totalWearRate * bcw))
-    renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight   
-
-
-
-    local col1_titles = { '  Motor overload factor', '  Service expired factor', '  Cold motor factor', '  Overheat motor factor', '  Cold CVT factor',  '  Overheat CVT factor'}
-    local col1_data = {
-        spec.debugData.condition.motorLoadFactor * bcw,
-        spec.debugData.condition.expiredServiceFactor * bcw,
-        spec.debugData.condition.coldMotorFactor * bcw,
-        spec.debugData.condition.hotMotorFactor * bcw,
-        spec.debugData.condition.coldTransFactor * bcw,
-        spec.debugData.condition.hotTransFactor * bcw
-    }
-
-    for index , title in ipairs(col1_titles) do
-        renderText(col1_x, currentY, textSettings.normalSize * 0.9, string.format("%s:", title))
-        drawValueWithColorHigh(col1_data[index], 0.01, 1, true)
-        renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("-%.2f%%", col1_data[index]))
-        setTextColor(1, 1, 1, 1)
-        renderText(col2_x - 0.01, currentY, textSettings.normalSize * 0.9, "|")
-        currentY = currentY - panel.lineHeight
-    end
-
-    renderText(col1_x, currentY, textSettings.normalSize, string.format("Failure chance:"))
-    renderText(col2_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f%% (%.2f%%)", spec.debugData.breakdown.failureChanceInHour * 100, spec.debugData.breakdown.criticalFailureInHour * 100))
-    renderText(col2_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight
-
-    -- COLUMN 2
-    currentY = startY
-    setTextColor(1, 1, 1, 1)
-    setTextBold(true)
-    renderText(col2_x, currentY, textSettings.normalSize, "THERMALS")
-    setTextBold(false)
-    currentY = currentY - panel.lineHeight
-
-    renderText(col2_x, currentY, textSettings.normalSize, "Engine:")
-    drawTemp(spec.engineTemperature)
-    renderText(col3_x - 0.09, currentY, textSettings.normalSize, string.format("%.2f°C", spec.engineTemperature))
-    setTextColor(1, 1, 1, 1)
-    renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight
-    
-    setTextColor(1, 1, 1, 1)
-    renderText(col2_x, currentY, textSettings.normalSize, string.format(" T-stat:"))
-    renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (k: %.2f | s: %.1f%% | w: %.1f%%)", spec.thermostatState * 100, spec.debugData.engineTemp.kp, spec.debugData.engineTemp.stiction * 100, spec.debugData.engineTemp.waxSpeed * 100))
-    setTextColor(1, 1, 1, 1)
-    renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight
-
-    setTextColor(1, 1, 1, 1)
-    renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total heat:"))
-    renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%%",  spec.debugData.engineTemp.totalHeat * 100))
-    setTextColor(1, 1, 1, 1)
-    renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight
-
-    setTextColor(1, 1, 1, 1)
-    renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total cooling:"))
-    renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (r: %.0f%% | s: %.0f%% | c: %.0f%%)",  spec.debugData.engineTemp.totalCooling * 100, spec.debugData.engineTemp.radiatorCooling * 100, spec.debugData.engineTemp.speedCooling * 100, spec.debugData.engineTemp.convectionCooling * 100))
-    setTextColor(1, 1, 1, 1)
-    renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-    currentY = currentY - panel.lineHeight
-
-
-    if spec.transmissionTemperature > -30 and spec.year >= 2000 then
-        renderText(col2_x, currentY, textSettings.normalSize, "Transmission:")
-        drawTemp(spec.transmissionTemperature)
-        renderText(col3_x - 0.09, currentY, textSettings.normalSize, string.format("%.2f°C", spec.transmissionTemperature))
-        setTextColor(1, 1, 1, 1)
-        renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-        currentY = currentY - panel.lineHeight
-        
-        setTextColor(1, 1, 1, 1)
-        renderText(col2_x, currentY, textSettings.normalSize, string.format(" T-stat:"))
-        renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (k: %.2f | s: %.1f%% | w: %.1f%%)", spec.transmissionThermostatState * 100, spec.debugData.transmissionTemp.kp, spec.debugData.transmissionTemp.stiction * 100, spec.debugData.transmissionTemp.waxSpeed * 100))
-        setTextColor(1, 1, 1, 1)
-        renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-        currentY = currentY - panel.lineHeight
-
-        setTextColor(1, 1, 1, 1)
-        renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total heat:"))
-        renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% | %.2f | %.2f | %.2f",  spec.debugData.transmissionTemp.totalHeat * 100, spec.debugData.transmissionTemp.loadFactor, spec.debugData.transmissionTemp.slipFactor, spec.debugData.transmissionTemp.accFactor))
-        setTextColor(1, 1, 1, 1)
-        renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-        currentY = currentY - panel.lineHeight
-
-        setTextColor(1, 1, 1, 1)
-        renderText(col2_x, currentY, textSettings.normalSize, string.format(" Total cooling:"))
-        renderText(col3_x - 0.09, currentY, textSettings.normalSize * 0.9, string.format("%.0f%% (r: %.0f%% | s: %.0f%% | c: %.0f%%)",  spec.debugData.transmissionTemp.totalCooling * 100, spec.debugData.transmissionTemp.radiatorCooling * 100, spec.debugData.transmissionTemp.speedCooling * 100, spec.debugData.transmissionTemp.convectionCooling * 100))
-        setTextColor(1, 1, 1, 1)
-        renderText(col3_x - 0.01, currentY, textSettings.normalSize, "|")
-        currentY = currentY - panel.lineHeight
-    end
-    
-    -- COLUMN 3
-    currentY = startY
-    setTextColor(1, 1, 1, 1)
-    setTextBold(true)
-    renderText(col3_x, currentY, textSettings.normalSize, "DRIVETRAIN")
-    setTextBold(false)
-    currentY = currentY - panel.lineHeight
-
-    local motorPower = motor:getMotorRotSpeed() * (motor:getMotorAvailableTorque() - motor:getMotorExternalTorque()) * 1000
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("Power:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%d hp / %d hp", motorPower / 735.5, motor.peakMotorPower * 1.36 or 0))
-    currentY = currentY - panel.lineHeight
-
-    local lastRpm = motor:getLastModulatedMotorRpm()
-    local maxRpm = motor.maxRpm
-    local rpmLoad = lastRpm / maxRpm
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("MotorLoad/RPMLoad:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%.0f%% / %.0f%%", vehicle:getMotorLoadPercentage() * 100, rpmLoad * 100))
-    currentY = currentY - panel.lineHeight
-
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("Gear:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%d -> %d (%d, %1.2f)", motor.gear, motor.targetGear * motor.currentDirection, motor.activeGearGroupIndex or 0, motor:getGearRatio()))
-    currentY = currentY - panel.lineHeight
-
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("Fuel:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%.2fl/h", vehicle.spec_motorized.lastFuelUsage or 0))
-    currentY = currentY - panel.lineHeight
-
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("Damage/Dirt:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%.2f%% / %.2f%%", vehicle:getDamageAmount() * 100, vehicle:getDirtAmount() * 100))
-    currentY = currentY - panel.lineHeight
-
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("State/Workshop:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%s / %s", g_i18n:getText(spec.currentState), g_i18n:getText(spec.workshopType)))
-    currentY = currentY - panel.lineHeight
-
-    renderText(col3_x, currentY, textSettings.normalSize, string.format("Timer:"))
-    renderText(col4_x - 0.07, currentY, textSettings.normalSize, string.format("%0.f s", spec.maintenanceTimer / 1000))
-    currentY = currentY - panel.lineHeight
-
-    -- BOTTOM
-    
-    currentY = startY - (11 * panel.lineHeight) 
-
-    local separator = "________________________________________________________________________________________________________________________________________________________________"
-    local function drawSeparator()
-        currentY = currentY - (panel.lineHeight * 0.8)
-        setTextAlignment(RenderText.ALIGN_LEFT)
-        renderText(textStartX, currentY, textSettings.normalSize, separator)
-        currentY = currentY - (panel.lineHeight * 0.2)
-    end
-
-    drawSeparator()
-
-    currentY = currentY - panel.lineHeight
-
-    setTextColor(1, 1, 1, 1)
-    renderText(textStartX, currentY, textSettings.normalSize, "Active Breakdowns:")
-    currentY = currentY - panel.lineHeight
-    setTextColor(1, 0.8, 0.8, 1)
-    for _, line in ipairs(breakdownLines) do
-        renderText(textStartX + 0.01, currentY, textSettings.normalSize, line)
-        currentY = currentY - panel.lineHeight
-    end
-
-    setTextColor(1, 1, 1, 1)
-    renderText(textStartX, currentY, textSettings.normalSize, "Active Effects:")
-    currentY = currentY - panel.lineHeight
-    setTextColor(0.8, 0.8, 1, 1)
-    for _, line in ipairs(effectLines) do
-        renderText(textStartX + 0.01, currentY, textSettings.normalSize, line)
-        currentY = currentY - panel.lineHeight
-    end
-    
     setTextColor(1, 1, 1, 1)
 end
 
@@ -675,7 +794,7 @@ function ADS_Hud:showInfoVehicle(box)
         box:addLine(g_i18n:getText('ads_ws_label_condition'), ADS_Utils.formatCondition(self:getLastInspectedCondition()))
         box:addLine(g_i18n:getText("ads_ws_label_last_inspection"), ADS_Utils.formatTimeAgo(self:getLastInspectionDate()))
         box:addLine(g_i18n:getText("ads_ws_label_last_maintenance"), ADS_Utils.formatTimeAgo(self:getLastMaintenanceDate()))
-        box:addLine(g_i18n:getText("ads_ws_label_service_interval"), ADS_Utils.formatOperatingHours(self:getMaintenanceInterval()))
+        box:addLine(g_i18n:getText("ads_ws_label_service_interval"), ADS_Utils.formatOperatingHours(self:getHoursSinceLastMaintenance(), self:getMaintenanceInterval()))
 
         
         if spec.currentState ~= AdvancedDamageSystem.STATUS.READY and spec.currentState ~= AdvancedDamageSystem.STATUS.BROKEN then

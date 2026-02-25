@@ -19,6 +19,8 @@
         <text name="ads_instantInspection_tooltip" text="Aktiverar direkt besiktning av fordon utan att behöva vänta."/>
         <text name="ads_parkVehicle_label" text="Parkera fordon undertiden underhåll utförs"/>
         <text name="ads_parkVehicle_tooltip" text="Om aktiverad så kommer fordon som underhålls hoppas över när man går till nästa fordon med TAB."/>
+        <text name="ads_warrantyEnabled_label" text="Warranty for New Equipment"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Applies warranty coverage to repairs on new vehicles (up to 20 operating hours or 12 months). Only OEM parts are covered at no cost."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="AI Överbelastning &amp; Överhettningskontroll"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Om aktiverad så kommer AI-arbetare minska belastning för att undvika motoröverbelastning eller överhettning."/>
         <text name="ads_debugMode_label" text="Felsökningsläge"/>
@@ -301,6 +303,7 @@
         <text name="ads_option_menu_option_one_title_overhaul" text="Välj omfattning av arbetet"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="Förnya lackering"/>
         <text name="ads_option_menu_price_text" text="Pris: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Warranty repair"/>
         <text name="ads_option_menu_duration_text" text="Varaktighet: "/>
         <text name="ads_option_menu_finish_time_text" text="Sluttid: "/>
         <text name="ads_option_menu_start_text" text="Starta"/>
@@ -378,3 +381,4 @@
         <text name="ads_report_recommendation_all_ok" text="Inga kritiska rekommendationer. Fordonet är i driftsdugligt skick."/>
     </texts>
 </l10n>
+

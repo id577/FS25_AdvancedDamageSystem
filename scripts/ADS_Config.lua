@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 24,
+    VER = 31,
 
     DEBUG = false,
 
@@ -49,7 +49,7 @@ ADS_Config = {
 
         -- The maximum penalty applied to CONDITION wear when the Service level is very low (e.g., 0%).
         -- A value of 4.0 means condition can degrade up to 4x faster if service is neglected.
-        SERVICE_EXPIRED_MAX_MULTIPLIER = 5.0,
+        SERVICE_EXPIRED_MAX_MULTIPLIER = 10.0,
         -- The Service level (from 1.0 to 0.0) below which the 'SERVICE_EXPIRED' penalty starts to apply.
         SERVICE_EXPIRED_THRESHOLD = 0.5, -- (Penalty starts when service is below 50%)
 
@@ -59,21 +59,21 @@ ADS_Config = {
         MOTOR_OVERLOADED_THRESHOLD = 0.95, -- (Penalty starts when engine load is above 95%)
 
         -- The maximum penalty for operating the engine under load while it's cold.
-        COLD_MOTOR_MAX_MULTIPLIER = 30.0, -- (up to 30x extra wear)
+        COLD_MOTOR_MAX_MULTIPLIER = 50.0, -- (up to 30x extra wear)
         -- The engine temperature in Celsius below which it is considered "cold" and the penalty applies.
         COLD_MOTOR_THRESHOLD = 50,
 
-        COLD_TRANSMISSION_MULTIPLIER = 30.0, -- (up to 30x extra wear)
+        COLD_TRANSMISSION_MULTIPLIER = 50.0, -- (up to 30x extra wear)
 
         COLD_TRANSMISSION_THRESHOLD = 55,
 
         -- The maximum penalty for operating the engine while it's overheating.
-        OVERHEAT_MOTOR_MAX_MULTIPLIER = 30.0, -- (up to 30x extra wear)
+        OVERHEAT_MOTOR_MAX_MULTIPLIER = 50.0, -- (up to 30x extra wear)
         -- The engine temperature in Celsius above which the 'OVERHEAT_MOTOR' penalty applies.
         OVERHEAT_MOTOR_THRESHOLD = 95,
 
         -- The maximum penalty for operating the transmission while it's overheating.
-        OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 30.0, -- (up to 30x extra wear)
+        OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 50.0, -- (up to 30x extra wear)
         -- The transmission temperature in Celsius above which the 'OVERHEAT_TRANSMISSION' penalty applies.
         OVERHEAT_TRANSMISSION_THRESHOLD = 95,
 
@@ -88,7 +88,37 @@ ADS_Config = {
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 5,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
+        AI_WORKER_PID = {
+            MIN_SPEED = 3.0,
+            MAX_REDUCTION = 16.0,
+            TARGET_STRESS = 0.30,
+            DEADBAND = 0.03,
+            LOAD_START = 0.8,
+            LOAD_FULL = 0.95,
+            ENGINE_TEMP_START = 92.0,
+            ENGINE_TEMP_FULL = 99.0,
+            TRANS_TEMP_START = 92.0,
+            TRANS_TEMP_FULL = 99.0,
+            WEIGHT_LOAD = 0.50,
+            WEIGHT_ENGINE_TEMP = 0.25,
+            WEIGHT_TRANS_TEMP = 0.25,
+            FILTER_TAU = 0.7,
+            KP = 4.5,
+            KI = 0.8,
+            KD = 0.45,
+            MAX_INTEGRAL = 3.0,
+            REDUCTION_RATE_DOWN = 8.0,
+            RECOVERY_RATE_UP = 2.5,
+            APPLY_INTERVAL_MS = 180,
+            MIN_APPLY_DELTA = 0.2,
+            BASE_SYNC_DOWN_RATE = 1.8,
+            EMERGENCY_ENGINE_TEMP = 105.0,
+            EMERGENCY_TRANS_TEMP = 105.0
+        },
         GENERAL_WEAR_THRESHOLD = 0.5,
+
+        RELIABILITY_YEAR_FACTOR = 0.01,
+        RELIABILITY_YEAR_FACTOR_THRESHOLD = 2000,
 
         -- Defines the probability of a new breakdown occurring.
         BREAKDOWN_PROBABILITY = {
@@ -122,6 +152,11 @@ ADS_Config = {
         OPEN_HOUR = 8,  -- (8 AM)
         -- The hour of the day (0-23) when the workshop closes. Repairs will pause at this time.
         CLOSE_HOUR = 19, -- (7 PM)
+        PRICE_MULTIPLIERS = {
+            [1] = 1.0, DEALER = 1.0,
+            [2] = 1.2, MOBILE = 1.2,
+            [3] = 0.8, OWN = 0.8,
+        },
     },
 
 
@@ -132,6 +167,9 @@ ADS_Config = {
 MAINTENANCE = {
     PARK_VEHICLE = true,
     INSTANT_INSPECTION = false,
+    WARRANTY_ENABLED = true,
+    WARRANTY_MAX_OPERATING_HOURS = 20,
+    WARRANTY_MAX_AGE_MONTHS = 12,
 
     GLOBAL_SERVICE_PRICE_MULTIPLIER = 1.0,
     GLOBAL_SERVICE_TIME_MULTIPLIER = 1.0,
@@ -177,6 +215,8 @@ MAINTENANCE = {
         [3] = 0.99, FULL     = 0.99,
     },
 
+    RE_OVERHAUL_FACTOR = 0.1,
+
     PARTS_BREAKDOWN_CHANCES = {
         [1] = 0.1,  OEM         = 0.1,
         [2] = 0.5,  USED        = 0.5,
@@ -193,8 +233,8 @@ MAINTENANCE = {
     },
     MAINTENANCE_PRICE_MULTIPLIERS = {
         [1] = 1.0,  STANDARD = 1.0,
-        [2] = 0.60, MINIMAL  = 0.60,
-        [3] = 1.30, EXTENDED = 1.30,
+        [2] = 0.65, MINIMAL  = 0.65,
+        [3] = 1.25, EXTENDED = 1.25,
     },
     REPAIR_PRICE_MULTIPLIERS = {
         [1] = 1.0, MEDIUM = 1.0,
@@ -211,6 +251,7 @@ MAINTENANCE = {
         [2] = 0.1, VISUAL   = 0.1,
         [3] = 4.0, COMPLETE = 4.0,
     },
+    AGE_FACTOR_PRICE_FACTOR = 0.01,
     OWN_WORKSHOP_PRICE_MULTIPLIER = 0.8,
 },
 

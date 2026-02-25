@@ -59,6 +59,14 @@ self.ads_breakdownProbability = ADS_InGameSettings:addMultiTextOption(
         g_i18n:getText("ads_parkVehicle_tooltip")
     )
 
+    -- Warranty Coverage (Binary)
+    self.ads_warrantyEnabled = ADS_InGameSettings:addBinaryOption(
+        self,
+        "onWarrantyEnabledChanged",
+        g_i18n:getText("ads_warrantyEnabled_label"),
+        g_i18n:getText("ads_warrantyEnabled_tooltip")
+    )
+
     -- Maintenance Price
     self.ads_maintenancePrice = ADS_InGameSettings:addMultiTextOption(
         self,
@@ -175,6 +183,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     
     currentPage.ads_instantInspection:setIsChecked(ADS_Config.MAINTENANCE.INSTANT_INSPECTION, false, false)
     currentPage.ads_parkVehicle:setIsChecked(ADS_Config.MAINTENANCE.PARK_VEHICLE, false, false)
+    currentPage.ads_warrantyEnabled:setIsChecked(ADS_Config.MAINTENANCE.WARRANTY_ENABLED, false, false)
     currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL, false, false)
     currentPage.ads_workshopAvailable:setIsChecked(ADS_Config.WORKSHOP.ALWAYS_AVAILABLE, false, false)
     currentPage.ads_debugMode:setIsChecked(ADS_Config.DEBUG, false, false)
@@ -205,6 +214,11 @@ end
 
 function ADS_InGameSettings:onParkVehicleChanged(state)
     ADS_Config.MAINTENANCE.PARK_VEHICLE = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+end
+
+function ADS_InGameSettings:onWarrantyEnabledChanged(state)
+    ADS_Config.MAINTENANCE.WARRANTY_ENABLED = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 

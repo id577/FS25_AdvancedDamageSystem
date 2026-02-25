@@ -86,7 +86,7 @@ function ADS_WorkshopDialog:updateScreen()
     self.serviceLastInspectionDeltaValue:setText(monthsSinceInspectionText)
     self.condtionLastInspectionDelataValue:setText(monthsSinceInspectionText)
 
-    self.relAndMainValue:setText(ADS_Utils.formatOperatingHours(self.vehicle:getMaintenanceInterval()))
+    self.relAndMainValue:setText(ADS_Utils.formatOperatingHours(self.vehicle:getHoursSinceLastMaintenance(), self.vehicle:getMaintenanceInterval()))
 
     -- ====================================================================
     -- 2: Breakdowns Table
@@ -161,19 +161,30 @@ function ADS_WorkshopDialog:updateScreen()
     self.cancelServiceButton:setVisible(isUnderService)
     self.cancelServiceButton.disabled = not isUnderService
 
-    local inspectionPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false)
-    local maintenancePrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.MAINTENANCE, AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD, AdvancedDamageSystem.PART_TYPES.OEM, false)
-    local repairPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.REPAIR, AdvancedDamageSystem.REPAIR_URGENCY.MEDIUM, AdvancedDamageSystem.PART_TYPES.OEM, false)
-    local overhaulPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.OVERHAUL, AdvancedDamageSystem.OVERHAUL_TYPES.STANDARD, "NONE", false)
+    local inspectionPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, self.workshopType)
+    local maintenancePrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.MAINTENANCE, AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD, AdvancedDamageSystem.PART_TYPES.OEM, false, self.workshopType)
+    local repairPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.REPAIR, AdvancedDamageSystem.REPAIR_URGENCY.MEDIUM, AdvancedDamageSystem.PART_TYPES.OEM, false, self.workshopType)
+    local overhaulPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.OVERHAUL, AdvancedDamageSystem.OVERHAUL_TYPES.STANDARD, "NONE", false, self.workshopType)
 
-    if repairPrice == 0 then
+    local selectedRepairCount = 0
+    for _, breakdown in pairs(self.activeBreakdowns) do
+        if breakdown ~= nil and breakdown.isVisible and breakdown.isSelectedForRepair then
+            selectedRepairCount = selectedRepairCount + 1
+        end
+    end
+
+    if selectedRepairCount == 0 then
         self.repairButton.disabled = true
     end
     
     local buttonFormat = g_i18n:getText("ads_ws_button_price_format")
     self.inscpectionButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_inspection"), g_i18n:formatMoney(inspectionPrice)))
     self.maintenanceButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_maintenance"), g_i18n:formatMoney(maintenancePrice)))
-    self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:formatMoney(repairPrice)))
+    if self.vehicle:isWarrantyRepairCovered(AdvancedDamageSystem.PART_TYPES.OEM) and selectedRepairCount > 0 then
+        self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:getText("ads_option_menu_warranty_repair_text")))
+    else
+        self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:formatMoney(repairPrice)))
+    end
     self.overhaulButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_overhaul"), g_i18n:formatMoney(overhaulPrice)))
 
     -- ====================================================================
@@ -246,7 +257,7 @@ function ADS_WorkshopDialog:populateCellForItemInSection(list, section, index, c
     local part_key = self.breakdonRegistry[breadownId].part
     local stage_key = self.breakdonRegistry[breadownId].stages[data.stage].severity
     local description_key = self.breakdonRegistry[breadownId].stages[data.stage].description
-    local price = self.vehicle:getBreakdownRepairPrice(breadownId, data.stage)
+    local price = self.vehicle:getBreakdownRepairPrice(breadownId, data.stage, AdvancedDamageSystem.PART_TYPES.OEM)
     local selected = data.isSelectedForRepair
 
     if data.stage == 1 then

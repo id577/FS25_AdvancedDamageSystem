@@ -55,6 +55,7 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
     log_dbg("Updating log Screen...")
 
     local spec = self.vehicle.spec_AdvancedDamageSystem
+    local workshopType = ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.workshopType or spec.workshopType
 
     -- title
     self.dialogTitleElement:setText(g_i18n:getText(self.maintenanceType))
@@ -103,9 +104,14 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
     self.optionTwo:setTexts(optionTwoOptions)
 
     -- price, duration, finishtime
-    self.maintenancePrice:setText(g_i18n:getText("ads_option_menu_price_text") .. g_i18n:formatMoney(self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree)))
-    self.maintenanceDuration:setText(g_i18n:getText("ads_option_menu_duration_text") .. ADS_Utils.formatDuration(self.vehicle:getServiceDuration(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree)))
-    self.maintenanceFinishTime:setText(g_i18n:getText("ads_option_menu_finish_time_text") .. ADS_Utils.formatFinishTime(self.vehicle:getServiceFinishTime(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree)))
+    local servicePrice = self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)
+    if self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR and self.vehicle:isWarrantyRepairCovered(self.selectedOptionTwo) then
+        self.maintenancePrice:setText(g_i18n:getText("ads_option_menu_price_text") .. g_i18n:getText("ads_option_menu_warranty_repair_text"))
+    else
+        self.maintenancePrice:setText(g_i18n:getText("ads_option_menu_price_text") .. g_i18n:formatMoney(servicePrice))
+    end
+    self.maintenanceDuration:setText(g_i18n:getText("ads_option_menu_duration_text") .. ADS_Utils.formatDuration(self.vehicle:getServiceDuration(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)))
+    self.maintenanceFinishTime:setText(g_i18n:getText("ads_option_menu_finish_time_text") .. ADS_Utils.formatFinishTime(self.vehicle:getServiceFinishTime(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)))
 
     -- disclaimers
     local optionOneDisclaimers = {}
@@ -171,7 +177,7 @@ function ADS_MaintenanceThreeOptionsDialog:onClickStartService()
     local vehicle = self.vehicle
     local workshopType = ADS_WorkshopDialog.INSTANCE.workshopType
     
-    local price = vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree)
+    local price = vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)
     if g_currentMission:getMoney() < price then
         InfoDialog.show(g_i18n:getText("shop_messageNotEnoughMoneyToBuy"))
         return

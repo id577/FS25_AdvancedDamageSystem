@@ -19,6 +19,8 @@
         <text name="ads_instantInspection_tooltip" text="Povolí nebo zakáže okamžitou kontrolu vozidla bez čekání."/>
         <text name="ads_parkVehicle_label" text="Zaparkovat vozidlo během údržby"/>
         <text name="ads_parkVehicle_tooltip" text="Pokud je zapnuto, vozidla v servisu budou vynechána při přepínání klávesou TAB."/>
+        <text name="ads_warrantyEnabled_label" text="Warranty for New Equipment"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Applies warranty coverage to repairs on new vehicles (up to 20 operating hours or 12 months). Only OEM parts are covered at no cost."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Kontrola přetížení a přehřátí UI"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="UI pracovník sníží zatížení motoru v případě přetížení nebo přehřátí."/>
         <text name="ads_debugMode_label" text="Režim ladění"/>
@@ -301,6 +303,7 @@
         <text name="ads_option_menu_option_one_title_overhaul" text="Vyberte rozsah práce"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="Obnovit lak"/>
         <text name="ads_option_menu_price_text" text="Cena: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Warranty repair"/>
         <text name="ads_option_menu_duration_text" text="Trvání: "/>
         <text name="ads_option_menu_finish_time_text" text="Čas dokončení: "/>
         <text name="ads_option_menu_start_text" text="Spustit"/>
@@ -378,3 +381,4 @@
         <text name="ads_report_recommendation_all_ok" text="Žádná kritická doporučení. Stroj je v provozuschopném stavu."/>
     </texts>
 </l10n>
+

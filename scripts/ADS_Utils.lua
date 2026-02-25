@@ -286,8 +286,8 @@ end
 
 -- operating hours ---------------------------------------------------
 
-function ADS_Utils.formatOperatingHours(currentHours)
-    return string.format("%.1f %s", currentHours, g_i18n:getText('ads_spec_op_hours_short'))
+function ADS_Utils.formatOperatingHours(currentHours, intervalHours)
+    return string.format("%.1f / %.1f %s", currentHours, intervalHours, g_i18n:getText('ads_spec_op_hours_short'))
 end
 
 

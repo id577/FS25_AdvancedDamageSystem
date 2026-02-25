@@ -19,6 +19,8 @@
         <text name="ads_instantInspection_tooltip" text="When enabled, all inspections complete instantly (no time passes). Note: the 'Visual' inspection option will become unavailable"/>
         <text name="ads_parkVehicle_label" text="Park Vehicle During Maintenance"/>
         <text name="ads_parkVehicle_tooltip" text="If enabled, vehicles undergoing maintenance are skipped when cycling with TAB."/>
+        <text name="ads_warrantyEnabled_label" text="Warranty for New Equipment"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Applies warranty coverage to repairs on new vehicles (up to 20 operating hours or 12 months). Only OEM parts are covered at no cost."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="AI Overload &amp; Overheat Control"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="If enabled, the AI worker reduces load to prevent engine overload or overheating."/>
         <text name="ads_debugMode_label" text="Debug Mode"/>
@@ -301,6 +303,7 @@
         <text name="ads_option_menu_option_one_title_overhaul" text="Select scope of work"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="Renew paintwork"/>
         <text name="ads_option_menu_price_text" text="Price: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Warranty repair"/>
         <text name="ads_option_menu_duration_text" text="Duration: "/>
         <text name="ads_option_menu_finish_time_text" text="Finish Time: "/>
         <text name="ads_option_menu_start_text" text="Start"/>
@@ -378,3 +381,4 @@
         <text name="ads_report_recommendation_all_ok" text="No critical recommendations. Vehicle is in serviceable condition."/>
     </texts>
 </l10n>
+

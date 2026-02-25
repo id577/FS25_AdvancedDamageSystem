@@ -311,6 +311,10 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "updateThermalSystems", AdvancedDamageSystem.updateThermalSystems)
     SpecializationUtil.registerFunction(vehicleType, "updateEngineThermalModel", AdvancedDamageSystem.updateEngineThermalModel)
     SpecializationUtil.registerFunction(vehicleType, "updateTransmissionThermalModel", AdvancedDamageSystem.updateTransmissionThermalModel)
+    SpecializationUtil.registerFunction(vehicleType, "resetAiWorkerCruiseControlState", AdvancedDamageSystem.resetAiWorkerCruiseControlState)
+    SpecializationUtil.registerFunction(vehicleType, "getAiWorkerImplementSpeedLimit", AdvancedDamageSystem.getAiWorkerImplementSpeedLimit)
+    SpecializationUtil.registerFunction(vehicleType, "updateAiWorkerCruiseControl", AdvancedDamageSystem.updateAiWorkerCruiseControl)
+    SpecializationUtil.registerFunction(vehicleType, "isWarrantyRepairCovered", AdvancedDamageSystem.isWarrantyRepairCovered)
 
     SpecializationUtil.registerFunction(vehicleType, "getServicePrice", AdvancedDamageSystem.getServicePrice)
     SpecializationUtil.registerFunction(vehicleType, "getServiceDuration", AdvancedDamageSystem.getServiceDuration)
@@ -323,7 +327,10 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getLastInspectionDate", AdvancedDamageSystem.getLastInspectionDate)
     SpecializationUtil.registerFunction(vehicleType, "getLastMaintenanceDate", AdvancedDamageSystem.getLastMaintenanceDate)
     SpecializationUtil.registerFunction(vehicleType, "getMaintenanceInterval", AdvancedDamageSystem.getMaintenanceInterval)
+    SpecializationUtil.registerFunction(vehicleType, "getHoursSinceLastMaintenance", AdvancedDamageSystem.getHoursSinceLastMaintenance)
     SpecializationUtil.registerFunction(vehicleType, "getLastServiceOptions", AdvancedDamageSystem.getLastServiceOptions)
+    SpecializationUtil.registerFunction(vehicleType, "getOverhaulPerformedCount", AdvancedDamageSystem.getOverhaulPerformedCount)
+    
 end
 
 
@@ -475,6 +482,15 @@ function AdvancedDamageSystem:onLoad(savegame)
         integral = 0,
         lastError = 0
     }
+    self.spec_AdvancedDamageSystem.aiWorkerPid = {
+        integral = 0,
+        lastError = 0,
+        filteredStress = 0,
+        currentReduction = 0,
+        baseCruiseSpeed = nil,
+        applyTimer = 0,
+        lastAppliedSpeed = nil
+    }
 
     self.spec_AdvancedDamageSystem.debugData = {
         service = {
@@ -529,6 +545,20 @@ function AdvancedDamageSystem:onLoad(savegame)
             stiction = 0,
             waxSpeed = 0,
             kp = 0
+        },
+        aiWorker = {
+            stress = 0,
+            filteredStress = 0,
+            error = 0,
+            integral = 0,
+            derivative = 0,
+            reduction = 0,
+            targetSpeed = 0,
+            appliedSpeed = 0,
+            baseCruiseSpeed = 0,
+            loadStress = 0,
+            engineStress = 0,
+            transStress = 0
         }
     }
 
@@ -764,6 +794,17 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.pendingProgressTotalTime == nil then spec.pendingProgressTotalTime = 0 end
         if spec.pendingProgressElapsedTime == nil then spec.pendingProgressElapsedTime = 0 end
         if spec.totalBreakdownsOccurred == nil then spec.totalBreakdownsOccurred = 0 end
+        if spec.aiWorkerPid == nil then
+            spec.aiWorkerPid = {
+                integral = 0,
+                lastError = 0,
+                filteredStress = 0,
+                currentReduction = 0,
+                baseCruiseSpeed = nil,
+                applyTimer = 0,
+                lastAppliedSpeed = nil
+            }
+        end
     end
 
     -- Sounds Loading
@@ -959,28 +1000,8 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- ai worker overload, temp control
-    if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL and self:getIsAIActive() and self:getIsMotorStarted() then
-        local motorLoad = self:getMotorLoadPercentage()
-        if (motorLoad > 0.95 or spec.rawEngineTemperature > 97 or spec.rawTransmissionTemperature > 97) and self:getCruiseControlSpeed() > 5 then
-
-            if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
-                for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
-                    if implementData.object ~= nil then
-                        local implement = implementData.object
-                        local currentSpeedLimit = implement.speedLimit
-                        if currentSpeedLimit ~= nil and implement:getIsLowered() then
-                            if currentSpeedLimit < self:getCruiseControlSpeed() then
-                                self:setCruiseControlMaxSpeed(currentSpeedLimit, nil)
-                            end
-                        end
-                    end
-                end
-            end
-    
-            self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() - 1, nil)
-        elseif motorLoad < 0.75 and spec.rawEngineTemperature < 92 and spec.rawTransmissionTemperature < 92  then
-            self:setCruiseControlMaxSpeed(self:getCruiseControlSpeed() + 1, nil)
-        end
+    if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL then
+        self:updateAiWorkerCruiseControl(spec.effectsUpdateTimer)
     end
 
     --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
@@ -1021,6 +1042,211 @@ end
 -- ==========================================================
 --                        AI WORKER
 -- ==========================================================
+
+function AdvancedDamageSystem:resetAiWorkerCruiseControlState()
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    local state = spec.aiWorkerPid
+    if state == nil then return end
+
+    state.integral = 0
+    state.lastError = 0
+    state.filteredStress = 0
+    state.currentReduction = 0
+    state.baseCruiseSpeed = nil
+    state.applyTimer = 0
+    state.lastAppliedSpeed = nil
+
+    if ADS_Config.DEBUG and spec.debugData and spec.debugData.aiWorker then
+        local dbg = spec.debugData.aiWorker
+        dbg.stress = 0
+        dbg.filteredStress = 0
+        dbg.error = 0
+        dbg.integral = 0
+        dbg.derivative = 0
+        dbg.reduction = 0
+        dbg.targetSpeed = 0
+        dbg.appliedSpeed = 0
+        dbg.baseCruiseSpeed = 0
+        dbg.loadStress = 0
+        dbg.engineStress = 0
+        dbg.transStress = 0
+    end
+end
+
+function AdvancedDamageSystem:getAiWorkerImplementSpeedLimit()
+    local speedLimit = math.huge
+
+    if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
+        for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
+            if implementData.object ~= nil then
+                local implement = implementData.object
+                local currentSpeedLimit = implement.speedLimit
+                if currentSpeedLimit ~= nil and implement.getIsLowered ~= nil and implement:getIsLowered() then
+                    speedLimit = math.min(speedLimit, currentSpeedLimit)
+                end
+            end
+        end
+    end
+
+    return speedLimit
+end
+
+function AdvancedDamageSystem:updateAiWorkerCruiseControl(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    local config = ADS_Config.CORE and ADS_Config.CORE.AI_WORKER_PID
+    if config == nil then return end
+
+    if spec.aiWorkerPid == nil then
+        spec.aiWorkerPid = {
+            integral = 0,
+            lastError = 0,
+            filteredStress = 0,
+            currentReduction = 0,
+            baseCruiseSpeed = nil,
+            applyTimer = 0,
+            lastAppliedSpeed = nil
+        }
+    end
+
+    if not self:getIsAIActive() or not self:getIsMotorStarted() then
+        self:resetAiWorkerCruiseControlState()
+        return
+    end
+
+    local cruiseSpeed = self:getCruiseControlSpeed() or 0
+    if cruiseSpeed <= 0 then
+        self:resetAiWorkerCruiseControlState()
+        return
+    end
+
+    local state = spec.aiWorkerPid
+    local dtMs = math.max(dt or ADS_Config.EFFECTS_UPDATE_DELAY, 1)
+    local dtSeconds = math.max(dtMs / 1000, 0.05)
+
+    local function normalizeToUnit(value, startValue, fullValue)
+        local denominator = math.max(fullValue - startValue, 0.0001)
+        return math.clamp((value - startValue) / denominator, 0.0, 1.0)
+    end
+
+    local motorLoad = math.max(self:getMotorLoadPercentage() or 0, 0)
+    local rawEngineTemperature = spec.rawEngineTemperature or spec.engineTemperature or 0
+    local rawTransmissionTemperature = spec.rawTransmissionTemperature or spec.transmissionTemperature or -99
+    if rawTransmissionTemperature < 0 then
+        rawTransmissionTemperature = rawEngineTemperature
+    end
+
+    local loadStress = normalizeToUnit(motorLoad, config.LOAD_START, config.LOAD_FULL)
+    local engineStress = normalizeToUnit(rawEngineTemperature, config.ENGINE_TEMP_START, config.ENGINE_TEMP_FULL)
+    local transStress = normalizeToUnit(rawTransmissionTemperature, config.TRANS_TEMP_START, config.TRANS_TEMP_FULL)
+
+    local stress = loadStress * config.WEIGHT_LOAD + engineStress * config.WEIGHT_ENGINE_TEMP + transStress * config.WEIGHT_TRANS_TEMP
+    stress = math.clamp(stress, 0.0, 1.0)
+
+    local filterTau = math.max(config.FILTER_TAU or 0.7, 0.05)
+    local filterAlpha = dtSeconds / (filterTau + dtSeconds)
+    state.filteredStress = state.filteredStress + (stress - state.filteredStress) * filterAlpha
+
+    local error = state.filteredStress - config.TARGET_STRESS
+    if math.abs(error) < config.DEADBAND then
+        error = 0
+    end
+
+    local lastError = state.lastError or 0
+    local derivative = (error - lastError) / math.max(dtSeconds, 0.001)
+
+    local maxReduction = math.max(config.MAX_REDUCTION or 16, 0)
+    local maxIntegral = math.max(config.MAX_INTEGRAL or 3, 0.001)
+
+    local integrate = true
+    if (state.currentReduction <= 0 and error < 0) or (state.currentReduction >= maxReduction and error > 0) then
+        integrate = false
+    end
+    if integrate then
+        state.integral = math.clamp((state.integral or 0) + error * dtSeconds, -maxIntegral, maxIntegral)
+    end
+
+    local rateCommand = config.KP * error + config.KI * state.integral + config.KD * derivative
+    local reductionRate = math.max(config.REDUCTION_RATE_DOWN or 8.0, 0.1)
+    local recoveryRate = math.max(config.RECOVERY_RATE_UP or 2.5, 0.1)
+    rateCommand = math.clamp(rateCommand, -recoveryRate, reductionRate)
+    state.currentReduction = math.clamp(state.currentReduction + rateCommand * dtSeconds, 0, maxReduction)
+
+    local emergency = rawEngineTemperature >= (config.EMERGENCY_ENGINE_TEMP or 112) or rawTransmissionTemperature >= (config.EMERGENCY_TRANS_TEMP or 112)
+    if emergency then
+        state.currentReduction = maxReduction
+        state.integral = math.max(state.integral, 0)
+    end
+
+    local minSpeed = math.max(config.MIN_SPEED or 5.0, 0)
+    local estimatedBaseCruiseSpeed = math.max(cruiseSpeed + state.currentReduction, minSpeed)
+    if state.baseCruiseSpeed == nil then
+        state.baseCruiseSpeed = estimatedBaseCruiseSpeed
+    end
+
+    if estimatedBaseCruiseSpeed > state.baseCruiseSpeed then
+        state.baseCruiseSpeed = estimatedBaseCruiseSpeed
+    elseif state.currentReduction < 0.25 then
+        local syncDownRate = math.max(config.BASE_SYNC_DOWN_RATE or 1.8, 0.1)
+        local syncBlend = math.min(dtSeconds * syncDownRate, 1.0)
+        state.baseCruiseSpeed = state.baseCruiseSpeed + (estimatedBaseCruiseSpeed - state.baseCruiseSpeed) * syncBlend
+    end
+
+    local baseSpeedLimit = state.baseCruiseSpeed
+    local implementSpeedLimit = self:getAiWorkerImplementSpeedLimit()
+    if implementSpeedLimit ~= math.huge then
+        baseSpeedLimit = math.min(baseSpeedLimit, implementSpeedLimit)
+    end
+
+    local targetSpeed = math.max(minSpeed, baseSpeedLimit - state.currentReduction)
+    local maxUpStep = recoveryRate * dtSeconds
+    local maxDownStep = reductionRate * dtSeconds
+    if targetSpeed > cruiseSpeed then
+        targetSpeed = math.min(targetSpeed, cruiseSpeed + maxUpStep)
+    elseif targetSpeed < cruiseSpeed then
+        targetSpeed = math.max(targetSpeed, cruiseSpeed - maxDownStep)
+    end
+    targetSpeed = math.floor(targetSpeed * 10 + 0.5) / 10
+
+    state.applyTimer = (state.applyTimer or 0) + dtMs
+    local applyInterval = math.max(config.APPLY_INTERVAL_MS or 180, 50)
+    local minApplyDelta = math.max(config.MIN_APPLY_DELTA or 0.2, 0.01)
+
+    local shouldApply = emergency
+    if not shouldApply and state.applyTimer >= applyInterval then
+        local lastAppliedSpeed = state.lastAppliedSpeed or cruiseSpeed
+        if math.abs(targetSpeed - lastAppliedSpeed) >= minApplyDelta or math.abs(targetSpeed - cruiseSpeed) >= minApplyDelta then
+            shouldApply = true
+        end
+    end
+
+    if shouldApply then
+        self:setCruiseControlMaxSpeed(targetSpeed, nil)
+        state.lastAppliedSpeed = targetSpeed
+        state.applyTimer = 0
+    end
+
+    state.lastError = error
+
+    if ADS_Config.DEBUG and spec.debugData and spec.debugData.aiWorker then
+        local dbg = spec.debugData.aiWorker
+        dbg.stress = stress
+        dbg.filteredStress = state.filteredStress
+        dbg.error = error
+        dbg.integral = state.integral
+        dbg.derivative = derivative
+        dbg.reduction = state.currentReduction
+        dbg.targetSpeed = targetSpeed
+        dbg.appliedSpeed = state.lastAppliedSpeed or cruiseSpeed
+        dbg.baseCruiseSpeed = state.baseCruiseSpeed or 0
+        dbg.loadStress = loadStress
+        dbg.engineStress = engineStress
+        dbg.transStress = transStress
+    end
+end
 
 -- ==========================================================
 --                      CORE FUNCTIONS
@@ -1905,6 +2131,11 @@ local function isBreakdownSelectedForPlayerRepair(breakdownId, breakdown)
         return false
     end
 
+    local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+    if breakdownDef == nil or breakdownDef.isSelectable ~= true then
+        return false
+    end
+
     return breakdown ~= nil and breakdown.isSelectedForRepair == true and breakdown.isVisible == true
 end
 
@@ -2015,12 +2246,12 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
             selectedBreakdowns = idsToRepair
         end
 
-        local ageFactor = math.min(self.age / 12 / 100, 0.50)
-        local minRestore = C.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[key] - ageFactor
-        local maxRestore = C.OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS[key] - ageFactor
+        local overhaulPerformedCount = self:getOverhaulPerformedCount()
+        local minRestore = C.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[key] - C.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[key] * C.RE_OVERHAUL_FACTOR * overhaulPerformedCount
+        local maxRestore = C.OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS[key] - C.OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS[key] * C.RE_OVERHAUL_FACTOR * overhaulPerformedCount
         local restoreAmount = math.min((minRestore + math.random() * (maxRestore - minRestore)) * spec.maintainability, spec.baseConditionLevel)
         spec.pendingOverhaulConditionStart = spec.conditionLevel
-        local desiredConditionTarget = math.max(restoreAmount, ADS_Config.MAINTENANCE.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[2])
+        local desiredConditionTarget = math.max(restoreAmount, C.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[key])
         spec.pendingOverhaulConditionTarget = math.max(spec.pendingOverhaulConditionStart, desiredConditionTarget)
     end
 
@@ -2144,6 +2375,7 @@ function AdvancedDamageSystem:completeService()
     local optionTwo = spec.serviceOptionTwo
     local optionThree = spec.serviceOptionThree
     local selectedBreakdowns = shallow_copy(spec.pendingSelectedBreakdowns or {})
+    local plannedRepairCandidateIds = {}
 
     if serviceType == states.MAINTENANCE and spec.pendingMaintenanceServiceTarget ~= nil then
         local maintenanceStart = spec.pendingMaintenanceServiceStart or spec.serviceLevel
@@ -2173,14 +2405,26 @@ function AdvancedDamageSystem:completeService()
 
     if serviceType == states.INSPECTION or serviceType == states.MAINTENANCE then
         local needRepair = #selectedBreakdowns > 0
-        for _, breakdown in pairs(self:getActiveBreakdowns()) do
+        for _, breakdownId in ipairs(selectedBreakdowns) do
+            table.insert(plannedRepairCandidateIds, breakdownId)
+        end
+
+        for breakdownId, breakdown in pairs(self:getActiveBreakdowns()) do
             if breakdown.isVisible and breakdown.isSelectedForRepair then
                 needRepair = true
-                break
+                table.insert(plannedRepairCandidateIds, breakdownId)
             end
         end
 
         if optionThree and needRepair then
+            -- Planned repair should have a concrete queue. Ensure discovered/selected visible
+            -- breakdowns are marked for repair before the next service starts.
+            for _, breakdownId in ipairs(plannedRepairCandidateIds) do
+                local breakdown = self:getActiveBreakdowns()[breakdownId]
+                if breakdown ~= nil and breakdown.isVisible and breakdownId ~= "GENERAL_WEAR" then
+                    breakdown.isSelectedForRepair = true
+                end
+            end
             spec.plannedState = states.REPAIR
         end
     end
@@ -2252,17 +2496,40 @@ function AdvancedDamageSystem:completeService()
             nextOptionThree = false
         end
 
+        if nextWork == states.REPAIR then
+            local repairQueueCount = 0
+            for breakdownId, breakdown in pairs(self:getActiveBreakdowns()) do
+                if isBreakdownSelectedForPlayerRepair(breakdownId, breakdown) then
+                    repairQueueCount = repairQueueCount + 1
+                end
+            end
+
+            if repairQueueCount == 0 then
+                log_dbg("Planned REPAIR skipped: no visible selected breakdowns to repair.")
+                ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
+                return
+            end
+        end
+
         local price = self:getServicePrice(nextWork, nextOptionOne, nextOptionTwo, nextOptionThree)
 
-        print(nextWork .. " " .. tostring(nextOptionOne) .. " " .. tostring(nextOptionTwo) .. " " .. tostring(nextOptionThree) .. " " .. tostring(price))
         if g_currentMission:getMoney() >= price then
             self:initService(nextWork, spec.workshopType, nextOptionOne, nextOptionTwo, nextOptionThree)
+            local started = spec.currentState == nextWork and (spec.maintenanceTimer or 0) > 0
+
             ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
-            g_currentMission:addMoney(-1 * price, self:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
-            g_currentMission.hud:addSideNotification(
-                {1, 1, 1, 1},
-                string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_notification'), g_i18n:getText(nextWork)))
-            )
+
+            if started then
+                if price > 0 then
+                    g_currentMission:addMoney(-1 * price, self:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
+                end
+                g_currentMission.hud:addSideNotification(
+                    {1, 1, 1, 1},
+                    string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_notification'), g_i18n:getText(nextWork)))
+                )
+            else
+                log_dbg("Planned service was requested but did not start. State:", tostring(spec.currentState), "Timer:", tostring(spec.maintenanceTimer))
+            end
         else
             ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
             g_currentMission.hud:addSideNotification(
@@ -2505,9 +2772,34 @@ end
 function AdvancedDamageSystem:getMaintenanceInterval()
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return 0 end
+    local lastMaintenanceType = AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD
 
-    local interval = ((spec.baseServiceLevel / ADS_Config.CORE.BASE_SERVICE_WEAR) / 2) * spec.reliability
+    for i = #spec.maintenanceLog, 1, -1 do
+        local entry = spec.maintenanceLog[i]
+        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE then
+            lastMaintenanceType = entry.optionOne
+            break
+        end
+    end
+
+    local maintenanceIndex = ADS_Utils.getNameByValue(AdvancedDamageSystem.MAINTENANCE_TYPES, lastMaintenanceType)
+    local restoreCoeff = ADS_Config.MAINTENANCE.MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS[maintenanceIndex]
+
+    local interval = (spec.baseServiceLevel * restoreCoeff / ADS_Config.CORE.BASE_SERVICE_WEAR / 2) * spec.reliability
     return interval
+end
+
+function AdvancedDamageSystem:getHoursSinceLastMaintenance()
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec then return 0 end
+
+    for i = #spec.maintenanceLog, 1, -1 do
+        local entry = spec.maintenanceLog[i]
+        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
+            return self:getFormattedOperatingTime() - entry.conditionData.operatingHours
+        end
+    end
+    return 0
 end
 
 function AdvancedDamageSystem:getLastServiceOptions()
@@ -2520,8 +2812,23 @@ function AdvancedDamageSystem:getLastServiceOptions()
     end
 end
 
+function AdvancedDamageSystem:getOverhaulPerformedCount()
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec or not spec.maintenanceLog or #spec.maintenanceLog == 0 then
+        return 0
+    end
+    local count = 0
+    for i = #spec.maintenanceLog, 1, -1 do
+        local entry = spec.maintenanceLog[i]
+        if entry.type == AdvancedDamageSystem.STATUS.OVERHAUL  then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
-    local year = 2000
+    local year = 2005
     local brandName = 'LIZARD'
     local name = 'LIZARD'
 
@@ -2553,8 +2860,8 @@ function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
     end
 
     local yearFactor = 0
-    if year < 2000 then
-        yearFactor = math.max(2000 - year, 0) * 0.01
+    if year < ADS_Config.CORE.RELIABILITY_YEAR_FACTOR_THRESHOLD then
+        yearFactor = math.max(ADS_Config.CORE.RELIABILITY_YEAR_FACTOR_THRESHOLD - year, 0) * ADS_Config.CORE.RELIABILITY_YEAR_FACTOR
     end
 
     local modelData = ADS_Config.BRANDS[name]
@@ -2588,7 +2895,33 @@ function AdvancedDamageSystem.calculateBreakdownProbability(level, p, dt)
     return probability
 end
 
-function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, optionTwo, optionThree)
+function AdvancedDamageSystem:isWarrantyRepairCovered(partType)
+    local C = ADS_Config.MAINTENANCE
+    if C == nil or not C.WARRANTY_ENABLED then
+        return false
+    end
+
+    if self.propertyState ~= 2 then
+        return false
+    end
+
+    local resolvedPartType = partType or AdvancedDamageSystem.PART_TYPES.OEM
+    local partTypeKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.PART_TYPES, resolvedPartType) or tostring(resolvedPartType)
+    if partTypeKey ~= "OEM" then
+        return false
+    end
+
+    local operatingHours = self.getFormattedOperatingTime ~= nil and tonumber(self:getFormattedOperatingTime()) or 0
+    local ageMonths = tonumber(self.age) or 0
+
+    if operatingHours >= (C.WARRANTY_MAX_OPERATING_HOURS or 20) or ageMonths >= (C.WARRANTY_MAX_AGE_MONTHS or 12) then
+        return false
+    end
+
+    return true
+end
+
+function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, optionTwo, optionThree, workshopTypeOverride)
     local price = self:getPrice()
     local spec = self.spec_AdvancedDamageSystem
     local ageFactor = math.min(math.max(math.log10(self.age), 1), 2)
@@ -2601,10 +2934,9 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
         return 0
     end
 
-    local ownWorkshopDiscount = 1.0
-    if spec.workshopType == AdvancedDamageSystem.WORKSHOP.OWN then
-        ownWorkshopDiscount = C.OWN_WORKSHOP_DISCOUNT
-    end
+    local workshopType = workshopTypeOverride or spec.workshopType
+    local workshopKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.WORKSHOP, workshopType)
+    local ownWorkshopDiscount = ADS_Config.WORKSHOP.PRICE_MULTIPLIERS[workshopKey] or 1.0
 
     -- inspection
     if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
@@ -2632,6 +2964,10 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
         return overhaulPrice
     -- repair
     elseif maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
+        if self:isWarrantyRepairCovered(optionTwo) then
+            return 0
+        end
+
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.REPAIR_URGENCY, optionOne)
         local repairPrice = 0
         local activeBreakdowns = self:getActiveBreakdowns()
@@ -2651,7 +2987,7 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
     return 0
 end
 
-function AdvancedDamageSystem:getBreakdownRepairPrice(breakdownId, breakdownStage)
+function AdvancedDamageSystem:getBreakdownRepairPrice(breakdownId, breakdownStage, partType)
     local C = ADS_Config.MAINTENANCE
     local spec = self.spec_AdvancedDamageSystem
     local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
@@ -2660,21 +2996,25 @@ function AdvancedDamageSystem:getBreakdownRepairPrice(breakdownId, breakdownStag
     local stageData = registryEntry.stages[breakdownStage]
     if stageData == nil then return 0 end
 
+    if self:isWarrantyRepairCovered(partType) then
+        return 0
+    end
+
     local price = stageData.repairPrice or 0
     local vehiclePrice = self:getPrice()
     local ageFactor = math.min(math.max(math.log10(self.age), 1), 2)
-    local ownWorkshopDiscount = 1.0
-    if spec.workshopType == AdvancedDamageSystem.WORKSHOP.OWN then
-        ownWorkshopDiscount = C.OWN_WORKSHOP_DISCOUNT
-    end
+
+    local workshopKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.WORKSHOP, spec.workshopType)
+    local ownWorkshopDiscount = ADS_Config.WORKSHOP.PRICE_MULTIPLIERS[workshopKey] or 1.0
+
 
     return price * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * (vehiclePrice / 100) * ageFactor * ownWorkshopDiscount / spec.maintainability
 end
 
-function AdvancedDamageSystem:getServiceDuration(maintenanceType, optionOne, optionTwo, optionThree)
+function AdvancedDamageSystem:getServiceDuration(maintenanceType, optionOne, optionTwo, optionThree, workshopTypeOverride)
     local spec = self.spec_AdvancedDamageSystem
     local C = ADS_Config.MAINTENANCE
-    local workshopType = spec.workshopType
+    local workshopType = workshopTypeOverride or spec.workshopType
 
     if not maintenanceType then maintenanceType = spec.currentState end
 
@@ -2774,7 +3114,7 @@ function AdvancedDamageSystem:getServiceDuration(maintenanceType, optionOne, opt
 end
 
 
-function AdvancedDamageSystem:getServiceFinishTime(maintenanceType, optionOne, optionTwo, optionThree)
+function AdvancedDamageSystem:getServiceFinishTime(maintenanceType, optionOne, optionTwo, optionThree, workshopTypeOverride)
     local spec = self.spec_AdvancedDamageSystem
 
     if not maintenanceType then maintenanceType = spec.currentState end
@@ -2787,7 +3127,7 @@ function AdvancedDamageSystem:getServiceFinishTime(maintenanceType, optionOne, o
         return 0
     end
 
-    local totalCalendarDuration = AdvancedDamageSystem.getServiceDuration(self, maintenanceType, optionOne, optionTwo, optionThree)
+    local totalCalendarDuration = AdvancedDamageSystem.getServiceDuration(self, maintenanceType, optionOne, optionTwo, optionThree, workshopTypeOverride)
 
     if totalCalendarDuration <= 0 then
         local currentTime = (g_currentMission.environment.dayTime / 3600000) % 24
