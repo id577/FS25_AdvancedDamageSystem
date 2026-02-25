@@ -441,7 +441,6 @@ These options directly affect service **duration**, **cost**, and **quality**. A
 
 - **When to use:** Regularly! However, keep in mind that the cost of this procedure is **fixed** and does not depend on the actual Service level. This means servicing a vehicle at 90% costs the same as servicing it at 10%, so finding the right balance is key to managing your budget.
 
-Manufacturer's recommendation: Every 5 operating hours. Experienced farmers might find their own balance, but don't delay maintenance for too long.
 
 > [!NOTE]
 > <details>
