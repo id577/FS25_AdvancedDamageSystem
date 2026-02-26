@@ -30,7 +30,7 @@ function ADS_Utils.getEstimatedMTBF(level, p)
 end
 
 function ADS_Utils.getCriticalFailureChance(condition)
-    local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITY
+    local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITIES
     return math.clamp((1 - condition) ^ probability.CRITICAL_DEGREE, probability.CRITICAL_MIN, probability.CRITICAL_MAX)
 end
 
@@ -101,8 +101,8 @@ function ADS_Utils.serializeBreakdowns(breakdownsTable)
         local visible = breakdown.isVisible and 1 or 0
         local selected = breakdown.isSelectedForRepair and 1 or 0
         
-        local part = string.format("%s,%d,%.2f,%d,%d", id, breakdown.stage, breakdown.progressTimer or 0, visible, selected)
-        table.insert(parts, part)
+        local system = string.format("%s,%d,%.2f,%d,%d", id, breakdown.stage, breakdown.progressTimer or 0, visible, selected)
+        table.insert(parts, system)
     end
     return table.concat(parts, ";")
 end

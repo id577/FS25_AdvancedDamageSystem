@@ -222,10 +222,10 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
             if isLoggableRepairBreakdownId(breakdownId) then
                 local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
                  
-                if breakdownDef and breakdownDef.part then
-                    if not seenParts[breakdownDef.part] then
-                        table.insert(repairedParts, breakdownDef.part)
-                        seenParts[breakdownDef.part] = true
+                if breakdownDef and breakdownDef.system then
+                    if not seenParts[breakdownDef.system] then
+                        table.insert(repairedParts, breakdownDef.system)
+                        seenParts[breakdownDef.system] = true
                     end
                 end
             end

@@ -172,7 +172,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
         element:setState(1)
     end
 
-     local currentBreakdownPct = math.floor((1200 / ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF) * 100 + 0.5)
+     local currentBreakdownPct = math.floor((1200 / ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF) * 100 + 0.5)
     setIndex(currentPage.ads_breakdownProbability, steps.breakdown.values, currentBreakdownPct)
     setIndex(currentPage.ads_serviceWear,       steps.serviceWear.values,    ADS_Config.CORE.BASE_SERVICE_WEAR)
     setIndex(currentPage.ads_conditionWear,     steps.conditionWear.values,  ADS_Config.CORE.BASE_SYSTEMS_WEAR)
@@ -275,7 +275,7 @@ end
 
 function ADS_InGameSettings:onBreakdownProbabilityChanged(state)
     local pct = ADS_InGameSettings.steps.breakdown.values[state]
-    ADS_Config.CORE.BREAKDOWN_PROBABILITY.MAX_MTBF = math.floor(1200 / (pct / 100) + 0.5)
+    ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF = math.floor(1200 / (pct / 100) + 0.5)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 

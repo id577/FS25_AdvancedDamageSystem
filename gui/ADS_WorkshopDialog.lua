@@ -254,7 +254,7 @@ function ADS_WorkshopDialog:populateCellForItemInSection(list, section, index, c
     local data = self.activeBreakdowns[breadownId]
     if data == nil then return end
 
-    local part_key = self.breakdonRegistry[breadownId].part
+    local part_key = self.breakdonRegistry[breadownId].system
     local stage_key = self.breakdonRegistry[breadownId].stages[data.stage].severity
     local description_key = self.breakdonRegistry[breadownId].stages[data.stage].description
     local price = self.vehicle:getBreakdownRepairPrice(breadownId, data.stage, AdvancedDamageSystem.PART_TYPES.OEM)

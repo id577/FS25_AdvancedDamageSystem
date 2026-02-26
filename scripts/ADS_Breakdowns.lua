@@ -50,33 +50,35 @@ local function getIsElectricVehicle(vehicle)
     end
 end
 
+local systems = AdvancedDamageSystem.SYSTEMS
 ADS_Breakdowns.BreakdownRegistry = {
 
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
 
 -- additional debuffs for aging equipment, in addition to the standard ones (torque for motorized, fillDelta for combine)
-    GENERAL_WEAR = {
+    ENGINE_WEAR = {
+        system = systems.ENGINE,
         isSelectable = false,
         part = "ads_breakdowns_part_vehicle",
         isApplicable = function(vehicle)
             return true
         end,
         probability = function(vehicle)
-            return 0.0   
+            return 0.0
         end,
         isCanProgress = function(vehicle)
-            return true
+            return false
         end,
         stages = {
             {
                 severity = "ads_breakdowns_severity_permanent",
                 description = "ads_breakdowns_general_wear_stage1_description",
                 detectionChance = 0.0,
-                progressMultiplier = 0.2,
+                progressMultiplier = 0.0,
                 repairPrice = 0.0,
                 effects = {
-                    { 
-                        id = "ENGINE_TORQUE_MODIFIER", 
+                    {
+                        id = "ENGINE_TORQUE_MODIFIER",
                         value = function(vehicle)
                             local baseEffect = -0.30
                             local condition = vehicle:getConditionLevel()
@@ -84,19 +86,125 @@ ADS_Breakdowns.BreakdownRegistry = {
                             return baseEffect * multiplier
                         end,
                         aggregation = "sum"
-                    },
-                    { 
-                        id = "BRAKE_FORCE_MODIFIER", 
+                    }
+                },
+                indicators = {}
+            }
+        }
+    },
+
+    TRANSMISSION_WEAR = {
+        system = systems.TRANSMISSION,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {}
+            }
+        }
+    },
+
+    HYDRAULICS_WEAR = {
+        system = systems.HYDRAULICS,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {}
+            }
+        }
+    },
+
+    COOLING_WEAR = {
+        system = systems.COOLING,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    {
+                        id = "THERMOSTAT_HEALTH_MODIFIER",
                         value = function(vehicle)
-                            local baseEffect = -0.3
+                            local baseEffect = -0.30
                             local condition = vehicle:getConditionLevel()
                             local multiplier = (1 - condition) ^ 3
                             return baseEffect * multiplier
                         end,
                         aggregation = "min"
-                    },
-                    { 
-                        id = "ENGINE_START_FAILURE_CHANCE", 
+                    }
+                },
+                indicators = {}
+            }
+        }
+    },
+
+    ELECTRICAL_WEAR = {
+        system = systems.ELECTRICAL,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    {
+                        id = "ENGINE_START_FAILURE_CHANCE",
                         value = function(vehicle)
                             local baseEffect = 0.66
                             local condition = vehicle:getConditionLevel()
@@ -105,19 +213,73 @@ ADS_Breakdowns.BreakdownRegistry = {
                         end,
                         aggregation = "max",
                         extraData = {timer = 0, status = 'IDLE'}
-                    },
-                    { 
-                        id = "THERMOSTAT_HEALTH_MODIFIER", 
+                    }
+                },
+                indicators = {}
+            }
+        }
+    },
+
+    CHASSIS_WEAR = {
+        system = systems.CHASSIS,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    {
+                        id = "BRAKE_FORCE_MODIFIER",
                         value = function(vehicle)
-                            local baseEffect = -0.30
+                            local baseEffect = -0.3
                             local condition = vehicle:getConditionLevel()
                             local multiplier = (1 - condition) ^ 3
                             return baseEffect * multiplier
                         end,
                         aggregation = "min"
-                    },
-                    { 
-                        id = "YIELD_REDUCTION_MODIFIER", 
+                    }
+                },
+                indicators = {}
+            }
+        }
+    },
+
+    WORKPROCESS_WEAR = {
+        system = systems.WORKPROCESS,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    {
+                        id = "YIELD_REDUCTION_MODIFIER",
                         value = function(vehicle)
                             local baseEffect = -0.30
                             local condition = vehicle:getConditionLevel()
@@ -129,13 +291,65 @@ ADS_Breakdowns.BreakdownRegistry = {
                     }
                 },
                 indicators = {}
-            }  
+            }
+        }
+    },
+
+    MATERIALFLOW_WEAR = {
+        system = systems.MATERIALFLOW,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {}
+            }
+        }
+    },
+
+    FUEL_WEAR = {
+        system = systems.FUEL,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {}
+            }
         }
     },
 
     MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES = {
         isSelectable = false,
-        part = "ads_breakdowns_part_vehicle",
+        system = "ads_breakdowns_part_vehicle",
         isApplicable = function(vehicle)
             return true
         end,
@@ -172,7 +386,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     REPAIR_WITH_POOR_QUALITY_PARTS = {
         isSelectable = false,
-        part = "ads_breakdowns_part_vehicle",
+        system = "ads_breakdowns_part_vehicle",
         isApplicable = function(vehicle)
             return true
         end,
@@ -216,7 +430,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     OVERHEAT_PROTECTION = {
         isSelectable = false,
-        part = "ads_breakdowns_part_engine",
+        system = "ads_breakdowns_part_engine",
         isApplicable = function(vehicle)
             return true
         end,
@@ -304,7 +518,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     ENGINE_JAM = {
         isSelectable = false,
-        part = "ads_breakdowns_part_engine",
+        system = "ads_breakdowns_part_engine",
         isApplicable = function(vehicle)
             return true
         end,
@@ -336,9 +550,10 @@ ADS_Breakdowns.BreakdownRegistry = {
 
 -------------------------------------------- SELECTABLE -----------------------------------------
 
+    -- electrical
     ECU_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_ecu",
+        system = systems.ELECTRICAL,
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
             if spec.year >= 2000 and not getIsElectricVehicle(vehicle) then
@@ -426,10 +641,84 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+    ELECTRICAL_SYSTEM_MALFUNCTION = {
+        isSelectable = true,
+        system = systems.ELECTRICAL,
+        isApplicable = function(vehicle)
+            local spec = vehicle.spec_AdvancedDamageSystem
+            return spec.year >= 2000 and vehicle.spec_lights ~= nil
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_electrical_system_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.0,
+                repairPrice = 0.36,
+                effects = {
+                    { id = "LIGHTS_FLICKER_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 200, maskBackup = 0}, aggregation = "min"},
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.1, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
 
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate", 
+                description = "ads_breakdowns_electrical_system_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0,
+                repairPrice = 0.72,
+                effects = {
+                    { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"},
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                },
+                indicators = {
+                    { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_electrical_system_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0,
+                repairPrice = 1.44, 
+                effects = { 
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
+                    { id = "LIGHTS_FAILURE", value = 1.0, extraData = {message = "ads_breakdowns_electrical_system_malfunction_stage3_message"}, aggregation = "boolean_or" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
+                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"},
+                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
+                },
+                indicators = {
+                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_electrical_system_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 2.88, 
+                effects = { 
+                    { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
+                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_electrical_system_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
+                },
+                indicators = {
+                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+    -- engine
     TURBOCHARGER_WEAR = {
         isSelectable = false,
-        part = "ads_breakdowns_part_turbocharger",
+        system = systems.ENGINE,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             local power = motor.peakMotorPower * 1.36
@@ -507,10 +796,10 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
+    -- fuel system 
     FUEL_PUMP_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_fuel_pump",
+        system = systems.FUEL,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -593,10 +882,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
     FUEL_INJECTOR_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_fuel_injectors",
+        system = systems.FUEL,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -666,10 +954,78 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
+    CARBURETOR_CLOGGING = {
+        isSelectable = true,
+        system = systems.FUEL,
+        isApplicable = function(vehicle)
+            local spec = vehicle.spec_AdvancedDamageSystem
+            return spec.year < 1980 and not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_carburetor_clogging_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.0,
+                repairPrice = 0.2,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_carburetor_clogging_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0,
+                repairPrice = 0.4,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_carburetor_clogging_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0,
+                repairPrice = 0.8, 
+                effects = { 
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_carburetor_clogging_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 1.6, 
+                effects = { 
+                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+    -- chassis system
     BRAKE_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_brake_system",
+        system = systems.CHASSIS,
         isApplicable = function(vehicle)
             if vehicle.spec_crawlers ~= nil then
                 return #vehicle.spec_crawlers.crawlers == 0
@@ -743,10 +1099,10 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
+    -- transmission system
     TRANSMISSION_SLIP = {
         isSelectable = true,
-        part = "ads_breakdowns_part_transmission",
+        system = systems.TRANSMISSION,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -813,10 +1169,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
     TRANSMISSION_SYNCHRONIZER_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_transmission",
+        system = systems.TRANSMISSION,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -875,10 +1230,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
     POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_transmission",
+        system = systems.TRANSMISSION,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -939,10 +1293,10 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
+    -- cooling system
     CVT_THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_cvt_cooling_system",
+        system = systems.COOLING,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             local spec = vehicle.spec_AdvancedDamageSystem
@@ -1006,10 +1360,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
     THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_cooling_system",
+        system = systems.COOLING,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -1069,10 +1422,10 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
+    -- hydraulic system
     HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_hydraulic_lift_system",
+        system = systems.HYDRAULICS,
         isApplicable = function(vehicle)
             local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
             if storeItem.categoryName == "TRUCKS" then return false end
@@ -1135,154 +1488,10 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
-    ELECTRICAL_SYSTEM_MALFUNCTION = {
-        isSelectable = true,
-        part = "ads_breakdowns_part_electrical_system",
-        isApplicable = function(vehicle)
-            local spec = vehicle.spec_AdvancedDamageSystem
-            return spec.year >= 2000 and vehicle.spec_lights ~= nil
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_electrical_system_malfunction_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.36,
-                effects = {
-                    { id = "LIGHTS_FLICKER_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 200, maskBackup = 0}, aggregation = "min"},
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.1, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
-
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate", 
-                description = "ads_breakdowns_electrical_system_malfunction_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.72,
-                effects = {
-                    { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"},
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
-                },
-                indicators = {
-                    { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_electrical_system_malfunction_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 1.44, 
-                effects = { 
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
-                    { id = "LIGHTS_FAILURE", value = 1.0, extraData = {message = "ads_breakdowns_electrical_system_malfunction_stage3_message"}, aggregation = "boolean_or" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
-                    { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"},
-                    { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
-                },
-                indicators = {
-                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_electrical_system_malfunction_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 2.88, 
-                effects = { 
-                    { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
-                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_electrical_system_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
-                },
-                indicators = {
-                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
-    CARBURETOR_CLOGGING = {
-        isSelectable = true,
-        part = "ads_breakdowns_part_carburetor",
-        isApplicable = function(vehicle)
-            local spec = vehicle.spec_AdvancedDamageSystem
-            return spec.year < 1980 and not getIsElectricVehicle(vehicle)
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_carburetor_clogging_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.2,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_carburetor_clogging_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.4,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" }
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_carburetor_clogging_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 0.8, 
-                effects = { 
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_carburetor_clogging_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 1.6, 
-                effects = { 
-                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
+    -- workprocess system
     YIELD_SENSOR_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_yield_sensor",
+        system = systems.WORKPROCESS,
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
             local vtype = vehicle.type.name
@@ -1347,10 +1556,10 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
+    -- materialflow system
     MATERIAL_FLOW_SYSTEM_WEAR = {
         isSelectable = true,
-        part = "ads_breakdowns_part_material_flow_system",
+        system = systems.MATERIALFLOW,
         isApplicable = function(vehicle)
             local vtype = vehicle.type.name
             return (vtype == 'combineDrivable' or vtype == 'combineCutter')
@@ -1422,10 +1631,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
     UNLOADING_AUGER_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_unloading_auger",
+        system = systems.MATERIALFLOW,
         isApplicable = function(vehicle)
             local vtype = vehicle.type.name
             return (vtype == 'combineDrivable' or vtype == 'combineCutter') and vehicle.spec_pipe ~= nil
@@ -2083,16 +2291,16 @@ ADS_Breakdowns.EffectApplicators.SERVICE_WEAR_MODIFIER = {
 }
 
 
------------------ BREAKDOWN_PROBABILITY_MODIFIER -----------------
-ADS_Breakdowns.EffectApplicators.BREAKDOWN_PROBABILITY_MODIFIER = {
+----------------- BREAKDOWN_PROBABILITIES_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.BREAKDOWN_PROBABILITIES_MODIFIER = {
     apply = function(vehicle, effectData, handler)
-        log_dbg("Applying BREAKDOWN_PROBABILITY_MODIFIER:", effectData.value)
+        log_dbg("Applying BREAKDOWN_PROBABILITIES_MODIFIER:", effectData.value)
         local spec = vehicle.spec_AdvancedDamageSystem
         spec.extraBreakdownProbability = effectData.value
     end,
 
     remove = function(vehicle, handler)
-        log_dbg("Removing BREAKDOWN_PROBABILITY_MODIFIER effect.")
+        log_dbg("Removing BREAKDOWN_PROBABILITIES_MODIFIER effect.")
         local spec = vehicle.spec_AdvancedDamageSystem
         spec.extraBreakdownProbability = 0
     end

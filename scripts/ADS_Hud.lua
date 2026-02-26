@@ -263,7 +263,7 @@ function ADS_Hud:drawDashboard()
     local motorText = string.format("%.0f%%", math.max(motorLoad * 100, 0))
 
     local motorLoadTextColor = {1, 1, 1, 1}
-    if motorLoad > ADS_Config.CORE.POWER_UNIT_SYSTEM_FACTORS_DATA.MOTOR_OVERLOADED_THRESHOLD then
+    if motorLoad > ADS_Config.CORE.ENGINE_FACTOR_DATA.MOTOR_OVERLOADED_THRESHOLD then
         motorLoadTextColor = colors.WARNING
     end
 
@@ -451,33 +451,67 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     local bcw = ADS_Config.CORE.BASE_SYSTEMS_WEAR
-    local bsw = ADS_Config.CORE.BASE_SERVICE_WEAR
-    local mf = spec.debugData.condition.motorLoadFactor * bcw
-    local sf = spec.debugData.condition.expiredServiceFactor * bcw
-    local cmf = spec.debugData.condition.coldMotorFactor * bcw
-    local hmf = spec.debugData.condition.hotMotorFactor * bcw
-    local ctf = spec.debugData.condition.coldTransFactor * bcw
-    local htf = spec.debugData.condition.hotTransFactor * bcw
-    local maxConditionFactor = math.max(mf, sf, cmf, hmf, ctf, htf)
 
-    local statusLines = {}
-    addLine(statusLines, string.format(
-        "R/M: %.2f/%.2f | S: %.3f(-%.4f) | C: %.3f(-%.4f) | F/C: %.4f/%.4f | mf/sf/cmf/hmf/ctf/htf: -%.4f/-%.4f/-%.4f/-%.4f/-%.4f/-%.4f",
-        spec.reliability,
-        spec.maintainability,
-        spec.serviceLevel,
-        spec.debugData.service.totalWearRate * bsw,
-        spec.conditionLevel,
-        spec.debugData.condition.totalWearRate * bcw,
-        spec.debugData.breakdown.failureChanceInHour,
-        spec.debugData.breakdown.criticalFailureInHour,
-        mf,
-        sf,
-        cmf,
-        hmf,
-        ctf,
-        htf
-    ), getConditionFactorColor(maxConditionFactor), 0.95)
+    local function asPercent(value)
+        return (value or 0) * 100
+    end
+
+    local function getSystemCondition(systemKey)
+        local systemData = spec.systems and spec.systems[systemKey]
+        if type(systemData) == "table" then
+            return systemData.condition or 0
+        end
+        return systemData or 0
+    end
+
+    local function getSystemStress(systemKey)
+        local systemData = spec.systems and spec.systems[systemKey]
+        if type(systemData) == "table" then
+            return systemData.stress or 0
+        end
+        return 0
+    end
+
+    local engineDbg = spec.debugData.engine or {}
+    local transmissionDbg = spec.debugData.transmission or {}
+    local engineMaxFactor = math.max(
+        engineDbg.motorLoadFactor or 0,
+        engineDbg.expiredServiceFactor or 0,
+        engineDbg.coldMotorFactor or 0,
+        engineDbg.hotMotorFactor or 0
+    ) * bcw
+    local transmissionMaxFactor = math.max(
+        transmissionDbg.expiredServiceFactor or 0,
+        transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor or 0,
+        transmissionDbg.hotTransFactor or 0
+    ) * bcw
+
+    local engineLines = {}
+    addLine(engineLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% mlf: %.2f%% cmf: %.2f%% hmf %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("engine")),
+        asPercent((engineDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("engine")),
+        asPercent((engineDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((engineDbg.motorLoadFactor or 0) * bcw),
+        asPercent((engineDbg.coldMotorFactor or 0) * bcw),
+        asPercent((engineDbg.hotMotorFactor or 0) * bcw),
+        asPercent(engineDbg.breakdownProbability or 0),
+        asPercent(engineDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(engineMaxFactor), 0.95)
+
+    local transmissionLines = {}
+    addLine(transmissionLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% ctf: %.2f%% htf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("transmission")),
+        asPercent((transmissionDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("transmission")),
+        asPercent((transmissionDbg.expiredServiceFactor or 0) * bcw),
+        asPercent(((transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0) * bcw),
+        asPercent((transmissionDbg.hotTransFactor or 0) * bcw),
+        asPercent(transmissionDbg.breakdownProbability or 0),
+        asPercent(transmissionDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(transmissionMaxFactor), 0.95)
 
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
@@ -588,7 +622,8 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     local sections = {
-        {title = "Status", lines = statusLines},
+        {title = "Engine", lines = engineLines},
+        {title = "Transmission", lines = transmissionLines},
         {title = "Engine Temp", lines = engineTempLines}
     }
 

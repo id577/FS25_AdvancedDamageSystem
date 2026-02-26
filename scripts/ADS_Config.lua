@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 32,
+    VER = 35,
 
     DEBUG = false,
 
@@ -40,22 +40,33 @@ ADS_Config = {
         -- 'Condition' represents the physical health of the vehicle's components.
         -- Higher value means faster condition degradation.
         BASE_SYSTEMS_WEAR = 0.01, -- (0.01 = 1% wear per hour at base rate)
-
         DOWNTIME_MULTIPLIER = 0.0,
 
         SYSTEM_WEIGHTS = {
-            powerUnit=0.22, 
+            engine=0.22, 
             transmission=0.16, 
-            hydraullics=0.12, 
+            hydraulics=0.12, 
             cooling=0.12, 
             electrical=0.08, 
             chassis=0.10, 
             workProcess=0.08, 
             materialFlow=0.06, 
-            energyStorage=0.06
+            fuel=0.06
         },
 
-        POWER_UNIT_SYSTEM_FACTORS_DATA = {
+        SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS = {
+            engine=10.0, 
+            transmission=10.0, 
+            hydraulics=10.0, 
+            cooling=10.0, 
+            electrical=10.0, 
+            chassis=10.0, 
+            workProcess=10.0, 
+            materialFlow=10.0, 
+            fuel=10.0
+        },
+
+        ENGINE_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 10,
             MOTOR_IDLING_MULTIPLIER = 0.5,
             MOTOR_IDLING_THRESHOLD = 0.3,
@@ -63,11 +74,11 @@ ADS_Config = {
             MOTOR_OVERLOADED_THRESHOLD = 0.95,
             COLD_MOTOR_THRESHOLD = 50,
             COLD_MOTOR_MULTIPLIER = 50.0,
-            OVERHEAT_MOTOR_MAX_MULTIPLIER = 50.0,
+            OVERHEAT_MOTOR_MULTIPLIER = 50.0,
             OVERHEAT_MOTOR_THRESHOLD = 95,
         },
 
-        TRANSMISSION_SYSTEM_FACTORS_DATA = {
+        TRANSMISSION_FACTOR_DATA = {
             COLD_TRANSMISSION_MULTIPLIER = 50.0,
             COLD_TRANSMISSION_THRESHOLD = 55,
             OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 50.0,
@@ -117,23 +128,13 @@ ADS_Config = {
         RELIABILITY_YEAR_FACTOR = 0.01,
         RELIABILITY_YEAR_FACTOR_THRESHOLD = 2000,
 
-        -- Defines the probability of a new breakdown occurring.
-        BREAKDOWN_PROBABILITY = {
-            VEHICLE_HONEYMOON_HOURS = 10,
-            -- The min MTBF in minutes at 0% condition.
-            MIN_MTBF = 120,
-            -- The max MTBF in minutes at 100% condition
-            MAX_MTBF = 1200,
-
+        BREAKDOWN_PROBABILITIES = {
+            STRESS_THRESHOLD = 0.1,
+            MIN_MTBF = 60,
+            MAX_MTBF = 3200,
             DEGREE = 3.0,
-
-            -- When a breakdown occurs, this defines the chance it will be "critical" (worst stage).
-            -- Minimum chance of a critical outcome (at high vehicle condition).
-            CRITICAL_MIN = 0.05, -- (5% chance)
-            -- Maximum chance of a critical outcome (at 0% vehicle condition).
-            CRITICAL_MAX = 0.33, -- (33% chance)
-            -- Controls the curve of the critical chance. Higher value means low condition
-            -- is much more likely to result in an immediate critical failure.
+            CRITICAL_MIN = 0.05,
+            CRITICAL_MAX = 0.33,
             CRITICAL_DEGREE = 5
         },
     },

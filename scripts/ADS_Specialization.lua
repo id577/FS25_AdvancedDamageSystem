@@ -33,6 +33,19 @@ AdvancedDamageSystem = {
         WORKHORSE = "ads_spec_state_workhorse"
     },
 
+    SYSTEMS = {
+        ENGINE = "ads_spec_system_engine",
+        TRANSMISSION = "ads_spec_system_transmission",
+        HYDRAULICS = "ads_spec_system_hydraulics",
+        COOLING = "ads_spec_system_cooling",
+        ELECTRICAL = "ads_spec_system_electrical",
+        CHASSIS = "ads_spec_system_chassis",
+        WORKPROCESS = "ads_spec_system_workprocess",
+        MATERIALFLOW = "ads_spec_system_materialflow",
+        FUEL = "ads_spec_system_fuel"
+        
+    },
+
 WORKSHOP = {
     DEALER  = "ads_spec_workshop_dealer",
     MOBILE  = "ads_spec_workshop_mobile",
@@ -181,6 +194,10 @@ local function parseCsvList(csvString)
     return result
 end
 
+local function getSystemKey(systemName)
+    return string.lower(ADS_Utils.getNameByValue(AdvancedDamageSystem.SYSTEMS, systemName) or "")
+end
+
 -- ==========================================================
 --                    SAVE/LOAD & REGISTRATION
 -- ==========================================================
@@ -259,7 +276,6 @@ function AdvancedDamageSystem.initSpecialization()
     schema:setXMLSpecializationType()
 end
 
-
 function AdvancedDamageSystem.registerEventListeners(vehicleType)
     log_dbg("registerEventListeners called for vehicleType:", vehicleType.name)
     SpecializationUtil.registerEventListener(vehicleType, "onLoad", AdvancedDamageSystem)
@@ -276,7 +292,6 @@ function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "setLightsTypesMask", ADS_Breakdowns.setLightsTypesMask)
 end
 
-
 function AdvancedDamageSystem.registerFunctions(vehicleType)
     log_dbg("registerFunctions called for vehicleType:", vehicleType.name)
     SpecializationUtil.registerFunction(vehicleType, "adsUpdate", AdvancedDamageSystem.adsUpdate)
@@ -284,7 +299,8 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "recalculateAndApplyEffects", AdvancedDamageSystem.recalculateAndApplyEffects)
     SpecializationUtil.registerFunction(vehicleType, "recalculateAndApplyIndicators", AdvancedDamageSystem.recalculateAndApplyIndicators)
     
-    SpecializationUtil.registerFunction(vehicleType, "checkForNewBreakdown", AdvancedDamageSystem.checkForNewBreakdown)
+    SpecializationUtil.registerFunction(vehicleType, "tryTriggerBreakdown", AdvancedDamageSystem.tryTriggerBreakdown)
+    SpecializationUtil.registerFunction(vehicleType, "getRandomBreakdownBySystem", AdvancedDamageSystem.getRandomBreakdownBySystem)
     SpecializationUtil.registerFunction(vehicleType, "getRandomBreakdown", AdvancedDamageSystem.getRandomBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "addBreakdown", AdvancedDamageSystem.addBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "removeBreakdown", AdvancedDamageSystem.removeBreakdown)
@@ -300,11 +316,21 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
 
     SpecializationUtil.registerFunction(vehicleType, "getServiceLevel", AdvancedDamageSystem.getServiceLevel)
     SpecializationUtil.registerFunction(vehicleType, "getConditionLevel", AdvancedDamageSystem.getConditionLevel)
+    SpecializationUtil.registerFunction(vehicleType, "getSystemConditionLevel", AdvancedDamageSystem.getSystemConditionLevel)
+    SpecializationUtil.registerFunction(vehicleType, "getSystemStressLevel", AdvancedDamageSystem.getSystemStressLevel)
     SpecializationUtil.registerFunction(vehicleType, "updateServiceLevel", AdvancedDamageSystem.updateServiceLevel)
     SpecializationUtil.registerFunction(vehicleType, "updateConditionLevel", AdvancedDamageSystem.updateConditionLevel)
 
-    SpecializationUtil.registerFunction(vehicleType, "updatePowerUnitSystem", AdvancedDamageSystem.updatePowerUnitSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateSystemConditionAndStress", AdvancedDamageSystem.updateSystemConditionAndStress)
+    SpecializationUtil.registerFunction(vehicleType, "updateEngineSystem", AdvancedDamageSystem.updateEngineSystem)
     SpecializationUtil.registerFunction(vehicleType, "updateTransmissionSystem", AdvancedDamageSystem.updateTransmissionSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateHydraulicsSystem", AdvancedDamageSystem.updateHydraulicsSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateCoolingSystem", AdvancedDamageSystem.updateCoolingSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateElectricalSystem", AdvancedDamageSystem.updateElectricalSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateChassisSystem", AdvancedDamageSystem.updateChassisSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateFuelSystem", AdvancedDamageSystem.updateFuelSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateWorkProcessSystem", AdvancedDamageSystem.updateWorkProcessSystem)
+    SpecializationUtil.registerFunction(vehicleType, "updateMaterialFlowSystem", AdvancedDamageSystem.updateMaterialFlowSystem)
     
     SpecializationUtil.registerFunction(vehicleType, "isUnderService", AdvancedDamageSystem.isUnderService)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
@@ -333,7 +359,6 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getOverhaulPerformedCount", AdvancedDamageSystem.getOverhaulPerformedCount)
     
 end
-
 
 function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
     log_dbg("saveToXMLFile called for vehicle:", self:getFullName(), "with key:", key)
@@ -431,7 +456,6 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
     end
 end
 
-
 function AdvancedDamageSystem:onLoad(savegame)
     log_dbg("onLoad called for vehicle:", self:getFullName())
     self.spec_AdvancedDamageSystem = {}
@@ -441,15 +465,15 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
 
     self.spec_AdvancedDamageSystem.systems = {
-        powerUnit = 1.0,
-        transmission = 1.0,
-        hydraullics = 1.0,
-        cooling = 1.0,
-        electrical = 1.0,
-        chassis = 1.0,
-        workProcess = 1.0,
-        materialFlow = 1.0,
-        energyStorage = 1.0
+        engine = { name = AdvancedDamageSystem.SYSTEMS.ENGINE, condition = 1.0, stress = 0.0, enabled = true },
+        transmission = { name = AdvancedDamageSystem.SYSTEMS.TRANSMISSION, condition = 1.0, stress = 0.0, enabled = true },
+        hydraulics = { name = AdvancedDamageSystem.SYSTEMS.HYDRAULICS, condition = 1.0, stress = 0.0, enabled = true },
+        cooling = { name = AdvancedDamageSystem.SYSTEMS.COOLING, condition = 1.0, stress = 0.0, enabled = true },
+        electrical = { name = AdvancedDamageSystem.SYSTEMS.ELECTRICAL, condition = 1.0, stress = 0.0, enabled = true },
+        chassis = { name = AdvancedDamageSystem.SYSTEMS.CHASSIS, condition = 1.0, stress = 0.0, enabled = true },
+        workProcess = { name = AdvancedDamageSystem.SYSTEMS.WORKPROCESS, condition = 1.0, stress = 0.0, enabled = true },
+        materialFlow = { name = AdvancedDamageSystem.SYSTEMS.MATERIALFLOW, condition = 1.0, stress = 0.0, enabled = true },
+        fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true }
     }
 
     self.spec_AdvancedDamageSystem.extraConditionWear = 0
@@ -511,25 +535,82 @@ function AdvancedDamageSystem:onLoad(savegame)
         },
         condition = 0,
 
-        powerUnitSystem = {
+        engine = {
+            condition = 0,
+            stress = 0,
             totalWearRate = 0, 
             motorLoadFactor = 0, 
             expiredServiceFactor = 0, 
             coldMotorFactor = 0, 
-            hotMotorFactor = 0
+            hotMotorFactor = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
         },
 
-        transmissionSystem = {
+        transmission = {
+            condition = 0,
+            stress = 0,
             totalWearRate = 0, 
             expiredServiceFactor = 0, 
             coldMotorFactor = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
         },
 
-        breakdown = {
-            failureChancePerFrame = 0,
-            criticalOutcomeChance = 0,
-            failureChanceInHour = 0,
-            criticalFailureInHour = 0
+        hydraulics = {
+            condition = 0,
+            stress = 0,
+            totalWearRate = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
+        },
+
+        cooling = {
+            condition = 0,
+            stress = 0,
+            totalWearRate = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
+        },
+
+        electrical = {
+            condition = 0,
+            stress = 0,
+            totalWearRate = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
+        },
+
+        chassis = {
+            condition = 0,
+            stress = 0,
+            totalWearRate = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
+        },
+
+        workProcess = {
+            condition = 0,
+            stress = 0,
+            totalWearRate = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
+        },
+
+        materialFlow = {
+            condition = 0,
+            stress = 0,
+            totalWearRate = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
+        },
+
+        fuel = {
+            condition = 0,
+            stress = 0,
+            totalWearRate = 0,
+            breakdownProbability = 0,
+            critBreakdownProbability = 0
         },
 
         engineTemp = {
@@ -556,6 +637,7 @@ function AdvancedDamageSystem:onLoad(savegame)
             waxSpeed = 0,
             kp = 0
         },
+
         aiWorker = {
             stress = 0,
             filteredStress = 0,
@@ -910,7 +992,9 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             if self:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel or self:getDamageAmount() > 0 then
                 -- Used vehicle logic
                 spec.serviceLevel = 1 - self:getDamageAmount()
-                spec.conditionLevel = math.max(1 - self:getFormattedOperatingTime() / 150, math.random() * 0.3)
+                for _, systemData in pairs(spec.systems) do
+                    systemData.condition = math.max(1 - self:getFormattedOperatingTime() / 150, math.random() * 0.3)
+                end
                 self:setDamageAmount(0.0, true)
             end
 
@@ -932,13 +1016,6 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     --- just in case, reset damage amount to 0 if it's not
     if self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
-
-    --- general wear and tear
-    if self:getConditionLevel() < ADS_Config.CORE.GENERAL_WEAR_THRESHOLD and not self:hasBreakdown('GENERAL_WEAR') then
-        self:addBreakdown('GENERAL_WEAR', 1)
-    elseif self:hasBreakdown('GENERAL_WEAR') and self:getConditionLevel() > ADS_Config.CORE.GENERAL_WEAR_THRESHOLD then
-        self:removeBreakdown('GENERAL_WEAR')
-    end
 
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
     if spec.year >= 2000 then
@@ -985,7 +1062,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- Cold engine message
-    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.POWER_UNIT_SYSTEM_FACTORS_DATA.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
+    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
             local spec_motorized = self.spec_motorized
             local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
             local maxRpm = spec_motorized.motor.maxRpm
@@ -1029,7 +1106,6 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     spec.effectsUpdateTimer = spec.effectsUpdateTimer - ADS_Config.EFFECTS_UPDATE_DELAY
 end
 
-
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then return end
@@ -1041,16 +1117,23 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     else
         if self:getIsOperating() and self.propertyState ~= 4 then
             self:processBreakdowns(dt)
-            self:checkForNewBreakdown(dt)
+            self:tryTriggerBreakdown(dt)
         end
         -- service
         self:updateServiceLevel(dt)
         -- systems
-        self:updatePowerUnitSystem(dt)
+        self:updateEngineSystem(dt)
         self:updateTransmissionSystem(dt)
+        self:updateHydraulicsSystem(dt)
+        self:updateCoolingSystem(dt)
+        self:updateElectricalSystem(dt)
+        self:updateChassisSystem(dt)
+        self:updateFuelSystem(dt)
+        self:updateWorkProcessSystem(dt)
+        self:updateMaterialFlowSystem(dt)
 
         --condtition
-        self:updateConditionLevel(dt)
+        self:updateConditionLevel()
     end
 end
 
@@ -1267,6 +1350,42 @@ end
 --                      CORE FUNCTIONS
 -- =========================================================
 
+local function ensureSystemData(spec, systemName)
+    if spec.systems == nil then
+        spec.systems = {}
+    end
+
+    local systemData = spec.systems[systemName]
+    if type(systemData) ~= "table" then
+        systemData = {
+            condition = tonumber(systemData) or 1.0,
+            stress = 0.0
+        }
+        spec.systems[systemName] = systemData
+    end
+
+    systemData.condition = math.clamp(tonumber(systemData.condition) or 1.0, 0.001, 1.0)
+    systemData.stress = math.max(tonumber(systemData.stress) or 0.0, 0.0)
+
+    return systemData
+end
+
+local function syncSystemWearBreakdown(vehicle, systemData, wearBreakdownName)
+    if vehicle == nil or systemData == nil or wearBreakdownName == nil then
+        return
+    end
+
+    local condition = tonumber(systemData.condition) or 1.0
+    local threshold = ADS_Config.CORE.GENERAL_WEAR_THRESHOLD or 0.0
+    local hasWearBreakdown = vehicle:hasBreakdown(wearBreakdownName)
+
+    if condition < threshold and not hasWearBreakdown then
+        vehicle:addBreakdown(wearBreakdownName)
+    elseif condition > threshold and hasWearBreakdown then
+        vehicle:removeBreakdown(wearBreakdownName)
+    end
+end
+
 -- service
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -1280,18 +1399,71 @@ function AdvancedDamageSystem:updateConditionLevel()
     local condition = 0
 
     for system, health in pairs(spec.systems) do
-        condition = condition + health * (ADS_Config.CORE.SYSTEM_WEIGHTS[system] or 0)
+        local systemCondition = health
+        if type(health) == "table" then
+            systemCondition = health.condition or 1.0
+        end
+        condition = condition + systemCondition * (ADS_Config.CORE.SYSTEM_WEIGHTS[system] or 0)
     end
     spec.conditionLevel = math.clamp(condition, 0.001, 1.0)
 end
 
--- power unit
-function AdvancedDamageSystem:updatePowerUnitSystem(dt)
+function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wearRate, debugFactors)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    local baseWearRate = 1.0
+    local systemData = ensureSystemData(spec, systemName)
+
+    if self.getIsMotorStarted == nil or not self:getIsMotorStarted() then
+        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+    end
+
+    local reliability = math.max(spec.reliability or 1.0, 0.001)
+    wearRate = wearRate / reliability
+
+    local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
+    local systemStressMultiplier = stressMultipliers[systemName] or 1.0
+    local dtMultiplier =  ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
+
+    local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier
+    systemData.stress = math.max((systemData.stress or 0) + stressToAdd, 0)
+
+    local newCondition = (systemData.condition or 1.0) - wearRate * dtMultiplier
+    systemData.condition = math.clamp(newCondition, 0.001, 1.0)
+
+    if ADS_Config.DEBUG and systemName ~= nil then
+        if spec.debugData == nil then
+            spec.debugData = {}
+        end
+        if spec.debugData[systemName] == nil then
+            spec.debugData[systemName] = {}
+        end
+
+        local dbg = spec.debugData[systemName]
+        dbg.condition = systemData.condition
+        dbg.stress = systemData.stress
+        dbg.totalWearRate = wearRate
+
+        if debugFactors ~= nil then
+            for key, value in pairs(debugFactors) do
+                dbg[key] = value
+            end
+        end
+    end
+end
+
+-- engine
+function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
-    local C = ADS_Config.CORE.POWER_UNIT_SYSTEM_FACTORS_DATA
-    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor = 0, 0, 0, 0, 0, 0
-    local wearRate = 1.0
+    local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
+    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor = 0, 0, 0, 0
+    local baseWearRate = 1.0
+    local wearRate = baseWearRate
+    local systemKey = getSystemKey(spec.systems.engine.name)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1299,32 +1471,32 @@ function AdvancedDamageSystem:updatePowerUnitSystem(dt)
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
 
-        -- overload
+        -- overload factor
         if motorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
             motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, C.MOTOR_OVERLOADED_THRESHOLD, false)
-            motorLoadFactor = motorLoadFactor * C.MOTOR_OVERLOADED_MAX_MULTIPLIER
+            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0)
             wearRate = wearRate + motorLoadFactor
         end
 
-        -- service
-        if self:getServiceLevel() < C.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * C.SERVICE_EXPIRED_MAX_MULTIPLIER
+        -- service factor
+        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
+            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
+            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
             wearRate = wearRate + expiredServiceFactor
         end
 
-        -- engine cold
+        -- cold engine factor
         if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
-            coldMotorFactor = coldMotorFactor * C.COLD_MOTOR_MAX_MULTIPLIER * motorLoadInf
+            coldMotorFactor = coldMotorFactor * (C.COLD_MOTOR_MULTIPLIER or 0) * motorLoadInf
             wearRate = wearRate + coldMotorFactor
 
-        -- engine overheating
+        -- overheating engine factor
         elseif spec.engineTemperature > C.OVERHEAT_MOTOR_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
             hotMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_MOTOR_THRESHOLD, false, 120)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.3, false)
-            hotMotorFactor = hotMotorFactor * C.OVERHEAT_MOTOR_MAX_MULTIPLIER * motorLoadInf
+            hotMotorFactor = hotMotorFactor * (C.OVERHEAT_MOTOR_MULTIPLIER or C.OVERHEAT_MOTOR_MULTIPLIER or 0) * motorLoadInf
             wearRate = wearRate + hotMotorFactor
         end
         
@@ -1338,24 +1510,26 @@ function AdvancedDamageSystem:updatePowerUnitSystem(dt)
     else
         wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
     end
-        wearRate = wearRate  / spec.reliability
 
-    spec.systems.powerUnit = spec.systems.powerUnit - wearRate * ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
-
-    if ADS_Config.DEBUG then
-        spec.debugData.powerUnitSystem = {totalWearRate = wearRate, motorLoadFactor = motorLoadFactor, expiredServiceFactor = expiredServiceFactor, coldMotorFactor = coldMotorFactor, hotMotorFactor = hotMotorFactor}
-    end
-
+    syncSystemWearBreakdown(self, spec.systems.engine, "ENGINE_WEAR")
+       
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
+        motorLoadFactor = motorLoadFactor,
+        expiredServiceFactor = expiredServiceFactor,
+        coldMotorFactor = coldMotorFactor,
+        hotMotorFactor = hotMotorFactor
+    })
 end
 
 -- transmission
 function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
-    local C = ADS_Config.CORE.TRANSMISSION_SYSTEM_FACTORS_DATA
+    local C = ADS_Config.CORE.TRANSMISSION_FACTOR_DATA
     local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
-    local coldTransFactor, hotTransFactor = 0, 0
+    local expiredServiceFactor, coldTransFactor, hotTransFactor = 0, 0, 0
     local wearRate = 1.0
+    local systemKey = getSystemKey(spec.systems.transmission.name)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1363,13 +1537,22 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
 
+        -- service factor
+        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
+            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
+            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or ADS_Config.CORE.ENGINE_FACTOR_DATA.SERVICE_EXPIRED_MULTIPLIER or 0)
+            wearRate = wearRate + expiredServiceFactor
+        end
+
         if vehicleHaveCVT then
+            -- cold CVT factor
             if spec.transmissionTemperature < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
                 coldTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.COLD_TRANSMISSION_THRESHOLD, true)
                 local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
                 coldTransFactor = coldTransFactor * C.COLD_TRANSMISSION_MULTIPLIER * motorLoadInf
                 wearRate = wearRate + coldTransFactor
 
+            -- overheating CVT factor
             elseif spec.transmissionTemperature > C.OVERHEAT_TRANSMISSION_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
                 local transTemp = spec.transmissionTemperature
                 hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(transTemp, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
@@ -1378,91 +1561,124 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
                 wearRate = wearRate + hotTransFactor
             end
         end
+    else
+        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
     end
 
-    wearRate = wearRate  / spec.reliability
-    spec.systems.transmission = spec.systems.powerUnit - wearRate * ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
+    syncSystemWearBreakdown(self, spec.systems.transmission, "TRANSMISSION_WEAR")
 
-    if ADS_Config.DEBUG then
-        spec.debugData.transmissionSystem = {totalWearRate = wearRate, expiredServiceFactor = coldTransFactor, coldMotorFactor = hotTransFactor}
-    end
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
+        expiredServiceFactor = expiredServiceFactor,
+        coldTransFactor = coldTransFactor,
+        coldMotorFactor = coldTransFactor,
+        hotTransFactor = hotTransFactor
+    })
 end
 
--- TO-DO: updateHydraulicsSystem
+function AdvancedDamageSystem:updateHydraulicsSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(spec.systems.hydraulics.name)
+    local wearRate = 1.0
+    syncSystemWearBreakdown(self, spec.systems.hydraulics, "HYDRAULICS_WEAR")
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate)
+end
 
--- TO-DO: updateCoolingSystem
+function AdvancedDamageSystem:updateCoolingSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(spec.systems.cooling.name)
+    local wearRate = 1.0
+    syncSystemWearBreakdown(self, spec.systems.cooling, "COOLING_WEAR")
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate)
+end
 
--- TO-DO: updateElecticalSystem
+function AdvancedDamageSystem:updateElectricalSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(spec.systems.electrical.name)
+    local wearRate = 1.0
+    syncSystemWearBreakdown(self, spec.systems.electrical, "ELECTRICAL_WEAR")
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate)
+end
 
--- TO-DO: updateChassisSytem
+function AdvancedDamageSystem:updateChassisSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(spec.systems.chassis.name)
+    local wearRate = 1.0
+    syncSystemWearBreakdown(self, spec.systems.chassis, "CHASSIS_WEAR")
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate)
+end
 
--- TO-DO: updateEnergyStorageSystem
+function AdvancedDamageSystem:updateFuelSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(spec.systems.fuel.name)
+    local wearRate = 1.0
+    syncSystemWearBreakdown(self, spec.systems.fuel, "FUEL_WEAR")
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate)
+end
 
--- TO-DO: updateWorkProcessSystem
+function AdvancedDamageSystem:updateWorkProcessSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(spec.systems.workProcess.name)
+    local wearRate = 1.0
+    syncSystemWearBreakdown(self, spec.systems.workProcess, "WORKPROCESS_WEAR")
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate)
+end
 
--- TO-DO: updateMaterialFlowSystem
+function AdvancedDamageSystem:updateMaterialFlowSystem(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(spec.systems.materialFlow.name)
+    local wearRate = 1.0
+    syncSystemWearBreakdown(self, spec.systems.materialFlow, "MATERIALFLOW_WEAR")
+    self:updateSystemConditionAndStress(dt, systemKey, wearRate)
+end
 
 ---------------------- breakdowns ----------------------
 
-function AdvancedDamageSystem:checkForNewBreakdown(dt)
+function AdvancedDamageSystem:tryTriggerBreakdown(dt)
     local spec = self.spec_AdvancedDamageSystem
     if not spec or dt == 0 then
         return
     end
-    local probability = ADS_Config.CORE.BREAKDOWN_PROBABILITY
-    local minFailureChancePerFrame = 0.01 / 3600000 * ADS_Config.CORE_UPDATE_DELAY
 
-    local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(self:getConditionLevel(), probability, dt)
-    if self:getFormattedOperatingTime() > probability.VEHICLE_HONEYMOON_HOURS then
-        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability), minFailureChancePerFrame)
-    else
-        failureChancePerFrame = math.max((failureChancePerFrame + failureChancePerFrame * spec.extraBreakdownProbability) - failureChancePerFrame * ((probability.VEHICLE_HONEYMOON_HOURS - self:getFormattedOperatingTime()) / probability.VEHICLE_HONEYMOON_HOURS), minFailureChancePerFrame)
-    end
+    local probabilityData = ADS_Config.CORE.BREAKDOWN_PROBABILITIES
 
-    local random = math.random()
-    
-    if random < failureChancePerFrame then
-        
-        local breakdownId = self:getRandomBreakdown()
-        if breakdownId == nil then return end
+    for systemName, systemData in pairs(spec.systems) do
+        local systemCondition = math.max(systemData.condition or 1.0, 0.001)
+        local systemStress = math.max(systemData.stress or 0.0, 0.0)
+        local stressThreshold = probabilityData.STRESS_THRESHOLD
 
-        local criticalOutcomeChance = ADS_Utils.getCriticalFailureChance(self:getConditionLevel())
+        if systemStress >= stressThreshold then
+            local stressOverload = math.max(1 - systemStress / systemCondition, 0.001)
+            local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(stressOverload, probabilityData, dt)
 
-        local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
-        if not registryEntry then
-            log_dbg("Warning: Could not find registry entry for breakdown ID:", breakdownId)
-            return
+            local random = math.random()
+            if random < failureChancePerFrame then
+                local breakdownId = self:getRandomBreakdownBySystem(systemData.name)
+                if breakdownId ~= nil then
+                    local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+                    if registryEntry ~= nil and registryEntry.stages ~= nil and #registryEntry.stages > 0 then
+                        local criticalOutcomeChance = ADS_Utils.getCriticalFailureChance(stressOverload)
+
+                        if math.random() < criticalOutcomeChance then
+                            self:addBreakdown(breakdownId, #registryEntry.stages)
+                        else
+                            self:addBreakdown(breakdownId, 1)
+                        end
+                    end
+                end
+            end
+
+            if ADS_Config.DEBUG and spec.debugData[systemName] ~= nil then
+                local hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
+                local criticalChance = math.clamp((1 - stressOverload) ^ probabilityData.CRITICAL_DEGREE, probabilityData.CRITICAL_MIN, probabilityData.CRITICAL_MAX)
+                spec.debugData[systemName].breakdownProbability = hourlyProb
+                spec.debugData[systemName].critBreakdownProbability = criticalChance
+            end       
         end
-
-        if math.random() < criticalOutcomeChance then
-            log_dbg("Breakdown is CRITICAL!")
-            self:addBreakdown(breakdownId, #registryEntry.stages)
-        else
-            log_dbg("Breakdown is MINOR.")
-            self:addBreakdown(breakdownId, 1)
-        end
-    end
-
-    if ADS_Config.DEBUG then
-        if spec.debugData == nil then spec.debugData = {} end
-
-        local hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
-        local criticalChance = math.clamp((1 - spec.conditionLevel) ^ probability.CRITICAL_DEGREE, probability.CRITICAL_MIN, probability.CRITICAL_MAX)
-        
-        spec.debugData.breakdown = {
-            failureChancePerFrame = failureChancePerFrame,
-            criticalOutcomeChance = failureChancePerFrame * criticalChance,
-            failureChanceInHour = hourlyProb,
-            criticalFailureInHour = hourlyProb * criticalChance
-        }
     end
 end
 
-
 function AdvancedDamageSystem:getRandomBreakdown()
-    log_dbg("getRandomBreakdown called for vehicle:", self:getFullName())
     if not self.spec_AdvancedDamageSystem then
-        log_dbg("-> Vehicle has no ADS spec. Returning nil.")
         return nil
     end
 
@@ -1492,11 +1708,8 @@ function AdvancedDamageSystem:getRandomBreakdown()
     end
 
     if #applicableBreakdowns == 0 or totalProbability <= 0 then
-        log_dbg("-> No new applicable breakdowns available with positive probability.")
         return nil
     end
-
-    log_dbg("-> Found "..#applicableBreakdowns.." applicable breakdowns. Total probability weight:", totalProbability)
 
     local randomNumber = math.random() * totalProbability
 
@@ -1504,7 +1717,63 @@ function AdvancedDamageSystem:getRandomBreakdown()
     for _, breakdown in ipairs(applicableBreakdowns) do
         cumulativeProbability = cumulativeProbability + breakdown.probability
         if randomNumber <= cumulativeProbability then
-            log_dbg("-> Weighted random choice selected:", breakdown.id, "with probability", breakdown.probability)
+            return breakdown.id
+        end
+    end
+    return nil
+end
+
+function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
+    if not self.spec_AdvancedDamageSystem then
+        return nil
+    end
+
+    if systemName == nil then
+        return nil
+    end
+
+    local targetSystem = systemName
+    if type(targetSystem) == "string" and AdvancedDamageSystem.SYSTEMS[targetSystem] ~= nil then
+        targetSystem = AdvancedDamageSystem.SYSTEMS[targetSystem]
+    end
+
+    local targetSystemKey = string.lower(tostring(targetSystem))
+    local activeBreakdowns = self:getActiveBreakdowns()
+    local applicableBreakdowns = {}
+    local totalProbability = 0
+
+    for id, breakdownData in pairs(ADS_Breakdowns.BreakdownRegistry) do
+        local breakdownSystemKey = string.lower(tostring(breakdownData.system or ""))
+        if not activeBreakdowns[id] and breakdownData.isSelectable and breakdownSystemKey == targetSystemKey then
+            local isApplicable = true
+            if breakdownData.isApplicable ~= nil then
+                isApplicable = breakdownData.isApplicable(self)
+            end
+
+            if isApplicable then
+                local probability = 1.0 
+                if breakdownData.probability ~= nil then
+                    probability = breakdownData.probability(self)
+                end
+
+                if probability > 0 then
+                    table.insert(applicableBreakdowns, {id = id, probability = probability})
+                    totalProbability = totalProbability + probability
+                end
+            end
+        end
+    end
+
+    if #applicableBreakdowns == 0 or totalProbability <= 0 then
+        return nil
+    end
+
+    local randomNumber = math.random() * totalProbability
+
+    local cumulativeProbability = 0
+    for _, breakdown in ipairs(applicableBreakdowns) do
+        cumulativeProbability = cumulativeProbability + breakdown.probability
+        if randomNumber <= cumulativeProbability then
             return breakdown.id
         end
     end
@@ -1512,9 +1781,7 @@ function AdvancedDamageSystem:getRandomBreakdown()
     return nil
 end
 
-
 function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
-    log_dbg("addBreakdown called for", self:getFullName(), "with ID:", breakdownId, "and stage:", stage)
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
 
@@ -1528,18 +1795,15 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
     local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
 
     if activeBreakdownsCount >= ADS_Config.CORE.CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE and registryEntry.isSelectable then
-        log_dbg("-> Concurrent breakdown limit reached for vehicle:", self:getFullName())
         return nil 
     end
 
 
     if registryEntry == nil then
-        log_dbg("-> Breakdown ID not found in registry. Aborting.")
         return
     end
     
     if self:hasBreakdown(breakdownId) then
-        log_dbg("-> Breakdown already active. Aborting.")
         return
     end
 
@@ -1547,7 +1811,6 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
         spec.totalBreakdownsOccurred = (spec.totalBreakdownsOccurred or 0) + 1
     end
 
-    log_dbg("-> Creating new breakdown instance.")
     spec.activeBreakdowns[breakdownId] = {
         stage = stage or 1,
         progressTimer = 0,
@@ -1556,9 +1819,7 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
     }
     
     self:recalculateAndApplyEffects()
-    log_dbg("-> Successfully created breakdown.")
 end
-
 
 function AdvancedDamageSystem:removeBreakdown(...)
     local spec = self.spec_AdvancedDamageSystem
@@ -1569,14 +1830,10 @@ function AdvancedDamageSystem:removeBreakdown(...)
     local idsToRemove = {...}
 
     if #idsToRemove == 0 then
-        log_dbg("removeBreakdown called for", self:getFullName(), "with no arguments. Removing all breakdowns.")
         spec.activeBreakdowns = {}
         self:recalculateAndApplyEffects()
-        log_dbg("-> removeBreakdown finished.")
         return
     end
-
-    log_dbg("removeBreakdown called for", self:getFullName(), "with IDs:", table.concat(idsToRemove, ", "))
 
     local removedCount = 0
     for _, id in ipairs(idsToRemove) do
@@ -1587,12 +1844,9 @@ function AdvancedDamageSystem:removeBreakdown(...)
     end
     
     if removedCount > 0 then
-        log_dbg("-> Removed", removedCount, "breakdown(s).")
         self:recalculateAndApplyEffects()
     else
-        log_dbg("-> No matching breakdowns found to remove.")
     end
-    log_dbg("-> removeBreakdown finished.")
 end
 
 function AdvancedDamageSystem:hasBreakdown(breakdownId)
@@ -1603,7 +1857,6 @@ function AdvancedDamageSystem:hasBreakdown(breakdownId)
 
     return spec.activeBreakdowns[breakdownId] ~= nil
 end
-
 
 function AdvancedDamageSystem:advanceBreakdown(breakdownId)
     local spec = self.spec_AdvancedDamageSystem
@@ -1619,7 +1872,6 @@ function AdvancedDamageSystem:advanceBreakdown(breakdownId)
         self:recalculateAndApplyEffects()
     end
 end
-
 
 function AdvancedDamageSystem:processBreakdowns(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -1662,13 +1914,6 @@ function AdvancedDamageSystem:processBreakdowns(dt)
                                 if breakdown.stage == maxStages and registryEntry.stages[breakdown.stage].detectionChance > 0 then
                                     breakdown.isVisible = true
                                 end
-
-                                log_dbg(string.format("ADS: Breakdown '%s' on vehicle '%s' advanced to stage %d.", id, self:getFullName(), breakdown.stage))
-                            end
-
-                            if id == "GENERAL_WEAR" then
-                                breakdown.progressTimer = 0
-                                effectsNeedRecalculation = true
                             end
                         end
                     end
@@ -1682,6 +1927,61 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     end
 end
 
+function AdvancedDamageSystem:processWearBreakdowns(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec or not spec.activeBreakdowns or next(spec.activeBreakdowns) == nil then
+        return
+    end
+
+    local C = ADS_Config.CORE
+    local effectsNeedRecalculation = false
+
+    for id, breakdown in pairs(self:getActiveBreakdowns()) do
+        local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
+
+        if registryEntry then
+            
+            if registryEntry.stages[breakdown.stage] then
+                local stageData = registryEntry.stages[breakdown.stage]
+                
+                if stageData.progressMultiplier and stageData.progressMultiplier > 0 then
+                    
+                    local canProgress = true
+                    if registryEntry.isCanProgress ~= nil then
+                        canProgress = registryEntry.isCanProgress(self)
+                    end
+
+                    if canProgress then
+                        breakdown.progressTimer = breakdown.progressTimer or 0
+                        breakdown.progressTimer = breakdown.progressTimer + dt
+                        
+                        local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
+
+                        if breakdown.progressTimer >= stageDuration then
+                            local maxStages = #registryEntry.stages
+                            
+                            if breakdown.stage < maxStages then
+                                breakdown.stage = breakdown.stage + 1
+                                breakdown.progressTimer = 0
+                                effectsNeedRecalculation = true
+
+                                if breakdown.stage == maxStages and registryEntry.stages[breakdown.stage].detectionChance > 0 then
+                                    breakdown.isVisible = true
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if effectsNeedRecalculation then
+        self:recalculateAndApplyEffects()
+    end
+end
+
+
 local function shallow_copy(original)
     local copy = {}
     for k, v in pairs(original) do
@@ -1690,9 +1990,7 @@ local function shallow_copy(original)
     return copy
 end
 
-
 function AdvancedDamageSystem:recalculateAndApplyEffects()
-    log_dbg("recalculateAndApplyEffects called for vehicle:", self:getFullName())
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
 
@@ -1703,7 +2001,6 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
 
         if registryEntry == nil then
-            log_dbg("Warning: Could not find registry entry for breakdown ID: ".. id ..". Removing breakdown from active list.")
             self:removeBreakdown(id)
         end
 
@@ -1766,7 +2063,6 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
     end
 
     spec.activeEffects = aggregatedEffects
-    log_dbg("Recalculated effects:", ADS_Utils.tableToString(spec.activeEffects))
 
     for effectId, applicator in pairs(ADS_Breakdowns.EffectApplicators) do
         local isCurrentlyActive = spec.activeEffects[effectId] ~= nil
@@ -1788,12 +2084,9 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
     end
     
     self:recalculateAndApplyIndicators()
-    log_dbg("-> recalculateAndApplyEffects finished.")
 end
 
-
 function AdvancedDamageSystem:recalculateAndApplyIndicators()
-    log_dbg("recalculateAndApplyIndicators called for vehicle:", self:getFullName())
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
 
@@ -1877,18 +2170,11 @@ function AdvancedDamageSystem:recalculateAndApplyIndicators()
 
         spec.activeIndicators[id] = finalIndicator
     end
-
-    log_dbg("Recalculated indicators:", ADS_Utils.tableToString(spec.activeIndicators))
-    log_dbg("-> recalculateAndApplyIndicators finished.")
 end
 
 --------------------- maintenance --------------------------------
 
 local function isBreakdownSelectedForPlayerRepair(breakdownId, breakdown)
-    if breakdownId == "GENERAL_WEAR" then
-        return false
-    end
-
     local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
     if breakdownDef == nil or breakdownDef.isSelectable ~= true then
         return false
@@ -2029,7 +2315,6 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         resetPendingServiceProgress(spec)
     end
 end
-
 
 function AdvancedDamageSystem:processService(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -2179,7 +2464,7 @@ function AdvancedDamageSystem:completeService()
             -- breakdowns are marked for repair before the next service starts.
             for _, breakdownId in ipairs(plannedRepairCandidateIds) do
                 local breakdown = self:getActiveBreakdowns()[breakdownId]
-                if breakdown ~= nil and breakdown.isVisible and breakdownId ~= "GENERAL_WEAR" then
+                if breakdown ~= nil and breakdown.isVisible then
                     breakdown.isSelectedForRepair = true
                 end
             end
@@ -2432,7 +2717,6 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     end
 end
 
-
 function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted, motorLoad, speedCooling, eviromentTemp, dirt)
     local C = ADS_Config.THERMAL
     local heat, cooling = 0, 0
@@ -2483,7 +2767,6 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
 
     return dbg 
 end
-
 
 function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
     local C = ADS_Config.THERMAL
@@ -2571,7 +2854,6 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
 
     return dbg
 end
-
 
 function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth, year, stuckedPosition, debugData)
 
@@ -2664,6 +2946,17 @@ function AdvancedDamageSystem:getConditionLevel()
     return self.spec_AdvancedDamageSystem.conditionLevel
 end
 
+function AdvancedDamageSystem:getSystemConditionLevel(systemName)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(systemName)
+    return spec.systems[systemKey].condition
+end
+
+function AdvancedDamageSystem:getSystemStressLevel(systemName)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = getSystemKey(systemName)
+    return spec.systems[systemKey].stress
+end
 
 function AdvancedDamageSystem:isUnderService()
     return self.spec_AdvancedDamageSystem.currentState ~= AdvancedDamageSystem.STATUS.READY
@@ -3195,13 +3488,159 @@ local function parseArguments(argString)
     return args
 end
 
+local function parsePathTokens(path)
+    local tokens = {}
+    if type(path) ~= "string" or path == "" then
+        return tokens
+    end
+
+    for token in string.gmatch(path, "[^%.]+") do
+        local numberToken = tonumber(token)
+        if numberToken ~= nil then
+            table.insert(tokens, numberToken)
+        else
+            table.insert(tokens, token)
+        end
+    end
+
+    return tokens
+end
+
+local function parseConsoleValue(rawValue)
+    if rawValue == nil then
+        return nil, false
+    end
+
+    local lowerValue = string.lower(tostring(rawValue))
+    if lowerValue == "true" then
+        return true, true
+    end
+    if lowerValue == "false" then
+        return false, true
+    end
+    if lowerValue == "nil" then
+        return nil, true
+    end
+
+    local numberValue = tonumber(rawValue)
+    if numberValue ~= nil then
+        return numberValue, true
+    end
+
+    return rawValue, true
+end
+
+local function resolvePathParent(rootTable, fullPath)
+    if type(rootTable) ~= "table" then
+        return nil, nil, nil, "Root is not a table."
+    end
+
+    local tokens = parsePathTokens(fullPath)
+    if #tokens == 0 then
+        return nil, nil, nil, "Path is empty."
+    end
+
+    local current = rootTable
+    for i = 1, #tokens - 1 do
+        local key = tokens[i]
+        if type(current) ~= "table" then
+            return nil, nil, nil, string.format("Path segment '%s' is not a table.", tostring(key))
+        end
+
+        current = current[key]
+        if current == nil then
+            return nil, nil, nil, string.format("Path segment '%s' does not exist.", tostring(key))
+        end
+    end
+
+    return current, tokens[#tokens], tokens
+end
+
+function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
+    local path = nil
+    local valueToken = nil
+
+    if rawValue ~= nil then
+        path = tostring(rawArgs)
+        valueToken = tostring(rawValue)
+    else
+        local args = parseArguments(rawArgs)
+        path = args and args[1] or nil
+        valueToken = args and args[2] or nil
+    end
+
+    if path == nil or valueToken == nil then
+        print("ADS Error: Usage: ads_setConfigVar <path> <value>")
+        print("Example: ads_setConfigVar CORE.BASE_SYSTEMS_WEAR 0.02")
+        return
+    end
+
+    local value, valueParsed = parseConsoleValue(valueToken)
+    if not valueParsed then
+        print("ADS Error: Failed to parse value.")
+        return
+    end
+
+    local parent, key, _, err = resolvePathParent(ADS_Config, path)
+    if parent == nil then
+        print(string.format("ADS Error: Invalid ADS_Config path '%s': %s", path, tostring(err)))
+        return
+    end
+
+    local oldValue = parent[key]
+    parent[key] = value
+
+    print(string.format("ADS: ADS_Config.%s changed: %s -> %s", path, tostring(oldValue), tostring(value)))
+end
+
+function AdvancedDamageSystem.ConsoleCommands:setSpecVar(rawArgs, rawValue)
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then return end
+
+    local path = nil
+    local valueToken = nil
+
+    if rawValue ~= nil then
+        path = tostring(rawArgs)
+        valueToken = tostring(rawValue)
+    else
+        local args = parseArguments(rawArgs)
+        path = args and args[1] or nil
+        valueToken = args and args[2] or nil
+    end
+
+    if path == nil or valueToken == nil then
+        print("ADS Error: Usage: ads_setSpecVar <path> <value>")
+        print("Example: ads_setSpecVar systems.engine.condition 0.85")
+        return
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local value, valueParsed = parseConsoleValue(valueToken)
+    if not valueParsed then
+        print("ADS Error: Failed to parse value.")
+        return
+    end
+
+    local parent, key, _, err = resolvePathParent(spec, path)
+    if parent == nil then
+        print(string.format("ADS Error: Invalid ADS spec path '%s': %s", path, tostring(err)))
+        return
+    end
+
+    local oldValue = parent[key]
+    parent[key] = value
+
+    print(string.format("ADS: spec_AdvancedDamageSystem.%s changed on '%s': %s -> %s", path, vehicle:getFullName(), tostring(oldValue), tostring(value)))
+end
+
 
 function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()
     print("--- Available Breakdowns ---")
     
     local breakdownIds = {}
     for id, data in pairs(ADS_Breakdowns.BreakdownRegistry) do
-        table.insert(breakdownIds, string.format(" - %s (%s)", id, data.part or "No name"))
+        table.insert(breakdownIds, string.format(" - %s (%s)", id, data.system or "No name"))
     end
 
     if #breakdownIds > 0 then
@@ -3318,14 +3757,14 @@ function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
 end
 
 
-function AdvancedDamageSystem.ConsoleCommands:setCondition(rawArgs)
+function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
     
     local spec = vehicle.spec_AdvancedDamageSystem
     local value = 1.0
-    
+
     if args and args[1] then
         local parsedValue = tonumber(args[1])
         if parsedValue == nil or parsedValue < 0 or parsedValue > 1 then
@@ -3334,9 +3773,184 @@ function AdvancedDamageSystem.ConsoleCommands:setCondition(rawArgs)
         end
         value = parsedValue
     end
-    
-    spec.conditionLevel = value
-    print(string.format("ADS: Set Condition level for '%s' to %.2f.", vehicle:getFullName(), value))
+
+    local function resolveSystemKey(rawSystem)
+        if rawSystem == nil or rawSystem == "" then
+            return nil
+        end
+
+        local normalized = string.lower(rawSystem)
+        for key, _ in pairs(spec.systems or {}) do
+            if string.lower(tostring(key)) == normalized then
+                return key
+            end
+        end
+
+        return false
+    end
+
+    local requestedSystem = args and args[2] or nil
+    local systemKey = resolveSystemKey(requestedSystem)
+
+    if systemKey == false then
+        local availableSystems = {}
+        for key, _ in pairs(spec.systems or {}) do
+            table.insert(availableSystems, tostring(key))
+        end
+        table.sort(availableSystems)
+        print(string.format("ADS Error: Unknown system '%s'. Available systems: %s", tostring(requestedSystem), table.concat(availableSystems, ", ")))
+        return
+    end
+
+    if systemKey == nil then
+        for key, systemData in pairs(spec.systems or {}) do
+            if type(systemData) == "table" then
+                systemData.condition = value
+            else
+                spec.systems[key] = value
+            end
+        end
+        print(string.format("ADS: Set condition for all systems on '%s' to %.2f.", vehicle:getFullName(), value))
+    else
+        local systemData = spec.systems[systemKey]
+        if type(systemData) == "table" then
+            systemData.condition = value
+        else
+            spec.systems[systemKey] = value
+        end
+        print(string.format("ADS: Set condition for system '%s' on '%s' to %.2f.", tostring(systemKey), vehicle:getFullName(), value))
+    end
+
+    vehicle:updateConditionLevel()
+end
+
+function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
+    local args = parseArguments(rawArgs)
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then return end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local value = 0.0
+
+    if args and args[1] then
+        local parsedValue = tonumber(args[1])
+        if parsedValue == nil or parsedValue < 0 then
+            print("ADS Error: Invalid value. Please provide a number >= 0.0.")
+            return
+        end
+        value = parsedValue
+    end
+
+    local function resolveSystemKey(rawSystem)
+        if rawSystem == nil or rawSystem == "" then
+            return nil
+        end
+
+        local normalized = string.lower(rawSystem)
+        for key, _ in pairs(spec.systems or {}) do
+            if string.lower(tostring(key)) == normalized then
+                return key
+            end
+        end
+
+        return false
+    end
+
+    local requestedSystem = args and args[2] or nil
+    local systemKey = resolveSystemKey(requestedSystem)
+
+    if systemKey == false then
+        local availableSystems = {}
+        for key, _ in pairs(spec.systems or {}) do
+            table.insert(availableSystems, tostring(key))
+        end
+        table.sort(availableSystems)
+        print(string.format("ADS Error: Unknown system '%s'. Available systems: %s", tostring(requestedSystem), table.concat(availableSystems, ", ")))
+        return
+    end
+
+    if systemKey == nil then
+        for key, systemData in pairs(spec.systems or {}) do
+            if type(systemData) == "table" then
+                systemData.stress = value
+            else
+                spec.systems[key] = { condition = systemData or 1.0, stress = value }
+            end
+        end
+        print(string.format("ADS: Set stress for all systems on '%s' to %.4f.", vehicle:getFullName(), value))
+    else
+        local systemData = spec.systems[systemKey]
+        if type(systemData) == "table" then
+            systemData.stress = value
+        else
+            spec.systems[systemKey] = { condition = systemData or 1.0, stress = value }
+        end
+        print(string.format("ADS: Set stress for system '%s' on '%s' to %.4f.", tostring(systemKey), vehicle:getFullName(), value))
+    end
+end
+
+function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs)
+    local args = parseArguments(rawArgs)
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then return end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local multipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS
+
+    if multipliers == nil then
+        print("ADS Error: SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS is missing in config.")
+        return
+    end
+
+    local value = 1.0
+    if args and args[1] then
+        local parsedValue = tonumber(args[1])
+        if parsedValue == nil or parsedValue < 0 then
+            print("ADS Error: Invalid value. Please provide a number >= 0.0.")
+            return
+        end
+        value = parsedValue
+    end
+
+    local function resolveSystemKey(rawSystem)
+        if rawSystem == nil or rawSystem == "" then
+            return nil
+        end
+
+        local normalized = string.lower(rawSystem)
+        for key, _ in pairs(spec.systems or {}) do
+            if string.lower(tostring(key)) == normalized then
+                return key
+            end
+        end
+
+        return false
+    end
+
+    local requestedSystem = args and args[2] or nil
+    local systemKey = resolveSystemKey(requestedSystem)
+
+    if systemKey == false then
+        local availableSystems = {}
+        for key, _ in pairs(spec.systems or {}) do
+            table.insert(availableSystems, tostring(key))
+        end
+        table.sort(availableSystems)
+        print(string.format("ADS Error: Unknown system '%s'. Available systems: %s", tostring(requestedSystem), table.concat(availableSystems, ", ")))
+        return
+    end
+
+    if systemKey == nil then
+        for key, _ in pairs(multipliers) do
+            if type(key) == "string" then
+                multipliers[key] = value
+            end
+        end
+        print(string.format("ADS: Set stress accumulation multiplier for all systems to %.4f.", value))
+    else
+        multipliers[systemKey] = value
+        print(string.format("ADS: Set stress accumulation multiplier for system '%s' to %.4f.", tostring(systemKey), value))
+    end
 end
 
 
@@ -3427,7 +4041,7 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
         local visibleRepairableCount = 0
         local selected = 0
         for breakdownId, breakdown in pairs(vehicle:getActiveBreakdowns()) do
-            local isRepairable = breakdownId ~= "GENERAL_WEAR" and breakdown ~= nil and breakdown.isVisible == true
+            local isRepairable = breakdown ~= nil and breakdown.isVisible == true
             if isRepairable then
                 visibleRepairableCount = visibleRepairableCount + 1
             end
@@ -3720,7 +4334,9 @@ addConsoleCommand("ads_listBreakdowns", "Lists all available breakdown IDs.", "l
 addConsoleCommand("ads_addBreakdown", "Adds a breakdown. Usage: ads_addBreakdown [id] [stage]", "addBreakdown", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_removeBreakdown", "Removes a breakdown. Usage: ads_removeBreakdown [id]", "removeBreakdown", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_advanceBreakdown", "Advances a breakdown to the next stage. Usage: ads_advanceBreakdown [id]", "advanceBreakdown", AdvancedDamageSystem.ConsoleCommands)
-addConsoleCommand("ads_setCondition", "Sets vehicle condition. Usage: ads_setCondition [0.0-1.0]", "setCondition", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setSystemCondition", "Sets system condition. Usage: ads_setSystemCondition [0.0-1.0] [system]", "setSystemCondition", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setSystemStress", "Sets system stress. Usage: ads_setSystemStress [>=0.0] [system]", "setSystemStress", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setSystemStressMultiplier", "Sets stress accumulation multiplier. Usage: ads_setSystemStressMultiplier [>=0.0] [system]", "setSystemStressMultiplier", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setService", "Sets vehicle service. Usage: ads_setService [0.0-1.0]", "setService", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_resetVehicle", "Resets vehicle state.", "resetVehicle", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_startService", "Starts service. Usage: ads_startService <type> [count]", "startMaintance", AdvancedDamageSystem.ConsoleCommands)
@@ -3730,3 +4346,5 @@ addConsoleCommand("ads_showServiceLog", "Shows service log. Usage: ads_showServi
 addConsoleCommand("ads_getDebugVehicleInfo", "Vehicle debug info", "getDebugVehicleInfo", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_setDirtAmount [0.0-1.0]", "setDirtAmount", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)
