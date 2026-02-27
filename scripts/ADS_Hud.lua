@@ -482,6 +482,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     ) * bcw
     local transmissionMaxFactor = math.max(
         transmissionDbg.expiredServiceFactor or 0,
+        transmissionDbg.pullOverloadFactor or 0,
+        transmissionDbg.heavyTrailerFactor or 0,
+        transmissionDbg.luggingFactor or 0,
+        transmissionDbg.wheelSlipFactor or 0,
         transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor or 0,
         transmissionDbg.hotTransFactor or 0
     ) * bcw
@@ -502,16 +506,46 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local transmissionLines = {}
     addLine(transmissionLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% ctf: %.2f%% htf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% pof: %.2f%% (%.1fs) htf: %.2f%% lf: %.2f%% wsf: %.2f%% (wsi: %.2f%%) ctf: %.2f%% hotf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("transmission")),
         asPercent((transmissionDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("transmission")),
         asPercent((transmissionDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((transmissionDbg.pullOverloadFactor or 0) * bcw),
+        (transmissionDbg.pullOverloadTimer or 0),
+        asPercent((transmissionDbg.heavyTrailerFactor or 0) * bcw),
+        asPercent((transmissionDbg.luggingFactor or 0) * bcw),
+        asPercent((transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0) * bcw),
+        asPercent(transmissionDbg.wheelSlipIntensity or 0),
         asPercent(((transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0) * bcw),
         asPercent((transmissionDbg.hotTransFactor or 0) * bcw),
         asPercent(transmissionDbg.breakdownProbability or 0),
         asPercent(transmissionDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(transmissionMaxFactor), 0.95)
+
+    local function buildDefaultSystemLines(systemKey)
+        local systemDbg = spec.debugData[systemKey] or {}
+        local systemMaxFactor = (systemDbg.expiredServiceFactor or 0) * bcw
+        local lines = {}
+        addLine(lines, string.format(
+            "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+            asPercent(getSystemCondition(systemKey)),
+            asPercent((systemDbg.totalWearRate or 0) * bcw),
+            asPercent(getSystemStress(systemKey)),
+            asPercent((systemDbg.expiredServiceFactor or 0) * bcw),
+            asPercent(systemDbg.breakdownProbability or 0),
+            asPercent(systemDbg.critBreakdownProbability or 0)
+        ), getConditionFactorColor(systemMaxFactor), 0.95)
+        return lines
+    end
+
+    local hydraulicsLines = buildDefaultSystemLines("hydraulics")
+    local coolingLines = buildDefaultSystemLines("cooling")
+    local electricalLines = buildDefaultSystemLines("electrical")
+    local chassisLines = buildDefaultSystemLines("chassis")
+    local fuelLines = buildDefaultSystemLines("fuel")
+    local workProcessLines = buildDefaultSystemLines("workProcess")
+    local materialFlowLines = buildDefaultSystemLines("materialFlow")
 
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
@@ -608,7 +642,7 @@ function ADS_Hud:drawActiveVehicleHUD()
             #pendingRepairQueue
         ), {1, 0.95, 0.75, 1}, 0.95)
         addLine(serviceDataLines, string.format(
-            "svc s->t: %s->%s | cond s->t: %s->%s | cur s/c: %.4f/%.4f",
+            "svc s->t: %s->%s | cond(avg) s->t: %s->%s | cur s/c: %.4f/%.4f",
             tostring(spec.pendingMaintenanceServiceStart),
             tostring(spec.pendingMaintenanceServiceTarget),
             tostring(spec.pendingOverhaulConditionStart),
@@ -616,6 +650,38 @@ function ADS_Hud:drawActiveVehicleHUD()
             spec.serviceLevel or 0,
             spec.conditionLevel or 0
         ), {1, 0.95, 0.75, 1}, 0.95)
+
+        if spec.currentState == states.OVERHAUL then
+            local overhaulSystemStart = spec.pendingOverhaulSystemStart or {}
+            local overhaulSystemTarget = spec.pendingOverhaulSystemTarget or {}
+            local systemEntries = {}
+
+            for systemKey, systemStart in pairs(overhaulSystemStart) do
+                local systemTarget = overhaulSystemTarget[systemKey]
+                local systemData = spec.systems and spec.systems[systemKey]
+                local currentSystemCondition = 0
+                if type(systemData) == "table" then
+                    currentSystemCondition = tonumber(systemData.condition) or 0
+                else
+                    currentSystemCondition = tonumber(systemData) or 0
+                end
+
+                if systemTarget ~= nil then
+                    table.insert(
+                        systemEntries,
+                        string.format("%s: %.3f->%.3f (cur %.3f)", tostring(systemKey), tonumber(systemStart) or 0, tonumber(systemTarget) or 0, currentSystemCondition)
+                    )
+                end
+            end
+
+            table.sort(systemEntries)
+            addLine(serviceDataLines, "ovh systems:", {1, 0.95, 0.75, 1}, 0.95)
+            local systemLines = packEntries(systemEntries, 2, {1, 0.95, 0.75, 1}, 0.95)
+            for _, line in ipairs(systemLines) do
+                table.insert(serviceDataLines, line)
+            end
+        end
+
         addLine(serviceDataLines, "sel: " .. listToString(pendingSelectedBreakdowns), {1, 0.95, 0.75, 1}, 0.95)
         addLine(serviceDataLines, "insp: " .. listToString(pendingInspectionQueue), {1, 0.95, 0.75, 1}, 0.95)
         addLine(serviceDataLines, "rep: " .. listToString(pendingRepairQueue), {1, 0.95, 0.75, 1}, 0.95)
@@ -624,6 +690,13 @@ function ADS_Hud:drawActiveVehicleHUD()
     local sections = {
         {title = "Engine", lines = engineLines},
         {title = "Transmission", lines = transmissionLines},
+        {title = "Hydraulics", lines = hydraulicsLines},
+        {title = "Cooling", lines = coolingLines},
+        {title = "Electrical", lines = electricalLines},
+        {title = "Chassis", lines = chassisLines},
+        {title = "Fuel", lines = fuelLines},
+        {title = "Work Process", lines = workProcessLines},
+        {title = "Material Flow", lines = materialFlowLines},
         {title = "Engine Temp", lines = engineTempLines}
     }
 

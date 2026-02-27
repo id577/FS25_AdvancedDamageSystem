@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 35,
+    VER = 40,
 
     DEBUG = false,
 
@@ -67,8 +67,8 @@ ADS_Config = {
         },
 
         ENGINE_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 10,
             MOTOR_IDLING_MULTIPLIER = 0.5,
+            SERVICE_EXPIRED_MULTIPLIER = 10.0,
             MOTOR_IDLING_THRESHOLD = 0.3,
             MOTOR_OVERLOADED_MULTIPLIER = 1.0,
             MOTOR_OVERLOADED_THRESHOLD = 0.95,
@@ -79,12 +79,55 @@ ADS_Config = {
         },
 
         TRANSMISSION_FACTOR_DATA = {
-            COLD_TRANSMISSION_MULTIPLIER = 50.0,
-            COLD_TRANSMISSION_THRESHOLD = 55,
+            TRANSMISSION_IDLING_MULTIPLIER = 0.2,
+            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            PULL_OVERLOAD_MULTIPLIER = 2.0,
+            PULL_OVERLOAD_THRESHOLD = 0.82,
+            PULL_OVERLOAD_TIMER_THRESHOLD = 30,
+            LUGGING_MULTIPLIER = 5.0,
+            LUGGING_RPM_THRESHOLD = 0.5,
+            LUGGING_MOTORLOAD_THRESHOLD = 0.80,
+            HEAVY_TRAILER_MULTIPLIER = 3.0,
+            HEAVY_TRAILER_THRESHOLD = 1.2,
+            HEAVY_TRAILER_MOTORLOAD_THRESHOLD = 0.5,
+            WHEEL_SLIP_MULTIPLIER = 10.0,
+            WHEEL_SLIP_THRESHOLD = 0.3,
+            COLD_TRANSMISSION_MULTIPLIER = 20.0,
+            COLD_TRANSMISSION_THRESHOLD = 50,
             OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 50.0,
             OVERHEAT_TRANSMISSION_THRESHOLD = 95,
         },
 
+        HYDRAULICS_FACTOR_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 4.0,
+        },
+
+        COOLING_FACTOR_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+        },
+
+        ELECTRICAL_FACTOR_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 2.0,
+        },
+
+        CHASSIS_FACTOR_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+        },
+
+        WORKPROCESS_FACTOR_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 2.0,
+        },
+
+        MATERIALFLOW_FACTOR_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 2.0,
+        },
+
+        FUEL_FACTOR_DATA = {
+            SERVICE_EXPIRED_MULTIPLIER = 4.0,
+        },
+
+
+        STRESS_COOLDOWN = 0.5,
         CVT_SHIFT_SPEED_THRESHOLD = 1.0,
         CVT_SHOCK_MULTIPLIER = 100.0,
 

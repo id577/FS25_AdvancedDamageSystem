@@ -50,7 +50,17 @@ local function getIsElectricVehicle(vehicle)
     end
 end
 
-local systems = AdvancedDamageSystem.SYSTEMS
+local systems = (AdvancedDamageSystem ~= nil and AdvancedDamageSystem.SYSTEMS) or {
+    ENGINE = "ads_spec_system_engine",
+    TRANSMISSION = "ads_spec_system_transmission",
+    HYDRAULICS = "ads_spec_system_hydraulics",
+    COOLING = "ads_spec_system_cooling",
+    ELECTRICAL = "ads_spec_system_electrical",
+    CHASSIS = "ads_spec_system_chassis",
+    WORKPROCESS = "ads_spec_system_workprocess",
+    MATERIALFLOW = "ads_spec_system_materialflow",
+    FUEL = "ads_spec_system_fuel"
+}
 ADS_Breakdowns.BreakdownRegistry = {
 
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
@@ -641,6 +651,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     ELECTRICAL_SYSTEM_MALFUNCTION = {
         isSelectable = true,
         system = systems.ELECTRICAL,
@@ -715,6 +726,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- engine
     TURBOCHARGER_WEAR = {
         isSelectable = false,
@@ -796,6 +808,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- fuel system 
     FUEL_PUMP_MALFUNCTION = {
         isSelectable = true,
@@ -882,6 +895,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     FUEL_INJECTOR_MALFUNCTION = {
         isSelectable = true,
         system = systems.FUEL,
@@ -954,6 +968,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     CARBURETOR_CLOGGING = {
         isSelectable = true,
         system = systems.FUEL,
@@ -1022,6 +1037,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- chassis system
     BRAKE_MALFUNCTION = {
         isSelectable = true,
@@ -1099,6 +1115,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- transmission system
     TRANSMISSION_SLIP = {
         isSelectable = true,
@@ -1169,6 +1186,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     TRANSMISSION_SYNCHRONIZER_MALFUNCTION = {
         isSelectable = true,
         system = systems.TRANSMISSION,
@@ -1230,6 +1248,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
         system = systems.TRANSMISSION,
@@ -1293,6 +1312,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- cooling system
     CVT_THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
@@ -1360,6 +1380,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
         system = systems.COOLING,
@@ -1422,6 +1443,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- hydraulic system
     HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
@@ -1488,6 +1510,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- workprocess system
     YIELD_SENSOR_MALFUNCTION = {
         isSelectable = true,
@@ -1556,6 +1579,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     -- materialflow system
     MATERIAL_FLOW_SYSTEM_WEAR = {
         isSelectable = true,
@@ -1631,6 +1655,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
     UNLOADING_AUGER_MALFUNCTION = {
         isSelectable = true,
         system = systems.MATERIALFLOW,
@@ -1705,6 +1730,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+    
 }
 
 -- ==========================================================

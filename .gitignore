@@ -1,0 +1,49 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Spotlight-V100/
+.Trashes/
+._*
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.code-workspace
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local environment files
+.env
+.env.*
+*.local
+
+# Temporary files and caches
+tmp/
+temp/
+.cache/
+.sass-cache/
+.eslintcache
+coverage/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Project-specific artifacts
+AdvancedDamageSystem.zip
+dataS_decompile/
