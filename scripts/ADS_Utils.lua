@@ -445,5 +445,212 @@ function ADS_Utils.getValueColorInverted(value, ideal, low, mid, high, smooth)
     return c[1], c[2], c[3], c[4]
 end
 
+-- ==========================================================
+--                  GENERIC HELPERS
+-- ==========================================================
+
+local SAVEGAME_OPTIONAL_FLOAT_SENTINEL = -1
+
+function ADS_Utils.normalizeBoolValue(value, defaultValue)
+    if value == nil then
+        return defaultValue == true
+    end
+
+    if type(value) == "boolean" then
+        return value
+    end
+
+    if type(value) == "number" then
+        return value ~= 0
+    end
+
+    if type(value) == "string" then
+        local v = string.lower(value)
+        if v == "false" or v == "0" or v == "off" or v == "no" then
+            return false
+        end
+        if v == "true" or v == "1" or v == "on" or v == "yes" then
+            return true
+        end
+    end
+
+    return value and true or false
+end
+
+function ADS_Utils.normalizeNumberValue(value, defaultValue)
+    if value == nil then
+        return defaultValue
+    end
+
+    local num = tonumber(value)
+    if num == nil then
+        return defaultValue
+    end
+
+    return num
+end
+
+function ADS_Utils.encodeOptionalFloat(value)
+    if value == nil then
+        return SAVEGAME_OPTIONAL_FLOAT_SENTINEL
+    end
+
+    local num = tonumber(value)
+    if num == nil then
+        return SAVEGAME_OPTIONAL_FLOAT_SENTINEL
+    end
+
+    return num
+end
+
+function ADS_Utils.decodeOptionalFloat(value)
+    local num = tonumber(value)
+    if num == nil or num < 0 then
+        return nil
+    end
+
+    return num
+end
+
+function ADS_Utils.parseCsvList(csvString)
+    local result = {}
+    if csvString == nil or csvString == "" then
+        return result
+    end
+
+    for item in string.gmatch(csvString, "([^,]+)") do
+        local trimmed = tostring(item):gsub("^%s+", ""):gsub("%s+$", "")
+        if trimmed ~= "" then
+            table.insert(result, trimmed)
+        end
+    end
+
+    return result
+end
+
+function ADS_Utils.getSystemNameByKey(systems, systemKey)
+    if systems == nil then
+        return tostring(systemKey)
+    end
+
+    local normalized = string.lower(tostring(systemKey))
+    for enumKey, systemName in pairs(systems) do
+        if string.lower(tostring(enumKey)) == normalized then
+            return systemName
+        end
+    end
+
+    return tostring(systemKey)
+end
+
+function ADS_Utils.serializeSystemsState(systems)
+    local entries = {}
+    if systems == nil then
+        return ""
+    end
+
+    for systemKey, systemData in pairs(systems) do
+        local condition = 1.0
+        local stress = 0.0
+        local enabled = true
+
+        if type(systemData) == "table" then
+            condition = tonumber(systemData.condition) or 1.0
+            stress = tonumber(systemData.stress) or 0.0
+            enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
+        else
+            condition = tonumber(systemData) or 1.0
+        end
+
+        table.insert(entries, string.format("%s|%.6f|%.6f|%d", tostring(systemKey), condition, stress, enabled and 1 or 0))
+    end
+
+    table.sort(entries)
+    return table.concat(entries, ",")
+end
+
+function ADS_Utils.deserializeSystemsState(serialized)
+    local result = {}
+    if serialized == nil or serialized == "" then
+        return result
+    end
+
+    for entry in string.gmatch(serialized, "([^,]+)") do
+        local key, conditionStr, stressStr, enabledStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)|([^|]+)")
+        if key ~= nil then
+            result[key] = {
+                condition = tonumber(conditionStr) or 1.0,
+                stress = tonumber(stressStr) or 0.0,
+                enabled = ADS_Utils.normalizeBoolValue(tonumber(enabledStr), true)
+            }
+        else
+            local legacyKey, legacyConditionStr, legacyStressStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)")
+            if legacyKey ~= nil then
+                result[legacyKey] = {
+                    condition = tonumber(legacyConditionStr) or 1.0,
+                    stress = tonumber(legacyStressStr) or 0.0,
+                    enabled = true
+                }
+            end
+        end
+    end
+
+    return result
+end
+
+function ADS_Utils.serializeNumericMap(valueMap)
+    local entries = {}
+    if valueMap == nil then
+        return ""
+    end
+
+    for key, value in pairs(valueMap) do
+        local numericValue = tonumber(value)
+        if numericValue ~= nil then
+            table.insert(entries, string.format("%s|%.6f", tostring(key), numericValue))
+        end
+    end
+
+    table.sort(entries)
+    return table.concat(entries, ",")
+end
+
+function ADS_Utils.deserializeNumericMap(serialized)
+    local result = {}
+    if serialized == nil or serialized == "" then
+        return result
+    end
+
+    for entry in string.gmatch(serialized, "([^,]+)") do
+        local key, valueStr = string.match(entry, "([^|]+)|([^|]+)")
+        if key ~= nil then
+            local numericValue = tonumber(valueStr)
+            if numericValue ~= nil then
+                result[key] = numericValue
+            end
+        end
+    end
+
+    return result
+end
+
+function ADS_Utils.getSystemKey(systems, systemName)
+    if systems == nil then
+        return ""
+    end
+    return string.lower(ADS_Utils.getNameByValue(systems, systemName) or "")
+end
+
+function ADS_Utils.shallowCopy(original)
+    local result = {}
+    if type(original) ~= "table" then
+        return result
+    end
+    for key, value in pairs(original) do
+        result[key] = value
+    end
+    return result
+end
+
 
 

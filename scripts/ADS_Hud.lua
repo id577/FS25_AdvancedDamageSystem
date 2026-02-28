@@ -474,6 +474,7 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local engineDbg = spec.debugData.engine or {}
     local transmissionDbg = spec.debugData.transmission or {}
+    local hydraulicsDbg = spec.debugData.hydraulics or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
         engineDbg.expiredServiceFactor or 0,
@@ -488,6 +489,14 @@ function ADS_Hud:drawActiveVehicleHUD()
         transmissionDbg.wheelSlipFactor or 0,
         transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor or 0,
         transmissionDbg.hotTransFactor or 0
+    ) * bcw
+    local hydraulicsMaxFactor = math.max(
+        hydraulicsDbg.expiredServiceFactor or 0,
+        hydraulicsDbg.heavyLiftFactor or 0,
+        hydraulicsDbg.operatingFactor or 0,
+        hydraulicsDbg.coldOilFactor or 0,
+        hydraulicsDbg.ptoOperatingFactor or 0,
+        hydraulicsDbg.sharpAngleFactor or 0
     ) * bcw
 
     local engineLines = {}
@@ -539,7 +548,23 @@ function ADS_Hud:drawActiveVehicleHUD()
         return lines
     end
 
-    local hydraulicsLines = buildDefaultSystemLines("hydraulics")
+    local hydraulicsLines = {}
+    addLine(hydraulicsLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% hlf: %.2f%% (mr: %.2f%%) of: %.2f%% cof: %.2f%% ptof: %.2f%% saf: %.2f%% (%.1fdeg) | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("hydraulics")),
+        asPercent((hydraulicsDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("hydraulics")),
+        asPercent((hydraulicsDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((hydraulicsDbg.heavyLiftFactor or 0) * bcw),
+        asPercent(hydraulicsDbg.heavyLiftMassRatio or 0),
+        asPercent((hydraulicsDbg.operatingFactor or 0) * bcw),
+        asPercent((hydraulicsDbg.coldOilFactor or 0) * bcw),
+        asPercent((hydraulicsDbg.ptoOperatingFactor or 0) * bcw),
+        asPercent((hydraulicsDbg.sharpAngleFactor or 0) * bcw),
+        (hydraulicsDbg.ptoSharpAngleDeg or 0),
+        asPercent(hydraulicsDbg.breakdownProbability or 0),
+        asPercent(hydraulicsDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(hydraulicsMaxFactor), 0.95)
     local coolingLines = buildDefaultSystemLines("cooling")
     local electricalLines = buildDefaultSystemLines("electrical")
     local chassisLines = buildDefaultSystemLines("chassis")

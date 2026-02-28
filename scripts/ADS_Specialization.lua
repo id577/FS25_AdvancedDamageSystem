@@ -41,9 +41,7 @@ AdvancedDamageSystem = {
         ELECTRICAL = "ads_spec_system_electrical",
         CHASSIS = "ads_spec_system_chassis",
         WORKPROCESS = "ads_spec_system_workprocess",
-        MATERIALFLOW = "ads_spec_system_materialflow",
         FUEL = "ads_spec_system_fuel"
-        
     },
 
 WORKSHOP = {
@@ -113,195 +111,6 @@ local function log_dbg(...)
         end
         print("[ADS_SPEC] " .. table.concat(args, " "))
     end
-end
-
-local function normalizeBoolValue(value, defaultValue)
-    if value == nil then
-        return defaultValue == true
-    end
-
-    if type(value) == "boolean" then
-        return value
-    end
-
-    if type(value) == "number" then
-        return value ~= 0
-    end
-
-    if type(value) == "string" then
-        local v = string.lower(value)
-        if v == "false" or v == "0" or v == "off" or v == "no" then
-            return false
-        end
-        if v == "true" or v == "1" or v == "on" or v == "yes" then
-            return true
-        end
-    end
-
-    return value and true or false
-end
-
-local function normalizeNumberValue(value, defaultValue)
-    if value == nil then
-        return defaultValue
-    end
-
-    local num = tonumber(value)
-    if num == nil then
-        return defaultValue
-    end
-
-    return num
-end
-
-local SAVEGAME_OPTIONAL_FLOAT_SENTINEL = -1
-
-local function encodeOptionalFloat(value)
-    if value == nil then
-        return SAVEGAME_OPTIONAL_FLOAT_SENTINEL
-    end
-
-    local num = tonumber(value)
-    if num == nil then
-        return SAVEGAME_OPTIONAL_FLOAT_SENTINEL
-    end
-
-    return num
-end
-
-local function decodeOptionalFloat(value)
-    local num = tonumber(value)
-    if num == nil or num < 0 then
-        return nil
-    end
-
-    return num
-end
-
-local function parseCsvList(csvString)
-    local result = {}
-    if csvString == nil or csvString == "" then
-        return result
-    end
-
-    for item in string.gmatch(csvString, "([^,]+)") do
-        local trimmed = tostring(item):gsub("^%s+", ""):gsub("%s+$", "")
-        if trimmed ~= "" then
-            table.insert(result, trimmed)
-        end
-    end
-
-    return result
-end
-
-local function getSystemNameByKey(systemKey)
-    if AdvancedDamageSystem == nil or AdvancedDamageSystem.SYSTEMS == nil then
-        return tostring(systemKey)
-    end
-
-    local normalized = string.lower(tostring(systemKey))
-    for enumKey, systemName in pairs(AdvancedDamageSystem.SYSTEMS) do
-        if string.lower(tostring(enumKey)) == normalized then
-            return systemName
-        end
-    end
-
-    return tostring(systemKey)
-end
-
-local function serializeSystemsState(systems)
-    local entries = {}
-    if systems == nil then
-        return ""
-    end
-
-    for systemKey, systemData in pairs(systems) do
-        local condition = 1.0
-        local stress = 0.0
-        local enabled = true
-
-        if type(systemData) == "table" then
-            condition = tonumber(systemData.condition) or 1.0
-            stress = tonumber(systemData.stress) or 0.0
-            enabled = normalizeBoolValue(systemData.enabled, true)
-        else
-            condition = tonumber(systemData) or 1.0
-        end
-
-        table.insert(entries, string.format("%s|%.6f|%.6f|%d", tostring(systemKey), condition, stress, enabled and 1 or 0))
-    end
-
-    table.sort(entries)
-    return table.concat(entries, ",")
-end
-
-local function deserializeSystemsState(serialized)
-    local result = {}
-    if serialized == nil or serialized == "" then
-        return result
-    end
-
-    for entry in string.gmatch(serialized, "([^,]+)") do
-        local key, conditionStr, stressStr, enabledStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)|([^|]+)")
-        if key ~= nil then
-            result[key] = {
-                condition = tonumber(conditionStr) or 1.0,
-                stress = tonumber(stressStr) or 0.0,
-                enabled = normalizeBoolValue(tonumber(enabledStr), true)
-            }
-        else
-            local legacyKey, legacyConditionStr, legacyStressStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)")
-            if legacyKey ~= nil then
-                result[legacyKey] = {
-                    condition = tonumber(legacyConditionStr) or 1.0,
-                    stress = tonumber(legacyStressStr) or 0.0,
-                    enabled = true
-                }
-            end
-        end
-    end
-
-    return result
-end
-
-local function serializeNumericMap(valueMap)
-    local entries = {}
-    if valueMap == nil then
-        return ""
-    end
-
-    for key, value in pairs(valueMap) do
-        local numericValue = tonumber(value)
-        if numericValue ~= nil then
-            table.insert(entries, string.format("%s|%.6f", tostring(key), numericValue))
-        end
-    end
-
-    table.sort(entries)
-    return table.concat(entries, ",")
-end
-
-local function deserializeNumericMap(serialized)
-    local result = {}
-    if serialized == nil or serialized == "" then
-        return result
-    end
-
-    for entry in string.gmatch(serialized, "([^,]+)") do
-        local key, valueStr = string.match(entry, "([^|]+)|([^|]+)")
-        if key ~= nil then
-            local numericValue = tonumber(valueStr)
-            if numericValue ~= nil then
-                result[key] = numericValue
-            end
-        end
-    end
-
-    return result
-end
-
-local function getSystemKey(systemName)
-    return string.lower(ADS_Utils.getNameByValue(AdvancedDamageSystem.SYSTEMS, systemName) or "")
 end
 
 -- ==========================================================
@@ -439,7 +248,6 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "updateChassisSystem", AdvancedDamageSystem.updateChassisSystem)
     SpecializationUtil.registerFunction(vehicleType, "updateFuelSystem", AdvancedDamageSystem.updateFuelSystem)
     SpecializationUtil.registerFunction(vehicleType, "updateWorkProcessSystem", AdvancedDamageSystem.updateWorkProcessSystem)
-    SpecializationUtil.registerFunction(vehicleType, "updateMaterialFlowSystem", AdvancedDamageSystem.updateMaterialFlowSystem)
     
     SpecializationUtil.registerFunction(vehicleType, "isUnderService", AdvancedDamageSystem.isUnderService)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
@@ -495,19 +303,19 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#serviceOptionTwo", spec.serviceOptionTwo or "")
         xmlFile:setValue(key .. "#serviceOptionThree", spec.serviceOptionThree)
         xmlFile:setValue(key .. "#pendingSelectedBreakdowns", table.concat(spec.pendingSelectedBreakdowns or {}, ","))
-        xmlFile:setValue(key .. "#pendingServicePrice", encodeOptionalFloat(spec.pendingServicePrice))
+        xmlFile:setValue(key .. "#pendingServicePrice", ADS_Utils.encodeOptionalFloat(spec.pendingServicePrice))
         xmlFile:setValue(key .. "#pendingInspectionQueue", table.concat(spec.pendingInspectionQueue or {}, ","))
         xmlFile:setValue(key .. "#pendingRepairQueue", table.concat(spec.pendingRepairQueue or {}, ","))
         xmlFile:setValue(key .. "#pendingProgressStepIndex", spec.pendingProgressStepIndex or 0)
         xmlFile:setValue(key .. "#pendingProgressTotalTime", spec.pendingProgressTotalTime or 0)
         xmlFile:setValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime or 0)
-        xmlFile:setValue(key .. "#pendingMaintenanceServiceStart", encodeOptionalFloat(spec.pendingMaintenanceServiceStart))
-        xmlFile:setValue(key .. "#pendingMaintenanceServiceTarget", encodeOptionalFloat(spec.pendingMaintenanceServiceTarget))
-        xmlFile:setValue(key .. "#pendingOverhaulConditionStart", encodeOptionalFloat(spec.pendingOverhaulConditionStart))
-        xmlFile:setValue(key .. "#pendingOverhaulConditionTarget", encodeOptionalFloat(spec.pendingOverhaulConditionTarget))
-        xmlFile:setValue(key .. "#systemsState", serializeSystemsState(spec.systems))
-        xmlFile:setValue(key .. "#pendingOverhaulSystemStart", serializeNumericMap(spec.pendingOverhaulSystemStart))
-        xmlFile:setValue(key .. "#pendingOverhaulSystemTarget", serializeNumericMap(spec.pendingOverhaulSystemTarget))
+        xmlFile:setValue(key .. "#pendingMaintenanceServiceStart", ADS_Utils.encodeOptionalFloat(spec.pendingMaintenanceServiceStart))
+        xmlFile:setValue(key .. "#pendingMaintenanceServiceTarget", ADS_Utils.encodeOptionalFloat(spec.pendingMaintenanceServiceTarget))
+        xmlFile:setValue(key .. "#pendingOverhaulConditionStart", ADS_Utils.encodeOptionalFloat(spec.pendingOverhaulConditionStart))
+        xmlFile:setValue(key .. "#pendingOverhaulConditionTarget", ADS_Utils.encodeOptionalFloat(spec.pendingOverhaulConditionTarget))
+        xmlFile:setValue(key .. "#systemsState", ADS_Utils.serializeSystemsState(spec.systems))
+        xmlFile:setValue(key .. "#pendingOverhaulSystemStart", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemStart))
+        xmlFile:setValue(key .. "#pendingOverhaulSystemTarget", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemTarget))
         xmlFile:setValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred or 0)
 
         if spec.maintenanceLog and #spec.maintenanceLog > 0 then
@@ -522,9 +330,9 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
                 xmlFile:setValue(entryKey .. "#optionOne", entry.optionOne or "NONE")
                 xmlFile:setValue(entryKey .. "#optionTwo", entry.optionTwo or "NONE")
                 xmlFile:setValue(entryKey .. "#optionThree", entry.optionThree or false)
-                xmlFile:setValue(entryKey .. "#isVisible", tostring(normalizeBoolValue(entry.isVisible, true)))
-                xmlFile:setValue(entryKey .. "#isCompleted", normalizeBoolValue(entry.isCompleted, true))
-                xmlFile:setValue(entryKey .. "#isLegacyEntry", normalizeBoolValue(entry.isLegacyEntry, false))
+                xmlFile:setValue(entryKey .. "#isVisible", tostring(ADS_Utils.normalizeBoolValue(entry.isVisible, true)))
+                xmlFile:setValue(entryKey .. "#isCompleted", ADS_Utils.normalizeBoolValue(entry.isCompleted, true))
+                xmlFile:setValue(entryKey .. "#isLegacyEntry", ADS_Utils.normalizeBoolValue(entry.isLegacyEntry, false))
 
                 if entry.conditionData then
                     local condKey = entryKey .. ".conditionData"
@@ -584,7 +392,6 @@ function AdvancedDamageSystem:onLoad(savegame)
         electrical = { name = AdvancedDamageSystem.SYSTEMS.ELECTRICAL, condition = 1.0, stress = 0.0, enabled = true },
         chassis = { name = AdvancedDamageSystem.SYSTEMS.CHASSIS, condition = 1.0, stress = 0.0, enabled = true },
         workProcess = { name = AdvancedDamageSystem.SYSTEMS.WORKPROCESS, condition = 1.0, stress = 0.0, enabled = true },
-        materialFlow = { name = AdvancedDamageSystem.SYSTEMS.MATERIALFLOW, condition = 1.0, stress = 0.0, enabled = true },
         fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true }
     }
 
@@ -683,6 +490,13 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
+            heavyLiftFactor = 0,
+            heavyLiftMassRatio = 0,
+            operatingFactor = 0,
+            coldOilFactor = 0,
+            ptoOperatingFactor = 0,
+            sharpAngleFactor = 0,
+            ptoSharpAngleDeg = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -719,16 +533,6 @@ function AdvancedDamageSystem:onLoad(savegame)
         },
 
         workProcess = {
-            condition = 0,
-            stress = 0,
-            totalWearRate = 0,
-            expiredServiceFactor = 0,
-            breakdownInSystemFactor = 0, 
-            breakdownProbability = 0,
-            critBreakdownProbability = 0
-        },
-
-        materialFlow = {
             condition = 0,
             stress = 0,
             totalWearRate = 0,
@@ -813,6 +617,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.pendingOverhaulSystemTarget = {}
     self.spec_AdvancedDamageSystem.totalBreakdownsOccurred = 0
     self.spec_AdvancedDamageSystem.isElectricVehicle = false
+    self.spec_AdvancedDamageSystem.hydraulicsMoveAlphaCache = {}
 end
 
 function AdvancedDamageSystem:onPostLoad(savegame)
@@ -855,7 +660,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.serviceOptionOne == "" then spec.serviceOptionOne = nil end
         if spec.serviceOptionTwo == "" then spec.serviceOptionTwo = nil end
         spec.serviceOptionThree = savegame.xmlFile:getValue(key .. "#serviceOptionThree", spec.serviceOptionThree)
-        spec.pendingServicePrice = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingServicePrice", spec.pendingServicePrice))
+        spec.pendingServicePrice = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingServicePrice", spec.pendingServicePrice))
         spec.pendingSelectedBreakdowns = {}
         local pendingSelBdStr = savegame.xmlFile:getValue(key .. "#pendingSelectedBreakdowns", "")
         if pendingSelBdStr ~= nil and pendingSelBdStr ~= "" then
@@ -882,14 +687,14 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.pendingProgressStepIndex = savegame.xmlFile:getValue(key .. "#pendingProgressStepIndex", spec.pendingProgressStepIndex)
         spec.pendingProgressTotalTime = savegame.xmlFile:getValue(key .. "#pendingProgressTotalTime", spec.pendingProgressTotalTime)
         spec.pendingProgressElapsedTime = savegame.xmlFile:getValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime)
-        spec.pendingMaintenanceServiceStart = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceStart", spec.pendingMaintenanceServiceStart))
-        spec.pendingMaintenanceServiceTarget = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget))
-        spec.pendingOverhaulConditionStart = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart))
-        spec.pendingOverhaulConditionTarget = decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget))
-        spec.pendingOverhaulSystemStart = deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemStart", ""))
-        spec.pendingOverhaulSystemTarget = deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemTarget", ""))
+        spec.pendingMaintenanceServiceStart = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceStart", spec.pendingMaintenanceServiceStart))
+        spec.pendingMaintenanceServiceTarget = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget))
+        spec.pendingOverhaulConditionStart = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart))
+        spec.pendingOverhaulConditionTarget = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget))
+        spec.pendingOverhaulSystemStart = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemStart", ""))
+        spec.pendingOverhaulSystemTarget = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemTarget", ""))
 
-        local loadedSystemsStateRaw = deserializeSystemsState(savegame.xmlFile:getValue(key .. "#systemsState", ""))
+        local loadedSystemsStateRaw = ADS_Utils.deserializeSystemsState(savegame.xmlFile:getValue(key .. "#systemsState", ""))
         local loadedSystemsState = {}
         for loadedKey, loadedData in pairs(loadedSystemsStateRaw) do
             loadedSystemsState[string.lower(tostring(loadedKey))] = loadedData
@@ -913,7 +718,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
             if loadedData ~= nil then
                 systemData.condition = math.clamp(tonumber(loadedData.condition) or systemData.condition or 1.0, 0.001, 1.0)
                 systemData.stress = math.max(tonumber(loadedData.stress) or systemData.stress or 0.0, 0.0)
-                systemData.enabled = normalizeBoolValue(loadedData.enabled, systemData.enabled ~= false)
+                systemData.enabled = ADS_Utils.normalizeBoolValue(loadedData.enabled, systemData.enabled ~= false)
             else
                 if not hasSerializedSystemsState and spec.conditionLevel ~= nil then
                     systemData.condition = math.clamp(tonumber(spec.conditionLevel) or systemData.condition or 1.0, 0.001, 1.0)
@@ -921,10 +726,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                     systemData.condition = math.clamp(tonumber(systemData.condition) or 1.0, 0.001, 1.0)
                 end
                 systemData.stress = math.max(tonumber(systemData.stress) or 0.0, 0.0)
-                systemData.enabled = normalizeBoolValue(systemData.enabled, true)
+                systemData.enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
             end
 
-            systemData.name = getSystemNameByKey(systemKey)
+            systemData.name = ADS_Utils.getSystemNameByKey(AdvancedDamageSystem.SYSTEMS, systemKey)
         end
 
         local hasTotalBreakdownsOccurred = savegame.xmlFile:hasProperty(key .. "#totalBreakdownsOccurred")
@@ -954,9 +759,9 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 entry.optionOne = savegame.xmlFile:getValue(entryKey .. "#optionOne", "NONE")
                 entry.optionTwo = savegame.xmlFile:getValue(entryKey .. "#optionTwo", "NONE")
                 entry.optionThree = savegame.xmlFile:getValue(entryKey .. "#optionThree", false)
-                entry.isVisible = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isVisible", true), true)
-                entry.isCompleted = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isCompleted", true), true)
-                entry.isLegacyEntry = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isLegacyEntry", false), false)
+                entry.isVisible = ADS_Utils.normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isVisible", true), true)
+                entry.isCompleted = ADS_Utils.normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isCompleted", true), true)
+                entry.isLegacyEntry = ADS_Utils.normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#isLegacyEntry", false), false)
 
                 entry.conditionData.year = savegame.xmlFile:getValue(condKey .. "#year", 0)
                 entry.conditionData.operatingHours = savegame.xmlFile:getValue(condKey .. "#operatingHours", 0)
@@ -970,25 +775,25 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 entry.conditionData.activeBreakdowns = ADS_Utils.deserializeBreakdowns(bdStr) or {}
 
                 local selBdStr = savegame.xmlFile:getValue(condKey .. "#selectedBreakdowns", "")
-                entry.conditionData.selectedBreakdowns = parseCsvList(selBdStr)
+                entry.conditionData.selectedBreakdowns = ADS_Utils.parseCsvList(selBdStr)
 
                 entry.conditionData.activeEffects = {}
-                local effectIds = parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeEffects", ""))
+                local effectIds = ADS_Utils.parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeEffects", ""))
                 for _, effId in ipairs(effectIds) do
                     entry.conditionData.activeEffects[effId] = true
                 end
 
                 entry.conditionData.activeIndicators = {}
-                local indicatorIds = parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeIndicators", ""))
+                local indicatorIds = ADS_Utils.parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeIndicators", ""))
                 for _, indId in ipairs(indicatorIds) do
                     entry.conditionData.activeIndicators[indId] = true
                 end
             else
                 -- COMPAT(0.8.5.0): migrate legacy maintenance log entry format (hours/aftermarket/breakdowns/info).
                 -- Remove this migration branch after legacy save migration window is over.
-                local legacyAftermarket = normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#aftermarket", false), false)
-                local legacyOperatingHours = normalizeNumberValue(savegame.xmlFile:getValue(entryKey .. "#hours", 0), 0)
-                local legacyBreakdowns = parseCsvList(savegame.xmlFile:getValue(entryKey .. "#breakdowns", ""))
+                local legacyAftermarket = ADS_Utils.normalizeBoolValue(savegame.xmlFile:getValue(entryKey .. "#aftermarket", false), false)
+                local legacyOperatingHours = ADS_Utils.normalizeNumberValue(savegame.xmlFile:getValue(entryKey .. "#hours", 0), 0)
+                local legacyBreakdowns = ADS_Utils.parseCsvList(savegame.xmlFile:getValue(entryKey .. "#breakdowns", ""))
 
                 local optionOne = "NONE"
                 local optionTwo = legacyAftermarket and AdvancedDamageSystem.PART_TYPES.AFTERMARKET or AdvancedDamageSystem.PART_TYPES.OEM
@@ -1127,6 +932,34 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     end
     
     spec.isElectricVehicle = getIsElectricVehicle(self)
+    spec.hydraulicsMoveAlphaCache = {}
+
+    local function resetIsMovingRecursive(vehicleObj, visited)
+        if vehicleObj == nil or visited[vehicleObj] then
+            return
+        end
+        visited[vehicleObj] = true
+
+        if vehicleObj.spec_attacherJoints ~= nil then
+            if vehicleObj.spec_attacherJoints.attacherJoints ~= nil then
+                for _, jointDesc in pairs(vehicleObj.spec_attacherJoints.attacherJoints) do
+                    if jointDesc ~= nil then
+                        jointDesc.isMoving = false
+                    end
+                end
+            end
+
+            if vehicleObj.spec_attacherJoints.attachedImplements ~= nil then
+                for _, implementData in pairs(vehicleObj.spec_attacherJoints.attachedImplements) do
+                    if implementData ~= nil and implementData.object ~= nil then
+                        resetIsMovingRecursive(implementData.object, visited)
+                    end
+                end
+            end
+        end
+    end
+
+    resetIsMovingRecursive(self, {})
     self:recalculateAndApplyEffects()
 end
 
@@ -1312,7 +1145,6 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:updateChassisSystem(dt)
         self:updateFuelSystem(dt)
         self:updateWorkProcessSystem(dt)
-        self:updateMaterialFlowSystem(dt)
 
         --condtition
         self:updateConditionLevel()
@@ -1568,6 +1400,19 @@ local function syncSystemWearBreakdown(vehicle, systemData, wearBreakdownName)
     end
 end
 
+local function getExpiredServiceMultiplier(serviceLevel, serviceMultiplier)
+    if serviceLevel == nil then
+        return 1.0
+    end
+
+    if serviceLevel < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
+        local severity = ADS_Utils.calculateQuadraticMultiplier(serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
+        return 1.0 + severity * (serviceMultiplier or 0)
+    end
+
+    return 1.0
+end
+
 -- service
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -1590,6 +1435,7 @@ function AdvancedDamageSystem:updateConditionLevel()
     spec.conditionLevel = math.clamp(condition, 0.001, 1.0)
 end
 
+-- system condition and stress
 function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wearRate, debugFactors)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then
@@ -1637,15 +1483,21 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     end
 end
 
--- engine
+-- damage
+function AdvancedDamageSystem:setDamageToSystem(system, damageAmount)
+
+end
+
+-- engine (overload, cold, overheat)
 function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
     local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor = 0, 0, 0, 0
+    local expiredServiceMultiplier = 1.0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
-    local systemKey = getSystemKey(spec.systems.engine.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.engine.name)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1658,13 +1510,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, C.MOTOR_OVERLOADED_THRESHOLD, false)
             motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0)
             wearRate = wearRate + motorLoadFactor
-        end
-
-        -- service factor
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
         end
 
         -- cold engine factor
@@ -1689,6 +1534,11 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         if motorLoad < C.MOTOR_IDLING_THRESHOLD and self:getLastSpeed() < 0.003 then
             wearRate = wearRate * C.MOTOR_IDLING_MULTIPLIER
         end
+
+        expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
     else
         wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
     end
@@ -1703,7 +1553,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     })
 end
 
--- transmission
+-- transmission (pullOverload, lugging, heavyTrailer, slip, cvtCold, cvtOverheat)
 function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
@@ -1713,8 +1563,9 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     systemData.pullOverloadTimer = tonumber(systemData.pullOverloadTimer) or 0
     local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
     local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor, wheelSlipIntensity, coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0, 0, 0
+    local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
-    local systemKey = getSystemKey(spec.systems.transmission.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1723,13 +1574,6 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         local rpmLoad = lastRpm / maxRpm
         local speed = self:getLastSpeed()
 
-        -- service factor
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or ADS_Config.CORE.ENGINE_FACTOR_DATA.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
-        end
-        
         -- pull overload
         if motorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
             systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
@@ -1864,6 +1708,11 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         if motorLoad < ADS_Config.CORE.ENGINE_FACTOR_DATA.MOTOR_IDLING_THRESHOLD and speed < 0.003 then
             wearRate = wearRate * C.TRANSMISSION_IDLING_MULTIPLIER
         end
+
+        expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER or ADS_Config.CORE.ENGINE_FACTOR_DATA.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
     else
         wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
     end
@@ -1884,42 +1733,363 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     })
 end
 
+-- hydraulics (heavyLift, operation, coldOperation, ptoOperation, ptoSharpAngle)
 function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(spec.systems.hydraulics.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.hydraulics.name)
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
+    local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor = 0, 0, 0, 0, 0
+    local ptoSharpAngleDeg = 0
+    local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
+    local implements = {}
+    local prevMoveAlphaCache = spec.hydraulicsMoveAlphaCache or {}
+    local nextMoveAlphaCache = {}
+    local vehicleMass = self.getTotalMass ~= nil and (self:getTotalMass(true) or 0) or 0
+    local heavyLiftMassRatio, operatingMassRatio = 0, 0
 
-    -- service factor
-    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
+    local function getSupportWheelCount(vehicleObj)
+        local supportWheelCount = 0
+        if vehicleObj ~= nil and vehicleObj.spec_wheels ~= nil and vehicleObj.spec_wheels.wheels ~= nil then
+            for _, wheel in ipairs(vehicleObj.spec_wheels.wheels) do
+                if wheel ~= nil then
+                    local hasGroundContact = false
+                    if wheel.physics ~= nil then
+                        hasGroundContact = wheel.physics.hasGroundContact == true
+                    elseif wheel.hasGroundContact ~= nil then
+                        hasGroundContact = wheel.hasGroundContact == true
+                    end
+                    if hasGroundContact then
+                        supportWheelCount = supportWheelCount + 1
+                    end
+                end
+            end
         end
+        return supportWheelCount
     end
 
-    syncSystemWearBreakdown(self, spec.systems.hydraulics, "HYDRAULICS_WEAR")
+    local function getMoveState(moveKey, jointDesc)
+        local moveAlpha = jointDesc ~= nil and (jointDesc.moveAlpha or 0) or 0
+        local prevMoveAlpha = prevMoveAlphaCache[moveKey]
+        nextMoveAlphaCache[moveKey] = moveAlpha
+
+        if prevMoveAlpha ~= nil then
+            return math.abs(moveAlpha - prevMoveAlpha) > 0.0005
+        end
+
+        local isMovingRaw = jointDesc ~= nil and jointDesc.isMoving == true
+        return isMovingRaw and moveAlpha > 0.001 and moveAlpha < 0.999
+    end
+
+    local function getToolMotionFlags(vehicleObj)
+        local isFoldMoving = false
+        local isPlowRotationMoving = false
+        local isCylinderedMoving = false
+
+        if vehicleObj ~= nil and vehicleObj.spec_foldable ~= nil then
+            isFoldMoving = math.abs(vehicleObj.spec_foldable.foldMoveDirection or 0) > 0.0001
+        end
+
+        if vehicleObj ~= nil and vehicleObj.spec_plow ~= nil and vehicleObj.spec_plow.rotationPart ~= nil and vehicleObj.spec_plow.rotationPart.turnAnimation ~= nil and vehicleObj.getIsAnimationPlaying ~= nil then
+            isPlowRotationMoving = vehicleObj:getIsAnimationPlaying(vehicleObj.spec_plow.rotationPart.turnAnimation)
+        end
+
+        if vehicleObj ~= nil and vehicleObj.spec_cylindered ~= nil then
+            isCylinderedMoving = vehicleObj.spec_cylindered.movingToolNeedsSound == true
+        end
+
+        return isFoldMoving, isPlowRotationMoving, isCylinderedMoving
+    end
+
+    local function getDefaultNode(vehicleObj)
+        if vehicleObj == nil then
+            return nil
+        end
+        if vehicleObj.steeringAxleNode ~= nil then
+            return vehicleObj.steeringAxleNode
+        end
+        if vehicleObj.components ~= nil and vehicleObj.components[1] ~= nil then
+            return vehicleObj.components[1].node
+        end
+        return nil
+    end
+
+    local function hasActivePtoInChain(rootVehicle)
+        local visited = {}
+
+        local function scan(vehicleObj)
+            if vehicleObj == nil or visited[vehicleObj] then
+                return false
+            end
+            visited[vehicleObj] = true
+
+            local ptoActive = vehicleObj.getIsPowerTakeOffActive ~= nil and vehicleObj:getIsPowerTakeOffActive() or false
+            local ptoConsuming = vehicleObj.getDoConsumePtoPower ~= nil and vehicleObj:getDoConsumePtoPower() or false
+            local ptoRpm = vehicleObj.getPtoRpm ~= nil and (tonumber(vehicleObj:getPtoRpm()) or 0) or 0
+
+            local ptoTorque = 0
+            if PowerConsumer ~= nil and PowerConsumer.getTotalConsumedPtoTorque ~= nil then
+                local ok, torqueValue = pcall(PowerConsumer.getTotalConsumedPtoTorque, vehicleObj, nil, nil, true)
+                if ok then
+                    ptoTorque = tonumber(torqueValue) or 0
+                end
+            end
+
+            if ptoActive or ptoConsuming or ptoRpm > 10 or ptoTorque > 0.001 then
+                return true
+            end
+
+            if vehicleObj.getAttachedImplements ~= nil then
+                local attachedImplements = vehicleObj:getAttachedImplements() or {}
+                for _, implement in pairs(attachedImplements) do
+                    if implement ~= nil and implement.object ~= nil and scan(implement.object) then
+                        return true
+                    end
+                end
+            end
+
+            return false
+        end
+
+        return scan(rootVehicle)
+    end
+
+    local function getMaxConnectedPtoAngleDeg(rootVehicle)
+        local maxAngleDeg = 0
+        local hasConnectedPto = false
+        local visited = {}
+
+        local function scan(vehicleObj)
+            if vehicleObj == nil or visited[vehicleObj] then
+                return
+            end
+            visited[vehicleObj] = true
+
+            if vehicleObj.getAttachedImplements == nil then
+                return
+            end
+
+            local attachedImplements = vehicleObj:getAttachedImplements() or {}
+            for _, implement in pairs(attachedImplements) do
+                if implement ~= nil and implement.object ~= nil then
+                    local childObj = implement.object
+                    local linkAngleDeg = 0
+                    local hasLinkPto = false
+
+                    if vehicleObj.getOutputPowerTakeOffsByJointDescIndex ~= nil and implement.jointDescIndex ~= nil then
+                        local outputs = vehicleObj:getOutputPowerTakeOffsByJointDescIndex(implement.jointDescIndex) or {}
+                        for _, output in ipairs(outputs) do
+                            if output ~= nil and output.connectedInput ~= nil then
+                                hasLinkPto = true
+                                hasConnectedPto = true
+
+                                if output.outputNode ~= nil and output.connectedInput.inputNode ~= nil then
+                                    local x1, y1, z1 = getWorldTranslation(output.outputNode)
+                                    local x2, y2, z2 = getWorldTranslation(output.connectedInput.inputNode)
+                                    local dx = x1 - x2
+                                    local dy = y1 - y2
+                                    local dz = z1 - z2
+                                    local planarLength = MathUtil.vector2Length(dx, dz)
+                                    local length = MathUtil.vector3Length(dx, dy, dz)
+                                    if length > 0.0001 then
+                                        local verticalAngleDeg = math.deg(math.atan(math.abs(dy) / math.max(planarLength, 0.0001)))
+                                        linkAngleDeg = math.max(linkAngleDeg, verticalAngleDeg)
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    if hasLinkPto and Utils ~= nil and Utils.getYRotationBetweenNodes ~= nil then
+                        local parentNode = getDefaultNode(vehicleObj)
+                        local childNode = getDefaultNode(childObj)
+                        if parentNode ~= nil and childNode ~= nil then
+                            local yRot = Utils.getYRotationBetweenNodes(parentNode, childNode) or 0
+                            local horizontalAngleDeg = math.deg(math.abs(yRot))
+                            linkAngleDeg = math.max(linkAngleDeg, horizontalAngleDeg)
+                        end
+                    end
+
+                    maxAngleDeg = math.max(maxAngleDeg, linkAngleDeg)
+                    scan(childObj)
+                end
+            end
+        end
+
+        scan(rootVehicle)
+        return maxAngleDeg, hasConnectedPto
+    end
+
+    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
+        local isPtoActive = hasActivePtoInChain(self)
+        local headIsMoving = false
+        if self.spec_attacherJoints ~= nil and self.spec_attacherJoints.attacherJoints ~= nil then
+            for index, jointDesc in pairs(self.spec_attacherJoints.attacherJoints) do
+                headIsMoving = headIsMoving or getMoveState('__head:' .. tostring(index), jointDesc)
+            end
+        end
+        local headIsFoldMoving, headIsPlowRotationMoving, headIsCylinderedMoving = getToolMotionFlags(self)
+
+        table.insert(implements, {
+            mass = vehicleMass,
+            jointTypeId = 0,
+            isLowered = self.getIsLowered ~= nil and self:getIsLowered(false) or false,
+            supportWheelCount = getSupportWheelCount(self),
+            isMoving = headIsMoving,
+            isFoldMoving = headIsFoldMoving,
+            isPlowRotationMoving = headIsPlowRotationMoving,
+            isCylinderedMoving = headIsCylinderedMoving,
+            isHead = true
+        })
+
+        if self.spec_attacherJoints ~= nil and self.spec_attacherJoints.attachedImplements ~= nil then
+            for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
+                local object = implementData.object
+                if object ~= nil then
+                    local jointDesc = nil
+                    if self.spec_attacherJoints.attacherJoints ~= nil then
+                        jointDesc = self.spec_attacherJoints.attacherJoints[implementData.jointDescIndex]
+                    end
+
+                    local isLowered = false
+                    if object.getIsLowered ~= nil then
+                        isLowered = object:getIsLowered(false)
+                    elseif jointDesc ~= nil then
+                        isLowered = jointDesc.moveDown == true
+                    end
+
+                    local isFoldMoving, isPlowRotationMoving, isCylinderedMoving = getToolMotionFlags(object)
+                    local moveKey = string.format('%s:%s', tostring(object), tostring(implementData.jointDescIndex or -1))
+
+                    table.insert(implements, {
+                        mass = object.getTotalMass ~= nil and (object:getTotalMass(true) or 0) or 0,
+                        jointTypeId = jointDesc ~= nil and jointDesc.jointType or nil,
+                        isLowered = isLowered,
+                        supportWheelCount = getSupportWheelCount(object),
+                        isMoving = getMoveState(moveKey, jointDesc),
+                        isFoldMoving = isFoldMoving,
+                        isPlowRotationMoving = isPlowRotationMoving,
+                        isCylinderedMoving = isCylinderedMoving,
+                        isHead = false
+                    })
+                end
+            end
+        end
+
+        spec.hydraulicsMoveAlphaCache = nextMoveAlphaCache
+
+        local isImplementLifted = false
+        local isImplementOperating = false
+        local liftedMass = 0
+        local operatingMass = 0
+    
+
+        for _, impl in ipairs(implements) do
+            print(impl.jointTypeId)
+            if impl.jointTypeId ~= 0 and impl.jointTypeId ~= 3 and not impl.isLowered and (impl.supportWheelCount or 0) == 0 then
+                liftedMass = liftedMass + (impl.mass or 0)
+                isImplementLifted = true
+            end
+            if impl.isMoving or impl.isFoldMoving or impl.isPlowRotationMoving or impl.isCylinderedMoving then
+                isImplementOperating  = true
+                operatingMass = operatingMass + (impl.mass or 0)
+            end
+        end
+
+        if isImplementLifted or isImplementOperating or isPtoActive then
+
+            -- operating and cold oil
+            if isImplementOperating then
+                operatingMassRatio = vehicleMass > 0 and (operatingMass / vehicleMass) or 0
+                if operatingMassRatio == 0 then
+                    operatingMassRatio = 0.3
+                end
+                operatingFactor = ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false)
+                operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0)
+                wearRate = wearRate + operatingFactor
+                if spec.engineTemperature < C.COLD_OIL_THRESHOLD then
+                    coldOilFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_OIL_THRESHOLD, true)
+                    coldOilFactor = coldOilFactor * (C.COLD_OIL_MULTIPLIER or 0) * (1 + ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false))
+                    wearRate = wearRate + coldOilFactor
+                end
+            end
+
+            -- heavy lift
+            heavyLiftMassRatio = vehicleMass > 0 and (liftedMass / vehicleMass) or 0
+            if heavyLiftMassRatio > (C.HEAVY_LIFT_FACTOR_THRESHOLD or 0) then
+                heavyLiftFactor = ADS_Utils.calculateQuadraticMultiplier(heavyLiftMassRatio, C.HEAVY_LIFT_FACTOR_THRESHOLD, false)
+                heavyLiftFactor = heavyLiftFactor * (C.HEAVY_LIFT_FACTOR_MULTIPLIER or 0)
+                wearRate = wearRate + heavyLiftFactor
+            end
+
+            -- pto operating
+            if isPtoActive then
+                ptoOperatingFactor = C.PTO_OPERATING_FACTOR or 0
+                wearRate = wearRate + ptoOperatingFactor
+                
+                -- pto sharp angle factor
+                local ptoAngleDeg, hasConnectedPto = getMaxConnectedPtoAngleDeg(self)
+                ptoSharpAngleDeg = ptoAngleDeg
+                local sharpAngleThreshold = C.PTO_SHARP_ANGLE_FACTOR_THRESHOLD or 30
+                if sharpAngleThreshold <= (2 * math.pi + 0.001) then
+                    sharpAngleThreshold = math.deg(sharpAngleThreshold)
+                end
+
+                if hasConnectedPto and ptoAngleDeg > sharpAngleThreshold then
+                    sharpAngleFactor = ADS_Utils.calculateQuadraticMultiplier(ptoAngleDeg, sharpAngleThreshold, false, 50)
+                    sharpAngleFactor = sharpAngleFactor * (C.PTO_SHARP_ANGLE_FACTOR_MULTIPLIER or 0)
+                    wearRate = wearRate + sharpAngleFactor
+                end
+            end
+
+
+        else
+            --idling
+            wearRate = wearRate * C.HYDRAULICS_IDLING_MULTIPLIER
+        end
+
+        -- service factor
+        expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
+
+    else
+        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+    end
+
+
+    syncSystemWearBreakdown(self, spec.systems.hydraulics, 'HYDRAULICS_WEAR')
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
-        expiredServiceFactor = expiredServiceFactor
+        expiredServiceFactor = expiredServiceFactor,
+        heavyLiftFactor = heavyLiftFactor,
+        heavyLiftMassRatio = heavyLiftMassRatio,
+        operatingFactor = operatingFactor,
+        coldOilFactor = coldOilFactor,
+        ptoOperatingFactor = ptoOperatingFactor,
+        sharpAngleFactor = sharpAngleFactor,
+        ptoSharpAngleDeg = ptoSharpAngleDeg
     })
 end
 
+-- cooling
 function AdvancedDamageSystem:updateCoolingSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(spec.systems.cooling.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.cooling.name)
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.COOLING_FACTOR_DATA
     local wearRate = 1.0
 
-    -- service factor
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
-        end
+
+
+
+        -- service factor
+        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
     syncSystemWearBreakdown(self, spec.systems.cooling, "COOLING_WEAR")
@@ -1928,20 +2098,19 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     })
 end
 
+-- electrical
 function AdvancedDamageSystem:updateElectricalSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(spec.systems.electrical.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
-    -- service factor
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
-        end
+        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
     syncSystemWearBreakdown(self, spec.systems.electrical, "ELECTRICAL_WEAR")
@@ -1950,20 +2119,19 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     })
 end
 
+-- chassis
 function AdvancedDamageSystem:updateChassisSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(spec.systems.chassis.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.chassis.name)
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
     local wearRate = 1.0
 
-    -- service factor
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
-        end
+        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
     syncSystemWearBreakdown(self, spec.systems.chassis, "CHASSIS_WEAR")
@@ -1972,20 +2140,19 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     })
 end
 
+-- fuel
 function AdvancedDamageSystem:updateFuelSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(spec.systems.fuel.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.fuel.name)
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
 
-    -- service factor
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
-        end
+        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
     syncSystemWearBreakdown(self, spec.systems.fuel, "FUEL_WEAR")
@@ -1994,45 +2161,22 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     })
 end
 
+-- workprocess
 function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(spec.systems.workProcess.name)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workProcess.name)
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
 
-    -- service factor
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
-        end
+        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        local wearRateWithoutService = wearRate
+        wearRate = wearRate * expiredServiceMultiplier
+        expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
     syncSystemWearBreakdown(self, spec.systems.workProcess, "WORKPROCESS_WEAR")
-    self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
-        expiredServiceFactor = expiredServiceFactor
-    })
-end
-
-function AdvancedDamageSystem:updateMaterialFlowSystem(dt)
-    local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(spec.systems.materialFlow.name)
-    local expiredServiceFactor = 0
-    local C = ADS_Config.CORE.MATERIALFLOW_FACTOR_DATA
-    local wearRate = 1.0
-
-    -- service factor
-    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        if self:getServiceLevel() < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-            expiredServiceFactor = ADS_Utils.calculateQuadraticMultiplier(spec.serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-            expiredServiceFactor = expiredServiceFactor * (C.SERVICE_EXPIRED_MULTIPLIER or 0)
-            wearRate = wearRate + expiredServiceFactor
-        end
-    end
-    
-    syncSystemWearBreakdown(self, spec.systems.materialFlow, "MATERIALFLOW_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor
     })
@@ -2394,15 +2538,6 @@ function AdvancedDamageSystem:processWearBreakdowns(dt)
     end
 end
 
-
-local function shallow_copy(original)
-    local copy = {}
-    for k, v in pairs(original) do
-        copy[k] = v
-    end
-    return copy
-end
-
 function AdvancedDamageSystem:recalculateAndApplyEffects()
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
@@ -2435,7 +2570,7 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
                     local existingEffect = aggregatedEffects[effectId]
 
                     if existingEffect == nil then
-                        local newEffect = shallow_copy(effectData)
+                        local newEffect = ADS_Utils.shallowCopy(effectData)
                         newEffect.value = newValue 
                         aggregatedEffects[effectId] = newEffect
                     else
@@ -2686,7 +2821,7 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         end
 
         selectedBreakdowns = idsToRepair
-        spec.pendingRepairQueue = shallow_copy(idsToRepair)
+        spec.pendingRepairQueue = ADS_Utils.shallowCopy(idsToRepair)
         totalTimeMs = C.REPAIR_TIME * C.GLOBAL_SERVICE_TIME_MULTIPLIER * C.REPAIR_TIME_MULTIPLIERS[key] * #idsToRepair
         repairPrice = self:getServicePrice(type, optionOne, optionTwo, optionThree)
 
@@ -2880,7 +3015,7 @@ function AdvancedDamageSystem:completeService()
     local optionOne = spec.serviceOptionOne
     local optionTwo = spec.serviceOptionTwo
     local optionThree = spec.serviceOptionThree
-    local selectedBreakdowns = shallow_copy(spec.pendingSelectedBreakdowns or {})
+    local selectedBreakdowns = ADS_Utils.shallowCopy(spec.pendingSelectedBreakdowns or {})
     local plannedRepairCandidateIds = {}
 
     if serviceType == states.MAINTENANCE and spec.pendingMaintenanceServiceTarget ~= nil then
@@ -3070,7 +3205,7 @@ function AdvancedDamageSystem:cancelService()
     local optionOne = spec.serviceOptionOne
     local optionTwo = spec.serviceOptionTwo
     local optionThree = spec.serviceOptionThree
-    local selectedBreakdowns = shallow_copy(spec.pendingSelectedBreakdowns or {})
+    local selectedBreakdowns = ADS_Utils.shallowCopy(spec.pendingSelectedBreakdowns or {})
 
     spec.pendingSelectedBreakdowns = selectedBreakdowns
     self:recalculateAndApplyEffects()
@@ -3107,7 +3242,7 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
 
     local entryId = (#spec.maintenanceLog or 0) + 1
     local env = g_currentMission.environment
-    local selectedBreakdowns = shallow_copy(spec.pendingSelectedBreakdowns or {})
+    local selectedBreakdowns = ADS_Utils.shallowCopy(spec.pendingSelectedBreakdowns or {})
 
     local entry = {
         id = entryId,                     
@@ -3135,8 +3270,8 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
             service = self:getServiceLevel(),
             activeBreakdowns = self:getActiveBreakdowns(),
             selectedBreakdowns = selectedBreakdowns,
-            activeEffects = shallow_copy(spec.activeEffects),
-            activeIndicators = shallow_copy(spec.activeIndicators),
+            activeEffects = ADS_Utils.shallowCopy(spec.activeEffects),
+            activeIndicators = ADS_Utils.shallowCopy(spec.activeIndicators),
             reliability = spec.reliability,
             maintainability = spec.maintainability,
         }
@@ -3420,13 +3555,13 @@ end
 
 function AdvancedDamageSystem:getSystemConditionLevel(systemName)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(systemName)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemName)
     return spec.systems[systemKey].condition
 end
 
 function AdvancedDamageSystem:getSystemStressLevel(systemName)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = getSystemKey(systemName)
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemName)
     return spec.systems[systemKey].stress
 end
 
@@ -3451,9 +3586,9 @@ end
 
 
 function AdvancedDamageSystem.getIsLogEntryHasReport(entry)
-    local isVisible = normalizeBoolValue(entry.isVisible, true)
-    local isCompleted = normalizeBoolValue(entry.isCompleted, true)
-    local isLegacyEntry = normalizeBoolValue(entry.isLegacyEntry, false)
+    local isVisible = ADS_Utils.normalizeBoolValue(entry.isVisible, true)
+    local isCompleted = ADS_Utils.normalizeBoolValue(entry.isCompleted, true)
+    local isLegacyEntry = ADS_Utils.normalizeBoolValue(entry.isLegacyEntry, false)
 
     return (entry.type ~= AdvancedDamageSystem.STATUS.REPAIR 
     and entry.optionOne ~= AdvancedDamageSystem.INSPECTION_TYPES.VISUAL 
@@ -4820,3 +4955,5 @@ addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_set
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)
+
+
