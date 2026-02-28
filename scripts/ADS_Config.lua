@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 47,
+    VER = 48,
 
     DEBUG = false,
 
@@ -32,14 +32,9 @@ ADS_Config = {
     -- This section controls the fundamental mechanics of wear, tear, and breakdowns.
     -- ====================================================================================
     CORE = {
-        -- The base amount of 'Service' level decrease per real hour of engine operation.
-        -- 'Service' represents consumables like oil and filters. Higher value means faster service wear.
-        BASE_SERVICE_WEAR = 0.1, -- (0.1 = 10% wear per hour at base rate)
+        BASE_SERVICE_WEAR = 0.1,
         SERVICE_EXPIRED_THRESHOLD = 0.5,
-        -- The base amount of 'Condition' level decrease per real hour of engine operation.
-        -- 'Condition' represents the physical health of the vehicle's components.
-        -- Higher value means faster condition degradation.
-        BASE_SYSTEMS_WEAR = 0.01, -- (0.01 = 1% wear per hour at base rate)
+        BASE_SYSTEMS_WEAR = 0.01,
         DOWNTIME_MULTIPLIER = 0.0,
 
         SYSTEM_WEIGHTS = {
@@ -112,7 +107,14 @@ ADS_Config = {
         },
 
         COOLING_FACTOR_DATA = {
+            COOLING_IDLING_MULTIPLIER = 0.2,
             SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            HIGH_COOLING_FACTOR_MULTIPLIER = 3.0,
+            HIGH_COOLING_FACTOR_THRESHOLD = 0.8,
+            OVERHEAT_FACTOR_MULTIPLIER = 20.0,
+            OVERHEAT_FACTOR_THRESHOLD = 95,
+            COLD_SHOCK_FACTOR_MULTIPLIER = 20.0,
+            COLD_SHOCK_FACTOR_THRESHOLD = 50
         },
 
         ELECTRICAL_FACTOR_DATA = {
@@ -139,12 +141,6 @@ ADS_Config = {
         STRESS_COOLDOWN = 0.5,
         CVT_SHIFT_SPEED_THRESHOLD = 1.0,
         CVT_SHOCK_MULTIPLIER = 100.0,
-
-        -- --- Breakdown Mechanics ---
-
-        -- The base time in milliseconds it takes for a breakdown to progress from one stage to the next.
-        -- This can be modified by individual breakdown definitions. 3,600,000ms = 1 hour.
-        BASE_BREAKDOWN_PROGRESS_TIME = 3600000,
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 5,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
@@ -180,6 +176,7 @@ ADS_Config = {
         RELIABILITY_YEAR_FACTOR = 0.01,
         RELIABILITY_YEAR_FACTOR_THRESHOLD = 2000,
 
+        BASE_BREAKDOWN_PROGRESS_TIME = 3600000,
         BREAKDOWN_PROBABILITIES = {
             STRESS_THRESHOLD = 0.1,
             MIN_MTBF = 60,
@@ -214,96 +211,96 @@ ADS_Config = {
     -- MAINTENANCE & REPAIR PARAMETERS
     -- Controls the time and cost of all service types.
     -- ====================================================================================
-MAINTENANCE = {
-    PARK_VEHICLE = true,
-    INSTANT_INSPECTION = false,
-    WARRANTY_ENABLED = true,
-    WARRANTY_MAX_OPERATING_HOURS = 20,
-    WARRANTY_MAX_AGE_MONTHS = 12,
+    MAINTENANCE = {
+        PARK_VEHICLE = true,
+        INSTANT_INSPECTION = false,
+        WARRANTY_ENABLED = true,
+        WARRANTY_MAX_OPERATING_HOURS = 20,
+        WARRANTY_MAX_AGE_MONTHS = 12,
 
-    GLOBAL_SERVICE_PRICE_MULTIPLIER = 1.0,
-    GLOBAL_SERVICE_TIME_MULTIPLIER = 1.0,
+        GLOBAL_SERVICE_PRICE_MULTIPLIER = 1.0,
+        GLOBAL_SERVICE_TIME_MULTIPLIER = 1.0,
 
-    INSPECTION_TIME = 3600000,
-    INSPECTION_TIME_MULTIPLIERS = {
-        [1] = 1.0,  STANDARD = 1.0,
-        [2] = 0.1,  VISUAL   = 0.1,
-        [3] = 4.0,  COMPLETE = 4.0,
-    },
-    MAINTENANCE_TIME = 21600000,
-    MAINTENANCE_TIME_MULTIPLIERS = {
-        [1] = 1.0,  STANDARD = 1.0,
-        [2] = 0.25, MINIMAL  = 0.25,
-        [3] = 1.5,  EXTENDED = 1.5,
-    },
-    REPAIR_TIME = 14400000,
-    REPAIR_TIME_MULTIPLIERS = {
-        [1] = 1.0, MEDIUM = 1.0,
-        [2] = 1.5, LOW   = 1.5,
-        [3] = 0.5, HIGH    = 0.5,
-    },
-    OVERHAUL_TIME = 86400000,
-    OVERHAUL_TIME_MULTIPLIERS = {
-        [1] = 1.0, STANDARD = 1.0,
-        [2] = 0.5, PARTIAL  = 0.5,
-        [3] = 2.0, FULL     = 2.0,
-    },
+        INSPECTION_TIME = 3600000,
+        INSPECTION_TIME_MULTIPLIERS = {
+            [1] = 1.0,  STANDARD = 1.0,
+            [2] = 0.1,  VISUAL   = 0.1,
+            [3] = 4.0,  COMPLETE = 4.0,
+        },
+        MAINTENANCE_TIME = 21600000,
+        MAINTENANCE_TIME_MULTIPLIERS = {
+            [1] = 1.0,  STANDARD = 1.0,
+            [2] = 0.25, MINIMAL  = 0.25,
+            [3] = 1.5,  EXTENDED = 1.5,
+        },
+        REPAIR_TIME = 14400000,
+        REPAIR_TIME_MULTIPLIERS = {
+            [1] = 1.0, MEDIUM = 1.0,
+            [2] = 1.5, LOW   = 1.5,
+            [3] = 0.5, HIGH    = 0.5,
+        },
+        OVERHAUL_TIME = 86400000,
+        OVERHAUL_TIME_MULTIPLIERS = {
+            [1] = 1.0, STANDARD = 1.0,
+            [2] = 0.5, PARTIAL  = 0.5,
+            [3] = 2.0, FULL     = 2.0,
+        },
 
-    MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS = {
-        [1] = 1.0,  STANDARD = 1.0,
-        [2] = 0.75, MINIMAL  = 0.75,
-        [3] = 1.2,  EXTENDED = 1.2,
-    },
-    OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS = {
-        [1] = 0.61, STANDARD = 0.61,
-        [2] = 0.41, PARTIAL  = 0.41,
-        [3] = 0.81, FULL     = 0.81,
-    },
-    OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS = {
-        [1] = 0.79, STANDARD = 0.79,
-        [2] = 0.59, PARTIAL  = 0.59,
-        [3] = 0.99, FULL     = 0.99,
-    },
+        MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS = {
+            [1] = 1.0,  STANDARD = 1.0,
+            [2] = 0.75, MINIMAL  = 0.75,
+            [3] = 1.2,  EXTENDED = 1.2,
+        },
+        OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS = {
+            [1] = 0.61, STANDARD = 0.61,
+            [2] = 0.41, PARTIAL  = 0.41,
+            [3] = 0.81, FULL     = 0.81,
+        },
+        OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS = {
+            [1] = 0.79, STANDARD = 0.79,
+            [2] = 0.59, PARTIAL  = 0.59,
+            [3] = 0.99, FULL     = 0.99,
+        },
 
-    RE_OVERHAUL_FACTOR = 0.1,
+        RE_OVERHAUL_FACTOR = 0.1,
 
-    PARTS_BREAKDOWN_CHANCES = {
-        [1] = 0.1,  OEM         = 0.1,
-        [2] = 0.5,  USED        = 0.5,
-        [3] = 0.33, AFTERMARKET = 0.33,
-        [4] = 0.0,  PREMIUM     = 0.0,
-    },
-    PARTS_BREAKDOWN_TIME = 18000000,
+        PARTS_BREAKDOWN_CHANCES = {
+            [1] = 0.1,  OEM         = 0.1,
+            [2] = 0.5,  USED        = 0.5,
+            [3] = 0.33, AFTERMARKET = 0.33,
+            [4] = 0.0,  PREMIUM     = 0.0,
+        },
+        PARTS_BREAKDOWN_TIME = 18000000,
 
-    PARTS_PRICE_MULTIPLIERS = {
-        [1] = 1.0,  OEM         = 1.0,
-        [2] = 0.33, USED        = 0.33,
-        [3] = 0.66, AFTERMARKET = 0.66,
-        [4] = 1.20, PREMIUM     = 1.20,
+        PARTS_PRICE_MULTIPLIERS = {
+            [1] = 1.0,  OEM         = 1.0,
+            [2] = 0.33, USED        = 0.33,
+            [3] = 0.66, AFTERMARKET = 0.66,
+            [4] = 1.20, PREMIUM     = 1.20,
+        },
+        MAINTENANCE_PRICE_MULTIPLIERS = {
+            [1] = 1.0,  STANDARD = 1.0,
+            [2] = 0.65, MINIMAL  = 0.65,
+            [3] = 1.25, EXTENDED = 1.25,
+        },
+        REPAIR_PRICE_MULTIPLIERS = {
+            [1] = 1.0, MEDIUM = 1.0,
+            [2] = 0.8, LOW    = 0.8,
+            [3] = 1.2, HIGH   = 1.2,
+        },
+        OVERHAUL_PRICE_MULTIPLIERS = {
+            [1] = 0.5, STANDARD = 0.5,
+            [2] = 0.3, PARTIAL  = 0.3,
+            [3] = 0.8, FULL     = 0.8,
+        },
+        INSPECTION_PRICE_MULTIPLIERS = {
+            [1] = 1.0, STANDARD = 1.0,
+            [2] = 0.1, VISUAL   = 0.1,
+            [3] = 4.0, COMPLETE = 4.0,
+        },
+        AGE_FACTOR_PRICE_FACTOR = 0.01,
+        OWN_WORKSHOP_PRICE_MULTIPLIER = 0.8,
     },
-    MAINTENANCE_PRICE_MULTIPLIERS = {
-        [1] = 1.0,  STANDARD = 1.0,
-        [2] = 0.65, MINIMAL  = 0.65,
-        [3] = 1.25, EXTENDED = 1.25,
-    },
-    REPAIR_PRICE_MULTIPLIERS = {
-        [1] = 1.0, MEDIUM = 1.0,
-        [2] = 0.8, LOW    = 0.8,
-        [3] = 1.2, HIGH   = 1.2,
-    },
-    OVERHAUL_PRICE_MULTIPLIERS = {
-        [1] = 0.5, STANDARD = 0.5,
-        [2] = 0.3, PARTIAL  = 0.3,
-        [3] = 0.8, FULL     = 0.8,
-    },
-    INSPECTION_PRICE_MULTIPLIERS = {
-        [1] = 1.0, STANDARD = 1.0,
-        [2] = 0.1, VISUAL   = 0.1,
-        [3] = 4.0, COMPLETE = 4.0,
-    },
-    AGE_FACTOR_PRICE_FACTOR = 0.01,
-    OWN_WORKSHOP_PRICE_MULTIPLIER = 0.8,
-},
 
     -- ====================================================================================
     -- THERMAL DYNAMICS PARAMETERS

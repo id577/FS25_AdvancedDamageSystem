@@ -248,6 +248,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "updateChassisSystem", AdvancedDamageSystem.updateChassisSystem)
     SpecializationUtil.registerFunction(vehicleType, "updateFuelSystem", AdvancedDamageSystem.updateFuelSystem)
     SpecializationUtil.registerFunction(vehicleType, "updateWorkProcessSystem", AdvancedDamageSystem.updateWorkProcessSystem)
+    SpecializationUtil.registerFunction(vehicleType, "applyInstantDamageToSystem", AdvancedDamageSystem.applyInstantDamageToSystem)
     
     SpecializationUtil.registerFunction(vehicleType, "isUnderService", AdvancedDamageSystem.isUnderService)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
@@ -507,6 +508,9 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
+            highCoolingFactor = 0,
+            overheatFactor = 0,
+            coldShockFactor = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -1484,8 +1488,11 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
 end
 
 -- damage
-function AdvancedDamageSystem:setDamageToSystem(system, damageAmount)
-
+function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
+    local spec = self.spec_AdvancedDamageSystem
+    local systemKey = ADS_Config.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
+    spec.systems[systemKey].condition = spec.systems[systemKey].condition - damageAmount
+    spec.systems[systemKey].stress = spec.systems[systemKey].stress + damageAmount
 end
 
 -- engine (overload, cold, overheat)
@@ -2073,28 +2080,65 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     })
 end
 
--- cooling
+-- cooling (highCooling, overheat, coldShock)
 function AdvancedDamageSystem:updateCoolingSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
+    local spec_motorized = self.spec_motorized
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.cooling.name)
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.COOLING_FACTOR_DATA
+    local highCoolingFactor, overheatFactor, coldShockFactor = 0, 0, 0
     local wearRate = 1.0
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+        local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
+        local maxRpm = spec_motorized.motor.maxRpm
+        local rpmLoad = lastRpm / maxRpm
 
+        -- high cooling
+        if spec.thermostatState > 0.0 then
+            if spec.thermostatState > C.HIGH_COOLING_FACTOR_THRESHOLD then
+                highCoolingFactor = ADS_Utils.calculateQuadraticMultiplier(spec.thermostatState, C.HIGH_COOLING_FACTOR_THRESHOLD, false)
+                highCoolingFactor = highCoolingFactor * (C.HIGH_COOLING_FACTOR_MULTIPLIER or 0)
+                wearRate = wearRate + highCoolingFactor
+            end
+        end
 
+        -- overheat
+        if spec.engineTemperature > C.OVERHEAT_FACTOR_THRESHOLD then
+            overheatFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_FACTOR_THRESHOLD, false, 120)
+            overheatFactor = overheatFactor * (C.OVERHEAT_FACTOR_MULTIPLIER or 0)
+            wearRate = wearRate + overheatFactor
+        end
+
+        -- cold shock
+        if spec.engineTemperature < C.COLD_SHOCK_FACTOR_THRESHOLD and rpmLoad > 0.75 and not self:getIsAIActive() then
+            coldShockFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_SHOCK_FACTOR_THRESHOLD, true)
+            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
+            coldShockFactor = coldShockFactor * (C.COLD_SHOCK_FACTOR_MULTIPLIER or 0) * motorLoadInf
+            wearRate = wearRate + coldShockFactor
+        end
+
+        -- idling
+        if highCoolingFactor == 0 and overheatFactor == 0 and coldShockFactor == 0 then
+            wearRate = wearRate * C.COOLING_IDLING_MULTIPLIER
+        end
 
         -- service factor
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
+    else
+        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
     end
 
     syncSystemWearBreakdown(self, spec.systems.cooling, "COOLING_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
-        expiredServiceFactor = expiredServiceFactor
+        expiredServiceFactor = expiredServiceFactor,
+        highCoolingFactor = highCoolingFactor,
+        overheatFactor = overheatFactor,
+        coldShockFactor = coldShockFactor
     })
 end
 

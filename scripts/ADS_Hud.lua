@@ -475,6 +475,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local engineDbg = spec.debugData.engine or {}
     local transmissionDbg = spec.debugData.transmission or {}
     local hydraulicsDbg = spec.debugData.hydraulics or {}
+    local coolingDbg = spec.debugData.cooling or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
         engineDbg.expiredServiceFactor or 0,
@@ -497,6 +498,12 @@ function ADS_Hud:drawActiveVehicleHUD()
         hydraulicsDbg.coldOilFactor or 0,
         hydraulicsDbg.ptoOperatingFactor or 0,
         hydraulicsDbg.sharpAngleFactor or 0
+    ) * bcw
+    local coolingMaxFactor = math.max(
+        coolingDbg.expiredServiceFactor or 0,
+        coolingDbg.highCoolingFactor or 0,
+        coolingDbg.overheatFactor or 0,
+        coolingDbg.coldShockFactor or 0
     ) * bcw
 
     local engineLines = {}
@@ -565,7 +572,20 @@ function ADS_Hud:drawActiveVehicleHUD()
         asPercent(hydraulicsDbg.breakdownProbability or 0),
         asPercent(hydraulicsDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(hydraulicsMaxFactor), 0.95)
-    local coolingLines = buildDefaultSystemLines("cooling")
+    local coolingLines = {}
+    addLine(coolingLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% hcf: %.2f%% (ts: %.1f%%) ohf: %.2f%% csf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("cooling")),
+        asPercent((coolingDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("cooling")),
+        asPercent((coolingDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((coolingDbg.highCoolingFactor or 0) * bcw),
+        asPercent(spec.thermostatState or 0),
+        asPercent((coolingDbg.overheatFactor or 0) * bcw),
+        asPercent((coolingDbg.coldShockFactor or 0) * bcw),
+        asPercent(coolingDbg.breakdownProbability or 0),
+        asPercent(coolingDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(coolingMaxFactor), 0.95)
     local electricalLines = buildDefaultSystemLines("electrical")
     local chassisLines = buildDefaultSystemLines("chassis")
     local fuelLines = buildDefaultSystemLines("fuel")
