@@ -2141,7 +2141,7 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         end
 
         -- idling
-        if highCoolingFactor == 0 and overheatFactor == 0 and coldShockFactor == 0 then
+        if spec.thermostatState == 0 and overheatFactor == 0 and coldShockFactor == 0 then
             wearRate = wearRate * C.COOLING_IDLING_MULTIPLIER
         end
 
@@ -2176,9 +2176,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
-    local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted() or false
-    local wasMotorStarted = systemData.isMotorStarted == true
-    systemData.isMotorStarted = isMotorStarted
+    local isMotorStarted = systemData.isMotorStarted or false
     local isOutdoor = not spec.isUnderRoof
 
     -- weather factor
@@ -2195,7 +2193,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     end
 
     -- cranking stress damage: one-time instant damage on start transition
-    if not spec.isElectricVehicle and not wasMotorStarted and isMotorStarted then
+    if not spec.isElectricVehicle and isMotorStarted then
         if spec.engineTemperature < C.CRANKING_STRESS_THRESHOLD then
             local tempMultiplier = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.CRANKING_STRESS_THRESHOLD, true)
             local damage = C.CRANKING_STRESS_DAMAGE * (1 + tempMultiplier)
@@ -2203,10 +2201,11 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         else
             self:applyInstantDamageToSystem(spec.systems.electrical.name, C.CRANKING_STRESS_DAMAGE)
         end
+        systemData.isMotorStarted = false
     end
 
 
-    if isMotorStarted and not spec.isElectricVehicle then
+    if self:getIsMotorStarted() and not spec.isElectricVehicle then
         -- service factor
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate

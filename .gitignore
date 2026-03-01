@@ -48,3 +48,4 @@ out/
 AdvancedDamageSystem.zip
 dataS_decompile/
 data_dump/
+.gitignore

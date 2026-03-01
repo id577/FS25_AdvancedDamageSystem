@@ -2859,6 +2859,13 @@ function ADS_Breakdowns.getCanMotorRun(self, superFunc)
 end
 
 
+local function setMotorStartedFlagForStarterDamage(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
+    local systemData = spec.systems[systemKey]
+    systemData.isMotorStarted = true
+end
+
 function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
 
     if self.spec_AdvancedDamageSystem and self.spec_AdvancedDamageSystem.activeEffects then
@@ -2870,6 +2877,7 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
                 if not g_soundManager:getIsSamplePlaying(spec.samples.starter) then
                     g_soundManager:playSample(spec.samples.starter)
                 end 
+                setMotorStartedFlagForStarterDamage(self)
                 return
             end
         end
@@ -2888,15 +2896,18 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
                 if math.random() < chance then
                     spec.activeEffects.ENGINE_START_FAILURE_CHANCE.extraData.status = "CRANKING"
                     spec.activeEffects.ENGINE_START_FAILURE_CHANCE.extraData.timer = 0
+                    setMotorStartedFlagForStarterDamage(self)
                     return
                 end
             else
                 superFunc(self, noEventSend)
+                setMotorStartedFlagForStarterDamage(self)
             end
             
         end
     end
     superFunc(self, noEventSend)
+    setMotorStartedFlagForStarterDamage(self)
 end
 
 
