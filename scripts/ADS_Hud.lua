@@ -477,6 +477,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local hydraulicsDbg = spec.debugData.hydraulics or {}
     local coolingDbg = spec.debugData.cooling or {}
     local electricalDbg = spec.debugData.electrical or {}
+    local chassisDbg = spec.debugData.chassis or {}
     local serviceDbg = spec.debugData.service or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
@@ -516,6 +517,11 @@ function ADS_Hud:drawActiveVehicleHUD()
         electricalDbg.weatherFactor or 0,
         electricalDbg.lightsFactor or 0,
         electricalDbg.overheatFactor or 0
+    ) * bcw
+    local chassisMaxFactor = math.max(
+        chassisDbg.expiredServiceFactor or 0,
+        chassisDbg.weatherFactor or 0,
+        chassisDbg.vibFactor or 0
     ) * bcw
 
     local overviewLines = {}
@@ -629,7 +635,22 @@ function ADS_Hud:drawActiveVehicleHUD()
         asPercent(electricalDbg.breakdownProbability or 0),
         asPercent(electricalDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(electricalMaxFactor), 0.95)
-    local chassisLines = buildDefaultSystemLines("chassis")
+    local chassisLines = {}
+    addLine(chassisLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% vf: %.2f%% (raw: %.2f%% sig: %.2f%% spf: %.2f%% v: %.1fkmh) | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("chassis")),
+        asPercent((chassisDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("chassis")),
+        asPercent((chassisDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((chassisDbg.weatherFactor or 0) * bcw),
+        asPercent((chassisDbg.vibFactor or 0) * bcw),
+        asPercent(chassisDbg.vibRaw or 0),
+        asPercent(chassisDbg.vibSignal or 0),
+        asPercent(chassisDbg.vibSpeedFactor or 0),
+        (chassisDbg.vibSpeedKmh or 0),
+        asPercent(chassisDbg.breakdownProbability or 0),
+        asPercent(chassisDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(chassisMaxFactor), 0.95)
     local fuelLines = buildDefaultSystemLines("fuel")
     local workProcessLines = buildDefaultSystemLines("workProcess")
     local materialFlowLines = buildDefaultSystemLines("materialFlow")

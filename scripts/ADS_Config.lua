@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 50,
+    VER = 53,
 
     DEBUG = false,
 
@@ -133,6 +133,10 @@ ADS_Config = {
 
         CHASSIS_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            VIB_FACTOR_THRESHOLD = 0.08,
+            VIB_FACTOR_MAX_SIGNAL = 0.22,
+            VIB_FACTOR_MULTIPLIER = 50.0,
+            VIB_FIELD_MULTIPLIER = 1.3
         },
 
         WORKPROCESS_FACTOR_DATA = {

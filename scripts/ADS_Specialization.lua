@@ -540,6 +540,14 @@ function AdvancedDamageSystem:onLoad(savegame)
             totalWearRate = 0,
             expiredServiceFactor = 0,
             weatherFactor = 0,
+            vibFactor = 0,
+            vibSignal = 0,
+            vibRaw = 0,
+            vibWheelCount = 0,
+            vibSpeedFactor = 0,
+            vibSpeedKmh = 0,
+            vibAvgDensityType = 0,
+            vibFieldMultiplier = 1,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -634,6 +642,10 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.totalBreakdownsOccurred = 0
     self.spec_AdvancedDamageSystem.isElectricVehicle = false
     self.spec_AdvancedDamageSystem.hydraulicsMoveAlphaCache = {}
+    self.spec_AdvancedDamageSystem.chassisVibState = {
+        prevSuspension = {},
+        smoothed = 0
+    }
 end
 
 function AdvancedDamageSystem:onPostLoad(savegame)
@@ -1459,11 +1471,10 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
         return
     end
 
-    local baseWearRate = 1.0
+    local reliability = math.max(spec.reliability or 1.0, 0.001)
+    local baseWearRate = 1.0 / reliability
     local systemData = ensureSystemData(spec, systemName)
     wearRate = tonumber(wearRate) or baseWearRate
-
-    local reliability = math.max(spec.reliability or 1.0, 0.001)
     wearRate = wearRate / reliability
 
     local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
@@ -2301,9 +2312,99 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.chassis.name)
     local expiredServiceFactor = 0
     local weatherFactor = 0
+    local vibFactor = 0
+    local vibSignal = 0
+    local vibRaw = 0
+    local vibWheelCount = 0
+    local vibSpeedFactor = 0
+    local vibAvgDensityType = 0
+    local vibFieldMultiplier = 1
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
     local wearRate = 1.0
 
+    local speed = tonumber(self.getLastSpeed ~= nil and self:getLastSpeed() or 0) or 0
+
+    -- vibration
+    if speed > 1 then
+        local vibState = spec.chassisVibState
+        if vibState == nil then
+            vibState = {
+                prevSuspension = {},
+                smoothed = 0
+            }
+            spec.chassisVibState = vibState
+        end
+
+        local prevSuspension = vibState.prevSuspension or {}
+        vibState.prevSuspension = prevSuspension
+
+        local sumSuspNorm = 0
+        local countSuspNorm = 0
+        local sumDensityType = 0
+        local countDensityType = 0
+
+        if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
+            for wheelIndex, wheel in ipairs(self.spec_wheels.wheels) do
+                local runtimeWheel = wheel.physics or wheel
+                local netInfo = runtimeWheel.netInfo or wheel.netInfo
+                local suspTravel = tonumber(runtimeWheel.suspTravel or wheel.suspTravel) or 0
+                local suspLength = tonumber((netInfo and netInfo.suspensionLength) or runtimeWheel.suspensionLength or wheel.suspensionLength) or 0
+                local prevSuspLength = tonumber(prevSuspension[wheelIndex]) or suspLength
+                local suspDelta = math.abs(suspLength - prevSuspLength)
+                prevSuspension[wheelIndex] = suspLength
+
+                local suspNorm = 0
+                if suspTravel > 0.0001 then
+                    suspNorm = math.min(suspDelta / suspTravel, 3.0)
+                end
+
+                local hasGroundContact = false
+                if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
+                    hasGroundContact = wheel.physics.hasGroundContact == true
+                elseif runtimeWheel.hasGroundContact ~= nil then
+                    hasGroundContact = runtimeWheel.hasGroundContact == true
+                elseif wheel.hasGroundContact ~= nil then
+                    hasGroundContact = wheel.hasGroundContact == true
+                end
+
+                local densityType = tonumber(runtimeWheel.densityType or wheel.densityType) or -1
+
+                if hasGroundContact then
+                    sumSuspNorm = sumSuspNorm + suspNorm
+                    countSuspNorm = countSuspNorm + 1
+                    if densityType >= 0 then
+                        sumDensityType = sumDensityType + densityType
+                        countDensityType = countDensityType + 1
+                    end
+                end
+            end
+        end
+
+        vibRaw = countSuspNorm > 0 and (sumSuspNorm / countSuspNorm) or 0
+        vibWheelCount = countSuspNorm
+        local speedForDamage = math.clamp(speed, 0.0, 50.0)
+        vibSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(speedForDamage, 0.0, false, 40.0)
+        local vibSignalRaw = vibRaw * vibSpeedFactor
+        local alpha = dt / (300 + dt)
+        vibState.smoothed = vibState.smoothed + (vibSignalRaw - vibState.smoothed) * alpha
+        vibSignal = vibState.smoothed
+        vibAvgDensityType = countDensityType > 0 and (sumDensityType / countDensityType) or 0
+        if vibAvgDensityType > 1 then
+            vibFieldMultiplier = tonumber(C.VIB_FIELD_MULTIPLIER) or 1.3
+        end
+
+        local vibThreshold = tonumber(C.VIB_FACTOR_THRESHOLD) or 0.12
+        local vibMaxSignal = tonumber(C.VIB_FACTOR_MAX_SIGNAL) or 0.22
+        local vibMaxForCurve = math.max(vibMaxSignal, vibThreshold + 0.001)
+        local vibMultiplier = (tonumber(C.VIB_FACTOR_MULTIPLIER) or 4.0) * vibFieldMultiplier
+        if vibSignal > vibThreshold then
+            vibFactor = ADS_Utils.calculateQuadraticMultiplier(vibSignal, vibThreshold, false, vibMaxForCurve)
+            vibFactor = vibFactor * vibMultiplier
+            wearRate = wearRate + vibFactor
+        end
+    end
+
+    -- service
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
@@ -2311,6 +2412,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
+    -- weather
     local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
     weatherMultiplier = math.max(weatherMultiplier, 0.001)
     local wearRateWithoutWeather = wearRate
@@ -2320,7 +2422,15 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     syncSystemWearBreakdown(self, spec.systems.chassis, "CHASSIS_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor
+        weatherFactor = weatherFactor,
+        vibFactor = vibFactor,
+        vibSignal = vibSignal,
+        vibRaw = vibRaw,
+        vibWheelCount = vibWheelCount,
+        vibSpeedFactor = vibSpeedFactor,
+        vibSpeedKmh = speed,
+        vibAvgDensityType = vibAvgDensityType,
+        vibFieldMultiplier = vibFieldMultiplier
     })
 end
 
