@@ -105,7 +105,6 @@ function ADS_Main:onStartMission()
 
     -- spec list damage fix (store and garage overwiev)
     for _, spec in ipairs(g_storeManager.specTypes) do
-        print(spec.name)
         if spec.name == 'wearable' then
             local origFunc = spec.getValueFunc
             spec.getValueFunc = function(s, v)

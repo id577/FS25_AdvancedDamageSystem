@@ -527,6 +527,8 @@ function AdvancedDamageSystem:onLoad(savegame)
             totalWearRate = 0,
             expiredServiceFactor = 0,
             weatherFactor = 0,
+            lightsFactor = 0,
+            overheatFactor = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -2201,17 +2203,34 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     })
 end
 
--- electrical (weather, cranking)
+-- electrical (weather, cranking, lights, overheat)
 function AdvancedDamageSystem:updateElectricalSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
     local systemData = spec.systems[systemKey]
-    local expiredServiceFactor, weatherFactor, weatherExposureFactor = 0, 0, 0
+    local expiredServiceFactor, weatherFactor, weatherExposureFactor, lightsFactor, overheatFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
     local isMotorStarted = systemData.isMotorStarted or false
     local isOutdoor = not spec.isUnderRoof
+
+    -- lights factor
+    if self.spec_lights ~= nil and self.getLightsTypesMask ~= nil then
+        local lightsSpec = self.spec_lights
+        local lightsMask = tonumber(self:getLightsTypesMask()) or 0
+        local maxLightStateMask = tonumber(lightsSpec.maxLightStateMask) or 0
+        local activeMainLightsMask = lightsMask
+
+        if maxLightStateMask > 0 and bitAND ~= nil then
+            activeMainLightsMask = bitAND(lightsMask, maxLightStateMask)
+        end
+
+        if activeMainLightsMask > 0 then
+            lightsFactor = C.LIGHTS_FACTOR_MULTIPLIER or 0
+            wearRate = wearRate + lightsFactor
+        end
+    end
 
     -- weather factor
     if isOutdoor then
@@ -2245,6 +2264,13 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         local wearRateWithoutService = wearRate
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
+
+        -- overheating engine compartment
+        if spec.engineTemperature > C.OVERHEAT_FACTOR_THRESHOLD then
+            overheatFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_FACTOR_THRESHOLD, false, 120)
+            overheatFactor = overheatFactor * (C.OVERHEAT_FACTOR_MULTIPLIER or 0)
+            wearRate = wearRate + overheatFactor
+        end
     else
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -2263,7 +2289,9 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         weatherFactor = weatherFactor,
-        weatherExposureFactor = weatherExposureFactor
+        weatherExposureFactor = weatherExposureFactor,
+        lightsFactor = lightsFactor,
+        overheatFactor = overheatFactor
     })
 end
 
@@ -3808,7 +3836,6 @@ function AdvancedDamageSystem:isUnderService()
     return self.spec_AdvancedDamageSystem.currentState ~= AdvancedDamageSystem.STATUS.READY
 end
 
-
 function AdvancedDamageSystem:getCurrentStatus()
     return self.spec_AdvancedDamageSystem.currentState
 end
@@ -3818,11 +3845,9 @@ function AdvancedDamageSystem:setNewStatus(status)
     ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
 end
 
-
 function AdvancedDamageSystem:getActiveBreakdowns()
     return self.spec_AdvancedDamageSystem.activeBreakdowns
 end
-
 
 function AdvancedDamageSystem.getIsLogEntryHasReport(entry)
     local isVisible = ADS_Utils.normalizeBoolValue(entry.isVisible, true)

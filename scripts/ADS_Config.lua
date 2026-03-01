@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 49,
+    VER = 50,
 
     DEBUG = false,
 
@@ -125,7 +125,10 @@ ADS_Config = {
             CRANKING_STRESS_THRESHOLD = 5,
             RAIN_FACTOR_MULTIPLIER = 0.5,
             SNOW_FACTOR_MULTIPLIER = 0.3,
-            HALL_FACTOR_MULTIPLIER = 1.0
+            HALL_FACTOR_MULTIPLIER = 1.0,
+            OVERHEAT_FACTOR_MULTIPLIER = 20.0,
+            OVERHEAT_FACTOR_THRESHOLD = 95,
+            LIGHTS_FACTOR_MULTIPLIER = 0.2
         },
 
         CHASSIS_FACTOR_DATA = {
