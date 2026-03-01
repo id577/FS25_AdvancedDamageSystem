@@ -1,5 +1,6 @@
 ADS_Hud = {}
 ADS_Hud.modDirectory = g_currentModDirectory
+ADS_Hud.debugViewMode = ADS_Hud.debugViewMode or "default"
 local ADS_Hud_mt = Class(ADS_Hud, HUDDisplay)
 
 function ADS_Hud:new()
@@ -401,6 +402,11 @@ function ADS_Hud:drawActiveVehicleHUD()
             yellow[3] + (red[3] - yellow[3]) * t,
             1
         }
+    end
+
+    if ADS_Hud.debugViewMode == "factorStats" then
+        self:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSize, activeNormalSize, activeLineHeight, sectionGap)
+        return
     end
 
     local breakdownEntries = {}
@@ -876,6 +882,197 @@ function ADS_Hud:drawActiveVehicleHUD()
     setTextBold(true)
     setTextColor(1, 1, 1, 1)
     renderText(textStartX, currentY, activeHeaderSize, vehicle:getFullName() .. " " .. spec.year)
+    setTextBold(false)
+    currentY = currentY - activeHeaderSize - activeLineHeight
+
+    local function drawSection(section)
+        local sectionLines = section.lines or {}
+        if #sectionLines == 0 then
+            setTextColor(1, 1, 1, 1)
+            renderText(textStartX, currentY, activeNormalSize, section.title .. ":")
+            currentY = currentY - activeLineHeight
+            return
+        end
+
+        local firstLine = sectionLines[1]
+        local firstColor = firstLine.color or {1, 1, 1, 1}
+        local firstSize = activeNormalSize * (firstLine.sizeScale or 1.0)
+        setTextColor(firstColor[1], firstColor[2], firstColor[3], firstColor[4] or 1)
+        renderText(textStartX, currentY, firstSize, section.title .. ": " .. (firstLine.text or ""))
+        currentY = currentY - activeLineHeight
+
+        for index = 2, #sectionLines do
+            local line = sectionLines[index]
+            local lineText = line.text or ""
+            local lineColor = line.color or {1, 1, 1, 1}
+            local lineSize = activeNormalSize * (line.sizeScale or 1.0)
+            setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
+            renderText(textStartX + 0.01, currentY, lineSize, lineText)
+            currentY = currentY - activeLineHeight
+        end
+    end
+
+    for index, section in ipairs(sections) do
+        drawSection(section)
+        if index < #sections then
+            currentY = currentY - sectionGap
+        end
+    end
+
+    setTextColor(1, 1, 1, 1)
+end
+
+function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSize, activeNormalSize, activeLineHeight, sectionGap)
+    local function addLine(target, text, color, sizeScale)
+        table.insert(target, {
+            text = text,
+            color = color or {1, 1, 1, 1},
+            sizeScale = sizeScale or 1.0
+        })
+    end
+
+    local function packEntries(entries, maxPerLine, color, sizeScale)
+        local lines = {}
+        if #entries == 0 then
+            addLine(lines, "-", color, sizeScale)
+            return lines
+        end
+
+        local lineEntries = {}
+        for i, entry in ipairs(entries) do
+            table.insert(lineEntries, entry)
+            if #lineEntries >= maxPerLine or i == #entries then
+                addLine(lines, table.concat(lineEntries, " | "), color, sizeScale)
+                lineEntries = {}
+            end
+        end
+
+        return lines
+    end
+
+    local function toPct(value)
+        return (tonumber(value) or 0) * 100
+    end
+
+    local function getSystemTitle(systemKey)
+        local names = {
+            engine = "Engine",
+            transmission = "Transmission",
+            hydraulics = "Hydraulics",
+            cooling = "Cooling",
+            electrical = "Electrical",
+            chassis = "Chassis",
+            fuel = "Fuel",
+            workProcess = "Work Process",
+            materialFlow = "Material Flow"
+        }
+        return names[systemKey] or tostring(systemKey)
+    end
+
+    local sections = {}
+    local factorStatsRaw = spec.factorStats or {}
+    local factorStats = {}
+    for rawSystemKey, rawStats in pairs(factorStatsRaw) do
+        if type(rawStats) == "table" then
+            local normalizedKey = tostring(rawSystemKey)
+            local loweredKey = string.lower(normalizedKey)
+            if loweredKey == "workprocess" then
+                normalizedKey = "workProcess"
+            elseif loweredKey == "materialflow" then
+                normalizedKey = "materialFlow"
+            end
+
+            if factorStats[normalizedKey] == nil then
+                factorStats[normalizedKey] = {}
+            end
+
+            for statKey, statValue in pairs(rawStats) do
+                local numericValue = tonumber(statValue)
+                if numericValue ~= nil then
+                    factorStats[normalizedKey][statKey] = (tonumber(factorStats[normalizedKey][statKey]) or 0) + numericValue
+                end
+            end
+        end
+    end
+
+    local orderedSystems = {
+        "engine", "transmission", "hydraulics", "cooling",
+        "electrical", "chassis", "fuel", "workProcess", "materialFlow"
+    }
+
+    local usedSystems = {}
+    for _, systemKey in ipairs(orderedSystems) do
+        local stats = factorStats[systemKey]
+        if type(stats) == "table" then
+            usedSystems[systemKey] = true
+            local lines = {}
+            addLine(lines, string.format(
+                "total: %.3f%% | stress: %.3f%%",
+                toPct(stats.total),
+                toPct(stats.stress)
+            ), {1, 1, 1, 1}, 0.95)
+
+            local factorEntries = {}
+            for key, value in pairs(stats) do
+                if key ~= "total" and key ~= "stress" then
+                    local numericValue = tonumber(value)
+                    if numericValue ~= nil and math.abs(numericValue) > 0 then
+                        table.insert(factorEntries, { key = key, value = numericValue })
+                    end
+                end
+            end
+
+            table.sort(factorEntries, function(a, b)
+                return math.abs(a.value) > math.abs(b.value)
+            end)
+
+            local formattedEntries = {}
+            for _, entry in ipairs(factorEntries) do
+                table.insert(formattedEntries, string.format("%s: %.3f%%", entry.key, toPct(entry.value)))
+            end
+
+            local packedLines = packEntries(formattedEntries, 4, {0.92, 0.96, 1.0, 1}, 0.9)
+            for _, packedLine in ipairs(packedLines) do
+                table.insert(lines, packedLine)
+            end
+
+            table.insert(sections, { title = getSystemTitle(systemKey), lines = lines })
+        end
+    end
+
+    for systemKey, stats in pairs(factorStats) do
+        if type(stats) == "table" and not usedSystems[systemKey] then
+            local lines = {}
+            addLine(lines, string.format(
+                "total: %.3f%% | stress: %.3f%%",
+                toPct(stats.total),
+                toPct(stats.stress)
+            ), {1, 1, 1, 1}, 0.95)
+            table.insert(sections, { title = getSystemTitle(systemKey), lines = lines })
+        end
+    end
+
+    local totalSectionHeight = 0
+    for _, section in ipairs(sections) do
+        totalSectionHeight = totalSectionHeight + (math.max(#section.lines, 1) * activeLineHeight)
+    end
+    totalSectionHeight = totalSectionHeight + (math.max(#sections - 1, 0) * sectionGap)
+
+    local dynamicHeight = (panel.padding * 2) + activeHeaderSize + totalSectionHeight + 0.02
+    if panel.background ~= nil then
+        local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
+        overlay:setColor(1, 1, 1, 0.7)
+        overlay:render()
+    end
+
+    local textStartX = panel.x + panel.padding
+    local currentY = panel.y + dynamicHeight - panel.padding
+
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
+    setTextBold(true)
+    setTextColor(1, 1, 1, 1)
+    renderText(textStartX, currentY, activeHeaderSize, vehicle:getFullName() .. " " .. spec.year .. " [Factor Stats]")
     setTextBold(false)
     currentY = currentY - activeHeaderSize - activeLineHeight
 

@@ -103,6 +103,127 @@ OVERHAUL_TYPES = {
 
 AdvancedDamageSystem.modDirectory = g_currentModDirectory
 
+AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
+    expiredServiceFactor = "sf",
+    weatherFactor = "wf",
+
+    motorLoadFactor = "mlf",
+    coldMotorFactor = "cmf",
+    hotMotorFactor = "hmf",
+
+    pullOverloadFactor = "pof",
+    heavyTrailerFactor = "htf",
+    luggingFactor = "lf",
+    wheelSlipFactor = "wsf",
+    coldTransFactor = "ctf",
+    hotTransFactor = "hotf",
+
+    heavyLiftFactor = "hlf",
+    operatingFactor = "of",
+    coldOilFactor = "cof",
+    ptoOperatingFactor = "ptof",
+    sharpAngleFactor = "saf",
+
+    highCoolingFactor = "hcf",
+    overheatFactor = "ohf",
+    coldShockFactor = "csf",
+
+    lightsFactor = "ltf",
+
+    vibFactor = "vf",
+    steerLoadFactor = "slf",
+    brakeMassFactor = "bmf",
+
+    lowFuelStarvationFactor = "lff",
+    coldFuelFactor = "cff",
+    idleDepositFactor = "idf",
+
+    instantDamageFactor = "idfg"
+}
+
+local function createEmptyFactorStats(systems)
+    local result = {}
+    if type(systems) ~= "table" then
+        return result
+    end
+
+    for systemKey, _ in pairs(systems) do
+        result[systemKey] = {
+            total = 0,
+            stress = 0
+        }
+    end
+
+    return result
+end
+
+local function flattenFactorStats(factorStats)
+    local flat = {}
+    if type(factorStats) ~= "table" then
+        return flat
+    end
+
+    for systemKey, stats in pairs(factorStats) do
+        if type(stats) == "table" then
+            for statKey, statValue in pairs(stats) do
+                local numericValue = tonumber(statValue)
+                if numericValue ~= nil then
+                    flat[string.format("%s.%s", tostring(systemKey), tostring(statKey))] = numericValue
+                end
+            end
+        end
+    end
+
+    return flat
+end
+
+local function applyFlattenedFactorStats(spec, flattenedMap)
+    if spec == nil then
+        return
+    end
+
+    if type(spec.factorStats) ~= "table" then
+        spec.factorStats = {}
+    end
+
+    if type(flattenedMap) ~= "table" then
+        return
+    end
+
+    for flatKey, value in pairs(flattenedMap) do
+        local systemKey, statKey = string.match(tostring(flatKey), "([^%.]+)%.(.+)")
+        local numericValue = tonumber(value)
+        if systemKey ~= nil and statKey ~= nil and numericValue ~= nil then
+            if type(spec.factorStats[systemKey]) ~= "table" then
+                spec.factorStats[systemKey] = {}
+            end
+            spec.factorStats[systemKey][statKey] = numericValue
+        end
+    end
+end
+
+local function ensureFactorStats(spec)
+    if spec == nil then
+        return {}
+    end
+
+    if type(spec.factorStats) ~= "table" then
+        spec.factorStats = {}
+    end
+
+    for systemKey, _ in pairs(spec.systems or {}) do
+        if type(spec.factorStats[systemKey]) ~= "table" then
+            spec.factorStats[systemKey] = {}
+        end
+
+        local stats = spec.factorStats[systemKey]
+        stats.total = tonumber(stats.total) or 0
+        stats.stress = tonumber(stats.stress) or 0
+    end
+
+    return spec.factorStats
+end
+
 local function log_dbg(...)
     if ADS_Config and ADS_Config.DEBUG then
         local args = {...}
@@ -157,6 +278,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingOverhaulConditionStart", "Pending Overhaul Condition Start")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingOverhaulConditionTarget", "Pending Overhaul Condition Target")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#systemsState", "Systems state snapshot")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#factorStats", "Per-system accumulated factor stats")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingOverhaulSystemStart", "Pending overhaul per-system start values")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingOverhaulSystemTarget", "Pending overhaul per-system target values")
     schemaSavegame:register(XMLValueType.INT,    baseKey .. "#totalBreakdownsOccurred", "Total Breakdowns Occurred")
@@ -316,6 +438,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#pendingOverhaulConditionStart", ADS_Utils.encodeOptionalFloat(spec.pendingOverhaulConditionStart))
         xmlFile:setValue(key .. "#pendingOverhaulConditionTarget", ADS_Utils.encodeOptionalFloat(spec.pendingOverhaulConditionTarget))
         xmlFile:setValue(key .. "#systemsState", ADS_Utils.serializeSystemsState(spec.systems))
+        xmlFile:setValue(key .. "#factorStats", ADS_Utils.serializeNumericMap(flattenFactorStats(spec.factorStats)))
         xmlFile:setValue(key .. "#pendingOverhaulSystemStart", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemStart))
         xmlFile:setValue(key .. "#pendingOverhaulSystemTarget", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemTarget))
         xmlFile:setValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred or 0)
@@ -396,6 +519,7 @@ function AdvancedDamageSystem:onLoad(savegame)
         workProcess = { name = AdvancedDamageSystem.SYSTEMS.WORKPROCESS, condition = 1.0, stress = 0.0, enabled = true },
         fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true }
     }
+    self.spec_AdvancedDamageSystem.factorStats = createEmptyFactorStats(self.spec_AdvancedDamageSystem.systems)
 
     self.spec_AdvancedDamageSystem.extraConditionWear = 0
     self.spec_AdvancedDamageSystem.extraServiceWear = 0
@@ -739,6 +863,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.pendingOverhaulConditionTarget = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget))
         spec.pendingOverhaulSystemStart = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemStart", ""))
         spec.pendingOverhaulSystemTarget = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemTarget", ""))
+        local loadedFactorStatsFlat = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#factorStats", ""))
 
         local loadedSystemsStateRaw = ADS_Utils.deserializeSystemsState(savegame.xmlFile:getValue(key .. "#systemsState", ""))
         local loadedSystemsState = {}
@@ -777,6 +902,9 @@ function AdvancedDamageSystem:onPostLoad(savegame)
 
             systemData.name = ADS_Utils.getSystemNameByKey(AdvancedDamageSystem.SYSTEMS, systemKey)
         end
+        ensureFactorStats(spec)
+        applyFlattenedFactorStats(spec, loadedFactorStatsFlat)
+        ensureFactorStats(spec)
 
         local hasTotalBreakdownsOccurred = savegame.xmlFile:hasProperty(key .. "#totalBreakdownsOccurred")
         spec.totalBreakdownsOccurred = savegame.xmlFile:getValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred)
@@ -1411,10 +1539,40 @@ end
 --                      CORE FUNCTIONS
 -- =========================================================
 
+local function resolveSystemKey(spec, systemName)
+    if spec == nil or spec.systems == nil or type(systemName) ~= "string" then
+        return systemName
+    end
+
+    if spec.systems[systemName] ~= nil then
+        return systemName
+    end
+
+    local loweredSystemName = string.lower(systemName)
+    local weights = ADS_Config ~= nil and ADS_Config.CORE ~= nil and ADS_Config.CORE.SYSTEM_WEIGHTS or nil
+    if type(weights) == "table" then
+        for weightedKey, _ in pairs(weights) do
+            if string.lower(tostring(weightedKey)) == loweredSystemName and spec.systems[weightedKey] ~= nil then
+                return weightedKey
+            end
+        end
+    end
+
+    for existingKey, _ in pairs(spec.systems) do
+        if string.lower(tostring(existingKey)) == loweredSystemName then
+            return existingKey
+        end
+    end
+
+    return systemName
+end
+
 local function ensureSystemData(spec, systemName)
     if spec.systems == nil then
         spec.systems = {}
     end
+
+    systemName = resolveSystemKey(spec, systemName)
 
     local systemData = spec.systems[systemName]
     if type(systemData) ~= "table" then
@@ -1489,6 +1647,8 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
         return
     end
 
+    systemName = resolveSystemKey(spec, systemName)
+
     local reliability = math.max(spec.reliability or 1.0, 0.001)
     local baseWearRate = 1.0 / reliability
     local systemData = ensureSystemData(spec, systemName)
@@ -1504,6 +1664,24 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
 
     local newCondition = (systemData.condition or 1.0) - wearRate * dtMultiplier
     systemData.condition = math.clamp(newCondition, 0.001, 1.0)
+
+    local factorStats = ensureFactorStats(spec)
+    local systemStats = factorStats[systemName]
+    if type(systemStats) == "table" then
+        systemStats.total = (tonumber(systemStats.total) or 0) + wearRate * dtMultiplier
+        systemStats.stress = (tonumber(systemStats.stress) or 0) + stressToAdd
+
+        if type(debugFactors) == "table" then
+            for key, value in pairs(debugFactors) do
+                local numericValue = tonumber(value)
+                local alias = AdvancedDamageSystem.FACTOR_STATS_ALIASES[tostring(key)]
+                if numericValue ~= nil and alias ~= nil then
+                    local factorDelta = (numericValue / reliability) * dtMultiplier
+                    systemStats[alias] = (tonumber(systemStats[alias]) or 0) + factorDelta
+                end
+            end
+        end
+    end
 
     if ADS_Config.DEBUG and systemName ~= nil then
         if spec.debugData == nil then
@@ -1530,6 +1708,8 @@ end
 function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
+    systemKey = resolveSystemKey(spec, systemKey)
+
     if systemKey == nil or systemKey == "" or spec.systems[systemKey] == nil then
         return
     end
@@ -1538,6 +1718,14 @@ function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     spec.systems[systemKey].condition = math.clamp((spec.systems[systemKey].condition or 1.0) - dmg, 0.001, 1.0)
     local stressToAdd = dmg * (ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey] or 1)
     spec.systems[systemKey].stress = math.max((spec.systems[systemKey].stress or 0) + stressToAdd, 0)
+
+    local factorStats = ensureFactorStats(spec)
+    local systemStats = factorStats[systemKey]
+    if type(systemStats) == "table" then
+        systemStats.total = (tonumber(systemStats.total) or 0) + dmg
+        systemStats.stress = (tonumber(systemStats.stress) or 0) + stressToAdd
+        systemStats.idfg = (tonumber(systemStats.idfg) or 0) + dmg
+    end
 end
 
 -- engine (overload, cold, overheat)
@@ -5656,6 +5844,58 @@ function AdvancedDamageSystem.ConsoleCommands:setFuelLevel(rawArgs)
     ))
 end
 
+function AdvancedDamageSystem.ConsoleCommands:resetFactorStats()
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then
+        return
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local factorStats = ensureFactorStats(spec)
+
+    for _, systemStats in pairs(factorStats) do
+        if type(systemStats) == "table" then
+            for key, value in pairs(systemStats) do
+                if tonumber(value) ~= nil then
+                    systemStats[key] = 0
+                end
+            end
+            systemStats.total = 0
+            systemStats.stress = 0
+        end
+    end
+
+    print(string.format("ADS: Factor stats reset for '%s'.", vehicle:getFullName()))
+end
+
+function AdvancedDamageSystem.ConsoleCommands:toggleHudDebugView(rawArgs)
+    local args = parseArguments(rawArgs)
+    local requestedMode = args and args[1] and string.lower(tostring(args[1])) or nil
+    local currentMode = tostring((ADS_Hud ~= nil and ADS_Hud.debugViewMode) or "default")
+    local nextMode = "default"
+
+    if requestedMode == nil or requestedMode == "" or requestedMode == "toggle" then
+        if currentMode == "factorStats" then
+            nextMode = "default"
+        else
+            nextMode = "factorStats"
+        end
+    elseif requestedMode == "default" or requestedMode == "normal" then
+        nextMode = "default"
+    elseif requestedMode == "stats" or requestedMode == "stat" or requestedMode == "factorstats" or requestedMode == "factor_stats" then
+        nextMode = "factorStats"
+    else
+        print("ADS Error: Usage: ads_toggleHudDebugView [default|stats|toggle]")
+        return
+    end
+
+    if ADS_Hud ~= nil then
+        ADS_Hud.debugViewMode = nextMode
+    end
+
+    print(string.format("ADS: HUD debug view mode = %s", nextMode))
+end
+
 function AdvancedDamageSystem.ConsoleCommands:debug()
     if ADS_Config.DEBUG then
         ADS_Config.DEBUG = false
@@ -5680,6 +5920,8 @@ addConsoleCommand("ads_showServiceLog", "Shows service log. Usage: ads_showServi
 addConsoleCommand("ads_getDebugVehicleInfo", "Vehicle debug info", "getDebugVehicleInfo", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_setDirtAmount [0.0-1.0]", "setDirtAmount", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setFuelLevel", "Sets vehicle fuel level. Usage: ads_setFuelLevel [0.0-1.0 or 0..100]", "setFuelLevel", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_resetFactorStats", "Resets accumulated factor stats for current vehicle.", "resetFactorStats", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_toggleHudDebugView", "Switch debug HUD view. Usage: ads_toggleHudDebugView [default|stats|toggle]", "toggleHudDebugView", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)
