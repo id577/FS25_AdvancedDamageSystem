@@ -251,6 +251,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "applyInstantDamageToSystem", AdvancedDamageSystem.applyInstantDamageToSystem)
     
     SpecializationUtil.registerFunction(vehicleType, "isUnderService", AdvancedDamageSystem.isUnderService)
+    SpecializationUtil.registerFunction(vehicleType, "isUnderRoof", AdvancedDamageSystem.isUnderRoof)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
     
     SpecializationUtil.registerFunction(vehicleType, "updateThermalSystems", AdvancedDamageSystem.updateThermalSystems)
@@ -521,6 +522,7 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
+            weatherFactor = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -597,6 +599,7 @@ function AdvancedDamageSystem:onLoad(savegame)
         }
     }
 
+    self.spec_AdvancedDamageSystem.isUnderRoof = true
     self.spec_AdvancedDamageSystem.effectsUpdateTimer = ADS_Config.EFFECTS_UPDATE_DELAY
     self.spec_AdvancedDamageSystem.metaUpdateTimer = math.random() * ADS_Config.META_UPDATE_DELAY
     self.spec_AdvancedDamageSystem.maintenanceTimer = 0
@@ -886,9 +889,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 lastAppliedSpeed = nil
             }
         end
-
         self:updateConditionLevel()
     end
+
+    spec.isUnderRoof = self:isUnderRoof()
 
     -- Sounds Loading
     local xmlSoundFile = loadXMLFile("ads_sounds", AdvancedDamageSystem.modDirectory .. "sounds/ads_sounds.xml")
@@ -1137,6 +1141,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         if self:getIsOperating() and self.propertyState ~= 4 then
             self:processBreakdowns(dt)
             self:tryTriggerBreakdown(dt)
+            spec.isUnderRoof = self:isUnderRoof()
         end
         -- service
         self:updateServiceLevel(dt)
@@ -1149,7 +1154,6 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:updateChassisSystem(dt)
         self:updateFuelSystem(dt)
         self:updateWorkProcessSystem(dt)
-
         --condtition
         self:updateConditionLevel()
     end
@@ -1490,9 +1494,15 @@ end
 -- damage
 function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = ADS_Config.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
-    spec.systems[systemKey].condition = spec.systems[systemKey].condition - damageAmount
-    spec.systems[systemKey].stress = spec.systems[systemKey].stress + damageAmount
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
+    if systemKey == nil or systemKey == "" or spec.systems[systemKey] == nil then
+        return
+    end
+
+    local dmg = math.max(tonumber(damageAmount) or 0, 0)
+    spec.systems[systemKey].condition = math.clamp((spec.systems[systemKey].condition or 1.0) - dmg, 0.001, 1.0)
+    local stressToAdd = dmg * (ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey] or 1)
+    spec.systems[systemKey].stress = math.max((spec.systems[systemKey].stress or 0) + stressToAdd, 0)
 end
 
 -- engine (overload, cold, overheat)
@@ -1547,7 +1557,11 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
     else
-        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        end
     end
 
     syncSystemWearBreakdown(self, spec.systems.engine, "ENGINE_WEAR")
@@ -1721,7 +1735,11 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
     else
-        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        end
     end
 
     syncSystemWearBreakdown(self, spec.systems.transmission, "TRANSMISSION_WEAR")
@@ -1993,7 +2011,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     
 
         for _, impl in ipairs(implements) do
-            print(impl.jointTypeId)
             if impl.jointTypeId ~= 0 and impl.jointTypeId ~= 3 and not impl.isLowered and (impl.supportWheelCount or 0) == 0 then
                 liftedMass = liftedMass + (impl.mass or 0)
                 isImplementLifted = true
@@ -2063,7 +2080,11 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         expiredServiceFactor = wearRate - wearRateWithoutService
 
     else
-        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        end
     end
 
 
@@ -2130,7 +2151,11 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
     else
-        wearRate = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        end
     end
 
     syncSystemWearBreakdown(self, spec.systems.cooling, "COOLING_WEAR")
@@ -2142,24 +2167,63 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     })
 end
 
--- electrical
+-- electrical (weather, cranking)
 function AdvancedDamageSystem:updateElectricalSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
-    local expiredServiceFactor = 0
+    local systemData = spec.systems[systemKey]
+    local expiredServiceFactor, weatherFactor = 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
-    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+    local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted() or false
+    local wasMotorStarted = systemData.isMotorStarted == true
+    systemData.isMotorStarted = isMotorStarted
+    local isOutdoor = not spec.isUnderRoof
+
+    -- weather factor
+    if isOutdoor and g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather ~= nil then
+        local weatherType = g_currentMission.environment.weather:getCurrentWeatherType()
+        if weatherType == WeatherType.RAIN then
+            weatherFactor = C.RAIN_FACTOR_MULTIPLIER or 0
+        elseif weatherType == WeatherType.SNOW then
+            weatherFactor = C.SNOW_FACTOR_MULTIPLIER or 0
+        elseif weatherType == WeatherType.HAIL then
+            weatherFactor = C.HAIL_FACTOR_MULTIPLIER or C.HALL_FACTOR_MULTIPLIER or 0
+        end
+        wearRate = wearRate + weatherFactor
+    end
+
+    -- cranking stress damage: one-time instant damage on start transition
+    if not spec.isElectricVehicle and not wasMotorStarted and isMotorStarted then
+        if spec.engineTemperature < C.CRANKING_STRESS_THRESHOLD then
+            local tempMultiplier = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.CRANKING_STRESS_THRESHOLD, true)
+            local damage = C.CRANKING_STRESS_DAMAGE * (1 + tempMultiplier)
+            self:applyInstantDamageToSystem(spec.systems.electrical.name, damage)
+        else
+            self:applyInstantDamageToSystem(spec.systems.electrical.name, C.CRANKING_STRESS_DAMAGE)
+        end
+    end
+
+
+    if isMotorStarted and not spec.isElectricVehicle then
+        -- service factor
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
+    else
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        end
     end
 
     syncSystemWearBreakdown(self, spec.systems.electrical, "ELECTRICAL_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
-        expiredServiceFactor = expiredServiceFactor
+        expiredServiceFactor = expiredServiceFactor,
+        weatherFactor = weatherFactor
     })
 end
 
@@ -3607,6 +3671,73 @@ function AdvancedDamageSystem:getSystemStressLevel(systemName)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemName)
     return spec.systems[systemKey].stress
+end
+
+function AdvancedDamageSystem:isUnderRoof()
+    local node = self.rootNode
+    if (node == nil or node == 0) and self.components ~= nil and self.components[1] ~= nil then
+        node = self.components[1].node
+    end
+
+    if node == nil or node == 0 then
+        return false
+    end
+
+    local x, y, z = getWorldTranslation(node)
+    local mission = g_currentMission
+
+    if mission ~= nil and mission.indoorMask ~= nil then
+        local handle, firstChannel, numChannels = mission.indoorMask:getDensityMapData()
+        if handle ~= nil and handle ~= 0 and mission.terrainSize ~= nil and mission.terrainSize > 0 then
+            local maskSize = getBitVectorMapSize(handle)
+            if maskSize ~= nil and maskSize > 0 then
+                local terrainHalfSize = mission.terrainSize * 0.5
+                local worldToDensityMap = maskSize / mission.terrainSize
+                local xI = math.floor((x + terrainHalfSize) * worldToDensityMap)
+                local zI = math.floor((z + terrainHalfSize) * worldToDensityMap)
+
+                if xI >= 0 and xI < maskSize and zI >= 0 and zI < maskSize then
+                    local maskValue = getBitVectorMapPoint(handle, xI, zI, firstChannel, numChannels)
+                    local indoorValue = IndoorMask ~= nil and IndoorMask.INDOOR or 1
+                    return maskValue == indoorValue
+                end
+            end
+        end
+    end
+
+    if mission == nil or mission.placeableSystem == nil or mission.placeableSystem.placeables == nil then
+        return false
+    end
+
+    for _, placeable in pairs(mission.placeableSystem.placeables) do
+        local indoorAreas = placeable.spec_indoorAreas
+        if indoorAreas ~= nil and indoorAreas.areas ~= nil and placeable.rootNode ~= nil and placeable.rootNode ~= 0 then
+            local localX, _, localZ = worldToLocal(placeable.rootNode, x, y, z)
+
+            for _, area in ipairs(indoorAreas.areas) do
+                if area.start ~= nil and area.width ~= nil and area.height ~= nil then
+                    local sx, sy, sz = getWorldTranslation(area.start)
+                    local wx, wy, wz = getWorldTranslation(area.width)
+                    local hx, hy, hz = getWorldTranslation(area.height)
+
+                    local localStartX, _, localStartZ = worldToLocal(placeable.rootNode, sx, sy, sz)
+                    local localWidthX, _, localWidthZ = worldToLocal(placeable.rootNode, wx, wy, wz)
+                    local localHeightX, _, localHeightZ = worldToLocal(placeable.rootNode, hx, hy, hz)
+
+                    local minX = math.min(localStartX, localWidthX, localHeightX)
+                    local maxX = math.max(localStartX, localWidthX, localHeightX)
+                    local minZ = math.min(localStartZ, localWidthZ, localHeightZ)
+                    local maxZ = math.max(localStartZ, localWidthZ, localHeightZ)
+
+                    if localX >= minX and localX <= maxX and localZ >= minZ and localZ <= maxZ then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+
+    return false
 end
 
 function AdvancedDamageSystem:isUnderService()

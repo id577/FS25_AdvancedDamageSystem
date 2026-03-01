@@ -476,6 +476,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local transmissionDbg = spec.debugData.transmission or {}
     local hydraulicsDbg = spec.debugData.hydraulics or {}
     local coolingDbg = spec.debugData.cooling or {}
+    local electricalDbg = spec.debugData.electrical or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
         engineDbg.expiredServiceFactor or 0,
@@ -504,6 +505,10 @@ function ADS_Hud:drawActiveVehicleHUD()
         coolingDbg.highCoolingFactor or 0,
         coolingDbg.overheatFactor or 0,
         coolingDbg.coldShockFactor or 0
+    ) * bcw
+    local electricalMaxFactor = math.max(
+        electricalDbg.expiredServiceFactor or 0,
+        electricalDbg.weatherFactor or 0
     ) * bcw
 
     local engineLines = {}
@@ -586,7 +591,17 @@ function ADS_Hud:drawActiveVehicleHUD()
         asPercent(coolingDbg.breakdownProbability or 0),
         asPercent(coolingDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(coolingMaxFactor), 0.95)
-    local electricalLines = buildDefaultSystemLines("electrical")
+    local electricalLines = {}
+    addLine(electricalLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("electrical")),
+        asPercent((electricalDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("electrical")),
+        asPercent((electricalDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((electricalDbg.weatherFactor or 0) * bcw),
+        asPercent(electricalDbg.breakdownProbability or 0),
+        asPercent(electricalDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(electricalMaxFactor), 0.95)
     local chassisLines = buildDefaultSystemLines("chassis")
     local fuelLines = buildDefaultSystemLines("fuel")
     local workProcessLines = buildDefaultSystemLines("workProcess")

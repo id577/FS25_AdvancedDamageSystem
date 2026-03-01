@@ -287,7 +287,9 @@ function ADS_Main:update(dt)
             local spec = vehicle.spec_AdvancedDamageSystem
             spec.metaUpdateTimer = spec.metaUpdateTimer + ADS_Config.CORE_UPDATE_DELAY
             if spec.metaUpdateTimer > ADS_Config.META_UPDATE_DELAY then
-                --vehicle:processPermanentEffects(spec.metaUpdateTimer)
+                if not vehicle:getIsOperating() then
+                    spec.isUnderRoof = vehicle:isUnderRoof()
+                end
                 spec.metaUpdateTimer = spec.metaUpdateTimer - ADS_Config.META_UPDATE_DELAY
             end
         end

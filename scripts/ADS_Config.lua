@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 48,
+    VER = 49,
 
     DEBUG = false,
 
@@ -21,11 +21,8 @@ ADS_Config = {
     -- How often the main simulation logic (wear, temperature, etc.) updates, in milliseconds.
     -- This handles the slow-burning processes. A higher value is better for performance
     -- as these calculations do not need to run every frame.
-    CORE_UPDATE_DELAY = 500, -- (500ms = 2 times per second)
-
-    -- How often non-critical, background tasks are updated, in milliseconds.
-    -- This is for very infrequent checks, like the chance of permanent wear appearing.
-    META_UPDATE_DELAY = 60000, -- (60000ms = 1 time per minute)
+    CORE_UPDATE_DELAY = 500,
+    META_UPDATE_DELAY = 30000,
 
     -- ====================================================================================
     -- CORE SIMULATION PARAMETERS
@@ -35,7 +32,8 @@ ADS_Config = {
         BASE_SERVICE_WEAR = 0.1,
         SERVICE_EXPIRED_THRESHOLD = 0.5,
         BASE_SYSTEMS_WEAR = 0.01,
-        DOWNTIME_MULTIPLIER = 0.0,
+        DOWNTIME_MULTIPLIER = 0.01,
+        UNDER_ROOF_DOWNTIME_MULTIPLIER = 0.0,
 
         SYSTEM_WEIGHTS = {
             engine=0.22, 
@@ -119,6 +117,11 @@ ADS_Config = {
 
         ELECTRICAL_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 2.0,
+            CRANKING_STRESS_DAMAGE = 0.0001,
+            CRANKING_STRESS_THRESHOLD = 5,
+            RAIN_FACTOR_MULTIPLIER = 0.5,
+            SNOW_FACTOR_MULTIPLIER = 0.3,
+            HALL_FACTOR_MULTIPLIER = 1.0
         },
 
         CHASSIS_FACTOR_DATA = {
