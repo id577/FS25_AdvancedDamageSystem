@@ -1579,8 +1579,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
-    -- materialflow system
+    
     MATERIAL_FLOW_SYSTEM_WEAR = {
         isSelectable = true,
         system = systems.MATERIALFLOW,

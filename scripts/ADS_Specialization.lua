@@ -106,37 +106,42 @@ AdvancedDamageSystem.modDirectory = g_currentModDirectory
 AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     expiredServiceFactor = "sf",
     weatherFactor = "wf",
-
+    -- engine
     motorLoadFactor = "mlf",
     coldMotorFactor = "cmf",
     hotMotorFactor = "hmf",
-
+    -- transmission
     pullOverloadFactor = "pof",
     heavyTrailerFactor = "htf",
     luggingFactor = "lf",
     wheelSlipFactor = "wsf",
     coldTransFactor = "ctf",
     hotTransFactor = "hotf",
-
+    -- hydraulic
     heavyLiftFactor = "hlf",
     operatingFactor = "of",
     coldOilFactor = "cof",
     ptoOperatingFactor = "ptof",
     sharpAngleFactor = "saf",
-
+    -- cooling
     highCoolingFactor = "hcf",
     overheatFactor = "ohf",
     coldShockFactor = "csf",
 
+    -- electrical
     lightsFactor = "ltf",
 
+    -- chassis
     vibFactor = "vf",
     steerLoadFactor = "slf",
     brakeMassFactor = "bmf",
 
+    --fuel
     lowFuelStarvationFactor = "lff",
     coldFuelFactor = "cff",
     idleDepositFactor = "idf",
+    highPressureFactor = "hpf",
+    longHarvestFactor = "lhf",
 
     instantDamageFactor = "idfg"
 }
@@ -695,6 +700,8 @@ function AdvancedDamageSystem:onLoad(savegame)
             totalWearRate = 0,
             expiredServiceFactor = 0,
             weatherFactor = 0,
+            longHarvestFactor = 0,
+            longHarvestTimer = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -709,6 +716,7 @@ function AdvancedDamageSystem:onLoad(savegame)
             lowFuelStarvationFactor = 0,
             coldFuelFactor = 0,
             idleDepositFactor = 0,
+            highPressureFactor = 0,
             idleTimer = 0,
             fuelLevel = 0,
             fuelTemperature = 0,
@@ -2042,11 +2050,13 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         nextMoveAlphaCache[moveKey] = moveAlpha
 
         if prevMoveAlpha ~= nil then
-            return math.abs(moveAlpha - prevMoveAlpha) > 0.0005
+            return math.abs(moveAlpha - prevMoveAlpha) > 0.05
         end
 
         local isMovingRaw = jointDesc ~= nil and jointDesc.isMoving == true
         return isMovingRaw and moveAlpha > 0.001 and moveAlpha < 0.999
+
+
     end
 
     local function getToolMotionFlags(vehicleObj)
@@ -2251,13 +2261,12 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         local liftedMass = 0
         local operatingMass = 0
     
-
         for _, impl in ipairs(implements) do
             if impl.jointTypeId ~= 0 and impl.jointTypeId ~= 3 and not impl.isLowered and (impl.supportWheelCount or 0) == 0 then
                 liftedMass = liftedMass + (impl.mass or 0)
                 isImplementLifted = true
             end
-            if impl.isMoving or impl.isFoldMoving or impl.isPlowRotationMoving or impl.isCylinderedMoving then
+            if (impl.isMoving and impl.jointTypeId ~= 0) or impl.isFoldMoving or impl.isPlowRotationMoving or impl.isCylinderedMoving then
                 isImplementOperating  = true
                 operatingMass = operatingMass + (impl.mass or 0)
             end
@@ -2551,8 +2560,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local speed = tonumber(self.getLastSpeed ~= nil and self:getLastSpeed() or 0) or 0
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
-        -- vibration
-        if speed > 1.0 then
+        if speed > 0.003 then
+             -- vibration
             local vibState = spec.chassisVibState
             if vibState == nil then
                 vibState = {
@@ -2629,6 +2638,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
                 vibFactor = vibFactor * vibMultiplier
                 wearRate = wearRate + vibFactor
             end
+        else
+            wearRate = wearRate * C.CHASSIS_IDLING_MULTIPLIER    
         end
 
         -- steering load at standstill / low speed
@@ -2769,13 +2780,13 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     })
 end
 
--- fuel TO-DO
+-- fuel (lowFuel, coldFuel, idle deposit, highPressure)
 function AdvancedDamageSystem:updateFuelSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.fuel.name)
     local systemData = spec.systems[systemKey]
     local weatherFactor, lowFuelStarvationFactor, coldFuelFactor = 0, 0, 0
-    local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor = 0, 0, 0, 0
+    local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
 
@@ -2867,6 +2878,13 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         end
         systemData.idleTimer = idleTimer
 
+        -- high pressure factor
+        local highPressureThreshold = tonumber(C.HIGH_PRESSURE_FACTOR_THRESHOLD) or 0.95
+        if motorLoad > highPressureThreshold then
+            highPressureFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, highPressureThreshold, false)
+            highPressureFactor = highPressureFactor * (C.HIGH_PRESSURE_FACTOR_MULTIPLIER or 0)
+            wearRate = wearRate + highPressureFactor
+        end
 
         -- service
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
@@ -2897,6 +2915,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         lowFuelStarvationFactor = lowFuelStarvationFactor,
         coldFuelFactor = coldFuelFactor,
         idleDepositFactor = idleDepositFactor,
+        highPressureFactor = highPressureFactor,
         idleTimer = systemData.idleTimer or 0,
         fuelLevel = fuelLevel,
         fuelTemperature = fuelTemperature
@@ -2907,16 +2926,47 @@ end
 function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workProcess.name)
+    local systemData = spec.systems[systemKey]
     local expiredServiceFactor = 0
-    local weatherFactor = 0
+    local weatherFactor, longHarvestFactor = 0, 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
 
-    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+    local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
+    local isTurnedOn = self.getIsTurnedOn ~= nil and self:getIsTurnedOn()
+
+    if isMotorStarted and not spec.isElectricVehicle then
+        -- longHarvestFactor
+        local longHarvestTimer = math.max(tonumber(systemData.longHarvestTimer) or 0, 0)
+        if isTurnedOn then
+            longHarvestTimer = math.min(longHarvestTimer + dt / 1000, C.LONG_HARVEST_TIMER_MAX)
+            if longHarvestTimer > C.LONG_HARVEST_TIMER_THRESHOLD then
+                longHarvestFactor = ADS_Utils.calculateQuadraticMultiplier(
+                    longHarvestTimer,
+                    C.LONG_HARVEST_TIMER_THRESHOLD,
+                    false,
+                    C.LONG_HARVEST_TIMER_MAX
+                )
+                longHarvestFactor = longHarvestFactor * C.LONG_HARVEST_FACTOR_MULTIPLIER
+                wearRate = wearRate + longHarvestFactor
+            end
+        else
+            longHarvestTimer = math.max(longHarvestTimer - 4 * dt / 1000, 0)
+            wearRate = wearRate * C.WORKPROCESSS_IDLING_MULTIPLIER
+        end
+        systemData.longHarvestTimer = longHarvestTimer
+
+        -- service
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
+    else
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER 
+        end
     end
 
     if spec.isUnderRoof ~= true then
@@ -2930,7 +2980,9 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     syncSystemWearBreakdown(self, spec.systems.workProcess, "WORKPROCESS_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor
+        weatherFactor = weatherFactor,
+        longHarvestFactor = longHarvestFactor,
+        longHarvestTimer = systemData.longHarvestTimer or 0
     })
 end
 

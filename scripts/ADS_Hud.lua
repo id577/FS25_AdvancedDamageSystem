@@ -485,6 +485,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local electricalDbg = spec.debugData.electrical or {}
     local chassisDbg = spec.debugData.chassis or {}
     local fuelDbg = spec.debugData.fuel or {}
+    local workProcessDbg = spec.debugData.workProcess or {}
     local serviceDbg = spec.debugData.service or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
@@ -537,7 +538,13 @@ function ADS_Hud:drawActiveVehicleHUD()
         fuelDbg.weatherFactor or 0,
         fuelDbg.lowFuelStarvationFactor or 0,
         fuelDbg.coldFuelFactor or 0,
-        fuelDbg.idleDepositFactor or 0
+        fuelDbg.idleDepositFactor or 0,
+        fuelDbg.highPressureFactor or 0
+    ) * bcw
+    local workProcessMaxFactor = math.max(
+        workProcessDbg.expiredServiceFactor or 0,
+        workProcessDbg.weatherFactor or 0,
+        workProcessDbg.longHarvestFactor or 0
     ) * bcw
 
     local overviewLines = {}
@@ -674,7 +681,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), getConditionFactorColor(chassisMaxFactor), 0.95)
     local fuelLines = {}
     addLine(fuelLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lff: %.2f%% (lvl: %.2f%%) cff: %.2f%% (ft: %.1fC) idf: %.2f%% (t: %.0fs) | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lff: %.2f%% (lvl: %.2f%%) cff: %.2f%% (ft: %.1fC) idf: %.2f%% (t: %.0fs) hpf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("fuel")),
         asPercent((fuelDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("fuel")),
@@ -686,11 +693,23 @@ function ADS_Hud:drawActiveVehicleHUD()
         (fuelDbg.fuelTemperature or 0),
         asPercent((fuelDbg.idleDepositFactor or 0) * bcw),
         (fuelDbg.idleTimer or 0),
+        asPercent((fuelDbg.highPressureFactor or 0) * bcw),
         asPercent(fuelDbg.breakdownProbability or 0),
         asPercent(fuelDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(fuelMaxFactor), 0.95)
-    local workProcessLines = buildDefaultSystemLines("workProcess")
-    local materialFlowLines = buildDefaultSystemLines("materialFlow")
+    local workProcessLines = {}
+    addLine(workProcessLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lhf: %.2f%% (t: %.0fs) | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("workProcess")),
+        asPercent((workProcessDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("workProcess")),
+        asPercent((workProcessDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((workProcessDbg.weatherFactor or 0) * bcw),
+        asPercent((workProcessDbg.longHarvestFactor or 0) * bcw),
+        (workProcessDbg.longHarvestTimer or 0),
+        asPercent(workProcessDbg.breakdownProbability or 0),
+        asPercent(workProcessDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(workProcessMaxFactor), 0.95)
 
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
@@ -842,7 +861,6 @@ function ADS_Hud:drawActiveVehicleHUD()
         {title = "Chassis", lines = chassisLines},
         {title = "Fuel", lines = fuelLines},
         {title = "Work Process", lines = workProcessLines},
-        {title = "Material Flow", lines = materialFlowLines},
         {title = "Engine Temp", lines = engineTempLines}
     }
 

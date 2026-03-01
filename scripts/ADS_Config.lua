@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 54,
+    VER = 55,
 
     DEBUG = false,
 
@@ -133,6 +133,7 @@ ADS_Config = {
 
         CHASSIS_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            CHASSIS_IDLING_MULTIPLIER = 0.2,
             VIB_FACTOR_THRESHOLD = 0.08,
             VIB_FACTOR_MAX_SIGNAL = 0.22,
             VIB_FACTOR_MULTIPLIER = 50.0,
@@ -152,6 +153,10 @@ ADS_Config = {
 
         WORKPROCESS_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 2.0,
+            WORKPROCESSS_IDLING_MULTIPLIER = 0.2,
+            LONG_HARVEST_FACTOR_MULTIPLIER = 1.0,
+            LONG_HARVEST_TIMER_THRESHOLD = 0,
+            LONG_HARVEST_TIMER_MAX = 7200
         },
 
         FUEL_FACTOR_DATA = {
@@ -162,7 +167,10 @@ ADS_Config = {
             COLD_FUEL_FACTOR_MULTIPLIER = 20,
             IDLE_DEPOSIT_FACTOR_MULTIPLIER = 2.0,
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
-            IDLE_DEPOSIT_FACTOR_MAX_TIMER = 600
+            IDLE_DEPOSIT_FACTOR_MAX_TIMER = 600,
+            HIGH_PRESSURE_FACTOR_MULTIPLIER = 1.0,
+            HIGH_PRESSURE_FACTOR_THRESHOLD = 0.95,
+            HIGH_PRESSURE_FACTOR_THRESSHOLD = 0.95
         },
 
         STRESS_COOLDOWN = 0.5,
