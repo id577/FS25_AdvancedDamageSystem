@@ -582,6 +582,12 @@ function AdvancedDamageSystem:onLoad(savegame)
             totalWearRate = 0,
             expiredServiceFactor = 0,
             weatherFactor = 0,
+            lowFuelStarvationFactor = 0,
+            coldFuelFactor = 0,
+            idleDepositFactor = 0,
+            idleTimer = 0,
+            fuelLevel = 0,
+            fuelTemperature = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -1593,11 +1599,13 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         end
     end
 
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
     syncSystemWearBreakdown(self, spec.systems.engine, "ENGINE_WEAR")
        
@@ -1778,11 +1786,13 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         end
     end
 
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
     syncSystemWearBreakdown(self, spec.systems.transmission, "TRANSMISSION_WEAR")
 
@@ -2131,11 +2141,13 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         end
     end
 
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
 
     syncSystemWearBreakdown(self, spec.systems.hydraulics, 'HYDRAULICS_WEAR')
@@ -2210,11 +2222,13 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         end
     end
 
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
     syncSystemWearBreakdown(self, spec.systems.cooling, "COOLING_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
@@ -2302,11 +2316,13 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         end
     end
 
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
     syncSystemWearBreakdown(self, spec.systems.electrical, "ELECTRICAL_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
@@ -2318,7 +2334,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     })
 end
 
--- chassis
+-- chassis (vibration, steering load, braking under mass)
 function AdvancedDamageSystem:updateChassisSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.chassis.name)
@@ -2346,190 +2362,199 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
 
     local speed = tonumber(self.getLastSpeed ~= nil and self:getLastSpeed() or 0) or 0
 
-    -- vibration
-    if speed > 1 then
-        local vibState = spec.chassisVibState
-        if vibState == nil then
-            vibState = {
-                prevSuspension = {},
-                smoothed = 0
-            }
-            spec.chassisVibState = vibState
-        end
+    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
+        -- vibration
+        if speed > 1.0 then
+            local vibState = spec.chassisVibState
+            if vibState == nil then
+                vibState = {
+                    prevSuspension = {},
+                    smoothed = 0
+                }
+                spec.chassisVibState = vibState
+            end
 
-        local prevSuspension = vibState.prevSuspension or {}
-        vibState.prevSuspension = prevSuspension
+            local prevSuspension = vibState.prevSuspension or {}
+            vibState.prevSuspension = prevSuspension
 
-        local sumSuspNorm = 0
-        local countSuspNorm = 0
-        local sumDensityType = 0
-        local countDensityType = 0
+            local sumSuspNorm = 0
+            local countSuspNorm = 0
+            local sumDensityType = 0
+            local countDensityType = 0
 
-        if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
-            for wheelIndex, wheel in ipairs(self.spec_wheels.wheels) do
-                local runtimeWheel = wheel.physics or wheel
-                local netInfo = runtimeWheel.netInfo or wheel.netInfo
-                local suspTravel = tonumber(runtimeWheel.suspTravel or wheel.suspTravel) or 0
-                local suspLength = tonumber((netInfo and netInfo.suspensionLength) or runtimeWheel.suspensionLength or wheel.suspensionLength) or 0
-                local prevSuspLength = tonumber(prevSuspension[wheelIndex]) or suspLength
-                local suspDelta = math.abs(suspLength - prevSuspLength)
-                prevSuspension[wheelIndex] = suspLength
+            if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
+                for wheelIndex, wheel in ipairs(self.spec_wheels.wheels) do
+                    local runtimeWheel = wheel.physics or wheel
+                    local netInfo = runtimeWheel.netInfo or wheel.netInfo
+                    local suspTravel = tonumber(runtimeWheel.suspTravel or wheel.suspTravel) or 0
+                    local suspLength = tonumber((netInfo and netInfo.suspensionLength) or runtimeWheel.suspensionLength or wheel.suspensionLength) or 0
+                    local prevSuspLength = tonumber(prevSuspension[wheelIndex]) or suspLength
+                    local suspDelta = math.abs(suspLength - prevSuspLength)
+                    prevSuspension[wheelIndex] = suspLength
 
-                local suspNorm = 0
-                if suspTravel > 0.0001 then
-                    suspNorm = math.min(suspDelta / suspTravel, 3.0)
-                end
+                    local suspNorm = 0
+                    if suspTravel > 0.0001 then
+                        suspNorm = math.min(suspDelta / suspTravel, 3.0)
+                    end
 
-                local hasGroundContact = false
-                if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
-                    hasGroundContact = wheel.physics.hasGroundContact == true
-                elseif runtimeWheel.hasGroundContact ~= nil then
-                    hasGroundContact = runtimeWheel.hasGroundContact == true
-                elseif wheel.hasGroundContact ~= nil then
-                    hasGroundContact = wheel.hasGroundContact == true
-                end
+                    local hasGroundContact = false
+                    if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
+                        hasGroundContact = wheel.physics.hasGroundContact == true
+                    elseif runtimeWheel.hasGroundContact ~= nil then
+                        hasGroundContact = runtimeWheel.hasGroundContact == true
+                    elseif wheel.hasGroundContact ~= nil then
+                        hasGroundContact = wheel.hasGroundContact == true
+                    end
 
-                local densityType = tonumber(runtimeWheel.densityType or wheel.densityType) or -1
+                    local densityType = tonumber(runtimeWheel.densityType or wheel.densityType) or -1
 
-                if hasGroundContact then
-                    sumSuspNorm = sumSuspNorm + suspNorm
-                    countSuspNorm = countSuspNorm + 1
-                    if densityType >= 0 then
-                        sumDensityType = sumDensityType + densityType
-                        countDensityType = countDensityType + 1
+                    if hasGroundContact then
+                        sumSuspNorm = sumSuspNorm + suspNorm
+                        countSuspNorm = countSuspNorm + 1
+                        if densityType >= 0 then
+                            sumDensityType = sumDensityType + densityType
+                            countDensityType = countDensityType + 1
+                        end
                     end
                 end
             end
+
+            vibRaw = countSuspNorm > 0 and (sumSuspNorm / countSuspNorm) or 0
+            vibWheelCount = countSuspNorm
+            local speedForDamage = math.clamp(speed, 0.0, 50.0)
+            vibSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(speedForDamage, 0.0, false, 40.0)
+            local vibSignalRaw = vibRaw * vibSpeedFactor
+            local alpha = dt / (300 + dt)
+            vibState.smoothed = vibState.smoothed + (vibSignalRaw - vibState.smoothed) * alpha
+            vibSignal = vibState.smoothed
+            vibAvgDensityType = countDensityType > 0 and (sumDensityType / countDensityType) or 0
+            if vibAvgDensityType > 1 then
+                vibFieldMultiplier = tonumber(C.VIB_FIELD_MULTIPLIER) or 1.3
+            end
+
+            local vibThreshold = tonumber(C.VIB_FACTOR_THRESHOLD) or 0.12
+            local vibMaxSignal = tonumber(C.VIB_FACTOR_MAX_SIGNAL) or 0.22
+            local vibMaxForCurve = math.max(vibMaxSignal, vibThreshold + 0.001)
+            local vibMultiplier = (tonumber(C.VIB_FACTOR_MULTIPLIER) or 4.0) * vibFieldMultiplier
+            if vibSignal > vibThreshold then
+                vibFactor = ADS_Utils.calculateQuadraticMultiplier(vibSignal, vibThreshold, false, vibMaxForCurve)
+                vibFactor = vibFactor * vibMultiplier
+                wearRate = wearRate + vibFactor
+            end
         end
 
-        vibRaw = countSuspNorm > 0 and (sumSuspNorm / countSuspNorm) or 0
-        vibWheelCount = countSuspNorm
-        local speedForDamage = math.clamp(speed, 0.0, 50.0)
-        vibSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(speedForDamage, 0.0, false, 40.0)
-        local vibSignalRaw = vibRaw * vibSpeedFactor
-        local alpha = dt / (300 + dt)
-        vibState.smoothed = vibState.smoothed + (vibSignalRaw - vibState.smoothed) * alpha
-        vibSignal = vibState.smoothed
-        vibAvgDensityType = countDensityType > 0 and (sumDensityType / countDensityType) or 0
-        if vibAvgDensityType > 1 then
-            vibFieldMultiplier = tonumber(C.VIB_FIELD_MULTIPLIER) or 1.3
-        end
+        -- steering load at standstill / low speed
+        local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
+        if steerSpeedThreshold > 0 and speed <= steerSpeedThreshold then
+            local steerState = spec.chassisSteerState
+            if steerState == nil then
+                steerState = {
+                    prevSteerAbs = nil
+                }
+                spec.chassisSteerState = steerState
+            end
 
-        local vibThreshold = tonumber(C.VIB_FACTOR_THRESHOLD) or 0.12
-        local vibMaxSignal = tonumber(C.VIB_FACTOR_MAX_SIGNAL) or 0.22
-        local vibMaxForCurve = math.max(vibMaxSignal, vibThreshold + 0.001)
-        local vibMultiplier = (tonumber(C.VIB_FACTOR_MULTIPLIER) or 4.0) * vibFieldMultiplier
-        if vibSignal > vibThreshold then
-            vibFactor = ADS_Utils.calculateQuadraticMultiplier(vibSignal, vibThreshold, false, vibMaxForCurve)
-            vibFactor = vibFactor * vibMultiplier
-            wearRate = wearRate + vibFactor
-        end
-    end
+            local steeringDirectionAbs = 0
+            if self.spec_wheels ~= nil and self.spec_wheels.rotatedTime ~= nil then
+                steeringDirectionAbs = math.abs(tonumber(self.spec_wheels.rotatedTime) or 0)
+            elseif self.getSteeringDirection ~= nil then
+                steeringDirectionAbs = math.abs(tonumber(self:getSteeringDirection()) or 0)
+            end
+            steerInputAbs = math.clamp(steeringDirectionAbs, 0, 1)
 
-    -- steering load at standstill / low speed
-    local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
-    if steerSpeedThreshold > 0 and speed <= steerSpeedThreshold and self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
-        local steerState = spec.chassisSteerState
-        if steerState == nil then
-            steerState = {
-                prevSteerAbs = nil
-            }
-            spec.chassisSteerState = steerState
-        end
+            local prevSteerAbs = tonumber(steerState.prevSteerAbs) or steerInputAbs
+            steerState.prevSteerAbs = steerInputAbs
+            local dtSafe = math.max(tonumber(dt) or 0, 1)
+            steerDeltaRate = math.clamp(math.abs(steerInputAbs - prevSteerAbs) * 1000 / dtSafe, 0, 1)
 
-        local steeringDirectionAbs = 0
-        if self.spec_wheels ~= nil and self.spec_wheels.rotatedTime ~= nil then
-            steeringDirectionAbs = math.abs(tonumber(self.spec_wheels.rotatedTime) or 0)
-        elseif self.getSteeringDirection ~= nil then
-            steeringDirectionAbs = math.abs(tonumber(self:getSteeringDirection()) or 0)
-        end
-        steerInputAbs = math.clamp(steeringDirectionAbs, 0, 1)
+            if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
+                for _, wheel in ipairs(self.spec_wheels.wheels) do
+                    local hasGroundContact = false
+                    if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
+                        hasGroundContact = wheel.physics.hasGroundContact == true
+                    elseif wheel.hasGroundContact ~= nil then
+                        hasGroundContact = wheel.hasGroundContact == true
+                    end
 
-        local prevSteerAbs = tonumber(steerState.prevSteerAbs) or steerInputAbs
-        steerState.prevSteerAbs = steerInputAbs
-        local dtSafe = math.max(tonumber(dt) or 0, 1)
-        steerDeltaRate = math.clamp(math.abs(steerInputAbs - prevSteerAbs) * 1000 / dtSafe, 0, 1)
-
-        if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
-            for _, wheel in ipairs(self.spec_wheels.wheels) do
-                local hasGroundContact = false
-                if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
-                    hasGroundContact = wheel.physics.hasGroundContact == true
-                elseif wheel.hasGroundContact ~= nil then
-                    hasGroundContact = wheel.hasGroundContact == true
+                    if hasGroundContact then
+                        steerGroundContact = 1
+                        break
+                    end
                 end
+            end
 
-                if hasGroundContact then
-                    steerGroundContact = 1
-                    break
+            if steerGroundContact > 0 then
+                steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
+                steerAngleFactor = ADS_Utils.calculateQuadraticMultiplier(steerInputAbs, tonumber(C.STEER_LOAD_STEER_THRESHOLD) or 0.2, false, 1.0)
+                steerChangeFactor = ADS_Utils.calculateQuadraticMultiplier(steerDeltaRate, tonumber(C.STEER_LOAD_CHANGE_THRESHOLD) or 0.08, false, 1.0)
+
+                if steerChangeFactor > 0 and steerLowSpeedFactor > 0 then
+                    local steerSignal = (0.35 + 0.65 * steerAngleFactor) * steerChangeFactor * steerLowSpeedFactor
+                    steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
+                    wearRate = wearRate + steerLoadFactor
                 end
             end
         end
 
-        if steerGroundContact > 0 then
-            steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
-            steerAngleFactor = ADS_Utils.calculateQuadraticMultiplier(steerInputAbs, tonumber(C.STEER_LOAD_STEER_THRESHOLD) or 0.2, false, 1.0)
-            steerChangeFactor = ADS_Utils.calculateQuadraticMultiplier(steerDeltaRate, tonumber(C.STEER_LOAD_CHANGE_THRESHOLD) or 0.08, false, 1.0)
-
-            if steerChangeFactor > 0 and steerLowSpeedFactor > 0 then
-                local steerSignal = (0.35 + 0.65 * steerAngleFactor) * steerChangeFactor * steerLowSpeedFactor
-                steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
-                wearRate = wearRate + steerLoadFactor
+        -- braking under mass
+        local drivable = self.spec_drivable
+        if drivable ~= nil and self.spec_wheels ~= nil then
+            local brakePedalRaw = tonumber(self.spec_wheels.brakePedal) or 0
+            local axisForward = tonumber(drivable.axisForward or drivable.axisForwardSend or (drivable.lastInputValues and drivable.lastInputValues.axisForward) or 0) or 0
+            local movingDirection = tonumber(self.movingDirection) or 0
+            local directionMode = self.getDirectionChangeMode ~= nil and self:getDirectionChangeMode() or 1
+            local isBrakingByAxis = false
+            if directionMode == 2 then
+                isBrakingByAxis = axisForward < -0.01
+            else
+                isBrakingByAxis = movingDirection ~= 0 and axisForward ~= 0 and math.sign(movingDirection) ~= math.sign(axisForward)
             end
-        end
-    end
 
-    -- braking under mass
-    local drivable = self.spec_drivable
-    local hasMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
-    if drivable ~= nil and self.spec_wheels ~= nil and hasMotorStarted then
-        local brakePedalRaw = tonumber(self.spec_wheels.brakePedal) or 0
-        local axisForward = tonumber(drivable.axisForward or drivable.axisForwardSend or (drivable.lastInputValues and drivable.lastInputValues.axisForward) or 0) or 0
-        local movingDirection = tonumber(self.movingDirection) or 0
-        local directionMode = self.getDirectionChangeMode ~= nil and self:getDirectionChangeMode() or 1
-        local isBrakingByAxis = false
-        if directionMode == 2 then
-            isBrakingByAxis = axisForward < -0.01
+            local brakePedalThreshold = tonumber(C.BRAKE_PEDAL_THRESHOLD) or 0.15
+            brakePedal = math.clamp(brakePedalRaw, 0, 1)
+            local isBraking = isBrakingByAxis or brakePedal > brakePedalThreshold
+
+            if isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
+                local ownMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
+                local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
+                if ownMass > 0 then
+                    brakeMassRatio = math.max(totalMass / ownMass, 0)
+                    local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 1.0
+                    local ratioMax = math.max(tonumber(C.BRAKE_MASS_RATIO_MAX) or 1.5, ratioThreshold + 0.01)
+                    if brakeMassRatio > ratioThreshold then
+                        local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(brakeMassRatio, ratioThreshold, false, ratioMax)
+                        local brakeInputFactor = math.max(brakePedal, isBrakingByAxis and 1 or 0)
+                        brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
+                        wearRate = wearRate + brakeMassFactor
+                    end
+                end
+            end
+
+        end
+
+        -- service
+        if not spec.isElectricVehicle then
+            local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+            local wearRateWithoutService = wearRate
+            wearRate = wearRate * expiredServiceMultiplier
+            expiredServiceFactor = wearRate - wearRateWithoutService
+        end
+    else
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
         else
-            isBrakingByAxis = movingDirection ~= 0 and axisForward ~= 0 and math.sign(movingDirection) ~= math.sign(axisForward)
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER 
         end
-
-        local brakePedalThreshold = tonumber(C.BRAKE_PEDAL_THRESHOLD) or 0.15
-        brakePedal = math.clamp(brakePedalRaw, 0, 1)
-        local isBraking = isBrakingByAxis or brakePedal > brakePedalThreshold
-
-        if isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
-            local ownMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
-            local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
-            if ownMass > 0 then
-                brakeMassRatio = math.max(totalMass / ownMass, 0)
-                local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 1.0
-                local ratioMax = math.max(tonumber(C.BRAKE_MASS_RATIO_MAX) or 1.5, ratioThreshold + 0.01)
-                if brakeMassRatio > ratioThreshold then
-                    local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(brakeMassRatio, ratioThreshold, false, ratioMax)
-                    local brakeInputFactor = math.max(brakePedal, isBrakingByAxis and 1 or 0)
-                    brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
-                    wearRate = wearRate + brakeMassFactor
-                end
-            end
-        end
-
-    end
-
-    -- service
-    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
-        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
     -- weather
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
     syncSystemWearBreakdown(self, spec.systems.chassis, "CHASSIS_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
@@ -2556,36 +2581,141 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     })
 end
 
--- fuel
+-- fuel TO-DO
 function AdvancedDamageSystem:updateFuelSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.fuel.name)
-    local expiredServiceFactor = 0
-    local weatherFactor = 0
+    local systemData = spec.systems[systemKey]
+    local weatherFactor, lowFuelStarvationFactor, coldFuelFactor = 0, 0, 0
+    local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor = 0, 0, 0, 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
 
+    local function getFuelLevel()
+        local fuelFillUnit = nil
+        if self.getConsumerFillUnitIndex ~= nil and FillType ~= nil and FillType.DIESEL ~= nil then
+            fuelFillUnit = self:getConsumerFillUnitIndex(FillType.DIESEL)
+        end
+
+        if type(fuelFillUnit) == "table" then
+            fuelFillUnit = tonumber(fuelFillUnit.fillUnitIndex or fuelFillUnit.index or fuelFillUnit[1])
+        end
+
+        local dieselType = FillType ~= nil and FillType.DIESEL or nil
+        local methaneType = FillType ~= nil and FillType.METHANE or nil
+        local electricType = FillType ~= nil and FillType.ELECTRICCHARGE or nil
+
+        if fuelFillUnit == nil and self.spec_motorized ~= nil and self.spec_motorized.consumers ~= nil then
+            for _, consumer in pairs(self.spec_motorized.consumers) do
+                if consumer ~= nil and consumer.fillUnitIndex ~= nil then
+                    local fillType = consumer.fillType
+                    if fillType == dieselType or fillType == methaneType or fillType == electricType then
+                        fuelFillUnit = consumer.fillUnitIndex
+                        break
+                    end
+                end
+            end
+        end
+
+        if fuelFillUnit ~= nil then
+            local fuelLiters = tonumber(self:getFillUnitFillLevel(fuelFillUnit)) or 0
+            local fuelCapacity = tonumber(self:getFillUnitCapacity(fuelFillUnit)) or 0
+            local fuelPct = fuelCapacity > 0 and (fuelLiters / fuelCapacity) or 0
+            return fuelPct, fuelLiters, fuelCapacity, fuelFillUnit
+        end
+
+        return 0, 0, 0, nil
+    end
+
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+        local motorLoad = self:getMotorLoadPercentage()
+        fuelLevel = getFuelLevel()
+
+        -- low fuel
+        if fuelLevel < C.LOW_FUEL_THRESHOLD then
+            lowFuelStarvationFactor = ADS_Utils.calculateQuadraticMultiplier(fuelLevel, C.LOW_FUEL_THRESHOLD, true)
+            local motorLoadInf = 1 + ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.70, false)
+            lowFuelStarvationFactor = lowFuelStarvationFactor * motorLoadInf * C.LOW_FUEL_FACTOR_MULTIPLIER
+            wearRate = wearRate + lowFuelStarvationFactor
+        end
+
+        -- cold fuel factor
+        local environmentTemp = 20
+        if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather ~= nil and g_currentMission.environment.weather.forecast ~= nil then
+            local weather = g_currentMission.environment.weather.forecast:getCurrentWeather()
+            if weather ~= nil and weather.temperature ~= nil then
+                environmentTemp = weather.temperature
+            end
+        end
+
+        fuelTemperature = math.max(spec.engineTemperature / 3.6, environmentTemp)
+        if fuelTemperature < C.COLD_FUEL_THRESHOLD and motorLoad > 0.5 then
+            coldFuelFactor = ADS_Utils.calculateQuadraticMultiplier(fuelTemperature, C.COLD_FUEL_THRESHOLD, true)
+            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.50, false)
+            coldFuelFactor = coldFuelFactor * motorLoadInf * C.COLD_FUEL_FACTOR_MULTIPLIER
+            wearRate = wearRate + coldFuelFactor
+        end
+
+        -- idle deposit
+        local idleSpeedThreshold = tonumber(C.IDLE_DEPOSIT_SPEED_THRESHOLD) or 0.5
+        local idleLoadThreshold = tonumber(C.IDLE_DEPOSIT_LOAD_THRESHOLD) or 0.3
+        local idleTimer = math.max(tonumber(systemData.idleTimer) or 0, 0)
+        local isIdle = (self:getLastSpeed() or 0) <= idleSpeedThreshold and motorLoad <= idleLoadThreshold
+
+        if isIdle then
+            idleTimer = math.min(idleTimer + dt / 1000, C.IDLE_DEPOSIT_FACTOR_MAX_TIMER)
+            if idleTimer >= C.IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD then
+                idleDepositFactor = ADS_Utils.calculateQuadraticMultiplier(
+                    idleTimer,
+                    C.IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD,
+                    false,
+                    C.IDLE_DEPOSIT_FACTOR_MAX_TIMER
+                )
+                idleDepositFactor = idleDepositFactor * C.IDLE_DEPOSIT_FACTOR_MULTIPLIER
+                wearRate = wearRate + idleDepositFactor
+            end
+        else
+            idleTimer = math.max(idleTimer - 10 * dt / 1000, 0)
+        end
+        systemData.idleTimer = idleTimer
+
+
+        -- service
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
+    else
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        end
     end
 
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    -- weather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
     syncSystemWearBreakdown(self, spec.systems.fuel, "FUEL_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor
+        weatherFactor = weatherFactor,
+        lowFuelStarvationFactor = lowFuelStarvationFactor,
+        coldFuelFactor = coldFuelFactor,
+        idleDepositFactor = idleDepositFactor,
+        idleTimer = systemData.idleTimer or 0,
+        fuelLevel = fuelLevel,
+        fuelTemperature = fuelTemperature
     })
 end
 
--- workprocess
+-- workprocess TO-DO
 function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workProcess.name)
@@ -2601,11 +2731,13 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         expiredServiceFactor = wearRate - wearRateWithoutService
     end
 
-    local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    weatherMultiplier = math.max(weatherMultiplier, 0.001)
-    local wearRateWithoutWeather = wearRate
-    wearRate = wearRate * weatherMultiplier
-    weatherFactor = wearRate - wearRateWithoutWeather
+    if spec.isUnderRoof ~= true then
+        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+        weatherMultiplier = math.max(weatherMultiplier, 0.001)
+        local wearRateWithoutWeather = wearRate
+        wearRate = wearRate * weatherMultiplier
+        weatherFactor = wearRate - wearRateWithoutWeather
+    end
 
     syncSystemWearBreakdown(self, spec.systems.workProcess, "WORKPROCESS_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
@@ -4296,7 +4428,6 @@ function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
     end
 end
 
-
 function AdvancedDamageSystem.calculateBreakdownProbability(level, p, dt)
     local wear = 1 - math.max(0, math.min(1, level))
 
@@ -4530,7 +4661,6 @@ function AdvancedDamageSystem:getServiceDuration(maintenanceType, optionOne, opt
     return totalElapsedHours
 end
 
-
 function AdvancedDamageSystem:getServiceFinishTime(maintenanceType, optionOne, optionTwo, optionThree, workshopTypeOverride)
     local spec = self.spec_AdvancedDamageSystem
 
@@ -4659,6 +4789,48 @@ local function resolvePathParent(rootTable, fullPath)
     return current, tokens[#tokens], tokens
 end
 
+local function getPrimaryFuelConsumerInfo(vehicle)
+    if vehicle == nil or vehicle.spec_motorized == nil or vehicle.spec_motorized.consumers == nil then
+        return nil, nil
+    end
+
+    local preferredTypes = {}
+    if FillType ~= nil then
+        if FillType.DIESEL ~= nil then table.insert(preferredTypes, FillType.DIESEL) end
+        if FillType.METHANE ~= nil then table.insert(preferredTypes, FillType.METHANE) end
+        if FillType.ELECTRICCHARGE ~= nil then table.insert(preferredTypes, FillType.ELECTRICCHARGE) end
+    end
+
+    local function isPreferred(fillType)
+        for _, preferredType in ipairs(preferredTypes) do
+            if fillType == preferredType then
+                return true
+            end
+        end
+        return false
+    end
+
+    local fallbackConsumer = nil
+    local defFillType = FillType ~= nil and FillType.DEF or nil
+    for _, consumer in pairs(vehicle.spec_motorized.consumers) do
+        if consumer ~= nil and consumer.fillUnitIndex ~= nil and consumer.fillType ~= nil then
+            if isPreferred(consumer.fillType) then
+                return consumer.fillUnitIndex, consumer.fillType
+            end
+
+            if fallbackConsumer == nil and (defFillType == nil or consumer.fillType ~= defFillType) then
+                fallbackConsumer = consumer
+            end
+        end
+    end
+
+    if fallbackConsumer ~= nil then
+        return fallbackConsumer.fillUnitIndex, fallbackConsumer.fillType
+    end
+
+    return nil, nil
+end
+
 function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
     local path = nil
     local valueToken = nil
@@ -4737,7 +4909,6 @@ function AdvancedDamageSystem.ConsoleCommands:setSpecVar(rawArgs, rawValue)
     print(string.format("ADS: spec_AdvancedDamageSystem.%s changed on '%s': %s -> %s", path, vehicle:getFullName(), tostring(oldValue), tostring(value)))
 end
 
-
 function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()
     print("--- Available Breakdowns ---")
     
@@ -4754,7 +4925,6 @@ function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()
     end
     print("----------------------------")
 end
-
 
 function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs)
     local args = parseArguments(rawArgs)
@@ -4795,7 +4965,6 @@ function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs)
     print(string.format("ADS: Added breakdown '%s' at stage %d to '%s'.", breakdownId, stage, vehicle:getFullName()))
 end
 
-
 function AdvancedDamageSystem.ConsoleCommands:removeBreakdown(rawArgs)
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
@@ -4808,7 +4977,6 @@ function AdvancedDamageSystem.ConsoleCommands:removeBreakdown(rawArgs)
         vehicle:removeBreakdown() 
     end
 end
-
 
 function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
     local args = parseArguments(rawArgs)
@@ -4858,7 +5026,6 @@ function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
         print(string.format("ADS: Recalculated effects for '%s'.", vehicle:getFullName()))
     end
 end
-
 
 function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
     local args = parseArguments(rawArgs)
@@ -5056,7 +5223,6 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs)
     end
 end
 
-
 function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
@@ -5078,7 +5244,6 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
     print(string.format("ADS: Set Service level for '%s' to %.2f.", vehicle:getFullName(), value))
 end
 
-
 function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -5089,7 +5254,6 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     vehicle:removeBreakdown()
     print(string.format("ADS: Fully reset state for '%s'.", vehicle:getFullName()))
 end
-
 
 function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
     local args = parseArguments(rawArgs)
@@ -5181,7 +5345,6 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
         print(string.format("ADS Error: Failed to start '%s' for '%s'.", maintenanceType, vehicle:getFullName()))
     end
 end
-
 
 function AdvancedDamageSystem.ConsoleCommands:finishMaintance()
     local vehicle = self:getTargetVehicle()
@@ -5425,6 +5588,74 @@ function AdvancedDamageSystem.ConsoleCommands:setDirtAmount(rawArgs)
     print(string.format("ADS: Set Dirt amount for '%s' to %.2f.", vehicle:getFullName(), value))
 end
 
+function AdvancedDamageSystem.ConsoleCommands:setFuelLevel(rawArgs)
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then
+        return
+    end
+
+    local args = parseArguments(rawArgs)
+    if not args or not args[1] then
+        print("ADS Error: Usage: ads_setFuelLevel <value>")
+        print("Value: 0.0..1.0 or 0..100 (percent)")
+        print("Example: ads_setFuelLevel 0.25")
+        print("Example: ads_setFuelLevel 25")
+        return
+    end
+
+    local inputValue = tonumber(args[1])
+    if inputValue == nil then
+        print("ADS Error: Invalid value. Expected number.")
+        return
+    end
+
+    if inputValue > 1 then
+        if inputValue <= 100 then
+            inputValue = inputValue / 100
+        else
+            print("ADS Error: Value must be 0.0..1.0 or 0..100.")
+            return
+        end
+    end
+
+    if inputValue < 0 or inputValue > 1 then
+        print("ADS Error: Value must be between 0.0 and 1.0 (or 0..100%).")
+        return
+    end
+
+    local fillUnitIndex, fillType = getPrimaryFuelConsumerInfo(vehicle)
+    if fillUnitIndex == nil or fillType == nil then
+        print(string.format("ADS Error: Fuel consumer not found for '%s'.", vehicle:getFullName()))
+        return
+    end
+
+    local capacity = tonumber(vehicle:getFillUnitCapacity(fillUnitIndex)) or 0
+    if capacity <= 0 then
+        print(string.format("ADS Error: Invalid fuel capacity for '%s' (fillUnit %s).", vehicle:getFullName(), tostring(fillUnitIndex)))
+        return
+    end
+
+    local currentLevel = tonumber(vehicle:getFillUnitFillLevel(fillUnitIndex)) or 0
+    local targetLevel = math.clamp(capacity * inputValue, 0, capacity)
+    local delta = targetLevel - currentLevel
+
+    if math.abs(delta) > 0.0001 then
+        vehicle:addFillUnitFillLevel(vehicle:getOwnerFarmId(), fillUnitIndex, delta, fillType, ToolType.UNDEFINED)
+    end
+
+    local resultLevel = tonumber(vehicle:getFillUnitFillLevel(fillUnitIndex)) or targetLevel
+    local resultRatio = resultLevel / math.max(capacity, 0.0001)
+    print(string.format(
+        "ADS: Fuel level set on '%s' -> %.1f / %.1f L (%.1f%%), fillType=%s, fillUnit=%s",
+        vehicle:getFullName(),
+        resultLevel,
+        capacity,
+        resultRatio * 100,
+        tostring(fillType),
+        tostring(fillUnitIndex)
+    ))
+end
+
 function AdvancedDamageSystem.ConsoleCommands:debug()
     if ADS_Config.DEBUG then
         ADS_Config.DEBUG = false
@@ -5448,6 +5679,7 @@ addConsoleCommand("ads_getServiceState", "Prints current service/workshop state 
 addConsoleCommand("ads_showServiceLog", "Shows service log. Usage: ads_showServiceLog [index]", "showServiceLog", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_getDebugVehicleInfo", "Vehicle debug info", "getDebugVehicleInfo", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_setDirtAmount [0.0-1.0]", "setDirtAmount", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setFuelLevel", "Sets vehicle fuel level. Usage: ads_setFuelLevel [0.0-1.0 or 0..100]", "setFuelLevel", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)

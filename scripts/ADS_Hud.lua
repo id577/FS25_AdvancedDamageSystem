@@ -478,6 +478,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local coolingDbg = spec.debugData.cooling or {}
     local electricalDbg = spec.debugData.electrical or {}
     local chassisDbg = spec.debugData.chassis or {}
+    local fuelDbg = spec.debugData.fuel or {}
     local serviceDbg = spec.debugData.service or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
@@ -524,6 +525,13 @@ function ADS_Hud:drawActiveVehicleHUD()
         chassisDbg.vibFactor or 0,
         chassisDbg.steerLoadFactor or 0,
         chassisDbg.brakeMassFactor or 0
+    ) * bcw
+    local fuelMaxFactor = math.max(
+        fuelDbg.expiredServiceFactor or 0,
+        fuelDbg.weatherFactor or 0,
+        fuelDbg.lowFuelStarvationFactor or 0,
+        fuelDbg.coldFuelFactor or 0,
+        fuelDbg.idleDepositFactor or 0
     ) * bcw
 
     local overviewLines = {}
@@ -639,7 +647,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), getConditionFactorColor(electricalMaxFactor), 0.95)
     local chassisLines = {}
     addLine(chassisLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% vf: %.2f%% (raw: %.2f%% sig: %.2f%%) slf: %.2f%% (in: %.2f%% d: %.2f%% lsf: %.2f%%) bmf: %.2f%% (mr: %.2f p: %.2f%%) | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% vf: %.2f%% (raw: %.2f%% sig: %.2f%%) slf: %.2f%% bmf: %.2f%% (mr: %.2f p: %.2f%%) | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("chassis")),
         asPercent((chassisDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("chassis")),
@@ -658,7 +666,23 @@ function ADS_Hud:drawActiveVehicleHUD()
         asPercent(chassisDbg.breakdownProbability or 0),
         asPercent(chassisDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(chassisMaxFactor), 0.95)
-    local fuelLines = buildDefaultSystemLines("fuel")
+    local fuelLines = {}
+    addLine(fuelLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lff: %.2f%% (lvl: %.2f%%) cff: %.2f%% (ft: %.1fC) idf: %.2f%% (t: %.0fs) | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("fuel")),
+        asPercent((fuelDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("fuel")),
+        asPercent((fuelDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((fuelDbg.weatherFactor or 0) * bcw),
+        asPercent((fuelDbg.lowFuelStarvationFactor or 0) * bcw),
+        asPercent(fuelDbg.fuelLevel or 0),
+        asPercent((fuelDbg.coldFuelFactor or 0) * bcw),
+        (fuelDbg.fuelTemperature or 0),
+        asPercent((fuelDbg.idleDepositFactor or 0) * bcw),
+        (fuelDbg.idleTimer or 0),
+        asPercent(fuelDbg.breakdownProbability or 0),
+        asPercent(fuelDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(fuelMaxFactor), 0.95)
     local workProcessLines = buildDefaultSystemLines("workProcess")
     local materialFlowLines = buildDefaultSystemLines("materialFlow")
 
