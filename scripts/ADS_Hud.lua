@@ -521,7 +521,9 @@ function ADS_Hud:drawActiveVehicleHUD()
     local chassisMaxFactor = math.max(
         chassisDbg.expiredServiceFactor or 0,
         chassisDbg.weatherFactor or 0,
-        chassisDbg.vibFactor or 0
+        chassisDbg.vibFactor or 0,
+        chassisDbg.steerLoadFactor or 0,
+        chassisDbg.brakeMassFactor or 0
     ) * bcw
 
     local overviewLines = {}
@@ -637,7 +639,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), getConditionFactorColor(electricalMaxFactor), 0.95)
     local chassisLines = {}
     addLine(chassisLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% vf: %.2f%% (raw: %.2f%% sig: %.2f%% spf: %.2f%% v: %.1fkmh) | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% vf: %.2f%% (raw: %.2f%% sig: %.2f%%) slf: %.2f%% (in: %.2f%% d: %.2f%% lsf: %.2f%%) bmf: %.2f%% (mr: %.2f p: %.2f%%) | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("chassis")),
         asPercent((chassisDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("chassis")),
@@ -646,8 +648,13 @@ function ADS_Hud:drawActiveVehicleHUD()
         asPercent((chassisDbg.vibFactor or 0) * bcw),
         asPercent(chassisDbg.vibRaw or 0),
         asPercent(chassisDbg.vibSignal or 0),
-        asPercent(chassisDbg.vibSpeedFactor or 0),
-        (chassisDbg.vibSpeedKmh or 0),
+        asPercent((chassisDbg.steerLoadFactor or 0) * bcw),
+        asPercent(chassisDbg.steerInputAbs or 0),
+        asPercent(chassisDbg.steerDeltaRate or 0),
+        asPercent(chassisDbg.steerLowSpeedFactor or 0),
+        asPercent((chassisDbg.brakeMassFactor or 0) * bcw),
+        (chassisDbg.brakeMassRatio or 0),
+        asPercent(chassisDbg.brakePedal or 0),
         asPercent(chassisDbg.breakdownProbability or 0),
         asPercent(chassisDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(chassisMaxFactor), 0.95)

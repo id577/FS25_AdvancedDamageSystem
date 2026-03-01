@@ -548,6 +548,18 @@ function AdvancedDamageSystem:onLoad(savegame)
             vibSpeedKmh = 0,
             vibAvgDensityType = 0,
             vibFieldMultiplier = 1,
+            steerLoadFactor = 0,
+            steerInputAbs = 0,
+            steerDeltaRate = 0,
+            steerLowSpeedFactor = 0,
+            steerAngleFactor = 0,
+            steerChangeFactor = 0,
+            steerGroundContact = 0,
+            brakeMassFactor = 0,
+            brakeMassRatio = 0,
+            brakePedal = 0,
+            parkingBrakeFactor = 0,
+            parkingBrakeActive = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -2319,6 +2331,16 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local vibSpeedFactor = 0
     local vibAvgDensityType = 0
     local vibFieldMultiplier = 1
+    local steerLoadFactor = 0
+    local steerInputAbs = 0
+    local steerDeltaRate = 0
+    local steerLowSpeedFactor = 0
+    local steerAngleFactor = 0
+    local steerChangeFactor = 0
+    local steerGroundContact = 0
+    local brakeMassFactor = 0
+    local brakeMassRatio = 0
+    local brakePedal = 0
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
     local wearRate = 1.0
 
@@ -2404,6 +2426,96 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         end
     end
 
+    -- steering load at standstill / low speed
+    local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
+    if steerSpeedThreshold > 0 and speed <= steerSpeedThreshold and self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
+        local steerState = spec.chassisSteerState
+        if steerState == nil then
+            steerState = {
+                prevSteerAbs = nil
+            }
+            spec.chassisSteerState = steerState
+        end
+
+        local steeringDirectionAbs = 0
+        if self.spec_wheels ~= nil and self.spec_wheels.rotatedTime ~= nil then
+            steeringDirectionAbs = math.abs(tonumber(self.spec_wheels.rotatedTime) or 0)
+        elseif self.getSteeringDirection ~= nil then
+            steeringDirectionAbs = math.abs(tonumber(self:getSteeringDirection()) or 0)
+        end
+        steerInputAbs = math.clamp(steeringDirectionAbs, 0, 1)
+
+        local prevSteerAbs = tonumber(steerState.prevSteerAbs) or steerInputAbs
+        steerState.prevSteerAbs = steerInputAbs
+        local dtSafe = math.max(tonumber(dt) or 0, 1)
+        steerDeltaRate = math.clamp(math.abs(steerInputAbs - prevSteerAbs) * 1000 / dtSafe, 0, 1)
+
+        if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
+            for _, wheel in ipairs(self.spec_wheels.wheels) do
+                local hasGroundContact = false
+                if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
+                    hasGroundContact = wheel.physics.hasGroundContact == true
+                elseif wheel.hasGroundContact ~= nil then
+                    hasGroundContact = wheel.hasGroundContact == true
+                end
+
+                if hasGroundContact then
+                    steerGroundContact = 1
+                    break
+                end
+            end
+        end
+
+        if steerGroundContact > 0 then
+            steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
+            steerAngleFactor = ADS_Utils.calculateQuadraticMultiplier(steerInputAbs, tonumber(C.STEER_LOAD_STEER_THRESHOLD) or 0.2, false, 1.0)
+            steerChangeFactor = ADS_Utils.calculateQuadraticMultiplier(steerDeltaRate, tonumber(C.STEER_LOAD_CHANGE_THRESHOLD) or 0.08, false, 1.0)
+
+            if steerChangeFactor > 0 and steerLowSpeedFactor > 0 then
+                local steerSignal = (0.35 + 0.65 * steerAngleFactor) * steerChangeFactor * steerLowSpeedFactor
+                steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
+                wearRate = wearRate + steerLoadFactor
+            end
+        end
+    end
+
+    -- braking under mass
+    local drivable = self.spec_drivable
+    local hasMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
+    if drivable ~= nil and self.spec_wheels ~= nil and hasMotorStarted then
+        local brakePedalRaw = tonumber(self.spec_wheels.brakePedal) or 0
+        local axisForward = tonumber(drivable.axisForward or drivable.axisForwardSend or (drivable.lastInputValues and drivable.lastInputValues.axisForward) or 0) or 0
+        local movingDirection = tonumber(self.movingDirection) or 0
+        local directionMode = self.getDirectionChangeMode ~= nil and self:getDirectionChangeMode() or 1
+        local isBrakingByAxis = false
+        if directionMode == 2 then
+            isBrakingByAxis = axisForward < -0.01
+        else
+            isBrakingByAxis = movingDirection ~= 0 and axisForward ~= 0 and math.sign(movingDirection) ~= math.sign(axisForward)
+        end
+
+        local brakePedalThreshold = tonumber(C.BRAKE_PEDAL_THRESHOLD) or 0.15
+        brakePedal = math.clamp(brakePedalRaw, 0, 1)
+        local isBraking = isBrakingByAxis or brakePedal > brakePedalThreshold
+
+        if isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
+            local ownMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
+            local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
+            if ownMass > 0 then
+                brakeMassRatio = math.max(totalMass / ownMass, 0)
+                local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 1.0
+                local ratioMax = math.max(tonumber(C.BRAKE_MASS_RATIO_MAX) or 1.5, ratioThreshold + 0.01)
+                if brakeMassRatio > ratioThreshold then
+                    local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(brakeMassRatio, ratioThreshold, false, ratioMax)
+                    local brakeInputFactor = math.max(brakePedal, isBrakingByAxis and 1 or 0)
+                    brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
+                    wearRate = wearRate + brakeMassFactor
+                end
+            end
+        end
+
+    end
+
     -- service
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
@@ -2430,7 +2542,17 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         vibSpeedFactor = vibSpeedFactor,
         vibSpeedKmh = speed,
         vibAvgDensityType = vibAvgDensityType,
-        vibFieldMultiplier = vibFieldMultiplier
+        vibFieldMultiplier = vibFieldMultiplier,
+        steerLoadFactor = steerLoadFactor,
+        steerInputAbs = steerInputAbs,
+        steerDeltaRate = steerDeltaRate,
+        steerLowSpeedFactor = steerLowSpeedFactor,
+        steerAngleFactor = steerAngleFactor,
+        steerChangeFactor = steerChangeFactor,
+        steerGroundContact = steerGroundContact,
+        brakeMassFactor = brakeMassFactor,
+        brakeMassRatio = brakeMassRatio,
+        brakePedal = brakePedal
     })
 end
 

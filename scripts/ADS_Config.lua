@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 53,
+    VER = 54,
 
     DEBUG = false,
 
@@ -136,7 +136,18 @@ ADS_Config = {
             VIB_FACTOR_THRESHOLD = 0.08,
             VIB_FACTOR_MAX_SIGNAL = 0.22,
             VIB_FACTOR_MULTIPLIER = 50.0,
-            VIB_FIELD_MULTIPLIER = 1.3
+            VIB_FIELD_MULTIPLIER = 1.3,
+            STEER_LOAD_FACTOR_MULTIPLIER = 5.0,
+            STEER_LOAD_SPEED_THRESHOLD = 4.0,
+            STEER_LOAD_STEER_THRESHOLD = 0.2,
+            STEER_LOAD_CHANGE_THRESHOLD = 0.08,
+            BRAKE_MASS_FACTOR_MULTIPLIER = 6.0,
+            BRAKE_MASS_RATIO_THRESHOLD = 1.0,
+            BRAKE_MASS_RATIO_MAX = 5.0,
+            BRAKE_MASS_SPEED_THRESHOLD = 2.0,
+            BRAKE_PEDAL_THRESHOLD = 0.15,
+            PARKING_BRAKE_FACTOR_MULTIPLIER = 8.0,
+            PARKING_BRAKE_SPEED_THRESHOLD = 1.0
         },
 
         WORKPROCESS_FACTOR_DATA = {
