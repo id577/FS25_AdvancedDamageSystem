@@ -30,10 +30,14 @@ ADS_Config = {
     -- ====================================================================================
     CORE = {
         BASE_SERVICE_WEAR = 0.1,
-        SERVICE_EXPIRED_THRESHOLD = 0.5,
         BASE_SYSTEMS_WEAR = 0.01,
-        DOWNTIME_MULTIPLIER = 0.01,
-        UNDER_ROOF_DOWNTIME_MULTIPLIER = 0.0,
+        DOWNTIME_MULTIPLIER = 0.05,
+        UNDER_ROOF_DOWNTIME_MULTIPLIER = 0.01,
+        RAIN_FACTOR = 1.1,
+        HALL_FACTOR = 1.3,
+        SNOW_FACTOR = 1.1,
+
+        SERVICE_EXPIRED_THRESHOLD = 0.5,
 
         SYSTEM_WEIGHTS = {
             engine=0.22, 

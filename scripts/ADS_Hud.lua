@@ -477,14 +477,17 @@ function ADS_Hud:drawActiveVehicleHUD()
     local hydraulicsDbg = spec.debugData.hydraulics or {}
     local coolingDbg = spec.debugData.cooling or {}
     local electricalDbg = spec.debugData.electrical or {}
+    local serviceDbg = spec.debugData.service or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
         engineDbg.expiredServiceFactor or 0,
+        engineDbg.weatherFactor or 0,
         engineDbg.coldMotorFactor or 0,
         engineDbg.hotMotorFactor or 0
     ) * bcw
     local transmissionMaxFactor = math.max(
         transmissionDbg.expiredServiceFactor or 0,
+        transmissionDbg.weatherFactor or 0,
         transmissionDbg.pullOverloadFactor or 0,
         transmissionDbg.heavyTrailerFactor or 0,
         transmissionDbg.luggingFactor or 0,
@@ -494,6 +497,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     ) * bcw
     local hydraulicsMaxFactor = math.max(
         hydraulicsDbg.expiredServiceFactor or 0,
+        hydraulicsDbg.weatherFactor or 0,
         hydraulicsDbg.heavyLiftFactor or 0,
         hydraulicsDbg.operatingFactor or 0,
         hydraulicsDbg.coldOilFactor or 0,
@@ -502,6 +506,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     ) * bcw
     local coolingMaxFactor = math.max(
         coolingDbg.expiredServiceFactor or 0,
+        coolingDbg.weatherFactor or 0,
         coolingDbg.highCoolingFactor or 0,
         coolingDbg.overheatFactor or 0,
         coolingDbg.coldShockFactor or 0
@@ -511,13 +516,27 @@ function ADS_Hud:drawActiveVehicleHUD()
         electricalDbg.weatherFactor or 0
     ) * bcw
 
+    local overviewLines = {}
+    local serviceWearRate = serviceDbg.totalWearRate or ADS_Config.CORE.BASE_SERVICE_WEAR or 0
+    local weatherFactor = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+    addLine(overviewLines, string.format(
+        "service: %.2f%% (service_wear: %.2f%%) | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s",
+        asPercent(spec.serviceLevel or 0),
+        asPercent(serviceWearRate),
+        asPercent(spec.reliability or 0),
+        asPercent(spec.maintainability or 0),
+        weatherFactor,
+        tostring(spec.isUnderRoof == true)
+    ), {1, 1, 1, 1}, 0.95)
+
     local engineLines = {}
     addLine(engineLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% mlf: %.2f%% cmf: %.2f%% hmf %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% mlf: %.2f%% cmf: %.2f%% hmf %.2f%% | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("engine")),
         asPercent((engineDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("engine")),
         asPercent((engineDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((engineDbg.weatherFactor or 0) * bcw),
         asPercent((engineDbg.motorLoadFactor or 0) * bcw),
         asPercent((engineDbg.coldMotorFactor or 0) * bcw),
         asPercent((engineDbg.hotMotorFactor or 0) * bcw),
@@ -527,11 +546,12 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local transmissionLines = {}
     addLine(transmissionLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% pof: %.2f%% (%.1fs) htf: %.2f%% lf: %.2f%% wsf: %.2f%% (wsi: %.2f%%) ctf: %.2f%% hotf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% pof: %.2f%% (%.1fs) htf: %.2f%% lf: %.2f%% wsf: %.2f%% (wsi: %.2f%%) ctf: %.2f%% hotf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("transmission")),
         asPercent((transmissionDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("transmission")),
         asPercent((transmissionDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((transmissionDbg.weatherFactor or 0) * bcw),
         asPercent((transmissionDbg.pullOverloadFactor or 0) * bcw),
         (transmissionDbg.pullOverloadTimer or 0),
         asPercent((transmissionDbg.heavyTrailerFactor or 0) * bcw),
@@ -546,14 +566,15 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local function buildDefaultSystemLines(systemKey)
         local systemDbg = spec.debugData[systemKey] or {}
-        local systemMaxFactor = (systemDbg.expiredServiceFactor or 0) * bcw
+        local systemMaxFactor = math.max(systemDbg.expiredServiceFactor or 0, systemDbg.weatherFactor or 0) * bcw
         local lines = {}
         addLine(lines, string.format(
-            "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+            "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
             asPercent(getSystemCondition(systemKey)),
             asPercent((systemDbg.totalWearRate or 0) * bcw),
             asPercent(getSystemStress(systemKey)),
             asPercent((systemDbg.expiredServiceFactor or 0) * bcw),
+            asPercent((systemDbg.weatherFactor or 0) * bcw),
             asPercent(systemDbg.breakdownProbability or 0),
             asPercent(systemDbg.critBreakdownProbability or 0)
         ), getConditionFactorColor(systemMaxFactor), 0.95)
@@ -562,11 +583,12 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local hydraulicsLines = {}
     addLine(hydraulicsLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% hlf: %.2f%% (mr: %.2f%%) of: %.2f%% cof: %.2f%% ptof: %.2f%% saf: %.2f%% (%.1fdeg) | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% hlf: %.2f%% (mr: %.2f%%) of: %.2f%% cof: %.2f%% ptof: %.2f%% saf: %.2f%% (%.1fdeg) | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("hydraulics")),
         asPercent((hydraulicsDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("hydraulics")),
         asPercent((hydraulicsDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((hydraulicsDbg.weatherFactor or 0) * bcw),
         asPercent((hydraulicsDbg.heavyLiftFactor or 0) * bcw),
         asPercent(hydraulicsDbg.heavyLiftMassRatio or 0),
         asPercent((hydraulicsDbg.operatingFactor or 0) * bcw),
@@ -579,11 +601,12 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), getConditionFactorColor(hydraulicsMaxFactor), 0.95)
     local coolingLines = {}
     addLine(coolingLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% hcf: %.2f%% (ts: %.1f%%) ohf: %.2f%% csf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% hcf: %.2f%% (ts: %.1f%%) ohf: %.2f%% csf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
         asPercent(getSystemCondition("cooling")),
         asPercent((coolingDbg.totalWearRate or 0) * bcw),
         asPercent(getSystemStress("cooling")),
         asPercent((coolingDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((coolingDbg.weatherFactor or 0) * bcw),
         asPercent((coolingDbg.highCoolingFactor or 0) * bcw),
         asPercent(spec.thermostatState or 0),
         asPercent((coolingDbg.overheatFactor or 0) * bcw),
@@ -748,6 +771,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     local sections = {
+        {title = "System", lines = overviewLines},
         {title = "Engine", lines = engineLines},
         {title = "Transmission", lines = transmissionLines},
         {title = "Hydraulics", lines = hydraulicsLines},

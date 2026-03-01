@@ -239,6 +239,8 @@ ADS_Main.previousKey = nil
 ADS_Main.updateAlphaTimer = 0
 ADS_Main.workshopCheckTimer = 0
 ADS_Main.isWorkshopOpen = true
+ADS_Main.currentWeather = WeatherType.SUN
+ADS_Main.currentWeatherFactor = 1.0
 
 function ADS_Main:update(dt)
     if ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.isDialogOpen then
@@ -287,10 +289,26 @@ function ADS_Main:update(dt)
             local spec = vehicle.spec_AdvancedDamageSystem
             spec.metaUpdateTimer = spec.metaUpdateTimer + ADS_Config.CORE_UPDATE_DELAY
             if spec.metaUpdateTimer > ADS_Config.META_UPDATE_DELAY then
+
+                if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather ~= nil then
+                    ADS_Main.currentWeather = g_currentMission.environment.weather:getCurrentWeatherType()
+                    if ADS_Main.currentWeather == WeatherType.RAIN then
+                        ADS_Main.currentWeatherFactor = ADS_Config.CORE.RAIN_FACTOR or 1.0
+                    elseif ADS_Main.currentWeather == WeatherType.SNOW then
+                        ADS_Main.currentWeatherFactor = ADS_Config.CORE.SNOW_FACTOR or 1.0
+                    elseif ADS_Main.currentWeather == WeatherType.HAIL then
+                        ADS_Main.currentWeatherFactor = ADS_Config.CORE.HALL_FACTOR or 1.0
+                    else
+                        ADS_Main.currentWeatherFactor = 1.0
+                    end
+                end
+
                 if not vehicle:getIsOperating() then
                     spec.isUnderRoof = vehicle:isUnderRoof()
                 end
+
                 spec.metaUpdateTimer = spec.metaUpdateTimer - ADS_Config.META_UPDATE_DELAY
+  
             end
         end
     end
