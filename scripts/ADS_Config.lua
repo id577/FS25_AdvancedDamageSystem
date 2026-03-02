@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 55,
+    VER = 56,
 
     DEBUG = false,
 
@@ -44,52 +44,50 @@ ADS_Config = {
             transmission=0.16, 
             hydraulics=0.12, 
             cooling=0.12, 
-            electrical=0.08, 
+            electrical=0.10, 
             chassis=0.10, 
-            workProcess=0.08, 
-            materialFlow=0.06, 
-            fuel=0.06
+            workProcess=0.10, 
+            fuel=0.08
         },
 
         SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS = {
-            engine=10.0, 
-            transmission=10.0, 
-            hydraulics=10.0, 
-            cooling=10.0, 
-            electrical=10.0, 
-            chassis=10.0, 
-            workProcess=10.0, 
-            materialFlow=10.0, 
-            fuel=10.0
+            engine=50.0, 
+            transmission=50.0, 
+            hydraulics=50.0, 
+            cooling=50.0, 
+            electrical=50.0, 
+            chassis=50.0, 
+            workProcess=50.0, 
+            fuel=50.0
         },
 
         ENGINE_FACTOR_DATA = {
             MOTOR_IDLING_MULTIPLIER = 0.5,
             SERVICE_EXPIRED_MULTIPLIER = 10.0,
             MOTOR_IDLING_THRESHOLD = 0.3,
-            MOTOR_OVERLOADED_MULTIPLIER = 1.0,
-            MOTOR_OVERLOADED_THRESHOLD = 0.95,
-            COLD_MOTOR_THRESHOLD = 50,
+            MOTOR_OVERLOADED_MULTIPLIER = 1.0, -- 1
+            MOTOR_OVERLOADED_THRESHOLD = 0.80,
+            COLD_MOTOR_THRESHOLD = 50,         -- 3
             COLD_MOTOR_MULTIPLIER = 50.0,
-            OVERHEAT_MOTOR_MULTIPLIER = 50.0,
+            OVERHEAT_MOTOR_MULTIPLIER = 50.0,  -- 3
             OVERHEAT_MOTOR_THRESHOLD = 95,
         },
 
         TRANSMISSION_FACTOR_DATA = {
             TRANSMISSION_IDLING_MULTIPLIER = 0.2,
             SERVICE_EXPIRED_MULTIPLIER = 6.0,
-            PULL_OVERLOAD_MULTIPLIER = 2.0,
+            PULL_OVERLOAD_MULTIPLIER = 2.0,    
             PULL_OVERLOAD_THRESHOLD = 0.82,
             PULL_OVERLOAD_TIMER_THRESHOLD = 30,
-            LUGGING_MULTIPLIER = 5.0,
+            LUGGING_MULTIPLIER = 5.0,       
             LUGGING_RPM_THRESHOLD = 0.8,
             LUGGING_MOTORLOAD_THRESHOLD = 0.80,
-            HEAVY_TRAILER_MULTIPLIER = 3.0,
+            HEAVY_TRAILER_MULTIPLIER = 3.0,     
             HEAVY_TRAILER_THRESHOLD = 1.2,
             HEAVY_TRAILER_MOTORLOAD_THRESHOLD = 0.5,
-            WHEEL_SLIP_MULTIPLIER = 10.0,
+            WHEEL_SLIP_MULTIPLIER = 30.0,        
             WHEEL_SLIP_THRESHOLD = 0.3,
-            COLD_TRANSMISSION_MULTIPLIER = 20.0,
+            COLD_TRANSMISSION_MULTIPLIER = 30.0,
             COLD_TRANSMISSION_THRESHOLD = 50,
             OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 50.0,
             OVERHEAT_TRANSMISSION_THRESHOLD = 95,
@@ -136,7 +134,7 @@ ADS_Config = {
             CHASSIS_IDLING_MULTIPLIER = 0.2,
             VIB_FACTOR_THRESHOLD = 0.08,
             VIB_FACTOR_MAX_SIGNAL = 0.22,
-            VIB_FACTOR_MULTIPLIER = 50.0,
+            VIB_FACTOR_MULTIPLIER = 10.0,
             VIB_FIELD_MULTIPLIER = 1.3,
             STEER_LOAD_FACTOR_MULTIPLIER = 5.0,
             STEER_LOAD_SPEED_THRESHOLD = 4.0,
@@ -156,7 +154,9 @@ ADS_Config = {
             WORKPROCESSS_IDLING_MULTIPLIER = 0.2,
             LONG_HARVEST_FACTOR_MULTIPLIER = 1.0,
             LONG_HARVEST_TIMER_THRESHOLD = 0,
-            LONG_HARVEST_TIMER_MAX = 7200
+            LONG_HARVEST_TIMER_MAX = 7200,
+            WET_CROP_FACTOR_MULTIPLIER = 2.0,
+
         },
 
         FUEL_FACTOR_DATA = {

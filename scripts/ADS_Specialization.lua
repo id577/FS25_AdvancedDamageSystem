@@ -142,6 +142,7 @@ AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     idleDepositFactor = "idf",
     highPressureFactor = "hpf",
     longHarvestFactor = "lhf",
+    wetCropFactor = "wcf",
 
     instantDamageFactor = "idfg"
 }
@@ -515,14 +516,14 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
 
     self.spec_AdvancedDamageSystem.systems = {
-        engine = { name = AdvancedDamageSystem.SYSTEMS.ENGINE, condition = 1.0, stress = 0.0, enabled = true },
-        transmission = { name = AdvancedDamageSystem.SYSTEMS.TRANSMISSION, condition = 1.0, stress = 0.0, enabled = true },
-        hydraulics = { name = AdvancedDamageSystem.SYSTEMS.HYDRAULICS, condition = 1.0, stress = 0.0, enabled = true },
-        cooling = { name = AdvancedDamageSystem.SYSTEMS.COOLING, condition = 1.0, stress = 0.0, enabled = true },
-        electrical = { name = AdvancedDamageSystem.SYSTEMS.ELECTRICAL, condition = 1.0, stress = 0.0, enabled = true },
-        chassis = { name = AdvancedDamageSystem.SYSTEMS.CHASSIS, condition = 1.0, stress = 0.0, enabled = true },
-        workProcess = { name = AdvancedDamageSystem.SYSTEMS.WORKPROCESS, condition = 1.0, stress = 0.0, enabled = true },
-        fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true }
+        engine = { name = AdvancedDamageSystem.SYSTEMS.ENGINE, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" },
+        transmission = { name = AdvancedDamageSystem.SYSTEMS.TRANSMISSION, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" },
+        hydraulics = { name = AdvancedDamageSystem.SYSTEMS.HYDRAULICS, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" },
+        cooling = { name = AdvancedDamageSystem.SYSTEMS.COOLING, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" },
+        electrical = { name = AdvancedDamageSystem.SYSTEMS.ELECTRICAL, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" },
+        chassis = { name = AdvancedDamageSystem.SYSTEMS.CHASSIS, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" },
+        workprocess = { name = AdvancedDamageSystem.SYSTEMS.WORKPROCESS, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" },
+        fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "" }
     }
     self.spec_AdvancedDamageSystem.factorStats = createEmptyFactorStats(self.spec_AdvancedDamageSystem.systems)
 
@@ -694,13 +695,14 @@ function AdvancedDamageSystem:onLoad(savegame)
             critBreakdownProbability = 0
         },
 
-        workProcess = {
+        workprocess = {
             condition = 0,
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
             weatherFactor = 0,
             longHarvestFactor = 0,
+            wetCropFactor = 0,
             longHarvestTimer = 0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
@@ -888,7 +890,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 systemData = {
                     condition = tonumber(systemData) or 1.0,
                     stress = 0.0,
-                    enabled = true
+                    enabled = true,
+                    plannedBreakdown = ""
                 }
                 spec.systems[systemKey] = systemData
             end
@@ -898,6 +901,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 systemData.condition = math.clamp(tonumber(loadedData.condition) or systemData.condition or 1.0, 0.001, 1.0)
                 systemData.stress = math.max(tonumber(loadedData.stress) or systemData.stress or 0.0, 0.0)
                 systemData.enabled = ADS_Utils.normalizeBoolValue(loadedData.enabled, systemData.enabled ~= false)
+                systemData.plannedBreakdown = tostring(loadedData.plannedBreakdown or systemData.plannedBreakdown or "")
             else
                 if not hasSerializedSystemsState and spec.conditionLevel ~= nil then
                     systemData.condition = math.clamp(tonumber(spec.conditionLevel) or systemData.condition or 1.0, 0.001, 1.0)
@@ -906,6 +910,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 end
                 systemData.stress = math.max(tonumber(systemData.stress) or 0.0, 0.0)
                 systemData.enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
+                systemData.plannedBreakdown = tostring(systemData.plannedBreakdown or "")
             end
 
             systemData.name = ADS_Utils.getSystemNameByKey(AdvancedDamageSystem.SYSTEMS, systemKey)
@@ -2922,18 +2927,29 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     })
 end
 
--- workprocess TO-DO
+-- workprocess (longHarves, wetCrop)
 function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workProcess.name)
-    local systemData = spec.systems[systemKey]
+    local spec_combine = self.spec_combine
+    local spec_cutter = self.spec_cutter
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workprocess.name)
+    local systemData = ensureSystemData(spec, systemKey)
     local expiredServiceFactor = 0
-    local weatherFactor, longHarvestFactor = 0, 0
+    local weatherFactor, longHarvestFactor, wetCropFactor = 0, 0, 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
 
     local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
     local isTurnedOn = self.getIsTurnedOn ~= nil and self:getIsTurnedOn()
+    local currentWeather = ADS_Main.currentWeather
+    local isHail = (WeatherType.HAIL ~= nil and currentWeather == WeatherType.HAIL) or (WeatherType.HALL ~= nil and currentWeather == WeatherType.HALL)
+    local isWetWeather = currentWeather == WeatherType.RAIN or currentWeather == WeatherType.SNOW or isHail
+    local isHarvestingInProcess = false
+    if spec_cutter ~= nil and spec_cutter.isWorking == true then
+        isHarvestingInProcess = true
+    elseif spec_combine ~= nil then
+        isHarvestingInProcess = (spec_combine.lastArea or 0) > 0
+    end
 
     if isMotorStarted and not spec.isElectricVehicle then
         -- longHarvestFactor
@@ -2956,6 +2972,12 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         end
         systemData.longHarvestTimer = longHarvestTimer
 
+        -- wetCrop
+        if isTurnedOn and isWetWeather and isHarvestingInProcess then
+            wetCropFactor = C.WET_CROP_FACTOR_MULTIPLIER
+            wearRate = wearRate + wetCropFactor
+        end
+
         -- service
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
@@ -2977,11 +2999,12 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         weatherFactor = wearRate - wearRateWithoutWeather
     end
 
-    syncSystemWearBreakdown(self, spec.systems.workProcess, "WORKPROCESS_WEAR")
+    syncSystemWearBreakdown(self, systemData, "WORKPROCESS_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         weatherFactor = weatherFactor,
         longHarvestFactor = longHarvestFactor,
+        wetCropFactor = wetCropFactor,
         longHarvestTimer = systemData.longHarvestTimer or 0
     })
 end
@@ -3085,6 +3108,8 @@ function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
         return nil
     end
 
+    local spec = self.spec_AdvancedDamageSystem
+
     if systemName == nil then
         return nil
     end
@@ -3095,9 +3120,22 @@ function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
     end
 
     local targetSystemKey = string.lower(tostring(targetSystem))
+    local targetSystemData = spec.systems[targetSystemKey]
+    if type(targetSystemData) ~= "table" then
+        return nil
+    end
+
     local activeBreakdowns = self:getActiveBreakdowns()
     local applicableBreakdowns = {}
     local totalProbability = 0
+
+    local plannedBreakdownId = tostring(targetSystemData.plannedBreakdown or "")
+    if plannedBreakdownId ~= "" then
+        targetSystemData.plannedBreakdown = ""
+        if not activeBreakdowns[plannedBreakdownId] and ADS_Breakdowns.BreakdownRegistry[plannedBreakdownId] ~= nil then
+            return plannedBreakdownId
+        end
+    end
 
     for id, breakdownData in pairs(ADS_Breakdowns.BreakdownRegistry) do
         local breakdownSystemKey = string.lower(tostring(breakdownData.system or ""))

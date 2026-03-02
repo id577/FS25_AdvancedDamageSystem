@@ -485,7 +485,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local electricalDbg = spec.debugData.electrical or {}
     local chassisDbg = spec.debugData.chassis or {}
     local fuelDbg = spec.debugData.fuel or {}
-    local workProcessDbg = spec.debugData.workProcess or {}
+    local workprocessDbg = spec.debugData.workprocess or {}
     local serviceDbg = spec.debugData.service or {}
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
@@ -541,10 +541,11 @@ function ADS_Hud:drawActiveVehicleHUD()
         fuelDbg.idleDepositFactor or 0,
         fuelDbg.highPressureFactor or 0
     ) * bcw
-    local workProcessMaxFactor = math.max(
-        workProcessDbg.expiredServiceFactor or 0,
-        workProcessDbg.weatherFactor or 0,
-        workProcessDbg.longHarvestFactor or 0
+    local workprocessMaxFactor = math.max(
+        workprocessDbg.expiredServiceFactor or 0,
+        workprocessDbg.weatherFactor or 0,
+        workprocessDbg.longHarvestFactor or 0,
+        workprocessDbg.wetCropFactor or 0
     ) * bcw
 
     local overviewLines = {}
@@ -697,19 +698,20 @@ function ADS_Hud:drawActiveVehicleHUD()
         asPercent(fuelDbg.breakdownProbability or 0),
         asPercent(fuelDbg.critBreakdownProbability or 0)
     ), getConditionFactorColor(fuelMaxFactor), 0.95)
-    local workProcessLines = {}
-    addLine(workProcessLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lhf: %.2f%% (t: %.0fs) | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("workProcess")),
-        asPercent((workProcessDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("workProcess")),
-        asPercent((workProcessDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((workProcessDbg.weatherFactor or 0) * bcw),
-        asPercent((workProcessDbg.longHarvestFactor or 0) * bcw),
-        (workProcessDbg.longHarvestTimer or 0),
-        asPercent(workProcessDbg.breakdownProbability or 0),
-        asPercent(workProcessDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(workProcessMaxFactor), 0.95)
+    local workprocessLines = {}
+    addLine(workprocessLines, string.format(
+        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lhf: %.2f%% (t: %.0fs) wcf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+        asPercent(getSystemCondition("workprocess")),
+        asPercent((workprocessDbg.totalWearRate or 0) * bcw),
+        asPercent(getSystemStress("workprocess")),
+        asPercent((workprocessDbg.expiredServiceFactor or 0) * bcw),
+        asPercent((workprocessDbg.weatherFactor or 0) * bcw),
+        asPercent((workprocessDbg.longHarvestFactor or 0) * bcw),
+        (workprocessDbg.longHarvestTimer or 0),
+        asPercent((workprocessDbg.wetCropFactor or 0) * bcw),
+        asPercent(workprocessDbg.breakdownProbability or 0),
+        asPercent(workprocessDbg.critBreakdownProbability or 0)
+    ), getConditionFactorColor(workprocessMaxFactor), 0.95)
 
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
@@ -860,7 +862,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         {title = "Electrical", lines = electricalLines},
         {title = "Chassis", lines = chassisLines},
         {title = "Fuel", lines = fuelLines},
-        {title = "Work Process", lines = workProcessLines},
+        {title = "Work Process", lines = workprocessLines},
         {title = "Engine Temp", lines = engineTempLines}
     }
 
@@ -981,7 +983,7 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
             electrical = "Electrical",
             chassis = "Chassis",
             fuel = "Fuel",
-            workProcess = "Work Process",
+            workprocess = "Work Process",
             materialFlow = "Material Flow"
         }
         return names[systemKey] or tostring(systemKey)
@@ -995,7 +997,7 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
             local normalizedKey = tostring(rawSystemKey)
             local loweredKey = string.lower(normalizedKey)
             if loweredKey == "workprocess" then
-                normalizedKey = "workProcess"
+                normalizedKey = "workprocess"
             elseif loweredKey == "materialflow" then
                 normalizedKey = "materialFlow"
             end
@@ -1015,7 +1017,7 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
 
     local orderedSystems = {
         "engine", "transmission", "hydraulics", "cooling",
-        "electrical", "chassis", "fuel", "workProcess", "materialFlow"
+        "electrical", "chassis", "fuel", "workprocess", "materialFlow"
     }
 
     local usedSystems = {}

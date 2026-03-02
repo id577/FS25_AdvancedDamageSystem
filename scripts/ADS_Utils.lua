@@ -553,16 +553,18 @@ function ADS_Utils.serializeSystemsState(systems)
         local condition = 1.0
         local stress = 0.0
         local enabled = true
+        local plannedBreakdown = ""
 
         if type(systemData) == "table" then
             condition = tonumber(systemData.condition) or 1.0
             stress = tonumber(systemData.stress) or 0.0
             enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
+            plannedBreakdown = tostring(systemData.plannedBreakdown or "")
         else
             condition = tonumber(systemData) or 1.0
         end
 
-        table.insert(entries, string.format("%s|%.6f|%.6f|%d", tostring(systemKey), condition, stress, enabled and 1 or 0))
+        table.insert(entries, string.format("%s|%.6f|%.6f|%d|%s", tostring(systemKey), condition, stress, enabled and 1 or 0, plannedBreakdown))
     end
 
     table.sort(entries)
@@ -576,21 +578,33 @@ function ADS_Utils.deserializeSystemsState(serialized)
     end
 
     for entry in string.gmatch(serialized, "([^,]+)") do
-        local key, conditionStr, stressStr, enabledStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)|([^|]+)")
+        local key, conditionStr, stressStr, enabledStr, plannedBreakdownStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)|([^|]+)|(.+)")
         if key ~= nil then
             result[key] = {
                 condition = tonumber(conditionStr) or 1.0,
                 stress = tonumber(stressStr) or 0.0,
-                enabled = ADS_Utils.normalizeBoolValue(tonumber(enabledStr), true)
+                enabled = ADS_Utils.normalizeBoolValue(tonumber(enabledStr), true),
+                plannedBreakdown = tostring(plannedBreakdownStr or "")
             }
         else
-            local legacyKey, legacyConditionStr, legacyStressStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)")
-            if legacyKey ~= nil then
-                result[legacyKey] = {
-                    condition = tonumber(legacyConditionStr) or 1.0,
-                    stress = tonumber(legacyStressStr) or 0.0,
-                    enabled = true
+            key, conditionStr, stressStr, enabledStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)|([^|]+)")
+            if key ~= nil then
+                result[key] = {
+                    condition = tonumber(conditionStr) or 1.0,
+                    stress = tonumber(stressStr) or 0.0,
+                    enabled = ADS_Utils.normalizeBoolValue(tonumber(enabledStr), true),
+                    plannedBreakdown = ""
                 }
+            else
+                local legacyKey, legacyConditionStr, legacyStressStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)")
+                if legacyKey ~= nil then
+                    result[legacyKey] = {
+                        condition = tonumber(legacyConditionStr) or 1.0,
+                        stress = tonumber(legacyStressStr) or 0.0,
+                        enabled = true,
+                        plannedBreakdown = ""
+                    }
+                end
             end
         end
     end
