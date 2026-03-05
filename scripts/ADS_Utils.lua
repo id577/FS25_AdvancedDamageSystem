@@ -554,17 +554,19 @@ function ADS_Utils.serializeSystemsState(systems)
         local stress = 0.0
         local enabled = true
         local plannedBreakdown = ""
+        local plannedBreakdownTimer = 0.0
 
         if type(systemData) == "table" then
             condition = tonumber(systemData.condition) or 1.0
             stress = tonumber(systemData.stress) or 0.0
             enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
             plannedBreakdown = tostring(systemData.plannedBreakdown or "")
+            plannedBreakdownTimer = math.max(tonumber(systemData.plannedBreakdownTimer) or 0.0, 0.0)
         else
             condition = tonumber(systemData) or 1.0
         end
 
-        table.insert(entries, string.format("%s|%.6f|%.6f|%d|%s", tostring(systemKey), condition, stress, enabled and 1 or 0, plannedBreakdown))
+        table.insert(entries, string.format("%s|%.6f|%.6f|%d|%s|%.6f", tostring(systemKey), condition, stress, enabled and 1 or 0, plannedBreakdown, plannedBreakdownTimer))
     end
 
     table.sort(entries)
@@ -578,34 +580,33 @@ function ADS_Utils.deserializeSystemsState(serialized)
     end
 
     for entry in string.gmatch(serialized, "([^,]+)") do
-        local key, conditionStr, stressStr, enabledStr, plannedBreakdownStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)|([^|]+)|(.+)")
-        if key ~= nil then
-            result[key] = {
-                condition = tonumber(conditionStr) or 1.0,
-                stress = tonumber(stressStr) or 0.0,
-                enabled = ADS_Utils.normalizeBoolValue(tonumber(enabledStr), true),
-                plannedBreakdown = tostring(plannedBreakdownStr or "")
-            }
-        else
-            key, conditionStr, stressStr, enabledStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)|([^|]+)")
-            if key ~= nil then
-                result[key] = {
-                    condition = tonumber(conditionStr) or 1.0,
-                    stress = tonumber(stressStr) or 0.0,
-                    enabled = ADS_Utils.normalizeBoolValue(tonumber(enabledStr), true),
-                    plannedBreakdown = ""
-                }
-            else
-                local legacyKey, legacyConditionStr, legacyStressStr = string.match(entry, "([^|]+)|([^|]+)|([^|]+)")
-                if legacyKey ~= nil then
-                    result[legacyKey] = {
-                        condition = tonumber(legacyConditionStr) or 1.0,
-                        stress = tonumber(legacyStressStr) or 0.0,
-                        enabled = true,
-                        plannedBreakdown = ""
-                    }
-                end
+        local parts = {}
+        for part in string.gmatch(entry .. "|", "(.-)|") do
+            table.insert(parts, part)
+        end
+
+        local key = parts[1]
+        if key ~= nil and key ~= "" then
+            local condition = tonumber(parts[2]) or 1.0
+            local stress = tonumber(parts[3]) or 0.0
+            local enabled = ADS_Utils.normalizeBoolValue(tonumber(parts[4]), true)
+            local plannedBreakdown = ""
+            local plannedBreakdownTimer = 0.0
+
+            if #parts >= 5 and parts[5] ~= nil then
+                plannedBreakdown = tostring(parts[5] or "")
             end
+            if #parts >= 6 and parts[6] ~= nil then
+                plannedBreakdownTimer = math.max(tonumber(parts[6]) or 0.0, 0.0)
+            end
+
+            result[key] = {
+                condition = condition,
+                stress = stress,
+                enabled = enabled,
+                plannedBreakdown = plannedBreakdown,
+                plannedBreakdownTimer = plannedBreakdownTimer
+            }
         end
     end
 

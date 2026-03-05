@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 57,
+    VER = 59,
 
     DEBUG = false,
 
@@ -212,6 +212,8 @@ ADS_Config = {
         RELIABILITY_YEAR_FACTOR_THRESHOLD = 2000,
 
         BASE_BREAKDOWN_PROGRESS_TIME = 3600000,
+        PLANNED_BREAKDOWN_TIME = 4800000,
+
         BREAKDOWN_PROBABILITIES = {
             STRESS_THRESHOLD = 0.1,
             MIN_MTBF = 60,
@@ -271,8 +273,8 @@ ADS_Config = {
         REPAIR_TIME = 14400000,
         REPAIR_TIME_MULTIPLIERS = {
             [1] = 1.0, MEDIUM = 1.0,
-            [2] = 1.5, LOW   = 1.5,
-            [3] = 0.5, HIGH    = 0.5,
+            [2] = 0.3, LOW   = 0.3,
+            [3] = 2.0, HIGH    = 2.0,
         },
         OVERHAUL_TIME = 86400000,
         OVERHAUL_TIME_MULTIPLIERS = {
@@ -286,6 +288,10 @@ ADS_Config = {
             [2] = 0.75, MINIMAL  = 0.75,
             [3] = 1.2,  EXTENDED = 1.2,
         },
+
+        REPAIR_MIN_CONDITION_RESTORE_MULTIPLIER = 0.07,
+        REPAIR_MAX_CONDITION_RESTORE_MULTIPLIER = 0.13,
+
         OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS = {
             [1] = 0.61, STANDARD = 0.61,
             [2] = 0.41, PARTIAL  = 0.41,
@@ -320,8 +326,8 @@ ADS_Config = {
         },
         REPAIR_PRICE_MULTIPLIERS = {
             [1] = 1.0, MEDIUM = 1.0,
-            [2] = 0.8, LOW    = 0.8,
-            [3] = 1.2, HIGH   = 1.2,
+            [2] = 0.2, LOW    = 0.2,
+            [3] = 2.0, HIGH   = 2.0,
         },
         OVERHAUL_PRICE_MULTIPLIERS = {
             [1] = 0.5, STANDARD = 0.5,

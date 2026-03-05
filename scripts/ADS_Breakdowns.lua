@@ -394,50 +394,6 @@ ADS_Breakdowns.BreakdownRegistry = {
         },
     },
 
-    REPAIR_WITH_POOR_QUALITY_PARTS = {
-        isSelectable = false,
-        system = "ads_breakdowns_part_vehicle",
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        isCanProgress = function(vehicle)
-            return true
-        end,
-        stages = {
-            {
-                severity = "",
-                description = "",
-                detectionChance = 0.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.0,
-                effects = {}
-            },
-            {
-                severity = "",
-                description = "",
-                detectionChance = 0.0,
-                progressMultiplier = 0.001,
-                repairPrice = 0.0,
-                effects = { 
-                    { id = "REPEATED_BREAKDOWN_EFFECT", value = 1.0, aggregation = 'boolean_or', extraData = {breakdownId = nil} },
-                },
-            },
-            {
-                severity = "",
-                description = "",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = { 
-                    { id = "SELF_DISAPPEARING_BREAKDOWN_EFFECT", value = 1.0, aggregation = 'boolean_or', extraData = {breakdownId = "REPAIR_WITH_POOR_QUALITY_PARTS"} }
-                },
-            },
-        },
-    },
-
     OVERHEAT_PROTECTION = {
         isSelectable = false,
         system = "ads_breakdowns_part_engine",
@@ -1763,32 +1719,6 @@ local function removeFuncFromActive(v, effectName)
         v.spec_AdvancedDamageSystem.activeFunctions[effectName] = nil
     end
 end
-
---- REPEATED_BREAKDOWN_EFFECT
-ADS_Breakdowns.EffectApplicators.REPEATED_BREAKDOWN_EFFECT = {
-    apply = function(vehicle, effectData, handler)
-        log_dbg("Applying REPEATED_BREAKDOWN_EFFECT")
-        if effectData.extraData.breakdownId == nil then
-            local spec = vehicle.spec_AdvancedDamageSystem
-            for i = #spec.maintenanceLog, 1, -1 do
-                local logEntry = spec.maintenanceLog[i]
-                if logEntry and logEntry.type == AdvancedDamageSystem.STATUS.REPAIR and logEntry.isAftermarketParts then
-                    local random = math.random(1, #logEntry.selectedBreakdowns)
-                    local randomStage = math.random(1, #ADS_Breakdowns.BreakdownRegistry[logEntry.selectedBreakdowns[random]].stages)
-                    vehicle:addBreakdown(logEntry.selectedBreakdowns[random], 1)
-                    break
-                end
-            end
-        else
-            local randomStage = math.random(1, #ADS_Breakdowns.BreakdownRegistry[effectData.extraData.breakdownId].stages)
-            vehicle:addBreakdown(effectData.extraData.breakdownId, 1)
-        end
-    end,
-
-    remove = function(vehicle, handler)
-        log_dbg("Removing REPEATED_BREAKDOWN_EFFECT effect.")
-    end
-}
 
 --- SELF_DISAPPEARING_BREAKDOWN_EFFECT
 ADS_Breakdowns.EffectApplicators.SELF_DISAPPEARING_BREAKDOWN_EFFECT = {

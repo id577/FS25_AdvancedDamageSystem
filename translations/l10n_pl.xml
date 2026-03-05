@@ -289,9 +289,9 @@
         <text name="ads_spec_overhaul_partial" text="Częściowy"/>
         <text name="ads_spec_overhaul_standard" text="Standard"/>
         <text name="ads_spec_overhaul_full" text="Pełny"/>
-        <text name="ads_spec_repair_urgency_low" text="Niski priorytet"/>
-        <text name="ads_spec_repair_urgency_medium" text="Standardowa kolejka"/>
-        <text name="ads_spec_repair_urgency_high" text="Pilny"/>
+        <text name="ads_spec_repair_type_fix" text="Prowizorka"/>
+        <text name="ads_spec_repair_type_replacement" text="Standard"/>
+        <text name="ads_spec_repair_type_with_related_parts" text="Pełna wymiana"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Wybierz typ inspekcji"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Napraw wykryte usterki"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Wybierz poziom konserwacji"/>
@@ -314,9 +314,9 @@
         <text name="ads_option_menu_maintenance_minimal_description" text="* Usługa podstawowa. Znacząco taniej i szybciej, ale nie przywraca w pełni Poziomu Usługi."/>
         <text name="ads_option_menu_maintenance_standard_description" text="* Rutynowa konserwacja zgodnie ze specyfikacjami producenta. Przywraca normalny poziom usług."/>
         <text name="ads_option_menu_maintenance_extended_description" text="* Kompleksowa obsługa. Trwa dłużej i kosztuje więcej, ale zwiększa poziom usług o dodatkowe ~20%"/>
-        <text name="ads_option_menu_repair_urgency_low_description" text="* Prace uzupełniające, gdy mechanicy są wolni. Trwa o 50% dłużej, ale oferuje 10% zniżki na robociznę."/>
-        <text name="ads_option_menu_repair_urgency_medium_description" text="* Standardowy harmonogram warsztatów. Zbilansowane koszty pracy i czas trwania naprawy."/>
-        <text name="ads_option_menu_repair_urgency_high_description" text="* Zespół napraw awaryjnych. Skraca przestoje o 50%, ale zwiększa koszty pracy o 10%."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Szybka naprawa, która pozwoli dociągnąć do końca sezonu, ale z dużym prawdopodobieństwem, że awaria powróci"/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Standardowa wymiana uszkodzonego podzespołu"/>
+        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Naprawa z wymianą wszystkich powiązanych części. Nieznacznie przywraca ogólny stan podsystemu"/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Przywraca stan do normalnego poziomu i zajmuje mniej czasu i zasobów niż pełny remont."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Kompleksowa praca nad wszystkimi głównymi podzespołami. Przywraca stan do dobrego poziomu."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Kompletna regeneracja. Wysoki koszt i czas trwania, ale przywraca Stan do doskonałego poziomu."/>

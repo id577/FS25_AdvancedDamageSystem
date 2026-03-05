@@ -163,7 +163,7 @@ function ADS_WorkshopDialog:updateScreen()
 
     local inspectionPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, self.workshopType)
     local maintenancePrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.MAINTENANCE, AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD, AdvancedDamageSystem.PART_TYPES.OEM, false, self.workshopType)
-    local repairPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.REPAIR, AdvancedDamageSystem.REPAIR_URGENCY.MEDIUM, AdvancedDamageSystem.PART_TYPES.OEM, false, self.workshopType)
+    local repairPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.REPAIR, AdvancedDamageSystem.REPAIR_TYPES.MEDIUM, AdvancedDamageSystem.PART_TYPES.OEM, false, self.workshopType)
     local overhaulPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.OVERHAUL, AdvancedDamageSystem.OVERHAUL_TYPES.STANDARD, "NONE", false, self.workshopType)
 
     local selectedRepairCount = 0
@@ -180,7 +180,7 @@ function ADS_WorkshopDialog:updateScreen()
     local buttonFormat = g_i18n:getText("ads_ws_button_price_format")
     self.inscpectionButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_inspection"), g_i18n:formatMoney(inspectionPrice)))
     self.maintenanceButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_maintenance"), g_i18n:formatMoney(maintenancePrice)))
-    if self.vehicle:isWarrantyRepairCovered(AdvancedDamageSystem.PART_TYPES.OEM) and selectedRepairCount > 0 then
+    if self.vehicle:isWarrantyRepairCovered(AdvancedDamageSystem.REPAIR_TYPES.MEDIUM, AdvancedDamageSystem.PART_TYPES.OEM) and selectedRepairCount > 0 then
         self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:getText("ads_option_menu_warranty_repair_text")))
     else
         self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:formatMoney(repairPrice)))

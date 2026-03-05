@@ -289,9 +289,9 @@
         <text name="ads_spec_overhaul_partial" text="Partial"/>
         <text name="ads_spec_overhaul_standard" text="Standard"/>
         <text name="ads_spec_overhaul_full" text="Full"/>
-        <text name="ads_spec_repair_urgency_low" text="Low Priority"/>
-        <text name="ads_spec_repair_urgency_medium" text="Standard Queue"/>
-        <text name="ads_spec_repair_urgency_high" text="Urgent"/>
+        <text name="ads_spec_repair_type_fix" text="Quick fix"/>
+        <text name="ads_spec_repair_type_replacement" text="Standard"/>
+        <text name="ads_spec_repair_type_with_related_parts" text="Full replacement"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Select inspection type"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Repair discovered faults"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Select maintenance level"/>
@@ -313,10 +313,10 @@
         <text name="ads_option_menu_inspection_complete_description" text="* Deep diagnostics. Guarantees detection of all faults and provides a comprehensive report with exact health percentages for all components."/>
         <text name="ads_option_menu_maintenance_minimal_description" text="* Basic service. Significantly cheaper and faster, but does not fully restore the Service Level."/>
         <text name="ads_option_menu_maintenance_standard_description" text="* Routine maintenance according to manufacturer specifications. Restores Service Level to normal."/>
-        <text name="ads_option_menu_maintenance_extended_description" text="* Comprehensive service. Takes longer and costs more, but boosts Service Level by an additional ~20%"/>
-        <text name="ads_option_menu_repair_urgency_low_description" text="* Fill-in work when mechanics are free. Takes 50% longer, but offers a 10% discount on labor."/>
-        <text name="ads_option_menu_repair_urgency_medium_description" text="* Standard workshop schedule. Balanced labor cost and repair duration."/>
-        <text name="ads_option_menu_repair_urgency_high_description" text="* Emergency repair team. Reduces downtime by 50%, but increases labor cost by 10%."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Comprehensive service. Takes longer and costs more, but boosts Service Level by an additional ~20%"/>   
+        <text name="ads_option_menu_repair_type_fix_description" text="* A quick fix to get you through the season, but with a high chance the breakdown will return"/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Standard replacement of the failed component"/>
+        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Repair with replacement of all related parts. Slightly restores the overall condition of the subsystem"/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Restores Condition to normal level and takes less time and resources than a full overhaul."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Comprehensive work on all major components. Restores Condition to good level."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Complete remanufacturing. High cost and duration, but restores Condition to excellent level."/>

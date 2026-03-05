@@ -289,9 +289,9 @@
         <text name="ads_spec_overhaul_partial" text="Partiell"/>
         <text name="ads_spec_overhaul_standard" text="Standard"/>
         <text name="ads_spec_overhaul_full" text="Full"/>
-        <text name="ads_spec_repair_urgency_low" text="Låg prioritet"/>
-        <text name="ads_spec_repair_urgency_medium" text="Standardkö"/>
-        <text name="ads_spec_repair_urgency_high" text="Brådskande"/>
+        <text name="ads_spec_repair_type_fix" text="Provisorisk"/>
+        <text name="ads_spec_repair_type_replacement" text="Standard"/>
+        <text name="ads_spec_repair_type_with_related_parts" text="Fullständigt byte"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Välj typ av inspektion"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Reparera upptäckta fel"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Välj underhållsnivå"/>
@@ -314,9 +314,9 @@
         <text name="ads_option_menu_maintenance_minimal_description" text="* Grundläggande service. Betydligt billigare och snabbare, men återställer inte servicenivån helt."/>
         <text name="ads_option_menu_maintenance_standard_description" text="* Rutinunderhåll enligt tillverkarens specifikationer. Återställer servicenivån till normal."/>
         <text name="ads_option_menu_maintenance_extended_description" text="* Omfattande service. Tar längre tid och kostar mer, men ökar servicenivån med ytterligare ~20 %"/>
-        <text name="ads_option_menu_repair_urgency_low_description" text="* Fyll i arbete när mekanik är ledig. Tar 50 % längre tid, men ger 10 % rabatt på arbetskraft."/>
-        <text name="ads_option_menu_repair_urgency_medium_description" text="* Standard workshopschema. Balanserad arbetskostnad och reparationstid."/>
-        <text name="ads_option_menu_repair_urgency_high_description" text="* Nödreparationsteam. Minskar stilleståndstiden med 50 %, men ökar arbetskostnaden med 10 %."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* En snabb lagning för att klara säsongen, men med hög risk att felet återkommer"/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Standardbyte av den trasiga komponenten"/>
+        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Reparation med byte av alla relaterade delar. Återställer delvis subsystemets övergripande skick"/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Återställer tillståndet till normal nivå och tar mindre tid och resurser än en fullständig översyn."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Omfattande arbete på alla större komponenter. Återställer skicket till bra nivå."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Komplett återtillverkning. Hög kostnad och varaktighet, men återställer skicket till utmärkt nivå."/>

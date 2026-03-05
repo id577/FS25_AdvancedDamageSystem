@@ -40,7 +40,7 @@ function ADS_MaintenanceThreeOptionsDialog.show(vehicle, maintenanceType)
     if dialog.maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
         dialog.selectedOptionOne = AdvancedDamageSystem.MAINTENANCE_TYPES[1]
     elseif dialog.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
-        dialog.selectedOptionOne = AdvancedDamageSystem.REPAIR_URGENCY[1]
+        dialog.selectedOptionOne = AdvancedDamageSystem.REPAIR_TYPES[1]
     end
     dialog.selectedOptionTwo = AdvancedDamageSystem.PART_TYPES[1]
     dialog.selectedOptionThree = false
@@ -74,9 +74,9 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
     else
         optionOneText = g_i18n:getText("ads_option_menu_option_one_title_repair")
         optionOneOptions = {
-            g_i18n:getText(AdvancedDamageSystem.REPAIR_URGENCY.MEDIUM),
-            g_i18n:getText(AdvancedDamageSystem.REPAIR_URGENCY.LOW),
-            g_i18n:getText(AdvancedDamageSystem.REPAIR_URGENCY.HIGH)
+            g_i18n:getText(AdvancedDamageSystem.REPAIR_TYPES.LOW),
+            g_i18n:getText(AdvancedDamageSystem.REPAIR_TYPES.MEDIUM),
+            g_i18n:getText(AdvancedDamageSystem.REPAIR_TYPES.HIGH)
         }
     end
 
@@ -103,9 +103,34 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
     self.optionTwoText:setText(optionTwoText)
     self.optionTwo:setTexts(optionTwoOptions)
 
+    -- Keep selected options synchronized with actual UI state.
+    -- This avoids mismatches if callback parameters differ across UI elements.
+    if self.optionOne ~= nil and self.optionOne.getState ~= nil then
+        local optionOneState = tonumber(self.optionOne:getState())
+        if optionOneState ~= nil then
+            if self.maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE and AdvancedDamageSystem.MAINTENANCE_TYPES[optionOneState] ~= nil then
+                self.selectedOptionOne = AdvancedDamageSystem.MAINTENANCE_TYPES[optionOneState]
+            elseif self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR and AdvancedDamageSystem.REPAIR_TYPES[optionOneState] ~= nil then
+                self.selectedOptionOne = AdvancedDamageSystem.REPAIR_TYPES[optionOneState]
+            end
+        end
+    end
+
+    if self.optionTwo ~= nil and self.optionTwo.getState ~= nil then
+        local optionTwoState = tonumber(self.optionTwo:getState())
+        if optionTwoState ~= nil and AdvancedDamageSystem.PART_TYPES[optionTwoState] ~= nil then
+            self.selectedOptionTwo = AdvancedDamageSystem.PART_TYPES[optionTwoState]
+        end
+    end
+
+    self.optionTwo:setDisabled(self.selectedOptionOne == AdvancedDamageSystem.REPAIR_TYPES.LOW)
+
     -- price, duration, finishtime
+    local isWarrantyRepair = self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR
+        and self.vehicle:isWarrantyRepairCovered(self.selectedOptionOne, self.selectedOptionTwo)
     local servicePrice = self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)
-    if self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR and self.vehicle:isWarrantyRepairCovered(self.selectedOptionTwo) then
+
+    if isWarrantyRepair then
         self.maintenancePrice:setText(g_i18n:getText("ads_option_menu_price_text") .. g_i18n:getText("ads_option_menu_warranty_repair_text"))
     else
         self.maintenancePrice:setText(g_i18n:getText("ads_option_menu_price_text") .. g_i18n:formatMoney(servicePrice))
@@ -123,13 +148,13 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
             g_i18n:getText("ads_option_menu_maintenance_extended_description")
         }
         self.optionOneDisclaimer:setText(optionOneDisclaimers[ADS_Utils.getIndexByValue(AdvancedDamageSystem.MAINTENANCE_TYPES, self.selectedOptionOne)] or "")
-        else
+    else
         optionOneDisclaimers = {
-            g_i18n:getText("ads_option_menu_repair_urgency_medium_description"),
-            g_i18n:getText("ads_option_menu_repair_urgency_low_description"),
-            g_i18n:getText("ads_option_menu_repair_urgency_high_description")
+            g_i18n:getText("ads_option_menu_repair_type_fix_description"),
+            g_i18n:getText("ads_option_menu_repair_type_replacement_description"),
+            g_i18n:getText("ads_option_menu_repair_type_with_related_parts_description")
         }
-        self.optionOneDisclaimer:setText(optionOneDisclaimers[ADS_Utils.getIndexByValue(AdvancedDamageSystem.REPAIR_URGENCY, self.selectedOptionOne)] or "")
+        self.optionOneDisclaimer:setText(optionOneDisclaimers[ADS_Utils.getIndexByValue(AdvancedDamageSystem.REPAIR_TYPES, self.selectedOptionOne)] or "")
     end
 
     local optionTwoDisclaimers = {
@@ -158,7 +183,7 @@ function ADS_MaintenanceThreeOptionsDialog:onClickOptionOne(index)
     if self.maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
         self.selectedOptionOne = AdvancedDamageSystem.MAINTENANCE_TYPES[index]
     elseif self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
-        self.selectedOptionOne = AdvancedDamageSystem.REPAIR_URGENCY[index]
+        self.selectedOptionOne = AdvancedDamageSystem.REPAIR_TYPES[index]
     end
     self:updateScreen()
 end

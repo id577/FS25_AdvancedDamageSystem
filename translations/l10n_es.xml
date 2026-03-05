@@ -289,9 +289,9 @@
         <text name="ads_spec_overhaul_partial" text="Parcial"/>
         <text name="ads_spec_overhaul_standard" text="Estándar"/>
         <text name="ads_spec_overhaul_full" text="Lleno"/>
-        <text name="ads_spec_repair_urgency_low" text="Prioridad baja"/>
-        <text name="ads_spec_repair_urgency_medium" text="Cola estándar"/>
-        <text name="ads_spec_repair_urgency_high" text="Urgente"/>
+        <text name="ads_spec_repair_type_fix" text="Apaño"/>
+        <text name="ads_spec_repair_type_replacement" text="Estándar"/>
+        <text name="ads_spec_repair_type_with_related_parts" text="Cambio completo"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Seleccione el tipo de inspección"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Reparar fallas descubiertas"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Seleccione el nivel de mantenimiento"/>
@@ -314,9 +314,9 @@
         <text name="ads_option_menu_maintenance_minimal_description" text="*Servicio básico. Significativamente más barato y más rápido, pero no restablece completamente el nivel de servicio."/>
         <text name="ads_option_menu_maintenance_standard_description" text="*Mantenimiento de rutina según especificaciones del fabricante. Restaura el nivel de servicio a la normalidad."/>
         <text name="ads_option_menu_maintenance_extended_description" text="* Servicio integral. Lleva más tiempo y cuesta más, pero aumenta el nivel de servicio en aproximadamente un 20 % adicional"/>
-        <text name="ads_option_menu_repair_urgency_low_description" text="* Trabajo de relleno cuando los mecánicos están libres. Tarda un 50% más, pero ofrece un 10% de descuento en mano de obra."/>
-        <text name="ads_option_menu_repair_urgency_medium_description" text="* Horario estándar del taller. Coste de mano de obra equilibrado y duración de la reparación."/>
-        <text name="ads_option_menu_repair_urgency_high_description" text="* Equipo de reparación de emergencia. Reduce el tiempo de inactividad en un 50%, pero aumenta el costo laboral en un 10%."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Una reparación rápida para llegar al final de la temporada, pero con alta probabilidad de que la avería vuelva"/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Sustitución estándar del componente averiado"/>
+        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Reparación con sustitución de todas las piezas relacionadas. Restaura ligeramente el estado general del subsistema"/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Restaura la condición al nivel normal y requiere menos tiempo y recursos que una revisión completa."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Trabajo integral en todos los componentes principales. Restaura la condición a buen nivel."/>
         <text name="ads_option_menu_overhaul_full_description" text="*Remanufactura completa. Alto costo y duración, pero restaura la condición a un nivel excelente."/>

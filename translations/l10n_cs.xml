@@ -289,9 +289,9 @@
         <text name="ads_spec_overhaul_partial" text="部分的"/>
         <text name="ads_spec_overhaul_standard" text="标准"/>
         <text name="ads_spec_overhaul_full" text="满的"/>
-        <text name="ads_spec_repair_urgency_low" text="低优先级"/>
-        <text name="ads_spec_repair_urgency_medium" text="标准队列"/>
-        <text name="ads_spec_repair_urgency_high" text="紧迫的"/>
+        <text name="ads_spec_repair_type_fix" text="临时修理"/>
+        <text name="ads_spec_repair_type_replacement" text="标准"/>
+        <text name="ads_spec_repair_type_with_related_parts" text="全部更换"/>
         <text name="ads_option_menu_option_one_title_inspection" text="选择检查类型"/>
         <text name="ads_option_menu_option_two_title_inspection" text="修复发现的故障"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="选择维护级别"/>
@@ -314,9 +314,9 @@
         <text name="ads_option_menu_maintenance_minimal_description" text="* 基本服务。明显更便宜、更快，但并不能完全恢复服务水平。"/>
         <text name="ads_option_menu_maintenance_standard_description" text="* 根据制造商规范进行日常维护。将服务级别恢复到正常。"/>
         <text name="ads_option_menu_maintenance_extended_description" text="* 综合服务。需要更长的时间，成本更高，但服务水平可额外提高约 20%"/>
-        <text name="ads_option_menu_repair_urgency_low_description" text="* 机械师有空时填补工作。耗时 50%，但提供 10% 的人工折扣。"/>
-        <text name="ads_option_menu_repair_urgency_medium_description" text="* 标准研讨会日程。平衡人工成本和维修工期。"/>
-        <text name="ads_option_menu_repair_urgency_high_description" text="* 紧急抢修小组。停机时间减少 50%，但人工成本增加 10%。"/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* 快速修理，能撑到季末，但故障很可能会再次发生"/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* 标准更换损坏的部件"/>
+        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* 更换所有相关部件的维修。略微恢复子系统的整体状态"/> 
         <text name="ads_option_menu_overhaul_partial_description" text="* 将状况恢复到正常水平，并且比全面检修所需的时间和资源更少。"/>
         <text name="ads_option_menu_overhaul_standard_description" text="* 所有主要组件的综合工作。将状况恢复到良好水平。"/>
         <text name="ads_option_menu_overhaul_full_description" text="* 完全再制造。高成本和持续时间，但将状况恢复到出色的水平。"/>
