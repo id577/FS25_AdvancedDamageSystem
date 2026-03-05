@@ -385,6 +385,8 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "updateThermalSystems", AdvancedDamageSystem.updateThermalSystems)
     SpecializationUtil.registerFunction(vehicleType, "updateEngineThermalModel", AdvancedDamageSystem.updateEngineThermalModel)
     SpecializationUtil.registerFunction(vehicleType, "updateTransmissionThermalModel", AdvancedDamageSystem.updateTransmissionThermalModel)
+    SpecializationUtil.registerFunction(vehicleType, "getSmoothedTemperature", AdvancedDamageSystem.getSmoothedTemperature)
+    
     SpecializationUtil.registerFunction(vehicleType, "resetAiWorkerCruiseControlState", AdvancedDamageSystem.resetAiWorkerCruiseControlState)
     SpecializationUtil.registerFunction(vehicleType, "getAiWorkerImplementSpeedLimit", AdvancedDamageSystem.getAiWorkerImplementSpeedLimit)
     SpecializationUtil.registerFunction(vehicleType, "updateAiWorkerCruiseControl", AdvancedDamageSystem.updateAiWorkerCruiseControl)
@@ -1297,6 +1299,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
         self:updateThermalSystems(spec.effectsUpdateTimer)
+        self:getSmoothedTemperature(spec.effectsUpdateTimer)
     end
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
@@ -1314,6 +1317,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     if spec == nil then return end
  
     self:updateThermalSystems(dt)
+    self:getSmoothedTemperature(dt)
 
     if self:isUnderService() then
         self:processService(dt)
@@ -4188,11 +4192,10 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
         end
     end
     
-    local alpha = dt / (C.TAU + dt)
+   
 
     spec.rawEngineTemperature = spec.rawEngineTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
     spec.rawEngineTemperature = math.max(spec.rawEngineTemperature, eviromentTemp)
-    spec.engineTemperature = math.max(spec.engineTemperature + alpha * (spec.rawEngineTemperature - spec.engineTemperature), eviromentTemp)
     
     local dbg = spec.debugData.engineTemp
 
@@ -4271,10 +4274,8 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         end
     end
 
-    local alpha = dt / (C.TAU + dt)
     spec.rawTransmissionTemperature = spec.rawTransmissionTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
     spec.rawTransmissionTemperature = math.max(spec.rawTransmissionTemperature, eviromentTemp)
-    spec.transmissionTemperature = math.max(spec.transmissionTemperature + alpha * (spec.rawTransmissionTemperature - spec.transmissionTemperature), eviromentTemp)
 
     if isMotorStarted and spec.transmissionTemperature > C.TRANS_THERMOSTAT_MIN_TEMP then
         spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
@@ -4380,6 +4381,24 @@ function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, the
     end
 
     return math.clamp(math.floor(newPos / stiction) * stiction, 0.0, maxOpening)
+end
+
+function AdvancedDamageSystem:getSmoothedTemperature(dt)
+    local C = ADS_Config.THERMAL
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    local alpha = dt / (C.TAU + dt)
+    local eviromentTemp = g_currentMission.environment.weather.forecast:getCurrentWeather().temperature or 0
+    local motor = self:getMotor()
+    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+
+    spec.engineTemperature = math.max((spec.engineTemperature or 0) + alpha * (spec.rawEngineTemperature - (spec.engineTemperature or 0)), eviromentTemp)
+    if vehicleHaveCVT then
+        spec.transmissionTemperature = math.max((spec.transmissionTemperature or 0) + alpha * (spec.rawTransmissionTemperature - (spec.transmissionTemperature or 0)), eviromentTemp)
+    end
 end
 
 -- ==========================================================

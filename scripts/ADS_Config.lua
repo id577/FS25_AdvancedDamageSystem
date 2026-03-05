@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 56,
+    VER = 57,
 
     DEBUG = false,
 
@@ -66,7 +66,7 @@ ADS_Config = {
             SERVICE_EXPIRED_MULTIPLIER = 10.0,
             MOTOR_IDLING_THRESHOLD = 0.3,
             MOTOR_OVERLOADED_MULTIPLIER = 1.0, -- 1
-            MOTOR_OVERLOADED_THRESHOLD = 0.80,
+            MOTOR_OVERLOADED_THRESHOLD = 0.90,
             COLD_MOTOR_THRESHOLD = 50,         -- 3
             COLD_MOTOR_MULTIPLIER = 50.0,
             OVERHEAT_MOTOR_MULTIPLIER = 50.0,  -- 3
@@ -76,7 +76,7 @@ ADS_Config = {
         TRANSMISSION_FACTOR_DATA = {
             TRANSMISSION_IDLING_MULTIPLIER = 0.2,
             SERVICE_EXPIRED_MULTIPLIER = 6.0,
-            PULL_OVERLOAD_MULTIPLIER = 2.0,    
+            PULL_OVERLOAD_MULTIPLIER = 1.0,    
             PULL_OVERLOAD_THRESHOLD = 0.82,
             PULL_OVERLOAD_TIMER_THRESHOLD = 30,
             LUGGING_MULTIPLIER = 5.0,       
@@ -101,7 +101,7 @@ ADS_Config = {
             OPERATING_FACTOR_MULTIPLIER = 5.0,
             COLD_OIL_MULTIPLIER = 100,
             COLD_OIL_THRESHOLD = 30,
-            PTO_OPERATING_FACTOR = 0.5,
+            PTO_OPERATING_FACTOR = 0.0,
             PTO_SHARP_ANGLE_FACTOR_MULTIPLIER = 10.0,
             PTO_SHARP_ANGLE_FACTOR_THRESHOLD = 20.0
         },
@@ -109,8 +109,8 @@ ADS_Config = {
         COOLING_FACTOR_DATA = {
             COOLING_IDLING_MULTIPLIER = 0.2,
             SERVICE_EXPIRED_MULTIPLIER = 6.0,
-            HIGH_COOLING_FACTOR_MULTIPLIER = 3.0,
-            HIGH_COOLING_FACTOR_THRESHOLD = 0.8,
+            HIGH_COOLING_FACTOR_MULTIPLIER = 1.0,
+            HIGH_COOLING_FACTOR_THRESHOLD = 0.9,
             OVERHEAT_FACTOR_MULTIPLIER = 20.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
             COLD_SHOCK_FACTOR_MULTIPLIER = 20.0,
@@ -119,7 +119,7 @@ ADS_Config = {
 
         ELECTRICAL_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 2.0,
-            CRANKING_STRESS_DAMAGE = 0.0001,
+            CRANKING_STRESS_DAMAGE = 0.00001,
             CRANKING_STRESS_THRESHOLD = 5,
             RAIN_FACTOR_MULTIPLIER = 0.5,
             SNOW_FACTOR_MULTIPLIER = 0.3,
@@ -134,7 +134,7 @@ ADS_Config = {
             CHASSIS_IDLING_MULTIPLIER = 0.2,
             VIB_FACTOR_THRESHOLD = 0.08,
             VIB_FACTOR_MAX_SIGNAL = 0.22,
-            VIB_FACTOR_MULTIPLIER = 10.0,
+            VIB_FACTOR_MULTIPLIER = 4.0,
             VIB_FIELD_MULTIPLIER = 1.3,
             STEER_LOAD_FACTOR_MULTIPLIER = 5.0,
             STEER_LOAD_SPEED_THRESHOLD = 4.0,
@@ -169,8 +169,8 @@ ADS_Config = {
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
             IDLE_DEPOSIT_FACTOR_MAX_TIMER = 600,
             HIGH_PRESSURE_FACTOR_MULTIPLIER = 1.0,
-            HIGH_PRESSURE_FACTOR_THRESHOLD = 0.95,
-            HIGH_PRESSURE_FACTOR_THRESSHOLD = 0.95
+            HIGH_PRESSURE_FACTOR_THRESHOLD = 0.9,
+            HIGH_PRESSURE_FACTOR_THRESSHOLD = 0.9
         },
 
         STRESS_COOLDOWN = 0.5,
