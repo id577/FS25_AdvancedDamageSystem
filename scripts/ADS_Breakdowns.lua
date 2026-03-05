@@ -2412,12 +2412,22 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
         log_dbg("Applying ENGINE_STALLS_CHANCE effect.")
         local effectName = handler.getEffectName()
         local activeFunc = function(v, dt)
+
+            -- In this case the entire method runs only on the server. 
+            -- If the effect triggers (engine stalls) — 
+            -- we simply shut down the engine on clients via an event.
+
+            -- MP: broadcastEvent server check
+
             if v:getIsMotorStarted() then
                 local effect = v.spec_AdvancedDamageSystem.activeEffects.ENGINE_STALLS_CHANCE
                 if effect and effect.value > 0 then
                     if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                         if v.stopMotor then
                             v:stopMotor()
+
+                            -- MP: broadcastEvent broadcastEvent (stopMotor, showBlinkingWarning)
+
                             if v.getIsControlled ~= nil and v:getIsControlled() then
                                 g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000) 
                             end
@@ -2560,11 +2570,15 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
             vehicle.spec_AdvancedDamageSystem.originalFunctions[originalShiftFuncName] = motor.shiftGear
         end
 
+        -- Standard pattern — check for failed shift on the server and send the resulting state to clients.
+
         motor.shiftGear = function(m, up)
             if effectData.extraData.status == "FAILED" then return end
-            if math.random() < effectData.value then
-                log_dbg("GEAR SHIFT FAILED! (shiftGear)")
+            if math.random() < effectData.value then -- MP: broadcastEvent server check
                 effectData.extraData.status = "FAILED"
+                
+                -- MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
+
                 if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                     g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                 end
@@ -2583,9 +2597,11 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         motor.selectGear = function(m, gearIndex, activation)
             if effectData.extraData.status == "FAILED" then return end
             if activation then
-                if math.random() < effectData.value then
+                if math.random() < effectData.value then -- MP: broadcastEvent server check
                     effectData.extraData.status = "FAILED"
-                    log_dbg("GEAR SHIFT FAILED! (selectGear)")
+
+                    -- MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
+
                     if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                        g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                     end
@@ -2609,21 +2625,22 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
             local isShifting = (m.gear == 0 and m.gearChangeTimer > 0)
             
             if isShifting and not wasShifting then
-                if math.random() < effectData.value then
-                    log_dbg("GEAR SHIFT FAILED! (updateGear)")
+                if math.random() < effectData.value then -- MP: broadcastEvent server check
+                
                     effectData.extraData.status = "FAILED"
                     effectData.extraData.timer = 0            
 
                     m.gearChangeTimer = effectData.extraData.duration
                     m.autoGearChangeTimer = effectData.extraData.duration
                     
+                    -- MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", effectData.extraData.timer = 0,  motor.gearChangeTimer, m.autoGearChangeTimer = effectData.extraData.duration,  playSample)
+
                     if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                         g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                     end
-                    
-                    if effectData.value >= 1.0 then
-                        m.targetGear = m.previousGear
-                    end
+                end
+                if effectData.value >= 1.0 then
+                    m.targetGear = m.previousGear
                 end
             end
 
@@ -2705,12 +2722,22 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
                             effect.extraData.status = 'IDLE'
                             g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                         end
-                    elseif v:getMotorLoadPercentage() > 0.8 and effect.extraData.status == 'IDLE' then
+
+                    -- This is where it checks if a gear has just been rejected. 
+                    -- Then timers are started that lock the gearbox for a short time. 
+                    -- The roll is done on the server, and if the random triggers, 
+                    -- we set effect.extraData.status = 'REJECTED' and reset the timer — 
+                    -- on the clients the gear will automatically get locked as well.
+
+                    elseif v:getMotorLoadPercentage() > 0.8 and effect.extraData.status == 'IDLE' then  -- MP: broadcastEvent server check
                         if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                             effect.extraData.status = 'REJECTED'
                             effect.extraData.timer = 0
                             if motor and motor.setGear then
                                 motor:setGear(0, false)
+
+                                -- MP: broadcastEvent broadcastEvent(motor:setGear(0, false), effect.extraData.status = 'REJECTED', effect.extraData.timer = 0, playSample, showBlinkingWarning)
+                                
                                 if v.getIsControlled ~= nil and v:getIsControlled() then
                                     g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples.gearDisengage1)
                                     g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_gear_disengage_message", 3000)) 
@@ -2760,11 +2787,18 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
                             effect.extraData.timer = 0
                             v:setLightsTypesMask(effect.extraData.maskBackup, true, true)
 
-                        elseif effect.extraData.status == 'IDLE' then
+                        -- This is where the headlight flickering process starts. 
+                        -- The server checks and triggers it, 
+                        -- clients will start flickering the headlights once they see the field status == 'FLICKERING'.
+            
+                        elseif effect.extraData.status == 'IDLE' then   -- MP: broadcastEvent broadcastEvent server check
                             if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                                 effect.extraData.maskBackup = v:getLightsTypesMask()
                                 if effect.extraData.maskBackup == 0 then return end
                                 effect.extraData.status = 'FLICKING'
+
+                                -- MP: broadcastEvent broadcastEvent broadcastEvent (effect.extraData.status = 'FLICKING')
+
                             end
                         end
                     end
@@ -2811,13 +2845,16 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
                     extra.timer = 0
                 end
             elseif vehicle:getMotorLoadPercentage() > extra.motorLoad then
-                if effectData.value > 0 and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effectData.value) and extra.status == "IDLE" then
+                if effectData.value > 0 and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effectData.value) and extra.status == "IDLE" then -- MP: broadcastEvent server check
+                    
                     local cruiseState = vehicle:getCruiseControlState()
                     if cruiseState ~= 0 then
                         extra.cruiseState = cruiseState
                         vehicle:setCruiseControlState(0, true)
                     end
                     extra.status = "CHOKING"
+
+
                 end
             end
         end
@@ -2887,6 +2924,11 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
             end
         end
 
+        -- As I understand it, startMotor will be triggered on the client first, 
+        -- and we need to notify the server about it. 
+        -- In that case, the dice roll would be better performed on the client (IMHO), 
+        -- and the result then sent to the server.
+
         if self.spec_AdvancedDamageSystem.activeEffects.ENGINE_START_FAILURE_CHANCE then
             local startFailureEffect = spec.activeEffects.ENGINE_START_FAILURE_CHANCE
             if startFailureEffect ~= nil and startFailureEffect.extraData == nil then
@@ -2901,9 +2943,9 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
                 extra.status = tostring(extra.status or "IDLE")
             end
 
-            local START_FAIL_RETRY_MULTIPLIER = 0.66 -- next attempt: chance * 0.66
-            local START_FAIL_TEMP_REFERENCE = 25 -- deg C
-            local START_FAIL_TEMP_PER_DEGREE = 0.01 -- +1% fail chance per degree below reference
+            local START_FAIL_RETRY_MULTIPLIER = 0.66
+            local START_FAIL_TEMP_REFERENCE = 25
+            local START_FAIL_TEMP_PER_DEGREE = 0.01
 
             if startFailureEffect and extra ~= nil and extra.status ~= "IDLE" then
                 log_dbg(string.format("[ADS][START_FAIL] blocked: status=%s timer=%.0f", tostring(extra.status), tonumber(extra.timer) or 0))
@@ -2922,10 +2964,13 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
                 local isFailedStart = roll < failChance
 
                 if isFailedStart then
+
+                    -- MP: send event 
                     extra.status = "CRANKING"
                     extra.timer = 0
                     extra.currentCount = failedAttempts + 1
                     setMotorStartedFlagForStarterDamage(self)
+                    -- MP: send event (extra.status = "CRANKING", extra.timer = 0, extra.currentCount = failedAttempts + 1, setMotorStartedFlagForStarterDamage(self))
                     return
                 end
 

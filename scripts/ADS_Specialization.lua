@@ -1189,6 +1189,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
         return
     end
 
+    --- MP: server check
     --- Registration in ADS_Main.vehicles and first load checks.
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil then
         if (self.propertyState == 2 or self.propertyState == 3 or self.propertyState == 4) and self.ownerFarmId ~= 0 and self.ownerFarmId < 10 then
@@ -1227,16 +1228,26 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     if self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
 
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
+    
+    --- MP: server check
     if spec.year >= 2000 then
         local overheatProtectionId = 'OVERHEAT_PROTECTION'
         local overheatProtection = self:getActiveBreakdowns()[overheatProtectionId]
         if overheatProtection and spec.transmissionTemperature < 100 and spec.engineTemperature < 100 then
-            self:removeBreakdown(overheatProtectionId)    
+            self:removeBreakdown(overheatProtectionId)
         end
         if self:getIsMotorStarted() then
             if (spec.transmissionTemperature > 105 or spec.engineTemperature > 105) and not overheatProtection then
+
+                -- There are probably already events or another way to synchronize breakdowns when they are added, 
+                -- removed, or progress to the next stage (addBreakdown(), removeBreakdown(), advanceBreakdown() ???)
+
                 self:addBreakdown(overheatProtectionId, 1)
                 if self.getIsControlled ~= nil and self:getIsControlled() then
+
+                    -- probably need a common event for playing sounds on the client side, 
+                    -- which accepts the type of sound to be played as an argument (if that's possible)
+
                     g_soundManager:playSample(spec.samples.alarm)
                 end
             elseif overheatProtection then
@@ -1270,6 +1281,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
        end
     end
 
+    --- MP: it can be done on the client side
     --- Cold engine message
     if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
             local spec_motorized = self.spec_motorized
@@ -1281,6 +1293,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
     end
 
+    --- MP: server.
     --- Messages, stop ai worker
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
@@ -1295,17 +1308,23 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
         end
     end
 
+    --- MP: server. in the method itself, 
+    --- where the cruise speed is set - self:setCruiseControlMaxSpeed(targetSpeed, nil) - 
+    --- as I understand, nil - is that the event
+
     --- ai worker overload, temp control
     if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL then
         self:updateAiWorkerCruiseControl(spec.effectsUpdateTimer)
     end
 
+    --- MP: server.
     --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
         self:updateThermalSystems(spec.effectsUpdateTimer)
         self:getSmoothedTemperature(spec.effectsUpdateTimer)
     end
 
+    --- MP: clients!!!
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeFunctions) ~= nil then
         for _ , func in pairs(spec.activeFunctions) do
@@ -3441,38 +3460,38 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
                     local existingEffect = aggregatedEffects[effectId]
 
                     if existingEffect == nil then
-                        local newEffect = ADS_Utils.shallowCopy(effectData)
+                        local newEffect = ADS_Utils.deepCopy(effectData)
                         newEffect.value = newValue 
                         aggregatedEffects[effectId] = newEffect
                     else
                         if strategy == "sum" then
                             if math.abs(newValue) > math.abs(existingEffect.value) then
-                                existingEffect.extraData = effectData.extraData
+                                existingEffect.extraData = ADS_Utils.deepCopy(effectData.extraData)
                             end
                             existingEffect.value = existingEffect.value + newValue
 
                         elseif strategy == "multiply" then
                             if math.abs(newValue - 1) > math.abs(existingEffect.value - 1) then
-                                existingEffect.extraData = effectData.extraData
+                                existingEffect.extraData = ADS_Utils.deepCopy(effectData.extraData)
                             end
                             existingEffect.value = existingEffect.value * newValue
                         
                         elseif strategy == "min" then
                             if newValue < existingEffect.value then
                                 existingEffect.value = newValue
-                                existingEffect.extraData = effectData.extraData 
+                                existingEffect.extraData = ADS_Utils.deepCopy(effectData.extraData)
                             end
 
                         elseif strategy == "max" then
                             if newValue > existingEffect.value then
                                 existingEffect.value = newValue
-                                existingEffect.extraData = effectData.extraData 
+                                existingEffect.extraData = ADS_Utils.deepCopy(effectData.extraData)
                             end
                         
                         elseif strategy == "boolean_or" then
                             existingEffect.value = existingEffect.value or newValue
                             if newValue == true and (existingEffect.value == false or existingEffect.value == nil) then
-                                existingEffect.extraData = effectData.extraData
+                                existingEffect.extraData = ADS_Utils.deepCopy(effectData.extraData)
                             end
                         end
                     end

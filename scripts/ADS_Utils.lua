@@ -667,5 +667,25 @@ function ADS_Utils.shallowCopy(original)
     return result
 end
 
+function ADS_Utils.deepCopy(original, seen)
+    if type(original) ~= "table" then
+        return original
+    end
+
+    seen = seen or {}
+    if seen[original] ~= nil then
+        return seen[original]
+    end
+
+    local result = {}
+    seen[original] = result
+
+    for key, value in pairs(original) do
+        local copiedKey = ADS_Utils.deepCopy(key, seen)
+        result[copiedKey] = ADS_Utils.deepCopy(value, seen)
+    end
+
+    return result
+end
 
 
