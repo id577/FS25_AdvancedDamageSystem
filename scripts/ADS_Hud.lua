@@ -60,9 +60,9 @@ function ADS_Hud:new()
     }
 
     self.activeVehicleDebugPanel = {
-        x = 0.25,
+        x = 0.20,
         y = 0.05,
-        width = 0.5,
+        width = 0.60,
         padding = 0.01,
         lineHeight = 0.012,
         background = self.modDirectory .. "hud/ads_debugHud.dds",
@@ -110,9 +110,7 @@ function ADS_Hud:draw()
         return
     end
 
-    if ADS_Config.DEBUG then
-        self:drawManagerHUD()
-    end
+    -- manager debug panel temporarily disabled
 
     if ADS_Config.DEBUG and self.vehicle ~= nil and self.activeVehicleDebugPanel.isVisible then
         self:drawActiveVehicleHUD()
@@ -404,11 +402,6 @@ function ADS_Hud:drawActiveVehicleHUD()
         }
     end
 
-    if ADS_Hud.debugViewMode == "factorStats" then
-        self:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSize, activeNormalSize, activeLineHeight, sectionGap)
-        return
-    end
-
     local breakdownEntries = {}
     if spec.activeBreakdowns and next(spec.activeBreakdowns) ~= nil then
         for id, breakdown in pairs(spec.activeBreakdowns) do
@@ -478,6 +471,14 @@ function ADS_Hud:drawActiveVehicleHUD()
         return 0
     end
 
+    local function isSystemEnabled(systemKey)
+        local systemData = spec.systems and spec.systems[systemKey]
+        if type(systemData) == "table" then
+            return systemData.enabled ~= false
+        end
+        return true
+    end
+
     local engineDbg = spec.debugData.engine or {}
     local transmissionDbg = spec.debugData.transmission or {}
     local hydraulicsDbg = spec.debugData.hydraulics or {}
@@ -487,6 +488,20 @@ function ADS_Hud:drawActiveVehicleHUD()
     local fuelDbg = spec.debugData.fuel or {}
     local workprocessDbg = spec.debugData.workprocess or {}
     local serviceDbg = spec.debugData.service or {}
+
+    local overviewLines = {}
+    local serviceWearRate = serviceDbg.totalWearRate or ADS_Config.CORE.BASE_SERVICE_WEAR or 0
+    local weatherFactor = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+    addLine(overviewLines, string.format(
+        "service: %.2f%% (service_wear: %.2f%%) | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s",
+        asPercent(spec.serviceLevel or 0),
+        asPercent(serviceWearRate),
+        asPercent(spec.reliability or 0),
+        asPercent(spec.maintainability or 0),
+        weatherFactor,
+        tostring(spec.isUnderRoof == true)
+    ), {1, 1, 1, 1}, 0.95)
+
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
         engineDbg.expiredServiceFactor or 0,
@@ -548,170 +563,152 @@ function ADS_Hud:drawActiveVehicleHUD()
         workprocessDbg.wetCropFactor or 0
     ) * bcw
 
-    local overviewLines = {}
-    local serviceWearRate = serviceDbg.totalWearRate or ADS_Config.CORE.BASE_SERVICE_WEAR or 0
-    local weatherFactor = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-    addLine(overviewLines, string.format(
-        "service: %.2f%% (service_wear: %.2f%%) | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s",
-        asPercent(spec.serviceLevel or 0),
-        asPercent(serviceWearRate),
-        asPercent(spec.reliability or 0),
-        asPercent(spec.maintainability or 0),
-        weatherFactor,
-        tostring(spec.isUnderRoof == true)
-    ), {1, 1, 1, 1}, 0.95)
+    local factorStats = {}
+    for rawSystemKey, rawStats in pairs(spec.factorStats or {}) do
+        if type(rawStats) == "table" then
+            factorStats[string.lower(tostring(rawSystemKey))] = rawStats
+        end
+    end
 
-    local engineLines = {}
-    addLine(engineLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% mlf: %.2f%% cmf: %.2f%% hmf %.2f%% | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("engine")),
-        asPercent((engineDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("engine")),
-        asPercent((engineDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((engineDbg.weatherFactor or 0) * bcw),
-        asPercent((engineDbg.motorLoadFactor or 0) * bcw),
-        asPercent((engineDbg.coldMotorFactor or 0) * bcw),
-        asPercent((engineDbg.hotMotorFactor or 0) * bcw),
-        asPercent(engineDbg.breakdownProbability or 0),
-        asPercent(engineDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(engineMaxFactor), 0.95)
+    local function getAccumulatedStat(systemKey, statKey)
+        local stats = factorStats[string.lower(tostring(systemKey))]
+        if type(stats) ~= "table" then
+            return 0
+        end
+        return tonumber(stats[statKey]) or 0
+    end
 
-    local transmissionLines = {}
-    addLine(transmissionLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% pof: %.2f%% (%.1fs) htf: %.2f%% lf: %.2f%% wsf: %.2f%% (wsi: %.2f%%) ctf: %.2f%% hotf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("transmission")),
-        asPercent((transmissionDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("transmission")),
-        asPercent((transmissionDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((transmissionDbg.weatherFactor or 0) * bcw),
-        asPercent((transmissionDbg.pullOverloadFactor or 0) * bcw),
-        (transmissionDbg.pullOverloadTimer or 0),
-        asPercent((transmissionDbg.heavyTrailerFactor or 0) * bcw),
-        asPercent((transmissionDbg.luggingFactor or 0) * bcw),
-        asPercent((transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0) * bcw),
-        asPercent(transmissionDbg.wheelSlipIntensity or 0),
-        asPercent(((transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0) * bcw),
-        asPercent((transmissionDbg.hotTransFactor or 0) * bcw),
-        asPercent(transmissionDbg.breakdownProbability or 0),
-        asPercent(transmissionDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(transmissionMaxFactor), 0.95)
+    local function formatFactorLine(systemKey, shortName, factorValue, statKey, extraInfo)
+        local currentPct = asPercent((factorValue or 0) * bcw)
+        local sumPct = asPercent(getAccumulatedStat(systemKey, statKey))
+        if extraInfo ~= nil and tostring(extraInfo) ~= "" then
+            return string.format("%s: %.2f (%s, %.2f)", shortName, currentPct, tostring(extraInfo), sumPct)
+        end
+        return string.format("%s: %.2f (%.2f)", shortName, currentPct, sumPct)
+    end
 
-    local function buildDefaultSystemLines(systemKey)
-        local systemDbg = spec.debugData[systemKey] or {}
-        local systemMaxFactor = math.max(systemDbg.expiredServiceFactor or 0, systemDbg.weatherFactor or 0) * bcw
+    local function buildSystemLines(systemKey, dbg, maxFactor, factorEntries)
         local lines = {}
         addLine(lines, string.format(
-            "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
+            "C: %.1f (-%.2f)",
             asPercent(getSystemCondition(systemKey)),
-            asPercent((systemDbg.totalWearRate or 0) * bcw),
+            asPercent((dbg.totalWearRate or 0) * bcw)
+        ), getConditionFactorColor(maxFactor), 0.84)
+        addLine(lines, string.format(
+            "S: %.2f (%.2f)",
             asPercent(getSystemStress(systemKey)),
-            asPercent((systemDbg.expiredServiceFactor or 0) * bcw),
-            asPercent((systemDbg.weatherFactor or 0) * bcw),
-            asPercent(systemDbg.breakdownProbability or 0),
-            asPercent(systemDbg.critBreakdownProbability or 0)
-        ), getConditionFactorColor(systemMaxFactor), 0.95)
+            asPercent(getAccumulatedStat(systemKey, "stress"))
+        ), {1, 1, 1, 1}, 0.84)
+
+        for _, entry in ipairs(factorEntries) do
+            addLine(
+                lines,
+                formatFactorLine(systemKey, entry.shortName, entry.value, entry.statKey, entry.extraInfo),
+                {0.92, 0.96, 1.0, 1},
+                0.80
+            )
+        end
+
+        addLine(lines, string.format(
+            "B: %.2f | %.2f",
+            asPercent(dbg.breakdownProbability or 0),
+            asPercent(dbg.critBreakdownProbability or 0)
+        ), {1, 0.82, 0.82, 1}, 0.80)
+
         return lines
     end
 
-    local hydraulicsLines = {}
-    addLine(hydraulicsLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% hlf: %.2f%% (mr: %.2f%%) of: %.2f%% cof: %.2f%% ptof: %.2f%% saf: %.2f%% (%.1fdeg) | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("hydraulics")),
-        asPercent((hydraulicsDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("hydraulics")),
-        asPercent((hydraulicsDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((hydraulicsDbg.weatherFactor or 0) * bcw),
-        asPercent((hydraulicsDbg.heavyLiftFactor or 0) * bcw),
-        asPercent(hydraulicsDbg.heavyLiftMassRatio or 0),
-        asPercent((hydraulicsDbg.operatingFactor or 0) * bcw),
-        asPercent((hydraulicsDbg.coldOilFactor or 0) * bcw),
-        asPercent((hydraulicsDbg.ptoOperatingFactor or 0) * bcw),
-        asPercent((hydraulicsDbg.sharpAngleFactor or 0) * bcw),
-        (hydraulicsDbg.ptoSharpAngleDeg or 0),
-        asPercent(hydraulicsDbg.breakdownProbability or 0),
-        asPercent(hydraulicsDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(hydraulicsMaxFactor), 0.95)
-    local coolingLines = {}
-    addLine(coolingLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% hcf: %.2f%% (ts: %.1f%%) ohf: %.2f%% csf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("cooling")),
-        asPercent((coolingDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("cooling")),
-        asPercent((coolingDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((coolingDbg.weatherFactor or 0) * bcw),
-        asPercent((coolingDbg.highCoolingFactor or 0) * bcw),
-        asPercent(spec.thermostatState or 0),
-        asPercent((coolingDbg.overheatFactor or 0) * bcw),
-        asPercent((coolingDbg.coldShockFactor or 0) * bcw),
-        asPercent(coolingDbg.breakdownProbability or 0),
-        asPercent(coolingDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(coolingMaxFactor), 0.95)
-    local electricalLines = {}
-    addLine(electricalLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% ltf: %.2f%% ohf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("electrical")),
-        asPercent((electricalDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("electrical")),
-        asPercent((electricalDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((electricalDbg.weatherFactor or 0) * bcw),
-        asPercent((electricalDbg.lightsFactor or 0) * bcw),
-        asPercent((electricalDbg.overheatFactor or 0) * bcw),
-        asPercent(electricalDbg.breakdownProbability or 0),
-        asPercent(electricalDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(electricalMaxFactor), 0.95)
-    local chassisLines = {}
-    addLine(chassisLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% vf: %.2f%% (raw: %.2f%% sig: %.2f%%) slf: %.2f%% bmf: %.2f%% (mr: %.2f p: %.2f%%) | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("chassis")),
-        asPercent((chassisDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("chassis")),
-        asPercent((chassisDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((chassisDbg.weatherFactor or 0) * bcw),
-        asPercent((chassisDbg.vibFactor or 0) * bcw),
-        asPercent(chassisDbg.vibRaw or 0),
-        asPercent(chassisDbg.vibSignal or 0),
-        asPercent((chassisDbg.steerLoadFactor or 0) * bcw),
-        asPercent(chassisDbg.steerInputAbs or 0),
-        asPercent(chassisDbg.steerDeltaRate or 0),
-        asPercent(chassisDbg.steerLowSpeedFactor or 0),
-        asPercent((chassisDbg.brakeMassFactor or 0) * bcw),
-        (chassisDbg.brakeMassRatio or 0),
-        asPercent(chassisDbg.brakePedal or 0),
-        asPercent(chassisDbg.breakdownProbability or 0),
-        asPercent(chassisDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(chassisMaxFactor), 0.95)
-    local fuelLines = {}
-    addLine(fuelLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lff: %.2f%% (lvl: %.2f%%) cff: %.2f%% (ft: %.1fC) idf: %.2f%% (t: %.0fs) hpf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("fuel")),
-        asPercent((fuelDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("fuel")),
-        asPercent((fuelDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((fuelDbg.weatherFactor or 0) * bcw),
-        asPercent((fuelDbg.lowFuelStarvationFactor or 0) * bcw),
-        asPercent(fuelDbg.fuelLevel or 0),
-        asPercent((fuelDbg.coldFuelFactor or 0) * bcw),
-        (fuelDbg.fuelTemperature or 0),
-        asPercent((fuelDbg.idleDepositFactor or 0) * bcw),
-        (fuelDbg.idleTimer or 0),
-        asPercent((fuelDbg.highPressureFactor or 0) * bcw),
-        asPercent(fuelDbg.breakdownProbability or 0),
-        asPercent(fuelDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(fuelMaxFactor), 0.95)
-    local workprocessLines = {}
-    addLine(workprocessLines, string.format(
-        "con: %.2f%% (-%.2f%%) | stress: %.2f%% | sf: %.2f%% wf: %.2f%% lhf: %.2f%% (t: %.0fs) wcf: %.2f%% | breakdown: %.2f%% crit: %.2f%%",
-        asPercent(getSystemCondition("workprocess")),
-        asPercent((workprocessDbg.totalWearRate or 0) * bcw),
-        asPercent(getSystemStress("workprocess")),
-        asPercent((workprocessDbg.expiredServiceFactor or 0) * bcw),
-        asPercent((workprocessDbg.weatherFactor or 0) * bcw),
-        asPercent((workprocessDbg.longHarvestFactor or 0) * bcw),
-        (workprocessDbg.longHarvestTimer or 0),
-        asPercent((workprocessDbg.wetCropFactor or 0) * bcw),
-        asPercent(workprocessDbg.breakdownProbability or 0),
-        asPercent(workprocessDbg.critBreakdownProbability or 0)
-    ), getConditionFactorColor(workprocessMaxFactor), 0.95)
+    local engineLines = buildSystemLines("engine", engineDbg, engineMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = engineDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = engineDbg.weatherFactor or 0 },
+        { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0 },
+        { shortName = "cmf", statKey = "cmf", value = engineDbg.coldMotorFactor or 0 },
+        { shortName = "hmf", statKey = "hmf", value = engineDbg.hotMotorFactor or 0 }
+    })
+
+    local transmissionLines = buildSystemLines("transmission", transmissionDbg, transmissionMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = transmissionDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = transmissionDbg.weatherFactor or 0 },
+        { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("t: %.1fs", transmissionDbg.pullOverloadTimer or 0) },
+        { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
+        { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("wsi: %.2f", asPercent(transmissionDbg.wheelSlipIntensity or 0)) },
+        { shortName = "ctf", statKey = "ctf", value = (transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0 },
+        { shortName = "hotf", statKey = "hotf", value = transmissionDbg.hotTransFactor or 0 }
+    })
+
+    local hydraulicsLines = buildSystemLines("hydraulics", hydraulicsDbg, hydraulicsMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = hydraulicsDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = hydraulicsDbg.weatherFactor or 0 },
+        { shortName = "hlf", statKey = "hlf", value = hydraulicsDbg.heavyLiftFactor or 0, extraInfo = string.format("mr: %.2f", asPercent(hydraulicsDbg.heavyLiftMassRatio or 0)) },
+        { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0 },
+        { shortName = "cof", statKey = "cof", value = hydraulicsDbg.coldOilFactor or 0 },
+        { shortName = "saf", statKey = "saf", value = hydraulicsDbg.sharpAngleFactor or 0, extraInfo = string.format("%.1f deg", hydraulicsDbg.ptoSharpAngleDeg or 0) }
+    })
+
+    local coolingLines = buildSystemLines("cooling", coolingDbg, coolingMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = coolingDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = coolingDbg.weatherFactor or 0 },
+        { shortName = "hcf", statKey = "hcf", value = coolingDbg.highCoolingFactor or 0, extraInfo = string.format("ts: %.1f", asPercent(spec.thermostatState or 0)) },
+        { shortName = "ohf", statKey = "ohf", value = coolingDbg.overheatFactor or 0 },
+        { shortName = "csf", statKey = "csf", value = coolingDbg.coldShockFactor or 0 }
+    })
+
+    local electricalLines = buildSystemLines("electrical", electricalDbg, electricalMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = electricalDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = electricalDbg.weatherFactor or 0 },
+        { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
+        { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 }
+    })
+
+    local chassisLines = buildSystemLines("chassis", chassisDbg, chassisMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = chassisDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = chassisDbg.weatherFactor or 0 },
+        { shortName = "vf", statKey = "vf", value = chassisDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(chassisDbg.vibRaw or 0), asPercent(chassisDbg.vibSignal or 0)) },
+        { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("d: %.2f", asPercent(chassisDbg.steerDeltaRate or 0)) },
+        { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("mr: %.2f", chassisDbg.brakeMassRatio or 0) }
+    })
+
+    local fuelLines = buildSystemLines("fuel", fuelDbg, fuelMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = fuelDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = fuelDbg.weatherFactor or 0 },
+        { shortName = "lff", statKey = "lff", value = fuelDbg.lowFuelStarvationFactor or 0, extraInfo = string.format("lvl: %.2f", asPercent(fuelDbg.fuelLevel or 0)) },
+        { shortName = "cff", statKey = "cff", value = fuelDbg.coldFuelFactor or 0, extraInfo = string.format("ft: %.1f C", fuelDbg.fuelTemperature or 0) },
+        { shortName = "idf", statKey = "idf", value = fuelDbg.idleDepositFactor or 0, extraInfo = string.format("t: %.0fs", fuelDbg.idleTimer or 0) },
+        { shortName = "hpf", statKey = "hpf", value = fuelDbg.highPressureFactor or 0 }
+    })
+
+    local workprocessLines = buildSystemLines("workprocess", workprocessDbg, workprocessMaxFactor, {
+        { shortName = "sf", statKey = "sf", value = workprocessDbg.expiredServiceFactor or 0 },
+        { shortName = "wf", statKey = "wf", value = workprocessDbg.weatherFactor or 0 },
+        { shortName = "lhf", statKey = "lhf", value = workprocessDbg.longHarvestFactor or 0, extraInfo = string.format("t: %.0fs", workprocessDbg.longHarvestTimer or 0) },
+        { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 }
+    })
+
+    local systemSections = {}
+    if isSystemEnabled("engine") then
+        table.insert(systemSections, {title = "Engine", lines = engineLines})
+    end
+    if isSystemEnabled("transmission") then
+        table.insert(systemSections, {title = "Transmission", lines = transmissionLines})
+    end
+    if isSystemEnabled("hydraulics") then
+        table.insert(systemSections, {title = "Hydraulics", lines = hydraulicsLines})
+    end
+    if isSystemEnabled("cooling") then
+        table.insert(systemSections, {title = "Cooling", lines = coolingLines})
+    end
+    if isSystemEnabled("electrical") then
+        table.insert(systemSections, {title = "Electrical", lines = electricalLines})
+    end
+    if isSystemEnabled("chassis") then
+        table.insert(systemSections, {title = "Chassis", lines = chassisLines})
+    end
+    if isSystemEnabled("fuel") then
+        table.insert(systemSections, {title = "Fuel", lines = fuelLines})
+    end
+    if isSystemEnabled("workprocess") then
+        table.insert(systemSections, {title = "Work Process", lines = workprocessLines})
+    end
 
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
@@ -853,16 +850,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         addLine(serviceDataLines, "rep: " .. listToString(pendingRepairQueue), {1, 0.95, 0.75, 1}, 0.95)
     end
 
+    local overviewSection = {title = "System", lines = overviewLines}
     local sections = {
-        {title = "System", lines = overviewLines},
-        {title = "Engine", lines = engineLines},
-        {title = "Transmission", lines = transmissionLines},
-        {title = "Hydraulics", lines = hydraulicsLines},
-        {title = "Cooling", lines = coolingLines},
-        {title = "Electrical", lines = electricalLines},
-        {title = "Chassis", lines = chassisLines},
-        {title = "Fuel", lines = fuelLines},
-        {title = "Work Process", lines = workprocessLines},
         {title = "Engine Temp", lines = engineTempLines}
     }
 
@@ -874,18 +863,53 @@ function ADS_Hud:drawActiveVehicleHUD()
     if isUnderService then
         table.insert(sections, {title = "Service Data", lines = serviceDataLines})
     end
-    table.insert(sections, {title = "Active Breakdowns", lines = breakdownLines})
-    table.insert(sections, {title = "Active Effects", lines = effectLines})
+    if #breakdownEntries > 0 then
+        table.insert(sections, {title = "Active Breakdowns", lines = breakdownLines})
+    end
+    if #effectEntries > 0 then
+        table.insert(sections, {title = "Active Effects", lines = effectLines})
+    end
 
     if #aiCruiseLines > 0 then
         table.insert(sections, {title = "AI Cruise Control", lines = aiCruiseLines})
     end
 
+    local systemColumns = math.min(8, math.max(#systemSections, 1))
+    local systemGapX = 0.00012
+    local systemGapY = sectionGap * 0.16
+    local systemRows = (#systemSections > 0) and math.ceil(#systemSections / systemColumns) or 0
+    local rowHeights = {}
+    local totalSystemHeight = 0
+
+    for row = 1, systemRows do
+        local rowMaxLines = 0
+        for col = 1, systemColumns do
+            local index = (row - 1) * systemColumns + col
+            local section = systemSections[index]
+            if section ~= nil then
+                rowMaxLines = math.max(rowMaxLines, #section.lines)
+            end
+        end
+        local rowHeight = (rowMaxLines + 1) * activeLineHeight
+        rowHeights[row] = rowHeight
+        totalSystemHeight = totalSystemHeight + rowHeight
+    end
+    if systemRows > 1 then
+        totalSystemHeight = totalSystemHeight + (systemRows - 1) * systemGapY
+    end
+
     local totalSectionHeight = 0
+    local allLinearSections = {}
+    table.insert(allLinearSections, overviewSection)
     for _, section in ipairs(sections) do
+        table.insert(allLinearSections, section)
+    end
+
+    for _, section in ipairs(allLinearSections) do
         totalSectionHeight = totalSectionHeight + (math.max(#section.lines, 1) * activeLineHeight)
     end
-    totalSectionHeight = totalSectionHeight + (math.max(#sections - 1, 0) * sectionGap)
+    totalSectionHeight = totalSectionHeight + (math.max(#allLinearSections - 1, 0) * sectionGap)
+    totalSectionHeight = totalSectionHeight + sectionGap + totalSystemHeight
 
     local dynamicHeight = (panel.padding * 2) + activeHeaderSize + totalSectionHeight + 0.02
     if panel.background ~= nil then
@@ -932,11 +956,50 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
     end
 
-    for index, section in ipairs(sections) do
-        drawSection(section)
-        if index < #sections then
-            currentY = currentY - sectionGap
+    drawSection(overviewSection)
+    currentY = currentY - sectionGap
+
+    if #systemSections > 0 then
+        local gridStartX = textStartX
+        local gridAvailableWidth = panel.width - panel.padding * 2
+        local cardWidth = (gridAvailableWidth - (systemColumns - 1) * systemGapX) / systemColumns
+        local rowY = currentY
+
+        for row = 1, systemRows do
+            local rowHeight = rowHeights[row] or activeLineHeight
+            for col = 1, systemColumns do
+                local index = (row - 1) * systemColumns + col
+                local section = systemSections[index]
+                if section ~= nil then
+                    local cardX = gridStartX + (col - 1) * (cardWidth + systemGapX)
+                    local cardY = rowY
+                    setTextColor(1, 1, 1, 1)
+                    renderText(cardX, cardY, activeNormalSize, section.title .. ":")
+
+                    local cardLineY = cardY - activeLineHeight
+                    for _, line in ipairs(section.lines) do
+                        local lineText = line.text or ""
+                        local lineColor = line.color or {1, 1, 1, 1}
+                        local lineSize = activeNormalSize * (line.sizeScale or 1.0)
+                        setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
+                        renderText(cardX + 0.003, cardLineY, lineSize, lineText)
+                        cardLineY = cardLineY - activeLineHeight
+                    end
+                end
+            end
+
+            rowY = rowY - rowHeight
+            if row < systemRows then
+                rowY = rowY - systemGapY
+            end
         end
+
+        currentY = currentY - totalSystemHeight
+    end
+
+    for index, section in ipairs(sections) do
+        currentY = currentY - sectionGap
+        drawSection(section)
     end
 
     setTextColor(1, 1, 1, 1)
@@ -1162,11 +1225,17 @@ function ADS_Hud:drawManagerHUD()
 
     table.sort(vehicleLines)
 
-    local totalLines = #vehicleLines + 1
+    local maxVehicleLines = 20
+    local shownVehicleCount = math.min(#vehicleLines, maxVehicleLines)
+    local hiddenVehicleCount = math.max(#vehicleLines - shownVehicleCount, 0)
+    local hasOverflowLine = hiddenVehicleCount > 0
+
+    local totalLines = shownVehicleCount + 1 + (hasOverflowLine and 1 or 0)
     local dynamicHeight = (panel.padding * 2) + textSettings.headerSize + (totalLines * panel.lineHeight)
+    local panelY = panel.y - dynamicHeight
 
     if panel.background ~= nil then
-        local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
+        local overlay = Overlay.new(panel.background, panel.x, panelY, panel.width, dynamicHeight)
         overlay:setColor(1, 1, 1, 0.7)
         overlay:render()
     end
@@ -1174,16 +1243,23 @@ function ADS_Hud:drawManagerHUD()
     setTextColor(unpack(textSettings.color))
     
     local textStartX = panel.x + panel.padding
-    local currentY = panel.y + dynamicHeight - panel.padding - 0.005
+    local currentY = panel.y - panel.padding - 0.005
 
     setTextAlignment(RenderText.ALIGN_LEFT)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
     setTextBold(true)
     renderText(textStartX, currentY, textSettings.headerSize, "ADS Monitored Vehicles")
     setTextBold(false)
 
-    for _, line in ipairs(vehicleLines) do
+    for i = 1, shownVehicleCount do
+        local line = vehicleLines[i]
         currentY = currentY - panel.lineHeight
         renderText(textStartX, currentY, textSettings.normalSize, line)
+    end
+
+    if hasOverflowLine then
+        currentY = currentY - panel.lineHeight
+        renderText(textStartX, currentY, textSettings.normalSize, string.format("and %d more vehicles...", hiddenVehicleCount))
     end
 
     setTextColor(1, 1, 1, 1)

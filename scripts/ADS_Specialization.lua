@@ -533,6 +533,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.extraConditionWear = 0
     self.spec_AdvancedDamageSystem.extraServiceWear = 0
     self.spec_AdvancedDamageSystem.extraBreakdownProbability = 0
+    self.spec_AdvancedDamageSystem.extraEngineHeat = 0
     
     self.spec_AdvancedDamageSystem.reliability = 1.0
     self.spec_AdvancedDamageSystem.maintainability = 1.0
@@ -1100,11 +1101,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.brakes1 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes1", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.brakes2 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes2", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.brakes3 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes3", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
-        spec.samples.turbocharger1 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turbocharger1", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
-        spec.samples.turbocharger2 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turbocharger2", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
-        spec.samples.turbocharger3 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turbocharger3", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
-        spec.samples.turbocharger4 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turbocharger4", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.turboWhistle = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turboWhistle", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.gearDisengage1 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "gearDisengage1", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.engineKnocking = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "engineKnocking", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+         spec.samples.valveTrainNoise = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "valveTrainNoise", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.maintenanceCompleted = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "maintenanceCompleted", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         delete(xmlSoundFile)
     else
@@ -1153,6 +1153,63 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         end
     end
 
+    local function enableOrDisableSystems(vehicle)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        for _, systemData in pairs(spec.systems) do
+            -- disable engine for electric vehicles
+            if systemData.name == AdvancedDamageSystem.SYSTEMS.ENGINE then
+                if spec.isElectricVehicle then
+                    systemData.enabled = false
+                end
+            -- disable transsmision for electric vehicles
+            elseif systemData.name == AdvancedDamageSystem.SYSTEMS.TRANSMISSION then
+                if spec.isElectricVehicle then
+                    systemData.enabled = false
+                end
+            -- disable hydralic for trucks, cars, motorbikes
+            elseif systemData.name == AdvancedDamageSystem.SYSTEMS.HYDRAULICS then
+                local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+                local vtype = vehicle.type.name
+                if storeItem.categoryName == "TRUCKS" or vtype == "car" or vtype == "carFillable" or vtype == "motorbike" then
+                    systemData.enabled = false
+                end
+            -- disable cooling for trucks, cars, motorbikes
+            elseif systemData.name == AdvancedDamageSystem.SYSTEMS.COOLING then
+                if spec.isElectricVehicle then
+                    systemData.enabled = false
+                end
+            -- electrical is  applicable for all vehicles
+            elseif systemData.name == AdvancedDamageSystem.SYSTEMS.ELECTRICAL then
+            -- chassis is applicable for all vehicles
+            elseif systemData.name == AdvancedDamageSystem.SYSTEMS.CHASSIS  then
+            --- disable fuel system for electric vehicles
+            elseif systemData.name == AdvancedDamageSystem.SYSTEMS.FUEL then
+                if spec.isElectricVehicle then
+                    systemData.enabled = false
+                end
+            --- disables workprocess systems for tractors, cars etc.
+            elseif systemData.name == AdvancedDamageSystem.SYSTEMS.WORKPROCESS then
+                local vtype = vehicle.type.name
+                if  vtype ~= 'combineDrivable' and
+                    vtype ~= 'combineCutter' and 
+                    vtype ~= 'combineCutterFruitPreparer' and -- add to yield sensor breakdown and test
+                    vtype ~= 'cottonHarvester' and -- add to yield sensor breakdown and test
+                    vtype ~= 'riceHarvester' and -- add to yield sensor breakdown and test
+                    vtype ~= 'vineHarvester' then -- add to yield sensor breakdown and test
+
+                        systemData.enabled = false
+                        -- ricePlanter
+                        -- balerDrivable
+                        -- selfPropelledMower
+                        -- woodHarvester
+                end
+            else
+                systemData.enabled = true
+            end
+        end
+    end
+
+    enableOrDisableSystems(self)
     resetIsMovingRecursive(self, {})
     self:recalculateAndApplyEffects()
 end
@@ -1662,7 +1719,7 @@ end
 -- service
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local newLevel = spec.serviceLevel - ADS_Config.CORE.BASE_SERVICE_WEAR / (60 * 60 * 1000) * dt
+    local newLevel = spec.serviceLevel - (ADS_Config.CORE.BASE_SERVICE_WEAR * (1 + spec.extraServiceWear)) / (60 * 60 * 1000) * dt
     spec.serviceLevel = math.max(newLevel, 0)
 end
 
@@ -1671,12 +1728,9 @@ function AdvancedDamageSystem:updateConditionLevel()
     local spec = self.spec_AdvancedDamageSystem
     local condition = 0
 
-    for system, health in pairs(spec.systems) do
-        local systemCondition = health
-        if type(health) == "table" then
-            systemCondition = health.condition or 1.0
-        end
-        condition = condition + systemCondition * (ADS_Config.CORE.SYSTEM_WEIGHTS[system] or 0)
+    for systemName, systemData in pairs(spec.systems) do
+        local systemCondition = systemData.condition
+        condition = condition + systemCondition * (ADS_Config.CORE.SYSTEM_WEIGHTS[systemName] or 0)
     end
     spec.conditionLevel = math.clamp(condition, 0.001, 1.0)
 end
@@ -1694,7 +1748,7 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     local baseWearRate = 1.0 / reliability
     local systemData = ensureSystemData(spec, systemName)
     wearRate = tonumber(wearRate) or baseWearRate
-    wearRate = wearRate / reliability
+    wearRate = wearRate * (1 + spec.extraConditionWear) / reliability
 
     local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
     local systemStressMultiplier = stressMultipliers[systemName] or 1.0
@@ -1779,6 +1833,11 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local baseWearRate = 1.0
     local wearRate = baseWearRate
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.engine.name)
+    local systemData = spec.systems.engine
+
+    if not systemData.enabled then
+        return
+    end
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1847,7 +1906,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     })
 end
 
--- transmission (pullOverload, lugging, heavyTrailer, slip, cvtCold, cvtOverheat)
+-- transmission (pullOverload, lugging, slip, cvtCold, cvtOverheat)
 function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
@@ -1860,6 +1919,10 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
+
+    if not systemData.enabled then
+        return
+    end
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -1880,31 +1943,20 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
 
         -- lugging factor
         if motorLoad > C.LUGGING_MOTORLOAD_THRESHOLD and rpmLoad < C.LUGGING_RPM_THRESHOLD and speed > 0.5 then
-            local minDiff = C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD
-            local currentDiff = motorLoad - rpmLoad
-            luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false)
+            local minDiff = math.max(C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD, 0)
+            local maxDiff = 1 - (1 - C.LUGGING_MOTORLOAD_THRESHOLD) + (1 - C.LUGGING_RPM_THRESHOLD)
+            local currentDiff = math.clamp(motorLoad - rpmLoad, 0.0, 1.0)
+            luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false, maxDiff)
             luggingFactor = luggingFactor * C.LUGGING_MULTIPLIER
             wearRate = wearRate + luggingFactor
-        end
-
-        -- heavy trailer
-        local vehicleMass = self:getTotalMass(true)
-        if vehicleMass > 0 then
-            local massRatio = (self:getTotalMass() - vehicleMass) / vehicleMass
-            if massRatio > C.HEAVY_TRAILER_THRESHOLD and motorLoad > C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD and speed > 0 then
-                heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(massRatio, C.HEAVY_TRAILER_THRESHOLD, false, 2.0)
-                local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD, false)
-                heavyTrailerFactor = heavyTrailerFactor * C.HEAVY_TRAILER_MULTIPLIER * motorLoadInf
-                wearRate = wearRate + heavyTrailerFactor
-            end
         end
 
         -- wheel slip (0 = no slip, 1 = max slip)
         if spec_wheels ~= nil and spec_wheels.wheels ~= nil then
             local sum = 0.0
             local cnt = 0
-            local bodySpeed = math.abs(self.lastSpeedReal or 0) -- m/ms
-            local minBodySpeed = 0.00002 -- ~0.072 km/h
+            local bodySpeed = math.abs(self.lastSpeedReal or 0)
+            local minBodySpeed = 0.00002
             local speedKmh = math.abs(speed or 0)
             local clamp = (MathUtil ~= nil and MathUtil.clamp) or math.clamp or function(value, minValue, maxValue)
                 if value < minValue then return minValue end
@@ -2044,6 +2096,7 @@ end
 function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.hydraulics.name)
+    local systemData = spec.systems.hydraulics
     local expiredServiceFactor = 0
     local weatherFactor = 0
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
@@ -2056,6 +2109,10 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local nextMoveAlphaCache = {}
     local vehicleMass = self.getTotalMass ~= nil and (self:getTotalMass(true) or 0) or 0
     local heavyLiftMassRatio, operatingMassRatio = 0, 0
+
+    if not systemData.enabled then
+        return
+    end
 
     local function getSupportWheelCount(vehicleObj)
         local supportWheelCount = 0
@@ -2399,11 +2456,16 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.cooling.name)
+    local systemData = spec.systems.cooling
     local expiredServiceFactor = 0
     local weatherFactor = 0
     local C = ADS_Config.CORE.COOLING_FACTOR_DATA
     local highCoolingFactor, overheatFactor, coldShockFactor = 0, 0, 0
     local wearRate = 1.0
+
+    if not systemData.enabled then
+        return
+    end
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
@@ -2474,10 +2536,14 @@ end
 function AdvancedDamageSystem:updateElectricalSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
-    local systemData = spec.systems[systemKey]
+    local systemData = spec.systems.electrical
     local expiredServiceFactor, weatherFactor, weatherExposureFactor, lightsFactor, overheatFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
+
+    if not systemData.enabled then
+        return
+    end
 
     local isMotorStarted = systemData.isMotorStarted or false
     local isOutdoor = not spec.isUnderRoof
@@ -2568,6 +2634,7 @@ end
 function AdvancedDamageSystem:updateChassisSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.chassis.name)
+    local systemData = spec.systems.chassis
     local expiredServiceFactor = 0
     local weatherFactor = 0
     local vibFactor = 0
@@ -2589,6 +2656,10 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local brakePedal = 0
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
     local wearRate = 1.0
+
+    if not systemData.enabled then
+        return
+    end
 
     local speed = tonumber(self.getLastSpeed ~= nil and self:getLastSpeed() or 0) or 0
 
@@ -2817,11 +2888,15 @@ end
 function AdvancedDamageSystem:updateFuelSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.fuel.name)
-    local systemData = spec.systems[systemKey]
+    local systemData = spec.systems.fuel
     local weatherFactor, lowFuelStarvationFactor, coldFuelFactor = 0, 0, 0
     local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
+
+    if not systemData.enabled then
+        return
+    end
 
     local function getFuelLevel()
         local fuelFillUnit = nil
@@ -2966,6 +3041,10 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local weatherFactor, longHarvestFactor, wetCropFactor = 0, 0, 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
+
+    if not systemData.enabled then
+        return
+    end
 
     local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
     local isTurnedOn = self.getIsTurnedOn ~= nil and self:getIsTurnedOn()
@@ -3354,59 +3433,7 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     end
 end
 
-function AdvancedDamageSystem:processWearBreakdowns(dt)
-    local spec = self.spec_AdvancedDamageSystem
-    if not spec or not spec.activeBreakdowns or next(spec.activeBreakdowns) == nil then
-        return
-    end
 
-    local C = ADS_Config.CORE
-    local effectsNeedRecalculation = false
-
-    for id, breakdown in pairs(self:getActiveBreakdowns()) do
-        local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
-
-        if registryEntry then
-            
-            if registryEntry.stages[breakdown.stage] then
-                local stageData = registryEntry.stages[breakdown.stage]
-                
-                if stageData.progressMultiplier and stageData.progressMultiplier > 0 then
-                    
-                    local canProgress = true
-                    if registryEntry.isCanProgress ~= nil then
-                        canProgress = registryEntry.isCanProgress(self)
-                    end
-
-                    if canProgress then
-                        breakdown.progressTimer = breakdown.progressTimer or 0
-                        breakdown.progressTimer = breakdown.progressTimer + dt
-                        
-                        local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
-
-                        if breakdown.progressTimer >= stageDuration then
-                            local maxStages = #registryEntry.stages
-                            
-                            if breakdown.stage < maxStages then
-                                breakdown.stage = breakdown.stage + 1
-                                breakdown.progressTimer = 0
-                                effectsNeedRecalculation = true
-
-                                if breakdown.stage == maxStages and registryEntry.stages[breakdown.stage].detectionChance > 0 then
-                                    breakdown.isVisible = true
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    if effectsNeedRecalculation then
-        self:recalculateAndApplyEffects()
-    end
-end
 
 function AdvancedDamageSystem:processPlannedBreakdowns(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -4249,7 +4276,8 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
 
     if isMotorStarted then
-        heat = C.ENGINE_MIN_HEAT + motorLoad * (C.ENGINE_MAX_HEAT - C.ENGINE_MIN_HEAT)
+        local engineMaxHeat = C.ENGINE_MAX_HEAT + spec.extraEngineHeat
+        heat = C.ENGINE_MIN_HEAT + motorLoad * (engineMaxHeat - C.ENGINE_MIN_HEAT)
         
         local dirtRadiatorMaxCooling = C.ENGINE_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
@@ -5876,16 +5904,68 @@ function AdvancedDamageSystem.ConsoleCommands:getDebugVehicleInfo(rawArgs)
     if not vehicle then return end
     
     local spec = vehicle.spec_AdvancedDamageSystem
+    local motor = vehicle:getMotor()
 
+    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
     print("--- Vehicle Debug Info ---")
     print(string.format("RawBrand: %s", g_brandManager:getBrandByIndex(vehicle:getBrand()).name))
     print(string.format("Name: %s", vehicle:getFullName()))
-    print(string.format("Type: %s", vehicle.type.name))
-    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-    print(string.format("Category: %s", storeItem.categoryName))
+    print(string.format("Type/Category: %s/%s", vehicle.type.name, storeItem.categoryName))
     print(string.format("Property state: %s", vehicle.propertyState))
-    local motor = vehicle:getMotor()
     print(string.format("Transmission: %s, %s, %s", motor.minForwardGearRatio, motor.gearType, motor.groupType))
+
+    local hasTurboBaseSound = false
+    local hasTurboCurrentConfigSound = false
+    local hasTurboAnyConfigSound = false
+    local hasTurboLoadedSample = false
+    local turboMotorConfigKey = "-"
+    local turboConfigIndices = {}
+    local motorConfigCount = 0
+
+    if vehicle.xmlFile ~= nil and vehicle.xmlFile.hasProperty ~= nil then
+        hasTurboBaseSound = vehicle.xmlFile:hasProperty("vehicle.motorized.sounds.blowOffValve")
+
+        local motorConfigIndex = 1
+        if vehicle.configurations ~= nil and vehicle.configurations.motor ~= nil then
+            motorConfigIndex = math.max(tonumber(vehicle.configurations.motor) or 1, 1)
+        end
+
+        turboMotorConfigKey = string.format("vehicle.motorized.motorConfigurations.motorConfiguration(%d)", motorConfigIndex - 1)
+        hasTurboCurrentConfigSound = vehicle.xmlFile:hasProperty(turboMotorConfigKey .. ".sounds.blowOffValve")
+
+        local maxScanCount = 64
+        for idx = 0, maxScanCount - 1 do
+            local cfgKey = string.format("vehicle.motorized.motorConfigurations.motorConfiguration(%d)", idx)
+            if not vehicle.xmlFile:hasProperty(cfgKey) then
+                break
+            end
+
+            motorConfigCount = motorConfigCount + 1
+            if vehicle.xmlFile:hasProperty(cfgKey .. ".sounds.blowOffValve") then
+                hasTurboAnyConfigSound = true
+                table.insert(turboConfigIndices, tostring(idx + 1))
+            end
+        end
+    end
+
+    local spec_motorized = vehicle.spec_motorized
+    if spec_motorized ~= nil and spec_motorized.samples ~= nil then
+        hasTurboLoadedSample = spec_motorized.samples.blowOffValve ~= nil
+    end
+
+    local turboConfigList = (#turboConfigIndices > 0) and table.concat(turboConfigIndices, ",") or "-"
+    local hasTurbo = hasTurboBaseSound or hasTurboCurrentConfigSound or hasTurboAnyConfigSound or hasTurboLoadedSample
+    print(string.format(
+        "Turbo detect: %s | base=%s | cfgCurrent=%s | cfgAny=%s (%s/%d) | sample=%s | motorCfgKey=%s",
+        tostring(hasTurbo),
+        tostring(hasTurboBaseSound),
+        tostring(hasTurboCurrentConfigSound),
+        tostring(hasTurboAnyConfigSound),
+        turboConfigList,
+        motorConfigCount,
+        tostring(hasTurboLoadedSample),
+        tostring(turboMotorConfigKey)
+    ))
 
     for _, entry in ipairs(spec.maintenanceLog) do
         for _, breakdown in pairs(entry.conditionData.selectedBreakdowns) do

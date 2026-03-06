@@ -305,32 +305,6 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    MATERIALFLOW_WEAR = {
-        system = systems.MATERIALFLOW,
-        isSelectable = false,
-        part = "ads_breakdowns_part_vehicle",
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {},
-                indicators = {}
-            }
-        }
-    },
-
     FUEL_WEAR = {
         system = systems.FUEL,
         isSelectable = false,
@@ -684,21 +658,13 @@ ADS_Breakdowns.BreakdownRegistry = {
     },
 
     -- engine
-    TURBOCHARGER_WEAR = {
-        isSelectable = false,
+    TURBOCHARGER_MALFUNCTION = { -- TO-DO: add names
+        isSelectable = true,
         system = systems.ENGINE,
         isApplicable = function(vehicle)
-            local motor = vehicle:getMotor()
-            local power = motor.peakMotorPower * 1.36
-            local spec = vehicle.spec_AdvancedDamageSystem
-            local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-            if power >= 150 
-            and (storeItem.categoryName == "TRACTORSL" or storeItem.categoryName == "TRACTORSM") 
-            and spec.year >= 2005 then
-                return true
-            else
-                return false
-            end
+            local name = vehicle:getFullName()
+            if name == "Fiat 160-90 DT" then return true end
+            return false
         end,
         probability = function(vehicle)
             return 1.0   
@@ -712,7 +678,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 0.8,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
-                    { id = "TURBOCHARGER_GRINDING_EFFECT", value = 0.2, aggregation = "max", extraData = {timer = 0, soundPlayed = false} },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.25, aggregation = "max", extraData = { sampleName = "turboWhistle" } },
                 }
             },
             {
@@ -724,7 +690,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
-                    { id = "TURBOCHARGER_GRINDING_EFFECT", value = 0.3, aggregation = "max", extraData = {timer = 0, soundPlayed = false} },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.35, aggregation = "max", extraData = { sampleName = "turboWhistle" } },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
@@ -737,10 +703,10 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0,
                 repairPrice = 3.2,
                 effects = {
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.45, aggregation = "sum" },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.40, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "TURBOCHARGER_GRINDING_EFFECT", value = 0.5, aggregation = "max", extraData = {timer = 0, soundPlayed = false} },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.6, aggregation = "max", extraData = { sampleName = "turboWhistle" } },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -754,11 +720,432 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 6.4,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.50, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.40, aggregation = "sum" },
-                    { id = "ENGINE_LIMP_EFFECT", value = -0.5, aggregation = "min", extraData = {reason = "TURBO_FAIL"}, disableAi = true}
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.60, aggregation = "sum" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" }, },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false },
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+    },
+    
+
+    -- Oil Pump Malfunction
+    -- Reduced oil pressure and unstable lubrication. 
+    -- Engine knocking appears, power drops, overheating risk increases, 
+    -- and in advanced stages the engine may stall or fail.
+
+    OIL_PUMP_MALFUNCTION = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.ENGINE,
+        isApplicable = function(vehicle)
+            return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_oil_pump_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0,
+                repairPrice = 1.2,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.30, aggregation = "max", extraData = { sampleName = "engineKnocking" } },
+                    { id = "ENGINE_HEAT_MODIFIER", value = 0.05, aggregation = "sum" },
+                    
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_oil_pump_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0,
+                repairPrice = 2.4,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.5, aggregation = "max", extraData = { sampleName = "engineKnocking" } },
+                    { id = "ENGINE_HEAT_MODIFIER", value = 0.15, aggregation = "sum" },
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_oil_pump_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.6,
+                repairPrice = 4.8,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.45, aggregation = "sum" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.8, aggregation = "max", extraData = { sampleName = "engineKnocking" } },
+                    { id = "ENGINE_HEAT_MODIFIER", value = 0.35, aggregation = "sum" },
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_oil_pump_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 9.6,
+                effects = {
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_oil_pump_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} },
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                
+                }
+            }
+        }
+    },
+
+    -- Valve Train Failure
+    -- Progressive wear of camshaft/rocker/valve components. 
+    -- Causes metallic ticking, rough running, loss of power at higher RPM, 
+    -- misfires under load, and eventual engine shutdown.
+
+    VALVE_TRAIN_MALFUNCTION = { -- TO-DO: $l10n
+        isSelectable = false,
+        system = systems.ENGINE,
+        isApplicable = function(vehicle)
+            return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            local spec = vehicle.spec_AdvancedDamageSystem
+            if spec.service < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
+                return 3.0
+            end
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_valve_train_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0,
+                repairPrice = 1.2,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.04, aggregation = "sum" },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.5, aggregation = "max", extraData = { sampleName = "valveTrainNoise" } },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.05, aggregation = "sum" },
+                    
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_valve_train_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0,
+                repairPrice = 2.4,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.7, aggregation = "max", extraData = { sampleName = "valveTrainNoise" } },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8, cruiseState = 0} }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_valve_train_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.6,
+                repairPrice = 4.8,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
+                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 1.0, aggregation = "max", extraData = { sampleName = "valveTrainNoise" } },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_valve_train_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 9.6,
+                effects = {
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_valve_train_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} },
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                
+                }
+            }
+        }
+    },
+
+    -- transmission system
+    MANUAL_TRANSMISSION_SLIP = {
+        isSelectable = true,
+        system = systems.TRANSMISSION,
+        isApplicable = function(vehicle)
+            local motor = vehicle:getMotor()
+            if not motor then return false end
+            return motor.minForwardGearRatio == nil
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            return vehicle:getLastSpeed() > 0.01
+        end,
+
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_transmission_slip_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.0,
+                repairPrice = 1.4,
+                effects = {
+                    { id = "TRANSMISSION_SLIP_EFFECT", value = 0.20, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_transmission_slip_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0,
+                repairPrice = 2.8,
+                effects = {
+                     { id = "TRANSMISSION_SLIP_EFFECT", value = 0.40, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" }
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_transmission_slip_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0,
+                repairPrice = 5.6, 
+                effects = { 
+                     { id = "TRANSMISSION_SLIP_EFFECT", value = 0.60, extraData = {accumulatedMod = 0.0}, aggregation = "max"},
+                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" }
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_transmission_slip_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 11.2, 
+                effects = { 
+                     { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_transmission_slip_stage4_message", disableAi = true}, aggregation = "max" }
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION = {
+        isSelectable = true,
+        system = systems.TRANSMISSION,
+        isApplicable = function(vehicle)
+            local motor = vehicle:getMotor()
+            if not motor then return false end
+            return motor.minForwardGearRatio == nil and motor.gearType ~= VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            local motor = vehicle:getMotor()
+            return (motor.gear == 0 and motor.gearChangeTimer > 0)
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.1,
+                repairPrice = 1.2,
+                effects = {
+                    { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max"},
+                    { id = "GEAR_REJECTION_CHANCE", value = 20.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.05,
+                repairPrice = 2.4,
+                effects = {
+                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.20, extraData = {timer = 0, status = 'IDLE', duration = 1800}, aggregation = "max"},
+                     { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.03,
+                repairPrice = 4.8, 
+                effects = { 
+                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.50, extraData = {timer = 0, status = 'IDLE', duration = 2200}, aggregation = "max"},
+                     { id = "GEAR_REJECTION_CHANCE", value = 3.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 9.6, 
+                effects = { 
+                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 1.00, extraData = {timer = 0, status = 'IDLE', duration = 2200, message = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_message", disableAi = true}, aggregation = "max"}
+                }
+            }
+        }
+    },
+
+    POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = {
+        isSelectable = true,
+        system = systems.TRANSMISSION,
+        isApplicable = function(vehicle)
+            local motor = vehicle:getMotor()
+            if not motor then return false end
+            return motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
+        end,
+        isCanProgress = function(vehicle)
+            return (vehicle:getLastSpeed() > 0.01)
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.5,
+                repairPrice = 2.0,
+                effects = {
+                    { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.2, extraData = {timer = 0, status = "IDLE", duration = 700, backup = 0}, aggregation = "max"}
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.5,
+                repairPrice = 4.0,
+                effects = {
+                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.5, extraData = {timer = 0, status = "IDLE", duration = 1000, backup = 0}, aggregation = "max"}
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.5,
+                repairPrice = 8.0, 
+                effects = { 
+                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.99, extraData = {timer = 0, status = "IDLE", duration = 1500, backup = 0}, aggregation = "max"}
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 16.0, 
+                effects = { 
+                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0, disableAi = true}, aggregation = "max"}
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    -- hydraulic system
+    HYDRAULIC_PUMP_MALFUNCTION = {
+        isSelectable = true,
+        system = systems.HYDRAULICS,
+        isApplicable = function(vehicle)
+            local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+            if storeItem.categoryName == "TRUCKS" then return false end
+            local vtype = vehicle.type.name
+            local spec = vehicle.spec_AdvancedDamageSystem
+            return vtype ~= "car" and vtype ~= "carFillable" and vtype ~= "motorbike" and spec.year >= 1960
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_hydraulic_pump_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.5,
+                repairPrice = 0.7,
+                effects = {
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.20, aggregation = "min" }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_hydraulic_pump_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.8,
+                repairPrice = 1.4,
+                effects = {
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.40, aggregation = "min" }
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_hydraulic_pump_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0,
+                repairPrice = 2.8, 
+                effects = { 
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.75, aggregation = "min" }
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_hydraulic_pump_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 5.6, 
+                effects = { 
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'ads_breakdowns_hydraulic_pump_malfunction_stage4_message', disableAi = true}, aggregation = "min" }
+                },
+                indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             }
@@ -1072,203 +1459,6 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- transmission system
-    TRANSMISSION_SLIP = {
-        isSelectable = true,
-        system = systems.TRANSMISSION,
-        isApplicable = function(vehicle)
-            local motor = vehicle:getMotor()
-            if not motor then return false end
-            return motor.minForwardGearRatio == nil
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        isCanProgress = function(vehicle)
-            return vehicle:getLastSpeed() > 0.01
-        end,
-
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_transmission_slip_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 1.4,
-                effects = {
-                    { id = "TRANSMISSION_SLIP_EFFECT", value = 0.20, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_transmission_slip_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 2.8,
-                effects = {
-                     { id = "TRANSMISSION_SLIP_EFFECT", value = 0.40, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
-                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" }
-                },
-                indicators = {
-                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_transmission_slip_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 5.6, 
-                effects = { 
-                     { id = "TRANSMISSION_SLIP_EFFECT", value = 0.60, extraData = {accumulatedMod = 0.0}, aggregation = "max"},
-                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" }
-                },
-                indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_transmission_slip_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 11.2, 
-                effects = { 
-                     { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_transmission_slip_stage4_message", disableAi = true}, aggregation = "max" }
-                },
-                indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
-    TRANSMISSION_SYNCHRONIZER_MALFUNCTION = {
-        isSelectable = true,
-        system = systems.TRANSMISSION,
-        isApplicable = function(vehicle)
-            local motor = vehicle:getMotor()
-            if not motor then return false end
-            return motor.minForwardGearRatio == nil and motor.gearType ~= VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        isCanProgress = function(vehicle)
-            local motor = vehicle:getMotor()
-            return (motor.gear == 0 and motor.gearChangeTimer > 0)
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0.1,
-                repairPrice = 1.2,
-                effects = {
-                    { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max"},
-                    { id = "GEAR_REJECTION_CHANCE", value = 20.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0.05,
-                repairPrice = 2.4,
-                effects = {
-                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.20, extraData = {timer = 0, status = 'IDLE', duration = 1800}, aggregation = "max"},
-                     { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0.03,
-                repairPrice = 4.8, 
-                effects = { 
-                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.50, extraData = {timer = 0, status = 'IDLE', duration = 2200}, aggregation = "max"},
-                     { id = "GEAR_REJECTION_CHANCE", value = 3.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 9.6, 
-                effects = { 
-                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 1.00, extraData = {timer = 0, status = 'IDLE', duration = 2200, message = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_message", disableAi = true}, aggregation = "max"}
-                }
-            }
-        }
-    },
-
-    POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = {
-        isSelectable = true,
-        system = systems.TRANSMISSION,
-        isApplicable = function(vehicle)
-            local motor = vehicle:getMotor()
-            if not motor then return false end
-            return motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
-        end,
-        isCanProgress = function(vehicle)
-            return (vehicle:getLastSpeed() > 0.01)
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 3.5,
-                repairPrice = 2.0,
-                effects = {
-                    { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.2, extraData = {timer = 0, status = "IDLE", duration = 500, backup = 0}, aggregation = "max"}
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 4.0,
-                effects = {
-                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.5, extraData = {timer = 0, status = "IDLE", duration = 700, backup = 0}, aggregation = "max"}
-                },
-                indicators = {
-                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.5,
-                repairPrice = 8.0, 
-                effects = { 
-                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.99, extraData = {timer = 0, status = "IDLE", duration = 1200, backup = 0}, aggregation = "max"}
-                },
-                indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 16.0, 
-                effects = { 
-                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0, disableAi = true}, aggregation = "max"}
-                },
-                indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
     -- cooling system
     CVT_THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
@@ -1394,73 +1584,6 @@ ADS_Breakdowns.BreakdownRegistry = {
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false },
-                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
-    -- hydraulic system
-    HYDRAULIC_PUMP_MALFUNCTION = {
-        isSelectable = true,
-        system = systems.HYDRAULICS,
-        isApplicable = function(vehicle)
-            local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-            if storeItem.categoryName == "TRUCKS" then return false end
-            local vtype = vehicle.type.name
-            local spec = vehicle.spec_AdvancedDamageSystem
-            return vtype ~= "car" and vtype ~= "carFillable" and vtype ~= "motorbike" and spec.year >= 1960
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_hydraulic_pump_malfunction_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 0.7,
-                effects = {
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.20, aggregation = "min" }
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_hydraulic_pump_malfunction_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.8,
-                repairPrice = 1.4,
-                effects = {
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.40, aggregation = "min" }
-                },
-                indicators = {
-                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_hydraulic_pump_malfunction_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 2.8, 
-                effects = { 
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.75, aggregation = "min" }
-                },
-                indicators = {
-                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_hydraulic_pump_malfunction_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 5.6, 
-                effects = { 
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'ads_breakdowns_hydraulic_pump_malfunction_stage4_message', disableAi = true}, aggregation = "min" }
-                },
-                indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             }
@@ -1856,7 +1979,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_TORQUE_MODIFIER = {
     end
 }
 
-
 -------------------- BRAKE_FORCE_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.BRAKE_FORCE_MODIFIER = {
     getOriginalFunctionName = function() return "updateVehiclePhysics" end,
@@ -1880,7 +2002,6 @@ ADS_Breakdowns.EffectApplicators.BRAKE_FORCE_MODIFIER = {
     end
 }
 
-
 ------------------ FUEL_CONSUMPTION_MODIFIER -----------------
 ADS_Breakdowns.EffectApplicators.FUEL_CONSUMPTION_MODIFIER = {
     getOriginalFunctionName = function() return "updateConsumers" end,
@@ -1902,7 +2023,6 @@ ADS_Breakdowns.EffectApplicators.FUEL_CONSUMPTION_MODIFIER = {
         restoreOrigFunc(vehicle, originalFuncName)
     end
 }
-
 
 ------------------ TRANSMISSION_SLIP_EFFECT -----------------
 ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
@@ -1986,7 +2106,6 @@ ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
     end
 }
 
-
 ----------------- CVT_THERMOSTAT_HEALTH_MODIFIER ----------------
 ADS_Breakdowns.EffectApplicators.CVT_THERMOSTAT_HEALTH_MODIFIER = {
     apply = function(vehicle, effectData, handler)
@@ -2019,7 +2138,6 @@ ADS_Breakdowns.EffectApplicators.CVT_THERMOSTAT_STUCK_EFFECT = {
         spec.transmissionThermostatStuckedPosition = nil
     end
 }
-
 
 ----------------- THERMOSTAT_HEALTH_MODIFIER -----------------
 ADS_Breakdowns.EffectApplicators.THERMOSTAT_HEALTH_MODIFIER = {
@@ -2140,7 +2258,6 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
     end
 }
 
-
 ---------------- HYDRAULIC_SPEED_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
@@ -2151,7 +2268,6 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
         log_dbg("Removing HYDRAULIC_SPEED_MODIFIER effect.")
     end
 }
-
 
 ---------------- YIELD_REDUCTION_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.YIELD_REDUCTION_MODIFIER = {
@@ -2186,7 +2302,6 @@ ADS_Breakdowns.EffectApplicators.YIELD_REDUCTION_MODIFIER = {
         restoreOrigFunc(vehicle, originalFuncName)
     end
 }
-
 
 ---------------- UNLOADING_SPEED_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.UNLOADING_SPEED_MODIFIER = {
@@ -2260,6 +2375,25 @@ ADS_Breakdowns.EffectApplicators.BREAKDOWN_PROBABILITIES_MODIFIER = {
         spec.extraBreakdownProbability = 0
     end
 }
+
+----------------- ENGINE_HEAT_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.ENGINE_HEAT_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying ENGINE_HEAT_MODIFIER:", effectData.value)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraEngineHeat = effectData.value
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing ENGINE_HEAT_MODIFIER effect.")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraEngineHeat = 0
+    end
+}
+
+-- ==========================================================
+--                VISUAL AND SOUND EFFECTS
+-- ==========================================================
 
 ----------------- IDLE_HUNTING_EFFECT -----------------
 ADS_Breakdowns.EffectApplicators.IDLE_HUNTING_EFFECT = {
@@ -2398,7 +2532,173 @@ ADS_Breakdowns.EffectApplicators.TURBOCHARGER_GRINDING_EFFECT = {
     end
 }
 
+ADS_Breakdowns.EffectApplicators.ENGINE_ABNORMAL_NOISE_EFFECT = {
+    getEffectName = function()
+        return "ENGINE_ABNORMAL_NOISE_EFFECT"
+    end,
 
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying ENGINE_ABNORMAL_NOISE_EFFECT effect")
+        local effectName = handler.getEffectName()
+
+        local activeFunc = function(v, dt)
+            local spec_ads = v.spec_AdvancedDamageSystem
+            if spec_ads == nil or spec_ads.samples == nil then return end
+            local motor = v:getMotor()
+            if motor == nil then return end
+
+            local function stopAndReset(sample)
+                if sample == nil then return end
+                if g_soundManager:getIsSamplePlaying(sample) then
+                    g_soundManager:stopSample(sample, 0, 0)
+                end
+                g_soundManager:setSampleVolumeOffset(sample, 0)
+                g_soundManager:setSamplePitchOffset(sample, 0)
+                if sample.adsOriginalLoops ~= nil then
+                    sample.loops = sample.adsOriginalLoops
+                end
+                if sample.adsOriginalVolumeScale ~= nil then
+                    sample.volumeScale = sample.adsOriginalVolumeScale
+                end
+            end
+
+            local currentEffect = spec_ads.activeEffects and spec_ads.activeEffects[effectName]
+            local currentExtraData = currentEffect and currentEffect.extraData or nil
+            local configuredExtraData = effectData and effectData.extraData or nil
+            local requestedSampleName = (currentExtraData and currentExtraData.sampleName)
+                or (configuredExtraData and configuredExtraData.sampleName)
+                or "engineKnocking"
+
+            local sampleName = requestedSampleName
+            local sample = spec_ads.samples[sampleName]
+            if sample == nil then
+                sampleName = "engineKnocking"
+                sample = spec_ads.samples.engineKnocking
+            end
+            if sample == nil then
+                sampleName = "valveTrainNoise"
+                sample = spec_ads.samples.valveTrainNoise
+            end
+
+            local prevSampleName = spec_ads.engineAbnormalNoiseSampleName
+            if prevSampleName ~= nil and prevSampleName ~= sampleName then
+                stopAndReset(spec_ads.samples[prevSampleName])
+            end
+
+            if sample == nil then
+                spec_ads.engineAbnormalNoiseSampleName = nil
+                return
+            end
+
+            if not v:getIsMotorStarted() then
+                stopAndReset(sample)
+                spec_ads.engineAbnormalNoiseSampleName = nil
+                return
+            end
+
+            local minRpm = tonumber(motor.minRpm) or 800
+            local maxRpm = math.max(tonumber(motor.maxRpm) or (minRpm + 1), minRpm + 1)
+            local lastRpm = (motor.getLastModulatedMotorRpm ~= nil and tonumber(motor:getLastModulatedMotorRpm())) or tonumber(motor.lastMotorRpm) or minRpm
+            local rpmN = math.clamp((lastRpm - minRpm) / (maxRpm - minRpm), 0, 1)
+            local loadN = math.clamp(tonumber(v:getMotorLoadPercentage()) or 0, 0, 1)
+            local accelN = math.clamp(math.abs(tonumber(motor.lastAcceleratorPedal) or 0), 0, 1)
+            local hotN = math.clamp(((tonumber(spec_ads.engineTemperature) or 0) - 70) / 40, 0, 1)
+            local baseVolumeScale = math.clamp(tonumber(currentEffect and currentEffect.value) or tonumber(effectData.value) or 1, 0, 2)
+
+            local dynamicIntensity =
+                (0.30 + 0.70 * rpmN)
+                * (0.65 + 0.35 * loadN)
+                * (0.70 + 0.30 * hotN)
+            dynamicIntensity = math.clamp(dynamicIntensity, 0, 1.6)
+
+            local turboGate = 1.0
+            if sampleName == "turboWhistle" then
+                local accelThreshold = 0.02
+                local targetGate = math.clamp((accelN - accelThreshold) / (1 - accelThreshold), 0, 1)
+                local previousGate = math.clamp(tonumber(spec_ads.engineAbnormalNoiseTurboGate) or 0, 0, 1)
+                local attackMs = 220
+                local releaseMs = 520
+                local responseMs = targetGate > previousGate and attackMs or releaseMs
+                local alpha = math.min((tonumber(dt) or 0) / math.max(responseMs, 1), 1)
+                turboGate = previousGate + (targetGate - previousGate) * alpha
+                turboGate = math.clamp(turboGate, 0, 1)
+                spec_ads.engineAbnormalNoiseTurboGate = turboGate
+
+                baseVolumeScale = baseVolumeScale * turboGate
+            else
+                spec_ads.engineAbnormalNoiseTurboGate = nil
+            end
+
+            if baseVolumeScale <= 0.02 then
+                if sampleName == "turboWhistle" and (spec_ads.engineAbnormalNoiseTurboGate or 0) > 0.001 then
+                    baseVolumeScale = 0.02
+                else
+                    stopAndReset(sample)
+                    spec_ads.engineAbnormalNoiseSampleName = nil
+                    spec_ads.engineAbnormalNoiseTurboGate = nil
+                    return
+                end
+            end
+
+            if sample.adsOriginalLoops == nil then
+                sample.adsOriginalLoops = sample.loops
+            end
+            if sample.adsOriginalVolumeScale == nil then
+                sample.adsOriginalVolumeScale = sample.volumeScale
+            end
+            sample.loops = 0
+            sample.volumeScale = sample.adsOriginalVolumeScale * baseVolumeScale
+
+            if not g_soundManager:getIsSamplePlaying(sample) then
+                g_soundManager:playSample(sample)
+            end
+
+            g_soundManager:setSampleVolumeOffset(sample, 0)
+            local pitchOffset
+            if sampleName == "turboWhistle" then
+                local accelThreshold = 0.02
+                local accelGate = math.clamp((accelN - accelThreshold) / (1 - accelThreshold), 0, 1)
+                local gate = math.clamp(tonumber(spec_ads.engineAbnormalNoiseTurboGate) or turboGate or 0, 0, 1)
+                pitchOffset = (0.20 * accelGate + 0.16 * (rpmN ^ 1.20) * accelGate + 0.03 * loadN * accelGate) * gate
+            else
+                pitchOffset = 0.24 * (rpmN ^ 1.35) + 0.04 * dynamicIntensity * rpmN
+            end
+            g_soundManager:setSamplePitchOffset(sample, pitchOffset)
+            spec_ads.engineAbnormalNoiseSampleName = sampleName
+        end
+        addFuncToActive(vehicle, effectName, activeFunc)
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing ENGINE_ABNORMAL_NOISE_EFFECT effect")
+
+        local spec_ads = vehicle.spec_AdvancedDamageSystem
+        if spec_ads ~= nil and spec_ads.samples ~= nil then
+            local function stopAndReset(sample)
+                if sample == nil then return end
+                if g_soundManager:getIsSamplePlaying(sample) then
+                    g_soundManager:stopSample(sample, 0, 0)
+                end
+                g_soundManager:setSampleVolumeOffset(sample, 0)
+                g_soundManager:setSamplePitchOffset(sample, 0)
+                if sample.adsOriginalLoops ~= nil then
+                    sample.loops = sample.adsOriginalLoops
+                end
+                if sample.adsOriginalVolumeScale ~= nil then
+                    sample.volumeScale = sample.adsOriginalVolumeScale
+                end
+            end
+
+            stopAndReset(spec_ads.samples.engineKnocking)
+            stopAndReset(spec_ads.samples.valveTrainNoise)
+            stopAndReset(spec_ads.samples.turboWhistle)
+            spec_ads.engineAbnormalNoiseSampleName = nil
+            spec_ads.engineAbnormalNoiseTurboGate = nil
+        end
+
+        removeFuncFromActive(vehicle, handler.getEffectName())
+    end
+}
 
 
 -- ==========================================================
