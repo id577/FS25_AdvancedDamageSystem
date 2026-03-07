@@ -889,7 +889,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     },
 
     -- transmission system
-    MANUAL_TRANSMISSION_SLIP = {
+    MANUAL_TRANSMISSION_CLUTCH_WEAR = {
         isSelectable = true,
         system = systems.TRANSMISSION,
         isApplicable = function(vehicle)
@@ -1077,6 +1077,76 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 16.0, 
                 effects = { 
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0, disableAi = true}, aggregation = "max"}
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    CVT_CHAIN_WEAR = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.TRANSMISSION,
+        isApplicable = function(vehicle)
+            local motor = vehicle:getMotor()
+            if not motor then return false end
+            return motor.minForwardGearRatio ~= nil
+        end,
+        isCanProgress = function(vehicle)
+            return (vehicle:getLastSpeed() > 0.01)
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_cvt_chain_wear_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.5,
+                repairPrice = 2.2,
+                effects = {
+                    { id = "CVT_SLIP_EFFECT", value = 0.2, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                    { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" }
+                    
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_cvt_chain_wear_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.5,
+                repairPrice = 4.4,
+                effects = {
+                     { id = "CVT_SLIP_EFFECT", value = 0.4, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
+                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.1, aggregation = "sum" }
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_cvt_chain_wear_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.5,
+                repairPrice = 8.8, 
+                effects = { 
+                     { id = "CVT_SLIP_EFFECT", value = 0.6, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
+                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.15, aggregation = "sum" }
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_cvt_chain_wear_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 17.6, 
+                effects = { 
+                     { id = "CVT_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_cvt_chain_wear_stage4_message", disableAi = true}, aggregation = "max" }
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -2106,6 +2176,87 @@ ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
     end
 }
 
+------------------ CVT_SLIP_EFFECT -----------------
+ADS_Breakdowns.EffectApplicators.CVT_SLIP_EFFECT = {
+    getOriginalFunctionName = function()
+        return "getMinMaxGearRatio"
+    end,
+
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying CVT_SLIP_EFFECT:", effectData.value)
+        local motor = vehicle:getMotor()
+        if motor == nil then return end
+        if motor.minForwardGearRatio == nil then return end
+
+        local originalFuncName = handler.getOriginalFunctionName()
+
+        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] == nil then
+            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = motor.getMinMaxGearRatio
+        end
+
+        motor.getMinMaxGearRatio = function(m)
+            local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+            local origMinRatio, origMaxRatio = originalFunc(m)
+            local minRatio, maxRatio = origMinRatio, origMaxRatio
+
+            local spec_ads = vehicle.spec_AdvancedDamageSystem
+            local slipEffect = spec_ads and spec_ads.activeEffects and spec_ads.activeEffects.CVT_SLIP_EFFECT
+            local modifier = (slipEffect and slipEffect.value) or 0
+
+            slipEffect.extraData = slipEffect.extraData or {}
+            local nowMs = (g_currentMission and g_currentMission.time) or 0
+            local lastUpdateMs = tonumber(slipEffect.extraData.lastUpdateMs) or nowMs
+            local dtSec = math.max((nowMs - lastUpdateMs) / 1000, 0)
+            if dtSec > 1 then dtSec = 1 end
+            slipEffect.extraData.lastUpdateMs = nowMs
+
+            local lastAccelerationFactor = tonumber(slipEffect.extraData.lastAccelerationFactor) or 0
+            local speedFactor = math.min(m.vehicle:getLastSpeed() / (m:getMaximumForwardSpeed() * 3.6 / 2), 1.0)
+            local loadFactor = vehicle:getMotorLoadPercentage() + 0.2
+            local massFactor = vehicle:getTotalMass() / vehicle:getTotalMass(true)
+
+            if modifier > 0 and origMinRatio ~= 0 and origMaxRatio ~= 0 then
+                local decatPerSecond = 0.01 / modifier * math.max(speedFactor, 0.1) * 1 / loadFactor * 1 / massFactor
+                local motorAccel = m.motorRotAccelerationSmoothed
+                local accelLimit = math.max(tonumber(m.motorRotationAccelerationLimit) or 0, 0.000001)
+                local accelerationFactor = math.clamp(motorAccel / accelLimit, 0, 1)
+                if accelerationFactor < lastAccelerationFactor then
+                    accelerationFactor = math.clamp(lastAccelerationFactor - decatPerSecond * dtSec, 0, 1)
+                end
+                slipEffect.extraData.lastAccelerationFactor = accelerationFactor
+
+                local clampMin = math.min(origMinRatio, origMinRatio * 10)
+                local clampMax = math.max(origMinRatio, origMinRatio * 10)
+                minRatio = math.clamp(m.gearRatio * accelerationFactor, clampMin, clampMax)
+                local lastDebugMs = tonumber(slipEffect.extraData.lastDebugMs) or 0
+
+
+                if nowMs - lastDebugMs >= 500 then
+                    slipEffect.extraData.lastDebugMs = nowMs
+                    print(string.format("[ADS][CVT_SLIP] accel=%.4f dt=%.4f minRatio=%.1f/%.1f gearRatio=%.1f decat=%.4f", accelerationFactor, dtSec, minRatio, origMinRatio, m.gearRatio, decatPerSecond))
+                end
+            end
+            return minRatio, maxRatio
+        end
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing CVT_SLIP_EFFECT effect.")
+        local motor = vehicle:getMotor()
+        if motor == nil then return end
+
+        local originalFuncName = handler.getOriginalFunctionName()
+        local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+
+        if originalFunc ~= nil then
+            motor.getMinMaxGearRatio = originalFunc
+            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = nil
+        end
+
+        motor:setExternalTorqueVirtualMultiplicator(1)
+    end
+}
+
 ----------------- CVT_THERMOSTAT_HEALTH_MODIFIER ----------------
 ADS_Breakdowns.EffectApplicators.CVT_THERMOSTAT_HEALTH_MODIFIER = {
     apply = function(vehicle, effectData, handler)
@@ -2388,6 +2539,21 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HEAT_MODIFIER = {
         log_dbg("Removing ENGINE_HEAT_MODIFIER effect.")
         local spec = vehicle.spec_AdvancedDamageSystem
         spec.extraEngineHeat = 0
+    end
+}
+
+----------------- TRANASMISSION_HEAT_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.ENGINE_HEAT_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying TRANASMISSION_HEAT_MODIFIER:", effectData.value)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraTransmissionHeat = effectData.value
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing TRANASMISSION_HEAT_MODIFIER effect.")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.extraTransmissionHeat = 0
     end
 }
 
@@ -2717,7 +2883,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
             -- If the effect triggers (engine stalls) — 
             -- we simply shut down the engine on clients via an event.
 
-            -- MP: broadcastEvent server check
+            -- TO-DO MP: broadcastEvent server check
 
             if v:getIsMotorStarted() then
                 local effect = v.spec_AdvancedDamageSystem.activeEffects.ENGINE_STALLS_CHANCE
@@ -2726,7 +2892,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
                         if v.stopMotor then
                             v:stopMotor()
 
-                            -- MP: broadcastEvent broadcastEvent (stopMotor, showBlinkingWarning)
+                            -- TO-DO MP: broadcastEvent broadcastEvent (stopMotor, showBlinkingWarning)
 
                             if v.getIsControlled ~= nil and v:getIsControlled() then
                                 g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000) 
@@ -2874,10 +3040,10 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
 
         motor.shiftGear = function(m, up)
             if effectData.extraData.status == "FAILED" then return end
-            if math.random() < effectData.value then -- MP: broadcastEvent server check
+            if math.random() < effectData.value then -- TO-DO MP: broadcastEvent server check
                 effectData.extraData.status = "FAILED"
                 
-                -- MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
+                -- TO-DO MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
 
                 if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                     g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
@@ -2897,10 +3063,10 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         motor.selectGear = function(m, gearIndex, activation)
             if effectData.extraData.status == "FAILED" then return end
             if activation then
-                if math.random() < effectData.value then -- MP: broadcastEvent server check
+                if math.random() < effectData.value then -- TO-DO MP: broadcastEvent server check
                     effectData.extraData.status = "FAILED"
 
-                    -- MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
+                    -- TO-DO MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
 
                     if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                        g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
@@ -2925,7 +3091,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
             local isShifting = (m.gear == 0 and m.gearChangeTimer > 0)
             
             if isShifting and not wasShifting then
-                if math.random() < effectData.value then -- MP: broadcastEvent server check
+                if math.random() < effectData.value then -- TO-DO MP: broadcastEvent server check
                 
                     effectData.extraData.status = "FAILED"
                     effectData.extraData.timer = 0            
@@ -2933,7 +3099,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
                     m.gearChangeTimer = effectData.extraData.duration
                     m.autoGearChangeTimer = effectData.extraData.duration
                     
-                    -- MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", effectData.extraData.timer = 0,  motor.gearChangeTimer, m.autoGearChangeTimer = effectData.extraData.duration,  playSample)
+                    -- TO-DO MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", effectData.extraData.timer = 0,  motor.gearChangeTimer, m.autoGearChangeTimer = effectData.extraData.duration,  playSample)
 
                     if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                         g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
@@ -3029,14 +3195,14 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
                     -- we set effect.extraData.status = 'REJECTED' and reset the timer — 
                     -- on the clients the gear will automatically get locked as well.
 
-                    elseif v:getMotorLoadPercentage() > 0.8 and effect.extraData.status == 'IDLE' then  -- MP: broadcastEvent server check
+                    elseif v:getMotorLoadPercentage() > 0.8 and effect.extraData.status == 'IDLE' then  -- TO-DO MP: broadcastEvent server check
                         if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                             effect.extraData.status = 'REJECTED'
                             effect.extraData.timer = 0
                             if motor and motor.setGear then
                                 motor:setGear(0, false)
 
-                                -- MP: broadcastEvent broadcastEvent(motor:setGear(0, false), effect.extraData.status = 'REJECTED', effect.extraData.timer = 0, playSample, showBlinkingWarning)
+                                -- TO-DO MP: broadcastEvent broadcastEvent(motor:setGear(0, false), effect.extraData.status = 'REJECTED', effect.extraData.timer = 0, playSample, showBlinkingWarning)
                                 
                                 if v.getIsControlled ~= nil and v:getIsControlled() then
                                     g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples.gearDisengage1)
@@ -3091,13 +3257,13 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
                         -- The server checks and triggers it, 
                         -- clients will start flickering the headlights once they see the field status == 'FLICKERING'.
             
-                        elseif effect.extraData.status == 'IDLE' then   -- MP: broadcastEvent broadcastEvent server check
+                        elseif effect.extraData.status == 'IDLE' then   -- TO-DO MP: broadcastEvent broadcastEvent server check
                             if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                                 effect.extraData.maskBackup = v:getLightsTypesMask()
                                 if effect.extraData.maskBackup == 0 then return end
                                 effect.extraData.status = 'FLICKING'
 
-                                -- MP: broadcastEvent broadcastEvent broadcastEvent (effect.extraData.status = 'FLICKING')
+                                -- TO-DO MP: broadcastEvent broadcastEvent broadcastEvent (effect.extraData.status = 'FLICKING')
 
                             end
                         end
@@ -3145,7 +3311,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
                     extra.timer = 0
                 end
             elseif vehicle:getMotorLoadPercentage() > extra.motorLoad then
-                if effectData.value > 0 and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effectData.value) and extra.status == "IDLE" then -- MP: broadcastEvent server check
+                if effectData.value > 0 and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effectData.value) and extra.status == "IDLE" then -- TO-DO MP: broadcastEvent server check
                     
                     local cruiseState = vehicle:getCruiseControlState()
                     if cruiseState ~= 0 then
@@ -3265,12 +3431,12 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
 
                 if isFailedStart then
 
-                    -- MP: send event 
+                    -- TO-DO MP: send event 
                     extra.status = "CRANKING"
                     extra.timer = 0
                     extra.currentCount = failedAttempts + 1
                     setMotorStartedFlagForStarterDamage(self)
-                    -- MP: send event (extra.status = "CRANKING", extra.timer = 0, extra.currentCount = failedAttempts + 1, setMotorStartedFlagForStarterDamage(self))
+                    -- TO-DO MP: send event (extra.status = "CRANKING", extra.timer = 0, extra.currentCount = failedAttempts + 1, setMotorStartedFlagForStarterDamage(self))
                     return
                 end
 

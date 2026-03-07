@@ -730,20 +730,25 @@ function ADS_Hud:drawActiveVehicleHUD()
     local transmissionTempLines = {}
     if showTransmissionSection then
         addLine(transmissionTempLines, string.format(
-            "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a: %.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f)",
+            "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a/p/ws: %.2f/%.2f/%.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f) | cvt: a/l=%d/%d eh=%.3f",
             spec.transmissionTemperature,
             spec.transmissionThermostatState,
-            spec.debugData.transmissionTemp.kp,
-            spec.debugData.transmissionTemp.stiction,
-            spec.debugData.transmissionTemp.waxSpeed,
-            spec.debugData.transmissionTemp.totalHeat,
-            spec.debugData.transmissionTemp.loadFactor,
-            spec.debugData.transmissionTemp.slipFactor,
-            spec.debugData.transmissionTemp.accFactor,
-            spec.debugData.transmissionTemp.totalCooling,
-            spec.debugData.transmissionTemp.radiatorCooling,
-            spec.debugData.transmissionTemp.speedCooling,
-            spec.debugData.transmissionTemp.convectionCooling
+            spec.debugData.transmissionTemp.kp or 0,
+            spec.debugData.transmissionTemp.stiction or 0,
+            spec.debugData.transmissionTemp.waxSpeed or 0,
+            spec.debugData.transmissionTemp.totalHeat or 0,
+            spec.debugData.transmissionTemp.loadFactor or 0,
+            spec.debugData.transmissionTemp.slipFactor or 0,
+            spec.debugData.transmissionTemp.accFactor or 0,
+            spec.debugData.transmissionTemp.pullFactor or 0,
+            spec.debugData.transmissionTemp.wheelSlipFactor or 0,
+            spec.debugData.transmissionTemp.totalCooling or 0,
+            spec.debugData.transmissionTemp.radiatorCooling or 0,
+            spec.debugData.transmissionTemp.speedCooling or 0,
+            spec.debugData.transmissionTemp.convectionCooling or 0,
+            spec.debugData.transmissionTemp.cvtSlipActive or 0,
+            spec.debugData.transmissionTemp.cvtSlipLocked or 0,
+            spec.debugData.transmissionTemp.extraTransmissionHeat or 0
         ), getTempColor(spec.transmissionTemperature), 0.95)
     end
 
