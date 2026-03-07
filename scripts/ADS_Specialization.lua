@@ -143,7 +143,6 @@ AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     highPressureFactor = "hpf",
     longHarvestFactor = "lhf",
     wetCropFactor = "wcf",
-
     instantDamageFactor = "idfg"
 }
 
@@ -328,6 +327,10 @@ function AdvancedDamageSystem.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onDelete", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onUpdate", AdvancedDamageSystem)
+    SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", AdvancedDamageSystem)
+    SpecializationUtil.registerEventListener(vehicleType, "onReadStream", AdvancedDamageSystem)
+    SpecializationUtil.registerEventListener(vehicleType, "onWriteUpdateStream", AdvancedDamageSystem)
+    SpecializationUtil.registerEventListener(vehicleType, "onReadUpdateStream", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "saveToXMLFile", AdvancedDamageSystem)
 end
 
@@ -410,31 +413,282 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     
 end
 
+-- ============================================================================
+--                         NETWORK STREAMS
+-- ============================================================================
+
+--- Full state sync for a joining client (server-side).
+function AdvancedDamageSystem:onWriteStream(streamId, connection)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    -- [Group 1] Core state
+    streamWriteFloat32(streamId, spec.serviceLevel or 1.0)
+    streamWriteFloat32(streamId, spec.conditionLevel or 1.0)
+    streamWriteString(streamId, spec.currentState or "")
+    streamWriteString(streamId, spec.plannedState or "")
+    streamWriteFloat32(streamId, spec.maintenanceTimer or 0)
+    streamWriteUInt16(streamId, spec.totalBreakdownsOccurred or 0)
+
+    -- [Group 2] Per-system condition/stress/enabled (compact CSV)
+    streamWriteString(streamId, ADS_Utils.serializeSystemsState(spec.systems))
+
+    -- [Group 3] Thermal model + fuel consumption
+    streamWriteFloat32(streamId, spec.engineTemperature or -99)
+    streamWriteFloat32(streamId, spec.transmissionTemperature or -99)
+    streamWriteFloat32(streamId, spec.thermostatState or 0)
+    streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
+
+    -- [Group 4] Active breakdowns (id;stage;timer;visible;selected CSV)
+    streamWriteString(streamId, ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {}))
+
+    -- [Group 5] Service history
+    streamWriteString(streamId, ADS_Utils.serializeDate(spec.lastServiceDate))
+    streamWriteString(streamId, ADS_Utils.serializeDate(spec.lastInspectionDate))
+    streamWriteFloat32(streamId, spec.lastServiceOperatingHours or 0)
+    streamWriteString(streamId, spec.lastInspectedConditionState or "")
+    streamWriteString(streamId, spec.lastInspectedServiceState or "")
+
+    -- [Group 6] Service options + workshop type
+    streamWriteString(streamId, spec.serviceOptionOne or "")
+    streamWriteString(streamId, spec.serviceOptionTwo or "")
+    streamWriteBool(streamId, spec.serviceOptionThree or false)
+    streamWriteString(streamId, spec.workshopType or "")
+
+    -- [Group 7] Service progress
+    streamWriteInt32(streamId, spec.pendingProgressStepIndex or 0)
+    streamWriteFloat32(streamId, spec.pendingProgressTotalTime or 0)
+    streamWriteFloat32(streamId, spec.pendingProgressElapsedTime or 0)
+
+    -- [Group 8] Maintenance log (variable-length: count + entries)
+    local logCount = spec.maintenanceLog and #spec.maintenanceLog or 0
+    streamWriteUInt16(streamId, logCount)
+    for i = 1, logCount do
+        local entry = spec.maintenanceLog[i]
+        streamWriteString(streamId, ADS_Utils.serializeMaintenanceLogEntry(entry))
+    end
+end
+
+--- Full state sync on a joining client (client-side).
+function AdvancedDamageSystem:onReadStream(streamId, connection)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    -- [Group 1] Core state
+    spec.serviceLevel = streamReadFloat32(streamId)
+    spec.conditionLevel = streamReadFloat32(streamId)
+    spec.currentState = streamReadString(streamId)
+    spec.plannedState = streamReadString(streamId)
+    spec.maintenanceTimer = streamReadFloat32(streamId)
+    spec.totalBreakdownsOccurred = streamReadUInt16(streamId)
+
+    -- [Group 2] Per-system condition/stress/enabled
+    local loadedSystems = ADS_Utils.deserializeSystemsState(streamReadString(streamId))
+    for sysKey, sysData in pairs(loadedSystems) do
+        if spec.systems[sysKey] ~= nil then
+            spec.systems[sysKey].condition = sysData.condition
+            spec.systems[sysKey].stress = sysData.stress
+            spec.systems[sysKey].enabled = sysData.enabled
+            spec.systems[sysKey].plannedBreakdown = sysData.plannedBreakdown
+            spec.systems[sysKey].plannedBreakdownTimer = sysData.plannedBreakdownTimer
+        end
+    end
+
+    -- [Group 3] Thermal model + fuel consumption (full sync: set both current + interpolation targets)
+    local syncEngTemp = streamReadFloat32(streamId)
+    local syncTransTemp = streamReadFloat32(streamId)
+    spec.engineTemperature = syncEngTemp
+    spec.rawEngineTemperature = syncEngTemp
+    spec._netTargetEngineTemp = syncEngTemp
+    spec.transmissionTemperature = syncTransTemp
+    spec.rawTransmissionTemperature = syncTransTemp
+    spec._netTargetTransmissionTemp = syncTransTemp
+    spec.thermostatState = streamReadFloat32(streamId)
+    local syncFuelRaw = streamReadFloat32(streamId)
+    spec._fuelUsageRaw = syncFuelRaw
+    spec.fuelUsage     = syncFuelRaw
+    if not self.isServer and self.spec_motorized ~= nil then
+        self.spec_motorized.lastFuelUsage = syncFuelRaw
+    end
+
+    -- [Group 4] Active breakdowns
+    spec.activeBreakdowns = ADS_Utils.deserializeBreakdowns(streamReadString(streamId))
+
+    -- [Group 5] Service history
+    spec.lastServiceDate = ADS_Utils.deserializeDate(streamReadString(streamId))
+    spec.lastInspectionDate = ADS_Utils.deserializeDate(streamReadString(streamId))
+    spec.lastServiceOperatingHours = streamReadFloat32(streamId)
+    spec.lastInspectedConditionState = streamReadString(streamId)
+    spec.lastInspectedServiceState = streamReadString(streamId)
+
+    -- [Group 6] Service options + workshop type
+    spec.serviceOptionOne = streamReadString(streamId)
+    spec.serviceOptionTwo = streamReadString(streamId)
+    spec.serviceOptionThree = streamReadBool(streamId)
+    spec.workshopType = streamReadString(streamId)
+    if spec.serviceOptionOne == "" then spec.serviceOptionOne = nil end
+    if spec.serviceOptionTwo == "" then spec.serviceOptionTwo = nil end
+    if spec.workshopType == "" then spec.workshopType = nil end
+
+    -- [Group 7] Service progress
+    spec.pendingProgressStepIndex = streamReadInt32(streamId)
+    spec.pendingProgressTotalTime = streamReadFloat32(streamId)
+    spec.pendingProgressElapsedTime = streamReadFloat32(streamId)
+
+    -- [Group 8] Maintenance log (variable-length)
+    local logCount = streamReadUInt16(streamId)
+    spec.maintenanceLog = {}
+    for i = 1, logCount do
+        local entry = ADS_Utils.deserializeMaintenanceLogEntry(streamReadString(streamId))
+        if entry ~= nil then
+            table.insert(spec.maintenanceLog, entry)
+        end
+    end
+
+    -- Rebuild derived state from initial sync data
+    self:recalculateAndApplyEffects()
+    self:recalculateAndApplyIndicators()
+end
+
+--- Differential update sync (server -> client, 5 dirty-flag groups).
+function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMask)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    if not connection:getIsServer() then
+        -- [1] State + Thermal + Service options + Fuel consumption
+        if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_state) ~= 0) then
+            streamWriteFloat32(streamId, spec.serviceLevel or 1.0)
+            streamWriteString(streamId, spec.currentState or "")
+            streamWriteString(streamId, spec.plannedState or "")
+            streamWriteFloat32(streamId, spec.maintenanceTimer or 0)
+            streamWriteFloat32(streamId, spec.engineTemperature or -99)
+            streamWriteFloat32(streamId, spec.transmissionTemperature or -99)
+            streamWriteFloat32(streamId, spec.thermostatState or 0)
+            streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
+            streamWriteString(streamId, spec.serviceOptionOne or "")
+            streamWriteString(streamId, spec.serviceOptionTwo or "")
+            streamWriteBool(streamId, spec.serviceOptionThree or false)
+            streamWriteString(streamId, spec.workshopType or "")
+        end
+
+        -- [2] Systems group
+        if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_systems) ~= 0) then
+            streamWriteFloat32(streamId, spec.conditionLevel or 1.0)
+            streamWriteString(streamId, ADS_Utils.serializeSystemsState(spec.systems))
+        end
+
+        -- [3] Breakdown group
+        if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_breakdown) ~= 0) then
+            streamWriteString(streamId, ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {}))
+        end
+
+        -- [4] Service group
+        if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_service) ~= 0) then
+            streamWriteUInt16(streamId, spec.totalBreakdownsOccurred or 0)
+            streamWriteInt32(streamId, spec.pendingProgressStepIndex or 0)
+            streamWriteFloat32(streamId, spec.pendingProgressTotalTime or 0)
+            streamWriteFloat32(streamId, spec.pendingProgressElapsedTime or 0)
+        end
+
+        -- [5] Meta (last log entry)
+        if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_meta) ~= 0) then
+            streamWriteString(streamId, ADS_Utils.serializeMaintenanceLogEntry(spec.lastLogEntry))
+        end
+    end
+end
+
+
+--- Differential update sync (client reads from server).
+function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    if connection:getIsServer() then
+        -- [1] State + Thermal + Service options + Fuel consumption
+        if streamReadBool(streamId) then
+            spec.serviceLevel = streamReadFloat32(streamId)
+            spec.currentState = streamReadString(streamId)
+            spec.plannedState = streamReadString(streamId)
+            spec.maintenanceTimer = streamReadFloat32(streamId)
+            spec._netTargetEngineTemp = streamReadFloat32(streamId)
+            spec._netTargetTransmissionTemp = streamReadFloat32(streamId)
+            spec.thermostatState = streamReadFloat32(streamId)
+            spec._fuelUsageRaw = streamReadFloat32(streamId)  -- raw lastFuelUsage, buffered client-side
+            spec.serviceOptionOne = streamReadString(streamId)
+            spec.serviceOptionTwo = streamReadString(streamId)
+            spec.serviceOptionThree = streamReadBool(streamId)
+            spec.workshopType = streamReadString(streamId)
+            if spec.serviceOptionOne == "" then spec.serviceOptionOne = nil end
+            if spec.serviceOptionTwo == "" then spec.serviceOptionTwo = nil end
+            if spec.workshopType == "" then spec.workshopType = nil end
+        end
+
+        -- [2] Systems group
+        if streamReadBool(streamId) then
+            spec.conditionLevel = streamReadFloat32(streamId)
+            local loadedSystems = ADS_Utils.deserializeSystemsState(streamReadString(streamId))
+            for sysKey, sysData in pairs(loadedSystems) do
+                if spec.systems[sysKey] ~= nil then
+                    spec.systems[sysKey].condition = sysData.condition
+                    spec.systems[sysKey].stress = sysData.stress
+                    spec.systems[sysKey].enabled = sysData.enabled
+                    spec.systems[sysKey].plannedBreakdown = sysData.plannedBreakdown
+                    spec.systems[sysKey].plannedBreakdownTimer = sysData.plannedBreakdownTimer
+                end
+            end
+        end
+
+        -- [3] Breakdown group
+        if streamReadBool(streamId) then
+            spec.activeBreakdowns = ADS_Utils.deserializeBreakdowns(streamReadString(streamId))
+            self:recalculateAndApplyEffects()
+            self:recalculateAndApplyIndicators()
+        end
+
+        -- [4] Service group
+        if streamReadBool(streamId) then
+            spec.totalBreakdownsOccurred = streamReadUInt16(streamId)
+            spec.pendingProgressStepIndex = streamReadInt32(streamId)
+            spec.pendingProgressTotalTime = streamReadFloat32(streamId)
+            spec.pendingProgressElapsedTime = streamReadFloat32(streamId)
+        end
+
+        -- [5] Meta (last log entry)
+        if streamReadBool(streamId) then
+            local entry = ADS_Utils.deserializeMaintenanceLogEntry(streamReadString(streamId))
+            if entry ~= nil then
+                table.insert(spec.maintenanceLog, entry)
+            end
+        end
+    end
+end
+
 function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
     log_dbg("saveToXMLFile called for vehicle:", self:getFullName(), "with key:", key)
     local spec = self.spec_AdvancedDamageSystem
     if spec ~= nil then
-        xmlFile:setValue(key .. "#service", spec.serviceLevel)
-        xmlFile:setValue(key .. "#condition", spec.conditionLevel)
+        xmlFile:setValue(key .. "#service", spec.serviceLevel or 1.0)
+        xmlFile:setValue(key .. "#condition", spec.conditionLevel or 1.0)
         
         local breakdownString = ADS_Utils.serializeBreakdowns(spec.activeBreakdowns)
         xmlFile:setValue(key .. "#breakdowns", breakdownString)
-        xmlFile:setValue(key .. "#state", spec.currentState)
-        xmlFile:setValue(key .. "#plannedState", spec.plannedState)
-        xmlFile:setValue(key .. "#maintenanceTimer", spec.maintenanceTimer)
+        xmlFile:setValue(key .. "#state", spec.currentState or AdvancedDamageSystem.STATUS.READY)
+        xmlFile:setValue(key .. "#plannedState", spec.plannedState or AdvancedDamageSystem.STATUS.READY)
+        xmlFile:setValue(key .. "#maintenanceTimer", spec.maintenanceTimer or 0)
         xmlFile:setValue(key .. "#lastServiceDate", ADS_Utils.serializeDate(spec.lastServiceDate))
         xmlFile:setValue(key .. "#lastInspectionDate", ADS_Utils.serializeDate(spec.lastInspectionDate))
-        xmlFile:setValue(key .. "#lastServiceOpHours", spec.lastServiceOperatingHours)
-        xmlFile:setValue(key .. "#lastInspCond", spec.lastInspectedConditionState)
-        xmlFile:setValue(key .. "#lastInspServ", spec.lastInspectedServiceState)
-        xmlFile:setValue(key .. "#engineTemperature", spec.engineTemperature)
-        xmlFile:setValue(key .. "#transmissionTemperature", spec.transmissionTemperature)
-        xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower)
-        xmlFile:setValue(key .. "#lastInspBrk", spec.lastInspectedBrake)
-        xmlFile:setValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction)
+        xmlFile:setValue(key .. "#lastServiceOpHours", spec.lastServiceOperatingHours or 0)
+        xmlFile:setValue(key .. "#lastInspCond", spec.lastInspectedConditionState or "")
+        xmlFile:setValue(key .. "#lastInspServ", spec.lastInspectedServiceState or "")
+        xmlFile:setValue(key .. "#engineTemperature", spec.engineTemperature or -99)
+        xmlFile:setValue(key .. "#transmissionTemperature", spec.transmissionTemperature or -99)
+        xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower or 1)
+        xmlFile:setValue(key .. "#lastInspBrk", spec.lastInspectedBrake or 1)
+        xmlFile:setValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction or 1)
         xmlFile:setValue(key .. "#serviceOptionOne", spec.serviceOptionOne or "")
         xmlFile:setValue(key .. "#serviceOptionTwo", spec.serviceOptionTwo or "")
-        xmlFile:setValue(key .. "#serviceOptionThree", spec.serviceOptionThree)
+        xmlFile:setValue(key .. "#serviceOptionThree", spec.serviceOptionThree or false)
         xmlFile:setValue(key .. "#pendingSelectedBreakdowns", table.concat(spec.pendingSelectedBreakdowns or {}, ","))
         xmlFile:setValue(key .. "#pendingServicePrice", ADS_Utils.encodeOptionalFloat(spec.pendingServicePrice))
         xmlFile:setValue(key .. "#pendingInspectionQueue", table.concat(spec.pendingInspectionQueue or {}, ","))
@@ -456,9 +710,9 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
             for i, entry in ipairs(spec.maintenanceLog) do
                 local entryKey = string.format("%s.maintenanceLog.entry(%d)", key, i - 1)
                 
-                xmlFile:setValue(entryKey .. "#id", entry.id)
-                xmlFile:setValue(entryKey .. "#type", entry.type)
-                xmlFile:setValue(entryKey .. "#price", entry.price)
+                xmlFile:setValue(entryKey .. "#id", entry.id or 0)
+                xmlFile:setValue(entryKey .. "#type", entry.type or "")
+                xmlFile:setValue(entryKey .. "#price", entry.price or 0)
                 xmlFile:setValue(entryKey .. "#date", ADS_Utils.serializeDate(entry.date)) 
                 xmlFile:setValue(entryKey .. "#location", entry.location or "UNKNOWN")
                 xmlFile:setValue(entryKey .. "#optionOne", entry.optionOne or "NONE")
@@ -555,8 +809,13 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.lastInspectedBrake = 1
     self.spec_AdvancedDamageSystem.lastInspectedYieldReduction = 1
     
+    self.spec_AdvancedDamageSystem.fuelUsage    = 0
+    self.spec_AdvancedDamageSystem._fuelUsageRaw  = 0
+    self.spec_AdvancedDamageSystem._prevSyncFuelUsage = 0
+
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
+    self.spec_AdvancedDamageSystem._netTargetEngineTemp = nil
     self.spec_AdvancedDamageSystem.thermostatState = 0.0
     self.spec_AdvancedDamageSystem.thermostatHealth = 1.0
     self.spec_AdvancedDamageSystem.thermostatStuckedPosition = nil
@@ -567,6 +826,7 @@ function AdvancedDamageSystem:onLoad(savegame)
 
     self.spec_AdvancedDamageSystem.transmissionTemperature = -99
     self.spec_AdvancedDamageSystem.rawTransmissionTemperature = -99
+    self.spec_AdvancedDamageSystem._netTargetTransmissionTemp = nil
     self.spec_AdvancedDamageSystem.transmissionThermostatState = 0.0
     self.spec_AdvancedDamageSystem.transmissionThermostatHealth = 1.0
     self.spec_AdvancedDamageSystem.transmissionThermostatStuckedPosition = nil
@@ -802,6 +1062,15 @@ function AdvancedDamageSystem:onLoad(savegame)
         prevSuspension = {},
         smoothed = 0
     }
+
+    -- Dirty flags for network differential sync
+    if self.isServer then
+        self.spec_AdvancedDamageSystem.adsDirtyFlag_state = self:getNextDirtyFlag()      -- [1] state + thermal
+        self.spec_AdvancedDamageSystem.adsDirtyFlag_systems = self:getNextDirtyFlag()    -- [2] condition / per-system
+        self.spec_AdvancedDamageSystem.adsDirtyFlag_breakdown = self:getNextDirtyFlag()  -- [3] active breakdowns
+        self.spec_AdvancedDamageSystem.adsDirtyFlag_service = self:getNextDirtyFlag()    -- [4] progress counters
+        self.spec_AdvancedDamageSystem.adsDirtyFlag_meta = self:getNextDirtyFlag()       -- [5] maintenance log
+    end
 end
 
 function AdvancedDamageSystem:onPostLoad(savegame)
@@ -1239,14 +1508,44 @@ end
 
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
-    
+
+    -- Client-side interpolation toward last server-synced values.
+    -- Server syncs via dirty flags every ~500 ms; without interpolation the HUD
+    -- shows discrete jumps each time a packet arrives.
+    if not self.isServer then
+        local t = math.min(dt / 200, 1)
+        if spec._netTargetEngineTemp ~= nil then
+            spec.engineTemperature = spec.engineTemperature + t * (spec._netTargetEngineTemp - spec.engineTemperature)
+        end
+        if spec._netTargetTransmissionTemp ~= nil and spec._netTargetTransmissionTemp > -90 then
+            spec.transmissionTemperature = (spec.transmissionTemperature or -99) + t * (spec._netTargetTransmissionTemp - (spec.transmissionTemperature or -99))
+        end
+    end
+    -- Fuel consumption sync (same approach as DashboardLive):
+    -- Server: capture raw lastFuelUsage every frame for dirty-flag network sync.
+    if self.isServer and self.spec_motorized ~= nil then
+        if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
+            spec._fuelUsageRaw = self.spec_motorized.lastFuelUsage or 0
+        else
+            spec._fuelUsageRaw = 0
+        end
+    end
+    -- Dedicated client: inject synced raw value into spec_motorized.lastFuelUsage
+    -- so Motorized's own fuelUsageBuffer picks it up every frame (identical to DashboardLive).
+    if self.isClient and not self.isServer and self.spec_motorized ~= nil then
+        self.spec_motorized.lastFuelUsage = spec._fuelUsageRaw or 0
+    end
+    -- Display: always read Motorized's own smoothed value (identical to dashboard gauge).
+    if self.isClient and self.spec_motorized ~= nil then
+        spec.fuelUsage = self.spec_motorized.lastFuelUsageDisplay or 0
+    end
+
     spec.effectsUpdateTimer = spec.effectsUpdateTimer + dt
 
     if spec.effectsUpdateTimer < ADS_Config.EFFECTS_UPDATE_DELAY then
         return
     end
 
-    --- MP: server check
     --- Registration in ADS_Main.vehicles and first load checks.
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil then
         if (self.propertyState == 2 or self.propertyState == 3 or self.propertyState == 4) and self.ownerFarmId ~= 0 and self.ownerFarmId < 10 then
@@ -1256,18 +1555,20 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             ADS_Main.numVehicles = ADS_Main.numVehicles + 1
    
             --- if first mod load or used vehicle
-            if self:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel or self:getDamageAmount() > 0 then
-                -- Used vehicle logic
-                spec.serviceLevel = 1 - self:getDamageAmount()
-                for _, systemData in pairs(spec.systems) do
-                    systemData.condition = math.max(1 - self:getFormattedOperatingTime() / 150, math.random() * 0.3)
+            if self.isServer then
+                if (self:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel) or self:getDamageAmount() > 0 then
+                    -- Used vehicle logic
+                    spec.serviceLevel = 1 - self:getDamageAmount()
+                    for _, systemData in pairs(spec.systems) do
+                        systemData.condition = math.max(1 - self:getFormattedOperatingTime() / 150, math.random() * 0.3)
+                    end
+                    self:setDamageAmount(0.0, true)
                 end
-                self:setDamageAmount(0.0, true)
-            end
 
-            --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
-            if (spec.maintenanceLog == nil or #spec.maintenanceLog == 0) then
-                self:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+                --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
+                if (spec.maintenanceLog == nil or #spec.maintenanceLog == 0) then
+                    self:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+                end
             end
 
             --- Updating vehicle's year from Vehicle Years mod
@@ -1282,46 +1583,36 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- just in case, reset damage amount to 0 if it's not
-    if self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
+    if self.isServer and self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
 
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
-    
-    --- MP: server check
-    if spec.year >= 2000 then
+    if self.isServer and spec.year >= 2000 then
         local overheatProtectionId = 'OVERHEAT_PROTECTION'
         local overheatProtection = self:getActiveBreakdowns()[overheatProtectionId]
-        if overheatProtection and spec.transmissionTemperature < 100 and spec.engineTemperature < 100 then
+        if overheatProtection and (spec.transmissionTemperature or -99) < 100 and (spec.engineTemperature or -99) < 100 then
             self:removeBreakdown(overheatProtectionId)
         end
         if self:getIsMotorStarted() then
-            if (spec.transmissionTemperature > 105 or spec.engineTemperature > 105) and not overheatProtection then
-
-                -- There are probably already events or another way to synchronize breakdowns when they are added, 
-                -- removed, or progress to the next stage (addBreakdown(), removeBreakdown(), advanceBreakdown() ???)
-
+            if ((spec.transmissionTemperature or -99) > 105 or (spec.engineTemperature or -99) > 105) and not overheatProtection then
                 self:addBreakdown(overheatProtectionId, 1)
                 if self.getIsControlled ~= nil and self:getIsControlled() then
-
-                    -- probably need a common event for playing sounds on the client side, 
-                    -- which accepts the type of sound to be played as an argument (if that's possible)
-
                     g_soundManager:playSample(spec.samples.alarm)
                 end
             elseif overheatProtection then
                 if self:getCruiseControlState() ~= 0 then
                     self:setCruiseControlState(0, true)
                 end
-                if (spec.transmissionTemperature > 125 or spec.engineTemperature > 125) and overheatProtection.stage < 4 then
+                if ((spec.transmissionTemperature or -99) > 125 or (spec.engineTemperature or -99) > 125) and overheatProtection.stage < 4 then
                     self:advanceBreakdown(overheatProtectionId)
                     if self.getIsControlled ~= nil and self:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
                     end
-                elseif (spec.transmissionTemperature > 115 or spec.engineTemperature > 115) and overheatProtection.stage < 3 then
+                elseif ((spec.transmissionTemperature or -99) > 115 or (spec.engineTemperature or -99) > 115) and overheatProtection.stage < 3 then
                     self:advanceBreakdown(overheatProtectionId)
                     if self.getIsControlled ~= nil and self:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
                     end
-                elseif (spec.transmissionTemperature > 110 or spec.engineTemperature > 110) and overheatProtection.stage < 2 then
+                elseif ((spec.transmissionTemperature or -99) > 110 or (spec.engineTemperature or -99) > 110) and overheatProtection.stage < 2 then
                     self:advanceBreakdown(overheatProtectionId)
                     if self.getIsControlled ~= nil and self:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
@@ -1330,17 +1621,18 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
         end
     else
-        local engineFailedEffect = spec.activeEffects.ENGINE_FAILURE
-        if spec.engineTemperature > 125 and not engineFailedEffect then
-            if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.effectsUpdateTimer, 3) then
-                self:addBreakdown('ENGINE_JAM')
+        if self.isServer then
+            local engineFailedEffect = spec.activeEffects.ENGINE_FAILURE
+            if (spec.engineTemperature or -99) > 125 and not engineFailedEffect then
+                if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.effectsUpdateTimer, 3) then
+                    self:addBreakdown('ENGINE_JAM')
+                end
             end
-       end
+        end
     end
 
-    --- MP: it can be done on the client side
-    --- Cold engine message
-    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
+    --- Cold engine message (guard: temperature must be initialized, i.e. > -90)
+    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature ~= nil and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
             local spec_motorized = self.spec_motorized
             local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
             local maxRpm = spec_motorized.motor.maxRpm
@@ -1350,7 +1642,6 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
             end
     end
 
-    --- MP: server.
     --- Messages, stop ai worker
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
@@ -1358,30 +1649,24 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
                 if self.getIsControlled ~= nil and self:getIsControlled() and not self:isUnderService() then
                     g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 200)
                 end
-                if self:getIsAIActive() and effectData.extraData.disableAi then 
+                if self.isServer and self:getIsAIActive() and effectData.extraData.disableAi then 
                     self:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) 
                 end
             end
         end
     end
 
-    --- MP: server. in the method itself, 
-    --- where the cruise speed is set - self:setCruiseControlMaxSpeed(targetSpeed, nil) - 
-    --- as I understand, nil - is that the event
-
     --- ai worker overload, temp control
     if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL then
         self:updateAiWorkerCruiseControl(spec.effectsUpdateTimer)
     end
 
-    --- MP: server.
     --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
-    if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
+    if self.isServer and ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
         self:updateThermalSystems(spec.effectsUpdateTimer)
         self:getSmoothedTemperature(spec.effectsUpdateTimer)
     end
 
-    --- MP: clients!!!
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeFunctions) ~= nil then
         for _ , func in pairs(spec.activeFunctions) do
@@ -1395,7 +1680,34 @@ end
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then return end
- 
+
+    -- Snapshot for dirty-flag comparison
+    local prevServiceLevel = spec.serviceLevel
+    local prevCurrentState = spec.currentState
+    local prevPlannedState = spec.plannedState
+    local prevMaintenanceTimer = spec.maintenanceTimer
+    local prevConditionLevel = spec.conditionLevel
+    local prevEngineTemp = spec.engineTemperature
+    local prevTransTemp = spec.transmissionTemperature
+    local prevThermostatState = spec.thermostatState
+    local prevSystemsHash = 0
+    do
+        local i = 0
+        for sysKey, sysData in pairs(spec.systems) do
+            i = i + 1
+            local c = sysData.condition or 0
+            local s = sysData.stress    or 0
+            local e = sysData.enabled ~= false and 1 or 0
+            local p = sysData.plannedBreakdownTimer or 0
+            local b = (sysData.plannedBreakdown ~= nil and sysData.plannedBreakdown ~= "") and 1 or 0
+            prevSystemsHash = prevSystemsHash + (c + s * 0.001 + e * 0.0001 + p * 0.00001 + b * 0.000001) * i
+        end
+    end
+
+    local prevProgressElapsed = spec.pendingProgressElapsedTime
+    local prevProgressStep = spec.pendingProgressStepIndex
+    local prevTotalBreakdowns = spec.totalBreakdownsOccurred
+
     self:updateThermalSystems(dt)
     self:getSmoothedTemperature(dt)
 
@@ -1421,6 +1733,47 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:updateWorkProcessSystem(dt)
         --condtition
         self:updateConditionLevel()
+    end
+
+    -- Raise dirty flags for changed data
+    if self.isServer and spec.adsDirtyFlag_state ~= nil then
+        -- [1] State + Thermal
+        if math.abs((spec.serviceLevel or 0) - (prevServiceLevel or 0)) > 0.001
+        or spec.currentState ~= prevCurrentState
+        or spec.plannedState ~= prevPlannedState
+        or math.abs((spec.maintenanceTimer or 0) - (prevMaintenanceTimer or 0)) > 0.5
+        or math.abs((spec.engineTemperature or 0) - (prevEngineTemp or 0)) > 0.5
+        or math.abs((spec.transmissionTemperature or 0) - (prevTransTemp or 0)) > 0.5
+        or spec.thermostatState ~= prevThermostatState
+        or math.abs((spec._fuelUsageRaw or 0) - (spec._prevSyncFuelUsage or 0)) > 0.3 then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_state)
+        end
+        spec._prevSyncFuelUsage = spec._fuelUsageRaw
+
+        -- [2] Systems
+        local postSystemsHash = 0
+        do
+            local i = 0
+            for sysKey, sysData in pairs(spec.systems) do
+                i = i + 1
+                local c = sysData.condition or 0
+                local s = sysData.stress    or 0
+                local e = sysData.enabled ~= false and 1 or 0
+                local p = sysData.plannedBreakdownTimer or 0
+                local b = (sysData.plannedBreakdown ~= nil and sysData.plannedBreakdown ~= "") and 1 or 0
+                postSystemsHash = postSystemsHash + (c + s * 0.001 + e * 0.0001 + p * 0.00001 + b * 0.000001) * i
+            end
+        end
+        if math.abs((spec.conditionLevel or 0) - (prevConditionLevel or 0)) > 0.001 or postSystemsHash ~= prevSystemsHash then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_systems)
+        end
+
+        -- [4] Service progress
+        if spec.pendingProgressElapsedTime ~= prevProgressElapsed
+        or spec.pendingProgressStepIndex ~= prevProgressStep
+        or spec.totalBreakdownsOccurred ~= prevTotalBreakdowns then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_service)
+        end
     end
 end
 
@@ -1479,6 +1832,7 @@ function AdvancedDamageSystem:getAiWorkerImplementSpeedLimit()
 end
 
 function AdvancedDamageSystem:updateAiWorkerCruiseControl(dt)
+    if not self.isServer then return end
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then return end
 
@@ -1853,14 +2207,14 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         end
 
         -- cold engine factor
-        if spec.engineTemperature < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
+        if (spec.engineTemperature or -99) < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldMotorFactor = coldMotorFactor * (C.COLD_MOTOR_MULTIPLIER or 0) * motorLoadInf
             wearRate = wearRate + coldMotorFactor
 
         -- overheating engine factor
-        elseif spec.engineTemperature > C.OVERHEAT_MOTOR_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
+        elseif (spec.engineTemperature or -99) > C.OVERHEAT_MOTOR_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
             hotMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_MOTOR_THRESHOLD, false, 120)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.3, false)
             hotMotorFactor = hotMotorFactor * (C.OVERHEAT_MOTOR_MULTIPLIER or C.OVERHEAT_MOTOR_MULTIPLIER or 0) * motorLoadInf
@@ -2034,14 +2388,14 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
 
         if vehicleHaveCVT then
             -- cold CVT factor
-            if spec.transmissionTemperature < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
+            if (spec.transmissionTemperature or -99) < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
                 coldTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.COLD_TRANSMISSION_THRESHOLD, true)
                 local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
                 coldTransFactor = coldTransFactor * C.COLD_TRANSMISSION_MULTIPLIER * motorLoadInf
                 wearRate = wearRate + coldTransFactor
 
             -- overheating CVT factor
-            elseif spec.transmissionTemperature > C.OVERHEAT_TRANSMISSION_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
+            elseif (spec.transmissionTemperature or -99) > C.OVERHEAT_TRANSMISSION_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
                 local transTemp = spec.transmissionTemperature
                 hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(transTemp, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
                 local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
@@ -2373,7 +2727,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 operatingFactor = ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false)
                 operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0)
                 wearRate = wearRate + operatingFactor
-                if spec.engineTemperature < C.COLD_OIL_THRESHOLD then
+                if (spec.engineTemperature or -99) < C.COLD_OIL_THRESHOLD then
                     coldOilFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_OIL_THRESHOLD, true)
                     coldOilFactor = coldOilFactor * (C.COLD_OIL_MULTIPLIER or 0) * (1 + ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false))
                     wearRate = wearRate + coldOilFactor
@@ -2482,14 +2836,14 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         end
 
         -- overheat
-        if spec.engineTemperature > C.OVERHEAT_FACTOR_THRESHOLD then
+        if (spec.engineTemperature or -99) > C.OVERHEAT_FACTOR_THRESHOLD then
             overheatFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_FACTOR_THRESHOLD, false, 120)
             overheatFactor = overheatFactor * (C.OVERHEAT_FACTOR_MULTIPLIER or 0)
             wearRate = wearRate + overheatFactor
         end
 
         -- cold shock
-        if spec.engineTemperature < C.COLD_SHOCK_FACTOR_THRESHOLD and rpmLoad > 0.75 and not self:getIsAIActive() then
+        if (spec.engineTemperature or -99) < C.COLD_SHOCK_FACTOR_THRESHOLD and rpmLoad > 0.75 and not self:getIsAIActive() then
             coldShockFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_SHOCK_FACTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldShockFactor = coldShockFactor * (C.COLD_SHOCK_FACTOR_MULTIPLIER or 0) * motorLoadInf
@@ -2537,6 +2891,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
     local systemData = spec.systems.electrical
+    if systemData == nil then return end
     local expiredServiceFactor, weatherFactor, weatherExposureFactor, lightsFactor, overheatFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
@@ -2580,7 +2935,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
 
     -- cranking stress damage: one-time instant damage on start transition
     if not spec.isElectricVehicle and isMotorStarted then
-        if spec.engineTemperature < C.CRANKING_STRESS_THRESHOLD then
+        if (spec.engineTemperature or -99) < C.CRANKING_STRESS_THRESHOLD then
             local tempMultiplier = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.CRANKING_STRESS_THRESHOLD, true)
             local damage = C.CRANKING_STRESS_DAMAGE * (1 + tempMultiplier)
             self:applyInstantDamageToSystem(spec.systems.electrical.name, damage)
@@ -2599,7 +2954,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         expiredServiceFactor = wearRate - wearRateWithoutService
 
         -- overheating engine compartment
-        if spec.engineTemperature > C.OVERHEAT_FACTOR_THRESHOLD then
+        if (spec.engineTemperature or -99) > C.OVERHEAT_FACTOR_THRESHOLD then
             overheatFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_FACTOR_THRESHOLD, false, 120)
             overheatFactor = overheatFactor * (C.OVERHEAT_FACTOR_MULTIPLIER or 0)
             wearRate = wearRate + overheatFactor
@@ -2889,6 +3244,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.fuel.name)
     local systemData = spec.systems.fuel
+    if systemData == nil then return end
     local weatherFactor, lowFuelStarvationFactor, coldFuelFactor = 0, 0, 0
     local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
@@ -3048,6 +3404,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
 
     local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
     local isTurnedOn = self.getIsTurnedOn ~= nil and self:getIsTurnedOn()
+
     local currentWeather = ADS_Main.currentWeather
     local isHail = (WeatherType.HAIL ~= nil and currentWeather == WeatherType.HAIL) or (WeatherType.HALL ~= nil and currentWeather == WeatherType.HALL)
     local isWetWeather = currentWeather == WeatherType.RAIN or currentWeather == WeatherType.SNOW or isHail
@@ -3325,11 +3682,19 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
     }
     
     self:recalculateAndApplyEffects()
+
+    if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
+        -- Also flag service group for totalBreakdownsOccurred
+        if registryEntry.isSelectable == true and spec.adsDirtyFlag_service ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_service)
+        end
+    end
 end
 
 function AdvancedDamageSystem:removeBreakdown(...)
     local spec = self.spec_AdvancedDamageSystem
-    if not spec or next(spec.activeBreakdowns) == nil then
+    if not spec or not spec.activeBreakdowns or next(spec.activeBreakdowns) == nil then
         return
     end
     
@@ -3338,6 +3703,9 @@ function AdvancedDamageSystem:removeBreakdown(...)
     if #idsToRemove == 0 then
         spec.activeBreakdowns = {}
         self:recalculateAndApplyEffects()
+        if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
+        end
         return
     end
 
@@ -3351,6 +3719,9 @@ function AdvancedDamageSystem:removeBreakdown(...)
     
     if removedCount > 0 then
         self:recalculateAndApplyEffects()
+        if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
+        end
     else
     end
 end
@@ -3376,6 +3747,11 @@ function AdvancedDamageSystem:advanceBreakdown(breakdownId)
     if breakdown.stage < #registryBreakdown.stages then
         breakdown.stage = breakdown.stage + 1
         self:recalculateAndApplyEffects()
+
+        -- Sync breakdown stage change
+        if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
+        end
     end
 end
 
@@ -3430,8 +3806,14 @@ function AdvancedDamageSystem:processBreakdowns(dt)
 
     if effectsNeedRecalculation then
         self:recalculateAndApplyEffects()
+
+        -- Sync breakdown stage progression
+        if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
+        end
     end
 end
+
 
 
 
@@ -3462,14 +3844,15 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
     local previouslyActiveEffects = spec.activeEffects or {}
     local aggregatedEffects = {}
 
+    -- Collect unknown breakdown IDs first without modifying the table during iteration
+    local unknownBreakdownIds = {}
+
     for id, breakdown in pairs(self:getActiveBreakdowns()) do
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
 
         if registryEntry == nil then
-            self:removeBreakdown(id)
-        end
-
-        if registryEntry and registryEntry.stages[breakdown.stage] then
+            table.insert(unknownBreakdownIds, id)
+        elseif registryEntry.stages[breakdown.stage] then
             local stageData = registryEntry.stages[breakdown.stage]
 
             if stageData.effects then
@@ -3524,6 +3907,16 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
                     end
                 end
             end
+        end
+    end
+
+    -- Remove unknown breakdowns safely after iteration completes
+    if #unknownBreakdownIds > 0 then
+        for _, unknownId in ipairs(unknownBreakdownIds) do
+            spec.activeBreakdowns[unknownId] = nil
+        end
+        if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
         end
     end
 
@@ -3677,7 +4070,7 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         self.spec_enterable:setIsTabbable(false)
     end
 
-    if vehicleState ~= states.READY or spec.maintenanceTimer ~= 0 then
+    if vehicleState ~= states.READY or (spec.maintenanceTimer or 0) ~= 0 then
         return
     end
 
@@ -3816,6 +4209,11 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         spec.currentState = states.READY
         resetPendingServiceProgress(spec)
     end
+
+    if self.isServer and spec.adsDirtyFlag_state ~= nil then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_state)
+        self:raiseDirtyFlags(spec.adsDirtyFlag_service)
+    end
 end
 
 function AdvancedDamageSystem:processService(dt)
@@ -3832,8 +4230,8 @@ function AdvancedDamageSystem:processService(dt)
 
     -- timer progress
     local timeScale = g_currentMission.missionInfo.timeScale
-    local prevTimer = spec.maintenanceTimer
-    spec.maintenanceTimer = spec.maintenanceTimer - dt * timeScale
+    local prevTimer = spec.maintenanceTimer or 0
+    spec.maintenanceTimer = (spec.maintenanceTimer or 0) - dt * timeScale
     local progressed = math.max(prevTimer - math.max(spec.maintenanceTimer, 0), 0)
 
     if spec.pendingProgressTotalTime > 0 then
@@ -3848,6 +4246,7 @@ function AdvancedDamageSystem:processService(dt)
     -- inspection effect
     if serviceType == states.INSPECTION or serviceType == states.MAINTENANCE then
         local steps = #spec.pendingInspectionQueue
+        local breakdownsRevealed = false
         if steps > 0 and spec.pendingProgressTotalTime > 0 then
             local targetStep = math.min(steps, math.floor((spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime) * steps))
             while spec.pendingProgressStepIndex < targetStep do
@@ -3861,12 +4260,17 @@ function AdvancedDamageSystem:processService(dt)
                             local chance = breakdownDef.stages[breakdown.stage].detectionChance or 0
                             if math.random() < chance then
                                 breakdown.isVisible = true
+                                breakdownsRevealed = true
                                 table.insert(spec.pendingSelectedBreakdowns, breakdownId)
                             end
                         end
                     end
                 end
             end
+        end
+        -- Sync newly-revealed breakdowns
+        if breakdownsRevealed and self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
         end
 
     -- repair effect
@@ -3941,7 +4345,7 @@ function AdvancedDamageSystem:processService(dt)
     end
 
     -- work done
-    if spec.maintenanceTimer <= 0 then
+    if (spec.maintenanceTimer or 0) <= 0 then
         spec.maintenanceTimer = 0
         if serviceType == states.MAINTENANCE and math.random() < C.PARTS_BREAKDOWN_CHANCES[optionTwoKey] then
             self:addBreakdown('MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES', 1)
@@ -4063,14 +4467,29 @@ function AdvancedDamageSystem:completeService()
         end
     end
 
-    g_currentMission.hud:addSideNotification({1, 1, 1, 1}, maintenanceCompletedText)
-    g_soundManager:playSample(spec.samples.maintenanceCompleted)
+    -- Guarded: dedicated server has no HUD
+    if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
+        g_currentMission.hud:addSideNotification({1, 1, 1, 1}, maintenanceCompletedText)
+    end
+    if g_soundManager ~= nil and spec.samples ~= nil and spec.samples.maintenanceCompleted ~= nil then
+        g_soundManager:playSample(spec.samples.maintenanceCompleted)
+    end
+
+    -- Sync maintenance log
+    if self.isServer and spec.adsDirtyFlag_meta ~= nil then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_meta)
+    end
 
     spec.maintenanceTimer = 0
     resetPendingServiceProgress(spec)
     spec.serviceOptionOne = nil
     spec.serviceOptionTwo = nil
     spec.serviceOptionThree = false
+
+    if self.isServer and spec.adsDirtyFlag_state ~= nil then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_state)
+        self:raiseDirtyFlags(spec.adsDirtyFlag_service)
+    end
 
     if spec.plannedState ~= states.READY then
         local nextWork = spec.plannedState
@@ -4099,7 +4518,7 @@ function AdvancedDamageSystem:completeService()
 
             if repairQueueCount == 0 then
                 log_dbg("Planned REPAIR skipped: no visible selected breakdowns to repair.")
-                ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
+                ADS_VehicleChangeStatusEvent.send(self, maintenanceCompletedText)
                 return
             end
         end
@@ -4110,29 +4529,25 @@ function AdvancedDamageSystem:completeService()
             self:initService(nextWork, spec.workshopType, nextOptionOne, nextOptionTwo, nextOptionThree)
             local started = spec.currentState == nextWork and (spec.maintenanceTimer or 0) > 0
 
-            ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
-
             if started then
                 if price > 0 then
                     g_currentMission:addMoney(-1 * price, self:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
                 end
-                g_currentMission.hud:addSideNotification(
-                    {1, 1, 1, 1},
-                    string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_notification'), g_i18n:getText(nextWork)))
-                )
+                local nextServiceText = string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_notification'), g_i18n:getText(nextWork)))
+                g_currentMission.hud:addSideNotification({1, 1, 1, 1}, nextServiceText)
+                ADS_VehicleChangeStatusEvent.send(self, maintenanceCompletedText)
             else
                 log_dbg("Planned service was requested but did not start. State:", tostring(spec.currentState), "Timer:", tostring(spec.maintenanceTimer))
+                ADS_VehicleChangeStatusEvent.send(self, maintenanceCompletedText)
             end
         else
-            ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
-            g_currentMission.hud:addSideNotification(
-                {1, 1, 1, 1},
-                string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_not_enouth_money_notification'), g_i18n:getText(nextWork)))
-            )
+            local notEnoughMoneyText = string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_not_enouth_money_notification'), g_i18n:getText(nextWork)))
+            g_currentMission.hud:addSideNotification({1, 1, 1, 1}, notEnoughMoneyText)
+            ADS_VehicleChangeStatusEvent.send(self, maintenanceCompletedText)
         end
     else
         spec.currentState = states.READY
-        ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
+        ADS_VehicleChangeStatusEvent.send(self, maintenanceCompletedText)
     end
 end
 
@@ -4163,10 +4578,15 @@ function AdvancedDamageSystem:cancelService()
         self.spec_enterable:setIsTabbable(true)
     end
 
-    g_currentMission.hud:addSideNotification(
-        {1, 1, 1, 1},
-        string.format("%s: %s %s", self:getFullName(), g_i18n:getText(serviceType), g_i18n:getText("ads_spec_maintenance_cancelled_notification"))
-    )
+    local cancelText = string.format("%s: %s %s", self:getFullName(), g_i18n:getText(serviceType), g_i18n:getText("ads_spec_maintenance_cancelled_notification"))
+    if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
+        g_currentMission.hud:addSideNotification({1, 1, 1, 1}, cancelText)
+    end
+
+    -- Sync maintenance log
+    if self.isServer and spec.adsDirtyFlag_meta ~= nil then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_meta)
+    end
 
     spec.maintenanceTimer = 0
     spec.plannedState = states.READY
@@ -4176,7 +4596,12 @@ function AdvancedDamageSystem:cancelService()
     spec.serviceOptionTwo = nil
     spec.serviceOptionThree = false
 
-    ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
+    if self.isServer and spec.adsDirtyFlag_state ~= nil then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_state)
+        self:raiseDirtyFlags(spec.adsDirtyFlag_service)
+    end
+
+    ADS_VehicleChangeStatusEvent.send(self, cancelText)
 end
 
 function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOne, optionTwo, optionThree, price, isCompleted)
@@ -4221,6 +4646,7 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
     }
 
     table.insert(spec.maintenanceLog, entry)
+    spec.lastLogEntry = entry
 end
 
 -- ==========================================================
@@ -4248,11 +4674,11 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
         speedCooling = C.SPEED_COOLING_MAX_EFFECT * speedRatio
     end
 
-    if spec.engineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.engineTemperature = eviromentTemp end
-    if spec.rawEngineTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawEngineTemperature = eviromentTemp end
+    if (spec.engineTemperature or -99) < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.engineTemperature = eviromentTemp end
+    if (spec.rawEngineTemperature or -99) < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawEngineTemperature = eviromentTemp end
     if vehicleHaveCVT then
-        if spec.transmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.transmissionTemperature = eviromentTemp end
-        if spec.rawTransmissionTemperature < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
+        if (spec.transmissionTemperature or -99) < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.transmissionTemperature = eviromentTemp end
+        if (spec.rawTransmissionTemperature or -99) < eviromentTemp or (g_sleepManager.isSleeping and not isMotorStarted) then spec.rawTransmissionTemperature = eviromentTemp end
     end
 
     if not spec.isElectricVehicle then 
@@ -4283,7 +4709,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
     else
-        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
+        if (spec.engineTemperature or -99) < C.COOLING_SLOWDOWN_THRESHOLD then
             cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
         else
             cooling = convectionCooling
@@ -4297,7 +4723,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     
     local dbg = spec.debugData.engineTemp
 
-    if isMotorStarted and spec.engineTemperature > C.ENGINE_THERMOSTAT_MIN_TEMP then
+    if isMotorStarted and (spec.engineTemperature or -99) > C.ENGINE_THERMOSTAT_MIN_TEMP then
         spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
     else
         spec.thermostatState = 0.0
@@ -4365,7 +4791,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)
     else
-        if spec.engineTemperature < C.COOLING_SLOWDOWN_THRESHOLD then
+        if (spec.engineTemperature or -99) < C.COOLING_SLOWDOWN_THRESHOLD then
             cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
         else
             cooling = convectionCooling
@@ -4375,7 +4801,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     spec.rawTransmissionTemperature = spec.rawTransmissionTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
     spec.rawTransmissionTemperature = math.max(spec.rawTransmissionTemperature, eviromentTemp)
 
-    if isMotorStarted and spec.transmissionTemperature > C.TRANS_THERMOSTAT_MIN_TEMP then
+    if isMotorStarted and (spec.transmissionTemperature or -99) > C.TRANS_THERMOSTAT_MIN_TEMP then
         spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
     else
         spec.transmissionThermostatState = 0.0
@@ -4601,7 +5027,7 @@ end
 
 function AdvancedDamageSystem:setNewStatus(status)
     self.spec_AdvancedDamageSystem.currentState = status
-    ADS_VehicleChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self))
+    ADS_VehicleChangeStatusEvent.send(self)
 end
 
 function AdvancedDamageSystem:getActiveBreakdowns()
@@ -4740,7 +5166,7 @@ function AdvancedDamageSystem:getHoursSinceLastMaintenance()
     for i = #spec.maintenanceLog, 1, -1 do
         local entry = spec.maintenanceLog[i]
         if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
-            return self:getFormattedOperatingTime() - entry.conditionData.operatingHours
+            return self:getFormattedOperatingTime() - (entry.conditionData.operatingHours or 0)
         end
     end
     return 0
@@ -5733,7 +6159,7 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
 
     vehicle:initService(maintenanceType, AdvancedDamageSystem.WORKSHOP.OWN, optionOne, optionTwo, optionThree)
 
-    if spec.currentState == maintenanceType and spec.maintenanceTimer > 0 then
+    if spec.currentState == maintenanceType and (spec.maintenanceTimer or 0) > 0 then
         local finishTime, days = vehicle:getServiceFinishTime()
         print(string.format("ADS: Started '%s' for '%s'. Remaining time: %.1f sec. Finishes in %d day(s) at %.2f.", maintenanceType, vehicle:getFullName(), spec.maintenanceTimer / 1000, days or 0, finishTime or 0))
     else

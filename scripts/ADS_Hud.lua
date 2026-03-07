@@ -59,6 +59,8 @@ function ADS_Hud:new()
         year = 2000
     }
 
+    self.fuelConsoText = {}
+
     self.activeVehicleDebugPanel = {
         x = 0.20,
         y = 0.05,
@@ -118,6 +120,7 @@ function ADS_Hud:draw()
 
     if self.vehicle ~= nil then
         self:drawDashboard()
+        self:drawFuelConsumption()
     end
 end
 
@@ -167,6 +170,9 @@ function ADS_Hud:storeScaledValues()
 
     self.tsTempText.offsetX, self.tsTempText.offsetY = self:scalePixelValuesToScreenVector(38, 3)
 	self.tsTempText.size = self:scalePixelToScreenHeight(8)
+
+    self.fuelConsoText.offsetX, self.fuelConsoText.offsetY = self:scalePixelValuesToScreenVector(8, 4)
+    self.fuelConsoText.size = self:scalePixelToScreenHeight(13)
 end
 
 function ADS_Hud:drawDashboard()
@@ -278,6 +284,62 @@ function ADS_Hud:drawDashboard()
 
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
     setTextBold(false)
+end
+
+-- =====================================================================================
+--                          FUEL CONSUMPTION HUD
+-- =====================================================================================
+
+function ADS_Hud:drawFuelConsumption()
+    local vehicle = self.vehicle
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or vehicle.spec_motorized == nil then
+        return
+    end
+    if not vehicle:getIsMotorStarted() then
+        return
+    end
+
+    local sm = g_currentMission.hud.speedMeter
+    if sm == nil or sm.fuelIcon == nil then
+        return
+    end
+
+    local fuelLevel, fuelCapacity, fuelType = SpeedMeterDisplay.getVehicleFuelLevelAndCapacity(vehicle)
+    if fuelCapacity == nil or fuelCapacity <= 0 then
+        return
+    end
+
+    local consumption = vehicle.spec_AdvancedDamageSystem.fuelUsage or 0
+    local isElectric  = (fuelType == FillType.ELECTRICCHARGE)
+    local unit        = isElectric and "kW" or "L/h"
+
+    local fuelIconX, fuelIconY = sm.fuelIcon:getPosition()
+    local fuelIconW = sm.fuelIcon.width or 0
+    local centerX = fuelIconX + fuelIconW * 0.5
+    local textY   = fuelIconY + self.fuelConsoText.offsetY
+
+    local valueStr = string.format("%.1f", consumption)
+    local gap = 0.002
+
+    setTextBold(true)
+    local valueWidth = getTextWidth(self.fuelConsoText.size, valueStr)
+    local unitWidth  = getTextWidth(self.fuelConsoText.size, unit)
+    local totalWidth = valueWidth + gap + unitWidth
+    local startX = centerX - totalWidth * 0.5
+
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
+    setTextAlignment(RenderText.ALIGN_LEFT)
+
+    setTextColor(1, 1, 1, 1)
+    renderText(startX, textY, self.fuelConsoText.size, valueStr)
+
+    setTextColor(1, 0.4287, 0.0006, 1)
+    renderText(startX + valueWidth + gap, textY, self.fuelConsoText.size, unit)
+
+    setTextBold(false)
+    setTextColor(1, 1, 1, 1)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
+    setTextAlignment(RenderText.ALIGN_LEFT)
 end
 
 -- =====================================================================================

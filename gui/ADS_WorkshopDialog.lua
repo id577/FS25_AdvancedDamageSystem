@@ -233,6 +233,7 @@ function ADS_WorkshopDialog:updateServiceProgressText()
 
     local progressPercent = self:getServiceProgressPercent()
 
+    local progressText = ""
     if progressPercent ~= nil then
         progressText = string.format("%d%%", progressPercent)
     end
@@ -359,7 +360,13 @@ end
 
 function ADS_WorkshopDialog:onCancelServiceConfirm(yes)
     if yes and self.vehicle ~= nil then
-        self.vehicle:cancelService()
+        if g_server ~= nil then
+            -- Server: execute locally
+            self.vehicle:cancelService()
+        else
+            -- Client: send request to server
+            ADS_CancelServiceEvent.send(self.vehicle)
+        end
         self:updateScreen()
     end
 end

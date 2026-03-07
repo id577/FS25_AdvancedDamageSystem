@@ -12,6 +12,38 @@ source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
 source(g_currentModDirectory .. "scripts/ADS_InGameSettings.lua")
 source(g_currentModDirectory .. "events/ADS_VehicleChangeStatusEvent.lua")
 source(g_currentModDirectory .. "events/ADS_WorkshopChangeStatusEvent.lua")
+source(g_currentModDirectory .. "events/ADS_ServiceRequestEvent.lua")
+source(g_currentModDirectory .. "events/ADS_CancelServiceEvent.lua")
+source(g_currentModDirectory .. "events/ADS_SettingsSyncEvent.lua")
+source(g_currentModDirectory .. "events/ADS_EffectSyncEvent.lua")
+
+-- Network hook: wrap every settings callback so changes made by an admin
+-- client are automatically replicated to the dedicated server (and then
+-- re-broadcast to all other clients via ADS_SettingsSyncEvent).
+do
+    local cbs = {
+        "onServiceWearChanged", "onConditionWearChanged", "onBreakdownProbabilityChanged",
+        "onInstantInspectionChanged", "onParkVehicleChanged", "onWarrantyEnabledChanged",
+        "onMaintenancePriceChanged", "onMaintenanceDurationChanged", "onWorkshopAvailableChanged",
+        "onWorkshopOpenHourChanged", "onWorkshopCloseHourChanged", "onThermalSensitivityChanged",
+        "onDirtInfluenceChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"
+    }
+    for _, name in ipairs(cbs) do
+        local orig = ADS_InGameSettings[name]
+        if orig ~= nil then
+            ADS_InGameSettings[name] = function(self, ...)
+                orig(self, ...)
+                if g_currentMission ~= nil then
+                    if g_currentMission:getIsServer() and g_server ~= nil then
+                        g_server:broadcastEvent(ADS_SettingsSyncEvent.new())
+                    elseif g_client ~= nil then
+                        ADS_SettingsSyncEvent.send()
+                    end
+                end
+            end
+        end
+    end
+end
 
 
 local function log_dbg(...)
@@ -220,6 +252,16 @@ end
 
 
 FSBaseMission.onStartMission = Utils.prependedFunction(FSBaseMission.onStartMission, ADS_Main.onStartMission)
+FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, ADS_Config.saveToXMLFile)
+Mission00.loadMission00Finished = Utils.appendedFunction(Mission00.loadMission00Finished, function()
+    log_dbg("Mission00.loadMission00Finished hook fired")
+    ADS_Config.loadFromXMLFile()
+end)
+FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState, function(_, connection)
+    if g_server ~= nil then
+        connection:sendEvent(ADS_SettingsSyncEvent.new())
+    end
+end)
 WorkshopScreen.setVehicle = Utils.appendedFunction(WorkshopScreen.setVehicle, ADS_Main.hookRepairButton)
 WorkshopScreen.setStatusBarValue = Utils.overwrittenFunction(WorkshopScreen.setStatusBarValue, ADS_Main.setStatusBarValue)
 InGameMenuStatisticsFrame.populateCellForItemInSection = Utils.overwrittenFunction(InGameMenuStatisticsFrame.populateCellForItemInSection, ADS_Main.populateCellForItemInSection)
@@ -241,29 +283,54 @@ ADS_Main.isWorkshopOpen = true
 ADS_Main.currentWeather = WeatherType.SUN
 ADS_Main.currentWeatherFactor = 1.0
 
+
+-- Compute workshop open/close from config hours and current game time.
+-- Runs on all machines for consistent local state.
+function ADS_Main:evaluateWorkshopState()
+    if g_currentMission == nil or g_currentMission.environment == nil then
+        return self.isWorkshopOpen
+    end
+    local currentDayHour = g_currentMission.environment.dayTime / (60 * 60 * 1000)
+    return ADS_Config.WORKSHOP.ALWAYS_AVAILABLE
+        or (currentDayHour >= ADS_Config.WORKSHOP.OPEN_HOUR
+        and currentDayHour < ADS_Config.WORKSHOP.CLOSE_HOUR)
+end
+
+
+-- Re-evaluate and broadcast workshop state immediately (settings change).
+function ADS_Main:forceWorkshopUpdate()
+    local isWorkshopOpen = self:evaluateWorkshopState()
+    if isWorkshopOpen ~= self.isWorkshopOpen then
+        self.isWorkshopOpen = isWorkshopOpen
+        if g_currentMission:getIsServer() then
+            ADS_WorkshopChangeStatusEvent.send(self.isWorkshopOpen)
+        end
+        g_messageCenter:publish(MessageType.ADS_WORKSHOP_CHANGE_STATUS, self.isWorkshopOpen)
+    end
+end
+
+
 function ADS_Main:update(dt)
     if ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.isDialogOpen then
         ADS_WorkshopDialog.INSTANCE:updateServiceProgressText()
     end
 
+    --- workshop
+    self.workshopCheckTimer = self.workshopCheckTimer + dt
+    if self.workshopFirstEval == nil or self.workshopCheckTimer >= ADS_Config.CORE_UPDATE_DELAY then
+        self.workshopFirstEval = true
+        self:forceWorkshopUpdate()
+        if self.workshopCheckTimer >= ADS_Config.CORE_UPDATE_DELAY then
+            self.workshopCheckTimer = self.workshopCheckTimer - ADS_Config.CORE_UPDATE_DELAY
+        end
+    end
+
     if not g_currentMission:getIsServer() or self.numVehicles == 0 then
-        self.previousKey = nil 
+        self.previousKey = nil
         return
     end
-        
-    self.updateAlphaTimer = self.updateAlphaTimer + dt
-    self.workshopCheckTimer = self.workshopCheckTimer + dt
 
-    --- workshop
-    if self.workshopCheckTimer >= ADS_Config.CORE_UPDATE_DELAY then
-        local currentDayHour = g_currentMission.environment.dayTime / (60 * 60 * 1000)
-        local isWorkshopOpen = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE or (currentDayHour >= ADS_Config.WORKSHOP.OPEN_HOUR and currentDayHour < ADS_Config.WORKSHOP.CLOSE_HOUR)
-        if isWorkshopOpen ~= self.isWorkshopOpen then
-            self.isWorkshopOpen = isWorkshopOpen
-            ADS_WorkshopChangeStatusEvent.send(ADS_VehicleChangeStatusEvent.new(self.isWorkshopOpen))
-        end
-         self.workshopCheckTimer = self.workshopCheckTimer - ADS_Config.CORE_UPDATE_DELAY 
-    end
+    self.updateAlphaTimer = self.updateAlphaTimer + dt
 
     --- vehicles
     local timePerVehicle = ADS_Config.CORE_UPDATE_DELAY / self.numVehicles
@@ -312,6 +379,15 @@ function ADS_Main:update(dt)
         end
     end
     self.updateAlphaTimer = self.updateAlphaTimer - vehiclesToUpdate * timePerVehicle
+end
+
+function ADS_Main:loadMap()
+    log_dbg("loadMap() called")
+    ADS_Config.loadFromXMLFile()
+end
+
+function ADS_Main:deleteMap()
+    ADS_Config._loaded = nil
 end
 
 addModEventListener(ADS_Main)

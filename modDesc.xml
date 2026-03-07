@@ -1,21 +1,78 @@
-<modDesc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" descVersion="98" xsi:noNamespaceSchemaLocation="https://validation.gdn.giants-software.com/xml/fs25/modDesc.xsd">
-<author>id577</author>
-<version>0.8.6.0</version>
-<title>
-    <en>Advanced Damage System</en>
-    <fr>Système avancé de dégâts</fr>
-    <cz>Pokročilý systém poškození</cz>
-</title>
-<description>
-    <en>Adds realistic wear, breakdowns, inspections, maintenance, and repair workflows with logs and service reports.</en>
-</description>
-<iconFilename>icon_ads.dds</iconFilename>
-<multiplayer supported="false"/>
-<extraSourceFiles>
-    <sourceFile filename="scripts/ADS_Main.lua"/>
-</extraSourceFiles>
-<l10n filenamePrefix="translations/l10n"/>
-<dependencies>
-    <dependency>FS25_Vehicle_Years</dependency>
-</dependencies>
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="106">
+    <author>id577, Squallqt</author>
+    <version>0.9.0.0</version>
+    <title>
+        <en>Advanced Damage System</en>
+        <de>Erweitertes Schadenssystem</de>
+        <fr>Système Avancé De Dégâts</fr>
+        <es>Sistema Avanzado De Daños</es>
+        <it>Sistema Avanzato Di Danni</it>
+        <pl>Zaawansowany System Uszkodzeń</pl>
+        <ru>Продвинутая Система Повреждений</ru>
+        <cs>Pokročilý Systém Poškození</cs>
+        <cz>Pokročilý Systém Poškození</cz>
+        <sv>Avancerat Skadesystem</sv>
+    </title>
+    <description>
+        <en><![CDATA[Adds realistic wear, breakdowns, inspections, maintenance, and repair workflows with logs and service reports.
+
+Changelog 0.9.0.0:
+- Added multiplayer support
+- Added fuel consumption HUD display]]></en>
+        <de><![CDATA[Fügt realistische Abnutzung, Pannen, Inspektionen, Wartung und Reparaturabläufe mit Protokollen und Serviceberichten hinzu.
+
+Changelog 0.9.0.0:
+- Mehrspieler-Unterstützung hinzugefügt
+- HUD-Anzeige für Kraftstoffverbrauch hinzugefügt]]></de>
+        <fr><![CDATA[Ajoute une usure réaliste, des pannes, des inspections, de la maintenance et des processus de réparation avec journaux et rapports de service.
+
+Changelog 0.9.0.0:
+- Ajout du support multijoueur
+- Ajout de l'affichage HUD consommation de carburant]]></fr>
+        <es><![CDATA[Añade desgaste realista, averías, inspecciones, mantenimiento y flujos de reparación con registros e informes de servicio.
+
+Changelog 0.9.0.0:
+- Añadido soporte multijugador
+- Añadida pantalla HUD de consumo de combustible]]></es>
+        <it><![CDATA[Aggiunge usura realistica, guasti, ispezioni, manutenzione e flussi di riparazione con registri e rapporti di servizio.
+
+Changelog 0.9.0.0:
+- Aggiunto supporto multigiocatore
+- Aggiunto display HUD consumo carburante]]></it>
+        <pl><![CDATA[Dodaje realistyczne zużycie, awarie, przeglądy, konserwację i procesy napraw z dziennikami i raportami serwisowymi.
+
+Changelog 0.9.0.0:
+- Dodano obsługę trybu wieloosobowego
+- Dodano wyświetlacz HUD zużycia paliwa]]></pl>
+        <ru><![CDATA[Добавляет реалистичный износ, поломки, осмотры, техническое обслуживание и ремонт с журналами и сервисными отчётами.
+
+Changelog 0.9.0.0:
+- Добавлена поддержка мультиплеера
+- Добавлен HUD расхода топлива]]></ru>
+        <cs><![CDATA[Přidává realistické opotřebení, poruchy, inspekce, údržbu a opravy s protokoly a servisními zprávami.
+
+Changelog 0.9.0.0:
+- Přidána podpora pro více hráčů
+- Přidán HUD zobrazení spotřeby paliva]]></cs>
+        <cz><![CDATA[Přidává realistické opotřebení, poruchy, inspekce, údržbu a opravy s protokoly a servisními zprávami.
+
+Changelog 0.9.0.0:
+- Přidána podpora pro více hráčů
+- Přidán HUD zobrazení spotřeby paliva]]></cz>
+        <sv><![CDATA[Lägger till realistiskt slitage, haverier, inspektioner, underhåll och reparationsflöden med loggar och servicerapporter.
+
+Changelog 0.9.0.0:
+- Lagt till stöd för flera spelare
+- Lagt till HUD-visning av bränsleförbrukning]]></sv>
+    </description>
+    <iconFilename>icon_ads.dds</iconFilename>
+    <multiplayer supported="true"/>
+    <extraSourceFiles>
+        <sourceFile filename="scripts/ADS_Main.lua"/>
+    </extraSourceFiles>
+    <l10n filenamePrefix="translations/l10n"/>
+    <dependencies>
+        <dependency>FS25_Vehicle_Years</dependency>
+    </dependencies>
 </modDesc>

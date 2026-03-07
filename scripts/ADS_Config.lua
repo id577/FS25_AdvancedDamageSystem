@@ -520,263 +520,182 @@ ADS_Config = {
 ADS_Config.savegameFile = "advancedDamageSystem.xml"
 
 local function log_dbg(...)
-    if ADS_Config and ADS_Config.DEBUG then
+    if ADS_Config.DEBUG then
         local args = {...}
-        for i = 1, #args do
-            args[i] = tostring(args[i])
-        end
-        print("[ADS_CONFIG] " .. table.concat(args, " "))
+        for i = 1, #args do args[i] = tostring(args[i]) end
+        print("[ADS_CFG] " .. table.concat(args, " "))
     end
-end
-
-local function isArray(tbl)
-    if type(tbl) ~= "table" then return false end
-    local count = 0
-    local maxIndex = 0
-
-    for k in pairs(tbl) do
-        if type(k) ~= "number" or k < 1 or k % 1 ~= 0 then
-            return false
-        end
-        count = count + 1
-        if k > maxIndex then
-            maxIndex = k
-        end
-    end
-
-    if count == 0 then return false end
-    return maxIndex == count
 end
 
 -- ============================================================
 -- SAVE
 -- ============================================================
 function ADS_Config.saveToXMLFile()
-    if g_currentMission == nil or g_currentMission.missionInfo == nil
-       or g_currentMission.missionInfo.savegameDirectory == nil then
-        log_dbg("SAVE - mission or savegame directory is nil, skipping.")
+    if g_currentMission == nil or not g_currentMission:getIsServer() then
         return false
     end
 
-    local xmlFileName = g_currentMission.missionInfo.savegameDirectory
-                        .. "/" .. ADS_Config.savegameFile
-    local xmlFile = createXMLFile("advancedDamageSystem", xmlFileName,
-                                  "advancedDamageSystem")
+    if g_currentMission.missionInfo == nil then
+        log_dbg("SAVE ABORT - missionInfo is nil")
+        return false
+    end
+
+    local savegameFolderPath = g_currentMission.missionInfo.savegameDirectory
+    if savegameFolderPath == nil then
+        savegameFolderPath = ('%ssavegame%d'):format(getUserProfileAppPath(), g_currentMission.missionInfo.savegameIndex)
+    end
+
+    local xmlFileName = savegameFolderPath .. "/" .. ADS_Config.savegameFile
+    log_dbg("SAVE to:", xmlFileName)
+
+    local xmlFile = createXMLFile("advancedDamageSystem", xmlFileName, "advancedDamageSystem")
     if xmlFile == nil or xmlFile == 0 then
-        print("[ADS_CONFIG] SAVE ERROR - could not create XML file (handle=" .. tostring(xmlFile) .. ").")
+        log_dbg("SAVE ERROR - createXMLFile returned", tostring(xmlFile))
         return false
     end
 
-    log_dbg("Saving ADS_Config to " .. xmlFileName)
+    local root = "advancedDamageSystem"
 
-    -- --------------------------------------------------------
-    local function saveNode(tbl, path)
-        for k, v in pairs(tbl) do
-            if type(k) == "string" and type(v) ~= "function" and k ~= "savegameFile" then
-                local currentPath = path .. "." .. tostring(k)
+    -- Version
+    setXMLFloat(xmlFile, root .. ".VER", ADS_Config.VER)
 
-                if type(v) == "table" then
-                    if k == "BRANDS" then
-                        -- brands
-                        local sorted = {}
-                        for name in pairs(v) do
-                            table.insert(sorted, name)
-                        end
-                        table.sort(sorted)
-                        for i, name in ipairs(sorted) do
-                            local bp = currentPath .. ".brand(" .. (i - 1) .. ")"
-                            setXMLString(xmlFile, bp .. "#name",            name)
-                            setXMLFloat (xmlFile, bp .. "#reliability",     v[name][1])
-                            setXMLFloat (xmlFile, bp .. "#maintainability", v[name][2])
-                        end
+    -- CORE
+    setXMLFloat(xmlFile, root .. ".BASE_SERVICE_WEAR",      ADS_Config.CORE.BASE_SERVICE_WEAR)
+    setXMLFloat(xmlFile, root .. ".BASE_SYSTEMS_WEAR",      ADS_Config.CORE.BASE_SYSTEMS_WEAR)
+    setXMLFloat(xmlFile, root .. ".MAX_MTBF",               ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF)
+    setXMLBool (xmlFile, root .. ".AI_OVERLOAD_CONTROL",    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL)
 
-                    elseif isArray(v) then
-                        -- array
-                        for i, val in ipairs(v) do
-                            local ip = currentPath .. ".item(" .. (i - 1) .. ")"
-                            if type(val) == "number" then
-                                setXMLFloat(xmlFile, ip .. "#value", val)
-                            elseif type(val) == "boolean" then
-                                setXMLBool(xmlFile, ip .. "#value", val)
-                            elseif type(val) == "string" then
-                                setXMLString(xmlFile, ip .. "#value", val)
-                            end
-                        end
+    -- MAINTENANCE
+    setXMLBool (xmlFile, root .. ".INSTANT_INSPECTION",     ADS_Config.MAINTENANCE.INSTANT_INSPECTION)
+    setXMLBool (xmlFile, root .. ".PARK_VEHICLE",           ADS_Config.MAINTENANCE.PARK_VEHICLE)
+    setXMLBool (xmlFile, root .. ".WARRANTY_ENABLED",       ADS_Config.MAINTENANCE.WARRANTY_ENABLED)
+    setXMLFloat(xmlFile, root .. ".PRICE_MULTIPLIER",       ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER)
+    setXMLFloat(xmlFile, root .. ".TIME_MULTIPLIER",        ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER)
 
-                    else
-                        -- nested table
-                        saveNode(v, currentPath)
-                    end
+    -- WORKSHOP
+    setXMLBool (xmlFile, root .. ".ALWAYS_AVAILABLE",       ADS_Config.WORKSHOP.ALWAYS_AVAILABLE)
+    setXMLFloat(xmlFile, root .. ".OPEN_HOUR",              ADS_Config.WORKSHOP.OPEN_HOUR)
+    setXMLFloat(xmlFile, root .. ".CLOSE_HOUR",             ADS_Config.WORKSHOP.CLOSE_HOUR)
 
-                elseif type(v) == "number" then
-                    setXMLFloat(xmlFile, currentPath, v)
-                elseif type(v) == "boolean" then
-                    setXMLBool(xmlFile, currentPath, v)
-                elseif type(v) == "string" then
-                    setXMLString(xmlFile, currentPath, v)
-                end
-            end
-        end
-    end
-    -- --------------------------------------------------------
+    -- THERMAL
+    setXMLFloat(xmlFile, root .. ".ENGINE_MAX_HEAT",        ADS_Config.THERMAL.ENGINE_MAX_HEAT)
+    setXMLFloat(xmlFile, root .. ".TRANS_MAX_HEAT",         ADS_Config.THERMAL.TRANS_MAX_HEAT)
+    setXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE",     ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
 
-    saveNode(ADS_Config, "advancedDamageSystem")
+    -- DEBUG
+    setXMLBool (xmlFile, root .. ".DEBUG_MODE",             ADS_Config.DEBUG)
+
     saveXMLFile(xmlFile)
     delete(xmlFile)
-    log_dbg("ADS_Config: Settings saved successfully to " .. xmlFileName)
+    log_dbg("SAVE OK - BASE_SERVICE_WEAR=", tostring(ADS_Config.CORE.BASE_SERVICE_WEAR))
     return true
 end
 
 -- ============================================================
 -- LOAD
 -- ============================================================
-function ADS_Config.loadFromXMLFile(mission)
-    log_dbg("loadFromXMLFile called with mission: " .. tostring(mission))
-
-    local m = mission
-    if m == nil or m.missionInfo == nil or m.missionInfo.savegameDirectory == nil then
-        m = g_currentMission
-    end
-
-    if m == nil then
-        log_dbg("LOAD - mission is nil, using defaults.")
-        return
-    end
-    if m.missionInfo == nil then
-        log_dbg("LOAD - missionInfo is nil, using defaults.")
-        return
-    end
-    if m.missionInfo.savegameDirectory == nil then
-        log_dbg("LOAD - savegameDirectory is nil (new career?), using defaults.")
+function ADS_Config.loadFromXMLFile()
+    if ADS_Config._loaded then
+        log_dbg("LOAD SKIP - already loaded")
         return
     end
 
-    local xmlFileName = m.missionInfo.savegameDirectory
-                        .. "/" .. ADS_Config.savegameFile
+    log_dbg("LOAD - loadFromXMLFile() called")
 
-    log_dbg("LOAD - looking for config file at: " .. xmlFileName)
+    if g_currentMission == nil then
+        log_dbg("LOAD SKIP - g_currentMission is nil")
+        return
+    end
+
+    if g_currentMission.missionInfo == nil then
+        log_dbg("LOAD SKIP - missionInfo is nil")
+        return
+    end
+
+    local savegameFolderPath = g_currentMission.missionInfo.savegameDirectory
+    if savegameFolderPath == nil then
+        savegameFolderPath = ('%ssavegame%d'):format(getUserProfileAppPath(), g_currentMission.missionInfo.savegameIndex)
+    end
+
+    local xmlFileName = savegameFolderPath .. "/" .. ADS_Config.savegameFile
+    log_dbg("LOAD from:", xmlFileName)
 
     if not fileExists(xmlFileName) then
-        log_dbg("LOAD - config file does not exist, using defaults.")
+        log_dbg("LOAD - file not found, using defaults")
         return
     end
 
     local xmlFile = loadXMLFile("advancedDamageSystem", xmlFileName)
-
     if xmlFile == nil or xmlFile == 0 then
-        print("[ADS_CONFIG] ERROR - failed to parse XML (handle="
-              .. tostring(xmlFile) .. "). File may contain invalid XML.")
+        log_dbg("LOAD ERROR - loadXMLFile returned", tostring(xmlFile))
         return
     end
 
-    log_dbg("XML loaded successfully, handle=" .. tostring(xmlFile))
+    local root = "advancedDamageSystem"
+    local v
 
-    local savedVersion = getXMLFloat(xmlFile, "advancedDamageSystem.VER")
-    log_dbg("Saved version: " .. tostring(savedVersion) .. ", Current version: " .. tostring(ADS_Config.VER))
-
-    if savedVersion == nil or savedVersion ~= ADS_Config.VER then
-        log_dbg("Version mismatch or missing. Expected " .. tostring(ADS_Config.VER)
-                .. " but found " .. tostring(savedVersion) .. ".")
+    local savedVersion = getXMLFloat(xmlFile, root .. ".VER")
+    if savedVersion == nil then
+        log_dbg("LOAD - no VER in file, using defaults")
         delete(xmlFile)
         return
     end
+    log_dbg("LOAD - saved VER=", tostring(savedVersion), "current VER=", tostring(ADS_Config.VER))
 
-    -- --------------------------------------------------------
-    local function loadNode(targetTbl, path)
-        for k, v in pairs(targetTbl) do
-            if type(k) == "string" and type(v) ~= "function" and k ~= "savegameFile" and k ~= "VER" then
-                local currentPath = path .. "." .. tostring(k)
+    -- CORE
+    v = getXMLFloat(xmlFile, root .. ".BASE_SERVICE_WEAR")
+    if v ~= nil then ADS_Config.CORE.BASE_SERVICE_WEAR = v end
 
-                if type(v) == "table" then
-                    if k == "BRANDS" then
-                        -- brands
-                        local loaded = {}
-                        local i = 0
-                        while true do
-                            local bp = currentPath .. ".brand(" .. i .. ")"
-                            if not hasXMLProperty(xmlFile, bp .. "#name") then
-                                break
-                            end
-                            local name = getXMLString(xmlFile, bp .. "#name")
-                            local rel  = getXMLFloat (xmlFile, bp .. "#reliability")
-                            local mnt  = getXMLFloat (xmlFile, bp .. "#maintainability")
-                            if name and rel and mnt then
-                                loaded[name] = { rel, mnt }
-                            end
-                            i = i + 1
-                        end
-                        if next(loaded) then
-                            for n, vals in pairs(loaded) do
-                                targetTbl[k][n] = vals
-                            end
-                            print("ADS_Config:   Loaded " .. i .. " brand(s).")
-                        end
+    v = getXMLFloat(xmlFile, root .. ".BASE_SYSTEMS_WEAR")
+    if v ~= nil then ADS_Config.CORE.BASE_SYSTEMS_WEAR = v end
 
-                    elseif isArray(v) then
-                        -- massive
-                        local arr = {}
-                        local i = 0
-                        while true do
-                            local ip = currentPath .. ".item(" .. i .. ")"
-                            if not hasXMLProperty(xmlFile, ip .. "#value") then
-                                break
-                            end
-                            local val
-                            if type(v[1]) == "number" then
-                                val = getXMLFloat(xmlFile, ip .. "#value")
-                            elseif type(v[1]) == "boolean" then
-                                val = getXMLBool(xmlFile, ip .. "#value")
-                            elseif type(v[1]) == "string" then
-                                val = getXMLString(xmlFile, ip .. "#value")
-                            end
-                            if val ~= nil then
-                                table.insert(arr, val)
-                            end
-                            i = i + 1
-                        end
-                        if #arr > 0 then
-                            targetTbl[k] = arr
-                            log_dbg(currentPath
-                                  .. " = [" .. table.concat(
-                                      (function()
-                                          local s = {}
-                                          for _, a in ipairs(arr) do
-                                              table.insert(s, tostring(a))
-                                          end
-                                          return s
-                                      end)(), ", ") .. "]")
-                        end
+    v = getXMLFloat(xmlFile, root .. ".MAX_MTBF")
+    if v ~= nil then ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF = v end
 
-                    else
-                        -- nested table
-                        loadNode(v, currentPath)
-                    end
-                else
-                    local loadedValue
-                    if type(v) == "number" then
-                        loadedValue = getXMLFloat(xmlFile, currentPath)
-                    elseif type(v) == "boolean" then
-                        loadedValue = getXMLBool(xmlFile, currentPath)
-                    elseif type(v) == "string" then
-                        loadedValue = getXMLString(xmlFile, currentPath)
-                    end
+    v = getXMLBool(xmlFile, root .. ".AI_OVERLOAD_CONTROL")
+    if v ~= nil then ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = v end
 
-                    if loadedValue ~= nil then
-                        targetTbl[k] = loadedValue
-                    end
-                end
-            end
-        end
-    end
-    -- --------------------------------------------------------
+    -- MAINTENANCE
+    v = getXMLBool(xmlFile, root .. ".INSTANT_INSPECTION")
+    if v ~= nil then ADS_Config.MAINTENANCE.INSTANT_INSPECTION = v end
 
-    loadNode(ADS_Config, "advancedDamageSystem")
+    v = getXMLBool(xmlFile, root .. ".PARK_VEHICLE")
+    if v ~= nil then ADS_Config.MAINTENANCE.PARK_VEHICLE = v end
+
+    v = getXMLBool(xmlFile, root .. ".WARRANTY_ENABLED")
+    if v ~= nil then ADS_Config.MAINTENANCE.WARRANTY_ENABLED = v end
+
+    v = getXMLFloat(xmlFile, root .. ".PRICE_MULTIPLIER")
+    if v ~= nil then ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER = v end
+
+    v = getXMLFloat(xmlFile, root .. ".TIME_MULTIPLIER")
+    if v ~= nil then ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER = v end
+
+    -- WORKSHOP
+    v = getXMLBool(xmlFile, root .. ".ALWAYS_AVAILABLE")
+    if v ~= nil then ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = v end
+
+    v = getXMLFloat(xmlFile, root .. ".OPEN_HOUR")
+    if v ~= nil then ADS_Config.WORKSHOP.OPEN_HOUR = v end
+
+    v = getXMLFloat(xmlFile, root .. ".CLOSE_HOUR")
+    if v ~= nil then ADS_Config.WORKSHOP.CLOSE_HOUR = v end
+
+    -- THERMAL
+    v = getXMLFloat(xmlFile, root .. ".ENGINE_MAX_HEAT")
+    if v ~= nil then ADS_Config.THERMAL.ENGINE_MAX_HEAT = v end
+
+    v = getXMLFloat(xmlFile, root .. ".TRANS_MAX_HEAT")
+    if v ~= nil then ADS_Config.THERMAL.TRANS_MAX_HEAT = v end
+
+    v = getXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE")
+    if v ~= nil then ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = v end
+
+    -- DEBUG
+    v = getXMLBool(xmlFile, root .. ".DEBUG_MODE")
+    if v ~= nil then ADS_Config.DEBUG = v end
+
     delete(xmlFile)
-    log_dbg("Advanced Damage System settings loaded successfully.")
+    ADS_Config._loaded = true
+    log_dbg("LOAD OK - BASE_SERVICE_WEAR=", tostring(ADS_Config.CORE.BASE_SERVICE_WEAR))
 end
-
-Mission00.loadMission00Finished = Utils.appendedFunction(
-    Mission00.loadMission00Finished, ADS_Config.loadFromXMLFile)
-
-FSCareerMissionInfo.saveToXMLFile = Utils.appendedFunction(
-    FSCareerMissionInfo.saveToXMLFile, ADS_Config.saveToXMLFile)
