@@ -1091,7 +1091,13 @@ ADS_Breakdowns.BreakdownRegistry = {
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
-            return motor.minForwardGearRatio ~= nil
+            if motor.minForwardGearRatio == nil then return false end
+            local spec = vehicle.spec_AdvancedDamageSystem
+            local activeBreakdowns = spec and spec.activeBreakdowns
+            if activeBreakdowns ~= nil and activeBreakdowns.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION ~= nil then
+                return false
+            end
+            return true
         end,
         isCanProgress = function(vehicle)
             return (vehicle:getLastSpeed() > 0.01)
@@ -1147,6 +1153,89 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 17.6, 
                 effects = { 
                      { id = "CVT_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_cvt_chain_wear_stage4_message", disableAi = true}, aggregation = "max" }
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.TRANSMISSION,
+        isApplicable = function(vehicle)
+            local motor = vehicle:getMotor()
+            if not motor then return false end
+            if motor.minForwardGearRatio == nil then return false end
+            local spec = vehicle.spec_AdvancedDamageSystem
+            local activeBreakdowns = spec and spec.activeBreakdowns
+            if activeBreakdowns ~= nil and activeBreakdowns.CVT_CHAIN_WEAR ~= nil then
+                return false
+            end
+            return true
+        end,
+        isCanProgress = function(vehicle)
+            return (vehicle:getLastSpeed() > 0.01)
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.5,
+                repairPrice = 2.2,
+                effects = {
+                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.5, aggregation = "max", extraData = {timer = 0, duration = 200, status = 'IDLE'}},
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
+                    { id = "CVT_MAX_RATIO_MODIFIER", value = 0.3, aggregation = "max" },
+                },
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.5,
+                repairPrice = 4.4,
+                effects = {
+                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.25, aggregation = "max", extraData = {timer = 0, duration = 250, status = 'IDLE'}},
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.1, aggregation = "sum" },
+                    { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" },
+                    { id = "CVT_MAX_RATIO_MODIFIER", value = 0.4, aggregation = "max" },
+                    
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.5,
+                repairPrice = 8.8, 
+                effects = { 
+                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.1, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.2, aggregation = "sum" },
+                    { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.1, aggregation = "sum" },
+                    { id = "CVT_MAX_RATIO_MODIFIER", value = 0.5, aggregation = "max" },
+                },
+                indicators = {
+                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 17.6, 
+                effects = { 
+                     { id = "CVT_MAX_RATIO_MODIFIER", value = 0.8, aggregation = "max" },
+                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.15, aggregation = "sum" },
+                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.3, aggregation = "sum" },
+                     { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.05, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
+                     { id = "ENGINE_LIMP_EFFECT", value = -0.2, aggregation = "min", extraData = {reason = "BREAKDOWN", message = "ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message", disableAi = true } },
                 },
                 indicators = {
                     { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1431,6 +1520,235 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    -- fuel system
+    FUEL_PUMP_MALFUNCTION = {
+        isSelectable = true,
+        part = "ads_breakdowns_part_fuel_pump",
+        isApplicable = function(vehicle)
+            return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_fuel_pump_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.0,
+                repairPrice = 0.4,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8, cruiseState = 0} }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_fuel_pump_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0,
+                repairPrice = 0.8,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.4, aggregation = "sum" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.5, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
+                },
+                indicators = {
+                    {  
+                        id = db.ENGINE,
+                        color = color.WARNING,
+                        switchOn = function(vehicle)
+                            if vehicle.spec_motorized and vehicle:getIsMotorStarted() and vehicle:getMotorLoadPercentage() > 0.95 then
+                                return true
+                            end
+                            return false
+                        end,
+                        switchOff = false
+                    }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_fuel_pump_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.2,
+                repairPrice = 1.6, 
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} }, 
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 1.0, aggregation = "sum" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0} }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_fuel_pump_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 3.2, 
+                effects = { 
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_pump_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} } 
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    FUEL_INJECTOR_MALFUNCTION = {
+        isSelectable = true,
+        part = "ads_breakdowns_part_fuel_injectors",
+        isApplicable = function(vehicle)
+            return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_fuel_injector_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.5,
+                repairPrice = 0.6,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.08, aggregation = "sum" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.9, cruiseState = 0} }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_fuel_injector_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.5,
+                repairPrice = 1.2,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.20, aggregation = "sum" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 0.8, motorLoad = 0.8, cruiseState = 0} }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_fuel_injector_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.2,
+                repairPrice = 2.4,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_fuel_injector_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 4.8,
+                effects = {
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_injector_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    CARBURETOR_CLOGGING = {
+        isSelectable = true,
+        part = "ads_breakdowns_part_carburetor",
+        isApplicable = function(vehicle)
+            local spec = vehicle.spec_AdvancedDamageSystem
+            return spec.year < 1980 and not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_carburetor_clogging_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.0,
+                repairPrice = 0.2,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_carburetor_clogging_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0,
+                repairPrice = 0.4,
+                effects = {
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" }
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_carburetor_clogging_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0,
+                repairPrice = 0.8, 
+                effects = { 
+                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_carburetor_clogging_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 1.6, 
+                effects = { 
+                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
+                },
+                indicators = {
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
     -- workprocess system
     YIELD_SENSOR_MALFUNCTION = {
         isSelectable = true,
@@ -1651,7 +1969,6 @@ ADS_Breakdowns.BreakdownRegistry = {
     },
     
 }
-
 -- ==========================================================
 --                     BREAKDOWN EFFECTS
 -- ==========================================================
@@ -2000,12 +2317,6 @@ ADS_Breakdowns.EffectApplicators.CVT_SLIP_EFFECT = {
                 local clampMax = math.max(origMinRatio, origMinRatio * 10)
                 minRatio = math.clamp(m.gearRatio * accelerationFactor, clampMin, clampMax)
                 local lastDebugMs = tonumber(slipEffect.extraData.lastDebugMs) or 0
-
-
-                if nowMs - lastDebugMs >= 500 then
-                    slipEffect.extraData.lastDebugMs = nowMs
-                    print(string.format("[ADS][CVT_SLIP] accel=%.4f dt=%.4f minRatio=%.1f/%.1f gearRatio=%.1f decat=%.4f", accelerationFactor, dtSec, minRatio, origMinRatio, m.gearRatio, decatPerSecond))
-                end
             end
             return minRatio, maxRatio
         end
@@ -2025,6 +2336,51 @@ ADS_Breakdowns.EffectApplicators.CVT_SLIP_EFFECT = {
         end
 
         motor:setExternalTorqueVirtualMultiplicator(1)
+    end
+}
+
+------------------ CVT_MAX_RATIO_MODIFIER ---------------
+ADS_Breakdowns.EffectApplicators.CVT_MAX_RATIO_MODIFIER = {
+    getOriginalFunctionName = function()
+        return "getMinMaxGearRatio"
+    end,
+
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying CVT_MAX_RATIO_MODIFIER:", effectData.value)
+        local motor = vehicle:getMotor()
+        if motor == nil then return end
+        if motor.minForwardGearRatio == nil then return end
+
+        local originalFuncName = "__CVT_MAX_RATIO_PREV_getMinMaxGearRatio"
+
+        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] == nil then
+            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = motor.getMinMaxGearRatio
+        end
+
+        motor.getMinMaxGearRatio = function(m)
+            local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+            local origMinRatio, origMaxRatio = originalFunc(m)
+            local minRatio, maxRatio = origMinRatio, origMaxRatio
+            local effect = vehicle.spec_AdvancedDamageSystem.activeEffects and vehicle.spec_AdvancedDamageSystem.activeEffects.CVT_MAX_RATIO_MODIFIER
+            local value = (effect and tonumber(effect.value)) or 0
+            minRatio = minRatio + minRatio * value
+            return minRatio, maxRatio
+        end
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing CVT_MAX_RATIO_MODIFIER effect.")
+        local motor = vehicle:getMotor()
+        if motor == nil then return end
+
+        local originalFuncName = "__CVT_MAX_RATIO_PREV_getMinMaxGearRatio"
+        local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+
+        if originalFunc ~= nil then
+            motor.getMinMaxGearRatio = originalFunc
+            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = nil
+        end
+
     end
 }
 
@@ -2327,6 +2683,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HEAT_MODIFIER = {
         spec.extraTransmissionHeat = 0
     end
 }
+
 
 -- ==========================================================
 --                VISUAL AND SOUND EFFECTS
@@ -2642,6 +2999,114 @@ ADS_Breakdowns.EffectApplicators.ENGINE_ABNORMAL_NOISE_EFFECT = {
 --                 EFFECTS WITH PROBABILITY
 -- ==========================================================
 
+
+------------------- CVT_PRESSURE_DROP_CHANCE -----------------
+ADS_Breakdowns.EffectApplicators.CVT_PRESSURE_DROP_CHANCE = {
+    getOriginalFunctionName = function()
+        return "getMinMaxGearRatio"
+    end,
+    getEffectName = function()
+        return "CVT_PRESSURE_DROP_CHANCE"
+    end,
+
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying CVT_PRESSURE_DROP_CHANCE:", effectData.value)
+        local motor = vehicle:getMotor()
+        if motor == nil then return end
+        if motor.minForwardGearRatio == nil then return end
+        local effectName = handler.getEffectName()
+        local pressureDropFuncKey = "__CVT_PRESSURE_DROP_PREV_getMinMaxGearRatio"
+
+        local activeFunc = function(v, dt)
+
+            if v:getIsMotorStarted() and v:getLastSpeed() > 1 then
+                local originalFuncName = handler.getOriginalFunctionName()
+                local effect = v.spec_AdvancedDamageSystem.activeEffects.CVT_PRESSURE_DROP_CHANCE
+                if effect == nil then
+                    return
+                end
+                effect.extraData = effect.extraData or {}
+                effect.extraData.status = tostring(effect.extraData.status or "IDLE")
+                effect.extraData.timer = tonumber(effect.extraData.timer) or 0
+                effect.extraData.duration = tonumber(effect.extraData.duration) or 200
+
+                -- TO-DO MP: server check
+                if effect.extraData.status == 'IDLE' and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
+                    effect.extraData.status = 'DROP'
+                    effect.extraData.timer = effect.extraData.duration
+
+                    --TO-DO MP: send event (effect.extraData.status = 'DROP', effect.extraData.timer = effect.extraData.duration)
+                
+                end
+                if effect.extraData.status == 'DROP' and effect.extraData.timer > 0 then
+                    if v.spec_AdvancedDamageSystem.originalFunctions[pressureDropFuncKey] == nil then
+                        v.spec_AdvancedDamageSystem.originalFunctions[pressureDropFuncKey] = motor.getMinMaxGearRatio
+                    end
+
+                    effect.extraData.status = 'PROGRESS'
+                    motor.getMinMaxGearRatio = function(m)
+                        local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[pressureDropFuncKey]
+                        if originalFunc == nil then
+                            return m.minForwardGearRatio or 0, m.maxForwardGearRatio or 0
+                        end
+                        local origMinRatio, origMaxRatio = originalFunc(m)
+                        local minRatio, maxRatio = origMinRatio, origMaxRatio
+                        local currentEffect = vehicle.spec_AdvancedDamageSystem.activeEffects and vehicle.spec_AdvancedDamageSystem.activeEffects.CVT_PRESSURE_DROP_CHANCE
+                        if currentEffect ~= nil and currentEffect.extraData ~= nil and currentEffect.extraData.status == "PROGRESS" and (currentEffect.extraData.timer or 0) > 0 then
+                            return minRatio * 5, maxRatio
+                        end
+                        return minRatio, maxRatio
+                    end
+                    
+                end
+                if effect.extraData.status == 'PROGRESS' then
+                    effect.extraData.timer = effect.extraData.timer - dt
+                end
+                if effect.extraData.timer <= 0 then
+                    effect.extraData.timer = 0
+                    local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[pressureDropFuncKey]
+                    if originalFunc ~= nil then
+                        motor.getMinMaxGearRatio = originalFunc
+                        v.spec_AdvancedDamageSystem.originalFunctions[pressureDropFuncKey] = nil
+                    else
+                        local hasHydraulicValveBreakdown = v.spec_AdvancedDamageSystem.activeBreakdowns and v.spec_AdvancedDamageSystem.activeBreakdowns.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION ~= nil
+                        local sharedOriginalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+                        if sharedOriginalFunc ~= nil and not hasHydraulicValveBreakdown then
+                            motor.getMinMaxGearRatio = sharedOriginalFunc
+                            v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = nil
+                        end
+                    end
+                    effect.extraData.status = 'IDLE'
+                end
+            end
+        end
+        addFuncToActive(vehicle, effectName, activeFunc)
+    end,
+
+    remove = function(vehicle, handler)
+        local motor = vehicle:getMotor()
+        if motor ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
+            local spec = vehicle.spec_AdvancedDamageSystem
+            local pressureDropFuncKey = "__CVT_PRESSURE_DROP_PREV_getMinMaxGearRatio"
+            local originalFuncName = handler.getOriginalFunctionName()
+            local originalFunc = spec.originalFunctions and spec.originalFunctions[pressureDropFuncKey]
+
+            if originalFunc ~= nil then
+                motor.getMinMaxGearRatio = originalFunc
+                spec.originalFunctions[pressureDropFuncKey] = nil
+            else
+                local hasHydraulicValveBreakdown = spec.activeBreakdowns and spec.activeBreakdowns.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION ~= nil
+                local sharedOriginalFunc = spec.originalFunctions and spec.originalFunctions[originalFuncName]
+                if sharedOriginalFunc ~= nil and not hasHydraulicValveBreakdown then
+                    motor.getMinMaxGearRatio = sharedOriginalFunc
+                    spec.originalFunctions[originalFuncName] = nil
+                end
+            end
+        end
+        removeFuncFromActive(vehicle, handler.getEffectName())
+    end
+}
+
 ------------------- ENGINE_STALLS_CHANCE --------------------
 ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
     getEffectName = function() return "ENGINE_STALLS_CHANCE" end,
@@ -2676,7 +3141,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
         removeFuncFromActive(vehicle, handler.getEffectName())
     end,
 }
-
 
 ------------------- ENGINE_START_FAILURE_CHANCE ------------------
 ADS_Breakdowns.EffectApplicators.ENGINE_START_FAILURE_CHANCE = {
@@ -3072,7 +3536,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
                         vehicle:setCruiseControlState(0, true)
                     end
                     extra.status = "CHOKING"
-
                     ADS_EffectSyncEvent.send(vehicle, "ENGINE_HESITATION_CHANCE", "CHOKING", 0)
 
                 end

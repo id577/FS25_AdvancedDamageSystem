@@ -260,6 +260,8 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#maintenanceTimer", "Maintenance Timer")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#engineTemperature", "Engine Temperature")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionTemperature", "Transmission Temperature")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#thermostatState", "Engine Thermostat Position")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionThermostatState", "Transmission Thermostat Position")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#lastServiceDate", "Last Service Date")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#lastInspectionDate", "Last Inspection Date")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lastServiceOpHours", "Last Service Operating Hours")
@@ -504,6 +506,9 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
     spec.rawTransmissionTemperature = syncTransTemp
     spec._netTargetTransmissionTemp = syncTransTemp
     spec.thermostatState = streamReadFloat32(streamId)
+    if spec.engTermPID ~= nil then
+        spec.engTermPID.mechPos = spec.thermostatState
+    end
     local syncFuelRaw = streamReadFloat32(streamId)
     spec._fuelUsageRaw = syncFuelRaw
     spec.fuelUsage     = syncFuelRaw
@@ -619,6 +624,9 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             spec._netTargetEngineTemp = streamReadFloat32(streamId)
             spec._netTargetTransmissionTemp = streamReadFloat32(streamId)
             spec.thermostatState = streamReadFloat32(streamId)
+            if spec.engTermPID ~= nil then
+                spec.engTermPID.mechPos = spec.thermostatState
+            end
             spec._fuelUsageRaw = streamReadFloat32(streamId)  -- raw lastFuelUsage, buffered client-side
             spec.serviceOptionOne = streamReadString(streamId)
             spec.serviceOptionTwo = streamReadString(streamId)
@@ -691,6 +699,8 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#lastInspServ", spec.lastInspectedServiceState or "")
         xmlFile:setValue(key .. "#engineTemperature", spec.engineTemperature or -99)
         xmlFile:setValue(key .. "#transmissionTemperature", spec.transmissionTemperature or -99)
+        xmlFile:setValue(key .. "#thermostatState", math.clamp(spec.thermostatState or 0.0, 0.0, 1.0))
+        xmlFile:setValue(key .. "#transmissionThermostatState", math.clamp(spec.transmissionThermostatState or 0.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower or 1)
         xmlFile:setValue(key .. "#lastInspBrk", spec.lastInspectedBrake or 1)
         xmlFile:setValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction or 1)
@@ -1122,6 +1132,14 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.lastInspectedServiceState = savegame.xmlFile:getValue(key .. "#lastInspServ", spec.lastInspectedServiceState)
         spec.engineTemperature = savegame.xmlFile:getValue(key .. "#engineTemperature", spec.engineTemperature)
         spec.transmissionTemperature = savegame.xmlFile:getValue(key .. "#transmissionTemperature", spec.transmissionTemperature)
+        spec.thermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#thermostatState", spec.thermostatState), 0.0, 1.0)
+        spec.transmissionThermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#transmissionThermostatState", spec.transmissionThermostatState), 0.0, 1.0)
+        if spec.engTermPID ~= nil then
+            spec.engTermPID.mechPos = spec.thermostatState
+        end
+        if spec.transTermPID ~= nil then
+            spec.transTermPID.mechPos = spec.transmissionThermostatState
+        end
         spec.lastInspectedPower = savegame.xmlFile:getValue(key .. "#lastInspPwr", spec.lastInspectedPower)
         spec.lastInspectedBrake = savegame.xmlFile:getValue(key .. "#lastInspBrk", spec.lastInspectedBrake)
         spec.lastInspectedYieldReduction = savegame.xmlFile:getValue(key .. "#lastInspYld", spec.lastInspectedYieldReduction)
@@ -4797,7 +4815,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
 
     if isMotorStarted then
         if (self:getAccelerationAxis() > 0 or self:getCruiseControlAxis() > 0) then
-            accFactor = math.max(5 * motorRpm * math.max(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0), 1.0)
+            accFactor = math.max(5 * motorRpm * math.clamp(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0, 1.0), 1.0)
 
             if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
                 for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
