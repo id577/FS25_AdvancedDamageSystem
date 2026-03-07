@@ -194,6 +194,32 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     local isAlwaysAvailable = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE
     currentPage.ads_workshopOpenHour:setDisabled(isAlwaysAvailable)
     currentPage.ads_workshopCloseHour:setDisabled(isAlwaysAvailable)
+
+    -- MP permission: only server host or dedicated-server admin can change settings.
+    local canChangeSettings = g_currentMission ~= nil
+        and (g_currentMission:getIsServer() or g_currentMission.isMasterUser)
+        and g_currentMission:getIsClient()
+    local disableAll = not canChangeSettings
+
+    currentPage.ads_serviceWear:setDisabled(disableAll)
+    currentPage.ads_conditionWear:setDisabled(disableAll)
+    currentPage.ads_breakdownProbability:setDisabled(disableAll)
+    currentPage.ads_instantInspection:setDisabled(disableAll)
+    currentPage.ads_parkVehicle:setDisabled(disableAll)
+    currentPage.ads_warrantyEnabled:setDisabled(disableAll)
+    currentPage.ads_maintenancePrice:setDisabled(disableAll)
+    currentPage.ads_maintenanceDuration:setDisabled(disableAll)
+    currentPage.ads_workshopAvailable:setDisabled(disableAll)
+    currentPage.ads_thermalSensitivity:setDisabled(disableAll)
+    currentPage.ads_dirtInfluence:setDisabled(disableAll)
+    currentPage.ads_aiOverloadAndOverheatControl:setDisabled(disableAll)
+    currentPage.ads_debugMode:setDisabled(disableAll)
+
+    -- Workshop hour controls: disabled if non-server OR always-available is on.
+    if disableAll or isAlwaysAvailable then
+        currentPage.ads_workshopOpenHour:setDisabled(true)
+        currentPage.ads_workshopCloseHour:setDisabled(true)
+    end
 end
 
 -- --- Callback Handlers --- --
@@ -235,6 +261,7 @@ end
 function ADS_InGameSettings:onWorkshopAvailableChanged(state)
     ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    ADS_Main:forceWorkshopUpdate()
 end
 
 function ADS_InGameSettings:onWorkshopOpenHourChanged(state)
@@ -253,6 +280,7 @@ function ADS_InGameSettings:onWorkshopOpenHourChanged(state)
 
     ADS_Config.WORKSHOP.OPEN_HOUR = newOpen
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    ADS_Main:forceWorkshopUpdate()
 end
 
 function ADS_InGameSettings:onWorkshopCloseHourChanged(state)
@@ -271,6 +299,7 @@ function ADS_InGameSettings:onWorkshopCloseHourChanged(state)
 
     ADS_Config.WORKSHOP.CLOSE_HOUR = newClose
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    ADS_Main:forceWorkshopUpdate()
 end
 
 function ADS_InGameSettings:onBreakdownProbabilityChanged(state)

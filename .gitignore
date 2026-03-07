@@ -44,9 +44,11 @@ dist/
 build/
 out/
 
-# Project-specific artifacts
-AdvancedDamageSystem.zip
+# Build artifacts
+*.zip
+*.rar
+*.7z
+
+# Project-specific
 dataS_decompile/
 data_dump/
-.gitignore
-AGENTS.md

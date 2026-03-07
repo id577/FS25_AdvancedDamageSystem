@@ -570,7 +570,7 @@ function ADS_Utils.serializeSystemsState(systems)
     end
 
     table.sort(entries)
-    return table.concat(entries, ",")
+    return table.concat(entries, ";")
 end
 
 function ADS_Utils.deserializeSystemsState(serialized)
@@ -579,7 +579,13 @@ function ADS_Utils.deserializeSystemsState(serialized)
         return result
     end
 
-    for entry in string.gmatch(serialized, "([^,]+)") do
+    local separator = ";"
+    if not string.find(serialized, ";") then
+        separator = ","
+    end
+    local pattern = "([^" .. separator .. "]+)"
+
+    for entry in string.gmatch(serialized, pattern) do
         local parts = {}
         for part in string.gmatch(entry .. "|", "(.-)|") do
             table.insert(parts, part)
@@ -627,7 +633,7 @@ function ADS_Utils.serializeNumericMap(valueMap)
     end
 
     table.sort(entries)
-    return table.concat(entries, ",")
+    return table.concat(entries, ";")
 end
 
 function ADS_Utils.deserializeNumericMap(serialized)
@@ -636,7 +642,13 @@ function ADS_Utils.deserializeNumericMap(serialized)
         return result
     end
 
-    for entry in string.gmatch(serialized, "([^,]+)") do
+    local separator = ";"
+    if not string.find(serialized, ";") then
+        separator = ","
+    end
+    local pattern = "([^" .. separator .. "]+)"
+
+    for entry in string.gmatch(serialized, pattern) do
         local key, valueStr = string.match(entry, "([^|]+)|([^|]+)")
         if key ~= nil then
             local numericValue = tonumber(valueStr)
@@ -689,3 +701,69 @@ function ADS_Utils.deepCopy(original, seen)
 end
 
 
+
+-- ==========================================================
+--           MAINTENANCE LOG STREAM SERIALIZATION
+-- ==========================================================
+
+function ADS_Utils.serializeMaintenanceLogEntry(entry)
+    if entry == nil then return "" end
+    local cd = entry.conditionData or {}
+    local parts = {
+        tostring(entry.id or 0),
+        tostring(entry.type or ""),
+        tostring(entry.price or 0),
+        ADS_Utils.serializeDate(entry.date),
+        tostring(entry.location or "UNKNOWN"),
+        tostring(entry.optionOne or "NONE"),
+        tostring(entry.optionTwo or "NONE"),
+        tostring(entry.optionThree or false),
+        tostring(ADS_Utils.normalizeBoolValue(entry.isVisible, true)),
+        tostring(ADS_Utils.normalizeBoolValue(entry.isCompleted, true)),
+        tostring(ADS_Utils.normalizeBoolValue(entry.isLegacyEntry, false)),
+        tostring(cd.year or 0),
+        tostring(cd.operatingHours or 0),
+        tostring(cd.age or 0),
+        tostring(cd.condition or 1),
+        tostring(cd.service or 1),
+        tostring(cd.reliability or 1),
+        tostring(cd.maintainability or 1)
+    }
+    return table.concat(parts, "|")
+end
+
+function ADS_Utils.deserializeMaintenanceLogEntry(serialized)
+    if serialized == nil or serialized == "" then return nil end
+    local parts = {}
+    for part in string.gmatch(serialized, "([^|]+)") do
+        table.insert(parts, part)
+    end
+    if #parts < 11 then return nil end
+
+    return {
+        id = tonumber(parts[1]) or 0,
+        type = parts[2] ~= "" and parts[2] or nil,
+        price = tonumber(parts[3]) or 0,
+        date = ADS_Utils.deserializeDate(parts[4]),
+        location = parts[5] ~= "" and parts[5] or "UNKNOWN",
+        optionOne = parts[6] ~= "" and parts[6] or "NONE",
+        optionTwo = parts[7] ~= "" and parts[7] or "NONE",
+        optionThree = ADS_Utils.normalizeBoolValue(parts[8], false),
+        isVisible = ADS_Utils.normalizeBoolValue(parts[9], true),
+        isCompleted = ADS_Utils.normalizeBoolValue(parts[10], true),
+        isLegacyEntry = ADS_Utils.normalizeBoolValue(parts[11], false),
+        conditionData = {
+            year = tonumber(parts[12]) or 0,
+            operatingHours = tonumber(parts[13]) or 0,
+            age = tonumber(parts[14]) or 0,
+            condition = tonumber(parts[15]) or 1,
+            service = tonumber(parts[16]) or 1,
+            reliability = tonumber(parts[17]) or 1,
+            maintainability = tonumber(parts[18]) or 1,
+            activeBreakdowns = {},
+            selectedBreakdowns = {},
+            activeEffects = {},
+            activeIndicators = {}
+        }
+    }
+end

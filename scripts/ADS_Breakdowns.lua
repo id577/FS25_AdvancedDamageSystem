@@ -1222,235 +1222,6 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- fuel system 
-    FUEL_PUMP_MALFUNCTION = {
-        isSelectable = true,
-        system = systems.FUEL,
-        isApplicable = function(vehicle)
-            return not getIsElectricVehicle(vehicle)
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_fuel_pump_malfunction_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.4,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8, cruiseState = 0} }
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_fuel_pump_malfunction_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.8,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.4, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
-                },
-                indicators = {
-                    {  
-                        id = db.ENGINE,
-                        color = color.WARNING,
-                        switchOn = function(vehicle)
-                            if vehicle.spec_motorized and vehicle:getIsMotorStarted() and vehicle:getMotorLoadPercentage() > 0.95 then
-                                return true
-                            end
-                            return false
-                        end,
-                        switchOff = false
-                    }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_fuel_pump_malfunction_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.2,
-                repairPrice = 1.6, 
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} }, 
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 1.0, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.99, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0} }
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_fuel_pump_malfunction_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 3.2, 
-                effects = { 
-                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_pump_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} } 
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
-    FUEL_INJECTOR_MALFUNCTION = {
-        isSelectable = true,
-        system = systems.FUEL,
-        isApplicable = function(vehicle)
-            return not getIsElectricVehicle(vehicle)
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_fuel_injector_malfunction_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 3.5,
-                repairPrice = 0.6,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.08, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.9, cruiseState = 0} }
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_fuel_injector_malfunction_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 1.2,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.20, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min" },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 0.8, motorLoad = 0.8, cruiseState = 0} }
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_fuel_injector_malfunction_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.2,
-                repairPrice = 2.4,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_fuel_injector_malfunction_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 4.8,
-                effects = {
-                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_injector_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} }
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
-    CARBURETOR_CLOGGING = {
-        isSelectable = true,
-        system = systems.FUEL,
-        isApplicable = function(vehicle)
-            local spec = vehicle.spec_AdvancedDamageSystem
-            return spec.year < 1980 and not getIsElectricVehicle(vehicle)
-        end,
-        probability = function(vehicle)
-            return 1.0   
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_carburetor_clogging_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.2,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_carburetor_clogging_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.4,
-                effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" }
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_carburetor_clogging_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 0.8, 
-                effects = { 
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE', count = 0}, aggregation = "max"}
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_carburetor_clogging_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 1.6, 
-                effects = { 
-                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
-
     -- chassis system
     BRAKE_MALFUNCTION = {
         isSelectable = true,
@@ -2879,11 +2650,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
         local effectName = handler.getEffectName()
         local activeFunc = function(v, dt)
 
-            -- In this case the entire method runs only on the server. 
-            -- If the effect triggers (engine stalls) — 
-            -- we simply shut down the engine on clients via an event.
-
-            -- TO-DO MP: broadcastEvent server check
+            if not v.isServer then return end
 
             if v:getIsMotorStarted() then
                 local effect = v.spec_AdvancedDamageSystem.activeEffects.ENGINE_STALLS_CHANCE
@@ -2892,7 +2659,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
                         if v.stopMotor then
                             v:stopMotor()
 
-                            -- TO-DO MP: broadcastEvent broadcastEvent (stopMotor, showBlinkingWarning)
+                            ADS_EffectSyncEvent.send(v, "ENGINE_STALLS_CHANCE", "STALLED")
 
                             if v.getIsControlled ~= nil and v:getIsControlled() then
                                 g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000) 
@@ -3036,16 +2803,14 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
             vehicle.spec_AdvancedDamageSystem.originalFunctions[originalShiftFuncName] = motor.shiftGear
         end
 
-        -- Standard pattern — check for failed shift on the server and send the resulting state to clients.
+        -- Server-only: random roll for shift failure, broadcast result to clients.
 
         motor.shiftGear = function(m, up)
             if effectData.extraData.status == "FAILED" then return end
-            if math.random() < effectData.value then -- TO-DO MP: broadcastEvent server check
+            if m.vehicle and m.vehicle.isServer and math.random() < effectData.value then
                 effectData.extraData.status = "FAILED"
-                
-                -- TO-DO MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
-
-                if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
+                ADS_EffectSyncEvent.send(vehicle, "GEAR_SHIFT_FAILURE_CHANCE", "FAILED", 0, 0, 0)
+                if m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                     g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                 end
                 return
@@ -3063,12 +2828,10 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         motor.selectGear = function(m, gearIndex, activation)
             if effectData.extraData.status == "FAILED" then return end
             if activation then
-                if math.random() < effectData.value then -- TO-DO MP: broadcastEvent server check
+                if m.vehicle and m.vehicle.isServer and math.random() < effectData.value then
                     effectData.extraData.status = "FAILED"
-
-                    -- TO-DO MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", playSample)
-
-                    if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
+                    ADS_EffectSyncEvent.send(vehicle, "GEAR_SHIFT_FAILURE_CHANCE", "FAILED", 0, 0, 0)
+                    if m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                        g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                     end
                     return
@@ -3091,7 +2854,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
             local isShifting = (m.gear == 0 and m.gearChangeTimer > 0)
             
             if isShifting and not wasShifting then
-                if math.random() < effectData.value then -- TO-DO MP: broadcastEvent server check
+                if m.vehicle and m.vehicle.isServer and math.random() < effectData.value then
                 
                     effectData.extraData.status = "FAILED"
                     effectData.extraData.timer = 0            
@@ -3099,9 +2862,9 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
                     m.gearChangeTimer = effectData.extraData.duration
                     m.autoGearChangeTimer = effectData.extraData.duration
                     
-                    -- TO-DO MP: broadcastEvent broadcastEvent (effectData.extraData.status = "FAILED", effectData.extraData.timer = 0,  motor.gearChangeTimer, m.autoGearChangeTimer = effectData.extraData.duration,  playSample)
+                    ADS_EffectSyncEvent.send(vehicle, "GEAR_SHIFT_FAILURE_CHANCE", "FAILED", 0, 0, effectData.extraData.duration)
 
-                    if m.vehicle and m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
+                    if m.vehicle.spec_AdvancedDamageSystem and effectData.value < 1.0 then
                         g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                     end
                 end
@@ -3189,20 +2952,14 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
                             g_soundManager:playSample(vehicle.spec_AdvancedDamageSystem.samples['transmissionShiftFailed' .. math.random(3)])
                         end
 
-                    -- This is where it checks if a gear has just been rejected. 
-                    -- Then timers are started that lock the gearbox for a short time. 
-                    -- The roll is done on the server, and if the random triggers, 
-                    -- we set effect.extraData.status = 'REJECTED' and reset the timer — 
-                    -- on the clients the gear will automatically get locked as well.
-
-                    elseif v:getMotorLoadPercentage() > 0.8 and effect.extraData.status == 'IDLE' then  -- TO-DO MP: broadcastEvent server check
+                    elseif v.isServer and v:getMotorLoadPercentage() > 0.8 and effect.extraData.status == 'IDLE' then
                         if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                             effect.extraData.status = 'REJECTED'
                             effect.extraData.timer = 0
                             if motor and motor.setGear then
                                 motor:setGear(0, false)
 
-                                -- TO-DO MP: broadcastEvent broadcastEvent(motor:setGear(0, false), effect.extraData.status = 'REJECTED', effect.extraData.timer = 0, playSample, showBlinkingWarning)
+                                ADS_EffectSyncEvent.send(v, "GEAR_REJECTION_CHANCE", "REJECTED", 0)
                                 
                                 if v.getIsControlled ~= nil and v:getIsControlled() then
                                     g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples.gearDisengage1)
@@ -3253,17 +3010,13 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
                             effect.extraData.timer = 0
                             v:setLightsTypesMask(effect.extraData.maskBackup, true, true)
 
-                        -- This is where the headlight flickering process starts. 
-                        -- The server checks and triggers it, 
-                        -- clients will start flickering the headlights once they see the field status == 'FLICKERING'.
-            
-                        elseif effect.extraData.status == 'IDLE' then   -- TO-DO MP: broadcastEvent broadcastEvent server check
+                        elseif v.isServer and effect.extraData.status == 'IDLE' then
                             if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                                 effect.extraData.maskBackup = v:getLightsTypesMask()
                                 if effect.extraData.maskBackup == 0 then return end
                                 effect.extraData.status = 'FLICKING'
 
-                                -- TO-DO MP: broadcastEvent broadcastEvent broadcastEvent (effect.extraData.status = 'FLICKING')
+                                ADS_EffectSyncEvent.send(v, "LIGHTS_FLICKER_CHANCE", "FLICKING", 0, effect.extraData.maskBackup)
 
                             end
                         end
@@ -3311,7 +3064,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
                     extra.timer = 0
                 end
             elseif vehicle:getMotorLoadPercentage() > extra.motorLoad then
-                if effectData.value > 0 and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effectData.value) and extra.status == "IDLE" then -- TO-DO MP: broadcastEvent server check
+                if vehicle.isServer and effectData.value > 0 and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effectData.value) and extra.status == "IDLE" then
                     
                     local cruiseState = vehicle:getCruiseControlState()
                     if cruiseState ~= 0 then
@@ -3320,6 +3073,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
                     end
                     extra.status = "CHOKING"
 
+                    ADS_EffectSyncEvent.send(vehicle, "ENGINE_HESITATION_CHANCE", "CHOKING", 0)
 
                 end
             end
@@ -3390,11 +3144,6 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
             end
         end
 
-        -- As I understand it, startMotor will be triggered on the client first, 
-        -- and we need to notify the server about it. 
-        -- In that case, the dice roll would be better performed on the client (IMHO), 
-        -- and the result then sent to the server.
-
         if self.spec_AdvancedDamageSystem.activeEffects.ENGINE_START_FAILURE_CHANCE then
             local startFailureEffect = spec.activeEffects.ENGINE_START_FAILURE_CHANCE
             if startFailureEffect ~= nil and startFailureEffect.extraData == nil then
@@ -3429,14 +3178,14 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
                 local roll = math.random()
                 local isFailedStart = roll < failChance
 
-                if isFailedStart then
+                if self.isServer and isFailedStart then
 
-                    -- TO-DO MP: send event 
                     extra.status = "CRANKING"
                     extra.timer = 0
                     extra.currentCount = failedAttempts + 1
                     setMotorStartedFlagForStarterDamage(self)
-                    -- TO-DO MP: send event (extra.status = "CRANKING", extra.timer = 0, extra.currentCount = failedAttempts + 1, setMotorStartedFlagForStarterDamage(self))
+
+                    ADS_EffectSyncEvent.send(self, "ENGINE_START_FAILURE_CHANCE", "CRANKING", 0, failedAttempts + 1)
                     return
                 end
 

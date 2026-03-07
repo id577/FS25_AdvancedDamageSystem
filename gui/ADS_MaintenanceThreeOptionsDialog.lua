@@ -208,8 +208,15 @@ function ADS_MaintenanceThreeOptionsDialog:onClickStartService()
         return
     end
 
-    vehicle:initService(self.maintenanceType, workshopType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree)
-    g_currentMission:addMoney(-1 * price, vehicle:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
+    if g_server ~= nil then
+        -- Server: execute locally and broadcast
+        vehicle:initService(self.maintenanceType, workshopType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree)
+        g_currentMission:addMoney(-1 * price, vehicle:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
+        ADS_VehicleChangeStatusEvent.send(vehicle)
+    else
+        -- Client: only send request to server
+        ADS_ServiceRequestEvent.send(vehicle, self.maintenanceType, workshopType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, price)
+    end
 
     self:close()
 end
