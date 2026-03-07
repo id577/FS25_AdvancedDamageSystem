@@ -796,6 +796,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.extraServiceWear = 0
     self.spec_AdvancedDamageSystem.extraBreakdownProbability = 0
     self.spec_AdvancedDamageSystem.extraEngineHeat = 0
+    self.spec_AdvancedDamageSystem.extraTransmissionHeat = 0
     
     self.spec_AdvancedDamageSystem.reliability = 1.0
     self.spec_AdvancedDamageSystem.maintainability = 1.0
@@ -1018,7 +1019,13 @@ function AdvancedDamageSystem:onLoad(savegame)
             convectionCooling = 0,
             loadFactor = 0,
             slipFactor = 0,
+            pullFactor = 0,
+            wheelSlipFactor = 0,
             accFactor = 0,
+            speedLimit = 0,
+            cvtSlipActive = 0,
+            cvtSlipLocked = 0,
+            extraTransmissionHeat = 0,
             stiction = 0,
             waxSpeed = 0,
             kp = 0
@@ -2403,6 +2410,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             wheelSlipFactor = wheelSlipFactor * (C.WHEEL_SLIP_MULTIPLIER or 0)
             wearRate = wearRate + wheelSlipFactor
         end
+
+        spec.systems.transmission.wheelSlipIntensity = wheelSlipIntensity
 
         if vehicleHaveCVT then
             -- cold CVT factor
@@ -4775,9 +4784,13 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     local dbg = spec.debugData.transmissionTemp
 
     local loadFactor = motorLoad - motor.motorExternalTorque / motor.peakMotorTorque
+    local pullFactor = 1.0
     local slipFactor = 1.0
+    local wheelSlipFactor = 1.0
     local accFactor = 1.0
     local speedLimit = math.huge
+    local cvtSlipActive = false
+    local cvtSlipLocked = false
     
     local deltaTemp = math.max(0, spec.rawTransmissionTemperature - eviromentTemp)
     convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
@@ -4805,9 +4818,28 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
             if self:getCruiseControlState() ~= 0 then
                 speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
             end
-            slipFactor = 1 + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2
+            pullFactor = pullFactor + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2
         end
-        heat = C.TRANS_MIN_HEAT + (C.TRANS_MAX_HEAT - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor
+
+        -- slip effect from breakdown
+        if spec.activeEffects.CVT_SLIP_EFFECT ~= nil and spec.activeEffects.CVT_SLIP_EFFECT.value > 0 then
+            cvtSlipActive = true
+            local curSpeed = math.min(motor.vehicle:getLastSpeed() / (motor:getMaximumForwardSpeed() * 3.6), 1.0)
+            local minGearRatio, maxGearRatio = motor:getMinMaxGearRatio()
+            local isSliping = (1 - minGearRatio / math.max(motor.gearRatio, 0.01) <= 0.02) and curSpeed < 0.8
+            if isSliping then
+                cvtSlipLocked = true
+                slipFactor = slipFactor * 2.0
+            end
+        end
+
+        -- wheel slip
+        if spec.systems.transmission and spec.systems.transmission.wheelSlipIntensity and spec.systems.transmission.wheelSlipIntensity > 0.05 then
+            wheelSlipFactor = wheelSlipFactor + (spec.systems.transmission.wheelSlipIntensity or 0)
+        end
+        
+        local maxHeat = C.TRANS_MAX_HEAT + spec.extraTransmissionHeat
+        heat = C.TRANS_MIN_HEAT + (maxHeat - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor * wheelSlipFactor * pullFactor 
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
@@ -4845,7 +4877,13 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         dbg.convectionCooling = convectionCooling
         dbg.loadFactor = loadFactor
         dbg.slipFactor = slipFactor
+        dbg.pullFactor = pullFactor
+        dbg.wheelSlipFactor = wheelSlipFactor
         dbg.accFactor = accFactor
+        dbg.speedLimit = speedLimit ~= math.huge and speedLimit or 0
+        dbg.cvtSlipActive = cvtSlipActive and 1 or 0
+        dbg.cvtSlipLocked = cvtSlipLocked and 1 or 0
+        dbg.extraTransmissionHeat = spec.extraTransmissionHeat or 0
     end
 
     return dbg
