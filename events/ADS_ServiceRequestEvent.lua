@@ -65,6 +65,21 @@ function ADS_ServiceRequestEvent:run(connection)
                 return
             end
 
+            local spec = self.vehicle.spec_AdvancedDamageSystem
+            if spec.currentState ~= AdvancedDamageSystem.STATUS.READY then
+                return
+            end
+
+            local validTypes = {
+                [AdvancedDamageSystem.STATUS.INSPECTION] = true,
+                [AdvancedDamageSystem.STATUS.MAINTENANCE] = true,
+                [AdvancedDamageSystem.STATUS.REPAIR] = true,
+                [AdvancedDamageSystem.STATUS.OVERHAUL] = true
+            }
+            if not validTypes[self.serviceType] then
+                return
+            end
+
             local serverPrice = self.vehicle:getServicePrice(self.serviceType, self.optionOne, self.optionTwo, self.optionThree, self.workshopType) or 0
 
             self.vehicle:initService(self.serviceType, self.workshopType, self.optionOne, self.optionTwo, self.optionThree)

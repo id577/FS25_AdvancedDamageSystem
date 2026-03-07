@@ -591,9 +591,14 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
             streamWriteFloat32(streamId, spec.pendingProgressElapsedTime or 0)
         end
 
-        -- [5] Meta (last log entry)
+        -- [5] Meta (pending log entries)
         if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_meta) ~= 0) then
-            streamWriteString(streamId, ADS_Utils.serializeMaintenanceLogEntry(spec.lastLogEntry))
+            local pending = spec._pendingNetLogEntries or {}
+            streamWriteUInt8(streamId, #pending)
+            for _, entry in ipairs(pending) do
+                streamWriteString(streamId, ADS_Utils.serializeMaintenanceLogEntry(entry))
+            end
+            spec._pendingNetLogEntries = {}
         end
     end
 end
@@ -654,11 +659,14 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             spec.pendingProgressElapsedTime = streamReadFloat32(streamId)
         end
 
-        -- [5] Meta (last log entry)
+        -- [5] Meta (pending log entries)
         if streamReadBool(streamId) then
-            local entry = ADS_Utils.deserializeMaintenanceLogEntry(streamReadString(streamId))
-            if entry ~= nil then
-                table.insert(spec.maintenanceLog, entry)
+            local count = streamReadUInt8(streamId)
+            for i = 1, count do
+                local entry = ADS_Utils.deserializeMaintenanceLogEntry(streamReadString(streamId))
+                if entry ~= nil then
+                    table.insert(spec.maintenanceLog, entry)
+                end
             end
         end
     end
@@ -1071,6 +1079,8 @@ function AdvancedDamageSystem:onLoad(savegame)
         self.spec_AdvancedDamageSystem.adsDirtyFlag_service = self:getNextDirtyFlag()    -- [4] progress counters
         self.spec_AdvancedDamageSystem.adsDirtyFlag_meta = self:getNextDirtyFlag()       -- [5] maintenance log
     end
+
+    self.spec_AdvancedDamageSystem._pendingNetLogEntries = {}
 end
 
 function AdvancedDamageSystem:onPostLoad(savegame)
@@ -1692,9 +1702,13 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local prevThermostatState = spec.thermostatState
     local prevSystemsHash = 0
     do
-        local i = 0
-        for sysKey, sysData in pairs(spec.systems) do
-            i = i + 1
+        local sortedKeys = {}
+        for sysKey, _ in pairs(spec.systems) do
+            table.insert(sortedKeys, sysKey)
+        end
+        table.sort(sortedKeys)
+        for i, sysKey in ipairs(sortedKeys) do
+            local sysData = spec.systems[sysKey]
             local c = sysData.condition or 0
             local s = sysData.stress    or 0
             local e = sysData.enabled ~= false and 1 or 0
@@ -1753,9 +1767,13 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         -- [2] Systems
         local postSystemsHash = 0
         do
-            local i = 0
-            for sysKey, sysData in pairs(spec.systems) do
-                i = i + 1
+            local sortedKeys = {}
+            for sysKey, _ in pairs(spec.systems) do
+                table.insert(sortedKeys, sysKey)
+            end
+            table.sort(sortedKeys)
+            for i, sysKey in ipairs(sortedKeys) do
+                local sysData = spec.systems[sysKey]
                 local c = sysData.condition or 0
                 local s = sysData.stress    or 0
                 local e = sysData.enabled ~= false and 1 or 0
@@ -4647,6 +4665,10 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
 
     table.insert(spec.maintenanceLog, entry)
     spec.lastLogEntry = entry
+
+    if self.isServer then
+        table.insert(spec._pendingNetLogEntries, entry)
+    end
 end
 
 -- ==========================================================

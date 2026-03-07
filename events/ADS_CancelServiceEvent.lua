@@ -40,6 +40,11 @@ function ADS_CancelServiceEvent:run(connection)
                 return
             end
 
+            local spec = self.vehicle.spec_AdvancedDamageSystem
+            if spec.currentState == AdvancedDamageSystem.STATUS.READY then
+                return
+            end
+
             self.vehicle:cancelService()
         end
     end

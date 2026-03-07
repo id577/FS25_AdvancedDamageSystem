@@ -570,7 +570,7 @@ function ADS_Utils.serializeSystemsState(systems)
     end
 
     table.sort(entries)
-    return table.concat(entries, ",")
+    return table.concat(entries, ";")
 end
 
 function ADS_Utils.deserializeSystemsState(serialized)
@@ -579,7 +579,13 @@ function ADS_Utils.deserializeSystemsState(serialized)
         return result
     end
 
-    for entry in string.gmatch(serialized, "([^,]+)") do
+    local separator = ";"
+    if not string.find(serialized, ";") then
+        separator = ","
+    end
+    local pattern = "([^" .. separator .. "]+)"
+
+    for entry in string.gmatch(serialized, pattern) do
         local parts = {}
         for part in string.gmatch(entry .. "|", "(.-)|") do
             table.insert(parts, part)
@@ -627,7 +633,7 @@ function ADS_Utils.serializeNumericMap(valueMap)
     end
 
     table.sort(entries)
-    return table.concat(entries, ",")
+    return table.concat(entries, ";")
 end
 
 function ADS_Utils.deserializeNumericMap(serialized)
@@ -636,7 +642,13 @@ function ADS_Utils.deserializeNumericMap(serialized)
         return result
     end
 
-    for entry in string.gmatch(serialized, "([^,]+)") do
+    local separator = ";"
+    if not string.find(serialized, ";") then
+        separator = ","
+    end
+    local pattern = "([^" .. separator .. "]+)"
+
+    for entry in string.gmatch(serialized, pattern) do
         local key, valueStr = string.match(entry, "([^|]+)|([^|]+)")
         if key ~= nil then
             local numericValue = tonumber(valueStr)
