@@ -678,7 +678,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 0.8,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.25, aggregation = "max", extraData = { sampleName = "turboWhistle" } },
+                    { id = "TURBO_WHISTLE_NOISE_EFFECT", value = 0.25, aggregation = "max" },
                 }
             },
             {
@@ -690,7 +690,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.35, aggregation = "max", extraData = { sampleName = "turboWhistle" } },
+                    { id = "TURBO_WHISTLE_NOISE_EFFECT", value = 0.35, aggregation = "max" },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
@@ -706,7 +706,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.40, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.6, aggregation = "max", extraData = { sampleName = "turboWhistle" } },
+                    { id = "TURBO_WHISTLE_NOISE_EFFECT", value = 0.6, aggregation = "max" },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -754,7 +754,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.2,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.30, aggregation = "max", extraData = { sampleName = "engineKnocking" } },
+                    { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.30, aggregation = "max" },
                     { id = "ENGINE_HEAT_MODIFIER", value = 0.05, aggregation = "sum" },
                     
                 }
@@ -767,7 +767,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.4,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.5, aggregation = "max", extraData = { sampleName = "engineKnocking" } },
+                    { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.5, aggregation = "max" },
                     { id = "ENGINE_HEAT_MODIFIER", value = 0.15, aggregation = "sum" },
                 },
                 indicators = {
@@ -783,7 +783,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.45, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.8, aggregation = "max", extraData = { sampleName = "engineKnocking" } },
+                    { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.8, aggregation = "max" },
                     { id = "ENGINE_HEAT_MODIFIER", value = 0.35, aggregation = "sum" },
                 },
                 indicators = {
@@ -833,7 +833,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.2,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.04, aggregation = "sum" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.5, aggregation = "max", extraData = { sampleName = "valveTrainNoise" } },
+                    { id = "VALVE_TRAIN_NOISE_EFFECT", value = 0.5, aggregation = "max" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.05, aggregation = "sum" },
                     
                 }
@@ -846,7 +846,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.4,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 0.7, aggregation = "max", extraData = { sampleName = "valveTrainNoise" } },
+                    { id = "VALVE_TRAIN_NOISE_EFFECT", value = 0.7, aggregation = "max" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8, cruiseState = 0} }
                 },
@@ -864,7 +864,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
-                    { id = "ENGINE_ABNORMAL_NOISE_EFFECT", value = 1.0, aggregation = "max", extraData = { sampleName = "valveTrainNoise" } },
+                    { id = "VALVE_TRAIN_NOISE_EFFECT", value = 1.0, aggregation = "max" },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" }
                 },
                 indicators = {
@@ -1085,6 +1085,11 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    -- CVT Chain/Belt Wear
+    -- Progressive wear of CVT chain/belt contact surfaces and pulleys.
+    -- Causes ratio response lag and slip under load, increases heat generation,
+    -- and in advanced stages leads to severe pull loss and drivability issues.
+
     CVT_CHAIN_WEAR = { -- TO-DO: $l10n
         isSelectable = true,
         system = systems.TRANSMISSION,
@@ -1160,6 +1165,11 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
+    -- CVT Hydraulic Control Valve Malfunction
+    -- Pressure control instability in the CVT hydraulic block.
+    -- Causes intermittent pressure drops, torque interruptions and jerky behavior,
+    -- with worsening response and potential limp-home operation at critical stage.
 
     CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = { -- TO-DO: $l10n
         isSelectable = true,
@@ -1381,6 +1391,255 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.4, 
                 effects = { 
                     { id = "BRAKE_FORCE_MODIFIER", value = -1.0, aggregation = "min", extraData = {message = "ads_breakdowns_brake_malfunction_stage4_message", disableAi = true, timer = 0, soundPlayed = false} }
+                },
+                indicators = {
+                    { id = db.BRAKES, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    -- Wheel Hub Bearing Wear
+    -- Progressive wear of wheel hub bearings and adjacent running components.
+    -- Creates speed-dependent humming and chassis vibration, increases drag and
+    -- rolling losses, and at critical stage can lead to wheel seizure.
+
+    BEARING_WEAR = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.CHASSIS,
+        isApplicable = function(vehicle)
+            if vehicle.spec_crawlers ~= nil then
+                return #vehicle.spec_crawlers.crawlers == 0
+            else
+                return true
+            end
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        isCanProgress = function(vehicle)
+            return (vehicle:getLastSpeed() > 0.01)
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_bearing_wear_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.2,
+                repairPrice = 0.3,
+                effects = {
+                    { id = "WHEEL_HUB_BEARING_NOISE_EFFECT", value = 1.0, aggregation = "max" },
+                    { id = "VIBRATION_NOISE_EFFECT", value = 1.0, aggregation = "max" },
+                    { id = "MAX_SPEED_MODIFIER", value = 0.05, aggregation = "max" },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.03, aggregation = "sum" },
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_bearing_wear_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.1,
+                repairPrice = 0.6,
+                effects = {
+                    { id = "WHEEL_HUB_BEARING_NOISE_EFFECT", value = 1.5, aggregation = "max" },
+                    { id = "VIBRATION_NOISE_EFFECT", value = 1.5, aggregation = "max" },
+                    { id = "MAX_SPEED_MODIFIER", value = 0.10, aggregation = "max" },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
+                },
+                indicators = {
+
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_bearing_wear_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.05,
+                repairPrice = 1.2, 
+                effects = { 
+                    { id = "WHEEL_HUB_BEARING_NOISE_EFFECT", value = 2.0, aggregation = "max" },
+                    { id = "VIBRATION_NOISE_EFFECT", value = 2.0, aggregation = "max" },
+                    { id = "MAX_SPEED_MODIFIER", value = 0.20, aggregation = "max" },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.07, aggregation = "sum" },
+                    { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 0.3, aggregation = "max" }
+                },
+                indicators = {
+
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_bearing_wear_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 2.4, 
+                effects = { 
+                    { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 2.5, aggregation = "max" },
+                    { id = "WHEEL_SEIZURE_EFFECT", value = 1.0, aggregation = "max", extraData = {message = "ads_breakdowns_bearing_wear_stage4_message", disableAi = true}},
+                },
+                indicators = {
+                    { id = db.BRAKES, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    -- Steering Linkage Wear
+    -- Progressive wear in tie rods, joints and steering linkage geometry.
+    -- Causes constant pull to one side and reduced steering responsiveness,
+    -- degrading handling precision and controllability at higher stages.
+
+    STEERING_LINKAGE_WEAR = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.CHASSIS,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            if vehicle.spec_wheels == nil or vehicle.spec_wheels.wheels == nil or #vehicle.spec_wheels.wheels == 0 then
+                return false
+            end
+            if vehicle.spec_crawlers ~= nil and #vehicle.spec_crawlers.crawlers > 0 then
+                return false
+            end
+            return true
+        end,
+        probability = function(vehicle)
+            return 1.0
+        end,
+        isCanProgress = function(vehicle)
+            return vehicle:getLastSpeed() > 0.01
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_steering_linkage_wear_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.2,
+                repairPrice = 0.3,
+                effects = {
+                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.003, aggregation = "max" },
+                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.10, aggregation = "max" },
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_steering_linkage_wear_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.1,
+                repairPrice = 0.6,
+                effects = {
+                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.01, aggregation = "max" },
+                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.25, aggregation = "max" },
+                },
+                indicators = {
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_steering_linkage_wear_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.05,
+                repairPrice = 1.2,
+                effects = {
+                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.03, aggregation = "max" },
+                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.45, aggregation = "max" },
+                },
+                indicators = {
+                    { id = db.BRAKES, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_steering_linkage_wear_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 2.4,
+                effects = {
+                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.99, aggregation = "max", extraData = {message="ads_breakdowns_steering_linkage_wear_stage4_message", disableAi=true} },
+                },
+                indicators = {
+                    { id = db.BRAKES, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    TRACK_TENSIONER_MALFUNCTION = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.CHASSIS,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            if vehicle.spec_crawlers ~= nil and #vehicle.spec_crawlers.crawlers > 0 then
+                return true
+            end
+            return false
+        end,
+        probability = function(vehicle)
+            return 1.0
+        end,
+        isCanProgress = function(vehicle)
+            return vehicle:getLastSpeed() > 0.01
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_track_tensioner_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.2,
+                repairPrice = 0.3,
+                effects = {
+                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.003, aggregation = "max" },
+                    { id = "VIBRATION_NOISE_EFFECT", value = 1.0, aggregation = "max" },
+                    { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 0.5, aggregation = "max" },
+                    { id = "MAX_SPEED_MODIFIER", value = 0.03, aggregation = "max" },
+
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_track_tensioner_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.1,
+                repairPrice = 0.6,
+                effects = {
+                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.01, aggregation = "max" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 0.6, motorLoad = 0.2, cruiseState = 0}},
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
+                    { id = "VIBRATION_NOISE_EFFECT", value = 1.5, aggregation = "max" },
+                    { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 1.0, aggregation = "max" },
+                    { id = "MAX_SPEED_MODIFIER", value = 0.06, aggregation = "max" },
+
+                },
+                indicators = {
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_track_tensioner_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.05,
+                repairPrice = 1.2,
+                effects = {
+                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.05, aggregation = "max" },
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.1, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 0.6, motorLoad = 0.2, cruiseState = 0}},
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.1, aggregation = "sum" },
+                    { id = "VIBRATION_NOISE_EFFECT", value = 2.0, aggregation = "max" },
+                    { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 2.0, aggregation = "max" },
+                    { id = "MAX_SPEED_MODIFIER", value = 0.15, aggregation = "max" },
+
+                },
+                indicators = {
+                    { id = db.BRAKES, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_track_tensioner_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 2.4,
+                effects = {
+                    { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 2.5, aggregation = "max" },
+                    { id = "WHEEL_SEIZURE_EFFECT", value = 1.0, aggregation = "max", extraData = {message = "ads_breakdowns_track_tensioner_malfunction_stage4_message", disableAi = true}},
                 },
                 indicators = {
                     { id = db.BRAKES, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1975,18 +2234,75 @@ ADS_Breakdowns.BreakdownRegistry = {
 
 ADS_Breakdowns.EffectApplicators = {}
 
-local function saveOrigFunc(v, funcName)
-    if v.spec_AdvancedDamageSystem.originalFunctions[funcName] == nil then
-        v.spec_AdvancedDamageSystem.originalFunctions[funcName] = v[funcName]
+local function isOrigFuncStillUsed(v, funcName)
+    if v == nil or funcName == nil then
+        return false
     end
+    local spec = v.spec_AdvancedDamageSystem
+    if spec == nil or spec.activeEffects == nil then
+        return false
+    end
+
+    for effectId, _ in pairs(spec.activeEffects) do
+        local applicator = ADS_Breakdowns.EffectApplicators[effectId]
+        if applicator ~= nil and applicator.getOriginalFunctionName ~= nil then
+            local usedName = applicator.getOriginalFunctionName()
+            if usedName == funcName then
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
-local function restoreOrigFunc(v, funcName)
-    local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[funcName]
-    if originalFunc ~= nil then
-        v[funcName] = originalFunc
-        v.spec_AdvancedDamageSystem.originalFunctions[funcName] = nil
+local function saveOrigFunc(v, funcName, targetObject, targetField)
+    if v == nil or funcName == nil or funcName == "" then
+        return
     end
+    local spec = v.spec_AdvancedDamageSystem
+    if spec == nil or spec.originalFunctions == nil then
+        return
+    end
+    if spec.originalFunctions[funcName] ~= nil then
+        return
+    end
+
+    local sourceObject = targetObject or v
+    local sourceField = targetField or funcName
+    if sourceObject == nil or sourceField == nil then
+        return
+    end
+
+    spec.originalFunctions[funcName] = sourceObject[sourceField]
+end
+
+local function restoreOrigFunc(v, funcName, targetObject, targetField, forceRestore)
+    if v == nil or funcName == nil or funcName == "" then
+        return false
+    end
+    local spec = v.spec_AdvancedDamageSystem
+    if spec == nil or spec.originalFunctions == nil then
+        return false
+    end
+
+    if not forceRestore and isOrigFuncStillUsed(v, funcName) then
+        return false
+    end
+
+    local originalFunc = spec.originalFunctions[funcName]
+    if originalFunc == nil then
+        return false
+    end
+
+    local destinationObject = targetObject or v
+    local destinationField = targetField or funcName
+    if destinationObject ~= nil and destinationField ~= nil then
+        destinationObject[destinationField] = originalFunc
+    end
+
+    spec.originalFunctions[funcName] = nil
+    return true
 end
 
 local function addFuncToActive(v, effectName, func)
@@ -2106,10 +2422,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_TORQUE_MODIFIER = {
         if motor == nil then return end
 
         local originalFuncName = handler.getOriginalFunctionName()
-
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = motor.getTorqueCurveValue
-        end
+        saveOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
 
         motor.getTorqueCurveValue = function(m, rpm)
             local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
@@ -2126,14 +2439,11 @@ ADS_Breakdowns.EffectApplicators.ENGINE_TORQUE_MODIFIER = {
         if motor == nil then return end
 
         local originalFuncName = handler.getOriginalFunctionName()
-        local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-
-        if originalFunc ~= nil then
+        local restored = restoreOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
+        if restored then
             log_dbg("Restoring original function:", originalFuncName)
-            motor.getTorqueCurveValue = originalFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = nil
-            vehicle:updateMotorProperties()
         end
+        vehicle:updateMotorProperties()
     end
 }
 
@@ -2154,6 +2464,84 @@ ADS_Breakdowns.EffectApplicators.BRAKE_FORCE_MODIFIER = {
     end,
     remove = function(vehicle, handler)
         log_dbg("Removing BRAKE_FORCE_MODIFIER effect.")
+        if vehicle.spec_drivable == nil then return end
+        local originalFuncName = handler.getOriginalFunctionName()
+        restoreOrigFunc(vehicle, originalFuncName)
+    end
+}
+
+-------------------- STEERING_STATIC_BIAS_EFFECT -------------------
+ADS_Breakdowns.EffectApplicators.STEERING_STATIC_BIAS_EFFECT = {
+    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
+    apply = function(vehicle, effectData, handler)
+        if vehicle.spec_drivable == nil then return end
+        local originalFuncName = handler.getOriginalFunctionName()
+        saveOrigFunc(vehicle, originalFuncName)
+
+        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
+            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
+        end
+    end,
+    remove = function(vehicle, handler)
+        if vehicle.spec_drivable == nil then return end
+        local originalFuncName = handler.getOriginalFunctionName()
+
+        local spec_ads = vehicle.spec_AdvancedDamageSystem
+        if spec_ads ~= nil and spec_ads.activeEffects ~= nil and spec_ads.activeEffects.STEERING_SENSITIVITY_MODIFIER ~= nil then
+            return
+        end
+
+        restoreOrigFunc(vehicle, originalFuncName)
+    end
+}
+
+-------------------- STEERING_SENSITIVITY_MODIFIER -------------------
+ADS_Breakdowns.EffectApplicators.STEERING_SENSITIVITY_MODIFIER = {
+    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
+    apply = function(vehicle, effectData, handler)
+        if vehicle.spec_drivable == nil then return end
+        local originalFuncName = handler.getOriginalFunctionName()
+        saveOrigFunc(vehicle, originalFuncName)
+
+        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
+            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
+        end
+    end,
+    remove = function(vehicle, handler)
+        if vehicle.spec_drivable == nil then return end
+        local originalFuncName = handler.getOriginalFunctionName()
+
+        -- Do not restore updateVehiclePhysics while static steering bias is still active:
+        -- both effects share the same hook.
+        local spec_ads = vehicle.spec_AdvancedDamageSystem
+        if spec_ads ~= nil and spec_ads.activeEffects ~= nil and spec_ads.activeEffects.STEERING_STATIC_BIAS_EFFECT ~= nil then
+            return
+        end
+
+        restoreOrigFunc(vehicle, originalFuncName)
+    end
+}
+
+-------------------- WHEEL_SEIZURE_EFFECT -------------------
+ADS_Breakdowns.EffectApplicators.WHEEL_SEIZURE_EFFECT = {
+    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
+    apply = function(vehicle, effectData, handler)
+        if vehicle.spec_drivable == nil or vehicle.spec_wheels == nil then return end
+
+        local originalFuncName = handler.getOriginalFunctionName()
+        saveOrigFunc(vehicle, originalFuncName)
+
+        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
+            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
+        end
+    end,
+    remove = function(vehicle, handler)
+        if vehicle.spec_AdvancedDamageSystem ~= nil then
+            vehicle.spec_AdvancedDamageSystem.wheelSeizureTargetIndex = nil
+        end
         if vehicle.spec_drivable == nil then return end
         local originalFuncName = handler.getOriginalFunctionName()
         restoreOrigFunc(vehicle, originalFuncName)
@@ -2194,15 +2582,10 @@ ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
         if motor == nil then return end
 
         local originalFuncName = handler.getOriginalFunctionName()
-        local originalValueName = "clutchSlippingTime"
+        local originalValueName = "__TRANSMISSION_SLIP_clutchSlippingTime"
 
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = motor.getMinMaxGearRatio
-        end
-
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] = motor.clutchSlippingTime
-        end
+        saveOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
+        saveOrigFunc(vehicle, originalValueName, motor, "clutchSlippingTime")
 
         motor.clutchSlippingTime = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] * (1 + effectData.value) ^ 3
 
@@ -2247,20 +2630,10 @@ ADS_Breakdowns.EffectApplicators.TRANSMISSION_SLIP_EFFECT = {
         if motor == nil then return end
 
         local originalFuncName = handler.getOriginalFunctionName()
-        local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+        restoreOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
 
-        if originalFunc ~= nil then
-            motor.getMinMaxGearRatio = originalFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = nil
-        end
-
-        local originalValueName = "clutchSlippingTime"
-        local originalValue = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName]
-
-        if originalValue ~= nil then
-            motor.clutchSlippingTime = originalValue
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalValueName] = nil
-        end
+        local originalValueName = "__TRANSMISSION_SLIP_clutchSlippingTime"
+        restoreOrigFunc(vehicle, originalValueName, motor, "clutchSlippingTime", true)
     end
 }
 
@@ -2277,10 +2650,7 @@ ADS_Breakdowns.EffectApplicators.CVT_SLIP_EFFECT = {
         if motor.minForwardGearRatio == nil then return end
 
         local originalFuncName = handler.getOriginalFunctionName()
-
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = motor.getMinMaxGearRatio
-        end
+        saveOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
 
         motor.getMinMaxGearRatio = function(m)
             local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
@@ -2328,12 +2698,7 @@ ADS_Breakdowns.EffectApplicators.CVT_SLIP_EFFECT = {
         if motor == nil then return end
 
         local originalFuncName = handler.getOriginalFunctionName()
-        local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-
-        if originalFunc ~= nil then
-            motor.getMinMaxGearRatio = originalFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = nil
-        end
+        restoreOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
 
         motor:setExternalTorqueVirtualMultiplicator(1)
     end
@@ -2352,10 +2717,7 @@ ADS_Breakdowns.EffectApplicators.CVT_MAX_RATIO_MODIFIER = {
         if motor.minForwardGearRatio == nil then return end
 
         local originalFuncName = "__CVT_MAX_RATIO_PREV_getMinMaxGearRatio"
-
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = motor.getMinMaxGearRatio
-        end
+        saveOrigFunc(vehicle, originalFuncName, motor, "getMinMaxGearRatio")
 
         motor.getMinMaxGearRatio = function(m)
             local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
@@ -2374,12 +2736,7 @@ ADS_Breakdowns.EffectApplicators.CVT_MAX_RATIO_MODIFIER = {
         if motor == nil then return end
 
         local originalFuncName = "__CVT_MAX_RATIO_PREV_getMinMaxGearRatio"
-        local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-
-        if originalFunc ~= nil then
-            motor.getMinMaxGearRatio = originalFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName] = nil
-        end
+        restoreOrigFunc(vehicle, originalFuncName, motor, "getMinMaxGearRatio", true)
 
     end
 }
@@ -2457,16 +2814,17 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
     getEffectName = function()
         return "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT" 
     end,
+    getOriginalFunctionName = function()
+        return "applyTargetGear"
+    end,
 
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT:", effectData.value)
         local motor = vehicle:getMotor()
         if motor == nil then return end
 
-        local originalApplyFuncName = "applyTargetGear"
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName] = motor.applyTargetGear
-        end
+        local originalApplyFuncName = handler.getOriginalFunctionName()
+        saveOrigFunc(vehicle, originalApplyFuncName, motor, originalApplyFuncName)
 
         motor.applyTargetGear = function(m)
             local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName]
@@ -2521,12 +2879,10 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
         local motor = vehicle:getMotor()
         if motor == nil then return end
 
-        local originalApplyFuncName = "applyTargetGear"
-        local originalApplyFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName]
-        if originalApplyFunc ~= nil then
+        local originalApplyFuncName = handler.getOriginalFunctionName()
+        local restored = restoreOrigFunc(vehicle, originalApplyFuncName, motor, originalApplyFuncName)
+        if restored then
             log_dbg("Restoring original function:", originalApplyFuncName)
-            motor.applyTargetGear = originalApplyFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalApplyFuncName] = nil
         end
 
         local effectName = handler.getEffectName()
@@ -2544,6 +2900,58 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
 
     remove = function(vehicle, handler)
         log_dbg("Removing HYDRAULIC_SPEED_MODIFIER effect.")
+    end
+}
+
+---------------- MAX_SPEED_MODIFIER -------------------
+ADS_Breakdowns.EffectApplicators.MAX_SPEED_MODIFIER = {
+    getOriginalFunctionName = function()
+        return "getSpeedLimit"
+    end,
+    getEffectName = function()
+        return "MAX_SPEED_MODIFIER"
+    end,
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying MAX_SPEED_MODIFIER effect")
+        local originalFuncName = handler.getOriginalFunctionName()
+        local effectName = handler.getEffectName()
+        saveOrigFunc(vehicle, originalFuncName)
+
+        vehicle.getSpeedLimit = function(v, onlyIfWorking)
+            local origFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
+            if origFunc == nil then
+                return math.huge, v:doCheckSpeedLimit()
+            end
+
+            local speedLimit, doCheckSpeedLimit = origFunc(v, onlyIfWorking)
+            local currentEffect = v.spec_AdvancedDamageSystem.activeEffects and v.spec_AdvancedDamageSystem.activeEffects[effectName]
+            local reduction = math.clamp(tonumber((currentEffect and currentEffect.value) or effectData.value) or 0, 0, 0.99)
+            local motor = v:getMotor()
+
+            if speedLimit == nil or speedLimit >= math.huge then
+                local baseMaxMps = nil
+                if motor ~= nil then
+                    baseMaxMps = tonumber(motor.maxForwardSpeedOrigin)
+                        or tonumber(motor.maxForwardSpeed)
+                        or (motor.getMaximumForwardSpeed ~= nil and tonumber(motor:getMaximumForwardSpeed()) or nil)
+                end
+                if baseMaxMps ~= nil then
+                    speedLimit = baseMaxMps * 3.6
+                end
+            end
+
+            if speedLimit ~= nil and speedLimit < math.huge and reduction > 0 then
+                speedLimit = speedLimit - speedLimit * reduction
+            end
+
+            return speedLimit or math.huge, doCheckSpeedLimit
+        end
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing MAX_SPEED_MODIFIER effect.")
+        local originalFuncName = handler.getOriginalFunctionName()
+        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
@@ -2695,7 +3103,7 @@ ADS_Breakdowns.EffectApplicators.IDLE_HUNTING_EFFECT = {
         return "IDLE_HUNTING_EFFECT" 
     end,
 
-     apply = function(vehicle, effectData, handler)
+    apply = function(vehicle, effectData, handler)
         log_dbg("Applying IDLE_HUNTING_EFFECT effect")
 
         local effectName = handler.getEffectName()
@@ -2788,211 +3196,161 @@ ADS_Breakdowns.EffectApplicators.DARK_EXHAUST_EFFECT = {
     end
 }
 
--------------TURBOCHARGER_GRINDING_EFFECT -----------------
-ADS_Breakdowns.EffectApplicators.TURBOCHARGER_GRINDING_EFFECT = { 
-    getEffectName = function()
-        return "TURBOCHARGER_GRINDING_EFFECT" 
-    end,
-    
-    apply = function(vehicle, effectData, handler)
-        log_dbg("Applying TURBOCHARGER_GRINDING_EFFECT effect")
-        local motor = vehicle:getMotor()
-        local effectName = handler.getEffectName()
 
-        local activeFunc = function(v, dt)
-            if motor.lastTurboScale > 0.1 and not effectData.extraData.soundPlayed then
-                if math.random() < effectData.value then
-                    g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples['turbocharger' .. math.random(4)])
-                end
-                effectData.extraData.soundPlayed = true
-                effectData.extraData.timer = 10000
-            end
-
-            if effectData.extraData.timer > 0 then
-                effectData.extraData.timer = effectData.extraData.timer - dt
-            end
-
-            if effectData.extraData.timer <= 0 and effectData.extraData.soundPlayed and motor.lastTurboScale < 0.01 then
-                effectData.extraData.timer = 0
-                effectData.extraData.soundPlayed = false
-            end
-        end
-        addFuncToActive(vehicle, effectName, activeFunc)
-    end,
-
-    remove = function(vehicle, handler)
-        log_dbg("Removing TURBOCHARGER_GRINDING_EFFECT effect")
-        removeFuncFromActive(vehicle, handler.getEffectName())
+local function adsStopAndResetNoiseSample(sample)
+    if sample == nil then return end
+    if g_soundManager:getIsSamplePlaying(sample) then
+        g_soundManager:stopSample(sample, 0, 0)
     end
-}
+    g_soundManager:setSampleVolumeOffset(sample, 0)
+    g_soundManager:setSamplePitchOffset(sample, 0)
+    if sample.adsOriginalLoops ~= nil then
+        sample.loops = sample.adsOriginalLoops
+    end
+    if sample.adsOriginalVolumeScale ~= nil then
+        sample.volumeScale = sample.adsOriginalVolumeScale
+    end
+end
 
-ADS_Breakdowns.EffectApplicators.ENGINE_ABNORMAL_NOISE_EFFECT = {
-    getEffectName = function()
-        return "ENGINE_ABNORMAL_NOISE_EFFECT"
-    end,
+local function adsUpdateNoiseGate(spec, effectName, targetGate, dt)
+    spec.__adsNoiseGates = spec.__adsNoiseGates or {}
+    local previousGate = math.clamp(tonumber(spec.__adsNoiseGates[effectName]) or 0, 0, 1)
+    local attackMs = 220
+    local releaseMs = 520
+    local responseMs = targetGate > previousGate and attackMs or releaseMs
+    local alpha = math.min((tonumber(dt) or 0) / math.max(responseMs, 1), 1)
+    local gate = previousGate + (targetGate - previousGate) * alpha
+    gate = math.clamp(gate, 0, 1)
+    spec.__adsNoiseGates[effectName] = gate
+    return gate
+end
 
-    apply = function(vehicle, effectData, handler)
-        log_dbg("Applying ENGINE_ABNORMAL_NOISE_EFFECT effect")
-        local effectName = handler.getEffectName()
+local function createEngineNoiseEffectApplicator(effectName, sampleName, gateMode)
+    return {
+        getEffectName = function()
+            return effectName
+        end,
 
-        local activeFunc = function(v, dt)
-            local spec_ads = v.spec_AdvancedDamageSystem
-            if spec_ads == nil or spec_ads.samples == nil then return end
-            local motor = v:getMotor()
-            if motor == nil then return end
+        apply = function(vehicle, effectData, handler)
+            log_dbg(string.format("Applying %s effect", effectName))
+            local activeFunc = function(v, dt)
+                local spec_ads = v.spec_AdvancedDamageSystem
+                if spec_ads == nil or spec_ads.samples == nil then return end
+                local motor = v:getMotor()
+                if motor == nil then return end
 
-            local function stopAndReset(sample)
+                local sample = spec_ads.samples[sampleName]
                 if sample == nil then return end
-                if g_soundManager:getIsSamplePlaying(sample) then
-                    g_soundManager:stopSample(sample, 0, 0)
-                end
-                g_soundManager:setSampleVolumeOffset(sample, 0)
-                g_soundManager:setSamplePitchOffset(sample, 0)
-                if sample.adsOriginalLoops ~= nil then
-                    sample.loops = sample.adsOriginalLoops
-                end
-                if sample.adsOriginalVolumeScale ~= nil then
-                    sample.volumeScale = sample.adsOriginalVolumeScale
-                end
-            end
 
-            local currentEffect = spec_ads.activeEffects and spec_ads.activeEffects[effectName]
-            local currentExtraData = currentEffect and currentEffect.extraData or nil
-            local configuredExtraData = effectData and effectData.extraData or nil
-            local requestedSampleName = (currentExtraData and currentExtraData.sampleName)
-                or (configuredExtraData and configuredExtraData.sampleName)
-                or "engineKnocking"
+                local currentEffect = spec_ads.activeEffects and spec_ads.activeEffects[effectName]
+                local baseVolumeScale = math.clamp(tonumber(currentEffect and currentEffect.value) or tonumber(effectData.value) or 1, 0, 2)
 
-            local sampleName = requestedSampleName
-            local sample = spec_ads.samples[sampleName]
-            if sample == nil then
-                sampleName = "engineKnocking"
-                sample = spec_ads.samples.engineKnocking
-            end
-            if sample == nil then
-                sampleName = "valveTrainNoise"
-                sample = spec_ads.samples.valveTrainNoise
-            end
-
-            local prevSampleName = spec_ads.engineAbnormalNoiseSampleName
-            if prevSampleName ~= nil and prevSampleName ~= sampleName then
-                stopAndReset(spec_ads.samples[prevSampleName])
-            end
-
-            if sample == nil then
-                spec_ads.engineAbnormalNoiseSampleName = nil
-                return
-            end
-
-            if not v:getIsMotorStarted() then
-                stopAndReset(sample)
-                spec_ads.engineAbnormalNoiseSampleName = nil
-                return
-            end
-
-            local minRpm = tonumber(motor.minRpm) or 800
-            local maxRpm = math.max(tonumber(motor.maxRpm) or (minRpm + 1), minRpm + 1)
-            local lastRpm = (motor.getLastModulatedMotorRpm ~= nil and tonumber(motor:getLastModulatedMotorRpm())) or tonumber(motor.lastMotorRpm) or minRpm
-            local rpmN = math.clamp((lastRpm - minRpm) / (maxRpm - minRpm), 0, 1)
-            local loadN = math.clamp(tonumber(v:getMotorLoadPercentage()) or 0, 0, 1)
-            local accelN = math.clamp(math.abs(tonumber(motor.lastAcceleratorPedal) or 0), 0, 1)
-            local hotN = math.clamp(((tonumber(spec_ads.engineTemperature) or 0) - 70) / 40, 0, 1)
-            local baseVolumeScale = math.clamp(tonumber(currentEffect and currentEffect.value) or tonumber(effectData.value) or 1, 0, 2)
-
-            local dynamicIntensity =
-                (0.30 + 0.70 * rpmN)
-                * (0.65 + 0.35 * loadN)
-                * (0.70 + 0.30 * hotN)
-            dynamicIntensity = math.clamp(dynamicIntensity, 0, 1.6)
-
-            local turboGate = 1.0
-            if sampleName == "turboWhistle" then
-                local accelThreshold = 0.02
-                local targetGate = math.clamp((accelN - accelThreshold) / (1 - accelThreshold), 0, 1)
-                local previousGate = math.clamp(tonumber(spec_ads.engineAbnormalNoiseTurboGate) or 0, 0, 1)
-                local attackMs = 220
-                local releaseMs = 520
-                local responseMs = targetGate > previousGate and attackMs or releaseMs
-                local alpha = math.min((tonumber(dt) or 0) / math.max(responseMs, 1), 1)
-                turboGate = previousGate + (targetGate - previousGate) * alpha
-                turboGate = math.clamp(turboGate, 0, 1)
-                spec_ads.engineAbnormalNoiseTurboGate = turboGate
-
-                baseVolumeScale = baseVolumeScale * turboGate
-            else
-                spec_ads.engineAbnormalNoiseTurboGate = nil
-            end
-
-            if baseVolumeScale <= 0.02 then
-                if sampleName == "turboWhistle" and (spec_ads.engineAbnormalNoiseTurboGate or 0) > 0.001 then
-                    baseVolumeScale = 0.02
-                else
-                    stopAndReset(sample)
-                    spec_ads.engineAbnormalNoiseSampleName = nil
-                    spec_ads.engineAbnormalNoiseTurboGate = nil
+                if not v:getIsMotorStarted() then
+                    adsStopAndResetNoiseSample(sample)
+                    if spec_ads.__adsNoiseGates ~= nil then
+                        spec_ads.__adsNoiseGates[effectName] = nil
+                    end
                     return
                 end
-            end
 
-            if sample.adsOriginalLoops == nil then
-                sample.adsOriginalLoops = sample.loops
-            end
-            if sample.adsOriginalVolumeScale == nil then
-                sample.adsOriginalVolumeScale = sample.volumeScale
-            end
-            sample.loops = 0
-            sample.volumeScale = sample.adsOriginalVolumeScale * baseVolumeScale
+                local minRpm = tonumber(motor.minRpm) or 800
+                local maxRpm = math.max(tonumber(motor.maxRpm) or (minRpm + 1), minRpm + 1)
+                local lastRpm = (motor.getLastModulatedMotorRpm ~= nil and tonumber(motor:getLastModulatedMotorRpm())) or tonumber(motor.lastMotorRpm) or minRpm
+                local rpmN = math.clamp((lastRpm - minRpm) / (maxRpm - minRpm), 0, 1)
+                local loadN = math.clamp(tonumber(v:getMotorLoadPercentage()) or 0, 0, 1)
+                local accelN = math.clamp(math.abs(tonumber(motor.lastAcceleratorPedal) or 0), 0, 1)
+                local hotN = math.clamp(((tonumber(spec_ads.engineTemperature) or 0) - 70) / 40, 0, 1)
+                local speedMps = tonumber(v:getLastSpeed()) or 0
 
-            if not g_soundManager:getIsSamplePlaying(sample) then
-                g_soundManager:playSample(sample)
-            end
+                local dynamicIntensity =
+                    (0.30 + 0.70 * rpmN)
+                    * (0.65 + 0.35 * loadN)
+                    * (0.70 + 0.30 * hotN)
+                dynamicIntensity = math.clamp(dynamicIntensity, 0, 1.6)
 
-            g_soundManager:setSampleVolumeOffset(sample, 0)
-            local pitchOffset
-            if sampleName == "turboWhistle" then
-                local accelThreshold = 0.02
-                local accelGate = math.clamp((accelN - accelThreshold) / (1 - accelThreshold), 0, 1)
-                local gate = math.clamp(tonumber(spec_ads.engineAbnormalNoiseTurboGate) or turboGate or 0, 0, 1)
-                pitchOffset = (0.20 * accelGate + 0.16 * (rpmN ^ 1.20) * accelGate + 0.03 * loadN * accelGate) * gate
-            else
-                pitchOffset = 0.24 * (rpmN ^ 1.35) + 0.04 * dynamicIntensity * rpmN
-            end
-            g_soundManager:setSamplePitchOffset(sample, pitchOffset)
-            spec_ads.engineAbnormalNoiseSampleName = sampleName
-        end
-        addFuncToActive(vehicle, effectName, activeFunc)
-    end,
-
-    remove = function(vehicle, handler)
-        log_dbg("Removing ENGINE_ABNORMAL_NOISE_EFFECT effect")
-
-        local spec_ads = vehicle.spec_AdvancedDamageSystem
-        if spec_ads ~= nil and spec_ads.samples ~= nil then
-            local function stopAndReset(sample)
-                if sample == nil then return end
-                if g_soundManager:getIsSamplePlaying(sample) then
-                    g_soundManager:stopSample(sample, 0, 0)
+                local gate = 1
+                if gateMode == "accel" then
+                    local accelThreshold = 0.02
+                    local targetGate = math.clamp((accelN - accelThreshold) / (1 - accelThreshold), 0, 1)
+                    gate = adsUpdateNoiseGate(spec_ads, effectName, targetGate, dt)
+                    baseVolumeScale = baseVolumeScale * gate
+                elseif gateMode == "speed" then
+                    local speedThresholdMps = 0.20
+                    local fullSpeedMps = 2.00
+                    local targetGate = math.clamp((speedMps - speedThresholdMps) / (fullSpeedMps - speedThresholdMps), 0, 1)
+                    gate = adsUpdateNoiseGate(spec_ads, effectName, targetGate, dt)
+                    baseVolumeScale = baseVolumeScale * gate
                 end
+
+                if baseVolumeScale <= 0.02 then
+                    if (gateMode == "accel" or gateMode == "speed") and gate > 0.001 then
+                        baseVolumeScale = 0.02
+                    else
+                        adsStopAndResetNoiseSample(sample)
+                        if spec_ads.__adsNoiseGates ~= nil then
+                            spec_ads.__adsNoiseGates[effectName] = nil
+                        end
+                        return
+                    end
+                end
+
+                if sample.adsOriginalLoops == nil then
+                    sample.adsOriginalLoops = sample.loops
+                end
+                if sample.adsOriginalVolumeScale == nil then
+                    sample.adsOriginalVolumeScale = sample.volumeScale
+                end
+                sample.loops = 0
+                sample.volumeScale = sample.adsOriginalVolumeScale * baseVolumeScale
+
+                if not g_soundManager:getIsSamplePlaying(sample) then
+                    g_soundManager:playSample(sample)
+                end
+
                 g_soundManager:setSampleVolumeOffset(sample, 0)
-                g_soundManager:setSamplePitchOffset(sample, 0)
-                if sample.adsOriginalLoops ~= nil then
-                    sample.loops = sample.adsOriginalLoops
+                local pitchOffset
+                if sampleName == "turboWhistle" then
+                    local accelThreshold = 0.02
+                    local accelGate = math.clamp((accelN - accelThreshold) / (1 - accelThreshold), 0, 1)
+                    pitchOffset = (0.20 * accelGate + 0.16 * (rpmN ^ 1.20) * accelGate + 0.03 * loadN * accelGate) * gate
+                elseif sampleName == "wheelHubBearingNoise" then
+                    local speedN = math.clamp(speedMps / 15.0, 0, 1)
+                    pitchOffset = (0.12 * (speedN ^ 1.10) + 0.03 * loadN * speedN) * gate
+                elseif sampleName == "wheelSeizureGrind" then
+                    local speedN = math.clamp(speedMps / 12.0, 0, 1)
+                    pitchOffset = (0.06 * (speedN ^ 1.05) + 0.05 * loadN * speedN) * gate
+                elseif sampleName == "vibrationNoice" then
+                    local speedN = math.clamp(speedMps / 15.0, 0, 1)
+                    pitchOffset = (0.08 * (speedN ^ 1.05) + 0.02 * loadN * speedN) * gate
+                else
+                    pitchOffset = 0.24 * (rpmN ^ 1.35) + 0.04 * dynamicIntensity * rpmN
                 end
-                if sample.adsOriginalVolumeScale ~= nil then
-                    sample.volumeScale = sample.adsOriginalVolumeScale
-                end
+                g_soundManager:setSamplePitchOffset(sample, pitchOffset)
             end
 
-            stopAndReset(spec_ads.samples.engineKnocking)
-            stopAndReset(spec_ads.samples.valveTrainNoise)
-            stopAndReset(spec_ads.samples.turboWhistle)
-            spec_ads.engineAbnormalNoiseSampleName = nil
-            spec_ads.engineAbnormalNoiseTurboGate = nil
-        end
+            addFuncToActive(vehicle, effectName, activeFunc)
+        end,
 
-        removeFuncFromActive(vehicle, handler.getEffectName())
-    end
-}
+        remove = function(vehicle, handler)
+            log_dbg(string.format("Removing %s effect", effectName))
+            local spec_ads = vehicle.spec_AdvancedDamageSystem
+            if spec_ads ~= nil and spec_ads.samples ~= nil then
+                adsStopAndResetNoiseSample(spec_ads.samples[sampleName])
+                if spec_ads.__adsNoiseGates ~= nil then
+                    spec_ads.__adsNoiseGates[effectName] = nil
+                end
+            end
+            removeFuncFromActive(vehicle, handler.getEffectName())
+        end
+    }
+end
+
+ADS_Breakdowns.EffectApplicators.ENGINE_KNOCKING_NOISE_EFFECT = createEngineNoiseEffectApplicator("ENGINE_KNOCKING_NOISE_EFFECT", "engineKnocking", nil)
+ADS_Breakdowns.EffectApplicators.VALVE_TRAIN_NOISE_EFFECT = createEngineNoiseEffectApplicator("VALVE_TRAIN_NOISE_EFFECT", "valveTrainNoise", nil)
+ADS_Breakdowns.EffectApplicators.TURBO_WHISTLE_NOISE_EFFECT = createEngineNoiseEffectApplicator("TURBO_WHISTLE_NOISE_EFFECT", "turboWhistle", "accel")
+ADS_Breakdowns.EffectApplicators.VIBRATION_NOISE_EFFECT = createEngineNoiseEffectApplicator("VIBRATION_NOISE_EFFECT", "vibrationNoice", "speed")
+ADS_Breakdowns.EffectApplicators.WHEEL_HUB_BEARING_NOISE_EFFECT = createEngineNoiseEffectApplicator("WHEEL_HUB_BEARING_NOISE_EFFECT", "wheelHubBearingNoise", "speed")
+ADS_Breakdowns.EffectApplicators.WHEEL_SEIZURE_GRIND_NOISE_EFFECT = createEngineNoiseEffectApplicator("WHEEL_SEIZURE_GRIND_NOISE_EFFECT", "wheelSeizureGrind", "speed")
 
 
 -- ==========================================================
@@ -3053,7 +3411,7 @@ ADS_Breakdowns.EffectApplicators.CVT_PRESSURE_DROP_CHANCE = {
                         local minRatio, maxRatio = origMinRatio, origMaxRatio
                         local currentEffect = vehicle.spec_AdvancedDamageSystem.activeEffects and vehicle.spec_AdvancedDamageSystem.activeEffects.CVT_PRESSURE_DROP_CHANCE
                         if currentEffect ~= nil and currentEffect.extraData ~= nil and currentEffect.extraData.status == "PROGRESS" and (currentEffect.extraData.timer or 0) > 0 then
-                            return minRatio * 5, maxRatio
+                            return minRatio * 3, maxRatio
                         end
                         return minRatio, maxRatio
                     end
@@ -3263,9 +3621,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
 
 
         local originalShiftFuncName = "shiftGear"
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalShiftFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalShiftFuncName] = motor.shiftGear
-        end
+        saveOrigFunc(vehicle, originalShiftFuncName, motor, originalShiftFuncName)
 
         -- Server-only: random roll for shift failure, broadcast result to clients.
 
@@ -3285,9 +3641,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         end
         
         local originalSelectFuncName = "selectGear"
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalSelectFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalSelectFuncName] = motor.selectGear
-        end
+        saveOrigFunc(vehicle, originalSelectFuncName, motor, originalSelectFuncName)
 
         motor.selectGear = function(m, gearIndex, activation)
             if effectData.extraData.status == "FAILED" then return end
@@ -3307,9 +3661,7 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         end
         
         local originalUpdateFuncName = "updateGear"
-        if vehicle.spec_AdvancedDamageSystem.originalFunctions[originalUpdateFuncName] == nil then
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalUpdateFuncName] = motor.updateGear
-        end
+        saveOrigFunc(vehicle, originalUpdateFuncName, motor, originalUpdateFuncName)
 
         motor.updateGear = function(m, acceleratorPedal, brakePedal, dt)
             local wasShifting = (m.gear == 0 and m.gearChangeTimer > 0)
@@ -3366,27 +3718,21 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
         if motor == nil then return end
 
         local originalShiftFuncName = "shiftGear"
-        local originalShiftFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalShiftFuncName]
-        if originalShiftFunc ~= nil then
+        local restoredShift = restoreOrigFunc(vehicle, originalShiftFuncName, motor, originalShiftFuncName, true)
+        if restoredShift then
             log_dbg("Restoring original function:", originalShiftFuncName)
-            motor.shiftGear = originalShiftFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalShiftFuncName] = nil
         end
         
         local originalSelectFuncName = "selectGear"
-        local originalSelectFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalSelectFuncName]
-        if originalSelectFunc ~= nil then
+        local restoredSelect = restoreOrigFunc(vehicle, originalSelectFuncName, motor, originalSelectFuncName, true)
+        if restoredSelect then
             log_dbg("Restoring original function:", originalSelectFuncName)
-            motor.selectGear = originalSelectFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalSelectFuncName] = nil
         end
 
         local originalUpdateFuncName = "updateGear"
-        local originalUpdateFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalUpdateFuncName]
-        if originalUpdateFunc ~= nil then
+        local restoredUpdate = restoreOrigFunc(vehicle, originalUpdateFuncName, motor, originalUpdateFuncName, true)
+        if restoredUpdate then
             log_dbg("Restoring original function:", originalUpdateFuncName)
-            motor.updateGear = originalUpdateFunc
-            vehicle.spec_AdvancedDamageSystem.originalFunctions[originalUpdateFuncName] = nil
         end
 
         local effectName = handler.getEffectName()
@@ -3781,16 +4127,153 @@ end
 
 
 -- VEHICLE PHYSICS (BRAKES)
+local function getWheelSeizureTargetWheel(vehicle)
+    local spec_ads = vehicle.spec_AdvancedDamageSystem
+    local spec_wheels = vehicle.spec_wheels
+    if spec_ads == nil or spec_wheels == nil or spec_wheels.wheels == nil then
+        return nil
+    end
+
+    local wheels = spec_wheels.wheels
+
+    local function resolveWheelRuntime(wheel)
+        local runtimeWheel = (wheel ~= nil and wheel.physics ~= nil) and wheel.physics or wheel
+        if runtimeWheel == nil then
+            return nil
+        end
+
+        local data = {
+            wheel = wheel,
+            runtime = runtimeWheel
+        }
+
+        data.node = runtimeWheel.node or (wheel and wheel.node) or nil
+        data.wheelShape = runtimeWheel.wheelShape or (wheel and wheel.wheelShape) or nil
+        data.wheelShapeCreated = (runtimeWheel.wheelShapeCreated == true) or (wheel and wheel.wheelShapeCreated == true) or false
+        data.isLeft = runtimeWheel.isLeft
+        if data.isLeft == nil and wheel ~= nil then
+            data.isLeft = wheel.isLeft
+        end
+        data.brakeFactor = tonumber(runtimeWheel.brakeFactor) or tonumber(wheel and wheel.brakeFactor) or 0
+        data.driveNode = runtimeWheel.driveNode or (wheel and wheel.driveNode) or data.node
+        data.positionX = tonumber(runtimeWheel.positionX) or tonumber(wheel and wheel.positionX) or 0
+        data.positionZ = tonumber(runtimeWheel.positionZ) or tonumber(wheel and wheel.positionZ) or 0
+        data.steeringAngle = tonumber(runtimeWheel.steeringAngle) or tonumber(wheel and wheel.steeringAngle) or 0
+        data.rotationDamping = tonumber(runtimeWheel.rotationDamping) or tonumber(wheel and wheel.rotationDamping) or 0
+        data.torqueTarget = runtimeWheel
+
+        return data
+    end
+
+    local function isValidWheelData(wd)
+        return wd ~= nil
+            and wd.node ~= nil and wd.node ~= 0
+            and wd.wheelShape ~= nil and wd.wheelShape ~= 0
+    end
+    local cachedIndex = spec_ads.wheelSeizureTargetIndex
+    if cachedIndex ~= nil then
+        local cachedWheel = wheels[cachedIndex]
+        local cachedData = resolveWheelRuntime(cachedWheel)
+        if isValidWheelData(cachedData) then
+            return cachedData
+        end
+    end
+
+    local rootNode = vehicle.components and vehicle.components[1] and vehicle.components[1].node
+    local function getWheelLocalPos(wheelData)
+        if rootNode ~= nil and wheelData ~= nil then
+            local sampleNode = wheelData.driveNode or wheelData.node
+            if sampleNode ~= nil then
+                local x, _, z = localToLocal(sampleNode, rootNode, 0, 0, 0)
+                return x or 0, z or 0
+            end
+        end
+        return wheelData and wheelData.positionX or 0, wheelData and wheelData.positionZ or 0
+    end
+
+    local function pickBest(predicate)
+        local bestIndex = nil
+        local bestZ = -math.huge
+        for i, wheel in ipairs(wheels) do
+            local wheelData = resolveWheelRuntime(wheel)
+            if isValidWheelData(wheelData) and predicate(wheelData) then
+                local _, z = getWheelLocalPos(wheelData)
+                if bestIndex == nil or z > bestZ then
+                    bestIndex = i
+                    bestZ = z
+                end
+            end
+        end
+        return bestIndex
+    end
+
+    local bestIndex = pickBest(function(wheelData)
+        local x = getWheelLocalPos(wheelData)
+        return (wheelData.isLeft == false or x > 0) and wheelData.brakeFactor > 0
+    end)
+
+    if bestIndex == nil then
+        bestIndex = pickBest(function(wheelData)
+            local x = getWheelLocalPos(wheelData)
+            return (wheelData.isLeft == false or x > 0)
+        end)
+    end
+
+    if bestIndex == nil then
+        bestIndex = pickBest(function(wheelData)
+            return wheelData.brakeFactor > 0
+        end)
+    end
+
+    if bestIndex == nil then
+        bestIndex = pickBest(function(_)
+            return true
+        end)
+    end
+
+    spec_ads.wheelSeizureTargetIndex = bestIndex
+    if bestIndex ~= nil then
+        return resolveWheelRuntime(wheels[bestIndex])
+    end
+    return nil
+end
+
 function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, axisSide, doHandbrake, dt)
     local spec_ads = vehicle.spec_AdvancedDamageSystem
     local brakeEffect = spec_ads and spec_ads.activeEffects.BRAKE_FORCE_MODIFIER
     local limpEffect = spec_ads and spec_ads.activeEffects.ENGINE_LIMP_EFFECT
     local hesitationEffect = spec_ads and spec_ads.activeEffects.ENGINE_HESITATION_CHANCE
+    local steeringStaticBiasEffect = spec_ads and spec_ads.activeEffects.STEERING_STATIC_BIAS_EFFECT
+    local steeringSensitivityEffect = spec_ads and spec_ads.activeEffects.STEERING_SENSITIVITY_MODIFIER
+    local wheelSeizureEffect = spec_ads and spec_ads.activeEffects.WHEEL_SEIZURE_EFFECT
     local isBraking = false
     local drivingMode = vehicle:getDirectionChangeMode()
 
     if hesitationEffect and hesitationEffect.extraData and hesitationEffect.extraData.status == "CHOKING" then
         axisForward = axisForward * math.max(1 - hesitationEffect.extraData.amplitude, 0)
+    end
+
+    -- Steering sensitivity modifier: reduces driver steering input effect.
+    if steeringSensitivityEffect ~= nil and steeringSensitivityEffect.value ~= nil then
+        local value = math.max(tonumber(steeringSensitivityEffect.value) or 0, 0)
+        local sensitivity = math.clamp(1 - value, 0.05, 1.0)
+        axisSide = axisSide * sensitivity
+    end
+
+    -- Static steering bias: always drifts left, value controls offset angle/intensity.
+    if steeringStaticBiasEffect ~= nil and steeringStaticBiasEffect.value ~= nil then
+        local value = math.abs(tonumber(steeringStaticBiasEffect.value) or 0)
+        local leftBias = -math.clamp(value, 0, 1.0)
+        local x = math.clamp(axisSide, -1.0, 1.0)
+
+        -- Keep full steering range while shifting neutral point to the left.
+        -- Endpoints remain: f(-1) = -1, f(1) = 1, with f(0) = leftBias.
+        if x < 0 then
+            axisSide = (1 + leftBias) * x + leftBias
+        else
+            axisSide = (1 - leftBias) * x + leftBias
+        end
+        axisSide = math.clamp(axisSide, -1.0, 1.0)
     end
 
     if limpEffect and limpEffect.value then
@@ -3842,7 +4325,43 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
         end
     end
 
-    return superFunc(vehicle, axisForward, axisSide, doHandbrake, dt)
+    local result = superFunc(vehicle, axisForward, axisSide, doHandbrake, dt)
+
+    if wheelSeizureEffect ~= nil and (tonumber(wheelSeizureEffect.value) or 0) > 0 and vehicle.isAddedToPhysics then
+        local wheelData = getWheelSeizureTargetWheel(vehicle)
+        if wheelData ~= nil and wheelData.node ~= nil and wheelData.node ~= 0 and wheelData.wheelShape ~= nil and wheelData.wheelShape ~= 0 then
+            local intensity = math.clamp(tonumber(wheelSeizureEffect.value) or 1.0, 0, 1.0)
+            local baseBrakeForce = 0
+            if vehicle.getBrakeForce ~= nil then
+                baseBrakeForce = tonumber(vehicle:getBrakeForce()) or 0
+            end
+            if baseBrakeForce <= 0 and vehicle.spec_motorized ~= nil and vehicle.spec_motorized.motor ~= nil and vehicle.spec_motorized.motor.getBrakeForce ~= nil then
+                baseBrakeForce = tonumber(vehicle.spec_motorized.motor:getBrakeForce()) or 0
+            end
+            baseBrakeForce = math.max(baseBrakeForce, 100)
+
+            -- Seized wheel: heavy drag without fully anchoring vehicle in place.
+            local lockBrakeForce = math.max(baseBrakeForce * intensity, 100)
+            local lockDamping = math.max((tonumber(wheelData.rotationDamping) or 0) * (3 + 4 * intensity), 5)
+
+            if wheelData.torqueTarget ~= nil then
+                wheelData.torqueTarget.torque = 0
+            end
+            if wheelData.wheel ~= nil and wheelData.wheel ~= wheelData.torqueTarget then
+                wheelData.wheel.torque = 0
+            end
+            setWheelShapeProps(
+                wheelData.node,
+                wheelData.wheelShape,
+                0,
+                lockBrakeForce,
+                wheelData.steeringAngle or 0,
+                lockDamping
+            )
+        end
+    end
+
+    return result
 end
 
 

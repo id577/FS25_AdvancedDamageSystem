@@ -84,6 +84,27 @@
         <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </turboWhistle>
+    <wheelHubBearingNoise file="sounds/wheelHubBearingNoise.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="0.8" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </wheelHubBearingNoise>
+    <vibrationNoice file="sounds/vibrationNoice.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="0.8" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </vibrationNoice>
+    <wheelSeizureGrind file="sounds/wheelSeizureGrind.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="0.8" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </wheelSeizureGrind>
     <maintenanceCompleted file="sounds/maintenanceCompleted.ogg" linkNode="0" innerRadius="9999999.0" outerRadius="9999999.0" >
         <volume indoor="1.0" outdoor="1.0" />
         <pitch indoor="1.0" outdoor="1.0" />
