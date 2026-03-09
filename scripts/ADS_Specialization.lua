@@ -2122,7 +2122,20 @@ end
 -- service
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local wearRate = (ADS_Config.CORE.BASE_SERVICE_WEAR * (1 + spec.extraServiceWear)) / spec.reliability
+    local wearRate = ADS_Config.CORE.BASE_SERVICE_WEAR
+
+    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
+        wearRate = wearRate * (1 + spec.extraServiceWear) 
+    else
+        if spec.isUnderRoof then 
+            wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
+        else
+            wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER
+        end
+    end  
+
+    wearRate = wearRate / spec.reliability
+    
     local newLevel = spec.serviceLevel -  wearRate / (60 * 60 * 1000) * dt
     spec.serviceLevel = math.max(newLevel, 0)
 
