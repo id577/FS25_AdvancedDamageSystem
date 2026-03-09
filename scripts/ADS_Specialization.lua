@@ -5640,6 +5640,14 @@ end
 AdvancedDamageSystem.ConsoleCommands = {}
 
 function AdvancedDamageSystem.ConsoleCommands:getTargetVehicle()
+    if AdvancedDamageSystem.ConsoleCommands._overrideVehicle ~= nil then
+        local v = AdvancedDamageSystem.ConsoleCommands._overrideVehicle
+        if v.spec_AdvancedDamageSystem ~= nil then
+            return v
+        end
+        print("ADS Error: Override vehicle does not have AdvancedDamageSystem support.")
+        return nil
+    end
     local vehicle = g_localPlayer.getCurrentVehicle() 
     if not vehicle or not vehicle.spec_AdvancedDamageSystem then
         print("ADS Error: You must be in a vehicle with AdvancedDamageSystem support.")
@@ -5771,6 +5779,10 @@ local function getPrimaryFuelConsumerInfo(vehicle)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
+    if not g_currentMission:getIsServer() then
+        ADS_ConsoleCommandEvent.sendToServer("setConfigVar", rawArgs, rawValue, nil)
+        return
+    end
     local path = nil
     local valueToken = nil
 
@@ -5808,6 +5820,11 @@ function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSpecVar(rawArgs, rawValue)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSpecVar", rawArgs, rawValue, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
@@ -5866,6 +5883,11 @@ function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()
 end
 
 function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("addBreakdown", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -5905,6 +5927,11 @@ function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:removeBreakdown(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("removeBreakdown", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -5918,6 +5945,11 @@ function AdvancedDamageSystem.ConsoleCommands:removeBreakdown(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("advanceBreakdown", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -5967,6 +5999,11 @@ function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemCondition", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6034,6 +6071,11 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStress", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6099,6 +6141,11 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStressMultiplier", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6163,6 +6210,11 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setService", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6184,6 +6236,11 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("resetVehicle", nil, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
     
@@ -6195,6 +6252,11 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
 end
 
 function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("startMaintance", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6286,6 +6348,11 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:finishMaintance()
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("finishMaintance", nil, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
@@ -6549,6 +6616,11 @@ function AdvancedDamageSystem.ConsoleCommands:getDebugVehicleInfo(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setDirtAmount(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setDirtAmount", rawArgs, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then
         print("ADS Error: No target vehicle found. Please enter a vehicle.")
@@ -6580,6 +6652,11 @@ function AdvancedDamageSystem.ConsoleCommands:setDirtAmount(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setFuelLevel(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setFuelLevel", rawArgs, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then
         return
@@ -6648,6 +6725,11 @@ function AdvancedDamageSystem.ConsoleCommands:setFuelLevel(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:resetFactorStats()
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("resetFactorStats", nil, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then
         return
@@ -6700,6 +6782,10 @@ function AdvancedDamageSystem.ConsoleCommands:toggleHudDebugView(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:debug()
+    if not g_currentMission:getIsServer() then
+        ADS_ConsoleCommandEvent.sendToServer("debug", nil, nil, nil)
+        return
+    end
     if ADS_Config.DEBUG then
         ADS_Config.DEBUG = false
     else
