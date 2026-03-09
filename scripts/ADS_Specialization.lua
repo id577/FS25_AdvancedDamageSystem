@@ -6232,6 +6232,18 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
     end
     
     spec.serviceLevel = value
+
+    local interval = vehicle:getMaintenanceInterval()
+    local currentHours = vehicle:getFormattedOperatingTime()
+    local hoursSinceService = (1 - value) * interval
+    for i = #spec.maintenanceLog, 1, -1 do
+        local entry = spec.maintenanceLog[i]
+        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
+            entry.conditionData.operatingHours = currentHours - hoursSinceService
+            break
+        end
+    end
+
     print(string.format("ADS: Set Service level for '%s' to %.2f.", vehicle:getFullName(), value))
 end
 
@@ -6248,6 +6260,16 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     spec.conditionLevel = 1.0
     spec.serviceLevel = 1.0
     vehicle:removeBreakdown()
+
+    local currentHours = vehicle:getFormattedOperatingTime()
+    for i = #spec.maintenanceLog, 1, -1 do
+        local entry = spec.maintenanceLog[i]
+        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
+            entry.conditionData.operatingHours = currentHours
+            break
+        end
+    end
+
     print(string.format("ADS: Fully reset state for '%s'.", vehicle:getFullName()))
 end
 
