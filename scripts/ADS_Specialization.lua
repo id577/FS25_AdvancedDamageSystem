@@ -2122,8 +2122,21 @@ end
 -- service
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
-    local newLevel = spec.serviceLevel - (ADS_Config.CORE.BASE_SERVICE_WEAR * (1 + spec.extraServiceWear)) / (60 * 60 * 1000) * dt
+    local wearRate = (ADS_Config.CORE.BASE_SERVICE_WEAR * (1 + spec.extraServiceWear)) / spec.reliability
+    local newLevel = spec.serviceLevel -  wearRate / (60 * 60 * 1000) * dt
     spec.serviceLevel = math.max(newLevel, 0)
+
+    if ADS_Config.DEBUG then
+        if spec.debugData == nil then
+            spec.debugData = {}
+        end
+        if spec.debugData.service == nil then
+            spec.debugData.service = {}
+        end
+
+        local dbg = spec.debugData.service
+        dbg.totalWearRate = wearRate
+    end
 end
 
 -- condition

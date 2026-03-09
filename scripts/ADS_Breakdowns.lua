@@ -74,6 +74,8 @@ local breakdownPriceMultipliers = {
     CVT_CHAIN_WEAR = 2.60,
     CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = 2.80,
     HYDRAULIC_PUMP_MALFUNCTION = 0.90,
+    HYDRAULIC_CYLINDER_INTERNAL_LEAK = 1.0,
+    PTO_CLUTCH_SLIP = 1.25,
     BRAKE_MALFUNCTION = 0.35,
     BEARING_WEAR = 0.55,
     STEERING_LINKAGE_WEAR = 0.45,
@@ -102,6 +104,8 @@ local breakdownProgressMultipliers = {
     CVT_CHAIN_WEAR = 1.2,
     CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = 1.1,
     HYDRAULIC_PUMP_MALFUNCTION = 1.1,
+    HYDRAULIC_CYLINDER_INTERNAL_LEAK = 0.6,
+    PTO_CLUTCH_SLIP = 0.75,
     BRAKE_MALFUNCTION = 0.9,
     BEARING_WEAR = 1.2,
     STEERING_LINKAGE_WEAR = 1.2,
@@ -1027,8 +1031,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return 1.0   
         end,
         isCanProgress = function(vehicle)
-            local motor = vehicle:getMotor()
-            return (motor.gear == 0 and motor.gearChangeTimer > 0)
+            return vehicle:getLastSpeed() > 0.01
         end,
         stages = {
             {
@@ -1086,7 +1089,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
         end,
         isCanProgress = function(vehicle)
-            return (vehicle:getLastSpeed() > 0.01)
+            return vehicle:getLastSpeed() > 0.01
         end,
         stages = {
             {
@@ -1161,7 +1164,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return true
         end,
         isCanProgress = function(vehicle)
-            return (vehicle:getLastSpeed() > 0.01)
+            return vehicle:getLastSpeed() > 0.01
         end,
         stages = {
             {
@@ -1242,7 +1245,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return true
         end,
         isCanProgress = function(vehicle)
-            return (vehicle:getLastSpeed() > 0.01)
+            return vehicle:getLastSpeed() > 0.01
         end,
         stages = {
             {
@@ -1377,6 +1380,76 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    HYDRAULIC_CYLINDER_INTERNAL_LEAK  = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.HYDRAULICS,
+        isApplicable = function(vehicle)
+            local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+            if storeItem.categoryName == "TRUCKS" then return false end
+            local vtype = vehicle.type.name
+            local spec = vehicle.spec_AdvancedDamageSystem
+            return vtype ~= "car" and vtype ~= "carFillable" and vtype ~= "motorbike" and spec.year >= 1960
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
+                repairPrice = 1.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
+                effects = {
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.20, aggregation = "min" },
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.05, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.5} }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
+                repairPrice = 2.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
+                effects = {
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.40, aggregation = "min" },
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.1, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.4}}
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
+                repairPrice = 4.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
+                effects = { 
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.75, aggregation = "min" },
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.2, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.2} }
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 8.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
+                effects = { 
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message', disableAi = true}, aggregation = "min" },
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 1.0, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.0} }
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
     -- chassis system
     BRAKE_MALFUNCTION = {
         isSelectable = true,
@@ -1392,15 +1465,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return 1.0   
         end,
         isCanProgress = function(vehicle)
-            local spec_drivable = vehicle.spec_drivable
-            local drivingMode = vehicle:getDirectionChangeMode()
-            local isBraking = false
-            if drivingMode == 2 then
-                isBraking = spec_drivable.axisForward < -0.01
-            else
-                isBraking = vehicle.movingDirection ~= 0 and spec_drivable.axisForward ~= 0 and math.sign(vehicle.movingDirection) ~= math.sign(spec_drivable.axisForward)
-            end
-            return isBraking
+            return true
         end,
         stages = {
             {
@@ -1474,7 +1539,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return 1.0   
         end,
         isCanProgress = function(vehicle)
-            return (vehicle:getLastSpeed() > 0.01)
+            return vehicle:getLastSpeed() > 0.01
         end,
         stages = {
             {
@@ -1839,7 +1904,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    COOLANT_LEAK = {
+    COOLANT_LEAK = { -- TO-DO: $l10n
         isSelectable = true,
         system = systems.COOLING,
         isApplicable = function(vehicle)
@@ -1901,7 +1966,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    FAN_CLUTCH_FAILURE = {
+    FAN_CLUTCH_FAILURE = { -- TO-DO: $l10n
         isSelectable = true,
         system = systems.COOLING,
         isApplicable = function(vehicle)
@@ -2209,6 +2274,13 @@ ADS_Breakdowns.BreakdownRegistry = {
                 return 100.0
             else
                 return 1.0
+            end
+        end,
+        isCanProgress = function(vehicle)
+            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
+                return true
+            else
+                return false
             end
         end,
         stages = {
@@ -3025,7 +3097,6 @@ ADS_Breakdowns.EffectApplicators.THERMOSTAT_STUCK_EFFECT = {
     end
 }
 
-
 -------- POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT ----------
 ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
     getEffectName = function()
@@ -3110,13 +3181,147 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
 }
 
 ---------------- HYDRAULIC_SPEED_MODIFIER -------------------
+local hydraulicSpeedHookDefs = {
+    { objectName = "Plow", field = "setRotationMax", wrapperName = "applyHydraulicDamageToPlowRotation" },
+    { objectName = "Plow", field = "setRotationCenter", wrapperName = "applyHydraulicDamageToPlowCenterRotation" },
+    { objectName = "AttacherJoints", field = "onUpdateTick", wrapperName = "applyHydraulicDamageToAttacher" },
+    { objectName = "Cylindered", field = "onUpdate", wrapperName = "applyHydraulicDamageToCylindered" },
+    { objectName = "Foldable", field = "setFoldState", wrapperName = "applyHydraulicDamageToFoldable" }
+}
+
+local hydraulicSpeedHookState = {
+    installed = false,
+    users = setmetatable({}, { __mode = "k" }),
+    originals = {}
+}
+
+local function getHydraulicSpeedHookKey(def)
+    return string.format("%s.%s", def.objectName, def.field)
+end
+
+local function getHydraulicSpeedHookUsersCount()
+    local count = 0
+    for _ in pairs(hydraulicSpeedHookState.users) do
+        count = count + 1
+    end
+    return count
+end
+
+local function installHydraulicSpeedHooks()
+    if hydraulicSpeedHookState.installed then
+        return
+    end
+
+    for _, def in ipairs(hydraulicSpeedHookDefs) do
+        local targetObject = _G[def.objectName]
+        local wrapperFunc = ADS_Breakdowns[def.wrapperName]
+        local key = getHydraulicSpeedHookKey(def)
+
+        if targetObject ~= nil and targetObject[def.field] ~= nil and wrapperFunc ~= nil then
+            hydraulicSpeedHookState.originals[key] = targetObject[def.field]
+            targetObject[def.field] = Utils.overwrittenFunction(targetObject[def.field], wrapperFunc)
+            log_dbg("HYDRAULIC_SPEED_MODIFIER hook installed:", key)
+        else
+            log_dbg("HYDRAULIC_SPEED_MODIFIER hook skipped:", key)
+        end
+    end
+
+    hydraulicSpeedHookState.installed = true
+end
+
+local function uninstallHydraulicSpeedHooks()
+    if not hydraulicSpeedHookState.installed then
+        return
+    end
+
+    for _, def in ipairs(hydraulicSpeedHookDefs) do
+        local targetObject = _G[def.objectName]
+        local key = getHydraulicSpeedHookKey(def)
+        local originalFunc = hydraulicSpeedHookState.originals[key]
+
+        if targetObject ~= nil and originalFunc ~= nil then
+            targetObject[def.field] = originalFunc
+            log_dbg("HYDRAULIC_SPEED_MODIFIER hook restored:", key)
+        end
+
+        hydraulicSpeedHookState.originals[key] = nil
+    end
+
+    hydraulicSpeedHookState.installed = false
+end
+
+local function enableHydraulicSpeedHooksForVehicle(vehicle)
+    if vehicle == nil then
+        return
+    end
+
+    if hydraulicSpeedHookState.users[vehicle] then
+        return
+    end
+
+    hydraulicSpeedHookState.users[vehicle] = true
+    if getHydraulicSpeedHookUsersCount() == 1 then
+        installHydraulicSpeedHooks()
+    end
+end
+
+local function disableHydraulicSpeedHooksForVehicle(vehicle)
+    if vehicle == nil then
+        return
+    end
+
+    if not hydraulicSpeedHookState.users[vehicle] then
+        return
+    end
+
+    hydraulicSpeedHookState.users[vehicle] = nil
+    if getHydraulicSpeedHookUsersCount() == 0 then
+        uninstallHydraulicSpeedHooks()
+    end
+end
+
 ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_SPEED_MODIFIER effect")
+        enableHydraulicSpeedHooksForVehicle(vehicle)
     end,
 
     remove = function(vehicle, handler)
         log_dbg("Removing HYDRAULIC_SPEED_MODIFIER effect.")
+        disableHydraulicSpeedHooksForVehicle(vehicle)
+    end
+}
+
+---------------- HYDRAULIC_HOLD_DRIFT_EFFECT -------------------
+ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
+    getEffectName = function()
+        return "HYDRAULIC_HOLD_DRIFT_EFFECT"
+    end,
+
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying HYDRAULIC_HOLD_DRIFT_EFFECT:", effectData.value)
+        local activeFunc = function(v, dt) 
+            if v.spec_attacherJoints and v.spec_attacherJoints.attachedImplements and next(v.spec_attacherJoints.attachedImplements) ~= nil then
+                for _, implementData in pairs(v.spec_attacherJoints.attachedImplements) do
+                    if implementData.object ~= nil then
+                        local implement = implementData.object
+                        local jointDescIndex = implementData.jointDescIndex
+                        local jointDesc = v.spec_attacherJoints.attacherJoints[jointDescIndex]
+                        if jointDesc ~= nil and not implement:getIsLowered() and not jointDesc.isMoving then
+                            local originalMoveDefaultTime = jointDesc.ads_originalMoveDefaultTime or jointDesc.moveDefaultTime
+                            jointDesc.moveDefaultTime = originalMoveDefaultTime / effectData.value
+                            v:setJointMoveDown(jointDescIndex, true, false)
+                        end
+                    end
+                end
+            end
+        end
+        addFuncToActive(vehicle, handler.getEffectName(), activeFunc)
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing HYDRAULIC_HOLD_DRIFT_EFFECT effect.")
+        removeFuncFromActive(vehicle, handler.getEffectName())
     end
 }
 
@@ -4605,8 +4810,12 @@ function ADS_Breakdowns.applyHydraulicDamageToAttacher(self, superFunc, dt, ...)
             if jointDesc.ads_originalMoveDefaultTime == nil then
                 jointDesc.ads_originalMoveDefaultTime = jointDesc.moveDefaultTime
             end
-            
-            jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime / performance
+
+            if jointDesc.moveDown == true and jointDesc.isMoving == true then
+                jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime
+            else
+                jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime / performance
+            end
         end
     end
 
@@ -4803,8 +5012,3 @@ function ADS_Breakdowns.setLightsTypesMask(self, superFunc, lightsTypesMask, for
 end
 
 
-Plow.setRotationMax = Utils.overwrittenFunction(Plow.setRotationMax, ADS_Breakdowns.applyHydraulicDamageToPlowRotation)
-Plow.setRotationCenter = Utils.overwrittenFunction(Plow.setRotationCenter, ADS_Breakdowns.applyHydraulicDamageToPlowCenterRotation)
-AttacherJoints.onUpdateTick = Utils.overwrittenFunction(AttacherJoints.onUpdateTick, ADS_Breakdowns.applyHydraulicDamageToAttacher)
-Cylindered.onUpdate = Utils.overwrittenFunction(Cylindered.onUpdate, ADS_Breakdowns.applyHydraulicDamageToCylindered)
-Foldable.setFoldState = Utils.overwrittenFunction(Foldable.setFoldState, ADS_Breakdowns.applyHydraulicDamageToFoldable)
