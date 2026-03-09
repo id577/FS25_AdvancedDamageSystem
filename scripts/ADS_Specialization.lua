@@ -6232,7 +6232,6 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
     end
     
     spec.serviceLevel = value
-    vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.MAINTENANCE, AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD, "NONE", false, 0, true)
     print(string.format("ADS: Set Service level for '%s' to %.2f.", vehicle:getFullName(), value))
 end
 
@@ -6249,7 +6248,6 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     spec.conditionLevel = 1.0
     spec.serviceLevel = 1.0
     vehicle:removeBreakdown()
-    vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.MAINTENANCE, AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD, "NONE", false, 0, true)
     print(string.format("ADS: Fully reset state for '%s'.", vehicle:getFullName()))
 end
 
