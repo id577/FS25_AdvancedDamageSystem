@@ -6236,11 +6236,27 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
     local interval = vehicle:getMaintenanceInterval()
     local currentHours = vehicle:getFormattedOperatingTime()
     local hoursSinceService = (1 - value) * interval
+    local targetOpHours = currentHours - hoursSinceService
+    local found = false
     for i = #spec.maintenanceLog, 1, -1 do
         local entry = spec.maintenanceLog[i]
         if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
-            entry.conditionData.operatingHours = currentHours - hoursSinceService
+            entry.conditionData.operatingHours = targetOpHours
+            entry.conditionData.service = value
+            if vehicle.isServer then
+                table.insert(spec._pendingNetLogEntries, entry)
+            end
+            found = true
             break
+        end
+    end
+    if not found and vehicle.isServer then
+        vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+        local entry = spec.maintenanceLog[#spec.maintenanceLog]
+        if entry then
+            entry.conditionData.operatingHours = targetOpHours
+            entry.conditionData.service = value
+            entry.isVisible = false
         end
     end
 
@@ -6262,11 +6278,28 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     vehicle:removeBreakdown()
 
     local currentHours = vehicle:getFormattedOperatingTime()
+    local found = false
     for i = #spec.maintenanceLog, 1, -1 do
         local entry = spec.maintenanceLog[i]
         if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
             entry.conditionData.operatingHours = currentHours
+            entry.conditionData.condition = 1.0
+            entry.conditionData.service = 1.0
+            if vehicle.isServer then
+                table.insert(spec._pendingNetLogEntries, entry)
+            end
+            found = true
             break
+        end
+    end
+    if not found and vehicle.isServer then
+        vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+        local entry = spec.maintenanceLog[#spec.maintenanceLog]
+        if entry then
+            entry.conditionData.operatingHours = currentHours
+            entry.conditionData.condition = 1.0
+            entry.conditionData.service = 1.0
+            entry.isVisible = false
         end
     end
 
