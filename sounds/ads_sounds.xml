@@ -84,6 +84,13 @@
         <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </turboWhistle>
+    <fanNoice file="sounds/fanNoice.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="0.8" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </fanNoice>
     <wheelHubBearingNoise file="sounds/wheelHubBearingNoise.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
         <volume indoor="0.8" outdoor="1.0" />
         <pitch indoor="1.0" outdoor="1.0" />

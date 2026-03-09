@@ -835,6 +835,8 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
     self.spec_AdvancedDamageSystem._netTargetEngineTemp = nil
+    self.spec_AdvancedDamageSystem.radiatorHealth = 1.0
+    self.spec_AdvancedDamageSystem.fanClutchHealth = 1.0
     self.spec_AdvancedDamageSystem.thermostatState = 0.0
     self.spec_AdvancedDamageSystem.thermostatHealth = 1.0
     self.spec_AdvancedDamageSystem.thermostatStuckedPosition = nil
@@ -1406,6 +1408,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.brakes2 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes2", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.brakes3 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "brakes3", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.turboWhistle = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "turboWhistle", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.fanNoice = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "fanNoice", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.wheelHubBearingNoise = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "wheelHubBearingNoise", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.vibrationNoice = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "vibrationNoice", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.wheelSeizureGrind = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "wheelSeizureGrind", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
@@ -4757,7 +4760,15 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
         local engineMaxHeat = C.ENGINE_MAX_HEAT + spec.extraEngineHeat
         heat = C.ENGINE_MIN_HEAT + motorLoad * (engineMaxHeat - C.ENGINE_MIN_HEAT)
         
-        local dirtRadiatorMaxCooling = C.ENGINE_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
+        local brokenFanModifier = 1.0
+        if spec.fanClutchHealth < 1.0 then
+            local speed = self:getLastSpeed()
+            if speed < C.SPEED_COOLING_MIN_SPEED then
+                local speedK = 1 - speed / C.SPEED_COOLING_MIN_SPEED
+                brokenFanModifier = 1 - math.min(speedK * (1 - spec.fanClutchHealth), 0.5)
+            end
+        end
+        local dirtRadiatorMaxCooling = (C.ENGINE_RADIATOR_MAX_COOLING * spec.radiatorHealth) * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4)) * brokenFanModifier
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
     else

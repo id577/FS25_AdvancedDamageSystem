@@ -61,6 +61,63 @@ local systems = (AdvancedDamageSystem ~= nil and AdvancedDamageSystem.SYSTEMS) o
     MATERIALFLOW = "ads_spec_system_materialflow",
     FUEL = "ads_spec_system_fuel"
 }
+
+local breakdownPriceMultipliers = {
+    ECU_MALFUNCTION = 0.60,
+    ELECTRICAL_SYSTEM_MALFUNCTION = 0.45,
+    TURBOCHARGER_MALFUNCTION = 1.00, -- 1% price
+    OIL_PUMP_MALFUNCTION = 1.50,
+    VALVE_TRAIN_MALFUNCTION = 1.60,
+    MANUAL_TRANSMISSION_CLUTCH_WEAR = 1.30,
+    MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION = 1.10,
+    POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = 2.40,
+    CVT_CHAIN_WEAR = 2.60,
+    CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = 2.80,
+    HYDRAULIC_PUMP_MALFUNCTION = 0.90,
+    BRAKE_MALFUNCTION = 0.35,
+    BEARING_WEAR = 0.55,
+    STEERING_LINKAGE_WEAR = 0.45,
+    TRACK_TENSIONER_MALFUNCTION = 0.80,
+    CVT_THERMOSTAT_MALFUNCTION = 0.50,
+    THERMOSTAT_MALFUNCTION = 0.50,
+    COOLANT_LEAK = 0.80,
+    FAN_CLUTCH_FAILURE = 0.65,
+    FUEL_PUMP_MALFUNCTION = 0.55,
+    FUEL_INJECTOR_MALFUNCTION = 0.80,
+    CARBURETOR_CLOGGING = 0.25,
+    YIELD_SENSOR_MALFUNCTION = 0.30,
+    MATERIAL_FLOW_SYSTEM_WEAR = 0.35,
+    UNLOADING_AUGER_MALFUNCTION = 0.40,
+}
+
+local breakdownProgressMultipliers = {
+    ECU_MALFUNCTION = 1.00, -- 3.5 hours
+    ELECTRICAL_SYSTEM_MALFUNCTION = 0.9,
+    TURBOCHARGER_MALFUNCTION = 1.1,
+    OIL_PUMP_MALFUNCTION = 1.3,
+    VALVE_TRAIN_MALFUNCTION = 1.4,
+    MANUAL_TRANSMISSION_CLUTCH_WEAR = 1.00,
+    MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION = 1.3,
+    POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = 1.1,
+    CVT_CHAIN_WEAR = 1.2,
+    CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = 1.1,
+    HYDRAULIC_PUMP_MALFUNCTION = 1.1,
+    BRAKE_MALFUNCTION = 0.9,
+    BEARING_WEAR = 1.2,
+    STEERING_LINKAGE_WEAR = 1.2,
+    TRACK_TENSIONER_MALFUNCTION = 1.3,
+    CVT_THERMOSTAT_MALFUNCTION = 1.4,
+    THERMOSTAT_MALFUNCTION = 1.4,
+    COOLANT_LEAK = 0.6,
+    FAN_CLUTCH_FAILURE = 0.9,
+    FUEL_PUMP_MALFUNCTION = 1.1,
+    FUEL_INJECTOR_MALFUNCTION = 1.1,
+    CARBURETOR_CLOGGING = 0.9,
+    YIELD_SENSOR_MALFUNCTION = 1.1,
+    MATERIAL_FLOW_SYSTEM_WEAR = 1.0,
+    UNLOADING_AUGER_MALFUNCTION = 1.2
+}
+
 ADS_Breakdowns.BreakdownRegistry = {
 
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
@@ -487,7 +544,6 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-
 -------------------------------------------- SELECTABLE -----------------------------------------
 
     -- electrical
@@ -509,8 +565,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_ecu_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 0.5,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.ECU_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.ECU_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
                     { id = "DARK_EXHAUST_EFFECT", value = 0.40, aggregation = "max" },
@@ -538,8 +594,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_ecu_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 1.0,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.ECU_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.ECU_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.20, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.2, aggregation = "sum" },
@@ -553,8 +609,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_ecu_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 2.0, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.ECU_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.ECU_MALFUNCTION,
                 effects = { 
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.5, aggregation = "sum" },
@@ -571,7 +627,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_ecu_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 4.0, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.ECU_MALFUNCTION,
                 effects = { 
                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or",  extraData = {starter = true, message = "ads_breakdowns_ecu_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true}} 
                 },
@@ -597,8 +653,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_electrical_system_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.36,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
                 effects = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 200, maskBackup = 0}, aggregation = "min"},
                     { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE', count = 0}, aggregation = "max"}
@@ -609,8 +665,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate", 
                 description = "ads_breakdowns_electrical_system_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.72,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
                 effects = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
@@ -626,8 +682,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_electrical_system_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 1.44, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
                 effects = { 
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
                     { id = "LIGHTS_FAILURE", value = 1.0, extraData = {message = "ads_breakdowns_electrical_system_malfunction_stage3_message"}, aggregation = "boolean_or" },
@@ -645,7 +701,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_electrical_system_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 2.88, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
                 effects = { 
                     { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
                     { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_electrical_system_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
@@ -674,8 +730,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_turbocharger_wear_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.8,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.TURBOCHARGER_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.TURBOCHARGER_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
                     { id = "TURBO_WHISTLE_NOISE_EFFECT", value = 0.25, aggregation = "max" },
@@ -685,8 +741,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_turbocharger_wear_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 1.6,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.TURBOCHARGER_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.TURBOCHARGER_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
@@ -700,8 +756,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_turbocharger_wear_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 3.2,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.TURBOCHARGER_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.TURBOCHARGER_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.40, aggregation = "sum" },
@@ -717,7 +773,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_turbocharger_wear_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 6.4,
+                repairPrice = 8.0 * breakdownPriceMultipliers.TURBOCHARGER_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.50, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.60, aggregation = "sum" },
@@ -750,8 +806,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_oil_pump_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 1.2,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.OIL_PUMP_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.OIL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
                     { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.30, aggregation = "max" },
@@ -763,8 +819,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_oil_pump_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 2.4,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.OIL_PUMP_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.OIL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.5, aggregation = "max" },
@@ -778,8 +834,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_oil_pump_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.6,
-                repairPrice = 4.8,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.OIL_PUMP_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.OIL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.45, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
@@ -795,7 +851,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_oil_pump_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 9.6,
+                repairPrice = 8.0 * breakdownPriceMultipliers.OIL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_oil_pump_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} },
                 },
@@ -829,8 +885,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_valve_train_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 1.2,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.VALVE_TRAIN_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.VALVE_TRAIN_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.04, aggregation = "sum" },
                     { id = "VALVE_TRAIN_NOISE_EFFECT", value = 0.5, aggregation = "max" },
@@ -842,8 +898,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_valve_train_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 2.4,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.VALVE_TRAIN_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.VALVE_TRAIN_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
                     { id = "VALVE_TRAIN_NOISE_EFFECT", value = 0.7, aggregation = "max" },
@@ -858,8 +914,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_valve_train_malfunction_stage4_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.6,
-                repairPrice = 4.8,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.VALVE_TRAIN_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.VALVE_TRAIN_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
@@ -876,7 +932,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_valve_train_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 9.6,
+                repairPrice = 8.0 * breakdownPriceMultipliers.VALVE_TRAIN_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_valve_train_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} },
                 },
@@ -909,8 +965,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_transmission_slip_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 1.4,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.MANUAL_TRANSMISSION_CLUTCH_WEAR,
+                repairPrice = 1.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_CLUTCH_WEAR,
                 effects = {
                     { id = "TRANSMISSION_SLIP_EFFECT", value = 0.20, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                 }
@@ -919,8 +975,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_transmission_slip_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 2.8,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.MANUAL_TRANSMISSION_CLUTCH_WEAR,
+                repairPrice = 2.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_CLUTCH_WEAR,
                 effects = {
                      { id = "TRANSMISSION_SLIP_EFFECT", value = 0.40, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" }
@@ -933,8 +989,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_transmission_slip_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 5.6, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.MANUAL_TRANSMISSION_CLUTCH_WEAR,
+                repairPrice = 4.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_CLUTCH_WEAR,
                 effects = { 
                      { id = "TRANSMISSION_SLIP_EFFECT", value = 0.60, extraData = {accumulatedMod = 0.0}, aggregation = "max"},
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" }
@@ -948,7 +1004,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_transmission_slip_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 11.2, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_CLUTCH_WEAR,
                 effects = { 
                      { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_transmission_slip_stage4_message", disableAi = true}, aggregation = "max" }
                 },
@@ -979,8 +1035,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.1,
-                repairPrice = 1.2,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION,
                 effects = {
                     { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max"},
                     { id = "GEAR_REJECTION_CHANCE", value = 20.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
@@ -990,8 +1046,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.05,
-                repairPrice = 2.4,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION,
                 effects = {
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.20, extraData = {timer = 0, status = 'IDLE', duration = 1800}, aggregation = "max"},
                      { id = "GEAR_REJECTION_CHANCE", value = 10.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
@@ -1001,8 +1057,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.03,
-                repairPrice = 4.8, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION,
                 effects = { 
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.50, extraData = {timer = 0, status = 'IDLE', duration = 2200}, aggregation = "max"},
                      { id = "GEAR_REJECTION_CHANCE", value = 3.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min"}
@@ -1013,7 +1069,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 9.6, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION,
                 effects = { 
                      { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 1.00, extraData = {timer = 0, status = 'IDLE', duration = 2200, message = "ads_breakdowns_transmission_synchronizer_malfunction_stage4_message", disableAi = true}, aggregation = "max"}
                 }
@@ -1037,8 +1093,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.5,
-                repairPrice = 2.0,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
                 effects = {
                     { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.2, extraData = {timer = 0, status = "IDLE", duration = 700, backup = 0}, aggregation = "max"}
                 }
@@ -1047,8 +1103,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 4.0,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
                 effects = {
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.5, extraData = {timer = 0, status = "IDLE", duration = 1000, backup = 0}, aggregation = "max"}
                 },
@@ -1060,8 +1116,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.5,
-                repairPrice = 8.0, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
                 effects = { 
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.99, extraData = {timer = 0, status = "IDLE", duration = 1500, backup = 0}, aggregation = "max"}
                 },
@@ -1074,7 +1130,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 16.0, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
                 effects = { 
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0, disableAi = true}, aggregation = "max"}
                 },
@@ -1112,8 +1168,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_cvt_chain_wear_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.5,
-                repairPrice = 2.2,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
+                repairPrice = 1.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = {
                     { id = "CVT_SLIP_EFFECT", value = 0.2, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" }
@@ -1124,8 +1180,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_cvt_chain_wear_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 4.4,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
+                repairPrice = 2.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = {
                      { id = "CVT_SLIP_EFFECT", value = 0.4, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
@@ -1139,8 +1195,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_cvt_chain_wear_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.5,
-                repairPrice = 8.8, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
+                repairPrice = 4.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = { 
                      { id = "CVT_SLIP_EFFECT", value = 0.6, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
@@ -1155,7 +1211,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_cvt_chain_wear_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 17.6, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = { 
                      { id = "CVT_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_cvt_chain_wear_stage4_message", disableAi = true}, aggregation = "max" }
                 },
@@ -1193,8 +1249,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.5,
-                repairPrice = 2.2,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 effects = {
                     { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.5, aggregation = "max", extraData = {timer = 0, duration = 200, status = 'IDLE'}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
@@ -1205,8 +1261,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 4.4,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 effects = {
                     { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.25, aggregation = "max", extraData = {timer = 0, duration = 250, status = 'IDLE'}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.1, aggregation = "sum" },
@@ -1222,8 +1278,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.5,
-                repairPrice = 8.8, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 effects = { 
                     { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.1, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.2, aggregation = "sum" },
@@ -1239,7 +1295,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 17.6, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 effects = { 
                      { id = "CVT_MAX_RATIO_MODIFIER", value = 0.8, aggregation = "max" },
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.15, aggregation = "sum" },
@@ -1273,8 +1329,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_hydraulic_pump_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 0.7,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.HYDRAULIC_PUMP_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.HYDRAULIC_PUMP_MALFUNCTION,
                 effects = {
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.20, aggregation = "min" }
                 }
@@ -1283,8 +1339,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_hydraulic_pump_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.8,
-                repairPrice = 1.4,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.HYDRAULIC_PUMP_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.HYDRAULIC_PUMP_MALFUNCTION,
                 effects = {
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.40, aggregation = "min" }
                 },
@@ -1296,8 +1352,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_hydraulic_pump_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 2.8, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.HYDRAULIC_PUMP_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.HYDRAULIC_PUMP_MALFUNCTION,
                 effects = { 
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.75, aggregation = "min" }
                 },
@@ -1310,7 +1366,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_hydraulic_pump_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 5.6, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.HYDRAULIC_PUMP_MALFUNCTION,
                 effects = { 
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'ads_breakdowns_hydraulic_pump_malfunction_stage4_message', disableAi = true}, aggregation = "min" }
                 },
@@ -1351,8 +1407,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_brake_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.2,
-                repairPrice = 0.3,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.BRAKE_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.BRAKE_MALFUNCTION,
                 effects = {
                     { id = "BRAKE_FORCE_MODIFIER", value = -0.30, aggregation = "min",  extraData = {timer = 0, soundPlayed = false} }
                 }
@@ -1361,8 +1417,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_brake_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.1,
-                repairPrice = 0.6,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.BRAKE_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.BRAKE_MALFUNCTION,
                 effects = {
                     { id = "BRAKE_FORCE_MODIFIER", value = -0.45, aggregation = "min",  extraData = {timer = 0, soundPlayed = false} }
                 },
@@ -1374,8 +1430,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_brake_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.05,
-                repairPrice = 1.2, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.BRAKE_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.BRAKE_MALFUNCTION,
                 effects = { 
                     { id = "BRAKE_FORCE_MODIFIER", value = -0.70, aggregation = "min",  extraData = {timer = 0, soundPlayed = false} }
                 },
@@ -1388,7 +1444,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_brake_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 2.4, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.BRAKE_MALFUNCTION,
                 effects = { 
                     { id = "BRAKE_FORCE_MODIFIER", value = -1.0, aggregation = "min", extraData = {message = "ads_breakdowns_brake_malfunction_stage4_message", disableAi = true, timer = 0, soundPlayed = false} }
                 },
@@ -1425,8 +1481,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_bearing_wear_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.2,
-                repairPrice = 0.3,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.BEARING_WEAR,
+                repairPrice = 1.0 * breakdownPriceMultipliers.BEARING_WEAR,
                 effects = {
                     { id = "WHEEL_HUB_BEARING_NOISE_EFFECT", value = 1.0, aggregation = "max" },
                     { id = "VIBRATION_NOISE_EFFECT", value = 1.0, aggregation = "max" },
@@ -1438,8 +1494,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_bearing_wear_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.1,
-                repairPrice = 0.6,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.BEARING_WEAR,
+                repairPrice = 2.0 * breakdownPriceMultipliers.BEARING_WEAR,
                 effects = {
                     { id = "WHEEL_HUB_BEARING_NOISE_EFFECT", value = 1.5, aggregation = "max" },
                     { id = "VIBRATION_NOISE_EFFECT", value = 1.5, aggregation = "max" },
@@ -1454,8 +1510,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_bearing_wear_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.05,
-                repairPrice = 1.2, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.BEARING_WEAR,
+                repairPrice = 4.0 * breakdownPriceMultipliers.BEARING_WEAR,
                 effects = { 
                     { id = "WHEEL_HUB_BEARING_NOISE_EFFECT", value = 2.0, aggregation = "max" },
                     { id = "VIBRATION_NOISE_EFFECT", value = 2.0, aggregation = "max" },
@@ -1472,7 +1528,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_bearing_wear_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 2.4, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.BEARING_WEAR,
                 effects = { 
                     { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 2.5, aggregation = "max" },
                     { id = "WHEEL_SEIZURE_EFFECT", value = 1.0, aggregation = "max", extraData = {message = "ads_breakdowns_bearing_wear_stage4_message", disableAi = true}},
@@ -1513,8 +1569,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_steering_linkage_wear_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.2,
-                repairPrice = 0.3,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.STEERING_LINKAGE_WEAR,
+                repairPrice = 1.0 * breakdownPriceMultipliers.STEERING_LINKAGE_WEAR,
                 effects = {
                     { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.003, aggregation = "max" },
                     { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.10, aggregation = "max" },
@@ -1524,8 +1580,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_steering_linkage_wear_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.1,
-                repairPrice = 0.6,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.STEERING_LINKAGE_WEAR,
+                repairPrice = 2.0 * breakdownPriceMultipliers.STEERING_LINKAGE_WEAR,
                 effects = {
                     { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.01, aggregation = "max" },
                     { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.25, aggregation = "max" },
@@ -1537,8 +1593,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_steering_linkage_wear_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.05,
-                repairPrice = 1.2,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.STEERING_LINKAGE_WEAR,
+                repairPrice = 4.0 * breakdownPriceMultipliers.STEERING_LINKAGE_WEAR,
                 effects = {
                     { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.03, aggregation = "max" },
                     { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.45, aggregation = "max" },
@@ -1552,7 +1608,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_steering_linkage_wear_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 2.4,
+                repairPrice = 8.0 * breakdownPriceMultipliers.STEERING_LINKAGE_WEAR,
                 effects = {
                     { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.99, aggregation = "max", extraData = {message="ads_breakdowns_steering_linkage_wear_stage4_message", disableAi=true} },
                 },
@@ -1562,6 +1618,11 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
+    -- Track Tensioner Malfunction
+    -- Progressive wear/failure of track tensioning mechanism and guide alignment.
+    -- Causes drag, vibration and directional instability under load, with growing
+    -- risk of track seizure behavior and severe drivability loss at critical stage.
 
     TRACK_TENSIONER_MALFUNCTION = { -- TO-DO: $l10n
         isSelectable = true,
@@ -1584,8 +1645,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_track_tensioner_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.2,
-                repairPrice = 0.3,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.TRACK_TENSIONER_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.TRACK_TENSIONER_MALFUNCTION,
                 effects = {
                     { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.003, aggregation = "max" },
                     { id = "VIBRATION_NOISE_EFFECT", value = 1.0, aggregation = "max" },
@@ -1598,8 +1659,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_track_tensioner_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.1,
-                repairPrice = 0.6,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.TRACK_TENSIONER_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.TRACK_TENSIONER_MALFUNCTION,
                 effects = {
                     { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.01, aggregation = "max" },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 0.6, motorLoad = 0.2, cruiseState = 0}},
@@ -1616,8 +1677,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_track_tensioner_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.05,
-                repairPrice = 1.2,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.TRACK_TENSIONER_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.TRACK_TENSIONER_MALFUNCTION,
                 effects = {
                     { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.05, aggregation = "max" },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.1, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 0.6, motorLoad = 0.2, cruiseState = 0}},
@@ -1636,7 +1697,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_track_tensioner_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 2.4,
+                repairPrice = 8.0 * breakdownPriceMultipliers.TRACK_TENSIONER_MALFUNCTION,
                 effects = {
                     { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 2.5, aggregation = "max" },
                     { id = "WHEEL_SEIZURE_EFFECT", value = 1.0, aggregation = "max", extraData = {message = "ads_breakdowns_track_tensioner_malfunction_stage4_message", disableAi = true}},
@@ -1667,8 +1728,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_cvt_thermostat_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.44,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.CVT_THERMOSTAT_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.CVT_THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.3, aggregation = "min"}
                 }
@@ -1677,8 +1738,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_cvt_thermostat_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 0.88,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.CVT_THERMOSTAT_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.CVT_THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
                 },
@@ -1690,8 +1751,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_cvt_thermostat_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.5,
-                repairPrice = 1.76,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.CVT_THERMOSTAT_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.CVT_THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.8, aggregation = "min"}
                 },
@@ -1704,7 +1765,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_cvt_thermostat_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 3.52,
+                repairPrice = 8.0 * breakdownPriceMultipliers.CVT_THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "CVT_THERMOSTAT_STUCK_EFFECT", value = -1, aggregation = "min"}
                 },
@@ -1730,8 +1791,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_thermostat_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.44,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.THERMOSTAT_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.3, aggregation = "min"}
                 }
@@ -1740,8 +1801,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_thermostat_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 0.88,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.THERMOSTAT_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
                 },
@@ -1753,13 +1814,13 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_thermostat_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.5,
-                repairPrice = 1.76,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.THERMOSTAT_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.8, aggregation = "min"}
                 },
                 indicators = {
-                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }
                 }
             },
             {
@@ -1767,13 +1828,139 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_thermostat_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 3.52,
+                repairPrice = 8.0 * breakdownPriceMultipliers.THERMOSTAT_MALFUNCTION,
                 effects = {
                     { id = "THERMOSTAT_STUCK_EFFECT", value = -1.0, aggregation = "min"}
                 },
                 indicators = {
-                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false },
-                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.COOLANT, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    COOLANT_LEAK = {
+        isSelectable = true,
+        system = systems.COOLING,
+        isApplicable = function(vehicle)
+            return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_coolant_leak_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.COOLANT_LEAK,
+                repairPrice = 1.0 * breakdownPriceMultipliers.COOLANT_LEAK,
+                effects = {
+                    { id = "RADIATOR_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_coolant_leak_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.COOLANT_LEAK,
+                repairPrice = 2.0 * breakdownPriceMultipliers.COOLANT_LEAK,
+                effects = {
+                    { id = "RADIATOR_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                },
+                indicators = {
+
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_coolant_leak_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.COOLANT_LEAK,
+                repairPrice = 4.0 * breakdownPriceMultipliers.COOLANT_LEAK,
+                effects = {
+                    { id = "RADIATOR_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
+                },
+                indicators = {
+                    { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_coolant_leak_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 8.0 * breakdownPriceMultipliers.COOLANT_LEAK,
+                effects = {
+                    { id = "RADIATOR_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
+                },
+                indicators = {
+                    { id = db.COOLANT, color = color.CRITICAL, switchOn = true, switchOff = false },
+                }
+            }
+        }
+    },
+
+    FAN_CLUTCH_FAILURE = {
+        isSelectable = true,
+        system = systems.COOLING,
+        isApplicable = function(vehicle)
+            return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_fun_clutch_failure_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.FAN_CLUTCH_FAILURE,
+                repairPrice = 1.0 * breakdownPriceMultipliers.FAN_CLUTCH_FAILURE,
+                effects = {
+                    { id = "FUN_CLUTCH_MODIFIER", value = -0.1, aggregation = "min"},
+                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.4, aggregation = "max" }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_fun_clutch_failure_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.FAN_CLUTCH_FAILURE,
+                repairPrice = 2.0 * breakdownPriceMultipliers.FAN_CLUTCH_FAILURE,
+                effects = {
+                    { id = "FUN_CLUTCH_MODIFIER", value = -0.2, aggregation = "min"},
+                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.7, aggregation = "max" }
+                },
+                indicators = {
+                    { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_fun_clutch_failure_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.FAN_CLUTCH_FAILURE,
+                repairPrice = 4.0 * breakdownPriceMultipliers.FAN_CLUTCH_FAILURE,
+                effects = {
+                    { id = "FUN_CLUTCH_MODIFIER", value = -0.3, aggregation = "min"},
+                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 1.0, aggregation = "max" }
+                },
+                indicators = {
+                    { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_fun_clutch_failure_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 8.0 * breakdownPriceMultipliers.FAN_CLUTCH_FAILURE,
+                effects = {
+                    { id = "FUN_CLUTCH_MODIFIER", value = -0.5, aggregation = "min"},
+                },
+                indicators = {
+                    { id = db.COOLANT, color = color.CRITICAL, switchOn = true, switchOff = false },
                 }
             }
         }
@@ -1794,8 +1981,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_fuel_pump_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.4,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.FUEL_PUMP_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.FUEL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
@@ -1808,8 +1995,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_fuel_pump_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.8,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.FUEL_PUMP_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.FUEL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
@@ -1836,8 +2023,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_fuel_pump_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.2,
-                repairPrice = 1.6, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.FUEL_PUMP_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.FUEL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} }, 
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
@@ -1855,7 +2042,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_fuel_pump_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 3.2, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.FUEL_PUMP_MALFUNCTION,
                 effects = { 
                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_pump_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} } 
                 },
@@ -1880,8 +2067,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_fuel_injector_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.5,
-                repairPrice = 0.6,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.FUEL_INJECTOR_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.FUEL_INJECTOR_MALFUNCTION,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.08, aggregation = "sum" },
@@ -1893,8 +2080,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_fuel_injector_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.5,
-                repairPrice = 1.2,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.FUEL_INJECTOR_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.FUEL_INJECTOR_MALFUNCTION,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.20, aggregation = "sum" },
@@ -1910,8 +2097,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_fuel_injector_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.2,
-                repairPrice = 2.4,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.FUEL_INJECTOR_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.FUEL_INJECTOR_MALFUNCTION,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
@@ -1928,7 +2115,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_fuel_injector_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 4.8,
+                repairPrice = 8.0 * breakdownPriceMultipliers.FUEL_INJECTOR_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_injector_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} }
                 },
@@ -1954,8 +2141,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_carburetor_clogging_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 3.0,
-                repairPrice = 0.2,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.CARBURETOR_CLOGGING,
+                repairPrice = 1.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
@@ -1965,8 +2152,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_carburetor_clogging_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.4,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.CARBURETOR_CLOGGING,
+                repairPrice = 2.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
                 effects = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
@@ -1980,8 +2167,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_carburetor_clogging_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 0.8, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.CARBURETOR_CLOGGING,
+                repairPrice = 4.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
                 effects = { 
                     { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
@@ -1997,7 +2184,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_carburetor_clogging_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 1.6, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
                 effects = { 
                     { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
                 },
@@ -2029,8 +2216,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_yield_sensor_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 4.0,
-                repairPrice = 0.24,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.YIELD_SENSOR_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
                 effects = {
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.05, aggregation = "sum" }
                 }
@@ -2039,8 +2226,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_yield_sensor_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.48,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.YIELD_SENSOR_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
                 effects = {
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.1, aggregation = "sum" },
                 },
@@ -2052,8 +2239,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_yield_sensor_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 0.96, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.YIELD_SENSOR_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
                 effects = { 
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.2, aggregation = "sum" },
                 },
@@ -2066,7 +2253,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_yield_sensor_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 1.92, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
                 effects = { 
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.4, aggregation = "sum", extraData = {message = 'ads_breakdowns_yield_sensor_malfunction_stage4_message', disableAi = true} },
                 },
@@ -2103,8 +2290,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_material_flow_system_wear_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0,
-                repairPrice = 0.24,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
+                repairPrice = 1.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
                 effects = {
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.02, aggregation = "sum" }
                 }
@@ -2113,8 +2300,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_material_flow_system_wear_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0,
-                repairPrice = 0.48,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
+                repairPrice = 2.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
                 effects = {
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.05, aggregation = "sum" },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum"}
@@ -2124,8 +2311,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_material_flow_system_wear_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.5,
-                repairPrice = 0.96, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
+                repairPrice = 4.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
                 effects = { 
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.10, aggregation = "sum" },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
@@ -2139,7 +2326,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_material_flow_system_wear_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 1.92, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
                 effects = { 
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.80, aggregation = "sum", extraData = {message = "ads_breakdowns_material_flow_system_wear_stage4_message", disableAi = true}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.30, aggregation = "sum"},
@@ -2182,8 +2369,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_unloading_auger_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.4,
-                repairPrice = 0.24,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.UNLOADING_AUGER_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 effects = {
                     { id = "UNLOADING_SPEED_MODIFIER", value = -0.20, aggregation = "min" }
                 }
@@ -2192,8 +2379,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_unloading_auger_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.2,
-                repairPrice = 0.48,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.UNLOADING_AUGER_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 effects = {
                     { id = "UNLOADING_SPEED_MODIFIER", value = -0.40, aggregation = "min" }
                 }
@@ -2202,8 +2389,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_unloading_auger_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.1,
-                repairPrice = 0.96, 
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.UNLOADING_AUGER_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 effects = { 
                     { id = "UNLOADING_SPEED_MODIFIER", value = -0.60, aggregation = "min" }
                 },
@@ -2216,7 +2403,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_unloading_auger_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 1.92, 
+                repairPrice = 8.0 * breakdownPriceMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 effects = { 
                      { id = "UNLOADING_AUGER_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {message = "ads_breakdowns_unloading_auger_malfunction_stage4_message"} }
                 },
@@ -2789,6 +2976,36 @@ ADS_Breakdowns.EffectApplicators.THERMOSTAT_HEALTH_MODIFIER = {
     end
 }
 
+----------------- RADIATOR_HEALTH_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.RADIATOR_HEALTH_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying RADIATOR_HEALTH_MODIFIER:", effectData.value)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.radiatorHealth = math.max(1.0 + effectData.value, 0.1)
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing RADIATOR_HEALTH_MODIFIER effect.")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.radiatorHealth = 1.0
+    end
+}
+
+----------------- FAN_CLUTCH_MODIFIER -----------------
+ADS_Breakdowns.EffectApplicators.FAN_CLUTCH_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying FUN_CLUTCH_MODIFIER:", effectData.value)
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.fanClutchHealth = math.max(1.0 + effectData.value, 0.1)
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing FAN_CLUTCH_MODIFIER effect.")
+        local spec = vehicle.spec_AdvancedDamageSystem
+        spec.fanClutchHealth = 1.0
+    end
+}
+
 ----------------- THERMOSTAT_STUCK_EFFECT --------------------
 ADS_Breakdowns.EffectApplicators.THERMOSTAT_STUCK_EFFECT = {
     apply = function(vehicle, effectData, handler)
@@ -3313,6 +3530,8 @@ local function createEngineNoiseEffectApplicator(effectName, sampleName, gateMod
                     local accelThreshold = 0.02
                     local accelGate = math.clamp((accelN - accelThreshold) / (1 - accelThreshold), 0, 1)
                     pitchOffset = (0.20 * accelGate + 0.16 * (rpmN ^ 1.20) * accelGate + 0.03 * loadN * accelGate) * gate
+                elseif sampleName == "fanNoice" then
+                    pitchOffset = 0
                 elseif sampleName == "wheelHubBearingNoise" then
                     local speedN = math.clamp(speedMps / 15.0, 0, 1)
                     pitchOffset = (0.12 * (speedN ^ 1.10) + 0.03 * loadN * speedN) * gate
@@ -3348,6 +3567,7 @@ end
 ADS_Breakdowns.EffectApplicators.ENGINE_KNOCKING_NOISE_EFFECT = createEngineNoiseEffectApplicator("ENGINE_KNOCKING_NOISE_EFFECT", "engineKnocking", nil)
 ADS_Breakdowns.EffectApplicators.VALVE_TRAIN_NOISE_EFFECT = createEngineNoiseEffectApplicator("VALVE_TRAIN_NOISE_EFFECT", "valveTrainNoise", nil)
 ADS_Breakdowns.EffectApplicators.TURBO_WHISTLE_NOISE_EFFECT = createEngineNoiseEffectApplicator("TURBO_WHISTLE_NOISE_EFFECT", "turboWhistle", "accel")
+ADS_Breakdowns.EffectApplicators.FAN_CLUTCH_NOISE_EFFECT = createEngineNoiseEffectApplicator("FAN_CLUTCH_NOISE_EFFECT", "fanNoice", nil)
 ADS_Breakdowns.EffectApplicators.VIBRATION_NOISE_EFFECT = createEngineNoiseEffectApplicator("VIBRATION_NOISE_EFFECT", "vibrationNoice", "speed")
 ADS_Breakdowns.EffectApplicators.WHEEL_HUB_BEARING_NOISE_EFFECT = createEngineNoiseEffectApplicator("WHEEL_HUB_BEARING_NOISE_EFFECT", "wheelHubBearingNoise", "speed")
 ADS_Breakdowns.EffectApplicators.WHEEL_SEIZURE_GRIND_NOISE_EFFECT = createEngineNoiseEffectApplicator("WHEEL_SEIZURE_GRIND_NOISE_EFFECT", "wheelSeizureGrind", "speed")
