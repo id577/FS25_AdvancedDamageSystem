@@ -244,10 +244,8 @@ function ADS_Hud:drawDashboard()
         icon:render()
         end
 
-    local engineTemp, transTemp, motorLoad = spec.engineTemperature, spec.transmissionTemperature, vehicle:getMotorLoadPercentage()
-    if not vehicle:getIsMotorStarted() then
-        motorLoad = 0
-    end
+    local engineTemp, transTemp = spec.engineTemperature, spec.transmissionTemperature
+    local motorLoad = spec._smoothedMotorLoad or 0
 
     local tempSign = "°C"
 
