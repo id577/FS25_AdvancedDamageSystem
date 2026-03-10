@@ -835,6 +835,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
     self.spec_AdvancedDamageSystem._netTargetEngineTemp = nil
+    self.spec_AdvancedDamageSystem._smoothedMotorLoad = 0
     self.spec_AdvancedDamageSystem.radiatorHealth = 1.0
     self.spec_AdvancedDamageSystem.fanClutchHealth = 1.0
     self.spec_AdvancedDamageSystem.thermostatState = 0.0
@@ -1553,15 +1554,27 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     -- Client-side interpolation toward last server-synced values.
     -- Server syncs via dirty flags every ~500 ms; without interpolation the HUD
     -- shows discrete jumps each time a packet arrives.
+    -- Use a shorter TAU (1500ms) than the server-side smoothing (5000ms) so the
+    -- client tracks server values closely without re-introducing the full delay.
     if not self.isServer then
-        local t = math.min(dt / 200, 1)
+        local interpTau = 1500
+        local alpha = math.min(dt / (interpTau + dt), 1)
         if spec._netTargetEngineTemp ~= nil then
-            spec.engineTemperature = spec.engineTemperature + t * (spec._netTargetEngineTemp - spec.engineTemperature)
+            spec.engineTemperature = spec.engineTemperature + alpha * (spec._netTargetEngineTemp - spec.engineTemperature)
         end
         if spec._netTargetTransmissionTemp ~= nil and spec._netTargetTransmissionTemp > -90 then
-            spec.transmissionTemperature = (spec.transmissionTemperature or -99) + t * (spec._netTargetTransmissionTemp - (spec.transmissionTemperature or -99))
+            spec.transmissionTemperature = (spec.transmissionTemperature or -99) + alpha * (spec._netTargetTransmissionTemp - (spec.transmissionTemperature or -99))
         end
     end
+
+    -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
+    -- getMotorLoadPercentage() oscillates heavily frame-to-frame; this produces
+    -- a stable reading without losing responsiveness.
+    local rawLoad = math.max(self:getMotorLoadPercentage() or 0, 0)
+    if not self:getIsMotorStarted() then rawLoad = 0 end
+    local loadTau = 300
+    local loadAlpha = math.min(dt / (loadTau + dt), 1)
+    spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
     -- Fuel consumption sync (same approach as DashboardLive):
     -- Server: capture raw lastFuelUsage every frame for dirty-flag network sync.
     if self.isServer and self.spec_motorized ~= nil then
@@ -1787,8 +1800,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         or spec.currentState ~= prevCurrentState
         or spec.plannedState ~= prevPlannedState
         or math.abs((spec.maintenanceTimer or 0) - (prevMaintenanceTimer or 0)) > 0.5
-        or math.abs((spec.engineTemperature or 0) - (prevEngineTemp or 0)) > 0.5
-        or math.abs((spec.transmissionTemperature or 0) - (prevTransTemp or 0)) > 0.5
+        or math.abs((spec.engineTemperature or 0) - (prevEngineTemp or 0)) > 0.25
+        or math.abs((spec.transmissionTemperature or 0) - (prevTransTemp or 0)) > 0.25
         or spec.thermostatState ~= prevThermostatState
         or math.abs((spec._fuelUsageRaw or 0) - (spec._prevSyncFuelUsage or 0)) > 0.3 then
             self:raiseDirtyFlags(spec.adsDirtyFlag_state)
