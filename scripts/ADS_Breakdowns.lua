@@ -4812,7 +4812,9 @@ function ADS_Breakdowns.applyHydraulicDamageToAttacher(self, superFunc, dt, ...)
             end
 
             if jointDesc.moveDown == true and jointDesc.isMoving == true then
-                jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime
+                if not rootVehicle.spec_AdvancedDamageSystem.activeEffects.HYDRAULIC_HOLD_DRIFT_EFFECT then
+                    jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime
+                end
             else
                 jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime / performance
             end
