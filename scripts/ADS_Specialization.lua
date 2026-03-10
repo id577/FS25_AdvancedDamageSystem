@@ -3566,17 +3566,17 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
         local stressThreshold = probabilityData.STRESS_THRESHOLD
 
         if systemStress >= stressThreshold then
-            local stressOverload = math.max(1 - systemStress / systemCondition, 0.001)
+            local stressOverload = math.max(systemCondition - systemStress, 0.001)
             local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(stressOverload, probabilityData, dt)
 
             local random = math.random()
             if random < failureChancePerFrame then
-                local breakdownId = self:getRandomBreakdownBySystem(systemData.name)
+                local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemData.name)
+                local breakdownId = self:getRandomBreakdownBySystem(systemKey)
                 if breakdownId ~= nil then
                     local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
                     if registryEntry ~= nil and registryEntry.stages ~= nil and #registryEntry.stages > 0 then
-                        local criticalOutcomeChance = ADS_Utils.getCriticalFailureChance(stressOverload)
-
+                        local criticalOutcomeChance = ADS_Utils.getCriticalFailureChance(systemCondition)
                         if math.random() < criticalOutcomeChance then
                             self:addBreakdown(breakdownId, #registryEntry.stages)
                         else
@@ -3590,7 +3590,7 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
 
             if ADS_Config.DEBUG and spec.debugData[systemName] ~= nil then
                 local hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
-                local criticalChance = math.clamp((1 - stressOverload) ^ probabilityData.CRITICAL_DEGREE, probabilityData.CRITICAL_MIN, probabilityData.CRITICAL_MAX)
+                local criticalChance = math.clamp((1 - systemCondition) ^ probabilityData.CRITICAL_DEGREE, probabilityData.CRITICAL_MIN, probabilityData.CRITICAL_MAX)
                 spec.debugData[systemName].breakdownProbability = hourlyProb
                 spec.debugData[systemName].critBreakdownProbability = criticalChance
             end       
@@ -3660,7 +3660,10 @@ function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
         targetSystem = AdvancedDamageSystem.SYSTEMS[targetSystem]
     end
 
-    local targetSystemKey = string.lower(tostring(targetSystem))
+    local targetSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, targetSystem)
+    if targetSystemKey == nil or targetSystemKey == "" then
+        targetSystemKey = string.lower(tostring(targetSystem))
+    end
     local targetSystemData = spec.systems[targetSystemKey]
     if type(targetSystemData) ~= "table" then
         return nil
@@ -3679,7 +3682,16 @@ function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
     end
 
     for id, breakdownData in pairs(ADS_Breakdowns.BreakdownRegistry) do
-        local breakdownSystemKey = string.lower(tostring(breakdownData.system or ""))
+        local breakdownSystem = breakdownData.system
+        if type(breakdownSystem) == "string" and AdvancedDamageSystem.SYSTEMS[breakdownSystem] ~= nil then
+            breakdownSystem = AdvancedDamageSystem.SYSTEMS[breakdownSystem]
+        end
+
+        local breakdownSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, breakdownSystem)
+        if breakdownSystemKey == nil or breakdownSystemKey == "" then
+            breakdownSystemKey = string.lower(tostring(breakdownSystem or ""))
+        end
+
         if not activeBreakdowns[id] and breakdownData.isSelectable and breakdownSystemKey == targetSystemKey then
             local isApplicable = true
             if breakdownData.isApplicable ~= nil then

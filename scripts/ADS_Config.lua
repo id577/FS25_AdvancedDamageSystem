@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 59,
+    VER = 63,
 
     DEBUG = false,
 
@@ -46,7 +46,7 @@ ADS_Config = {
             cooling=0.12, 
             electrical=0.10, 
             chassis=0.10, 
-            workProcess=0.10, 
+            workProcess=0.10,  -- TO-DO: overall condition level calculations
             fuel=0.08
         },
 
