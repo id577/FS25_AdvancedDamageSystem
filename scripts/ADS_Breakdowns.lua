@@ -1427,7 +1427,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 4.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = { 
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.75, aggregation = "min" },
-                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.1, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.2} }
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.05, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.2} }
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -3299,7 +3299,6 @@ local function disableHydraulicSpeedHooksForVehicle(vehicle, token)
     end
 end
 
--- Hydraulic debug helper (console output with throttling + state-change detection)
 ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_SPEED_MODIFIER effect")
@@ -3331,12 +3330,15 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
                         local jointTypeId = jointDesc ~= nil and jointDesc.jointType or nil
                         if jointDesc ~= nil then
                             local isLowered = implement:getIsLowered()
+                            -- Clear auto-drift marker when movement has finished in lowered state
+                            -- or user switched direction to raising.
                             if jointDesc.ads_holdDriftForced == true then
                                 if (isLowered and not jointDesc.isMoving) or jointDesc.moveDown == false then
                                     jointDesc.ads_holdDriftForced = false
                                 end
                             end
 
+                            -- Force slow auto-drop only from raised idle state.
                             if not isLowered and not jointDesc.isMoving and jointDesc.moveDown == false and jointTypeId == 1 then
                                 jointDesc.ads_holdDriftForced = true
                                 v:setJointMoveDown(jointDescIndex, true, false)
@@ -4862,16 +4864,6 @@ function ADS_Breakdowns.applyHydraulicDamageToAttacher(self, superFunc, dt, ...)
                 -- Manual lowering and any neutral state should stay at normal speed.
                 jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime
             end
-
-            -- Important: vanilla recalculates moveTime mainly in lowering path.
-            -- When we switch from slow forced drift (down) to raising, stale moveTime
-            -- can keep old "drift-slow" timing even if moveDefaultTime is already normal.
-            -- Recompute moveTime every tick from current moveDefaultTime.
-            local alphaRange = math.abs((jointDesc.upperAlpha or 1) - (jointDesc.lowerAlpha or 0))
-            if alphaRange <= 0 then
-                alphaRange = 1
-            end
-            jointDesc.moveTime = jointDesc.moveDefaultTime * alphaRange
         end
     end
 
@@ -4879,7 +4871,7 @@ function ADS_Breakdowns.applyHydraulicDamageToAttacher(self, superFunc, dt, ...)
 
     for _, implement in ipairs(spec.attachedImplements) do
         if implement.object ~= nil then
-          з = spec.attacherJoints[implement.jointDescIndex]
+            local jointDesc = spec.attacherJoints[implement.jointDescIndex]
             
             if jointDesc.ads_originalMoveDefaultTime ~= nil then
                 jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime
