@@ -118,7 +118,8 @@ local breakdownPriceMultipliers = {
     FAN_CLUTCH_FAILURE = 0.65,
     FUEL_PUMP_MALFUNCTION = 0.55,
     FUEL_INJECTOR_MALFUNCTION = 0.80,
-    CARBURETOR_CLOGGING = 0.25,
+    FUEL_FILTER_CLOGGING = 0.35,
+    FUEL_LINE_AIR_LEAK = 0.45,
     YIELD_SENSOR_MALFUNCTION = 0.30,
     MATERIAL_FLOW_SYSTEM_WEAR = 0.35,
     UNLOADING_AUGER_MALFUNCTION = 0.40,
@@ -148,7 +149,8 @@ local breakdownProgressMultipliers = {
     FAN_CLUTCH_FAILURE = 0.9,
     FUEL_PUMP_MALFUNCTION = 1.1,
     FUEL_INJECTOR_MALFUNCTION = 1.1,
-    CARBURETOR_CLOGGING = 0.9,
+    FUEL_FILTER_CLOGGING = 1.2,
+    FUEL_LINE_AIR_LEAK = 0.8,
     YIELD_SENSOR_MALFUNCTION = 1.1,
     MATERIAL_FLOW_SYSTEM_WEAR = 1.0,
     UNLOADING_AUGER_MALFUNCTION = 1.2
@@ -1412,6 +1414,11 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    -- Hydraulic Cylinder Internal Leak
+    -- Progressive internal bypass/leak inside lift cylinders and seals.
+    -- Reduces lift/raise responsiveness and holding ability, causing gradual
+    -- implement drift when loaded and severe control loss at critical stage.
+    
     HYDRAULIC_CYLINDER_INTERNAL_LEAK  = { -- TO-DO: $l10n
         isSelectable = true,
         system = systems.HYDRAULICS,
@@ -1482,6 +1489,10 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    -- PTO Clutch Slip
+    -- Progressive wear of PTO clutch/friction pack under load.
+    -- Reduces transmitted PTO torque and causes intermittent auto-disengage,
+    -- ending in complete PTO unusable state on critical stage.
     PTO_CLUTCH_SLIP   = { -- TO-DO: $l10n
         isSelectable = true,
         system = systems.HYDRAULICS,
@@ -2002,6 +2013,10 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    -- Coolant Leak
+    -- Progressive coolant loss from hoses, seals, radiator joints, or pump area.
+    -- Gradually lowers effective cooling reserve and heat rejection capacity,
+    -- with strong overheating tendency as the fault worsens.
     COOLANT_LEAK = { -- TO-DO: $l10n
         isSelectable = true,
         system = systems.COOLING,
@@ -2064,6 +2079,10 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    -- Fan Clutch Failure
+    -- Progressive degradation of viscous/mechanical fan clutch engagement.
+    -- Reduces fan drive efficiency and airflow at critical thermal moments,
+    -- increasing overheating risk under sustained load.
     FAN_CLUTCH_FAILURE = { -- TO-DO: $l10n
         isSelectable = true,
         system = systems.COOLING,
@@ -2132,7 +2151,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     -- fuel system
     FUEL_PUMP_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_fuel_pump",
+        system = systems.FUEL,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2218,7 +2237,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     FUEL_INJECTOR_MALFUNCTION = {
         isSelectable = true,
-        part = "ads_breakdowns_part_fuel_injectors",
+        system = systems.FUEL,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2289,12 +2308,15 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    CARBURETOR_CLOGGING = {
+    -- Fuel Filter Clogging
+    -- Progressive fuel filter restriction from contamination/wax/water load.
+    -- Limits fuel flow at demand peaks, causing hesitation and power drop,
+    -- with stalling/start problems as blockage becomes severe.
+    FUEL_FILTER_CLOGGING = { -- TO-DO: $l10n
         isSelectable = true,
-        part = "ads_breakdowns_part_carburetor",
+        system = systems.FUEL,
         isApplicable = function(vehicle)
-            local spec = vehicle.spec_AdvancedDamageSystem
-            return spec.year < 1980 and not getIsElectricVehicle(vehicle)
+            return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
             return 1.0   
@@ -2302,57 +2324,109 @@ ADS_Breakdowns.BreakdownRegistry = {
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_carburetor_clogging_stage1_description",
+                description = "ads_breakdowns_fuel_filter_clogging_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0 * breakdownProgressMultipliers.CARBURETOR_CLOGGING,
-                repairPrice = 1.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.FUEL_FILTER_CLOGGING,
+                repairPrice = 1.0 * breakdownPriceMultipliers.FUEL_FILTER_CLOGGING,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.4, extraData = {timer = 0, duration = 200, status = 'IDLE', amplitude = 0.5, motorLoad = 0.8, cruiseState = 0}, aggregation = "max" },
+                     { id = "ENGINE_HESITATION_CHANCE", value = 0.4, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.9, cruiseState = 0} },
+                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.03, aggregation = "sum" },
                 }
             },
             {
                 severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_carburetor_clogging_stage2_description",
+                description = "ads_breakdowns_fuel_filter_clogging_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0 * breakdownProgressMultipliers.CARBURETOR_CLOGGING,
-                repairPrice = 2.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.FUEL_FILTER_CLOGGING,
+                repairPrice = 2.0 * breakdownPriceMultipliers.FUEL_FILTER_CLOGGING,
                 effects = {
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.08, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.25, extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.8, motorLoad = 0.6, cruiseState = 0}, aggregation = "max" },
-                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" }
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
+                     { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 0.7, motorLoad = 0.9, cruiseState = 0} },
+                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.06, aggregation = "sum" },
+                     { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min" },
                 }
             },
             { 
                 severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_carburetor_clogging_stage3_description",
+                description = "ads_breakdowns_fuel_filter_clogging_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.5 * breakdownProgressMultipliers.CARBURETOR_CLOGGING,
-                repairPrice = 4.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.FUEL_FILTER_CLOGGING,
+                repairPrice = 4.0 * breakdownPriceMultipliers.FUEL_FILTER_CLOGGING,
                 effects = { 
-                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
-                    { id = "ENGINE_HESITATION_CHANCE", value = 0.15, extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0}, aggregation = "max" },
-                    { id = "ENGINE_STALLS_CHANCE", value = 8.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                }
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 0.7, motorLoad = 0.9, cruiseState = 0} },
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.1, aggregation = "sum" },
+                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
+                } 
             },
             { 
                 severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_carburetor_clogging_stage4_description",
+                description = "ads_breakdowns_fuel_filter_clogging_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 8.0 * breakdownPriceMultipliers.CARBURETOR_CLOGGING,
-                effects = { 
-                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = true, message = "ads_breakdowns_carburetor_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
-                },
-                indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                repairPrice = 8.0 * breakdownPriceMultipliers.FUEL_FILTER_CLOGGING,
+                effects = {
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_filter_clogging_stage4_message", reason = "BREAKDOWN", disableAi = true} }
+                }
+            }
+        }
+    },
+
+    -- Fuel Line Air Leak
+    -- Progressive air ingress in low-pressure fuel lines and connections.
+    -- Destabilizes supply pressure and fuel column continuity, producing
+    -- harder starts, intermittent hesitation, and eventual run failure.
+    FUEL_LINE_AIR_LEAK = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.FUEL,
+        isApplicable = function(vehicle)
+            return not getIsElectricVehicle(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_fuel_line_air_leak_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.FUEL_LINE_AIR_LEAK,
+                repairPrice = 1.0 * breakdownPriceMultipliers.FUEL_LINE_AIR_LEAK,
+                effects = {
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.15, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}}
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_fuel_line_air_leak_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.FUEL_LINE_AIR_LEAK,
+                repairPrice = 2.0 * breakdownPriceMultipliers.FUEL_LINE_AIR_LEAK,
+                effects = {
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.5, cruiseState = 0} },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.2, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
+                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
+                    
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_fuel_line_air_leak_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.FUEL_LINE_AIR_LEAK,
+                repairPrice = 4.0 * breakdownPriceMultipliers.FUEL_LINE_AIR_LEAK,
+                effects = {
+                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 0.7, motorLoad = 0.5, cruiseState = 0} },
+                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
+                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_fuel_line_air_leak_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 8.0 * breakdownPriceMultipliers.FUEL_LINE_AIR_LEAK,
+                effects = {
+                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_fuel_line_air_leak_stage4_message", reason = "BREAKDOWN", disableAi = true}}
                 }
             }
         }
