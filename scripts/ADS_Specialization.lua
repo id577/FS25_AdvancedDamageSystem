@@ -1695,7 +1695,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- Cold engine message (guard: temperature must be initialized, i.e. > -90)
-    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature ~= nil and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and self.getIsControlled ~= nil and self:getIsControlled()  and not self:getIsAIActive() and not spec.isElectricVehicle then
+    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature ~= nil and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and self:getIsActiveForInput(true) and not self:getIsAIActive() and not spec.isElectricVehicle then
             local spec_motorized = self.spec_motorized
             local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
             local maxRpm = spec_motorized.motor.maxRpm
@@ -1709,7 +1709,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
             if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
-                if self.getIsControlled ~= nil and self:getIsControlled() and not self:isUnderService() then
+                if self:getIsActiveForInput(true) and not self:isUnderService() then
                     g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 200)
                 end
                 if self.isServer and self:getIsAIActive() and effectData.extraData.disableAi then 
