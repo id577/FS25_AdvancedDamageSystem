@@ -835,6 +835,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
     self.spec_AdvancedDamageSystem._netTargetEngineTemp = nil
+    self.spec_AdvancedDamageSystem._smoothedMotorLoad = 0
     self.spec_AdvancedDamageSystem.radiatorHealth = 1.0
     self.spec_AdvancedDamageSystem.fanClutchHealth = 1.0
     self.spec_AdvancedDamageSystem.thermostatState = 0.0
@@ -1553,15 +1554,27 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     -- Client-side interpolation toward last server-synced values.
     -- Server syncs via dirty flags every ~500 ms; without interpolation the HUD
     -- shows discrete jumps each time a packet arrives.
+    -- Use a shorter TAU (1500ms) than the server-side smoothing (5000ms) so the
+    -- client tracks server values closely without re-introducing the full delay.
     if not self.isServer then
-        local t = math.min(dt / 200, 1)
+        local interpTau = 1500
+        local alpha = math.min(dt / (interpTau + dt), 1)
         if spec._netTargetEngineTemp ~= nil then
-            spec.engineTemperature = spec.engineTemperature + t * (spec._netTargetEngineTemp - spec.engineTemperature)
+            spec.engineTemperature = spec.engineTemperature + alpha * (spec._netTargetEngineTemp - spec.engineTemperature)
         end
         if spec._netTargetTransmissionTemp ~= nil and spec._netTargetTransmissionTemp > -90 then
-            spec.transmissionTemperature = (spec.transmissionTemperature or -99) + t * (spec._netTargetTransmissionTemp - (spec.transmissionTemperature or -99))
+            spec.transmissionTemperature = (spec.transmissionTemperature or -99) + alpha * (spec._netTargetTransmissionTemp - (spec.transmissionTemperature or -99))
         end
     end
+
+    -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
+    -- getMotorLoadPercentage() oscillates heavily frame-to-frame; this produces
+    -- a stable reading without losing responsiveness.
+    local rawLoad = math.max(self:getMotorLoadPercentage() or 0, 0)
+    if not self:getIsMotorStarted() then rawLoad = 0 end
+    local loadTau = 300
+    local loadAlpha = math.min(dt / (loadTau + dt), 1)
+    spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
     -- Fuel consumption sync (same approach as DashboardLive):
     -- Server: capture raw lastFuelUsage every frame for dirty-flag network sync.
     if self.isServer and self.spec_motorized ~= nil then
@@ -1787,8 +1800,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         or spec.currentState ~= prevCurrentState
         or spec.plannedState ~= prevPlannedState
         or math.abs((spec.maintenanceTimer or 0) - (prevMaintenanceTimer or 0)) > 0.5
-        or math.abs((spec.engineTemperature or 0) - (prevEngineTemp or 0)) > 0.5
-        or math.abs((spec.transmissionTemperature or 0) - (prevTransTemp or 0)) > 0.5
+        or math.abs((spec.engineTemperature or 0) - (prevEngineTemp or 0)) > 0.25
+        or math.abs((spec.transmissionTemperature or 0) - (prevTransTemp or 0)) > 0.25
         or spec.thermostatState ~= prevThermostatState
         or math.abs((spec._fuelUsageRaw or 0) - (spec._prevSyncFuelUsage or 0)) > 0.3 then
             self:raiseDirtyFlags(spec.adsDirtyFlag_state)
@@ -5652,6 +5665,14 @@ end
 AdvancedDamageSystem.ConsoleCommands = {}
 
 function AdvancedDamageSystem.ConsoleCommands:getTargetVehicle()
+    if AdvancedDamageSystem.ConsoleCommands._overrideVehicle ~= nil then
+        local v = AdvancedDamageSystem.ConsoleCommands._overrideVehicle
+        if v.spec_AdvancedDamageSystem ~= nil then
+            return v
+        end
+        print("ADS Error: Override vehicle does not have AdvancedDamageSystem support.")
+        return nil
+    end
     local vehicle = g_localPlayer.getCurrentVehicle() 
     if not vehicle or not vehicle.spec_AdvancedDamageSystem then
         print("ADS Error: You must be in a vehicle with AdvancedDamageSystem support.")
@@ -5783,6 +5804,10 @@ local function getPrimaryFuelConsumerInfo(vehicle)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
+    if not g_currentMission:getIsServer() then
+        ADS_ConsoleCommandEvent.sendToServer("setConfigVar", rawArgs, rawValue, nil)
+        return
+    end
     local path = nil
     local valueToken = nil
 
@@ -5820,6 +5845,11 @@ function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSpecVar(rawArgs, rawValue)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSpecVar", rawArgs, rawValue, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
@@ -5878,6 +5908,11 @@ function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()
 end
 
 function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("addBreakdown", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -5917,6 +5952,11 @@ function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:removeBreakdown(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("removeBreakdown", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -5930,6 +5970,11 @@ function AdvancedDamageSystem.ConsoleCommands:removeBreakdown(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("advanceBreakdown", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -5979,6 +6024,11 @@ function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemCondition", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6046,6 +6096,11 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStress", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6111,6 +6166,11 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStressMultiplier", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6175,6 +6235,11 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setService", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6192,10 +6257,43 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
     end
     
     spec.serviceLevel = value
+
+    local interval = vehicle:getMaintenanceInterval()
+    local currentHours = vehicle:getFormattedOperatingTime()
+    local hoursSinceService = (1 - value) * interval
+    local targetOpHours = currentHours - hoursSinceService
+    local found = false
+    for i = #spec.maintenanceLog, 1, -1 do
+        local entry = spec.maintenanceLog[i]
+        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
+            entry.conditionData.operatingHours = targetOpHours
+            entry.conditionData.service = value
+            if vehicle.isServer then
+                table.insert(spec._pendingNetLogEntries, entry)
+            end
+            found = true
+            break
+        end
+    end
+    if not found and vehicle.isServer then
+        vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+        local entry = spec.maintenanceLog[#spec.maintenanceLog]
+        if entry then
+            entry.conditionData.operatingHours = targetOpHours
+            entry.conditionData.service = value
+            entry.isVisible = false
+        end
+    end
+
     print(string.format("ADS: Set Service level for '%s' to %.2f.", vehicle:getFullName(), value))
 end
 
 function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("resetVehicle", nil, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
     
@@ -6203,10 +6301,42 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     spec.conditionLevel = 1.0
     spec.serviceLevel = 1.0
     vehicle:removeBreakdown()
+
+    local currentHours = vehicle:getFormattedOperatingTime()
+    local found = false
+    for i = #spec.maintenanceLog, 1, -1 do
+        local entry = spec.maintenanceLog[i]
+        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
+            entry.conditionData.operatingHours = currentHours
+            entry.conditionData.condition = 1.0
+            entry.conditionData.service = 1.0
+            if vehicle.isServer then
+                table.insert(spec._pendingNetLogEntries, entry)
+            end
+            found = true
+            break
+        end
+    end
+    if not found and vehicle.isServer then
+        vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+        local entry = spec.maintenanceLog[#spec.maintenanceLog]
+        if entry then
+            entry.conditionData.operatingHours = currentHours
+            entry.conditionData.condition = 1.0
+            entry.conditionData.service = 1.0
+            entry.isVisible = false
+        end
+    end
+
     print(string.format("ADS: Fully reset state for '%s'.", vehicle:getFullName()))
 end
 
 function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("startMaintance", rawArgs, nil, vehicle) end
+        return
+    end
     local args = parseArguments(rawArgs)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
@@ -6298,6 +6428,11 @@ function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:finishMaintance()
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("finishMaintance", nil, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
@@ -6561,6 +6696,11 @@ function AdvancedDamageSystem.ConsoleCommands:getDebugVehicleInfo(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setDirtAmount(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setDirtAmount", rawArgs, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then
         print("ADS Error: No target vehicle found. Please enter a vehicle.")
@@ -6592,6 +6732,11 @@ function AdvancedDamageSystem.ConsoleCommands:setDirtAmount(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:setFuelLevel(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setFuelLevel", rawArgs, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then
         return
@@ -6660,6 +6805,11 @@ function AdvancedDamageSystem.ConsoleCommands:setFuelLevel(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:resetFactorStats()
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("resetFactorStats", nil, nil, vehicle) end
+        return
+    end
     local vehicle = self:getTargetVehicle()
     if not vehicle then
         return
@@ -6712,6 +6862,10 @@ function AdvancedDamageSystem.ConsoleCommands:toggleHudDebugView(rawArgs)
 end
 
 function AdvancedDamageSystem.ConsoleCommands:debug()
+    if not g_currentMission:getIsServer() then
+        ADS_ConsoleCommandEvent.sendToServer("debug", nil, nil, nil)
+        return
+    end
     if ADS_Config.DEBUG then
         ADS_Config.DEBUG = false
     else
