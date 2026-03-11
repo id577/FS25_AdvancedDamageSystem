@@ -440,6 +440,7 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
     streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
     streamWriteFloat32(streamId, spec.thermostatState or 0)
     streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
+    streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
 
     -- [Group 4] Active breakdowns (id;stage;timer;visible;selected CSV)
     streamWriteString(streamId, ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {}))
@@ -514,6 +515,7 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
     local syncFuelRaw = streamReadFloat32(streamId)
     spec._fuelUsageRaw = syncFuelRaw
     spec.fuelUsage     = syncFuelRaw
+    spec._netMotorLoad = streamReadFloat32(streamId)
     if not self.isServer and self.spec_motorized ~= nil then
         self.spec_motorized.lastFuelUsage = syncFuelRaw
     end
@@ -573,6 +575,7 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
             streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
             streamWriteFloat32(streamId, spec.thermostatState or 0)
             streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
+            streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
             streamWriteString(streamId, spec.serviceOptionOne or "")
             streamWriteString(streamId, spec.serviceOptionTwo or "")
             streamWriteBool(streamId, spec.serviceOptionThree or false)
@@ -635,6 +638,7 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
                 spec.engTermPID.mechPos = spec.thermostatState
             end
             spec._fuelUsageRaw = streamReadFloat32(streamId)  -- raw lastFuelUsage, buffered client-side
+            spec._netMotorLoad = streamReadFloat32(streamId)
             spec.serviceOptionOne = streamReadString(streamId)
             spec.serviceOptionTwo = streamReadString(streamId)
             spec.serviceOptionThree = streamReadBool(streamId)
@@ -843,6 +847,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
     self.spec_AdvancedDamageSystem._netTargetEngineTemp = nil
     self.spec_AdvancedDamageSystem._smoothedMotorLoad = 0
+    self.spec_AdvancedDamageSystem._netMotorLoad = 0
     self.spec_AdvancedDamageSystem.radiatorHealth = 1.0
     self.spec_AdvancedDamageSystem.fanClutchHealth = 1.0
     self.spec_AdvancedDamageSystem.thermostatState = 0.0
@@ -1559,13 +1564,24 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
 
     -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
-    -- getMotorLoadPercentage() oscillates heavily frame-to-frame; this produces
-    -- a stable reading without losing responsiveness.
-    local rawLoad = math.max(self:getMotorLoadPercentage() or 0, 0)
-    if not self:getIsMotorStarted() then rawLoad = 0 end
-    local loadTau = 300
-    local loadAlpha = math.min(dt / (loadTau + dt), 1)
-    spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
+    -- On a dedicated client, Giants' getMotorLoadPercentage() is derived from
+    -- a 7-bit quantized rawLoadPercentage sent in Motorized's update stream,
+    -- resulting in non-deterministic idle values between restarts.
+    -- We sync the server's authoritative value (float32) in dirty flag [1]
+    -- and use it as the EMA input on the client for a stable, consistent reading.
+    if self:getIsMotorStarted() then
+        local rawLoad
+        if self.isServer then
+            rawLoad = math.max(self:getMotorLoadPercentage() or 0, 0)
+        else
+            rawLoad = math.max(spec._netMotorLoad or 0, 0)
+        end
+        local loadTau = 300
+        local loadAlpha = math.min(dt / (loadTau + dt), 1)
+        spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
+    else
+        spec._smoothedMotorLoad = 0
+    end
     -- Fuel consumption sync (same approach as DashboardLive):
     -- Server: capture raw lastFuelUsage every frame for dirty-flag network sync.
     if self.isServer and self.spec_motorized ~= nil then

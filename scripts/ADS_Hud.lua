@@ -294,10 +294,6 @@ function ADS_Hud:drawFuelConsumption()
     if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or vehicle.spec_motorized == nil then
         return
     end
-    if not vehicle:getIsMotorStarted() then
-        return
-    end
-
     local sm = g_currentMission.hud.speedMeter
     if sm == nil or sm.fuelIcon == nil then
         return
@@ -308,7 +304,7 @@ function ADS_Hud:drawFuelConsumption()
         return
     end
 
-    local consumption = vehicle.spec_AdvancedDamageSystem.fuelUsage or 0
+    local consumption = vehicle:getIsMotorStarted() and (vehicle.spec_AdvancedDamageSystem.fuelUsage or 0) or 0
     local isElectric  = (fuelType == FillType.ELECTRICCHARGE)
     local unit        = isElectric and "kW" or "L/h"
 
@@ -329,10 +325,10 @@ function ADS_Hud:drawFuelConsumption()
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
     setTextAlignment(RenderText.ALIGN_LEFT)
 
-    setTextColor(1, 1, 1, 1)
+    setTextColor(1, 0.4287, 0.0006, 1)
     renderText(startX, textY, self.fuelConsoText.size, valueStr)
 
-    setTextColor(1, 0.4287, 0.0006, 1)
+    setTextColor(1, 1, 1, 1)
     renderText(startX + valueWidth + gap, textY, self.fuelConsoText.size, unit)
 
     setTextBold(false)
