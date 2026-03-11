@@ -45,7 +45,7 @@ function ADS_Hud:new()
         service = {
             name = 'service',
             icon = g_overlayManager:createOverlay("ads_DashboardHud.service", 0, 0, 0, 0),
-            year = 2005
+            year = 1970
         },
         oil = {
             name = 'oil',
@@ -224,7 +224,8 @@ function ADS_Hud:drawDashboard()
             if hudIndicatorId == self.indicators.transmission.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.transmission.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
 
-            if hudIndicatorId == self.indicators.service.name and spec.serviceLevel < 0.45 then targetColor = colors.WARNING end
+            local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 1) / (self.vehicle:getMaintenanceInterval() or 10)
+            if hudIndicatorId == self.indicators.service.name and serviceInterval > 1.0 then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
 
         else
