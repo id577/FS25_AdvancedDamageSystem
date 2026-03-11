@@ -4196,12 +4196,12 @@ ADS_Breakdowns.EffectApplicators.CVT_PRESSURE_DROP_CHANCE = {
                 effect.extraData.duration = tonumber(effect.extraData.duration) or 200
 
                 -- TO-DO MP: server check
-                if effect.extraData.status == 'IDLE' and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
+                if v.isServer and effect.extraData.status == 'IDLE' and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
                     effect.extraData.status = 'DROP'
                     effect.extraData.timer = effect.extraData.duration
 
                     --TO-DO MP: send event (effect.extraData.status = 'DROP', effect.extraData.timer = effect.extraData.duration)
-                
+                    ADS_EffectSyncEvent.send(v, handler.getEffectName(), "DROP", effect.extraData.timer, 0, 0)
                 end
                 if effect.extraData.status == 'DROP' and effect.extraData.timer > 0 then
                     if v.spec_AdvancedDamageSystem.originalFunctions[pressureDropFuncKey] == nil then
