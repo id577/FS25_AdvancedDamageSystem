@@ -63,6 +63,17 @@ function ADS_EffectSyncEvent:run(connection)
             g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000)
         end
 
+    elseif self.effectId == "PTO_AUTO_DISENGAGE_CHANCE" then
+        if effect ~= nil then
+            effect.extraData = effect.extraData or {}
+            effect.extraData.status = self.status
+        end
+
+    elseif self.effectId == "PTO_FAILED" then
+        if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
+            g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_pto_auto_disengage_message"), 4000)
+        end
+
     elseif self.effectId == "GEAR_SHIFT_FAILURE_CHANCE" then
         if effect and effect.extraData then
             effect.extraData.status = self.status

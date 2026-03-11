@@ -218,6 +218,7 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Courroie d'entraînement cassée ou boîte de vitesses grippée. La vis de déchargement est complètement bloquée."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Vis de déchargement bloquée"/>
         <text name="ads_breakdowns_engine_stalled_message" text="Moteur calé"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Transmission désactivée"/>
         <text name="ads_breakdown_at_progress_message" text="en cours"/>
         <text name="ads_cold_engine_message" text="Moteur froid ! Les hauts régimes causent de l'usure !"/>

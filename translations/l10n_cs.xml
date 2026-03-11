@@ -218,6 +218,7 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="传动皮带断裂或变速箱卡死。卸料螺旋输送器完全卡住。"/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="卸料螺旋输送器卡住"/>
         <text name="ads_breakdowns_engine_stalled_message" text="发动机熄火"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="挡位脱开"/>
         <text name="ads_breakdown_at_progress_message" text="进行中"/>
         <text name="ads_cold_engine_message" text="发动机未预热！高转速会导致磨损！"/>

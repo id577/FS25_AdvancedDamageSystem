@@ -50,6 +50,38 @@ local function getIsElectricVehicle(vehicle)
     end
 end
 
+local function hasPtoCapability(vehicle)
+    if vehicle == nil then
+        return false
+    end
+
+    local ptoSpec = vehicle.spec_powerTakeOffs
+    if ptoSpec ~= nil then
+        local outputCount = ptoSpec.outputPowerTakeOffs ~= nil and #ptoSpec.outputPowerTakeOffs or 0
+        local inputCount = ptoSpec.inputPowerTakeOffs ~= nil and #ptoSpec.inputPowerTakeOffs or 0
+        local localCount = ptoSpec.localPowerTakeOffs ~= nil and #ptoSpec.localPowerTakeOffs or 0
+        if outputCount > 0 or inputCount > 0 or localCount > 0 then
+            return true
+        end
+    end
+
+    if vehicle.getOutputPowerTakeOffs ~= nil then
+        local outputs = vehicle:getOutputPowerTakeOffs()
+        if outputs ~= nil and next(outputs) ~= nil then
+            return true
+        end
+    end
+
+    if vehicle.getInputPowerTakeOffs ~= nil then
+        local inputs = vehicle:getInputPowerTakeOffs()
+        if inputs ~= nil and next(inputs) ~= nil then
+            return true
+        end
+    end
+
+    return false
+end
+
 local systems = (AdvancedDamageSystem ~= nil and AdvancedDamageSystem.SYSTEMS) or {
     ENGINE = "ads_spec_system_engine",
     TRANSMISSION = "ads_spec_system_transmission",
@@ -1450,6 +1482,72 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    PTO_CLUTCH_SLIP   = { -- TO-DO: $l10n
+        isSelectable = true,
+        system = systems.HYDRAULICS,
+        isApplicable = function(vehicle)
+            return hasPtoCapability(vehicle)
+        end,
+        probability = function(vehicle)
+            return 1.0   
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_pto_clutch_slip_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.PTO_CLUTCH_SLIP,
+                repairPrice = 1.0 * breakdownPriceMultipliers.PTO_CLUTCH_SLIP,
+                effects = {
+                    { id = "PTO_TORQUE_TRANSFER_MODIFIER", value = 0.2, aggregation = "max" },
+                    { id = "PTO_AUTO_DISENGAGE_CHANCE", value = 24, aggregation = "min", extraData = {status = 'IDLE'} }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_pto_clutch_slip_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.PTO_CLUTCH_SLIP,
+                repairPrice = 2.0 * breakdownPriceMultipliers.PTO_CLUTCH_SLIP,
+                effects = {
+                    { id = "PTO_TORQUE_TRANSFER_MODIFIER", value = 0.4, aggregation = "max" },
+                    { id = "PTO_AUTO_DISENGAGE_CHANCE", value = 12, aggregation = "min", extraData = {status = 'IDLE'}}
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_pto_clutch_slip_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.PTO_CLUTCH_SLIP,
+                repairPrice = 4.0 * breakdownPriceMultipliers.PTO_CLUTCH_SLIP,
+                effects = { 
+                    { id = "PTO_TORQUE_TRANSFER_MODIFIER", value = 0.6, aggregation = "max" },
+                    { id = "PTO_AUTO_DISENGAGE_CHANCE", value = 6.0, aggregation = "min", extraData = {status = 'IDLE'} }
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_pto_clutch_slip_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 8.0 * breakdownPriceMultipliers.PTO_CLUTCH_SLIP,
+                effects = {
+                    { id = "PTO_FAILED", value = 1.0, aggregation = "max", extraData = {message = "ads_breakdowns_pto_clutch_slip_stage4_message", reason = "BREAKDOWN", disableAi = true}},
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                
+                }
+            }
+        }
+    },
+    
     -- chassis system
     BRAKE_MALFUNCTION = {
         isSelectable = true,
@@ -2706,6 +2804,25 @@ ADS_Breakdowns.EffectApplicators.ENGINE_TORQUE_MODIFIER = {
     end
 }
 
+local enablePtoTorqueTransferHookForVehicle
+local disablePtoTorqueTransferHookForVehicle
+
+-------------------- PTO_TORQUE_TRANSFER_MODIFIER -------------------
+ADS_Breakdowns.EffectApplicators.PTO_TORQUE_TRANSFER_MODIFIER = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying PTO_TORQUE_TRANSFER_MODIFIER:", effectData.value)
+        enablePtoTorqueTransferHookForVehicle(vehicle, "PTO_TORQUE_TRANSFER_MODIFIER")
+    end,
+
+    remove = function(vehicle, handler)
+        log_dbg("Removing PTO_TORQUE_TRANSFER_MODIFIER effect.")
+        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
+            vehicle.spec_AdvancedDamageSystem._adsPtoTorqueDbgNextLogAt = nil
+        end
+        disablePtoTorqueTransferHookForVehicle(vehicle, "PTO_TORQUE_TRANSFER_MODIFIER")
+    end
+}
+
 -------------------- BRAKE_FORCE_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.BRAKE_FORCE_MODIFIER = {
     getOriginalFunctionName = function() return "updateVehiclePhysics" end,
@@ -3180,7 +3297,6 @@ ADS_Breakdowns.EffectApplicators.POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT = {
     end
 }
 
----------------- HYDRAULIC_SPEED_MODIFIER -------------------
 local hydraulicSpeedHookDefs = {
     { objectName = "Plow", field = "setRotationMax", wrapperName = "applyHydraulicDamageToPlowRotation" },
     { objectName = "Plow", field = "setRotationCenter", wrapperName = "applyHydraulicDamageToPlowCenterRotation" },
@@ -3362,6 +3478,155 @@ local function restoreHydraulicHoldDriftSpeedLimitBypass(implement)
     implement.ads_holdDriftBypassSpeedLimit = nil
 end
 
+local ptoTorqueTransferHookState = {
+    installed = false,
+    users = setmetatable({}, { __mode = "k" }),
+    original = nil,
+    callDepth = 0
+}
+
+local function getPtoTorqueTransferUsersCount()
+    local count = 0
+    for _, tokenSet in pairs(ptoTorqueTransferHookState.users) do
+        if tokenSet ~= nil then
+            for _ in pairs(tokenSet) do
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+
+local function installPtoTorqueTransferHook()
+    if ptoTorqueTransferHookState.installed then
+        return
+    end
+
+    if PowerConsumer == nil or PowerConsumer.getTotalConsumedPtoTorque == nil then
+        log_dbg("PTO_TORQUE_TRANSFER_MODIFIER hook skipped: PowerConsumer.getTotalConsumedPtoTorque missing")
+        return
+    end
+
+    ptoTorqueTransferHookState.original = PowerConsumer.getTotalConsumedPtoTorque
+    PowerConsumer.getTotalConsumedPtoTorque = function(self, excludeVehicle, expected, ignoreTurnOnPeak)
+        local originalFunc = ptoTorqueTransferHookState.original
+        if originalFunc == nil then
+            return 0, 1
+        end
+
+        ptoTorqueTransferHookState.callDepth = ptoTorqueTransferHookState.callDepth + 1
+        local callDepth = ptoTorqueTransferHookState.callDepth
+
+        local ok, torque, virtualMultiplicator = pcall(originalFunc, self, excludeVehicle, expected, ignoreTurnOnPeak)
+        if not ok then
+            ptoTorqueTransferHookState.callDepth = math.max(ptoTorqueTransferHookState.callDepth - 1, 0)
+            log_dbg("ERROR in PowerConsumer.getTotalConsumedPtoTorque hook:", tostring(torque))
+            return 0, 1
+        end
+
+        if callDepth == 1 then
+            local rootVehicle = self
+            if rootVehicle ~= nil and rootVehicle.getRootVehicle ~= nil then
+                rootVehicle = rootVehicle:getRootVehicle()
+            end
+
+            local spec = rootVehicle ~= nil and rootVehicle.spec_AdvancedDamageSystem or nil
+            local effect = spec ~= nil and spec.activeEffects ~= nil and spec.activeEffects.PTO_TORQUE_TRANSFER_MODIFIER or nil
+            if effect ~= nil then
+                local effectValue = tonumber(effect.value) or 0
+                local transferScale = math.max(0, 1 + effectValue)
+                local modifiedTorque = torque * transferScale
+
+                if spec ~= nil and ADS_Config ~= nil and ADS_Config.DEBUG and modifiedTorque > 0 then
+                    local now = g_currentMission ~= nil and g_currentMission.time or 0
+                    local nextLogAt = tonumber(spec._adsPtoTorqueDbgNextLogAt) or 0
+                    if now >= nextLogAt then
+                        local vehicleName = (rootVehicle ~= nil and rootVehicle.getName ~= nil) and rootVehicle:getName() or "unknown"
+                        log_dbg(string.format("[ADS][PTO_TQ] veh='%s' eff=%.3f scale=%.3f baseT=%.3f modT=%.3f exp=%s igPeak=%s",
+                            tostring(vehicleName),
+                            effectValue,
+                            transferScale,
+                            tonumber(torque) or 0,
+                            tonumber(modifiedTorque) or 0,
+                            tostring(expected),
+                            tostring(ignoreTurnOnPeak)))
+                        spec._adsPtoTorqueDbgNextLogAt = now + 500
+                    end
+                end
+
+                torque = modifiedTorque
+            end
+        end
+
+        ptoTorqueTransferHookState.callDepth = math.max(ptoTorqueTransferHookState.callDepth - 1, 0)
+        return torque, virtualMultiplicator
+    end
+
+    ptoTorqueTransferHookState.installed = true
+    log_dbg("PTO_TORQUE_TRANSFER_MODIFIER hook installed")
+end
+
+local function uninstallPtoTorqueTransferHook()
+    if not ptoTorqueTransferHookState.installed then
+        return
+    end
+
+    if PowerConsumer ~= nil and ptoTorqueTransferHookState.original ~= nil then
+        PowerConsumer.getTotalConsumedPtoTorque = ptoTorqueTransferHookState.original
+    end
+
+    ptoTorqueTransferHookState.original = nil
+    ptoTorqueTransferHookState.callDepth = 0
+    ptoTorqueTransferHookState.installed = false
+    log_dbg("PTO_TORQUE_TRANSFER_MODIFIER hook restored")
+end
+
+enablePtoTorqueTransferHookForVehicle = function(vehicle, token)
+    if vehicle == nil then
+        return
+    end
+
+    token = token or "default"
+
+    local tokenSet = ptoTorqueTransferHookState.users[vehicle]
+    if tokenSet == nil then
+        tokenSet = {}
+        ptoTorqueTransferHookState.users[vehicle] = tokenSet
+    end
+
+    if tokenSet[token] then
+        return
+    end
+
+    tokenSet[token] = true
+    if getPtoTorqueTransferUsersCount() == 1 then
+        installPtoTorqueTransferHook()
+    end
+end
+
+disablePtoTorqueTransferHookForVehicle = function(vehicle, token)
+    if vehicle == nil then
+        return
+    end
+
+    token = token or "default"
+
+    local tokenSet = ptoTorqueTransferHookState.users[vehicle]
+    if tokenSet == nil or not tokenSet[token] then
+        return
+    end
+
+    tokenSet[token] = nil
+    if next(tokenSet) == nil then
+        ptoTorqueTransferHookState.users[vehicle] = nil
+    end
+
+    if getPtoTorqueTransferUsersCount() == 0 then
+        uninstallPtoTorqueTransferHook()
+    end
+end
+
+---------------- HYDRAULIC_SPEED_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_SPEED_MODIFIER effect")
@@ -4042,6 +4307,165 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
     end,
 }
 
+------------------- PTO_AUTO_DISENGAGE_CHANCE --------------------
+ADS_Breakdowns.EffectApplicators.PTO_AUTO_DISENGAGE_CHANCE = {
+    getEffectName = function() return "PTO_AUTO_DISENGAGE_CHANCE" end,
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying PTO_AUTO_DISENGAGE_CHANCE effect.")
+        local effectName = handler.getEffectName()
+
+        local function hasActivePtoLoad(rootVehicle)
+            if rootVehicle == nil then
+                return false
+            end
+
+            local ptoActive = rootVehicle.getIsPowerTakeOffActive ~= nil and rootVehicle:getIsPowerTakeOffActive() or false
+            local ptoConsuming = rootVehicle.getDoConsumePtoPower ~= nil and rootVehicle:getDoConsumePtoPower() or false
+            local ptoRpm = rootVehicle.getPtoRpm ~= nil and (tonumber(rootVehicle:getPtoRpm()) or 0) or 0
+            local ptoTorque = 0
+
+            if PowerConsumer ~= nil and PowerConsumer.getTotalConsumedPtoTorque ~= nil then
+                local ok, torqueValue = pcall(PowerConsumer.getTotalConsumedPtoTorque, rootVehicle, nil, nil, true)
+                if ok then
+                    ptoTorque = tonumber(torqueValue) or 0
+                end
+            end
+
+            return ptoActive or ptoConsuming or ptoRpm > 10 or ptoTorque > 0.001
+        end
+
+        local function disengagePtoConsumers(rootVehicle)
+            local turnedOff = false
+            local visited = {}
+
+            local function walk(vehicleObj)
+                if vehicleObj == nil or visited[vehicleObj] then
+                    return
+                end
+                visited[vehicleObj] = true
+
+                local isTurnedOn = vehicleObj.getIsTurnedOn ~= nil and vehicleObj:getIsTurnedOn() or false
+                if isTurnedOn and vehicleObj.setIsTurnedOn ~= nil then
+                    vehicleObj:setIsTurnedOn(false)
+                    turnedOff = true
+                end
+
+                if vehicleObj.getAttachedImplements ~= nil then
+                    local implements = vehicleObj:getAttachedImplements() or {}
+                    for _, implement in pairs(implements) do
+                        if implement ~= nil and implement.object ~= nil then
+                            walk(implement.object)
+                        end
+                    end
+                end
+            end
+
+            walk(rootVehicle)
+            return turnedOff
+        end
+
+        local activeFunc = function(v, dt)
+
+            local effect = v.spec_AdvancedDamageSystem.activeEffects[effectName]
+            if effect == nil or (tonumber(effect.value) or 0) <= 0 then
+                return
+            end
+
+            effect.extraData = effect.extraData or {}
+            if effect.extraData.status == nil then
+                effect.extraData.status = "IDLE"
+            end
+
+            if effect.extraData.status == "DISENGAGED" then
+                if disengagePtoConsumers(v) then
+                    if v.getIsControlled ~= nil and v:getIsControlled() then
+                        g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_pto_auto_disengage_message"), 4000)
+                    end
+                end
+                effect.extraData.status = "IDLE"
+                return
+            end
+
+            if not v.isServer then
+                return
+            end
+
+            if not hasActivePtoLoad(v) then
+                return
+            end
+
+            if effect.extraData.status == "IDLE" and math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
+                effect.extraData.status = "DISENGAGED"
+                ADS_EffectSyncEvent.send(v, effectName, "DISENGAGED", 0, 0, 0)
+            end
+        end
+
+        addFuncToActive(vehicle, effectName, activeFunc)
+    end,
+    remove = function(vehicle, handler)
+        log_dbg("Removing PTO_AUTO_DISENGAGE_CHANCE effect.")
+        removeFuncFromActive(vehicle, handler.getEffectName())
+    end
+}
+
+------------------- PTO_FAILED --------------------
+ADS_Breakdowns.EffectApplicators.PTO_FAILED = {
+    getEffectName = function() return "PTO_FAILED" end,
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying PTO_FAILED effect.")
+        local effectName = handler.getEffectName()
+
+        local function forceDisablePtoConsumers(rootVehicle)
+            local turnedOff = false
+            local visited = {}
+
+            local function walk(vehicleObj)
+                if vehicleObj == nil or visited[vehicleObj] then
+                    return
+                end
+                visited[vehicleObj] = true
+
+                local ptoCapable = vehicleObj.getDoConsumePtoPower ~= nil
+                    or vehicleObj.getIsPowerTakeOffActive ~= nil
+                    or vehicleObj.getPtoRpm ~= nil
+
+                local isTurnedOn = vehicleObj.getIsTurnedOn ~= nil and vehicleObj:getIsTurnedOn() or false
+                if ptoCapable and isTurnedOn and vehicleObj.setIsTurnedOn ~= nil then
+                    vehicleObj:setIsTurnedOn(false)
+                    turnedOff = true
+                end
+
+                if vehicleObj.getAttachedImplements ~= nil then
+                    local implements = vehicleObj:getAttachedImplements() or {}
+                    for _, implement in pairs(implements) do
+                        if implement ~= nil and implement.object ~= nil then
+                            walk(implement.object)
+                        end
+                    end
+                end
+            end
+
+            walk(rootVehicle)
+            return turnedOff
+        end
+
+        local activeFunc = function(v, dt)
+            local effect = v.spec_AdvancedDamageSystem.activeEffects[effectName]
+            if effect == nil or (tonumber(effect.value) or 0) <= 0 then
+                return
+            end
+            effect.extraData = effect.extraData or {}
+            forceDisablePtoConsumers(v)
+        end
+
+        addFuncToActive(vehicle, effectName, activeFunc)
+    end,
+    remove = function(vehicle, handler)
+        log_dbg("Removing PTO_FAILED effect.")
+        removeFuncFromActive(vehicle, handler.getEffectName())
+    end
+}
+
 ------------------- ENGINE_START_FAILURE_CHANCE ------------------
 ADS_Breakdowns.EffectApplicators.ENGINE_START_FAILURE_CHANCE = {
     getEffectName = function() return "ENGINE_START_FAILURE_CHANCE" end,
@@ -4148,7 +4572,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_START_FAILURE_CHANCE = {
         removeFuncFromActive(vehicle, handler.getEffectName())
     end
 }
-
 
 ------------------- GEAR_SHIFT_FAILURE_CHANCE ------------------
 ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
@@ -4284,7 +4707,6 @@ ADS_Breakdowns.EffectApplicators.GEAR_SHIFT_FAILURE_CHANCE = {
     end
 }
 
-
 ------------------- GEAR_REJECTION_CHANCE ------------------
 ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
     getEffectName = function() return "GEAR_REJECTION_CHANCE" end,
@@ -4330,7 +4752,6 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
         removeFuncFromActive(vehicle, handler.getEffectName())
     end
 }
-
 
 ------------------- LIGHTS_FLICKER_CHANCE ------------------
 
@@ -4383,7 +4804,6 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
         removeFuncFromActive(vehicle, handler.getEffectName())
     end
 }
-
 
 ------------------- ENGINE_HESITATION_CHANCE ------------------
 
@@ -4438,7 +4858,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
         restoreOrigFunc(vehicle, handler.getOriginalFunctionName())
     end
 }
-
 
 -- ==========================================================
 --                   OVERWRITTEN FUNCTIONS

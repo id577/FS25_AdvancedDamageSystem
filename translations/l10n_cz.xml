@@ -218,6 +218,7 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Hnací řemen se přetrhl nebo převodovka se zasekla. Vyprazdňovací šnek je úplně zaseknutý."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Vyprazdňovací šnek se zasekl"/>
         <text name="ads_breakdowns_engine_stalled_message" text="Motor zhasl"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Vyřazena rychlost"/>
         <text name="ads_breakdown_at_progress_message" text="probíhá"/>
         <text name="ads_cold_engine_message" text="Studený motor! Vysoké otáčky způsobují opotřebení!"/>

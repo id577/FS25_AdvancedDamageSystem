@@ -218,6 +218,7 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Zerwany pas napędowy lub zablokowana skrzynia biegów. Ślimak wyładowczy jest całkowicie zablokowany."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Zablokowany ślimak wyładowczy"/>
         <text name="ads_breakdowns_engine_stalled_message" text="Silnik zgasł"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Wyłączenie biegu"/>
         <text name="ads_breakdown_at_progress_message" text="w trakcie"/>
         <text name="ads_cold_engine_message" text="Zimny silnik! Wysokie obroty powodują zużycie!"/>

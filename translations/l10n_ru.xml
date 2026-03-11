@@ -218,6 +218,7 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Порвался приводной ремень или заклинило редуктор. Выгрузной шнек полностью заблокирован."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Выгрузной шнек заклинило"/>
         <text name="ads_breakdowns_engine_stalled_message" text="Двигатель заглох"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Передача выключена"/>
         <text name="ads_breakdown_at_progress_message" text="в процессе"/>
         <text name="ads_cold_engine_message" text="Двигатель холодный! Высокие обороты вызывают износ!"/>
