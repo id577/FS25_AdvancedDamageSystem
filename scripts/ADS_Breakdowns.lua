@@ -1402,7 +1402,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = {
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.20, aggregation = "min" },
-                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.05, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.5} }
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.01, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.5} }
                 }
             },
             {
@@ -1413,7 +1413,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = {
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.40, aggregation = "min" },
-                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.1, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.4}}
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.03, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.4}}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
@@ -1427,7 +1427,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 4.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = { 
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.75, aggregation = "min" },
-                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.2, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.2} }
+                    { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.05, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.2} }
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -3201,8 +3201,12 @@ end
 
 local function getHydraulicSpeedHookUsersCount()
     local count = 0
-    for _ in pairs(hydraulicSpeedHookState.users) do
-        count = count + 1
+    for _, tokenSet in pairs(hydraulicSpeedHookState.users) do
+        if tokenSet ~= nil then
+            for _ in pairs(tokenSet) do
+                count = count + 1
+            end
+        end
     end
     return count
 end
@@ -3250,31 +3254,46 @@ local function uninstallHydraulicSpeedHooks()
     hydraulicSpeedHookState.installed = false
 end
 
-local function enableHydraulicSpeedHooksForVehicle(vehicle)
+local function enableHydraulicSpeedHooksForVehicle(vehicle, token)
     if vehicle == nil then
         return
     end
 
-    if hydraulicSpeedHookState.users[vehicle] then
+    token = token or "default"
+
+    local tokenSet = hydraulicSpeedHookState.users[vehicle]
+    if tokenSet == nil then
+        tokenSet = {}
+        hydraulicSpeedHookState.users[vehicle] = tokenSet
+    end
+
+    if tokenSet[token] then
         return
     end
 
-    hydraulicSpeedHookState.users[vehicle] = true
+    tokenSet[token] = true
     if getHydraulicSpeedHookUsersCount() == 1 then
         installHydraulicSpeedHooks()
     end
 end
 
-local function disableHydraulicSpeedHooksForVehicle(vehicle)
+local function disableHydraulicSpeedHooksForVehicle(vehicle, token)
     if vehicle == nil then
         return
     end
 
-    if not hydraulicSpeedHookState.users[vehicle] then
+    token = token or "default"
+
+    local tokenSet = hydraulicSpeedHookState.users[vehicle]
+    if tokenSet == nil or not tokenSet[token] then
         return
     end
 
-    hydraulicSpeedHookState.users[vehicle] = nil
+    tokenSet[token] = nil
+    if next(tokenSet) == nil then
+        hydraulicSpeedHookState.users[vehicle] = nil
+    end
+
     if getHydraulicSpeedHookUsersCount() == 0 then
         uninstallHydraulicSpeedHooks()
     end
@@ -3283,12 +3302,12 @@ end
 ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_SPEED_MODIFIER effect")
-        enableHydraulicSpeedHooksForVehicle(vehicle)
+        enableHydraulicSpeedHooksForVehicle(vehicle, "HYDRAULIC_SPEED_MODIFIER")
     end,
 
     remove = function(vehicle, handler)
         log_dbg("Removing HYDRAULIC_SPEED_MODIFIER effect.")
-        disableHydraulicSpeedHooksForVehicle(vehicle)
+        disableHydraulicSpeedHooksForVehicle(vehicle, "HYDRAULIC_SPEED_MODIFIER")
     end
 }
 
@@ -3300,6 +3319,7 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
 
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_HOLD_DRIFT_EFFECT:", effectData.value)
+        enableHydraulicSpeedHooksForVehicle(vehicle, "HYDRAULIC_HOLD_DRIFT_EFFECT")
         local activeFunc = function(v, dt) 
             if v.spec_attacherJoints and v.spec_attacherJoints.attachedImplements and next(v.spec_attacherJoints.attachedImplements) ~= nil then
                 for _, implementData in pairs(v.spec_attacherJoints.attachedImplements) do
@@ -3307,10 +3327,22 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
                         local implement = implementData.object
                         local jointDescIndex = implementData.jointDescIndex
                         local jointDesc = v.spec_attacherJoints.attacherJoints[jointDescIndex]
-                        if jointDesc ~= nil and not implement:getIsLowered() and not jointDesc.isMoving then
-                            local originalMoveDefaultTime = jointDesc.ads_originalMoveDefaultTime or jointDesc.moveDefaultTime
-                            jointDesc.moveDefaultTime = originalMoveDefaultTime / effectData.value
-                            v:setJointMoveDown(jointDescIndex, true, false)
+                        local jointTypeId = jointDesc ~= nil and jointDesc.jointType or nil
+                        if jointDesc ~= nil then
+                            local isLowered = implement:getIsLowered()
+                            -- Clear auto-drift marker when movement has finished in lowered state
+                            -- or user switched direction to raising.
+                            if jointDesc.ads_holdDriftForced == true then
+                                if (isLowered and not jointDesc.isMoving) or jointDesc.moveDown == false then
+                                    jointDesc.ads_holdDriftForced = false
+                                end
+                            end
+
+                            -- Force slow auto-drop only from raised idle state.
+                            if not isLowered and not jointDesc.isMoving and jointDesc.moveDown == false and jointTypeId == 1 then
+                                jointDesc.ads_holdDriftForced = true
+                                v:setJointMoveDown(jointDescIndex, true, false)
+                            end
                         end
                     end
                 end
@@ -3321,6 +3353,7 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
 
     remove = function(vehicle, handler)
         log_dbg("Removing HYDRAULIC_HOLD_DRIFT_EFFECT effect.")
+        disableHydraulicSpeedHooksForVehicle(vehicle, "HYDRAULIC_HOLD_DRIFT_EFFECT")
         removeFuncFromActive(vehicle, handler.getEffectName())
     end
 }
@@ -4796,12 +4829,16 @@ function ADS_Breakdowns.applyHydraulicDamageToAttacher(self, superFunc, dt, ...)
     local spec = self.spec_attacherJoints
 
     local hydraulicEffect = rootVehicle.spec_AdvancedDamageSystem and rootVehicle.spec_AdvancedDamageSystem.activeEffects.HYDRAULIC_SPEED_MODIFIER
+    local hydraulicHoldEffect = rootVehicle.spec_AdvancedDamageSystem and rootVehicle.spec_AdvancedDamageSystem.activeEffects.HYDRAULIC_HOLD_DRIFT_EFFECT
     local hydraulicModifier = (hydraulicEffect and hydraulicEffect.value) or 0
-    if hydraulicModifier == 0 then
+    local hydraulicHoldModifier = (hydraulicHoldEffect and hydraulicHoldEffect.value) or 0
+    
+    if hydraulicModifier == 0 and hydraulicHoldModifier == 0 then
         return superFunc(self, dt, ...)
     end
 
-    local performance = math.max(0.05, 1.0 + hydraulicModifier)
+    local raisePerformance = math.max(0.05, 1.0 + hydraulicModifier)
+    local holdDriftPerformance = math.max(tonumber(hydraulicHoldModifier) or 0, 0.01)
 
     for _, implement in ipairs(spec.attachedImplements) do
         if implement.object ~= nil then
@@ -4811,12 +4848,21 @@ function ADS_Breakdowns.applyHydraulicDamageToAttacher(self, superFunc, dt, ...)
                 jointDesc.ads_originalMoveDefaultTime = jointDesc.moveDefaultTime
             end
 
-            if jointDesc.moveDown == true and jointDesc.isMoving == true then
-                if not rootVehicle.spec_AdvancedDamageSystem.activeEffects.HYDRAULIC_HOLD_DRIFT_EFFECT then
-                    jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime
-                end
+            -- Player requested raising: immediately disable forced hold-drift path
+            -- in this same tick, so upward movement uses raise/default speed.
+            if jointDesc.ads_holdDriftForced == true and jointDesc.moveDown == false then
+                jointDesc.ads_holdDriftForced = false
+            end
+
+            if jointDesc.moveDown == false and hydraulicModifier ~= 0 then
+                -- HYDRAULIC_SPEED_MODIFIER: slow down raising only.
+                jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime / raisePerformance
+            elseif jointDesc.moveDown == true and jointDesc.ads_holdDriftForced == true and hydraulicHoldModifier > 0 then
+                -- HYDRAULIC_HOLD_DRIFT_EFFECT: slow down only forced auto-drop.
+                jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime / holdDriftPerformance
             else
-                jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime / performance
+                -- Manual lowering and any neutral state should stay at normal speed.
+                jointDesc.moveDefaultTime = jointDesc.ads_originalMoveDefaultTime
             end
         end
     end
