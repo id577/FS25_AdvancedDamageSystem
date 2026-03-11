@@ -59,7 +59,7 @@ function ADS_EffectSyncEvent:run(connection)
         if vehicle.stopMotor then
             vehicle:stopMotor()
         end
-        if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
+        if vehicle:getIsActiveForInput(true) then
             g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000)
         end
 
@@ -70,7 +70,7 @@ function ADS_EffectSyncEvent:run(connection)
         end
 
     elseif self.effectId == "PTO_FAILED" then
-        if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
+        if vehicle:getIsActiveForInput(true) then
             g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_pto_auto_disengage_message"), 4000)
         end
 
@@ -97,8 +97,8 @@ function ADS_EffectSyncEvent:run(connection)
             if motor and motor.setGear then
                 motor:setGear(0, false)
             end
-            if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
-                g_soundManager:playSample(spec.samples.gearDisengage1)
+            g_soundManager:playSample(spec.samples.gearDisengage1)
+            if vehicle:getIsActiveForInput(true) then
                 g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_gear_disengage_message"), 3000)
             end
         end

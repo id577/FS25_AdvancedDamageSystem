@@ -4039,7 +4039,10 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
             if applicator.apply then
                 applicator.apply(self, spec.activeEffects[effectId], applicator)
                 local currentEffect = spec.activeEffects[effectId]
-                if currentEffect and currentEffect.extraData ~= nil and currentEffect.extraData.message ~= nil and self.getIsControlled ~= nil and not self:getIsControlled() then
+                if currentEffect and currentEffect.extraData ~= nil and currentEffect.extraData.message ~= nil
+                        and self.isClient and not self:getIsActiveForInput(true)
+                        and self:getOwnerFarmId() == g_currentMission:getFarmId()
+                        and g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
                     g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, self:getFullName() .. ": " .. g_i18n:getText(currentEffect.extraData.message))
                 end
             end
@@ -4576,8 +4579,9 @@ function AdvancedDamageSystem:completeService()
         end
     end
 
-    -- Guarded: dedicated server has no HUD
-    if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
+    -- Host-side notification: only if host owns the vehicle (clients get it via ADS_VehicleChangeStatusEvent)
+    if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil
+            and self:getOwnerFarmId() == g_currentMission:getFarmId() then
         g_currentMission.hud:addSideNotification({1, 1, 1, 1}, maintenanceCompletedText)
     end
     if g_soundManager ~= nil and spec.samples ~= nil and spec.samples.maintenanceCompleted ~= nil then
@@ -4643,7 +4647,10 @@ function AdvancedDamageSystem:completeService()
                     g_currentMission:addMoney(-1 * price, self:getOwnerFarmId(), MoneyType.VEHICLE_RUNNING_COSTS, true, true)
                 end
                 local nextServiceText = string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_notification'), g_i18n:getText(nextWork)))
-                g_currentMission.hud:addSideNotification({1, 1, 1, 1}, nextServiceText)
+                if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil
+                        and self:getOwnerFarmId() == g_currentMission:getFarmId() then
+                    g_currentMission.hud:addSideNotification({1, 1, 1, 1}, nextServiceText)
+                end
                 ADS_VehicleChangeStatusEvent.send(self, maintenanceCompletedText)
             else
                 log_dbg("Planned service was requested but did not start. State:", tostring(spec.currentState), "Timer:", tostring(spec.maintenanceTimer))
@@ -4651,7 +4658,10 @@ function AdvancedDamageSystem:completeService()
             end
         else
             local notEnoughMoneyText = string.format("%s: %s", self:getFullName(), string.format(g_i18n:getText('ads_spec_next_planned_service_not_enouth_money_notification'), g_i18n:getText(nextWork)))
-            g_currentMission.hud:addSideNotification({1, 1, 1, 1}, notEnoughMoneyText)
+            if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil
+                    and self:getOwnerFarmId() == g_currentMission:getFarmId() then
+                g_currentMission.hud:addSideNotification({1, 1, 1, 1}, notEnoughMoneyText)
+            end
             ADS_VehicleChangeStatusEvent.send(self, maintenanceCompletedText)
         end
     else
@@ -4688,7 +4698,9 @@ function AdvancedDamageSystem:cancelService()
     end
 
     local cancelText = string.format("%s: %s %s", self:getFullName(), g_i18n:getText(serviceType), g_i18n:getText("ads_spec_maintenance_cancelled_notification"))
-    if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
+    -- Host-side notification: only if host owns the vehicle (clients get it via ADS_VehicleChangeStatusEvent)
+    if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil
+            and self:getOwnerFarmId() == g_currentMission:getFarmId() then
         g_currentMission.hud:addSideNotification({1, 1, 1, 1}, cancelText)
     end
 

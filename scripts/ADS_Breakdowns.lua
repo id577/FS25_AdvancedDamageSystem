@@ -4365,7 +4365,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
 
                             ADS_EffectSyncEvent.send(v, "ENGINE_STALLS_CHANCE", "STALLED")
 
-                            if v.getIsControlled ~= nil and v:getIsControlled() then
+                            if v:getIsActiveForInput(true) then
                                 g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000) 
                             end
                         end
@@ -4452,7 +4452,7 @@ ADS_Breakdowns.EffectApplicators.PTO_AUTO_DISENGAGE_CHANCE = {
 
             if effect.extraData.status == "DISENGAGED" then
                 if disengagePtoConsumers(v) then
-                    if v.getIsControlled ~= nil and v:getIsControlled() then
+                    if v:getIsActiveForInput(true) then
                         g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_pto_auto_disengage_message"), 4000)
                     end
                 end
@@ -4809,8 +4809,8 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
 
                                 ADS_EffectSyncEvent.send(v, "GEAR_REJECTION_CHANCE", "REJECTED", 0)
                                 
-                                if v.getIsControlled ~= nil and v:getIsControlled() then
-                                    g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples.gearDisengage1)
+                                g_soundManager:playSample(v.spec_AdvancedDamageSystem.samples.gearDisengage1)
+                                if v:getIsActiveForInput(true) then
                                     g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_gear_disengage_message", 3000)) 
                                 end
                             end
@@ -4955,7 +4955,7 @@ function ADS_Breakdowns.getCanMotorRun(self, superFunc)
             return false
         end
     elseif self:isUnderService() then
-        if self.getIsControlled ~= nil and self:getIsControlled() then
+        if self:getIsActiveForInput(true) then
             g_currentMission:showBlinkingWarning(g_i18n:getText(self:getCurrentStatus()) .. " " .. g_i18n:getText("ads_breakdown_at_progress_message", 100)) 
         end
         return false
