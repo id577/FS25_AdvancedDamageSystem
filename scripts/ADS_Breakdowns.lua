@@ -1401,7 +1401,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0 * breakdownProgressMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 repairPrice = 1.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = {
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.20, aggregation = "min" },
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.10, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.01, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.5} }
                 }
             },
@@ -1412,7 +1412,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0 * breakdownProgressMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 repairPrice = 2.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = {
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.40, aggregation = "min" },
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.30, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.03, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.4}}
                 },
                 indicators = {
@@ -1426,7 +1426,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 repairPrice = 4.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = { 
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.75, aggregation = "min" },
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.55, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.05, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.2} }
                 },
                 indicators = {
@@ -1440,7 +1440,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0,
                 repairPrice = 8.0 * breakdownPriceMultipliers.HYDRAULIC_CYLINDER_INTERNAL_LEAK,
                 effects = { 
-                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -1.0, extraData = {message = 'ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message', disableAi = true}, aggregation = "min" },
+                    { id = "HYDRAULIC_SPEED_MODIFIER", value = -7.0, extraData = {message = 'ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message', disableAi = true}, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 1.0, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.0} }
                 },
                 indicators = {
@@ -3299,6 +3299,69 @@ local function disableHydraulicSpeedHooksForVehicle(vehicle, token)
     end
 end
 
+local function isHydraulicHoldDriftBlockedByFold(implement)
+    if implement == nil then
+        return false
+    end
+
+    if implement.getIsUnfolded ~= nil then
+        local isUnfolded = implement:getIsUnfolded()
+        if isUnfolded ~= nil then
+            return not isUnfolded
+        end
+    end
+
+    if implement.getFoldAnimTime ~= nil then
+        local foldAnimTime = implement:getFoldAnimTime()
+        if foldAnimTime ~= nil then
+            return foldAnimTime < 0.99
+        end
+    end
+
+    return false
+end
+
+local function setHydraulicHoldDriftSpeedLimitBypass(implement, enabled)
+    if implement == nil or implement.doCheckSpeedLimit == nil then
+        return
+    end
+
+    if implement.ads_holdDriftOrigDoCheckSpeedLimit == nil then
+        implement.ads_holdDriftOrigDoCheckSpeedLimit = implement.doCheckSpeedLimit
+        implement.doCheckSpeedLimit = function(obj, ...)
+            if obj.ads_holdDriftBypassSpeedLimit == true then
+                local attacherVehicle = obj.getAttacherVehicle ~= nil and obj:getAttacherVehicle() or nil
+                if attacherVehicle ~= nil then
+                    return false
+                end
+                obj.ads_holdDriftBypassSpeedLimit = false
+            end
+
+            local origFunc = obj.ads_holdDriftOrigDoCheckSpeedLimit
+            if origFunc ~= nil then
+                return origFunc(obj, ...)
+            end
+
+            return false
+        end
+    end
+
+    implement.ads_holdDriftBypassSpeedLimit = enabled == true
+end
+
+local function restoreHydraulicHoldDriftSpeedLimitBypass(implement)
+    if implement == nil then
+        return
+    end
+
+    if implement.ads_holdDriftOrigDoCheckSpeedLimit ~= nil then
+        implement.doCheckSpeedLimit = implement.ads_holdDriftOrigDoCheckSpeedLimit
+        implement.ads_holdDriftOrigDoCheckSpeedLimit = nil
+    end
+
+    implement.ads_holdDriftBypassSpeedLimit = nil
+end
+
 ADS_Breakdowns.EffectApplicators.HYDRAULIC_SPEED_MODIFIER = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying HYDRAULIC_SPEED_MODIFIER effect")
@@ -3329,19 +3392,27 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
                         local jointDesc = v.spec_attacherJoints.attacherJoints[jointDescIndex]
                         local jointTypeId = jointDesc ~= nil and jointDesc.jointType or nil
                         if jointDesc ~= nil then
+                            local driftBlockedByFold = isHydraulicHoldDriftBlockedByFold(implement)
                             local isLowered = implement:getIsLowered()
                             -- Clear auto-drift marker when movement has finished in lowered state
-                            -- or user switched direction to raising.
+                            -- or user switched direction to raising / implement is folded.
                             if jointDesc.ads_holdDriftForced == true then
-                                if (isLowered and not jointDesc.isMoving) or jointDesc.moveDown == false then
+                                if driftBlockedByFold or (isLowered and not jointDesc.isMoving) or jointDesc.moveDown == false then
                                     jointDesc.ads_holdDriftForced = false
                                 end
                             end
 
                             -- Force slow auto-drop only from raised idle state.
-                            if not isLowered and not jointDesc.isMoving and jointDesc.moveDown == false and jointTypeId == 1 then
+                            if not driftBlockedByFold and not isLowered and not jointDesc.isMoving and jointDesc.moveDown == false and jointTypeId == 1 then
                                 jointDesc.ads_holdDriftForced = true
                                 v:setJointMoveDown(jointDescIndex, true, false)
+                            end
+
+                            local bypassWorkSpeedLimit = jointDesc.ads_holdDriftForced == true and jointDesc.moveDown == true and jointDesc.isMoving == true and not driftBlockedByFold
+                            if bypassWorkSpeedLimit then
+                                setHydraulicHoldDriftSpeedLimitBypass(implement, true)
+                            else
+                                restoreHydraulicHoldDriftSpeedLimitBypass(implement)
                             end
                         end
                     end
@@ -3353,6 +3424,19 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
 
     remove = function(vehicle, handler)
         log_dbg("Removing HYDRAULIC_HOLD_DRIFT_EFFECT effect.")
+        if vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attachedImplements ~= nil then
+            for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
+                if implementData.object ~= nil then
+                    restoreHydraulicHoldDriftSpeedLimitBypass(implementData.object)
+                end
+
+                local jointDesc = vehicle.spec_attacherJoints.attacherJoints[implementData.jointDescIndex]
+                if jointDesc ~= nil then
+                    jointDesc.ads_holdDriftForced = false
+                end
+            end
+        end
+
         disableHydraulicSpeedHooksForVehicle(vehicle, "HYDRAULIC_HOLD_DRIFT_EFFECT")
         removeFuncFromActive(vehicle, handler.getEffectName())
     end
