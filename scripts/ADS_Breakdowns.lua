@@ -1984,7 +1984,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.0 * breakdownPriceMultipliers.FAN_CLUTCH_FAILURE,
                 effects = {
                     { id = "FUN_CLUTCH_MODIFIER", value = -0.1, aggregation = "min"},
-                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.4, aggregation = "max" }
+                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.6, aggregation = "max" }
                 }
             },
             {
@@ -1995,7 +1995,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.0 * breakdownPriceMultipliers.FAN_CLUTCH_FAILURE,
                 effects = {
                     { id = "FUN_CLUTCH_MODIFIER", value = -0.2, aggregation = "min"},
-                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.7, aggregation = "max" }
+                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.8, aggregation = "max" }
                 },
                 indicators = {
                     { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }

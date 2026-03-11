@@ -435,9 +435,9 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
     -- [Group 2] Per-system condition/stress/enabled (compact CSV)
     streamWriteString(streamId, ADS_Utils.serializeSystemsState(spec.systems))
 
-    -- [Group 3] Thermal model + fuel consumption
-    streamWriteFloat32(streamId, spec.engineTemperature or -99)
-    streamWriteFloat32(streamId, spec.transmissionTemperature or -99)
+    -- [Group 3] Thermal model (raw values) + fuel consumption
+    streamWriteFloat32(streamId, spec.rawEngineTemperature or -99)
+    streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
     streamWriteFloat32(streamId, spec.thermostatState or 0)
     streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
 
@@ -496,15 +496,17 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
         end
     end
 
-    -- [Group 3] Thermal model + fuel consumption (full sync: set both current + interpolation targets)
-    local syncEngTemp = streamReadFloat32(streamId)
-    local syncTransTemp = streamReadFloat32(streamId)
-    spec.engineTemperature = syncEngTemp
-    spec.rawEngineTemperature = syncEngTemp
-    spec._netTargetEngineTemp = syncEngTemp
-    spec.transmissionTemperature = syncTransTemp
-    spec.rawTransmissionTemperature = syncTransTemp
-    spec._netTargetTransmissionTemp = syncTransTemp
+    -- [Group 3] Thermal model + fuel consumption (raw sync)
+    local syncRawEngTemp = streamReadFloat32(streamId)
+    local syncRawTransTemp = streamReadFloat32(streamId)
+    spec.rawEngineTemperature = syncRawEngTemp
+    spec.rawTransmissionTemperature = syncRawTransTemp
+    -- Keep these fields in sync for compatibility with existing debug/tools.
+    spec._netTargetEngineTemp = syncRawEngTemp
+    spec._netTargetTransmissionTemp = syncRawTransTemp
+    -- Initialize smoothed values from raw on full sync.
+    spec.engineTemperature = syncRawEngTemp
+    spec.transmissionTemperature = syncRawTransTemp
     spec.thermostatState = streamReadFloat32(streamId)
     if spec.engTermPID ~= nil then
         spec.engTermPID.mechPos = spec.thermostatState
@@ -561,14 +563,14 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
     if spec == nil then return end
 
     if not connection:getIsServer() then
-        -- [1] State + Thermal + Service options + Fuel consumption
+        -- [1] State + Thermal(raw) + Service options + Fuel consumption
         if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_state) ~= 0) then
             streamWriteFloat32(streamId, spec.serviceLevel or 1.0)
             streamWriteString(streamId, spec.currentState or "")
             streamWriteString(streamId, spec.plannedState or "")
             streamWriteFloat32(streamId, spec.maintenanceTimer or 0)
-            streamWriteFloat32(streamId, spec.engineTemperature or -99)
-            streamWriteFloat32(streamId, spec.transmissionTemperature or -99)
+            streamWriteFloat32(streamId, spec.rawEngineTemperature or -99)
+            streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
             streamWriteFloat32(streamId, spec.thermostatState or 0)
             streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
             streamWriteString(streamId, spec.serviceOptionOne or "")
@@ -615,14 +617,19 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
     if spec == nil then return end
 
     if connection:getIsServer() then
-        -- [1] State + Thermal + Service options + Fuel consumption
+        -- [1] State + Thermal(raw) + Service options + Fuel consumption
         if streamReadBool(streamId) then
             spec.serviceLevel = streamReadFloat32(streamId)
             spec.currentState = streamReadString(streamId)
             spec.plannedState = streamReadString(streamId)
             spec.maintenanceTimer = streamReadFloat32(streamId)
-            spec._netTargetEngineTemp = streamReadFloat32(streamId)
-            spec._netTargetTransmissionTemp = streamReadFloat32(streamId)
+            local syncRawEngTemp = streamReadFloat32(streamId)
+            local syncRawTransTemp = streamReadFloat32(streamId)
+            spec.rawEngineTemperature = syncRawEngTemp
+            spec.rawTransmissionTemperature = syncRawTransTemp
+            -- Keep compatibility with previous tooling.
+            spec._netTargetEngineTemp = syncRawEngTemp
+            spec._netTargetTransmissionTemp = syncRawTransTemp
             spec.thermostatState = streamReadFloat32(streamId)
             if spec.engTermPID ~= nil then
                 spec.engTermPID.mechPos = spec.thermostatState
@@ -1551,22 +1558,6 @@ end
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
 
-    -- Client-side interpolation toward last server-synced values.
-    -- Server syncs via dirty flags every ~500 ms; without interpolation the HUD
-    -- shows discrete jumps each time a packet arrives.
-    -- Use a shorter TAU (1500ms) than the server-side smoothing (5000ms) so the
-    -- client tracks server values closely without re-introducing the full delay.
-    if not self.isServer then
-        local interpTau = 1500
-        local alpha = math.min(dt / (interpTau + dt), 1)
-        if spec._netTargetEngineTemp ~= nil then
-            spec.engineTemperature = spec.engineTemperature + alpha * (spec._netTargetEngineTemp - spec.engineTemperature)
-        end
-        if spec._netTargetTransmissionTemp ~= nil and spec._netTargetTransmissionTemp > -90 then
-            spec.transmissionTemperature = (spec.transmissionTemperature or -99) + alpha * (spec._netTargetTransmissionTemp - (spec.transmissionTemperature or -99))
-        end
-    end
-
     -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
     -- getMotorLoadPercentage() oscillates heavily frame-to-frame; this produces
     -- a stable reading without losing responsiveness.
@@ -1599,6 +1590,8 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     if spec.effectsUpdateTimer < ADS_Config.EFFECTS_UPDATE_DELAY then
         return
     end
+
+    self:getSmoothedTemperature(dt)
 
     --- Registration in ADS_Main.vehicles and first load checks.
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil then
@@ -1718,7 +1711,6 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
     if self.isServer and ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
         self:updateThermalSystems(spec.effectsUpdateTimer)
-        self:getSmoothedTemperature(spec.effectsUpdateTimer)
     end
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
@@ -1741,8 +1733,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local prevPlannedState = spec.plannedState
     local prevMaintenanceTimer = spec.maintenanceTimer
     local prevConditionLevel = spec.conditionLevel
-    local prevEngineTemp = spec.engineTemperature
-    local prevTransTemp = spec.transmissionTemperature
+    local prevRawEngineTemp = spec.rawEngineTemperature
+    local prevRawTransTemp = spec.rawTransmissionTemperature
     local prevThermostatState = spec.thermostatState
     local prevSystemsHash = 0
     do
@@ -1767,7 +1759,6 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local prevTotalBreakdowns = spec.totalBreakdownsOccurred
 
     self:updateThermalSystems(dt)
-    self:getSmoothedTemperature(dt)
 
     if self:isUnderService() then
         self:processService(dt)
@@ -1800,8 +1791,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         or spec.currentState ~= prevCurrentState
         or spec.plannedState ~= prevPlannedState
         or math.abs((spec.maintenanceTimer or 0) - (prevMaintenanceTimer or 0)) > 0.5
-        or math.abs((spec.engineTemperature or 0) - (prevEngineTemp or 0)) > 0.25
-        or math.abs((spec.transmissionTemperature or 0) - (prevTransTemp or 0)) > 0.25
+        or math.abs((spec.rawEngineTemperature or 0) - (prevRawEngineTemp or 0)) > 0.25
+        or math.abs((spec.rawTransmissionTemperature or 0) - (prevRawTransTemp or 0)) > 0.25
         or spec.thermostatState ~= prevThermostatState
         or math.abs((spec._fuelUsageRaw or 0) - (spec._prevSyncFuelUsage or 0)) > 0.3 then
             self:raiseDirtyFlags(spec.adsDirtyFlag_state)
