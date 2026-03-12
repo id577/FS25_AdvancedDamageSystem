@@ -16,6 +16,7 @@ source(g_currentModDirectory .. "events/ADS_ServiceRequestEvent.lua")
 source(g_currentModDirectory .. "events/ADS_CancelServiceEvent.lua")
 source(g_currentModDirectory .. "events/ADS_SettingsSyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_EffectSyncEvent.lua")
+source(g_currentModDirectory .. "events/ADS_LogEntrySyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_ConsoleCommandEvent.lua")
 
 -- Network hook: wrap every settings callback so changes made by an admin
