@@ -2665,77 +2665,6 @@ ADS_Breakdowns.BreakdownRegistry = {
 
 ADS_Breakdowns.EffectApplicators = {}
 
-local function isOrigFuncStillUsed(v, funcName)
-    if v == nil or funcName == nil then
-        return false
-    end
-    local spec = v.spec_AdvancedDamageSystem
-    if spec == nil or spec.activeEffects == nil then
-        return false
-    end
-
-    for effectId, _ in pairs(spec.activeEffects) do
-        local applicator = ADS_Breakdowns.EffectApplicators[effectId]
-        if applicator ~= nil and applicator.getOriginalFunctionName ~= nil then
-            local usedName = applicator.getOriginalFunctionName()
-            if usedName == funcName then
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
-local function saveOrigFunc(v, funcName, targetObject, targetField)
-    if v == nil or funcName == nil or funcName == "" then
-        return
-    end
-    local spec = v.spec_AdvancedDamageSystem
-    if spec == nil or spec.originalFunctions == nil then
-        return
-    end
-    if spec.originalFunctions[funcName] ~= nil then
-        return
-    end
-
-    local sourceObject = targetObject or v
-    local sourceField = targetField or funcName
-    if sourceObject == nil or sourceField == nil then
-        return
-    end
-
-    spec.originalFunctions[funcName] = sourceObject[sourceField]
-end
-
-local function restoreOrigFunc(v, funcName, targetObject, targetField, forceRestore)
-    if v == nil or funcName == nil or funcName == "" then
-        return false
-    end
-    local spec = v.spec_AdvancedDamageSystem
-    if spec == nil or spec.originalFunctions == nil then
-        return false
-    end
-
-    if not forceRestore and isOrigFuncStillUsed(v, funcName) then
-        return false
-    end
-
-    local originalFunc = spec.originalFunctions[funcName]
-    if originalFunc == nil then
-        return false
-    end
-
-    local destinationObject = targetObject or v
-    local destinationField = targetField or funcName
-    if destinationObject ~= nil and destinationField ~= nil then
-        destinationObject[destinationField] = originalFunc
-    end
-
-    spec.originalFunctions[funcName] = nil
-    return true
-end
-
 local function addFuncToActive(v, effectName, func)
     if v.spec_AdvancedDamageSystem.activeFunctions[effectName] == nil then
         v.spec_AdvancedDamageSystem.activeFunctions[effectName] = func
@@ -2832,9 +2761,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_TORQUE_MODIFIER = {
         vehicle:updateMotorProperties()
     end
 }
-
-local enablePtoTorqueTransferHookForVehicle
-local disablePtoTorqueTransferHookForVehicle
 
 -------------------- PTO_TORQUE_TRANSFER_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.PTO_TORQUE_TRANSFER_MODIFIER = {

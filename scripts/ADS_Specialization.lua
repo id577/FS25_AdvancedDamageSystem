@@ -730,6 +730,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#serviceOptionOne", spec.serviceOptionOne or "")
         xmlFile:setValue(key .. "#serviceOptionTwo", spec.serviceOptionTwo or "")
         xmlFile:setValue(key .. "#serviceOptionThree", spec.serviceOptionThree or false)
+        xmlFile:setValue(key .. "#workshopType", spec.workshopType or "")
         xmlFile:setValue(key .. "#pendingSelectedBreakdowns", table.concat(spec.pendingSelectedBreakdowns or {}, ","))
         xmlFile:setValue(key .. "#pendingServicePrice", ADS_Utils.encodeOptionalFloat(spec.pendingServicePrice))
         xmlFile:setValue(key .. "#pendingInspectionQueue", table.concat(spec.pendingInspectionQueue or {}, ","))
@@ -1210,6 +1211,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.serviceOptionOne == "" then spec.serviceOptionOne = nil end
         if spec.serviceOptionTwo == "" then spec.serviceOptionTwo = nil end
         spec.serviceOptionThree = savegame.xmlFile:getValue(key .. "#serviceOptionThree", spec.serviceOptionThree)
+        local loadedWorkshopType = savegame.xmlFile:getValue(key .. "#workshopType", "")
+        if loadedWorkshopType ~= nil and loadedWorkshopType ~= "" then
+            spec.workshopType = loadedWorkshopType
+        end
         spec.pendingServicePrice = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingServicePrice", spec.pendingServicePrice))
         spec.pendingSelectedBreakdowns = {}
         local pendingSelBdStr = savegame.xmlFile:getValue(key .. "#pendingSelectedBreakdowns", "")
