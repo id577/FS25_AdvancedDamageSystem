@@ -2822,58 +2822,23 @@ ADS_Breakdowns.EffectApplicators.UNLOADING_AUGER_FAILURE = {
 
 --------------------- ENGINE_LIMP_EFFECT --------------------
 ADS_Breakdowns.EffectApplicators.ENGINE_LIMP_EFFECT = {
-    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
     apply = function(vehicle, effectData, handler)
-
         log_dbg("Applying ENGINE_LIMP_EFFECT:", effectData.value)
-        local originalFuncName = handler.getOriginalFunctionName()
-        saveOrigFunc(vehicle, originalFuncName)
- 
-        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
-            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
-        end
     end,
     remove = function(vehicle, handler)
         log_dbg("Removing ENGINE_LIMP_EFFECT effect.")
-        local originalFuncName = handler.getOriginalFunctionName()
-        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
 -------------------- ENGINE_TORQUE_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.ENGINE_TORQUE_MODIFIER = {
-    getOriginalFunctionName = function()
-        return "getTorqueCurveValue"
-    end,
-
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying ENGINE_TORQUE_MODIFIER:", effectData.value)
-        local motor = vehicle.spec_motorized and vehicle.spec_motorized.motor
-        if motor == nil then return end
-
-        local originalFuncName = handler.getOriginalFunctionName()
-        saveOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
-
-        motor.getTorqueCurveValue = function(m, rpm)
-            local originalFunc = vehicle.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            local originalTorque = originalFunc(m, rpm)
-            local modifiedTorque = originalTorque * math.max((1 + effectData.value), 0.2)
-            return modifiedTorque
-        end
         vehicle:updateMotorProperties()
     end,
 
     remove = function(vehicle, handler)
         log_dbg("Removing ENGINE_TORQUE_MODIFIER effect.")
-        local motor = vehicle.spec_motorized and vehicle.spec_motorized.motor
-        if motor == nil then return end
-
-        local originalFuncName = handler.getOriginalFunctionName()
-        local restored = restoreOrigFunc(vehicle, originalFuncName, motor, originalFuncName)
-        if restored then
-            log_dbg("Restoring original function:", originalFuncName)
-        end
         vehicle:updateMotorProperties()
     end
 }
@@ -2899,102 +2864,38 @@ ADS_Breakdowns.EffectApplicators.PTO_TORQUE_TRANSFER_MODIFIER = {
 
 -------------------- BRAKE_FORCE_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.BRAKE_FORCE_MODIFIER = {
-    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying BRAKE_FORCE_MODIFIER:", effectData.value)
-        if vehicle.spec_drivable == nil then return end
-
-        local originalFuncName = handler.getOriginalFunctionName()
-        saveOrigFunc(vehicle, originalFuncName)
-
-        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
-            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
-        end
     end,
     remove = function(vehicle, handler)
         log_dbg("Removing BRAKE_FORCE_MODIFIER effect.")
-        if vehicle.spec_drivable == nil then return end
-        local originalFuncName = handler.getOriginalFunctionName()
-        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
 -------------------- STEERING_STATIC_BIAS_EFFECT -------------------
 ADS_Breakdowns.EffectApplicators.STEERING_STATIC_BIAS_EFFECT = {
-    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
     apply = function(vehicle, effectData, handler)
-        if vehicle.spec_drivable == nil then return end
-        local originalFuncName = handler.getOriginalFunctionName()
-        saveOrigFunc(vehicle, originalFuncName)
-
-        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
-            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
-        end
     end,
     remove = function(vehicle, handler)
-        if vehicle.spec_drivable == nil then return end
-        local originalFuncName = handler.getOriginalFunctionName()
-
-        local spec_ads = vehicle.spec_AdvancedDamageSystem
-        if spec_ads ~= nil and spec_ads.activeEffects ~= nil and spec_ads.activeEffects.STEERING_SENSITIVITY_MODIFIER ~= nil then
-            return
-        end
-
-        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
 -------------------- STEERING_SENSITIVITY_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.STEERING_SENSITIVITY_MODIFIER = {
-    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
     apply = function(vehicle, effectData, handler)
-        if vehicle.spec_drivable == nil then return end
-        local originalFuncName = handler.getOriginalFunctionName()
-        saveOrigFunc(vehicle, originalFuncName)
-
-        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
-            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
-        end
     end,
     remove = function(vehicle, handler)
-        if vehicle.spec_drivable == nil then return end
-        local originalFuncName = handler.getOriginalFunctionName()
-
-        -- Do not restore updateVehiclePhysics while static steering bias is still active:
-        -- both effects share the same hook.
-        local spec_ads = vehicle.spec_AdvancedDamageSystem
-        if spec_ads ~= nil and spec_ads.activeEffects ~= nil and spec_ads.activeEffects.STEERING_STATIC_BIAS_EFFECT ~= nil then
-            return
-        end
-
-        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
 -------------------- WHEEL_SEIZURE_EFFECT -------------------
 ADS_Breakdowns.EffectApplicators.WHEEL_SEIZURE_EFFECT = {
-    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
     apply = function(vehicle, effectData, handler)
-        if vehicle.spec_drivable == nil or vehicle.spec_wheels == nil then return end
-
-        local originalFuncName = handler.getOriginalFunctionName()
-        saveOrigFunc(vehicle, originalFuncName)
-
-        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
-            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
-        end
     end,
     remove = function(vehicle, handler)
         if vehicle.spec_AdvancedDamageSystem ~= nil then
             vehicle.spec_AdvancedDamageSystem.wheelSeizureTargetIndex = nil
         end
-        if vehicle.spec_drivable == nil then return end
-        local originalFuncName = handler.getOriginalFunctionName()
-        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
@@ -3783,53 +3684,12 @@ ADS_Breakdowns.EffectApplicators.HYDRAULIC_HOLD_DRIFT_EFFECT = {
 
 ---------------- MAX_SPEED_MODIFIER -------------------
 ADS_Breakdowns.EffectApplicators.MAX_SPEED_MODIFIER = {
-    getOriginalFunctionName = function()
-        return "getSpeedLimit"
-    end,
-    getEffectName = function()
-        return "MAX_SPEED_MODIFIER"
-    end,
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying MAX_SPEED_MODIFIER effect")
-        local originalFuncName = handler.getOriginalFunctionName()
-        local effectName = handler.getEffectName()
-        saveOrigFunc(vehicle, originalFuncName)
-
-        vehicle.getSpeedLimit = function(v, onlyIfWorking)
-            local origFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            if origFunc == nil then
-                return math.huge, v:doCheckSpeedLimit()
-            end
-
-            local speedLimit, doCheckSpeedLimit = origFunc(v, onlyIfWorking)
-            local currentEffect = v.spec_AdvancedDamageSystem.activeEffects and v.spec_AdvancedDamageSystem.activeEffects[effectName]
-            local reduction = math.clamp(tonumber((currentEffect and currentEffect.value) or effectData.value) or 0, 0, 0.99)
-            local motor = v:getMotor()
-
-            if speedLimit == nil or speedLimit >= math.huge then
-                local baseMaxMps = nil
-                if motor ~= nil then
-                    baseMaxMps = tonumber(motor.maxForwardSpeedOrigin)
-                        or tonumber(motor.maxForwardSpeed)
-                        or (motor.getMaximumForwardSpeed ~= nil and tonumber(motor:getMaximumForwardSpeed()) or nil)
-                end
-                if baseMaxMps ~= nil then
-                    speedLimit = baseMaxMps * 3.6
-                end
-            end
-
-            if speedLimit ~= nil and speedLimit < math.huge and reduction > 0 then
-                speedLimit = speedLimit - speedLimit * reduction
-            end
-
-            return speedLimit or math.huge, doCheckSpeedLimit
-        end
     end,
 
     remove = function(vehicle, handler)
         log_dbg("Removing MAX_SPEED_MODIFIER effect.")
-        local originalFuncName = handler.getOriginalFunctionName()
-        restoreOrigFunc(vehicle, originalFuncName)
     end
 }
 
@@ -4883,18 +4743,9 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
 
 ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
     getEffectName = function() return "ENGINE_HESITATION_CHANCE" end,
-    getOriginalFunctionName = function() return "updateVehiclePhysics" end,
 
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying ENGINE_HESITATION_CHANCE effect")
-
-        local originalFuncName = handler.getOriginalFunctionName()
-        saveOrigFunc(vehicle, originalFuncName)
-
-        vehicle.updateVehiclePhysics = function(v, axisForward, axisSide, doHandbrake, dt)
-            local originalFunc = v.spec_AdvancedDamageSystem.originalFunctions[originalFuncName]
-            return ADS_Breakdowns.updateVehiclePhysics(v, originalFunc, axisForward, axisSide, doHandbrake, dt)
-        end
 
         local effectName = handler.getEffectName()
         local activeFunc = function(v, dt)
@@ -4929,7 +4780,6 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
     remove = function(vehicle, handler)
         log_dbg("Removing ENGINE_HESITATION_CHANCE")
         removeFuncFromActive(vehicle, handler.getEffectName())
-        restoreOrigFunc(vehicle, handler.getOriginalFunctionName())
     end
 }
 
@@ -5634,6 +5484,70 @@ function ADS_Breakdowns.setLightsTypesMask(self, superFunc, lightsTypesMask, for
         end  
         return
     end
+end
+
+-- ==========================================================
+--      REGISTERED OVERWRITTEN FUNCTIONS (specialization chain)
+-- ==========================================================
+
+function ADS_Breakdowns.getSpeedLimitOverwrite(vehicle, superFunc, onlyIfWorking)
+    local speedLimit, doCheckSpeedLimit = superFunc(vehicle, onlyIfWorking)
+
+    local spec_ads = vehicle.spec_AdvancedDamageSystem
+    if spec_ads == nil or spec_ads.activeEffects == nil then
+        return speedLimit, doCheckSpeedLimit
+    end
+
+    local effect = spec_ads.activeEffects.MAX_SPEED_MODIFIER
+    if effect == nil or effect.value == nil then
+        return speedLimit, doCheckSpeedLimit
+    end
+
+    local reduction = math.clamp(tonumber(effect.value) or 0, 0, 0.99)
+    if reduction <= 0 then
+        return speedLimit, doCheckSpeedLimit
+    end
+
+    local motor = vehicle:getMotor()
+
+    if speedLimit == nil or speedLimit >= math.huge then
+        local baseMaxMps = nil
+        if motor ~= nil then
+            baseMaxMps = tonumber(motor.maxForwardSpeedOrigin)
+                or tonumber(motor.maxForwardSpeed)
+                or (motor.getMaximumForwardSpeed ~= nil and tonumber(motor:getMaximumForwardSpeed()) or nil)
+        end
+        if baseMaxMps ~= nil then
+            speedLimit = baseMaxMps * 3.6
+        end
+    end
+
+    if speedLimit ~= nil and speedLimit < math.huge then
+        speedLimit = speedLimit - speedLimit * reduction
+    end
+
+    return speedLimit or math.huge, doCheckSpeedLimit
+end
+
+-- ==========================================================
+--        VEHICLEMOTOR CLASS-LEVEL HOOK (mod-safe torque)
+-- ==========================================================
+
+if VehicleMotor ~= nil and VehicleMotor.getTorqueCurveValue ~= nil then
+    VehicleMotor.getTorqueCurveValue = Utils.overwrittenFunction(VehicleMotor.getTorqueCurveValue, function(self, superFunc, rpm)
+        local torque = superFunc(self, rpm)
+        local vehicle = self.vehicle
+        if vehicle ~= nil then
+            local spec_ads = vehicle.spec_AdvancedDamageSystem
+            if spec_ads ~= nil and spec_ads.activeEffects ~= nil then
+                local effect = spec_ads.activeEffects.ENGINE_TORQUE_MODIFIER
+                if effect ~= nil and effect.value ~= nil then
+                    torque = torque * math.max((1 + effect.value), 0.2)
+                end
+            end
+        end
+        return torque
+    end)
 end
 
 
