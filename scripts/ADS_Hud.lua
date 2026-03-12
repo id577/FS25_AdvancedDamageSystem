@@ -102,6 +102,24 @@ function ADS_Hud:setVehicle(vehicle)
     self.vehicle = vehicle
 end
 
+function ADS_Hud:getVehicleTypeCategoryLabel(vehicle)
+    local vehicleTypeName = "-"
+    local categoryName = "-"
+
+    if vehicle ~= nil and vehicle.type ~= nil and vehicle.type.name ~= nil then
+        vehicleTypeName = tostring(vehicle.type.name)
+    end
+
+    if vehicle ~= nil and g_storeManager ~= nil and g_storeManager.getItemByXMLFilename ~= nil then
+        local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+        if storeItem ~= nil and storeItem.categoryName ~= nil then
+            categoryName = tostring(storeItem.categoryName)
+        end
+    end
+
+    return string.format("%s/%s", vehicleTypeName, categoryName)
+end
+
 
 -- =====================================================================================
 --                              DRAW
@@ -176,7 +194,7 @@ function ADS_Hud:storeScaledValues()
 end
 
 function ADS_Hud:drawDashboard()
-    if self.vehicle == nil or self.vehicle.spec_AdvancedDamageSystem == nil then
+    if self.vehicle == nil or self.vehicle.spec_AdvancedDamageSystem == nil or self.vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
         return
     end
 
@@ -291,7 +309,7 @@ end
 
 function ADS_Hud:drawFuelConsumption()
     local vehicle = self.vehicle
-    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or vehicle.spec_motorized == nil then
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or vehicle.spec_motorized == nil or vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
         return
     end
     local sm = g_currentMission.hud.speedMeter
@@ -1004,7 +1022,9 @@ function ADS_Hud:drawActiveVehicleHUD()
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
     setTextBold(true)
     setTextColor(1, 1, 1, 1)
-    renderText(textStartX, currentY, activeHeaderSize, vehicle:getFullName() .. " " .. spec.year)
+    local vehicleTypeCategory = self:getVehicleTypeCategoryLabel(vehicle)
+    local headerText = string.format("%s %s | Type/Category: %s", vehicle:getFullName(), tostring(spec.year), vehicleTypeCategory)
+    renderText(textStartX, currentY, activeHeaderSize, headerText)
     setTextBold(false)
     currentY = currentY - activeHeaderSize - activeLineHeight
 
@@ -1234,7 +1254,9 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
     setTextBold(true)
     setTextColor(1, 1, 1, 1)
-    renderText(textStartX, currentY, activeHeaderSize, vehicle:getFullName() .. " " .. spec.year .. " [Factor Stats]")
+    local vehicleTypeCategory = self:getVehicleTypeCategoryLabel(vehicle)
+    local headerText = string.format("%s %s | Type/Category: %s [Factor Stats]", vehicle:getFullName(), tostring(spec.year), vehicleTypeCategory)
+    renderText(textStartX, currentY, activeHeaderSize, headerText)
     setTextBold(false)
     currentY = currentY - activeHeaderSize - activeLineHeight
 
@@ -1408,7 +1430,7 @@ end
 -- =====================================================================================
 
 function ADS_Hud:showInfoVehicle(box)
-    if self.spec_AdvancedDamageSystem ~= nil then
+    if self.spec_AdvancedDamageSystem ~= nil and not self.spec_AdvancedDamageSystem.isExcludedVehicle then
         local spec = self.spec_AdvancedDamageSystem
         
         box:addLine(g_i18n:getText('ads_ws_label_condition'), ADS_Utils.formatCondition(self:getLastInspectedCondition()))

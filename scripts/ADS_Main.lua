@@ -74,6 +74,7 @@ function ADS_Main.registerSpecializationToVehicles()
             not string.find(string.lower(vehicleType), "pushable") and
             not string.find(vehicleType, "FS25_lsfmFarmEquipmentPack") and
             not string.find(vehicleType, "FS25_FillablePallet")  and
+            not string.find(vehicleType, "FS25_ASM_FarmyardTrailerDolly")  and
             vehicleType ~= "motorbike" and 
             vehicleType ~= "inlineWrapper" and 
             vehicleType ~= "locomotive" and 
@@ -129,7 +130,7 @@ function ADS_Main:onStartMission()
 
 	mission.hud.setControlledVehicle = Utils.appendedFunction(mission.hud.setControlledVehicle, function(self, vehicle)
 		ADS_Main.hud:setVehicle(vehicle)
-		ADS_Main.hud:setVisible(vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil, true)
+		ADS_Main.hud:setVisible(vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle, true)
 	end)
 
 	mission.hud.drawControlledEntityHUD = Utils.appendedFunction(mission.hud.drawControlledEntityHUD, function(self)
@@ -141,7 +142,7 @@ function ADS_Main:onStartMission()
         if spec.name == 'wearable' then
             local origFunc = spec.getValueFunc
             spec.getValueFunc = function(s, v)
-                if v ~= nil and v.spec_AdvancedDamageSystem ~= nil then
+                if v ~= nil and v.spec_AdvancedDamageSystem ~= nil and not v.spec_AdvancedDamageSystem.isExcludedVehicle then
                     return ADS_Utils.formatTimeAgo(v:getLastMaintenanceDate())
                 else
                     return origFunc(s, v)
@@ -161,7 +162,7 @@ function ADS_Main.hookRepairButton(screenInstance, vehicle)
     if screenInstance.ads_originalRepairCallback == nil and screenInstance.repairButton.onClickCallback ~= nil then
         screenInstance.ads_originalRepairCallback = screenInstance.repairButton.onClickCallback
     end
-    if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
+    if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
         screenInstance.repairButton.onClickCallback = function()           
             ADS_Main.onCustomRepairClick(screenInstance)
         end
@@ -193,7 +194,7 @@ g_storeManager:addSpecType("maintainability", "shopListAttributeIconMaintainabil
 
 -- adds spec in config screen 
 function ADS_Main.processAttributeData(self, storeItem, vehicle, saleItem)
-    if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
+    if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
         local reliabilityItemElement = self.attributeItem:clone(self.attributesLayout)
         local reliabilityIconElement = reliabilityItemElement:getDescendantByName("icon")
         local reliabilityTextElement = reliabilityItemElement:getDescendantByName("text")
@@ -223,7 +224,7 @@ function ADS_Main.setStatusBarValue(screenInstance, superFunc, bar, value)
         end
     end
 
-    if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
+    if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
         local cs = vehicle.spec_AdvancedDamageSystem.lastInspectedConditionState
         if cs == AdvancedDamageSystem.STATES.UNKNOWN or cs == AdvancedDamageSystem.STATES.EXCELLENT then value = 1.0
         elseif cs == AdvancedDamageSystem.STATES.GOOD then value = 0.75
@@ -238,7 +239,7 @@ end
 function ADS_Main.populateCellForItemInSection(self, superFunc, list, section, index, cell)
     if list.id == 'vehiclesList' then
         local vehicle = self.vehicles[index].vehicle
-        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
+        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
             superFunc(self, list, section, index, cell)
             local condition, isCompleteInspection = vehicle:getLastInspectedCondition()
             cell:getAttribute("damage"):setText(ADS_Utils.formatCondition(condition, isCompleteInspection))
@@ -352,7 +353,7 @@ function ADS_Main:update(dt)
              self.previousKey, vehicle = next(self.vehicles)
         end
         
-        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
+        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
             vehicle:adsUpdate(ADS_Config.CORE_UPDATE_DELAY, self.isWorkshopOpen)
 
             --- meta

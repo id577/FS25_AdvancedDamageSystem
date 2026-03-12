@@ -4938,7 +4938,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
 -- ==========================================================
 
 function ADS_Breakdowns.updateDamageAmount(wearable, superFunc, dt)
-	if wearable.spec_AdvancedDamageSystem ~= nil then
+	if wearable.spec_AdvancedDamageSystem ~= nil and not wearable.spec_AdvancedDamageSystem.isExcludedVehicle then
 		return 0
 	else
 		return superFunc(wearable, dt)

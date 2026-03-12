@@ -240,7 +240,7 @@ local function log_dbg(...)
 end
 
 -- ==========================================================
---                    SAVE/LOAD & REGISTRATION
+--                          REGISTRATION
 -- ==========================================================
 
 
@@ -418,14 +418,14 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     
 end
 
--- ============================================================================
+-- ============================================================
 --                         NETWORK STREAMS
--- ============================================================================
+-- ============================================================
 
 --- Full state sync for a joining client (server-side).
 function AdvancedDamageSystem:onWriteStream(streamId, connection)
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then return end
+    if spec == nil or spec.isExcludedVehicle then return end
 
     -- [Group 1] Core state
     streamWriteFloat32(streamId, spec.serviceLevel or 1.0)
@@ -478,7 +478,7 @@ end
 --- Full state sync on a joining client (client-side).
 function AdvancedDamageSystem:onReadStream(streamId, connection)
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then return end
+    if spec == nil or spec.isExcludedVehicle then return end
 
     -- [Group 1] Core state
     spec.serviceLevel = streamReadFloat32(streamId)
@@ -565,7 +565,7 @@ end
 --- Differential update sync (server -> client, 5 dirty-flag groups).
 function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMask)
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then return end
+    if spec == nil or spec.isExcludedVehicle then return end
 
     if not connection:getIsServer() then
         -- [1] State + Thermal(raw) + Service options + Fuel consumption
@@ -616,11 +616,10 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
     end
 end
 
-
 --- Differential update sync (client reads from server).
 function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection)
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then return end
+    if spec == nil or spec.isExcludedVehicle then return end
 
     if connection:getIsServer() then
         -- [1] State + Thermal(raw) + Service options + Fuel consumption
@@ -694,10 +693,14 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
     end
 end
 
+-- ============================================================
+--                       SAVE & LOAD
+-- ============================================================
+
 function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
     log_dbg("saveToXMLFile called for vehicle:", self:getFullName(), "with key:", key)
     local spec = self.spec_AdvancedDamageSystem
-    if spec ~= nil then
+    if spec ~= nil and not spec.isExcludedVehicle then
         xmlFile:setValue(key .. "#service", spec.serviceLevel or 1.0)
         xmlFile:setValue(key .. "#condition", spec.conditionLevel or 1.0)
         
@@ -798,6 +801,7 @@ end
 
 function AdvancedDamageSystem:onLoad(savegame)
     log_dbg("onLoad called for vehicle:", self:getFullName())
+    self.spec_AdvancedDamageSystem.isExcludedVehicle = false
     self.spec_AdvancedDamageSystem = {}
     self.spec_AdvancedDamageSystem.baseServiceLevel = 1.0
     self.spec_AdvancedDamageSystem.baseConditionLevel = 1.0
@@ -1142,6 +1146,19 @@ end
 function AdvancedDamageSystem:onPostLoad(savegame)
     log_dbg("onPostLoad called for vehicle:", self:getFullName())
     local spec = self.spec_AdvancedDamageSystem
+
+    local function shouldExcludeFromADS(vehicle)
+        local vehicleName = vehicle:getFullName()
+        if  vehicleName == 'Lizard Old Bike' or
+            vehicleName == 'Lizard Mountain Bike' or
+            vehicleName == 'Lizard Motorized Bike' then
+                spec.isExcludedVehicle = true
+        end
+    end
+
+    shouldExcludeFromADS(self)
+    if spec.isExcludedVehicle then return end
+
     if spec ~= nil and savegame ~= nil then
         local key = savegame.key .. ".AdvancedDamageSystem"
 
@@ -1585,6 +1602,7 @@ end
 
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
+    if spec.isExcludedVehicle then return end
 
     -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
     -- On a dedicated client, Giants' getMotorLoadPercentage() is derived from
@@ -1764,7 +1782,7 @@ end
 
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then return end
+    if spec.isExcludedVehicle then return end
 
     -- Snapshot for dirty-flag comparison
     local prevServiceLevel = spec.serviceLevel
