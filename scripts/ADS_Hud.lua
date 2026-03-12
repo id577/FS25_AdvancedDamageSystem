@@ -545,6 +545,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local fuelDbg = spec.debugData.fuel or {}
     local workprocessDbg = spec.debugData.workprocess or {}
     local serviceDbg = spec.debugData.service or {}
+    local batteryDbg = spec.debugData.battery or {}
 
     local overviewLines = {}
     local serviceWearRate = serviceDbg.totalWearRate or ADS_Config.CORE.BASE_SERVICE_WEAR or 0
@@ -832,6 +833,21 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     ), {1, 1, 1, 1}, 0.95)
 
+    local batteryLines = {}
+    addLine(batteryLines, string.format(
+        "soc: %.1f%% | alt: %.1fA (k: %.2f) | load: %.1fA [b/l/c/h/p: %.1f/%.1f/%.1f/%.1f/%.1f] | net: %.1fA",
+        asPercent(batteryDbg.soc or spec.batterySoc or 0),
+        batteryDbg.iAltAvail or 0,
+        batteryDbg.altFactor or 0,
+        batteryDbg.iLoads or 0,
+        batteryDbg.baseLoadA or 0,
+        batteryDbg.lightsLoadA or 0,
+        batteryDbg.cabFanA or 0,
+        batteryDbg.winterHeaterA or 0,
+        batteryDbg.peakPulseA or 0,
+        batteryDbg.iNet or 0
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+
     local serviceDataLines = {}
     local states = AdvancedDamageSystem.STATUS
     local isUnderService = spec.currentState ~= states.READY
@@ -922,6 +938,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     table.insert(sections, {title = "Drivetrain", lines = drivetrainLines})
+    table.insert(sections, {title = "Battery", lines = batteryLines})
     if isUnderService then
         table.insert(sections, {title = "Service Data", lines = serviceDataLines})
     end

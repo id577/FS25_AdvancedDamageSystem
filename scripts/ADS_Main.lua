@@ -283,7 +283,10 @@ ADS_Main.workshopCheckTimer = 0
 ADS_Main.isWorkshopOpen = true
 ADS_Main.currentWeather = WeatherType.SUN
 ADS_Main.currentWeatherFactor = 1.0
+ADS_Main.samples = ADS_Main.samples or {}
 
+local xmlFile = loadXMLFile("adsSounds2D", Utils.getFilename("sounds/ads_sounds.xml", g_currentModDirectory))
+ADS_Main.samples.maintenanceCompleted2D = g_soundManager:loadSample2DFromXML(xmlFile, "sounds", "maintenanceCompleted2D", g_currentModDirectory, 1, AudioGroup.GUI)
 
 -- Compute workshop open/close from config hours and current game time.
 -- Runs on all machines for consistent local state.

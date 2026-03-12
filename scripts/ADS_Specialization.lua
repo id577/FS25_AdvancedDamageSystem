@@ -392,7 +392,10 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "updateEngineThermalModel", AdvancedDamageSystem.updateEngineThermalModel)
     SpecializationUtil.registerFunction(vehicleType, "updateTransmissionThermalModel", AdvancedDamageSystem.updateTransmissionThermalModel)
     SpecializationUtil.registerFunction(vehicleType, "getSmoothedTemperature", AdvancedDamageSystem.getSmoothedTemperature)
-    
+     
+    SpecializationUtil.registerFunction(vehicleType, "updateBatteryChargingModel", AdvancedDamageSystem.updateBatteryChargingModel)
+    SpecializationUtil.registerFunction(vehicleType, "updateBatterySoc", AdvancedDamageSystem.updateBatterySoc)
+
     SpecializationUtil.registerFunction(vehicleType, "resetAiWorkerCruiseControlState", AdvancedDamageSystem.resetAiWorkerCruiseControlState)
     SpecializationUtil.registerFunction(vehicleType, "getAiWorkerImplementSpeedLimit", AdvancedDamageSystem.getAiWorkerImplementSpeedLimit)
     SpecializationUtil.registerFunction(vehicleType, "updateAiWorkerCruiseControl", AdvancedDamageSystem.updateAiWorkerCruiseControl)
@@ -843,6 +846,13 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem._fuelUsageRaw  = 0
     self.spec_AdvancedDamageSystem._prevSyncFuelUsage = 0
 
+    self.spec_AdvancedDamageSystem.batterySoc = 1.0
+    self.spec_AdvancedDamageSystem.batteryHealth = 1.0
+    self.spec_AdvancedDamageSystem.batteryCapacityAh = 150
+    self.spec_AdvancedDamageSystem.batteryRint = 0
+    self.spec_AdvancedDamageSystem.alternatorHealth = 1.0
+    self.spec_AdvancedDamageSystem.alternatorMaxA = 100
+
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
     self.spec_AdvancedDamageSystem._netTargetEngineTemp = nil
@@ -1023,6 +1033,20 @@ function AdvancedDamageSystem:onLoad(savegame)
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
+        },
+
+        battery = {
+            soc = 1.0,
+            iAltAvail = 0,
+            iLoads = 0,
+            baseLoadA = 0,
+            lightsLoadA = 0,
+            cabFanA = 0,
+            winterHeaterA = 0,
+            peakPulseA = 0,
+            iNet = 0,
+            dAh = 0,
+            altFactor = 0
         },
 
         engineTemp = {
@@ -1427,8 +1451,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.wheelSeizureGrind = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "wheelSeizureGrind", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.gearDisengage1 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "gearDisengage1", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.engineKnocking = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "engineKnocking", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
-         spec.samples.valveTrainNoise = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "valveTrainNoise", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
-        spec.samples.maintenanceCompleted = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "maintenanceCompleted", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.valveTrainNoise = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "valveTrainNoise", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         delete(xmlSoundFile)
     else
         log_dbg("ERROR: AdvancedDamageSystem - Could not load ads_sounds.xml")
@@ -1775,6 +1798,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local prevTotalBreakdowns = spec.totalBreakdownsOccurred
 
     self:updateThermalSystems(dt)
+    self:updateBatteryChargingModel(dt)
 
     if self:isUnderService() then
         self:processService(dt)
@@ -4577,12 +4601,14 @@ function AdvancedDamageSystem:completeService()
     end
 
     -- Guarded: dedicated server has no HUD
-    if g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
+    if g_currentMission:getFarmId() == self.ownerFarmId and g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
         g_currentMission.hud:addSideNotification({1, 1, 1, 1}, maintenanceCompletedText)
     end
-    if g_soundManager ~= nil and spec.samples ~= nil and spec.samples.maintenanceCompleted ~= nil then
-        g_soundManager:playSample(spec.samples.maintenanceCompleted)
+
+    if g_currentMission:getFarmId() == self.ownerFarmId and ADS_Main.samples ~= nil and ADS_Main.samples.maintenanceCompleted2D ~= nil then
+        g_soundManager:playSample(ADS_Main.samples.maintenanceCompleted2D)
     end
+
 
     -- Sync maintenance log
     if self.isServer and spec.adsDirtyFlag_meta ~= nil then
@@ -4759,6 +4785,158 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
 
     if self.isServer then
         table.insert(spec._pendingNetLogEntries, entry)
+    end
+end
+
+
+-- ==========================================================
+--                       ELECTRICAL
+-- ==========================================================
+
+function AdvancedDamageSystem:updateBatteryChargingModel(dt)
+
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    if spec.debugData == nil then
+        spec.debugData = {}
+    end
+    if spec.debugData.battery == nil then
+        spec.debugData.battery = {}
+    end
+
+    local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
+    local iAltAvail = AdvancedDamageSystem.calculateAlternatorOutput(self, isMotorStarted)
+    local iLoads =  AdvancedDamageSystem.calculateCurrentLoadAmps(self, isMotorStarted)
+    self:updateBatterySoc(dt, iAltAvail, iLoads)
+end
+
+function AdvancedDamageSystem.calculateAlternatorOutput(vehicle, isMotorStarted)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    local iAltAvail = 0
+    local altFactor = 0
+
+    if isMotorStarted then
+        local motor = vehicle:getMotor()
+        if motor ~= nil then
+            local lastRpm = motor:getLastModulatedMotorRpm() or 0
+            local maxRpm = math.max(motor.maxRpm or 1, 1)
+            local rpmLoad = lastRpm / maxRpm
+            altFactor = math.clamp(rpmLoad, 0, 1)
+            iAltAvail= (spec.alternatorMaxA or 0) * altFactor * (spec.alternatorHealth or 1)
+        end
+    end
+
+    if ADS_Config.DEBUG then
+        spec.debugData.battery.iAltAvail = iAltAvail or 0
+        spec.debugData.battery.altFactor = altFactor or 0
+    end
+    return iAltAvail
+end
+
+function AdvancedDamageSystem.calculateCurrentLoadAmps(vehicle, isMotorStarted)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+   -- base load
+    local baseLoadA = isMotorStarted and 18 or 0.3
+
+    -- cab fan
+    local cabFanA = isMotorStarted and 12 or 0
+
+    -- heater
+    local winterHeaterA = 0
+    local enviromentTemp = 15
+    if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather ~= nil then
+        local weather = g_currentMission.environment.weather.forecast:getCurrentWeather()
+        enviromentTemp = (weather ~= nil and weather.temperature) or 15
+    end
+    if isMotorStarted and enviromentTemp <= 15 then
+        winterHeaterA = 20 * ((15 - enviromentTemp) / 15)
+
+    end
+
+    -- lights (3 load levels by active main lights mask)
+    local lightsLoadA = 0
+    if vehicle.spec_lights ~= nil and vehicle.getLightsTypesMask ~= nil then
+        local lightsSpec = vehicle.spec_lights
+        local lightsMask = tonumber(vehicle:getLightsTypesMask()) or 0
+        local maxLightStateMask = tonumber(lightsSpec.maxLightStateMask) or 0
+        local activeMainLightsMask = lightsMask
+
+        if maxLightStateMask > 0 and bitAND ~= nil then
+            activeMainLightsMask = bitAND(lightsMask, maxLightStateMask)
+        end
+
+        if activeMainLightsMask > 0 then
+            local lightStateLevel = 1
+            if maxLightStateMask > 0 then
+                local normalizedMask = activeMainLightsMask / maxLightStateMask
+                if normalizedMask <= (1 / 3) then
+                    lightStateLevel = 1
+                elseif normalizedMask <= (2 / 3) then
+                    lightStateLevel = 2
+                else
+                    lightStateLevel = 3
+                end
+            else
+                if activeMainLightsMask <= 1 then
+                    lightStateLevel = 1
+                elseif activeMainLightsMask <= 2 then
+                    lightStateLevel = 2
+                else
+                    lightStateLevel = 3
+                end
+            end
+
+            lightsLoadA = (20 / 3) * lightStateLevel
+        end
+    end
+
+    -- pulse
+    local peakPulse = isMotorStarted and (20 * math.random()) or 0
+
+    -- total
+    local iLoads = baseLoadA + lightsLoadA + cabFanA + winterHeaterA + peakPulse
+
+    if ADS_Config.DEBUG then
+        local dbg = spec.debugData.battery
+        dbg.iLoads = iLoads
+        dbg.baseLoadA = baseLoadA
+        dbg.lightsLoadA = lightsLoadA
+        dbg.cabFanA = cabFanA
+        dbg.winterHeaterA = winterHeaterA
+        dbg.peakPulseA = peakPulse
+    end
+
+    return iLoads
+end
+
+function AdvancedDamageSystem:updateBatterySoc(dt, iAltAvail, iLoads)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    local iNet = iAltAvail - iLoads
+    local dAh = iNet * dt / (60 * 60 * 1000)
+    local capacityAh = math.max(spec.batteryCapacityAh or 0, 1)
+    local health = math.max(spec.batteryHealth or 0, 0.01)
+    spec.batterySoc = math.clamp((spec.batterySoc or 1) + dAh / (capacityAh * health), 0, 1)
+
+    if ADS_Config.DEBUG then
+        local dbg = spec.debugData.battery
+        dbg.soc = spec.batterySoc or 0
+        dbg.iNet = iNet
+        dbg.dAh = dAh
     end
 end
 

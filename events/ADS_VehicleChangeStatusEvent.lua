@@ -44,12 +44,11 @@ function ADS_VehicleChangeStatusEvent:run(connection)
 
         -- Client-side: show HUD notification + play completion sound
         if connection:getIsServer() and self.notificationText ~= nil and self.notificationText ~= "" then
-            if g_currentMission ~= nil and g_currentMission.hud ~= nil then
+            if g_currentMission:getFarmId() == self.vehicle.ownerFarmId and g_currentMission ~= nil and g_currentMission.hud ~= nil then
                 g_currentMission.hud:addSideNotification({1, 1, 1, 1}, self.notificationText)
             end
-            local spec = self.vehicle.spec_AdvancedDamageSystem
-            if spec ~= nil and spec.samples ~= nil and spec.samples.maintenanceCompleted ~= nil then
-                g_soundManager:playSample(spec.samples.maintenanceCompleted)
+            if g_currentMission:getFarmId() == self.vehicle.ownerFarmId and ADS_Main.samples ~= nil and ADS_Main.samples.maintenanceCompleted2D ~= nil then
+                g_soundManager:playSample(ADS_Main.samples.maintenanceCompleted2D)
             end
         end
 
