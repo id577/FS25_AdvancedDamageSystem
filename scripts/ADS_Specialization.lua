@@ -343,6 +343,10 @@ function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "setLightsTypesMask", ADS_Breakdowns.setLightsTypesMask)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getSpeedLimit", ADS_Breakdowns.getSpeedLimitOverwrite)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateVehiclePhysics", ADS_Breakdowns.updateVehiclePhysics)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsDischargeNodeActive", ADS_Breakdowns.getIsDischargeNodeActiveOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateConsumers", ADS_Breakdowns.updateConsumersOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "addCutterArea", ADS_Breakdowns.addCutterAreaOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDischargeNodeEmptyFactor", ADS_Breakdowns.getDischargeNodeEmptyFactorOverwrite)
 end
 
 function AdvancedDamageSystem.registerFunctions(vehicleType)
