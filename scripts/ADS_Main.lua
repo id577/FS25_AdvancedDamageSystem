@@ -115,7 +115,6 @@ end
 -- ==========================================================
 
 function ADS_Main:onStartMission()
-    
     ADS_WorkshopDialog.register()
     ADS_MaintenanceLogDialog.register()
     ADS_ReportDialog.register()
