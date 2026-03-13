@@ -273,6 +273,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#serviceOptionOne", "Current Service Option One")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#serviceOptionTwo", "Current Service Option Two")
     schemaSavegame:register(XMLValueType.BOOL,   baseKey .. "#serviceOptionThree", "Current Service Option Three")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#workshopType", "Workshop Type")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingSelectedBreakdowns", "Pending Selected Breakdowns")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingServicePrice", "Pending Service Price")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingInspectionQueue", "Pending Inspection Queue")
@@ -341,6 +342,12 @@ function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "startMotor", ADS_Breakdowns.startMotor)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateDamageAmount", ADS_Breakdowns.updateDamageAmount)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "setLightsTypesMask", ADS_Breakdowns.setLightsTypesMask)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getSpeedLimit", ADS_Breakdowns.getSpeedLimitOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateVehiclePhysics", ADS_Breakdowns.updateVehiclePhysics)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getIsDischargeNodeActive", ADS_Breakdowns.getIsDischargeNodeActiveOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateConsumers", ADS_Breakdowns.updateConsumersOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "addCutterArea", ADS_Breakdowns.addCutterAreaOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDischargeNodeEmptyFactor", ADS_Breakdowns.getDischargeNodeEmptyFactorOverwrite)
 end
 
 function AdvancedDamageSystem.registerFunctions(vehicleType)
@@ -562,7 +569,7 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
     self:recalculateAndApplyIndicators()
 end
 
---- Differential update sync (server -> client, 5 dirty-flag groups).
+--- Differential update sync (server -> client, 4 dirty-flag groups).
 function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMask)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil or spec.isExcludedVehicle then return end
@@ -603,16 +610,7 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
             streamWriteFloat32(streamId, spec.pendingProgressTotalTime or 0)
             streamWriteFloat32(streamId, spec.pendingProgressElapsedTime or 0)
         end
-
-        -- [5] Meta (pending log entries)
-        if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_meta) ~= 0) then
-            local pending = spec._pendingNetLogEntries or {}
-            streamWriteUInt8(streamId, #pending)
-            for _, entry in ipairs(pending) do
-                streamWriteString(streamId, ADS_Utils.serializeMaintenanceLogEntry(entry))
-            end
-            spec._pendingNetLogEntries = {}
-        end
+        -- [5] Log entries are now synced via ADS_LogEntrySyncEvent (broadcast).
     end
 end
 
@@ -679,17 +677,7 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             spec.pendingProgressTotalTime = streamReadFloat32(streamId)
             spec.pendingProgressElapsedTime = streamReadFloat32(streamId)
         end
-
-        -- [5] Meta (pending log entries)
-        if streamReadBool(streamId) then
-            local count = streamReadUInt8(streamId)
-            for i = 1, count do
-                local entry = ADS_Utils.deserializeMaintenanceLogEntry(streamReadString(streamId))
-                if entry ~= nil then
-                    table.insert(spec.maintenanceLog, entry)
-                end
-            end
-        end
+        -- [5] Log entries are now synced via ADS_LogEntrySyncEvent (broadcast).
     end
 end
 
@@ -724,6 +712,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#serviceOptionOne", spec.serviceOptionOne or "")
         xmlFile:setValue(key .. "#serviceOptionTwo", spec.serviceOptionTwo or "")
         xmlFile:setValue(key .. "#serviceOptionThree", spec.serviceOptionThree or false)
+        xmlFile:setValue(key .. "#workshopType", spec.workshopType or "")
         xmlFile:setValue(key .. "#pendingSelectedBreakdowns", table.concat(spec.pendingSelectedBreakdowns or {}, ","))
         xmlFile:setValue(key .. "#pendingServicePrice", ADS_Utils.encodeOptionalFloat(spec.pendingServicePrice))
         xmlFile:setValue(key .. "#pendingInspectionQueue", table.concat(spec.pendingInspectionQueue or {}, ","))
@@ -1137,10 +1126,8 @@ function AdvancedDamageSystem:onLoad(savegame)
         self.spec_AdvancedDamageSystem.adsDirtyFlag_systems = self:getNextDirtyFlag()    -- [2] condition / per-system
         self.spec_AdvancedDamageSystem.adsDirtyFlag_breakdown = self:getNextDirtyFlag()  -- [3] active breakdowns
         self.spec_AdvancedDamageSystem.adsDirtyFlag_service = self:getNextDirtyFlag()    -- [4] progress counters
-        self.spec_AdvancedDamageSystem.adsDirtyFlag_meta = self:getNextDirtyFlag()       -- [5] maintenance log
+        -- [5] maintenance log entries are now synced via ADS_LogEntrySyncEvent (broadcast)
     end
-
-    self.spec_AdvancedDamageSystem._pendingNetLogEntries = {}
 end
 
 function AdvancedDamageSystem:onPostLoad(savegame)
@@ -1204,6 +1191,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.serviceOptionOne == "" then spec.serviceOptionOne = nil end
         if spec.serviceOptionTwo == "" then spec.serviceOptionTwo = nil end
         spec.serviceOptionThree = savegame.xmlFile:getValue(key .. "#serviceOptionThree", spec.serviceOptionThree)
+        local loadedWorkshopType = savegame.xmlFile:getValue(key .. "#workshopType", "")
+        if loadedWorkshopType ~= nil and loadedWorkshopType ~= "" then
+            spec.workshopType = loadedWorkshopType
+        end
         spec.pendingServicePrice = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingServicePrice", spec.pendingServicePrice))
         spec.pendingSelectedBreakdowns = {}
         local pendingSelBdStr = savegame.xmlFile:getValue(key .. "#pendingSelectedBreakdowns", "")
@@ -4632,9 +4623,12 @@ function AdvancedDamageSystem:completeService()
     end
 
 
-    -- Sync maintenance log
-    if self.isServer and spec.adsDirtyFlag_meta ~= nil then
-        self:raiseDirtyFlags(spec.adsDirtyFlag_meta)
+    -- Sync maintenance log to all clients via dedicated event
+    if self.isServer then
+        local lastEntry = spec.maintenanceLog and spec.maintenanceLog[#spec.maintenanceLog]
+        if lastEntry ~= nil then
+            ADS_LogEntrySyncEvent.sendToClients(self, lastEntry)
+        end
     end
 
     spec.maintenanceTimer = 0
@@ -4748,9 +4742,12 @@ function AdvancedDamageSystem:cancelService()
         g_currentMission.hud:addSideNotification({1, 1, 1, 1}, cancelText)
     end
 
-    -- Sync maintenance log
-    if self.isServer and spec.adsDirtyFlag_meta ~= nil then
-        self:raiseDirtyFlags(spec.adsDirtyFlag_meta)
+    -- Sync maintenance log to all clients via dedicated event
+    if self.isServer then
+        local lastEntry = spec.maintenanceLog and spec.maintenanceLog[#spec.maintenanceLog]
+        if lastEntry ~= nil then
+            ADS_LogEntrySyncEvent.sendToClients(self, lastEntry)
+        end
     end
 
     spec.maintenanceTimer = 0
@@ -4812,10 +4809,6 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
 
     table.insert(spec.maintenanceLog, entry)
     spec.lastLogEntry = entry
-
-    if self.isServer then
-        table.insert(spec._pendingNetLogEntries, entry)
-    end
 end
 
 
@@ -6484,7 +6477,7 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
             entry.conditionData.operatingHours = targetOpHours
             entry.conditionData.service = value
             if vehicle.isServer then
-                table.insert(spec._pendingNetLogEntries, entry)
+                ADS_LogEntrySyncEvent.sendToClients(vehicle, entry)
             end
             found = true
             break
@@ -6526,7 +6519,7 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
             entry.conditionData.condition = 1.0
             entry.conditionData.service = 1.0
             if vehicle.isServer then
-                table.insert(spec._pendingNetLogEntries, entry)
+                ADS_LogEntrySyncEvent.sendToClients(vehicle, entry)
             end
             found = true
             break

@@ -126,9 +126,6 @@ function ADS_ConsoleCommandEvent:run(connection)
         if spec.adsDirtyFlag_service ~= nil then
             self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_service)
         end
-        if spec.adsDirtyFlag_meta ~= nil then
-            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_meta)
-        end
     end
 
     if self.commandName == "setConfigVar" or self.commandName == "debug" then
