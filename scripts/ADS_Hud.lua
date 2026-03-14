@@ -852,18 +852,68 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {1, 1, 1, 1}, 0.95)
 
     local batteryLines = {}
+    local soc = batteryDbg.soc or spec.batterySoc or 0
+    local ocvV = batteryDbg.ocvV or 0
+    local termV = batteryDbg.termV or spec.batteryVoltageV or ocvV
+    local tempC = batteryDbg.batteryTempC or spec.batteryTempC or 0
+    local targetC = batteryDbg.battTempTargetC or 0
+    local iAlt = batteryDbg.iAltAvail or 0
+    local iLoads = batteryDbg.iLoads or 0
+    local iNetRaw = batteryDbg.iNetRaw or (iAlt - iLoads)
+    local iNet = batteryDbg.iNet or iNetRaw
+    local iBatteryA = batteryDbg.iBatteryA or math.abs(iNetRaw)
+
     addLine(batteryLines, string.format(
-        "soc: %.1f%% | alt: %.1fA (k: %.2f) | load: %.1fA [b/l/c/h/p: %.1f/%.1f/%.1f/%.1f/%.1f] | net: %.1fA",
-        asPercent(batteryDbg.soc or spec.batterySoc or 0),
-        batteryDbg.iAltAvail or 0,
+        "state: soc %.1f%% | term %.2fV (ocv %.2f) | temp %.1fC -> %.1fC",
+        asPercent(soc),
+        termV,
+        ocvV,
+        tempC,
+        targetC
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+
+    addLine(batteryLines, string.format(
+        "flow: alt %.1fA (raw %.1f, k %.2f) | load %.1fA | net %.1fA (raw %.1fA) | iBat %.1fA",
+        iAlt,
+        batteryDbg.iAltRaw or iAlt,
         batteryDbg.altFactor or 0,
-        batteryDbg.iLoads or 0,
+        iLoads,
+        iNet,
+        iNetRaw,
+        iBatteryA
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+
+    addLine(batteryLines, string.format(
+        "loads [b/l/c/h/p]: %.1f/%.1f/%.1f/%.1f/%.1f A",
         batteryDbg.baseLoadA or 0,
         batteryDbg.lightsLoadA or 0,
         batteryDbg.cabFanA or 0,
         batteryDbg.winterHeaterA or 0,
-        batteryDbg.peakPulseA or 0,
-        batteryDbg.iNet or 0
+        batteryDbg.peakPulseA or 0
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+
+    addLine(batteryLines, string.format(
+        "model: acc %.3f (t %.3f * s %.3f) | cap %.1fAh * %.3f * h %.3f = %.1fAh | rInt %.5f (f %.3f) | p %.1fW dT %.4fC",
+        batteryDbg.acceptK or 1,
+        batteryDbg.acceptTempK or 1,
+        batteryDbg.acceptSocK or 1,
+        batteryDbg.capacityNominalAh or spec.batteryCapacityAh or 0,
+        batteryDbg.capacityFactor or 1,
+        batteryDbg.batteryHealth or spec.batteryHealth or 0,
+        batteryDbg.capacityEffectiveAh or spec.batteryCapacityAh or 0,
+        batteryDbg.rIntOhm or 0,
+        batteryDbg.rintFactor or 1,
+        batteryDbg.pJouleW or 0,
+        batteryDbg.dTJoule or 0
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+    addLine(batteryLines, string.format(
+        "vdrop/rise: load %.2fV | crank %.2fV | rise %.2fV | cranking %d | iDis/iCh %.1f/%.1fA",
+        batteryDbg.termLoadDropV or 0,
+        batteryDbg.termCrankDropV or 0,
+        batteryDbg.termChargeRiseV or 0,
+        batteryDbg.termIsCranking or 0,
+        batteryDbg.termDischargeA or 0,
+        batteryDbg.termChargeA or 0
     ), {0.9, 1.0, 0.9, 1}, 0.95)
 
     local serviceDataLines = {}

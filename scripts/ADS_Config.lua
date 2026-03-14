@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 63,
+    VER = 75,
 
     DEBUG = false,
 
@@ -221,8 +221,6 @@ ADS_Config = {
             CRITICAL_DEGREE = 5
         },
     },
-
-
     -- ====================================================================================
     -- WORKSHOP PARAMETERS
     -- Controls workshop operating hours, which affects maintenance/repair completion times.
@@ -239,8 +237,6 @@ ADS_Config = {
             [3] = 0.8, OWN = 0.8,
         },
     },
-
-
     -- ====================================================================================
     -- MAINTENANCE & REPAIR PARAMETERS
     -- Controls the time and cost of all service types.
@@ -339,7 +335,6 @@ ADS_Config = {
         AGE_FACTOR_PRICE_FACTOR = 0.01,
         OWN_WORKSHOP_PRICE_MULTIPLIER = 0.8,
     },
-
     -- ====================================================================================
     -- THERMAL DYNAMICS PARAMETERS
     -- Controls engine and transmission temperature simulation.
@@ -433,6 +428,42 @@ ADS_Config = {
         ELECTRONIC_THERMOSTAT_MAX_STICTION = 0.05
     },
 
+    ELECTRICAL = {
+        BATTART_NOMINAL_CAPACITY = 150,
+        BATTERY_USABLE_CAPACITY_FACTOR = 0.2,
+        AMBIENT_DEFAULT_C = 15,
+        BATTERY_THERMAL_TAU_S = 600,
+        BATTERY_THERMAL_CAPACITY_J_PER_K = 3600,
+        ENGINE_BAY_COUPLING = 0.30,
+        RINT_REF_OHM = 0.06,
+        OCV_EMPTY_V = 11.7,
+        OCV_FULL_V = 12.7,
+        BATTERY_LOAD_DROP_PER_20A_V = 0.10,
+        BATTERY_LOAD_DROP_MIN_V = 12.2,
+        BATTERY_LOAD_IR_SCALE = 0.0,
+        BATTERY_CRANK_MIN_V = 10.0,
+        BATTERY_CRANK_CURRENT_A = 250,
+        BATTERY_CRANK_DROP_MULT = 2.0,
+        BATTERY_CHARGE_RISE_PER_20A_V = 0.18,
+        BATTERY_CHARGE_RISE_MAX_V = 1.6,
+        BATTERY_CHARGE_TARGET_MAX_V = 14.4,
+        BATTERY_CHARGE_IR_SCALE = 0.0,
+        BATTERY_TERMINAL_MIN_V = 8.5,
+        BATTERY_TERMINAL_MAX_V = 14.8,
+        CHARGE_ACCEPT_TEMP_MIN_C = -15,
+        CHARGE_ACCEPT_TEMP_MAX_C = 25,
+        CHARGE_TAPER_SOC_START = 0.80,
+        CHARGE_TAPER_SOC_END = 0.98,
+        ALT_MAX_OUTPUT = 100,
+        ALT_IDLE_FACTOR = 0.30,
+        ALT_RPM_CURVE = {
+            {0.00, 0.30},
+            {0.25, 0.55},
+            {0.50, 0.80},
+            {0.75, 0.95},
+            {1.00, 1.00}
+        }
+    },
 
     -- ====================================================================================
     -- BRAND CHARACTERISTICS
@@ -509,7 +540,6 @@ ADS_Config = {
             PORSCHEDIESEL   = {0.70, 1.30},
             OLIVER          = {0.85, 1.25}, 
             ALLISCHALMERS   = {0.85, 1.25},
-
 
             LIZARD          = {1.00, 1.00},
             GIANTS          = {1.00, 1.00},

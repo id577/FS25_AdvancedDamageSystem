@@ -2765,7 +2765,6 @@ function ADS_Breakdowns.getIsDischargeNodeActiveOverwrite(vehicle, superFunc, di
 end
 
 -- ==========================================================
-
 -- PTO_FAILURE
 ADS_Breakdowns.EffectApplicators.PTO_FAILURE = {
     getEffectName = function() return "PTO_FAILURE" end,
@@ -2984,7 +2983,6 @@ ADS_Breakdowns.EffectApplicators.WHEEL_SEIZURE_EFFECT = {
 }
 
 -- ENGINE_HESITATION_CHANCE
-
 ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
     getEffectName = function() return "ENGINE_HESITATION_CHANCE" end,
 

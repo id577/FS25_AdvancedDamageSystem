@@ -401,8 +401,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getSmoothedTemperature", AdvancedDamageSystem.getSmoothedTemperature)
      
     SpecializationUtil.registerFunction(vehicleType, "updateBatteryChargingModel", AdvancedDamageSystem.updateBatteryChargingModel)
-    SpecializationUtil.registerFunction(vehicleType, "updateBatterySoc", AdvancedDamageSystem.updateBatterySoc)
-
+    
     SpecializationUtil.registerFunction(vehicleType, "resetAiWorkerCruiseControlState", AdvancedDamageSystem.resetAiWorkerCruiseControlState)
     SpecializationUtil.registerFunction(vehicleType, "getAiWorkerImplementSpeedLimit", AdvancedDamageSystem.getAiWorkerImplementSpeedLimit)
     SpecializationUtil.registerFunction(vehicleType, "updateAiWorkerCruiseControl", AdvancedDamageSystem.updateAiWorkerCruiseControl)
@@ -841,10 +840,10 @@ function AdvancedDamageSystem:onLoad(savegame)
 
     self.spec_AdvancedDamageSystem.batterySoc = 1.0
     self.spec_AdvancedDamageSystem.batteryHealth = 1.0
-    self.spec_AdvancedDamageSystem.batteryCapacityAh = 150
-    self.spec_AdvancedDamageSystem.batteryRint = 0
+    self.spec_AdvancedDamageSystem.batteryCapacityAh = ADS_Config.ELECTRICAL.BATTART_NOMINAL_CAPACITY
+    self.spec_AdvancedDamageSystem.batteryTempC = 0
+    self.spec_AdvancedDamageSystem.batteryVoltageV = 0
     self.spec_AdvancedDamageSystem.alternatorHealth = 1.0
-    self.spec_AdvancedDamageSystem.alternatorMaxA = 100
 
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
@@ -3956,9 +3955,6 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     end
 end
 
-
-
-
 function AdvancedDamageSystem:processPlannedBreakdowns(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systems = spec.systems
@@ -4816,54 +4812,120 @@ end
 --                       ELECTRICAL
 -- ==========================================================
 
-function AdvancedDamageSystem:updateBatteryChargingModel(dt)
-
-    local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then
-        return
+local function getBatteryTempFactors(tempC)
+    local cap = 1.0
+    if tempC < 25 then
+        cap = math.clamp(1.0 - (25 - tempC) * 0.004, 0.55, 1.0)
     end
 
-    if spec.debugData == nil then
-        spec.debugData = {}
-    end
-    if spec.debugData.battery == nil then
-        spec.debugData.battery = {}
+    local rint = 1.0
+    if tempC < 20 then
+        rint = 1.0 + (20 - tempC) * 0.02
     end
 
-    local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
-    local iAltAvail = AdvancedDamageSystem.calculateAlternatorOutput(self, isMotorStarted)
-    local iLoads =  AdvancedDamageSystem.calculateCurrentLoadAmps(self, isMotorStarted)
-    self:updateBatterySoc(dt, iAltAvail, iLoads)
+    return cap, rint
 end
 
-function AdvancedDamageSystem.calculateAlternatorOutput(vehicle, isMotorStarted)
+local getBatteryChargeAcceptance
+
+local function evaluateAlternatorRpmCurve(curveData, rpmNorm)
+    rpmNorm = math.clamp(rpmNorm or 0, 0, 1)
+    if type(curveData) ~= "table" then
+        return nil
+    end
+
+    local points = {}
+    for _, point in pairs(curveData) do
+        local x, y
+        if type(point) == "table" then
+            x = tonumber(point.x or point.rpm or point.rpmNorm or point[1])
+            y = tonumber(point.y or point.factor or point.output or point[2])
+        end
+
+        if x ~= nil and y ~= nil then
+            table.insert(points, {
+                x = math.clamp(x, 0, 1),
+                y = math.max(y, 0)
+            })
+        end
+    end
+
+    if #points == 0 then
+        return nil
+    end
+
+    table.sort(points, function(a, b) return a.x < b.x end)
+
+    if rpmNorm <= points[1].x then
+        return points[1].y
+    end
+
+    for i = 2, #points do
+        local p0 = points[i - 1]
+        local p1 = points[i]
+        if rpmNorm <= p1.x then
+            local span = math.max(p1.x - p0.x, 0.000001)
+            local t = (rpmNorm - p0.x) / span
+            return p0.y + (p1.y - p0.y) * t
+        end
+    end
+
+    return points[#points].y
+end
+
+local function calculateAlternatorOutput(vehicle, isMotorStarted, iLoads)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
         return
     end
 
+    local cfg = ADS_Config.ELECTRICAL or {}
     local iAltAvail = 0
+    local iAltRaw = 0
     local altFactor = 0
+    local acceptK, tempK, socK = 1.0, 1.0, 1.0
 
     if isMotorStarted then
         local motor = vehicle:getMotor()
         if motor ~= nil then
             local lastRpm = motor:getLastModulatedMotorRpm() or 0
             local maxRpm = math.max(motor.maxRpm or 1, 1)
-            local rpmLoad = lastRpm / maxRpm
-            altFactor = math.clamp(rpmLoad, 0, 1)
-            iAltAvail= (spec.alternatorMaxA or 0) * altFactor * (spec.alternatorHealth or 1)
+            local rpmNorm = math.clamp(lastRpm / maxRpm, 0, 1)
+
+            local curveFactor = evaluateAlternatorRpmCurve(cfg.ALT_RPM_CURVE, rpmNorm)
+            if curveFactor == nil then
+                local idleFactor = math.clamp(cfg.ALT_IDLE_FACTOR or 0.25, 0, 1)
+                curveFactor = idleFactor + (1 - idleFactor) * rpmNorm
+            end
+
+            altFactor = math.max(curveFactor, 0)
+            iAltRaw = (ADS_Config.ELECTRICAL.ALT_MAX_OUTPUT or 0) * altFactor * math.max(spec.alternatorHealth or 1, 0)
+
+            local loadA = math.max(iLoads or 0, 0)
+            local chargeHeadroomA = math.max(iAltRaw - loadA, 0)
+            acceptK, tempK, socK = getBatteryChargeAcceptance(spec.batteryTempC, spec.batterySoc)
+
+            if iAltRaw <= loadA then
+                iAltAvail = iAltRaw
+            else
+                iAltAvail = loadA + chargeHeadroomA * acceptK
+            end
         end
     end
 
     if ADS_Config.DEBUG then
-        spec.debugData.battery.iAltAvail = iAltAvail or 0
-        spec.debugData.battery.altFactor = altFactor or 0
+        local dbg = spec.debugData.battery
+        dbg.iAltAvail = iAltAvail or 0
+        dbg.iAltRaw = iAltRaw or 0
+        dbg.altFactor = altFactor or 0
+        dbg.acceptK = acceptK
+        dbg.acceptTempK = tempK
+        dbg.acceptSocK = socK
     end
     return iAltAvail
 end
 
-function AdvancedDamageSystem.calculateCurrentLoadAmps(vehicle, isMotorStarted)
+local function calculateCurrentLoadAmps(vehicle, isMotorStarted, envTemp)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
         return
@@ -4877,13 +4939,9 @@ function AdvancedDamageSystem.calculateCurrentLoadAmps(vehicle, isMotorStarted)
 
     -- heater
     local winterHeaterA = 0
-    local enviromentTemp = 15
-    if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather ~= nil then
-        local weather = g_currentMission.environment.weather.forecast:getCurrentWeather()
-        enviromentTemp = (weather ~= nil and weather.temperature) or 15
-    end
-    if isMotorStarted and enviromentTemp <= 15 then
-        winterHeaterA = 20 * ((15 - enviromentTemp) / 15)
+
+    if isMotorStarted and envTemp <= 15 then
+        winterHeaterA = 20 * ((15 - envTemp) / 15)
 
     end
 
@@ -4901,34 +4959,26 @@ function AdvancedDamageSystem.calculateCurrentLoadAmps(vehicle, isMotorStarted)
 
         if activeMainLightsMask > 0 then
             local lightStateLevel = 1
-            if maxLightStateMask > 0 then
-                local normalizedMask = activeMainLightsMask / maxLightStateMask
-                if normalizedMask <= (1 / 3) then
+            if activeMainLightsMask == 1 then
                     lightStateLevel = 1
-                elseif normalizedMask <= (2 / 3) then
+            elseif activeMainLightsMask == 3 then
                     lightStateLevel = 2
-                else
+            elseif activeMainLightsMask == 7 then
                     lightStateLevel = 3
-                end
-            else
-                if activeMainLightsMask <= 1 then
-                    lightStateLevel = 1
-                elseif activeMainLightsMask <= 2 then
-                    lightStateLevel = 2
-                else
-                    lightStateLevel = 3
-                end
+            elseif activeMainLightsMask == 23 then
+                lightStateLevel = 4
             end
-
             lightsLoadA = (20 / 3) * lightStateLevel
         end
     end
 
     -- pulse
-    local peakPulse = isMotorStarted and (20 * math.random()) or 0
+    local isPeakPulse = math.random() > 0.95
+    local nominalPulse = isPeakPulse and 20 or 2
+    local pulse = isMotorStarted and (nominalPulse * math.random()) or 0
 
     -- total
-    local iLoads = baseLoadA + lightsLoadA + cabFanA + winterHeaterA + peakPulse
+    local iLoads = baseLoadA + lightsLoadA + cabFanA + winterHeaterA + pulse
 
     if ADS_Config.DEBUG then
         local dbg = spec.debugData.battery
@@ -4937,30 +4987,266 @@ function AdvancedDamageSystem.calculateCurrentLoadAmps(vehicle, isMotorStarted)
         dbg.lightsLoadA = lightsLoadA
         dbg.cabFanA = cabFanA
         dbg.winterHeaterA = winterHeaterA
-        dbg.peakPulseA = peakPulse
+        dbg.peakPulseA = pulse
     end
 
     return iLoads
 end
 
-function AdvancedDamageSystem:updateBatterySoc(dt, iAltAvail, iLoads)
-    local spec = self.spec_AdvancedDamageSystem
+local function smoothstep(x)
+    x = math.clamp(x, 0, 1)
+    return x * x * (3 - 2 * x)
+end
+
+local function getBatteryOpenCircuitVoltage(soc)
+    local C = ADS_Config.ELECTRICAL or {}
+    local vEmpty = C.OCV_EMPTY_V
+    local vFull = C.OCV_FULL_V
+
+    soc = math.clamp(soc or 0, 0, 1)
+
+    local shapedSoc = 0.65 * smoothstep(soc) + 0.35 * soc
+    return vEmpty + (vFull - vEmpty) * shapedSoc
+end
+
+local function getBatteryTerminalVoltage(ocvV, iAltAvail, iLoads, isCranking, rIntOhm)
+    local C = ADS_Config.ELECTRICAL or {}
+
+    local loadDropPer20A = C.BATTERY_LOAD_DROP_PER_20A_V or 0.10
+    local loadFloorV = C.BATTERY_LOAD_DROP_MIN_V or 12.2
+    local loadIrScale = C.BATTERY_LOAD_IR_SCALE or 0.0
+
+    local crankMinV = C.BATTERY_CRANK_MIN_V or 10.0
+    local crankCurrentA = C.BATTERY_CRANK_CURRENT_A or 250
+    local crankDropMult = C.BATTERY_CRANK_DROP_MULT or 2.0
+    local chargeRisePer20A = C.BATTERY_CHARGE_RISE_PER_20A_V or 0.18
+    local chargeRiseMaxV = C.BATTERY_CHARGE_RISE_MAX_V or 1.6
+    local chargeTargetMaxV = C.BATTERY_CHARGE_TARGET_MAX_V or 14.4
+    local chargeIrScale = C.BATTERY_CHARGE_IR_SCALE or 0.0
+
+    local termMinV = C.BATTERY_TERMINAL_MIN_V or 8.5
+    local termMaxV = C.BATTERY_TERMINAL_MAX_V or 14.8
+
+    local iAlt = math.max(iAltAvail or 0, 0)
+    local iLoad = math.max(iLoads or 0, 0)
+    local iDischarge = math.max(iLoad - iAlt, 0)
+    local iCharge = math.max(iAlt - iLoad, 0)
+
+    local linearLoadDropV = (iDischarge / 20) * loadDropPer20A
+    local irLoadDropV = iDischarge * math.max(rIntOhm or 0, 0) * math.max(loadIrScale, 0)
+    local loadDropV = linearLoadDropV + irLoadDropV
+
+    local vTerm = (ocvV or 0) - loadDropV
+    if iDischarge > 0 then
+        vTerm = math.max(vTerm, math.min(loadFloorV, ocvV or loadFloorV))
+    end
+
+    local crankDropV = 0
+    if isCranking then
+        crankDropV = (crankCurrentA / 20) * loadDropPer20A * crankDropMult
+        vTerm = math.max(vTerm - crankDropV, math.min(crankMinV, ocvV or crankMinV))
+    end
+
+    local linearChargeRiseV = (iCharge / 20) * chargeRisePer20A
+    local irChargeRiseV = iCharge * math.max(rIntOhm or 0, 0) * math.max(chargeIrScale, 0)
+    local chargeRiseV = math.min(linearChargeRiseV + irChargeRiseV, chargeRiseMaxV)
+    if iCharge > 0 then
+        vTerm = math.min(vTerm + chargeRiseV, math.min(chargeTargetMaxV, termMaxV))
+    end
+
+    vTerm = math.clamp(vTerm, termMinV, termMaxV)
+    return vTerm, loadDropV, crankDropV, chargeRiseV, iDischarge, iCharge
+end
+
+getBatteryChargeAcceptance = function(tempC, soc)
+    local C = ADS_Config.ELECTRICAL or {}
+
+    local tMin = C.CHARGE_ACCEPT_TEMP_MIN_C or -15
+    local tMax = C.CHARGE_ACCEPT_TEMP_MAX_C or 25
+    local taperStart = C.CHARGE_TAPER_SOC_START or 0.80
+    local taperEnd = C.CHARGE_TAPER_SOC_END or 0.98
+
+    tempC = tempC or 20
+    soc = math.clamp(soc or 1, 0, 1)
+
+    local tempK
+    if tempC <= tMin then
+        tempK = 0.15
+    elseif tempC >= tMax then
+        tempK = 1.0
+    else
+        local t = (tempC - tMin) / math.max(tMax - tMin, 0.001)
+        tempK = 0.15 + 0.85 * smoothstep(t)
+    end
+
+    local socK
+    if soc <= taperStart then
+        socK = 1.0
+    elseif soc >= taperEnd then
+        socK = 0.05
+    else
+        local t = (soc - taperStart) / math.max(taperEnd - taperStart, 0.001)
+        socK = 1.0 - 0.95 * smoothstep(t)
+    end
+
+    return math.clamp(tempK * socK, 0.02, 1.0), tempK, socK
+end
+
+function AdvancedDamageSystem.updateBatteryTemperatureC(vehicle, dtS, ambientC, engineC, iBatteryA, rintF)
+    local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
         return
     end
 
-    local iNet = iAltAvail - iLoads
-    local dAh = iNet * dt / (60 * 60 * 1000)
-    local capacityAh = math.max(spec.batteryCapacityAh or 0, 1)
+    local cfg = ADS_Config.ELECTRICAL or {}
+
+    ambientC = ambientC or cfg.AMBIENT_DEFAULT_C or 15
+    engineC = engineC or ambientC
+
+    -- thermal inertia (time constant, seconds)
+    local tauS = math.max(cfg.BATTERY_THERMAL_TAU_S or 120, 1)
+
+    -- coupling coefficient to engine temperature contribution
+    local kEngine = cfg.ENGINE_BAY_COUPLING or 0.30
+    kEngine = math.clamp(kEngine, 0, 1)
+
+    -- coupling contribution in degrees C from engine temperature
+    local couplingC = kEngine * engineC
+
+    -- effective target temp for battery (ambient + engine contribution)
+    local targetC = ambientC + couplingC
+
+    local tempC = spec.batteryTempC or ambientC
+
+    local rRef = math.max(cfg.RINT_REF_OHM or 0.06, 0.01)
+    local rInt = rRef * rintF
+
+    local iA = math.max(iBatteryA or 0, 0)
+    local pJouleW = iA * iA * rInt
+
+    local cTh = math.max(cfg.BATTERY_THERMAL_CAPACITY_J_PER_K or 18000, 100)
+    -- Move current self-heating into targetC (steady-state rise: dT = P / (C/tau) = P * tau / C)
+    local targetJouleRiseC = (pJouleW * tauS) / cTh
+    targetC = targetC + targetJouleRiseC
+
+    -- 1st-order lag: T = T + (T_target - T) * alpha
+    local alpha = 1 - math.exp(-dtS / tauS)
+    tempC = tempC + (targetC - tempC) * alpha
+    local dTJoule = targetJouleRiseC * alpha
+
+    -- safety clamp
+    spec.batteryTempC = math.clamp(tempC, ambientC, 85)
+
+    if ADS_Config.DEBUG and spec.debugData ~= nil and spec.debugData.battery ~= nil then
+        local dbg = spec.debugData.battery
+        dbg.dtS = dtS
+        dbg.ambientC = ambientC
+        dbg.engineC = engineC
+        dbg.battTempTargetC = targetC
+        dbg.battTempTargetJouleRiseC = targetJouleRiseC
+        dbg.battTempAlpha = alpha
+        dbg.battTempCoupling = couplingC
+        dbg.battTempTauS = tauS
+        dbg.batteryTempC = spec.batteryTempC
+        dbg.iBatteryA = iA
+        dbg.rintFactor = rintF
+        dbg.rIntOhm = rInt
+        dbg.pJouleW = pJouleW
+        dbg.dTJoule = dTJoule
+    end
+end
+
+function AdvancedDamageSystem.updateBatterySoc(vehicle, dtS, iAltAvail, iLoads, capF)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    local iNetRaw = iAltAvail - iLoads
+    local iNet = iNetRaw
+    local dAh = iNet * dtS / 3600
+
+    local nominalCapacityAh = math.max(spec.batteryCapacityAh or 0, 1)
+    local capFactor = capF or 1
+    local effectiveCapacityAh  = math.max(nominalCapacityAh * capFactor * ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR, 1)
     local health = math.max(spec.batteryHealth or 0, 0.01)
-    spec.batterySoc = math.clamp((spec.batterySoc or 1) + dAh / (capacityAh * health), 0, 1)
+
+    spec.batterySoc = math.clamp((spec.batterySoc or 1) + dAh / (effectiveCapacityAh * health), 0, 1)
 
     if ADS_Config.DEBUG then
         local dbg = spec.debugData.battery
         dbg.soc = spec.batterySoc or 0
+        dbg.capacityNominalAh = nominalCapacityAh
+        dbg.capacityFactor = capFactor
+        dbg.capacityEffectiveAh = effectiveCapacityAh
+        dbg.batteryHealth = health
+        dbg.iNetRaw = iNetRaw
         dbg.iNet = iNet
         dbg.dAh = dAh
     end
+end
+
+function AdvancedDamageSystem:updateBatteryChargingModel(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+    local dtS = math.max((dt or 0) / 1000, 0)
+    if dtS <= 0 then
+        return
+    end
+
+    if spec.debugData == nil then
+        spec.debugData = {}
+    end
+    if spec.debugData.battery == nil then
+        spec.debugData.battery = {}
+    end
+
+    local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
+    local enviromentTemp = 15
+    if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather ~= nil then
+        local weather = g_currentMission.environment.weather.forecast:getCurrentWeather()
+        enviromentTemp = (weather ~= nil and weather.temperature) or 15
+    end
+
+    local capF, rintF = getBatteryTempFactors(spec.batteryTempC)
+
+    local iLoads =  calculateCurrentLoadAmps(self, isMotorStarted, enviromentTemp)
+    local iAltAvail = calculateAlternatorOutput(self, isMotorStarted, iLoads)
+    local iBatteryA = math.abs((iAltAvail or 0) - (iLoads or 0))
+
+    AdvancedDamageSystem.updateBatteryTemperatureC(self, dtS, enviromentTemp, spec.engineTemperature, iBatteryA, rintF)
+    AdvancedDamageSystem.updateBatterySoc(self, dtS, iAltAvail, iLoads, capF)
+
+    local rRef = math.max((ADS_Config.ELECTRICAL and ADS_Config.ELECTRICAL.RINT_REF_OHM) or 0.06, 0.01)
+    local rIntOhm = rRef * (rintF or 1)
+    local ocvV = getBatteryOpenCircuitVoltage(spec.batterySoc)
+
+    local isCranking = false
+    if spec.systems ~= nil and spec.systems.electrical ~= nil and spec.systems.electrical.isMotorStarted then
+        isCranking = true
+    end
+    local startFail = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_START_FAILURE_CHANCE or nil
+    if startFail ~= nil and startFail.extraData ~= nil and startFail.extraData.status == "CRANKING" then
+        isCranking = true
+    end
+
+    local terminalV, loadDropV, crankDropV, chargeRiseV, iDischargeA, iChargeA = getBatteryTerminalVoltage(ocvV, iAltAvail, iLoads, isCranking, rIntOhm)
+    spec.batteryVoltageV = terminalV
+
+    if ADS_Config.DEBUG then
+        local dbg = spec.debugData.battery
+        dbg.ocvV = ocvV
+        dbg.termV = terminalV
+        dbg.termLoadDropV = loadDropV
+        dbg.termCrankDropV = crankDropV
+        dbg.termChargeRiseV = chargeRiseV
+        dbg.termIsCranking = isCranking and 1 or 0
+        dbg.termDischargeA = iDischargeA
+        dbg.termChargeA = iChargeA
+    end
+
 end
 
 -- ==========================================================
@@ -5283,7 +5569,6 @@ end
 function AdvancedDamageSystem:getServiceLevel()
     return self.spec_AdvancedDamageSystem.serviceLevel
 end
-
 
 function AdvancedDamageSystem:getConditionLevel()
     return self.spec_AdvancedDamageSystem.conditionLevel
