@@ -11,7 +11,7 @@ local SUSPICIOUS_SYMPTOMS_BY_EFFECT = {
     {id = "LIGHTS_FLICKER_CHANCE", l10nKey = "ads_report_system_symptoms_lights_flicker"},
     {id = "LIGHTS_FAILURE", l10nKey = "ads_report_system_symptoms_lights_failure"},
     {id = "ENGINE_STALLS_CHANCE", l10nKey = "ads_report_system_symptoms_engine_stalls"},
-    {id = "ENGINE_START_FAILURE_CHANCE", l10nKey = "ads_report_system_symptoms_start_failure"},
+    {id = "ENGINE_HARD_START_MODIFIER", l10nKey = "ads_report_system_symptoms_start_failure"},
     {id = "IDLE_HUNTING_EFFECT", l10nKey = "ads_report_system_symptoms_idle_hunting"},
     {id = "ENGINE_HESITATION_CHANCE", l10nKey = "ads_report_system_symptoms_engine_hesitation"},
     {id = "ENGINE_FAILURE", l10nKey = "ads_report_system_symptoms_engine_failure"},

@@ -7,6 +7,20 @@
         <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </starter>
+    <starterCranking file="sounds/starterCranking.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="2.0" outdoor="2.1" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </starterCranking>
+    <starterCrankingEnd file="sounds/starterCrankingEnd.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="2.0" outdoor="2.1" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.5" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </starterCrankingEnd>
     <alarm file="sounds/alarm.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
         <volume indoor="1.5" outdoor="1.6" />
         <pitch indoor="1.0" outdoor="1.0" />

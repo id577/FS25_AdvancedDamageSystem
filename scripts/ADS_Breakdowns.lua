@@ -10,6 +10,7 @@ local function log_dbg(...)
     end
 end
 
+
 ADS_Breakdowns.DASHBOARD = {
     ENGINE = "engine",
     WARNING = "warning",
@@ -309,9 +310,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 0.0,
                 effects = {
                     {
-                        id = "ENGINE_START_FAILURE_CHANCE",
+                        id = "ENGINE_HARD_START_MODIFIER",
                         value = function(vehicle)
-                            local baseEffect = 0.66
+                            local baseEffect = 10
                             local condition = vehicle:getConditionLevel()
                             local multiplier = (1 - condition) ^ 3
                             return baseEffect * multiplier
@@ -425,6 +426,40 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
+    COLD_ENGINE = {
+        system = systems.ENGINE,
+        isSelectable = false,
+        part = "ads_breakdowns_part_vehicle",
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    {
+                        id = "ENGINE_HARD_START_MODIFIER",
+                        value = 0,
+                        aggregation = "max",
+                        extraData = {timer = 0, status = 'IDLE'}
+                    }
+                },
+                indicators = {}
+            }
+        }
+    },
+
 
     MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES = {
         isSelectable = false,
@@ -581,6 +616,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+    
 
 -------------------------------------------- SELECTABLE -----------------------------------------
 
@@ -653,7 +689,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.5, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 2, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
                     { id = "DARK_EXHAUST_EFFECT", value = 1.0, aggregation = "max" }
                 },
                 indicators = {
@@ -695,7 +731,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.0 * breakdownPriceMultipliers.ELECTRICAL_SYSTEM_MALFUNCTION,
                 effects = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 200, maskBackup = 0}, aggregation = "min"},
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, extraData = { timer = 0, status = 'IDLE', count = 0}, aggregation = "max"}
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 3, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"}
 
                 }
             },
@@ -708,7 +744,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 5, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
                     { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.1, aggregation = "min"},
                     { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
                 },
@@ -726,7 +762,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
                     { id = "LIGHTS_FAILURE", value = 1.0, extraData = {message = "ads_breakdowns_electrical_system_malfunction_stage3_message"}, aggregation = "boolean_or" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.99, extraData = { timer = 0, status = 'IDLE', count = 0}, aggregation = "max"},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 8, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
                     { id = "CVT_THERMOSTAT_HEALTH_MODIFIER", value = -0.2, aggregation = "min"},
                     { id = "THERMOSTAT_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
                 },
@@ -982,7 +1018,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- transmission system
+    -- transmission system -- TO-DO: indicators
     MANUAL_TRANSMISSION_CLUTCH_WEAR = {
         isSelectable = true,
         system = systems.TRANSMISSION,
@@ -2169,7 +2205,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.05, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 2, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.8, cruiseState = 0} }
                 }
             },
@@ -2184,7 +2220,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.4, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.5, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 4, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 400, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
                 },
                 indicators = {
@@ -2212,7 +2248,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 1.0, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 6, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.15, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.5, cruiseState = 0} }
                 },
                 indicators = {
@@ -2285,7 +2321,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.35, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.66, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 6, aggregation = "max", extraData = { timer = 0, status = 'IDLE'}},
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.7, cruiseState = 0} }
                 },
                 indicators = {
@@ -2391,7 +2427,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0 * breakdownProgressMultipliers.FUEL_LINE_AIR_LEAK,
                 repairPrice = 1.0 * breakdownPriceMultipliers.FUEL_LINE_AIR_LEAK,
                 effects = {
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.15, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}}
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 1, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}}
                 }
             },
             {
@@ -2402,7 +2438,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.0 * breakdownPriceMultipliers.FUEL_LINE_AIR_LEAK,
                 effects = {
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE', amplitude = 0.6, motorLoad = 0.5, cruiseState = 0} },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.2, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 2, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
                     { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
                     
                 }
@@ -2415,7 +2451,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 4.0 * breakdownPriceMultipliers.FUEL_LINE_AIR_LEAK,
                 effects = {
                     { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 0.7, motorLoad = 0.5, cruiseState = 0} },
-                    { id = "ENGINE_START_FAILURE_CHANCE", value = 0.33, aggregation = "max", extraData = { timer = 0, status = 'IDLE', count = 0}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 3, aggregation = "max", extraData = {timer = 0, status = 'IDLE'}},
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                 }
             },
@@ -2699,9 +2735,23 @@ ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
     apply = function(vehicle, effectData, handler)
         log_dbg("Applying ENGINE_FAILURE effect.")
         local effectName = handler.getEffectName()
+        local spec = vehicle.spec_AdvancedDamageSystem
         local activeFunc = function(v, dt)
             if v:getIsMotorStarted() then
                 v:stopMotor()
+            end
+            if effectData.extraData and effectData.extraData.status and effectData.extraData.status == 'CRANKING' then
+                if spec.startButtonHeld then
+                    if vehicle.isClient and not g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
+                        g_soundManager:playSample(spec.samples.starterCranking)
+                    end
+                else
+                    if g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
+                        g_soundManager:stopSample(spec.samples.starterCranking, 0, 0)
+                    end
+                    effectData.extraData.status = 'IDLE'
+                    ADS_EffectSyncEvent.send(vehicle, handler.getEffectName(), "IDLE", 0, 0, 0)
+                end
             end
         end
         addFuncToActive(vehicle, effectName, activeFunc)
@@ -4717,91 +4767,101 @@ ADS_Breakdowns.EffectApplicators.PTO_AUTO_DISENGAGE_CHANCE = {
 }
 
 -- ==========================================================
--- ENGINE_START_FAILURE_CHANCE
-ADS_Breakdowns.EffectApplicators.ENGINE_START_FAILURE_CHANCE = {
-    getEffectName = function() return "ENGINE_START_FAILURE_CHANCE" end,
+-- ENGINE_HARD_START_MODIFIER
+
+local function tryStartMotor(dt, value, engTemp)
+    local tempFactor = 0
+    local modValue = value
+    if engTemp <= -10 then
+        tempFactor = math.max((-10 - engTemp) / 2, 0)
+        modValue = modValue + tempFactor
+    elseif engTemp >= 30 then
+    local hotT = math.clamp((engTemp - 30) / 60, 0, 1)
+    local hotFactor = 1.0 - 0.3 * hotT
+    modValue = modValue * hotFactor
+    end
+
+    local mtbfInMinutes = modValue / 60
+    local chance = ADS_Utils.getChancePerFrameFromMeanTime(dt, mtbfInMinutes)
+    local random = math.random()
+    if random < chance then return true end
+    return false
+end
+
+ADS_Breakdowns.EffectApplicators.ENGINE_HARD_START_MODIFIER = {
+    getEffectName = function() return "ENGINE_HARD_START_MODIFIER" end,
     apply = function(vehicle, effectData, handler)
-        log_dbg("Applying ENGINE_START_FAILURE_CHANCE effect")
+        log_dbg("Applying ENGINE_HARD_START_MODIFIER effect")
         local effectName = handler.getEffectName()
-        local function initStartFailureState(effect)
-            if effect == nil then
-                return
-            end
-
-            local extra = effect.extraData or {}
-            effect.extraData = extra
-
-            extra.status = tostring(extra.status or "IDLE")
-            extra.timer = tonumber(extra.timer) or 0
-            extra.duration = tonumber(extra.duration) or 2000
-            extra.soundPlaying = extra.soundPlaying == true
-
-            if extra.currentCount == nil then
-                extra.currentCount = 0
-            end
-
-            extra.currentCount = math.max(math.floor(tonumber(extra.currentCount) or 0), 0)
-        end
 
         local activeFunc = function(v, dt)
-            local effect = v.spec_AdvancedDamageSystem.activeEffects.ENGINE_START_FAILURE_CHANCE
-            if effect == nil or effect.value <= 0 then
+            local spec = v.spec_AdvancedDamageSystem
+            if spec == nil then return end
+            local effect = spec.activeEffects ~= nil and spec.activeEffects[effectName] or nil
+            if effect == nil or effect.extraData == nil then
                 return
             end
 
-            initStartFailureState(effect)
-            local extra = effect.extraData
+            
+            local motorStartDelay = 1500
+            local startFadeMs = 0
+            local endFadeMs = -1500
 
-            local starterSample = (v.spec_AdvancedDamageSystem.samples and v.spec_AdvancedDamageSystem.samples.starter) or nil
+            effect.extraData.timer = math.max((effect.extraData.timer or 0) - dt, endFadeMs)
 
-            if v:getIsMotorStarted() then
-                if starterSample ~= nil and extra.soundPlaying then
-                    g_soundManager:stopSample(starterSample, 0, 0)
-                    if extra.originalLoops ~= nil then
-                        starterSample.loops = extra.originalLoops
-                    end
+            if v.isClient and effect.extraData.status == 'PASSED' then
+                g_soundManager:setSampleVolumeOffset(spec.samples.starterCrankingEnd, 0)
+                if not g_soundManager:getIsSamplePlaying(spec.samples.starterCrankingEnd) then
+                    g_soundManager:playSample(spec.samples.starterCrankingEnd)
                 end
-                extra.soundPlaying = false
-                extra.status = "IDLE"
-                extra.timer = 0
-                extra.currentCount = 0
-                return
             end
 
-            if extra.status == "CRANKING" then
-                if starterSample ~= nil and not extra.soundPlaying then
-                    if extra.originalLoops == nil then
-                        extra.originalLoops = starterSample.loops
-                    end
-                    starterSample.loops = 0
-                    if not g_soundManager:getIsSamplePlaying(starterSample) then
-                        g_soundManager:playSample(starterSample)
-                    end
-                    extra.soundPlaying = true
+            -- starterCrankingEnd fade
+            if effect.extraData.timer <= startFadeMs and effect.extraData.timer >= endFadeMs then
+                local baseVolume = spec.samples.starterCrankingEnd.current.volume or 2.0
+                local t = math.clamp(math.abs(effect.extraData.timer / endFadeMs), 0, 1)
+                local easedT = t * t
+                local offset = math.max(-(baseVolume * easedT), -0.65)
+
+                if g_soundManager:getIsSamplePlaying(spec.samples.starterCrankingEnd) then
+                    g_soundManager:setSampleVolumeOffset(spec.samples.starterCrankingEnd, offset)
+                end
+            end
+
+            -- start motor after motorStartDelay
+            if effect.extraData.timer <= 0 and effect.extraData.status == 'PASSED' then
+                v:startMotor(false, true)
+                effect.extraData.status = 'IDLE'
+            end
+
+            -- play starter sound while startButtonHeld and roll dices
+            if not v:getIsMotorStarted() and spec.startButtonHeld and effect.extraData.status == 'CRANKING' then
+                if v.isClient and not g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
+                    g_soundManager:playSample(spec.samples.starterCranking)
                 end
 
-                extra.timer = extra.timer + dt
-                if extra.timer >= extra.duration then
-                    if starterSample ~= nil and extra.soundPlaying then
-                        g_soundManager:stopSample(starterSample, 0, 0)
-                        if extra.originalLoops ~= nil then
-                            starterSample.loops = extra.originalLoops
-                        end
-                    end
-
-                    extra.status = "IDLE"
-                    extra.timer = 0
-                    extra.soundPlaying = false
+                -- TO-DO MP: server check and send event after successful rolling
+                if v.isServer and tryStartMotor(dt, effect.value, spec.engineTemperature) then
+                    effect.extraData.timer = motorStartDelay
+                    effect.extraData.status = 'PASSED'
+                    ADS_EffectSyncEvent.send(vehicle, handler.getEffectName(), "PASSED", motorStartDelay, 0, 0)
                 end
+
+            -- stor play starter sound if not startButtonHeld or start successful
+            elseif (not spec.startButtonHeld and effect.extraData.status == 'CRANKING') or effect.extraData.status == 'PASSED' then
+                if g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
+                    g_soundManager:stopSample(spec.samples.starterCranking, 0, 0)
+                end
+                if effect.extraData.status == 'CRANKING' then effect.extraData.status = 'IDLE' end
             end
         end
         addFuncToActive(vehicle, effectName, activeFunc)
     end,
     remove = function(vehicle, handler)
-        log_dbg("Removing ENGINE_START_FAILURE_CHANCE effect.")
+        log_dbg("Removing ENGINE_HARD_START_MODIFIER effect.")
         local effect = vehicle.spec_AdvancedDamageSystem
             and vehicle.spec_AdvancedDamageSystem.activeEffects
-            and vehicle.spec_AdvancedDamageSystem.activeEffects.ENGINE_START_FAILURE_CHANCE
+            and vehicle.spec_AdvancedDamageSystem.activeEffects.ENGINE_HARD_START_MODIFIER
             or nil
         local starterSample = (vehicle.spec_AdvancedDamageSystem
             and vehicle.spec_AdvancedDamageSystem.samples
@@ -4823,6 +4883,58 @@ ADS_Breakdowns.EffectApplicators.ENGINE_START_FAILURE_CHANCE = {
         removeFuncFromActive(vehicle, handler.getEffectName())
     end
 }
+
+function ADS_Breakdowns.onStartButtonAction(self, actionName, inputValue, callbackState, isAnalog, isMouse, deviceCategory, binding)
+    local spec = self ~= nil and self.spec_AdvancedDamageSystem or nil
+    if spec == nil then
+        return
+    end
+
+    local value = tonumber(inputValue) or 0
+    local isPressed = binding ~= nil and binding.isPressed == true
+    local currentlyHeld = isPressed or value > 0.5
+    local wasHeld = spec.startButtonHeld == true
+
+    local _prevStartButtonDown = spec.startButtonDown
+    local _prevStartButtonUp = spec.startButtonUp
+    local _prevStartButtonHeld = spec.startButtonHeld
+
+    spec.startButtonDown = currentlyHeld and not wasHeld
+    spec.startButtonUp = not currentlyHeld and wasHeld
+    spec.startButtonHeld = currentlyHeld
+
+    --TO-DO MP: sync 
+    if _prevStartButtonDown ~= spec.startButtonDown or _prevStartButtonUp ~= spec.startButtonUp or _prevStartButtonHeld ~= spec.startButtonHeld then
+        ADS_StartButtonEvent.send(self, spec.startButtonDown, spec.startButtonHeld, spec.startButtonUp)
+    end
+end
+
+function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
+    local spec = self.spec_AdvancedDamageSystem
+    local engineFailure = spec and spec.activeEffects.ENGINE_FAILURE
+    local engineHardStart = spec and spec.activeEffects.ENGINE_HARD_START_MODIFIER
+
+
+    if self.spec_AdvancedDamageSystem == nil or (engineFailure == nil and engineHardStart == nil) or passed then
+        superFunc(self, noEventSend)
+        return
+    end
+
+    if engineFailure then
+        if engineFailure.extraData.starter then
+            engineFailure.extraData.status = 'CRANKING'
+            ADS_EffectSyncEvent.send(self, 'ENGINE_FAILURE', "CRANKING", 0, 0, 0)
+        end
+        return
+    end
+
+    if engineHardStart and engineHardStart.extraData.status == 'IDLE' then
+        engineHardStart.extraData.status = 'CRANKING'
+        ADS_EffectSyncEvent.send(self, 'ENGINE_HARD_START_MODIFIER', "CRANKING", 0, 0, 0)
+        return
+    end
+end
+
 
 -- ==========================================================
 -- GEAR_SHIFT_FAILURE_CHANCE
@@ -5005,7 +5117,7 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
         return "LIGHTS_FLICKER_CHANCE" 
     end,
 
-     apply = function(vehicle, effectData, handler)
+    apply = function(vehicle, effectData, handler)
         log_dbg("Applying LIGHTS_FLICKER_CHANCE effect")
 
         local effectName = handler.getEffectName()
@@ -5084,82 +5196,7 @@ local function setMotorStartedFlagForStarterDamage(vehicle)
     systemData.isMotorStarted = true
 end
 
-function ADS_Breakdowns.startMotor(self, superFunc, noEventSend)
 
-    if self.spec_AdvancedDamageSystem and self.spec_AdvancedDamageSystem.activeEffects then
-        local spec = self.spec_AdvancedDamageSystem
-
-        if self.spec_AdvancedDamageSystem.activeEffects.ENGINE_FAILURE then
-            local engineFailureEffect = spec.activeEffects.ENGINE_FAILURE
-            if (engineFailureEffect and engineFailureEffect.value >= 1.0) then
-                local starterSample = (spec.samples and spec.samples.starter) or nil
-                if starterSample ~= nil and not g_soundManager:getIsSamplePlaying(starterSample) then
-                    g_soundManager:playSample(starterSample)
-                end 
-                setMotorStartedFlagForStarterDamage(self)
-                return
-            end
-        end
-
-        if self.spec_AdvancedDamageSystem.activeEffects.ENGINE_START_FAILURE_CHANCE then
-            local startFailureEffect = spec.activeEffects.ENGINE_START_FAILURE_CHANCE
-            if startFailureEffect ~= nil and startFailureEffect.extraData == nil then
-                startFailureEffect.extraData = {}
-            end
-            local extra = startFailureEffect and startFailureEffect.extraData or nil
-            if startFailureEffect and extra ~= nil then
-                if extra.currentCount == nil then
-                    extra.currentCount = 0
-                end
-                extra.currentCount = math.max(math.floor(tonumber(extra.currentCount) or 0), 0)
-                extra.status = tostring(extra.status or "IDLE")
-            end
-
-            local START_FAIL_RETRY_MULTIPLIER = 0.66
-            local START_FAIL_TEMP_REFERENCE = 25
-            local START_FAIL_TEMP_PER_DEGREE = 0.01
-
-            if startFailureEffect and extra ~= nil and extra.status ~= "IDLE" then
-                log_dbg(string.format("[ADS][START_FAIL] blocked: status=%s timer=%.0f", tostring(extra.status), tonumber(extra.timer) or 0))
-                return
-            end
-
-            if startFailureEffect and startFailureEffect.value > 0 then
-                local failedAttempts = (extra and extra.currentCount) or 0
-                local baseFailChance = math.max(tonumber(startFailureEffect.value) or 0, 0)
-                local attemptMultiplier = math.pow(START_FAIL_RETRY_MULTIPLIER, failedAttempts)
-                local temperature = tonumber(spec.engineTemperature) or 0
-                local coldDegrees = math.max(START_FAIL_TEMP_REFERENCE - temperature, 0)
-                local tempPenalty = coldDegrees * START_FAIL_TEMP_PER_DEGREE
-                local failChance = math.clamp(baseFailChance * attemptMultiplier + tempPenalty, 0, 1)
-                local roll = math.random()
-                local isFailedStart = roll < failChance
-
-                if self.isServer and isFailedStart then
-
-                    extra.status = "CRANKING"
-                    extra.timer = 0
-                    extra.currentCount = failedAttempts + 1
-                    setMotorStartedFlagForStarterDamage(self)
-
-                    ADS_EffectSyncEvent.send(self, "ENGINE_START_FAILURE_CHANCE", "CRANKING", 0, failedAttempts + 1)
-                    return
-                end
-
-                extra.currentCount = 0
-                superFunc(self, noEventSend)
-                setMotorStartedFlagForStarterDamage(self)
-                return
-            else
-                superFunc(self, noEventSend)
-                setMotorStartedFlagForStarterDamage(self)
-                return
-            end
-        end
-    end
-    superFunc(self, noEventSend)
-    setMotorStartedFlagForStarterDamage(self)
-end
 
 
 

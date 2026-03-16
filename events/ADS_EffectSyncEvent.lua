@@ -43,6 +43,9 @@ end
 
 
 function ADS_EffectSyncEvent:run(connection)
+    local isFromClient = connection ~= nil and not connection:getIsServer()
+
+
     local vehicle = self.vehicle
     if vehicle == nil or not vehicle:getIsSynchronized() then
         return
@@ -61,6 +64,24 @@ function ADS_EffectSyncEvent:run(connection)
         end
         if vehicle:getIsActiveForInput(true) then
             g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_engine_stalled_message"), 5000)
+        end
+
+    elseif self.effectId == "ENGINE_HARD_START_MODIFIER" then
+        if effect ~= nil then
+            effect.extraData = effect.extraData or {}
+            effect.extraData.status = self.status
+            effect.extraData.timer = self.timer
+            effect.extraData.currentCount = self.extraInt
+        end
+
+        if isFromClient and g_server ~= nil then
+            g_server:broadcastEvent(ADS_EffectSyncEvent.new(vehicle, self.effectId, self.status, self.timer, self.extraInt, self.extraFloat), connection, nil, vehicle)
+        end
+
+    elseif self.effectId == "ENGINE_FAILURE" then
+        if effect ~= nil then
+            effect.extraData = effect.extraData or {}
+            effect.extraData.status = self.status
         end
 
     elseif self.effectId == "PTO_AUTO_DISENGAGE_CHANCE" then
@@ -122,19 +143,16 @@ function ADS_EffectSyncEvent:run(connection)
                 end
             end
         end
-
-    elseif self.effectId == "ENGINE_START_FAILURE_CHANCE" then
-        if effect and effect.extraData then
-            effect.extraData.status       = self.status
-            effect.extraData.timer        = self.timer
-            effect.extraData.currentCount = self.extraInt
-        end
     end
 end
 
 
 function ADS_EffectSyncEvent.send(vehicle, effectId, status, timer, extraInt, extraFloat)
+
     if g_server ~= nil then
         g_server:broadcastEvent(ADS_EffectSyncEvent.new(vehicle, effectId, status, timer, extraInt, extraFloat), nil, nil, vehicle)
+    elseif g_client ~= nil and (effectId == "ENGINE_HARD_START_MODIFIER" or effectId == "ENGINE_FAILURE") then
+        g_client:getServerConnection():sendEvent(ADS_EffectSyncEvent.new(vehicle, effectId, status, timer, extraInt, extraFloat))
     end
 end
+

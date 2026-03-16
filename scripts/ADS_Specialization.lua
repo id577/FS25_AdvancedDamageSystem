@@ -260,6 +260,8 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#maintenanceTimer", "Maintenance Timer")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#engineTemperature", "Engine Temperature")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionTemperature", "Transmission Temperature")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#batterySoc", "Battery State Of Charge")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#batteryTempC", "Battery Temperature")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#thermostatState", "Engine Thermostat Position")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionThermostatState", "Transmission Thermostat Position")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#lastServiceDate", "Last Service Date")
@@ -335,6 +337,7 @@ function AdvancedDamageSystem.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onWriteUpdateStream", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onReadUpdateStream", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "saveToXMLFile", AdvancedDamageSystem)
+    SpecializationUtil.registerEventListener(vehicleType, "onRegisterActionEvents", AdvancedDamageSystem)
 end
 
 function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
@@ -353,7 +356,7 @@ end
 function AdvancedDamageSystem.registerFunctions(vehicleType)
     log_dbg("registerFunctions called for vehicleType:", vehicleType.name)
     SpecializationUtil.registerFunction(vehicleType, "adsUpdate", AdvancedDamageSystem.adsUpdate)
-	
+
     SpecializationUtil.registerFunction(vehicleType, "recalculateAndApplyEffects", AdvancedDamageSystem.recalculateAndApplyEffects)
     SpecializationUtil.registerFunction(vehicleType, "recalculateAndApplyIndicators", AdvancedDamageSystem.recalculateAndApplyIndicators)
     
@@ -447,6 +450,8 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
     -- [Group 3] Thermal model (raw values) + fuel consumption
     streamWriteFloat32(streamId, spec.rawEngineTemperature or -99)
     streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
+    streamWriteFloat32(streamId, spec.batterySoc or 1.0)
+    streamWriteFloat32(streamId, spec.batteryVoltageV or 0)
     streamWriteFloat32(streamId, spec.thermostatState or 0)
     streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
     streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
@@ -517,6 +522,8 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
     -- Initialize smoothed values from raw on full sync.
     spec.engineTemperature = syncRawEngTemp
     spec.transmissionTemperature = syncRawTransTemp
+    spec.batterySoc = streamReadFloat32(streamId)
+    spec.batteryVoltageV = streamReadFloat32(streamId)
     spec.thermostatState = streamReadFloat32(streamId)
     if spec.engTermPID ~= nil then
         spec.engTermPID.mechPos = spec.thermostatState
@@ -582,6 +589,8 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
             streamWriteFloat32(streamId, spec.maintenanceTimer or 0)
             streamWriteFloat32(streamId, spec.rawEngineTemperature or -99)
             streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
+            streamWriteFloat32(streamId, spec.batterySoc or 1.0)
+            streamWriteFloat32(streamId, spec.batteryVoltageV or 0)
             streamWriteFloat32(streamId, spec.thermostatState or 0)
             streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
             streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
@@ -632,6 +641,8 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             -- Keep compatibility with previous tooling.
             spec._netTargetEngineTemp = syncRawEngTemp
             spec._netTargetTransmissionTemp = syncRawTransTemp
+            spec.batterySoc = streamReadFloat32(streamId)
+            spec.batteryVoltageV = streamReadFloat32(streamId)
             spec.thermostatState = streamReadFloat32(streamId)
             if spec.engTermPID ~= nil then
                 spec.engTermPID.mechPos = spec.thermostatState
@@ -703,6 +714,8 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#lastInspServ", spec.lastInspectedServiceState or "")
         xmlFile:setValue(key .. "#engineTemperature", spec.engineTemperature or -99)
         xmlFile:setValue(key .. "#transmissionTemperature", spec.transmissionTemperature or -99)
+        xmlFile:setValue(key .. "#batterySoc", spec.batterySoc or 1.0)
+        xmlFile:setValue(key .. "#batteryTempC", spec.batteryTempC or 0)
         xmlFile:setValue(key .. "#thermostatState", math.clamp(spec.thermostatState or 0.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#transmissionThermostatState", math.clamp(spec.transmissionThermostatState or 0.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower or 1)
@@ -837,6 +850,10 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.fuelUsage    = 0
     self.spec_AdvancedDamageSystem._fuelUsageRaw  = 0
     self.spec_AdvancedDamageSystem._prevSyncFuelUsage = 0
+    self.spec_AdvancedDamageSystem.startButtonActionEvents = {}
+    self.spec_AdvancedDamageSystem.startButtonDown = false
+    self.spec_AdvancedDamageSystem.startButtonHeld = false
+    self.spec_AdvancedDamageSystem.startButtonUp = false
 
     self.spec_AdvancedDamageSystem.batterySoc = 1.0
     self.spec_AdvancedDamageSystem.batteryHealth = 1.0
@@ -1174,6 +1191,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.lastInspectedServiceState = savegame.xmlFile:getValue(key .. "#lastInspServ", spec.lastInspectedServiceState)
         spec.engineTemperature = savegame.xmlFile:getValue(key .. "#engineTemperature", spec.engineTemperature)
         spec.transmissionTemperature = savegame.xmlFile:getValue(key .. "#transmissionTemperature", spec.transmissionTemperature)
+        spec.batterySoc = math.clamp(savegame.xmlFile:getValue(key .. "#batterySoc", spec.batterySoc), 0, 1)
+        spec.batteryTempC = savegame.xmlFile:getValue(key .. "#batteryTempC", spec.batteryTempC)
         spec.thermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#thermostatState", spec.thermostatState), 0.0, 1.0)
         spec.transmissionThermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#transmissionThermostatState", spec.transmissionThermostatState), 0.0, 1.0)
         if spec.engTermPID ~= nil then
@@ -1444,6 +1463,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         local i3d = self.i3dMappings
         
         spec.samples.starter = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "starter", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.starterCranking = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "starterCranking", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.starterCrankingEnd = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "starterCrankingEnd", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.alarm = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "alarm", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.transmissionShiftFailed1 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed1", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.transmissionShiftFailed2 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed2", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
@@ -1586,24 +1607,194 @@ function AdvancedDamageSystem:onDelete()
     end
 end
 
+function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveForInputIgnoreSelection)
+    if not self.isClient then
+        return
+    end
+
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    self:clearActionEventsTable(spec.startButtonActionEvents)
+
+    if not isActiveForInputIgnoreSelection then
+        return
+    end
+
+    local startInputActions = {
+        InputAction.TOGGLE_MOTOR_STATE,
+        InputAction.MOTOR_STATE_ON or "MOTOR_STATE_ON"
+    }
+
+    for _, inputAction in ipairs(startInputActions) do
+        local _, actionEventId = self:addActionEvent(
+            spec.startButtonActionEvents,
+            inputAction,
+            self,
+            ADS_Breakdowns.onStartButtonAction,
+            true,
+            true,
+            true,
+            true,
+            nil
+        )
+
+        if actionEventId ~= nil then
+            g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+            g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_VERY_LOW)
+        end
+    end
+end
+
 -- ==========================================================
 --                        UPDATE
 -- ==========================================================
 
-function AdvancedDamageSystem:onUpdate(dt, ...)
-    local spec = self.spec_AdvancedDamageSystem
-    if spec.isExcludedVehicle then return end
+local function registerVehicle(vehicle)
+    if (vehicle.propertyState == 2 or vehicle.propertyState == 3 or vehicle.propertyState == 4) and vehicle.ownerFarmId ~= 0 and vehicle.ownerFarmId < 10 then
 
-    -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
-    -- On a dedicated client, Giants' getMotorLoadPercentage() is derived from
-    -- a 7-bit quantized rawLoadPercentage sent in Motorized's update stream,
-    -- resulting in non-deterministic idle values between restarts.
-    -- We sync the server's authoritative value (float32) in dirty flag [1]
-    -- and use it as the EMA input on the client for a stable, consistent reading.
-    if self:getIsMotorStarted() then
+        local spec = vehicle.spec_AdvancedDamageSystem
+        if spec == nil then return end
+
+        log_dbg(" -> Registering vehicle in ADS_Main.vehicles list. ID:", vehicle.uniqueId)
+            --- Registration in ADS_Main.vehicles
+            ADS_Main.vehicles[vehicle.uniqueId] = vehicle
+            ADS_Main.numVehicles = ADS_Main.numVehicles + 1
+   
+            --- if first mod load or used vehicle
+            if vehicle.isServer then
+                if (vehicle:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel) or vehicle:getDamageAmount() > 0 then
+                    -- Used vehicle logic
+                    spec.serviceLevel = 1 - vehicle:getDamageAmount()
+                    for _, systemData in pairs(spec.systems) do
+                        systemData.condition = math.max(1 - vehicle:getFormattedOperatingTime() / 150, math.random() * 0.3)
+                    end
+                    vehicle:setDamageAmount(0.0, true)
+                end
+
+                --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
+                if (spec.maintenanceLog == nil or #spec.maintenanceLog == 0) then
+                    vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+                end
+            end
+
+            --- Updating vehicle's year from Vehicle Years mod
+            local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+            if storeItem ~= nil and storeItem.specs ~= nil and storeItem.specs.year ~= nil and tonumber(storeItem.specs.year) ~= nil then
+                spec.year = tonumber(storeItem.specs.year)
+            end
+
+            --- Updating vehicle's reliability and maintainability
+            spec.reliability, spec.maintainability = AdvancedDamageSystem.getBrandReliability(vehicle)
+        end
+end
+
+local function syncColdEngineEffect(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    if vehicle.isServer then
+        local engTemp = spec.engineTemperature
+        local breakdownId = 'COLD_ENGINE'
+
+        if engTemp <= -10 and not vehicle:hasBreakdown(breakdownId) then
+            vehicle:addBreakdown(breakdownId)
+        elseif engTemp > -10 and vehicle:hasBreakdown(breakdownId) then
+            vehicle:removeBreakdown(breakdownId)
+        end
+    end
+end
+
+local function syncOverheatProtection(vehicle) -- TO-DO: Rework
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    if vehicle.isServer and spec.year >= 2000 then
+        local overheatProtectionId = 'OVERHEAT_PROTECTION'
+        local overheatProtection = vehicle:getActiveBreakdowns()[overheatProtectionId]
+        if overheatProtection and (spec.transmissionTemperature or -99) < 100 and (spec.engineTemperature or -99) < 100 then
+            vehicle:removeBreakdown(overheatProtectionId)
+        end
+        if vehicle:getIsMotorStarted() then
+            if ((spec.transmissionTemperature or -99) > 105 or (spec.engineTemperature or -99) > 105) and not overheatProtection then
+                vehicle:addBreakdown(overheatProtectionId, 1)
+                if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
+                    g_soundManager:playSample(spec.samples.alarm)
+                end
+            elseif overheatProtection then
+                if vehicle:getCruiseControlState() ~= 0 then
+                    vehicle:setCruiseControlState(0, true)
+                end
+                if ((spec.transmissionTemperature or -99) > 125 or (spec.engineTemperature or -99) > 125) and overheatProtection.stage < 4 then
+                    vehicle:advanceBreakdown(overheatProtectionId)
+                    if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
+                        g_soundManager:playSample(spec.samples.alarm)
+                    end
+                elseif ((spec.transmissionTemperature or -99) > 115 or (spec.engineTemperature or -99) > 115) and overheatProtection.stage < 3 then
+                    vehicle:advanceBreakdown(overheatProtectionId)
+                    if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
+                        g_soundManager:playSample(spec.samples.alarm)
+                    end
+                elseif ((spec.transmissionTemperature or -99) > 110 or (spec.engineTemperature or -99) > 110) and overheatProtection.stage < 2 then
+                    vehicle:advanceBreakdown(overheatProtectionId)
+                    if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
+                        g_soundManager:playSample(spec.samples.alarm)
+                    end
+                end
+            end
+        end
+    else
+        if vehicle.isServer then
+            local engineFailedEffect = spec.activeEffects.ENGINE_FAILURE
+            if (spec.engineTemperature or -99) > 125 and not engineFailedEffect then
+                if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.effectsUpdateTimer, 3) then
+                    vehicle:addBreakdown('ENGINE_JAM')
+                end
+            end
+        end
+    end
+end
+
+local function syncMessages(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    --- Cold engine message (guard: temperature must be initialized, i.e. > -90)
+    if vehicle:getIsMotorStarted() and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and vehicle:getIsActiveForInput(true) and not vehicle:getIsAIActive() and not spec.isElectricVehicle then
+        local spec_motorized = vehicle.spec_motorized
+        local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
+        local maxRpm = spec_motorized.motor.maxRpm
+        local rpmLoad = lastRpm / maxRpm
+        if rpmLoad > 0.75 then
+            g_currentMission:showBlinkingWarning(g_i18n:getText('ads_cold_engine_message'), 2800)
+        end
+    end
+
+    --- Messages from breakdowns and stop AI
+    if spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
+        for _, effectData in pairs(spec.activeEffects) do
+            if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
+                if vehicle:getIsActiveForInput(true) and not vehicle:isUnderService() then
+                    g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 200)
+                end
+                if vehicle.isServer and vehicle:getIsAIActive() and effectData.extraData.disableAi then 
+                    vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) 
+                end
+            end
+        end
+    end
+end
+
+local function getSmoothedMotorLoad(vehicle, dt)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    if vehicle:getIsMotorStarted() then
         local rawLoad
-        if self.isServer then
-            rawLoad = math.max(self:getMotorLoadPercentage() or 0, 0)
+        if vehicle.isServer then
+            rawLoad = math.max(vehicle:getMotorLoadPercentage() or 0, 0)
         else
             rawLoad = math.max(spec._netMotorLoad or 0, 0)
         end
@@ -1613,144 +1804,74 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     else
         spec._smoothedMotorLoad = 0
     end
+end
+
+local function syncFuelConsumption(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
     -- Fuel consumption sync (same approach as DashboardLive):
     -- Server: capture raw lastFuelUsage every frame for dirty-flag network sync.
-    if self.isServer and self.spec_motorized ~= nil then
-        if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
-            spec._fuelUsageRaw = self.spec_motorized.lastFuelUsage or 0
+    if vehicle.isServer and vehicle.spec_motorized ~= nil then
+        if vehicle.getIsMotorStarted ~= nil and vehicle:getIsMotorStarted() then
+            spec._fuelUsageRaw = vehicle.spec_motorized.lastFuelUsage or 0
         else
             spec._fuelUsageRaw = 0
         end
     end
     -- Dedicated client: inject synced raw value into spec_motorized.lastFuelUsage
     -- so Motorized's own fuelUsageBuffer picks it up every frame (identical to DashboardLive).
-    if self.isClient and not self.isServer and self.spec_motorized ~= nil then
-        self.spec_motorized.lastFuelUsage = spec._fuelUsageRaw or 0
+    if vehicle.isClient and not vehicle.isServer and vehicle.spec_motorized ~= nil then
+        vehicle.spec_motorized.lastFuelUsage = spec._fuelUsageRaw or 0
     end
     -- Display: always read Motorized's own smoothed value (identical to dashboard gauge).
-    if self.isClient and self.spec_motorized ~= nil then
-        spec.fuelUsage = self.spec_motorized.lastFuelUsageDisplay or 0
+    if vehicle.isClient and vehicle.spec_motorized ~= nil then
+        spec.fuelUsage = vehicle.spec_motorized.lastFuelUsageDisplay or 0
     end
+end
+
+function AdvancedDamageSystem:onUpdate(dt, ...)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec.isExcludedVehicle then return end
 
     spec.effectsUpdateTimer = spec.effectsUpdateTimer + dt
+
+    -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
+    -- On a dedicated client, Giants' getMotorLoadPercentage() is derived from
+    -- a 7-bit quantized rawLoadPercentage sent in Motorized's update stream,
+    -- resulting in non-deterministic idle values between restarts.
+    -- We sync the server's authoritative value (float32) in dirty flag [1]
+    -- and use it as the EMA input on the client for a stable, consistent reading.
+    getSmoothedMotorLoad(self, spec.effectsUpdateTimer)
+
+    --- Fuel consumption
+    syncFuelConsumption(self)
 
     if spec.effectsUpdateTimer < ADS_Config.EFFECTS_UPDATE_DELAY then
         return
     end
 
-    self:getSmoothedTemperature(dt)
-
     --- Registration in ADS_Main.vehicles and first load checks.
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil then
-        if (self.propertyState == 2 or self.propertyState == 3 or self.propertyState == 4) and self.ownerFarmId ~= 0 and self.ownerFarmId < 10 then
-            log_dbg(" -> Registering vehicle in ADS_Main.vehicles list. ID:", self.uniqueId)
-            --- Registration in ADS_Main.vehicles
-            ADS_Main.vehicles[self.uniqueId] = self
-            ADS_Main.numVehicles = ADS_Main.numVehicles + 1
-   
-            --- if first mod load or used vehicle
-            if self.isServer then
-                if (self:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel) or self:getDamageAmount() > 0 then
-                    -- Used vehicle logic
-                    spec.serviceLevel = 1 - self:getDamageAmount()
-                    for _, systemData in pairs(spec.systems) do
-                        systemData.condition = math.max(1 - self:getFormattedOperatingTime() / 150, math.random() * 0.3)
-                    end
-                    self:setDamageAmount(0.0, true)
-                end
-
-                --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
-                if (spec.maintenanceLog == nil or #spec.maintenanceLog == 0) then
-                    self:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
-                end
-            end
-
-            --- Updating vehicle's year from Vehicle Years mod
-            local storeItem = g_storeManager:getItemByXMLFilename(self.configFileName)
-            if storeItem ~= nil and storeItem.specs ~= nil and storeItem.specs.year ~= nil and tonumber(storeItem.specs.year) ~= nil then
-                spec.year = tonumber(storeItem.specs.year)
-            end
-
-            --- Updating vehicle's reliability and maintainability
-            spec.reliability, spec.maintainability = AdvancedDamageSystem.getBrandReliability(self)
-        end
+        registerVehicle(self)
     end
 
+    --- Temperature smoothing
+    self:getSmoothedTemperature(spec.effectsUpdateTimer)
+    
+    --- Checking for cold engine effect
+    syncColdEngineEffect(self)
+    
+    --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
+    syncOverheatProtection(self)
+    
+    --- Messages
+    syncMessages(self)
+    
     --- just in case, reset damage amount to 0 if it's not
     if self.isServer and self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
-
-    --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
-    if self.isServer and spec.year >= 2000 then
-        local overheatProtectionId = 'OVERHEAT_PROTECTION'
-        local overheatProtection = self:getActiveBreakdowns()[overheatProtectionId]
-        if overheatProtection and (spec.transmissionTemperature or -99) < 100 and (spec.engineTemperature or -99) < 100 then
-            self:removeBreakdown(overheatProtectionId)
-        end
-        if self:getIsMotorStarted() then
-            if ((spec.transmissionTemperature or -99) > 105 or (spec.engineTemperature or -99) > 105) and not overheatProtection then
-                self:addBreakdown(overheatProtectionId, 1)
-                if self.getIsControlled ~= nil and self:getIsControlled() then
-                    g_soundManager:playSample(spec.samples.alarm)
-                end
-            elseif overheatProtection then
-                if self:getCruiseControlState() ~= 0 then
-                    self:setCruiseControlState(0, true)
-                end
-                if ((spec.transmissionTemperature or -99) > 125 or (spec.engineTemperature or -99) > 125) and overheatProtection.stage < 4 then
-                    self:advanceBreakdown(overheatProtectionId)
-                    if self.getIsControlled ~= nil and self:getIsControlled() then
-                        g_soundManager:playSample(spec.samples.alarm)
-                    end
-                elseif ((spec.transmissionTemperature or -99) > 115 or (spec.engineTemperature or -99) > 115) and overheatProtection.stage < 3 then
-                    self:advanceBreakdown(overheatProtectionId)
-                    if self.getIsControlled ~= nil and self:getIsControlled() then
-                        g_soundManager:playSample(spec.samples.alarm)
-                    end
-                elseif ((spec.transmissionTemperature or -99) > 110 or (spec.engineTemperature or -99) > 110) and overheatProtection.stage < 2 then
-                    self:advanceBreakdown(overheatProtectionId)
-                    if self.getIsControlled ~= nil and self:getIsControlled() then
-                        g_soundManager:playSample(spec.samples.alarm)
-                    end
-                end
-            end
-        end
-    else
-        if self.isServer then
-            local engineFailedEffect = spec.activeEffects.ENGINE_FAILURE
-            if (spec.engineTemperature or -99) > 125 and not engineFailedEffect then
-                if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.effectsUpdateTimer, 3) then
-                    self:addBreakdown('ENGINE_JAM')
-                end
-            end
-        end
-    end
-
-    --- Cold engine message (guard: temperature must be initialized, i.e. > -90)
-    if spec ~= nil and self:getIsMotorStarted() and spec.engineTemperature ~= nil and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and self:getIsActiveForInput(true) and not self:getIsAIActive() and not spec.isElectricVehicle then
-            local spec_motorized = self.spec_motorized
-            local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
-            local maxRpm = spec_motorized.motor.maxRpm
-            local rpmLoad = lastRpm / maxRpm
-            if rpmLoad > 0.75 then
-                g_currentMission:showBlinkingWarning(g_i18n:getText('ads_cold_engine_message'), 2800)
-            end
-    end
-
-    --- Messages, stop ai worker
-    if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
-        for _, effectData in pairs(spec.activeEffects) do
-            if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
-                if self:getIsActiveForInput(true) and not self:isUnderService() then
-                    g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 200)
-                end
-                if self.isServer and self:getIsAIActive() and effectData.extraData.disableAi then 
-                    self:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) 
-                end
-            end
-        end
-    end
-
-    --- ai worker overload, temp control
+    
+    --- AI worker overload, temp control
     if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL then
         self:updateAiWorkerCruiseControl(spec.effectsUpdateTimer)
     end
@@ -1782,6 +1903,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local prevConditionLevel = spec.conditionLevel
     local prevRawEngineTemp = spec.rawEngineTemperature
     local prevRawTransTemp = spec.rawTransmissionTemperature
+    local prevBatterySoc = spec.batterySoc
+    local prevBatteryVoltage = spec.batteryVoltageV
     local prevThermostatState = spec.thermostatState
     local prevSystemsHash = 0
     do
@@ -1841,6 +1964,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         or math.abs((spec.maintenanceTimer or 0) - (prevMaintenanceTimer or 0)) > 0.5
         or math.abs((spec.rawEngineTemperature or 0) - (prevRawEngineTemp or 0)) > 0.25
         or math.abs((spec.rawTransmissionTemperature or 0) - (prevRawTransTemp or 0)) > 0.25
+        or math.abs((spec.batterySoc or 0) - (prevBatterySoc or 0)) > 0.0025
+        or math.abs((spec.batteryVoltageV or 0) - (prevBatteryVoltage or 0)) > 0.02
         or spec.thermostatState ~= prevThermostatState
         or math.abs((spec._fuelUsageRaw or 0) - (spec._prevSyncFuelUsage or 0)) > 0.3 then
             self:raiseDirtyFlags(spec.adsDirtyFlag_state)
@@ -5227,7 +5352,7 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
     if spec.systems ~= nil and spec.systems.electrical ~= nil and spec.systems.electrical.isMotorStarted then
         isCranking = true
     end
-    local startFail = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_START_FAILURE_CHANCE or nil
+    local startFail = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_HARD_START_MODIFIER or nil
     if startFail ~= nil and startFail.extraData ~= nil and startFail.extraData.status == "CRANKING" then
         isCranking = true
     end

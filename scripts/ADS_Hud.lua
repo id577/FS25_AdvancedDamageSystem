@@ -55,6 +55,7 @@ function ADS_Hud:new()
     }
     self.engineTempText = {}
     self.motorLoadText = {}
+    self.batteryVoltageText = {}
     self.tsTempText = {
         year = 2000
     }
@@ -186,6 +187,9 @@ function ADS_Hud:storeScaledValues()
     self.motorLoadText.offsetX, self.motorLoadText.offsetY = self:scalePixelValuesToScreenVector(-39, 4)
 	self.motorLoadText.size = self:scalePixelToScreenHeight(9)
 
+    self.batteryVoltageText.offsetX, self.batteryVoltageText.offsetY = self:scalePixelValuesToScreenVector(37, 4)
+	self.batteryVoltageText.size = self:scalePixelToScreenHeight(9)
+
     self.tsTempText.offsetX, self.tsTempText.offsetY = self:scalePixelValuesToScreenVector(38, 3)
 	self.tsTempText.size = self:scalePixelToScreenHeight(8)
 
@@ -214,7 +218,7 @@ function ADS_Hud:drawDashboard()
         local targetColor = colors.DEFAULT 
         
 
-        if vehicle:getIsMotorStarted() then
+        if vehicle:getIsMotorStarted() or vehicle:getMotorState() == 2 then
             local motorStartedDelta = g_currentMission.environment.mission.time - vehicle:getMotorStartTime()
             if motorStartedDelta < 500 and spec.year >= 1990 then targetColor = colors.WARNING end
             if motorStartedDelta < 1000 and motorStartedDelta > 500 and spec.year >= 2005 then targetColor = colors.CRITICAL end
@@ -246,6 +250,9 @@ function ADS_Hud:drawDashboard()
             if hudIndicatorId == self.indicators.service.name and serviceInterval > 1.0 then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
 
+            if vehicle:getMotorState() == 2 then
+                targetColor = colors.WARNING
+            end
         else
             local activeData = activeIndicators[hudIndicatorId]
             if activeData then
@@ -255,7 +262,7 @@ function ADS_Hud:drawDashboard()
 
         icon:setColor(unpack(targetColor))
         icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
-        if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle or hudIndicatorId == self.indicators.oil.name then 
+        if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle or hudIndicatorId == self.indicators.oil.name or hudIndicatorId == self.indicators.transmission.name then 
             icon:setVisible(false)
         else
             icon:setVisible(hudIndicatorData.year < spec.year)
@@ -263,10 +270,11 @@ function ADS_Hud:drawDashboard()
         icon:render()
         end
 
-    local engineTemp, transTemp = spec.engineTemperature, spec.transmissionTemperature
+    local engineTemp, transTemp, batteryVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.batteryVoltageV
     local motorLoad = spec._smoothedMotorLoad or 0
 
     local tempSign = "°C"
+    local voltageSing = "V"
 
     if g_gameSettings:getValue(GameSettings.SETTING.USE_FAHRENHEIT) then
         engineTemp = engineTemp * 1.8 + 32
@@ -275,14 +283,19 @@ function ADS_Hud:drawDashboard()
     end
 
     local tempText = ""
-
     if transTemp > -90 and spec.year >= self.tsTempText.year then
         tempText = string.format("%.0f%s | %.0f%s" , engineTemp, tempSign, transTemp, tempSign)
     else
         tempText = string.format("%.1f%s", engineTemp, tempSign)
     end
 
+    local batteryVoltageText = string.format("%.1f%s", batteryVoltageV, voltageSing)
     local motorText = string.format("%.0f%%", math.max(motorLoad * 100, 0))
+
+    local batteryVoltageTextColor = {1, 1, 1, 1}
+    if batteryVoltageV < 12 then
+        batteryVoltageTextColor = colors.WARNING
+    end
 
     local motorLoadTextColor = {1, 1, 1, 1}
     if motorLoad > ADS_Config.CORE.ENGINE_FACTOR_DATA.MOTOR_OVERLOADED_THRESHOLD then
@@ -297,6 +310,8 @@ function ADS_Hud:drawDashboard()
         renderText(posX + self.engineTempText.offsetX, posY + self.engineTempText.offsetY, self.engineTempText.size, tempText)
         setTextColor(motorLoadTextColor[1], motorLoadTextColor[2], motorLoadTextColor[3], motorLoadTextColor[4])
         renderText(posX + self.motorLoadText.offsetX, posY + self.motorLoadText.offsetY, self.motorLoadText.size, motorText)
+        setTextColor(batteryVoltageTextColor[1], batteryVoltageTextColor[2], batteryVoltageTextColor[3], batteryVoltageTextColor[4])
+        renderText(posX + self.batteryVoltageText.offsetX, posY + self.batteryVoltageText.offsetY, self.batteryVoltageText.size, batteryVoltageText)
     end
 
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
