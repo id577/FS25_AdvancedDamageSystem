@@ -297,7 +297,7 @@ function ADS_ReportDialog:updateScreen()
     local activeEffects = self.lastReport.conditionData.activeEffects or {}
 
     -- harvesting performance
-    if ADS_Breakdowns.BreakdownRegistry.YIELD_SENSOR_MALFUNCTION.isApplicable(self.vehicle) then
+    if ADS_Breakdowns.BreakdownRegistry.HARVEST_PROCESSING_SYSTEM_WEAR.isApplicable(self.vehicle) then
         local harvestingEfficiencyModifier = 1.0
         local yieldReductionModifier = getEffectValue(activeEffects, "YIELD_REDUCTION_MODIFIER") or 0
         if yieldReductionModifier then

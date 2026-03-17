@@ -122,7 +122,7 @@ local breakdownPriceMultipliers = {
     FUEL_INJECTOR_MALFUNCTION = 0.80,
     FUEL_FILTER_CLOGGING = 0.35,
     FUEL_LINE_AIR_LEAK = 0.45,
-    YIELD_SENSOR_MALFUNCTION = 0.30,
+    HARVEST_PROCESSING_SYSTEM_WEAR = 0.85,
     MATERIAL_FLOW_SYSTEM_WEAR = 0.35,
     UNLOADING_AUGER_MALFUNCTION = 0.40,
 }
@@ -154,7 +154,7 @@ local breakdownProgressMultipliers = {
     FUEL_INJECTOR_MALFUNCTION = 1.1,
     FUEL_FILTER_CLOGGING = 1.2,
     FUEL_LINE_AIR_LEAK = 0.8,
-    YIELD_SENSOR_MALFUNCTION = 1.1,
+    HARVEST_PROCESSING_SYSTEM_WEAR = 1.35,
     MATERIAL_FLOW_SYSTEM_WEAR = 1.0,
     UNLOADING_AUGER_MALFUNCTION = 1.2
 }
@@ -2583,13 +2583,20 @@ ADS_Breakdowns.BreakdownRegistry = {
     },
 
     -- workprocess system
-    YIELD_SENSOR_MALFUNCTION = {
+    HARVEST_PROCESSING_SYSTEM_WEAR  = {
         isSelectable = true,
         system = systems.WORKPROCESS,
         isApplicable = function(vehicle)
-            local spec = vehicle.spec_AdvancedDamageSystem
             local vtype = vehicle.type.name
-            return spec.year > 2000 and (vtype == 'combineDrivable' or vtype == 'combineCutter')
+            if  vtype == 'combineDrivable' or
+                vtype == 'combineCutter' or
+                vtype == 'combineCutterFruitPreparer' or
+                vtype == 'cottonHarvester' or
+                vtype == 'riceHarvester' and
+                vtype == 'vineHarvester' then
+                    return true
+            end
+            return false
         end,
         probability = function(vehicle)
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
@@ -2610,18 +2617,18 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_minor",
                 description = "ads_breakdowns_yield_sensor_malfunction_stage1_description",
                 detectionChance = 1.0,
-                progressMultiplier = 2.0 * breakdownProgressMultipliers.YIELD_SENSOR_MALFUNCTION,
-                repairPrice = 1.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
+                progressMultiplier = 2.0 * breakdownProgressMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
+                repairPrice = 1.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 effects = {
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.05, aggregation = "sum" }
+                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.05, aggregation = "sum" },
                 }
             },
             {
                 severity = "ads_breakdowns_severity_moderate",
                 description = "ads_breakdowns_yield_sensor_malfunction_stage2_description",
                 detectionChance = 1.0,
-                progressMultiplier = 1.0 * breakdownProgressMultipliers.YIELD_SENSOR_MALFUNCTION,
-                repairPrice = 2.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
+                progressMultiplier = 1.0 * breakdownProgressMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
+                repairPrice = 2.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 effects = {
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.1, aggregation = "sum" },
                 },
@@ -2633,8 +2640,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 severity = "ads_breakdowns_severity_major",
                 description = "ads_breakdowns_yield_sensor_malfunction_stage3_description",
                 detectionChance = 1.0,
-                progressMultiplier = 0.5 * breakdownProgressMultipliers.YIELD_SENSOR_MALFUNCTION,
-                repairPrice = 4.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
+                repairPrice = 4.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 effects = { 
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.2, aggregation = "sum" },
                 },
@@ -2647,12 +2654,12 @@ ADS_Breakdowns.BreakdownRegistry = {
                 description = "ads_breakdowns_yield_sensor_malfunction_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
-                repairPrice = 8.0 * breakdownPriceMultipliers.YIELD_SENSOR_MALFUNCTION,
+                repairPrice = 8.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 effects = { 
                     { id = "YIELD_REDUCTION_MODIFIER", value = -0.4, aggregation = "sum", extraData = {message = 'ads_breakdowns_yield_sensor_malfunction_stage4_message', disableAi = true} },
                 },
                 indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             }
         }
@@ -5137,6 +5144,10 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
     end
 
     if engineHardStart and engineHardStart.extraData.status == 'IDLE' then
+        local hasManualStartInput = spec.startButtonHeld == true or spec.startButtonDown == true
+        if not hasManualStartInput then
+            return
+        end
         engineHardStart.extraData.status = 'CRANKING'
         ADS_EffectSyncEvent.send(self, 'ENGINE_HARD_START_MODIFIER', "CRANKING", 0, 0, 0)
         return
