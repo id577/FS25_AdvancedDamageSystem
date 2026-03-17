@@ -133,7 +133,7 @@ function ADS_Hud:draw()
 
     -- manager debug panel temporarily disabled
 
-    if ADS_Config.DEBUG and self.vehicle ~= nil and self.activeVehicleDebugPanel.isVisible then
+    if ADS_Config.DEBUG and g_currentMission.isMasterUser and self.vehicle ~= nil and self.activeVehicleDebugPanel.isVisible then
         self:drawActiveVehicleHUD()
     end
 
@@ -270,7 +270,7 @@ function ADS_Hud:drawDashboard()
         icon:render()
         end
 
-    local engineTemp, transTemp, batteryVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.batteryVoltageV
+    local engineTemp, transTemp, systemVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.systemVoltageV
     local motorLoad = spec._smoothedMotorLoad or 0
 
     local tempSign = "°C"
@@ -289,11 +289,11 @@ function ADS_Hud:drawDashboard()
         tempText = string.format("%.1f%s", engineTemp, tempSign)
     end
 
-    local batteryVoltageText = string.format("%.1f%s", batteryVoltageV, voltageSing)
+    local batteryVoltageText = string.format("%.1f%s", systemVoltageV, voltageSing)
     local motorText = string.format("%.0f%%", math.max(motorLoad * 100, 0))
 
     local batteryVoltageTextColor = {1, 1, 1, 1}
-    if batteryVoltageV < 12 then
+    if systemVoltageV < 12 then
         batteryVoltageTextColor = colors.WARNING
     end
 
@@ -630,6 +630,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         electricalDbg.expiredServiceFactor or 0,
         electricalDbg.weatherFactor or 0,
         electricalDbg.lightsFactor or 0,
+        electricalDbg.crankingStressFactor or 0,
         electricalDbg.overheatFactor or 0
     ) * bcw
     local chassisMaxFactor = math.max(
@@ -748,6 +749,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "sf", statKey = "sf", value = electricalDbg.expiredServiceFactor or 0 },
         { shortName = "wf", statKey = "wf", value = electricalDbg.weatherFactor or 0 },
         { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
+        { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s", tostring(spec.systems ~= nil and spec.systems.electrical ~= nil and spec.systems.electrical.isCranking == true)) },
         { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 }
     })
 
@@ -869,7 +871,8 @@ function ADS_Hud:drawActiveVehicleHUD()
     local batteryLines = {}
     local soc = batteryDbg.soc or spec.batterySoc or 0
     local ocvV = batteryDbg.ocvV or 0
-    local termV = batteryDbg.termV or spec.batteryVoltageV or ocvV
+    local termV = spec.batteryTerminalVoltageV or batteryDbg.batteryTerminalVoltageV or batteryDbg.batteryTerminalV or ocvV
+    local systemV = spec.systemVoltageV or batteryDbg.systemVoltageVSmoothed or batteryDbg.systemVoltageV or termV
     local tempC = batteryDbg.batteryTempC or spec.batteryTempC or 0
     local targetC = batteryDbg.battTempTargetC or 0
     local iAlt = batteryDbg.iAltAvail or 0
@@ -879,9 +882,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     local iBatteryA = batteryDbg.iBatteryA or math.abs(iNetRaw)
 
     addLine(batteryLines, string.format(
-        "state: soc %.1f%% | term %.2fV (ocv %.2f) | temp %.1fC -> %.1fC",
+        "state: soc %.1f%% | term %.2fV | sys %.2fV | ocv %.2fV | temp %.1fC -> %.1fC",
         asPercent(soc),
         termV,
+        systemV,
         ocvV,
         tempC,
         targetC
@@ -899,6 +903,16 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {0.9, 1.0, 0.9, 1}, 0.95)
 
     addLine(batteryLines, string.format(
+        "bus: reg %.2fV | head %.2fV | deficit %.1fA | sag %.2fV | regK %.2f | sagK %.2f",
+        batteryDbg.regulatedVoltageV or 0,
+        batteryDbg.altChargeHeadroomV or 0,
+        batteryDbg.altDeficitA or 0,
+        batteryDbg.altSagV or 0,
+        batteryDbg.altRegulationHealth or 0,
+        batteryDbg.altHealthDeficitMult or 1
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+
+    addLine(batteryLines, string.format(
         "loads [b/l/c/h/p]: %.1f/%.1f/%.1f/%.1f/%.1f A",
         batteryDbg.baseLoadA or 0,
         batteryDbg.lightsLoadA or 0,
@@ -908,23 +922,24 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {0.9, 1.0, 0.9, 1}, 0.95)
 
     addLine(batteryLines, string.format(
-        "model: acc %.3f (t %.3f * s %.3f) | cap %.1fAh * %.3f * h %.3f = %.1fAh | rInt %.5f (f %.3f) | p %.1fW dT %.4fC",
+        "model: acc %.3f (t %.3f * s %.3f * h %.3f) | cap %.1fAh * %.3f * h %.3f = %.1fAh | rInt %.5f (t %.3f * h %.3f) | p %.1fW dT %.4fC",
         batteryDbg.acceptK or 1,
         batteryDbg.acceptTempK or 1,
         batteryDbg.acceptSocK or 1,
+        batteryDbg.acceptHealthK or 1,
         batteryDbg.capacityNominalAh or spec.batteryCapacityAh or 0,
         batteryDbg.capacityFactor or 1,
         batteryDbg.batteryHealth or spec.batteryHealth or 0,
         batteryDbg.capacityEffectiveAh or spec.batteryCapacityAh or 0,
         batteryDbg.rIntOhm or 0,
         batteryDbg.rintFactor or 1,
+        batteryDbg.rIntHealthFactor or 1,
         batteryDbg.pJouleW or 0,
         batteryDbg.dTJoule or 0
     ), {0.9, 1.0, 0.9, 1}, 0.95)
     addLine(batteryLines, string.format(
-        "vdrop/rise: load %.2fV | crank %.2fV | rise %.2fV | cranking %d | iDis/iCh %.1f/%.1fA",
+        "vdrop/rise: load %.2fV | rise %.2fV | cranking %d | iDis/iCh %.1f/%.1fA",
         batteryDbg.termLoadDropV or 0,
-        batteryDbg.termCrankDropV or 0,
         batteryDbg.termChargeRiseV or 0,
         batteryDbg.termIsCranking or 0,
         batteryDbg.termDischargeA or 0,

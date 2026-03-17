@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 75,
+    VER = 81,
 
     DEBUG = false,
 
@@ -116,8 +116,7 @@ ADS_Config = {
 
         ELECTRICAL_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 2.0,
-            CRANKING_STRESS_DAMAGE = 0.00001,
-            CRANKING_STRESS_THRESHOLD = 5,
+            CRANKING_STRESS_MULTIPLIER = 50,
             RAIN_FACTOR_MULTIPLIER = 0.5,
             SNOW_FACTOR_MULTIPLIER = 0.3,
             HALL_FACTOR_MULTIPLIER = 1.0,
@@ -433,17 +432,14 @@ ADS_Config = {
         BATTERY_USABLE_CAPACITY_FACTOR = 0.2,
         AMBIENT_DEFAULT_C = 15,
         BATTERY_THERMAL_TAU_S = 600,
-        BATTERY_THERMAL_CAPACITY_J_PER_K = 3600,
+        BATTERY_THERMAL_CAPACITY_J_PER_K = 2400,
         ENGINE_BAY_COUPLING = 0.30,
-        RINT_REF_OHM = 0.06,
+        RINT_REF_OHM = 0.005,
+        BATTERY_HEALTH_RINT_MAX_MULT = 3.0,
         OCV_EMPTY_V = 11.7,
         OCV_FULL_V = 12.7,
-        BATTERY_LOAD_DROP_PER_20A_V = 0.10,
         BATTERY_LOAD_DROP_MIN_V = 12.2,
-        BATTERY_LOAD_IR_SCALE = 0.0,
-        BATTERY_CRANK_MIN_V = 10.0,
         BATTERY_CRANK_CURRENT_A = 250,
-        BATTERY_CRANK_DROP_MULT = 2.0,
         BATTERY_CHARGE_RISE_PER_20A_V = 0.18,
         BATTERY_CHARGE_RISE_MAX_V = 1.6,
         BATTERY_CHARGE_TARGET_MAX_V = 14.4,
@@ -454,6 +450,7 @@ ADS_Config = {
         CHARGE_ACCEPT_TEMP_MAX_C = 25,
         CHARGE_TAPER_SOC_START = 0.80,
         CHARGE_TAPER_SOC_END = 0.98,
+        BATTERY_HEALTH_ACCEPTANCE_MIN = 0.35,
         ALT_MAX_OUTPUT = 100,
         ALT_IDLE_FACTOR = 0.30,
         ALT_RPM_CURVE = {
@@ -462,7 +459,18 @@ ADS_Config = {
             {0.50, 0.80},
             {0.75, 0.95},
             {1.00, 1.00}
-        }
+        },
+        ALTERNATOR_REGULATED_VOLTAGE = 14.1, 
+        ALTERNATOR_MIN_REGULATED_VOLTAGE = 13.6,
+        SYSTEM_VOLTAGE_TAU_MS = 250,          
+        BATTERY_VOLTAGE_TAU_MS = 300,      
+        ALT_DEFICIT_SAG_PER_AMP = 0.045,
+        ALT_HEALTH_REGULATION_THRESHOLD = 0.15,
+        ALT_LOW_HEALTH_DEFICIT_MULT = 1.8,
+        ALT_BATTERY_SUPPORT_GAIN = 0.45,
+        ALT_SURPLUS_CHARGE_HEADROOM_V = 0.3,  
+        MAX_SYSTEM_VOLTAGE = 14.4,
+        MIN_SYSTEM_VOLTAGE = 9.0,
     },
 
     -- ====================================================================================
