@@ -1665,42 +1665,44 @@ end
 -- ==========================================================
 
 local function registerVehicle(vehicle)
-    if (vehicle.propertyState == 2 or vehicle.propertyState == 3 or vehicle.propertyState == 4) and vehicle.ownerFarmId ~= 0 and vehicle.ownerFarmId < 10 then
+    if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[vehicle.uniqueId] == nil then
+        if (vehicle.propertyState == 2 or vehicle.propertyState == 3 or vehicle.propertyState == 4) and vehicle.ownerFarmId ~= 0 and vehicle.ownerFarmId < 10 then
 
-        local spec = vehicle.spec_AdvancedDamageSystem
-        if spec == nil then return end
+            local spec = vehicle.spec_AdvancedDamageSystem
+            if spec == nil then return end
 
-        log_dbg(" -> Registering vehicle in ADS_Main.vehicles list. ID:", vehicle.uniqueId)
+            log_dbg(" -> Registering vehicle in ADS_Main.vehicles list. ID:", vehicle.uniqueId)
             --- Registration in ADS_Main.vehicles
             ADS_Main.vehicles[vehicle.uniqueId] = vehicle
             ADS_Main.numVehicles = ADS_Main.numVehicles + 1
-   
+    
             --- if first mod load or used vehicle
             if vehicle.isServer then
-                if (vehicle:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel) or vehicle:getDamageAmount() > 0 then
-                    -- Used vehicle logic
-                    spec.serviceLevel = 1 - vehicle:getDamageAmount()
-                    for _, systemData in pairs(spec.systems) do
-                        systemData.condition = math.max(1 - vehicle:getFormattedOperatingTime() / 150, math.random() * 0.3)
+                    if (vehicle:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel) or vehicle:getDamageAmount() > 0 then
+                        -- Used vehicle logic
+                        spec.serviceLevel = 1 - vehicle:getDamageAmount()
+                        for _, systemData in pairs(spec.systems) do
+                            systemData.condition = math.max(1 - vehicle:getFormattedOperatingTime() / 150, math.random() * 0.3)
+                        end
+                        vehicle:setDamageAmount(0.0, true)
                     end
-                    vehicle:setDamageAmount(0.0, true)
-                end
 
-                --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
-                if (spec.maintenanceLog == nil or #spec.maintenanceLog == 0) then
-                    vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
-                end
+                    --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
+                    if (spec.maintenanceLog == nil or #spec.maintenanceLog == 0) then
+                        vehicle:addEntryToMaintenanceLog(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, 0)
+                    end
             end
 
             --- Updating vehicle's year from Vehicle Years mod
             local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
             if storeItem ~= nil and storeItem.specs ~= nil and storeItem.specs.year ~= nil and tonumber(storeItem.specs.year) ~= nil then
-                spec.year = tonumber(storeItem.specs.year)
+                    spec.year = tonumber(storeItem.specs.year)
             end
 
             --- Updating vehicle's reliability and maintainability
             spec.reliability, spec.maintainability = AdvancedDamageSystem.getBrandReliability(vehicle)
         end
+    end
 end
 
 local function syncColdEngineEffect(vehicle)
@@ -1708,7 +1710,7 @@ local function syncColdEngineEffect(vehicle)
     if spec == nil then return end
 
     if vehicle.isServer then
-        local engTemp = spec.engineTemperature
+        local engTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
         local breakdownId = 'COLD_ENGINE'
 
         if engTemp <= -10 and not vehicle:hasBreakdown(breakdownId) then
@@ -1748,15 +1750,17 @@ end
 local function syncOverheatProtection(vehicle) -- TO-DO: Rework
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then return end
+    local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
+    local rawTransmissionTemp = spec.rawTransmissionTemperature or spec.transmissionTemperature or -99
 
     if vehicle.isServer and spec.year >= 2000 then
         local overheatProtectionId = 'OVERHEAT_PROTECTION'
         local overheatProtection = vehicle:getActiveBreakdowns()[overheatProtectionId]
-        if overheatProtection and (spec.transmissionTemperature or -99) < 100 and (spec.engineTemperature or -99) < 100 then
+        if overheatProtection and rawTransmissionTemp < 100 and rawEngineTemp < 100 then
             vehicle:removeBreakdown(overheatProtectionId)
         end
         if vehicle:getIsMotorStarted() then
-            if ((spec.transmissionTemperature or -99) > 105 or (spec.engineTemperature or -99) > 105) and not overheatProtection then
+            if (rawTransmissionTemp > 105 or rawEngineTemp > 105) and not overheatProtection then
                 vehicle:addBreakdown(overheatProtectionId, 1)
                 if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
                     g_soundManager:playSample(spec.samples.alarm)
@@ -1765,17 +1769,17 @@ local function syncOverheatProtection(vehicle) -- TO-DO: Rework
                 if vehicle:getCruiseControlState() ~= 0 then
                     vehicle:setCruiseControlState(0, true)
                 end
-                if ((spec.transmissionTemperature or -99) > 125 or (spec.engineTemperature or -99) > 125) and overheatProtection.stage < 4 then
+                if (rawTransmissionTemp > 125 or rawEngineTemp > 125) and overheatProtection.stage < 4 then
                     vehicle:advanceBreakdown(overheatProtectionId)
                     if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
                     end
-                elseif ((spec.transmissionTemperature or -99) > 115 or (spec.engineTemperature or -99) > 115) and overheatProtection.stage < 3 then
+                elseif (rawTransmissionTemp > 115 or rawEngineTemp > 115) and overheatProtection.stage < 3 then
                     vehicle:advanceBreakdown(overheatProtectionId)
                     if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
                     end
-                elseif ((spec.transmissionTemperature or -99) > 110 or (spec.engineTemperature or -99) > 110) and overheatProtection.stage < 2 then
+                elseif (rawTransmissionTemp > 110 or rawEngineTemp > 110) and overheatProtection.stage < 2 then
                     vehicle:advanceBreakdown(overheatProtectionId)
                     if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() then
                         g_soundManager:playSample(spec.samples.alarm)
@@ -1786,7 +1790,7 @@ local function syncOverheatProtection(vehicle) -- TO-DO: Rework
     else
         if vehicle.isServer then
             local engineFailedEffect = spec.activeEffects.ENGINE_FAILURE
-            if (spec.engineTemperature or -99) > 125 and not engineFailedEffect then
+            if rawEngineTemp > 125 and not engineFailedEffect then
                 if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.effectsUpdateTimer, 3) then
                     vehicle:addBreakdown('ENGINE_JAM')
                 end
@@ -1906,13 +1910,11 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     end
 
     --- Registration in ADS_Main.vehicles and first load checks.
-    if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil then
-        registerVehicle(self)
-    end
-
+    registerVehicle(self)
+    
     --- Temperature smoothing
     self:getSmoothedTemperature(spec.effectsUpdateTimer)
-    
+
     --- Checking for cold engine effect
     syncColdEngineEffect(self)
 
@@ -5492,7 +5494,7 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
     local iAltAvail = calculateAlternatorOutput(self, isMotorStarted, iLoads)
     local iBatteryA = math.abs((iAltAvail or 0) - (iLoads or 0))
 
-    AdvancedDamageSystem.updateBatteryTemperatureC(self, dtS, environmentTemp, spec.engineTemperature, iBatteryA, rintF)
+    AdvancedDamageSystem.updateBatteryTemperatureC(self, dtS, environmentTemp, spec.rawEngineTemperature or spec.engineTemperature, iBatteryA, rintF)
     AdvancedDamageSystem.updateBatterySoc(self, dtS, iAltAvail, iLoads, capF)
 
     local cfg = ADS_Config.ELECTRICAL or {}
@@ -5634,8 +5636,9 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     
     local dbg = spec.debugData.engineTemp
 
-    if isMotorStarted and (spec.engineTemperature or -99) > C.ENGINE_THERMOSTAT_MIN_TEMP then
-        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.engineTemperature, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
+    local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
+    if isMotorStarted and rawEngineTemp > C.ENGINE_THERMOSTAT_MIN_TEMP then
+        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, rawEngineTemp, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
     else
         spec.thermostatState = 0.0
         spec.engTermPID.integral = 0
@@ -5735,8 +5738,9 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     spec.rawTransmissionTemperature = spec.rawTransmissionTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
     spec.rawTransmissionTemperature = math.max(spec.rawTransmissionTemperature, eviromentTemp)
 
-    if isMotorStarted and (spec.transmissionTemperature or -99) > C.TRANS_THERMOSTAT_MIN_TEMP then
-        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, spec.transmissionTemperature, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
+    local rawTransmissionTemp = spec.rawTransmissionTemperature or spec.transmissionTemperature or -99
+    if isMotorStarted and rawTransmissionTemp > C.TRANS_THERMOSTAT_MIN_TEMP then
+        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, rawTransmissionTemp, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
     else
         spec.transmissionThermostatState = 0.0
         spec.transTermPID.integral = 0
@@ -5858,10 +5862,24 @@ function AdvancedDamageSystem:getSmoothedTemperature(dt)
     local eviromentTemp = g_currentMission.environment.weather.forecast:getCurrentWeather().temperature or 0
     local motor = self:getMotor()
     local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+    local snapThreshold = 5.0
 
-    spec.engineTemperature = math.max((spec.engineTemperature or 0) + alpha * (spec.rawEngineTemperature - (spec.engineTemperature or 0)), eviromentTemp)
+    local rawEngineTemperature = spec.rawEngineTemperature or eviromentTemp
+    local currentEngineTemperature = spec.engineTemperature or rawEngineTemperature
+    if math.abs(rawEngineTemperature - currentEngineTemperature) >= snapThreshold then
+        spec.engineTemperature = math.max(rawEngineTemperature, eviromentTemp)
+    else
+        spec.engineTemperature = math.max(currentEngineTemperature + alpha * (rawEngineTemperature - currentEngineTemperature), eviromentTemp)
+    end
+
     if vehicleHaveCVT then
-        spec.transmissionTemperature = math.max((spec.transmissionTemperature or 0) + alpha * (spec.rawTransmissionTemperature - (spec.transmissionTemperature or 0)), eviromentTemp)
+        local rawTransmissionTemperature = spec.rawTransmissionTemperature or eviromentTemp
+        local currentTransmissionTemperature = spec.transmissionTemperature or rawTransmissionTemperature
+        if math.abs(rawTransmissionTemperature - currentTransmissionTemperature) >= snapThreshold then
+            spec.transmissionTemperature = math.max(rawTransmissionTemperature, eviromentTemp)
+        else
+            spec.transmissionTemperature = math.max(currentTransmissionTemperature + alpha * (rawTransmissionTemperature - currentTransmissionTemperature), eviromentTemp)
+        end
     end
 end
 

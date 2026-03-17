@@ -5053,7 +5053,8 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HARD_START_MODIFIER = {
                     g_soundManager:playSample(spec.samples.starterCranking)
                 end
 
-                if v.isServer and tryStartMotor(dt, effect.value, spec.engineTemperature, effect.extraData.preCrankVoltageV) then
+                local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
+                if v.isServer and tryStartMotor(dt, effect.value, rawEngineTemp, effect.extraData.preCrankVoltageV) then
                     effect.extraData.timer = motorStartDelay
                     effect.extraData.status = 'PASSED'
                     ADS_EffectSyncEvent.send(vehicle, handler.getEffectName(), "PASSED", motorStartDelay, 0, 0)
@@ -5144,8 +5145,11 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
     end
 
     if engineHardStart and engineHardStart.extraData.status == 'IDLE' then
+        local automaticMotorStartEnabled = g_currentMission ~= nil
+            and g_currentMission.missionInfo ~= nil
+            and g_currentMission.missionInfo.automaticMotorStartEnabled == true
         local hasManualStartInput = spec.startButtonHeld == true or spec.startButtonDown == true
-        if not hasManualStartInput then
+        if automaticMotorStartEnabled and not hasManualStartInput then
             return
         end
         engineHardStart.extraData.status = 'CRANKING'
