@@ -44,16 +44,16 @@ AdvancedDamageSystem = {
         FUEL = "ads_spec_system_fuel"
     },
 
-WORKSHOP = {
+    WORKSHOP = {
     DEALER  = "ads_spec_workshop_dealer",
     MOBILE  = "ads_spec_workshop_mobile",
     OWN     = "ads_spec_workshop_own",
     [1] = "ads_spec_workshop_dealer",
     [2] = "ads_spec_workshop_mobile",
     [3] = "ads_spec_workshop_own",
-},
+    },
 
-PART_TYPES = {
+    PART_TYPES = {
     OEM         = "ads_spec_part_types_oem",
     USED        = "ads_spec_part_types_used",
     AFTERMARKET = "ads_spec_part_types_aftermarket",
@@ -62,43 +62,43 @@ PART_TYPES = {
     [2] = "ads_spec_part_types_used",
     [3] = "ads_spec_part_types_aftermarket",
     [4] = "ads_spec_part_types_premium",
-},
+    },
 
-INSPECTION_TYPES = {
+    INSPECTION_TYPES = {
     STANDARD = "ads_spec_inspection_standard",
     VISUAL   = "ads_spec_inspection_visual",
     COMPLETE = "ads_spec_inspection_complete",
     [1] = "ads_spec_inspection_standard",
     [2] = "ads_spec_inspection_visual",
     [3] = "ads_spec_inspection_complete",
-},
+    },
 
-MAINTENANCE_TYPES = {
+    MAINTENANCE_TYPES = {
     STANDARD = "ads_spec_maintenance_standard",
     MINIMAL  = "ads_spec_maintenance_minimal",
     EXTENDED = "ads_spec_maintenance_extended",
     [1] = "ads_spec_maintenance_standard",
     [2] = "ads_spec_maintenance_minimal",
     [3] = "ads_spec_maintenance_extended",
-},
+    },
 
-REPAIR_TYPES = {
+    REPAIR_TYPES = {
     MEDIUM = "ads_spec_repair_type_replacement",
     LOW    = "ads_spec_repair_type_fix",
     HIGH   = "ads_spec_repair_type_with_related_parts",
     [1] = "ads_spec_repair_type_fix",
     [2] = "ads_spec_repair_type_replacement",
     [3] = "ads_spec_repair_type_with_related_parts",
-},
+    },
 
-OVERHAUL_TYPES = {
+    OVERHAUL_TYPES = {
     STANDARD = "ads_spec_overhaul_standard",
     PARTIAL  = "ads_spec_overhaul_partial",
     FULL     = "ads_spec_overhaul_full",
     [1] = "ads_spec_overhaul_standard",
     [2] = "ads_spec_overhaul_partial",
     [3] = "ads_spec_overhaul_full",
-},
+    },
 }
 
 AdvancedDamageSystem.modDirectory = g_currentModDirectory
@@ -287,8 +287,6 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingProgressElapsedTime", "Pending Progress Elapsed Time")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingMaintenanceServiceStart", "Pending Maintenance Service Start")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingMaintenanceServiceTarget", "Pending Maintenance Service Target")
-    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingOverhaulConditionStart", "Pending Overhaul Condition Start")
-    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingOverhaulConditionTarget", "Pending Overhaul Condition Target")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#systemsState", "Systems state snapshot")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#factorStats", "Per-system accumulated factor stats")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingOverhaulSystemStart", "Pending overhaul per-system start values")
@@ -372,6 +370,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "advanceBreakdown", AdvancedDamageSystem.advanceBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "getActiveBreakdowns", AdvancedDamageSystem.getActiveBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "processPlannedBreakdowns", AdvancedDamageSystem.processPlannedBreakdowns)
+    SpecializationUtil.registerFunction(vehicleType, "processGeneralWearBreakdown", AdvancedDamageSystem.processGeneralWearBreakdown)
     
     SpecializationUtil.registerFunction(vehicleType, "initService", AdvancedDamageSystem.initService)
     SpecializationUtil.registerFunction(vehicleType, "processService", AdvancedDamageSystem.processService)
@@ -739,8 +738,6 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime or 0)
         xmlFile:setValue(key .. "#pendingMaintenanceServiceStart", ADS_Utils.encodeOptionalFloat(spec.pendingMaintenanceServiceStart))
         xmlFile:setValue(key .. "#pendingMaintenanceServiceTarget", ADS_Utils.encodeOptionalFloat(spec.pendingMaintenanceServiceTarget))
-        xmlFile:setValue(key .. "#pendingOverhaulConditionStart", ADS_Utils.encodeOptionalFloat(spec.pendingOverhaulConditionStart))
-        xmlFile:setValue(key .. "#pendingOverhaulConditionTarget", ADS_Utils.encodeOptionalFloat(spec.pendingOverhaulConditionTarget))
         xmlFile:setValue(key .. "#systemsState", ADS_Utils.serializeSystemsState(spec.systems))
         xmlFile:setValue(key .. "#factorStats", ADS_Utils.serializeNumericMap(flattenFactorStats(spec.factorStats)))
         xmlFile:setValue(key .. "#pendingOverhaulSystemStart", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemStart))
@@ -813,6 +810,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.baseConditionLevel = 1.0
     self.spec_AdvancedDamageSystem.serviceLevel = self.spec_AdvancedDamageSystem.baseServiceLevel
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
+    self.spec_AdvancedDamageSystem._prevConditionLevel = 0
 
     self.spec_AdvancedDamageSystem.systems = {
         engine = { name = AdvancedDamageSystem.SYSTEMS.ENGINE, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
@@ -842,6 +840,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.activeIndicators = {}
     self.spec_AdvancedDamageSystem.activeFunctions = {}
     self.spec_AdvancedDamageSystem.originalFunctions = {}
+    self.spec_AdvancedDamageSystem.dynamicBreakdowns = {}
 
     self.spec_AdvancedDamageSystem.maintenanceLog = {}
     self.spec_AdvancedDamageSystem.lastServiceDate = {}
@@ -867,7 +866,9 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.batteryCapacityAh = ADS_Config.ELECTRICAL.BATTART_NOMINAL_CAPACITY
     self.spec_AdvancedDamageSystem.batteryTempC = 0
     self.spec_AdvancedDamageSystem.batteryOpenCircuitVoltageV = 12.7
+    self.spec_AdvancedDamageSystem.rawBatteryTerminalVoltageV = 12.7
     self.spec_AdvancedDamageSystem.batteryTerminalVoltageV = 12.7
+    self.spec_AdvancedDamageSystem.rawSystemVoltageV = 12.7
     self.spec_AdvancedDamageSystem.systemVoltageV = 12.7
     self.spec_AdvancedDamageSystem.alternatorHealth = 1.0
 
@@ -1032,6 +1033,11 @@ function AdvancedDamageSystem:onLoad(savegame)
             longHarvestFactor = 0,
             wetCropFactor = 0,
             longHarvestTimer = 0,
+            currentHarvestRatio = 1.0,
+            currentHarvestPercent = 100.0,
+            lastUnloadOriginalFactor = 1.0,
+            lastUnloadFactor = 1.0,
+            lastUnloadPercent = 100.0,
             breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
@@ -1135,8 +1141,6 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.pendingProgressElapsedTime = 0
     self.spec_AdvancedDamageSystem.pendingMaintenanceServiceStart = nil
     self.spec_AdvancedDamageSystem.pendingMaintenanceServiceTarget = nil
-    self.spec_AdvancedDamageSystem.pendingOverhaulConditionStart = nil
-    self.spec_AdvancedDamageSystem.pendingOverhaulConditionTarget = nil
     self.spec_AdvancedDamageSystem.pendingOverhaulSystemStart = {}
     self.spec_AdvancedDamageSystem.pendingOverhaulSystemTarget = {}
     self.spec_AdvancedDamageSystem.totalBreakdownsOccurred = 0
@@ -1161,9 +1165,21 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     log_dbg("onPostLoad called for vehicle:", self:getFullName())
     local spec = self.spec_AdvancedDamageSystem
 
+    local function getIsElectricVehicle(vehicle)
+        if vehicle.spec_motorized and vehicle.spec_motorized.consumers then
+            for _, consumer in pairs(vehicle.spec_motorized.consumers) do
+                if consumer.fillType == FillType.ELECTRICCHARGE then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+
     local function shouldExcludeFromADS(vehicle)
         local vehicleName = vehicle:getFullName()
-        if  vehicleName == 'Lizard Old Bike' or
+        if  getIsElectricVehicle(vehicle) or
+            vehicleName == 'Lizard Old Bike' or
             vehicleName == 'Lizard Mountain Bike' or
             vehicleName == 'Lizard Motorized Bike' then
                 spec.isExcludedVehicle = true
@@ -1254,8 +1270,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.pendingProgressElapsedTime = savegame.xmlFile:getValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime)
         spec.pendingMaintenanceServiceStart = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceStart", spec.pendingMaintenanceServiceStart))
         spec.pendingMaintenanceServiceTarget = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget))
-        spec.pendingOverhaulConditionStart = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionStart", spec.pendingOverhaulConditionStart))
-        spec.pendingOverhaulConditionTarget = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingOverhaulConditionTarget", spec.pendingOverhaulConditionTarget))
         spec.pendingOverhaulSystemStart = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemStart", ""))
         spec.pendingOverhaulSystemTarget = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemTarget", ""))
         local loadedFactorStatsFlat = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#factorStats", ""))
@@ -1500,16 +1514,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec.rawEngineTemperature = spec.engineTemperature
     spec.rawTransmissionTemperature = spec.transmissionTemperature
 
-    local function getIsElectricVehicle(vehicle)
-        if vehicle.spec_motorized and vehicle.spec_motorized.consumers then
-            for _, consumer in pairs(vehicle.spec_motorized.consumers) do
-                if consumer.fillType == FillType.ELECTRICCHARGE then
-                    return true
-                end
-            end
-        end
-        return false
-    end
+
     
     spec.isElectricVehicle = getIsElectricVehicle(self)
     spec.hydraulicsMoveAlphaCache = {}
@@ -1597,6 +1602,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
 
     enableOrDisableSystems(self)
     resetIsMovingRecursive(self, {})
+    spec._prevConditionLevel = self:getConditionLevel()
     self:recalculateAndApplyEffects()
 end
 
@@ -1799,19 +1805,35 @@ local function syncOverheatProtection(vehicle) -- TO-DO: Rework
     end
 end
 
-local function syncVoltageSagEffect(vehicle)
+local function syncVoltageSagEffect(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil or not vehicle.isServer then return end
+    local triggerDelayMs = 2000
+    if spec.syncVoltageSagEffectTimer == nil then
+        spec.syncVoltageSagEffectTimer = triggerDelayMs
+    end
 
     local motorState = vehicle:getMotorState()
     local isCranking = spec.systems.electrical.isCranking ~= nil and spec.systems.electrical.isCranking
     local breakdownId = 'VOLTAGE_SAG'
-    if (motorState == 1 and spec.systemVoltageV < 12.0 and not isCranking) or (motorState == 4 and spec.systemVoltageV < 13.0)  then
+    local systemVoltageV = spec.rawSystemVoltageV or spec.systemVoltageV or 0
+    local isVoltageSagging = (motorState == 1 and systemVoltageV < 12.0 and not isCranking) or (motorState == 4 and systemVoltageV < 13.0)
+
+    if isVoltageSagging then
         if not vehicle:hasBreakdown(breakdownId) then
-            vehicle:addBreakdown(breakdownId)
+            spec.syncVoltageSagEffectTimer = math.max((spec.syncVoltageSagEffectTimer or triggerDelayMs) - (dt or 0), 0)
+            if spec.syncVoltageSagEffectTimer <= 0 then
+                vehicle:addBreakdown(breakdownId)
+                spec.syncVoltageSagEffectTimer = triggerDelayMs
+            end
+        else
+            spec.syncVoltageSagEffectTimer = triggerDelayMs
         end
-    elseif vehicle:hasBreakdown(breakdownId) then
-        vehicle:removeBreakdown(breakdownId)
+    else
+        spec.syncVoltageSagEffectTimer = triggerDelayMs
+        if vehicle:hasBreakdown(breakdownId) then
+            vehicle:removeBreakdown(breakdownId)
+        end
     end
 end
 
@@ -1919,7 +1941,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     syncColdEngineEffect(self)
 
     --- Checking for dead alternator or dead battery
-    syncVoltageSagEffect(self)
+    syncVoltageSagEffect(self, spec.effectsUpdateTimer)
 
     --- Checking for dead battery if motor is off
     syncDeadBatteryEffect(self)
@@ -2013,8 +2035,10 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:updateChassisSystem(dt)
         self:updateFuelSystem(dt)
         self:updateWorkProcessSystem(dt)
-        --condtition
+        -- condtition
         self:updateConditionLevel()
+        -- general wear
+        self:processGeneralWearBreakdown()
     end
 
     -- Raise dirty flags for changed data
@@ -2333,22 +2357,6 @@ local function ensureSystemData(spec, systemName)
     return systemData
 end
 
-local function syncSystemWearBreakdown(vehicle, systemData, wearBreakdownName)
-    if vehicle == nil or systemData == nil or wearBreakdownName == nil then
-        return
-    end
-
-    local condition = tonumber(systemData.condition) or 1.0
-    local threshold = ADS_Config.CORE.GENERAL_WEAR_THRESHOLD or 0.0
-    local hasWearBreakdown = vehicle:hasBreakdown(wearBreakdownName)
-
-    if condition < threshold and not hasWearBreakdown then
-        vehicle:addBreakdown(wearBreakdownName)
-    elseif condition > threshold and hasWearBreakdown then
-        vehicle:removeBreakdown(wearBreakdownName)
-    end
-end
-
 local function getExpiredServiceMultiplier(serviceLevel, serviceMultiplier)
     if serviceLevel == nil then
         return 1.0
@@ -2398,12 +2406,26 @@ end
 -- condition
 function AdvancedDamageSystem:updateConditionLevel()
     local spec = self.spec_AdvancedDamageSystem
-    local condition = 0
+    local weightedCondition = 0
+    local totalEnabledWeight = 0
+    local systemWeights = ADS_Config.CORE.SYSTEM_WEIGHTS or {}
 
     for systemName, systemData in pairs(spec.systems) do
-        local systemCondition = systemData.condition
-        condition = condition + systemCondition * (ADS_Config.CORE.SYSTEM_WEIGHTS[systemName] or 0)
+        if systemData.enabled ~= false then
+            local weight = tonumber(systemWeights[systemName]) or 0
+            if weight > 0 then
+                local systemCondition = tonumber(systemData.condition) or 1.0
+                weightedCondition = weightedCondition + systemCondition * weight
+                totalEnabledWeight = totalEnabledWeight + weight
+            end
+        end
     end
+
+    local condition = 1.0
+    if totalEnabledWeight > 0 then
+        condition = weightedCondition / totalEnabledWeight
+    end
+
     spec.conditionLevel = math.clamp(condition, 0.001, 1.0)
 end
 
@@ -2429,7 +2451,8 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier
     systemData.stress = math.max((systemData.stress or 0) + stressToAdd, 0)
 
-    local newCondition = (systemData.condition or 1.0) - wearRate * dtMultiplier
+    local conditionToRemove = wearRate * dtMultiplier
+    local newCondition = (systemData.condition or 1.0) - conditionToRemove
     systemData.condition = math.clamp(newCondition, 0.001, 1.0)
 
     local factorStats = ensureFactorStats(spec)
@@ -2567,8 +2590,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-    syncSystemWearBreakdown(self, spec.systems.engine, "ENGINE_WEAR")
        
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         motorLoadFactor = motorLoadFactor,
@@ -2749,8 +2770,6 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-    syncSystemWearBreakdown(self, spec.systems.transmission, "TRANSMISSION_WEAR")
 
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
@@ -3110,9 +3129,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-
-    syncSystemWearBreakdown(self, spec.systems.hydraulics, 'HYDRAULICS_WEAR')
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         weatherFactor = weatherFactor,
@@ -3196,8 +3212,6 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-    syncSystemWearBreakdown(self, spec.systems.cooling, "COOLING_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         weatherFactor = weatherFactor,
@@ -3296,8 +3310,6 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-    syncSystemWearBreakdown(self, spec.systems.electrical, "ELECTRICAL_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         crankingStressFactor = crankingStressFactor,
@@ -3536,8 +3548,6 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-    syncSystemWearBreakdown(self, spec.systems.chassis, "CHASSIS_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         weatherFactor = weatherFactor,
@@ -3694,8 +3704,6 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-    syncSystemWearBreakdown(self, spec.systems.fuel, "FUEL_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         weatherFactor = weatherFactor,
@@ -3785,8 +3793,6 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         wearRate = wearRate * weatherMultiplier
         weatherFactor = wearRate - wearRateWithoutWeather
     end
-
-    syncSystemWearBreakdown(self, systemData, "WORKPROCESS_WEAR")
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         weatherFactor = weatherFactor,
@@ -3810,10 +3816,12 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
         local systemCondition = math.max(systemData.condition or 1.0, 0.001)
         local systemStress = math.max(systemData.stress or 0.0, 0.0)
         local stressThreshold = probabilityData.STRESS_THRESHOLD
+        local hourlyProb = 0.0
 
         if systemStress >= stressThreshold then
             local stressOverload = math.max(systemCondition - systemStress, 0.001)
             local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(stressOverload, probabilityData, dt)
+            hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
 
             local random = math.random()
             if random < failureChancePerFrame then
@@ -3826,20 +3834,34 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
                         if math.random() < criticalOutcomeChance then
                             self:addBreakdown(breakdownId, #registryEntry.stages)
                         else
-                            self:addBreakdown(breakdownId, 1)
+                            local stage = 1
+                            if systemCondition <= ADS_Config.CORE.GENERAL_WEAR_LATE_STAGE_THRESHOLD then
+                                stage = 3
+                            elseif systemCondition <= ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD then
+                                stage = 2
+                            end
+                            self:addBreakdown(breakdownId, stage)
                         end
 
                         systemData.stress = systemStress * ADS_Config.CORE.STRESS_COOLDOWN
+                        systemStress = math.max(systemData.stress or 0.0, 0.0)
+
+                        if systemStress >= stressThreshold then
+                            local cooledStressOverload = math.max(systemCondition - systemStress, 0.001)
+                            local cooledFailureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(cooledStressOverload, probabilityData, dt)
+                            hourlyProb = 1 - (1 - cooledFailureChancePerFrame) ^ (3600000 / dt)
+                        else
+                            hourlyProb = 0.0
+                        end
                     end
                 end
             end
+        end
 
-            if ADS_Config.DEBUG and spec.debugData[systemName] ~= nil then
-                local hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
-                local criticalChance = math.clamp((1 - systemCondition) ^ probabilityData.CRITICAL_DEGREE, probabilityData.CRITICAL_MIN, probabilityData.CRITICAL_MAX)
-                spec.debugData[systemName].breakdownProbability = hourlyProb
-                spec.debugData[systemName].critBreakdownProbability = criticalChance
-            end       
+        if ADS_Config.DEBUG and spec.debugData[systemName] ~= nil then
+            local criticalChance = math.clamp((1 - systemCondition) ^ probabilityData.CRITICAL_DEGREE, probabilityData.CRITICAL_MIN, probabilityData.CRITICAL_MAX)
+            spec.debugData[systemName].breakdownProbability = hourlyProb
+            spec.debugData[systemName].critBreakdownProbability = criticalChance
         end
     end
 end
@@ -4118,7 +4140,7 @@ function AdvancedDamageSystem:processBreakdowns(dt)
                         breakdown.progressTimer = breakdown.progressTimer or 0
                         breakdown.progressTimer = breakdown.progressTimer + dt
                         
-                        local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * math.clamp(0.333 + spec.conditionLevel, 0.333, 1)
+                        local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier
 
                         if breakdown.progressTimer >= stageDuration then
                             local maxStages = #registryEntry.stages
@@ -4149,12 +4171,304 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     end
 end
 
+local function buildGeneralWearBreakdown(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if not spec then
+        return
+    end
+
+    local generalWearBreakdown = {
+        system = 'vehicle',
+        isSelectable = false,
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {}
+            }
+        }
+    }
+
+    local effects = generalWearBreakdown.stages[1].effects
+    local systems = AdvancedDamageSystem.SYSTEMS
+
+    for _, systemData in pairs(spec.systems) do
+        local systemName = systemData.name
+        local systemCondition = vehicle:getSystemConditionLevel(systemName)
+        local effect = nil
+        local isLateStage = systemCondition <= ADS_Config.CORE.GENERAL_WEAR_LATE_STAGE_THRESHOLD
+        
+        if systemData.enabled and systemCondition <= ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD  then
+            
+            --- ENGINE
+            if systemName == systems.ENGINE then
+
+                --- early stage
+                effect = {
+                    id = "ENGINE_TORQUE_MODIFIER",
+                    value = function() 
+                        local baseEffect = -0.30
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,
+                    aggregation = "sum"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+            --- TRANSMISSION
+            elseif systemName == systems.TRANSMISSION then
+                local motor = vehicle:getMotor()
+                if not motor then return false end
+                
+                local isManual = motor.minForwardGearRatio == nil
+                local isPowerShift = motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
+                local isCvt = motor.minForwardGearRatio ~= nil
+
+                --- early stage
+                if isManual then
+                    effect = {
+                        id = "TRANSMISSION_SLIP_EFFECT", 
+                        value = function ()
+                            local baseEffect = 0.30
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return baseEffect * multiplier
+                        end, 
+                        extraData = {accumulatedMod = 0.0}, 
+                        aggregation = "max"
+                    }
+                    if effect ~= nil then table.insert(effects, effect) end
+
+                elseif isPowerShift then
+                    effect = { 
+                        id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", 
+                        value = function ()
+                            local baseEffect = 0.30
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return baseEffect * multiplier
+                        end,
+                        extraData = {timer = 0, status = "IDLE", duration = 1000, backup = 0}, 
+                        aggregation = "max"
+                    }
+                    if effect ~= nil then table.insert(effects, effect) end
+
+                elseif isCvt then
+                    effect = { 
+                        id = "CVT_MAX_RATIO_MODIFIER", 
+                        value = function ()
+                            local baseEffect = 0.30
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return baseEffect * multiplier
+                        end,
+                        aggregation = "max" 
+                    }
+                    if effect ~= nil then table.insert(effects, effect) end
+                end
+
+            --- HYDRAULIC
+            elseif systemName == systems.HYDRAULICS then
+                effect = {
+                    id = "HYDRAULIC_SPEED_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.30
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,
+                    aggregation = "min"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+            
+            --- FUEL
+            elseif systemName == systems.FUEL then
+
+                --- ealry stage
+                effect = {
+                    id = "FUEL_CONSUMPTION_MODIFIER", 
+                    value = function ()
+                        local baseEffect = 0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end, 
+                    aggregation = "sum" 
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+            --- CHASSIS
+            elseif systemName == systems.CHASSIS then
+                
+                --- early stage
+                effect = {
+                    id = "BRAKE_FORCE_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,  
+                    aggregation = "min",  
+                    extraData = {timer = 0, soundPlayed = false}
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+                --- late stage
+                effect = {
+                    id = "STEERING_SENSITIVITY_MODIFIER", 
+                    value = function ()
+                        local baseEffect = 0.30
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,   
+                    aggregation = "max" 
+                }
+                if isLateStage and effect ~= nil then table.insert(effects, effect) end
+
+            --- COOLING
+            elseif systemName == systems.COOLING then
+                
+                --- early stage
+                effect = {
+                    id = "RADIATOR_HEALTH_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.20
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,  
+                    aggregation = "min",  
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+            --- ELECTRICAL
+            elseif systemName == systems.ELECTRICAL then
+
+                --- early stage
+                effect = {
+                    id = "ALTERNATOR_HEALTH_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,   
+                    aggregation = "min"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+                effect = {
+                    id = "BATTERY_HEALTH_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,  
+                    aggregation = "min"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+                --- late stage
+                effect = {
+                        id = "ENGINE_HARD_START_MODIFIER",
+                        value = function ()
+                        local baseEffect = 6
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return math.max(baseEffect * multiplier, 2)
+                        end,  
+                        aggregation = "max",
+                        extraData = {timer = 0, status = 'IDLE'}
+                }
+                if isLateStage and effect ~= nil and effect.value() >= 2 then table.insert(effects, effect) end
+
+            --- WORKPORCESS
+            elseif systemName == systems.WORKPROCESS then
+
+                --- early stage
+                effect = {
+                    id = "YIELD_REDUCTION_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.20
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,
+                    aggregation = "sum"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+            end 
+        end
+    end
+
+    return generalWearBreakdown
+end
+
+local function getBreakdownDefinition(vehicle, breakdownId)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec ~= nil and spec.dynamicBreakdowns ~= nil and spec.dynamicBreakdowns[breakdownId] ~= nil then
+        return spec.dynamicBreakdowns[breakdownId]
+    end
+    return ADS_Breakdowns.BreakdownRegistry[breakdownId]
+end
+
+function AdvancedDamageSystem:processGeneralWearBreakdown()
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec or not self.isServer then
+        return
+    end
+
+    local generalWearId = "GENERAL_WEAR"
+    local isGeneralWearShouldBe = false
+    local needToRecalculate = math.abs(self:getConditionLevel() - spec._prevConditionLevel) > ADS_Config.CORE.BASE_SYSTEMS_WEAR / 5
+    
+    for _, systemData in pairs(spec.systems) do
+        if systemData.enabled and systemData.condition <= ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD  then
+            isGeneralWearShouldBe = true
+        end
+    end
+    if isGeneralWearShouldBe and not self:hasBreakdown(generalWearId) then
+        self:addBreakdown(generalWearId)
+        spec._prevConditionLevel = self:getConditionLevel()
+        return
+    elseif not isGeneralWearShouldBe and self:hasBreakdown(generalWearId) then
+        self:removeBreakdown(generalWearId)
+        spec._prevConditionLevel = self:getConditionLevel()
+        return
+    end
+
+    if needToRecalculate and isGeneralWearShouldBe then
+        if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
+        end
+        self:recalculateAndApplyEffects()
+        spec._prevConditionLevel = self:getConditionLevel()
+    end
+end
+
 function AdvancedDamageSystem:processPlannedBreakdowns(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systems = spec.systems
     local effectsNeedRecalculation = false
 
-    for systemName, systemData in pairs(systems) do
+    for _, systemData in pairs(systems) do
         if systemData.plannedBreakdownTimer > 0 then
             systemData.plannedBreakdownTimer = math.max(systemData.plannedBreakdownTimer - dt, 0)
         end
@@ -4173,14 +4487,19 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
 
+    if self:hasBreakdown("GENERAL_WEAR") then
+        spec.dynamicBreakdowns.GENERAL_WEAR = buildGeneralWearBreakdown(self)
+    else
+        spec.dynamicBreakdowns.GENERAL_WEAR = nil
+    end
+
     local previouslyActiveEffects = spec.activeEffects or {}
     local aggregatedEffects = {}
 
-    -- Collect unknown breakdown IDs first without modifying the table during iteration
     local unknownBreakdownIds = {}
 
     for id, breakdown in pairs(self:getActiveBreakdowns()) do
-        local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
+        local registryEntry = getBreakdownDefinition(self, id)
 
         if registryEntry == nil then
             table.insert(unknownBreakdownIds, id)
@@ -4417,8 +4736,6 @@ local function resetPendingServiceProgress(spec)
     spec.pendingProgressElapsedTime = 0
     spec.pendingMaintenanceServiceStart = nil
     spec.pendingMaintenanceServiceTarget = nil
-    spec.pendingOverhaulConditionStart = nil
-    spec.pendingOverhaulConditionTarget = nil
     spec.pendingOverhaulSystemStart = {}
     spec.pendingOverhaulSystemTarget = {}
 end
@@ -4533,31 +4850,6 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         end
 
         self:updateConditionLevel()
-        spec.pendingOverhaulConditionStart = spec.conditionLevel
-
-        local weightedTarget = 0
-        local totalWeight = 0
-        local averageTarget = 0
-        local targetCount = 0
-        local systemWeights = ADS_Config.CORE.SYSTEM_WEIGHTS or {}
-
-        for systemKey, targetCondition in pairs(spec.pendingOverhaulSystemTarget) do
-            local weight = tonumber(systemWeights[systemKey]) or 0
-            if weight > 0 then
-                weightedTarget = weightedTarget + targetCondition * weight
-                totalWeight = totalWeight + weight
-            end
-            averageTarget = averageTarget + targetCondition
-            targetCount = targetCount + 1
-        end
-
-        local desiredConditionTarget = spec.pendingOverhaulConditionStart or spec.conditionLevel
-        if totalWeight > 0 then
-            desiredConditionTarget = weightedTarget / totalWeight
-        elseif targetCount > 0 then
-            desiredConditionTarget = averageTarget / targetCount
-        end
-        spec.pendingOverhaulConditionTarget = math.max(spec.pendingOverhaulConditionStart, desiredConditionTarget)
     end
 
     spec.pendingSelectedBreakdowns = {}
@@ -4691,7 +4983,7 @@ function AdvancedDamageSystem:processService(dt)
         local ratio = math.min(math.max(spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime, 0), 1)
         local interpolatedService = spec.pendingMaintenanceServiceStart + (spec.pendingMaintenanceServiceTarget - spec.pendingMaintenanceServiceStart) * ratio
         spec.serviceLevel = math.max(spec.pendingMaintenanceServiceStart, interpolatedService)
-    elseif serviceType == states.OVERHAUL and spec.pendingOverhaulConditionStart ~= nil and spec.pendingOverhaulConditionTarget ~= nil and spec.pendingProgressTotalTime > 0 then
+    elseif serviceType == states.OVERHAUL and spec.pendingProgressTotalTime > 0 then
         local ratio = math.min(math.max(spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime, 0), 1)
         local hasPerSystemTargets = spec.pendingOverhaulSystemStart ~= nil and next(spec.pendingOverhaulSystemStart) ~= nil and spec.pendingOverhaulSystemTarget ~= nil and next(spec.pendingOverhaulSystemTarget) ~= nil
         if hasPerSystemTargets then
@@ -4704,9 +4996,6 @@ function AdvancedDamageSystem:processService(dt)
                 end
             end
             self:updateConditionLevel()
-        else
-            local interpolatedCondition = spec.pendingOverhaulConditionStart + (spec.pendingOverhaulConditionTarget - spec.pendingOverhaulConditionStart) * ratio
-            spec.conditionLevel = math.max(spec.pendingOverhaulConditionStart, interpolatedCondition)
         end
     end
 
@@ -4746,9 +5035,6 @@ function AdvancedDamageSystem:completeService()
                 end
             end
             self:updateConditionLevel()
-        elseif spec.pendingOverhaulConditionTarget ~= nil then
-            local overhaulStart = spec.pendingOverhaulConditionStart or spec.conditionLevel
-            spec.conditionLevel = math.max(overhaulStart, spec.pendingOverhaulConditionTarget)
         end
         spec.serviceLevel = 1.0
 
@@ -5512,6 +5798,7 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
 
     local batteryTerminalV, loadDropV, chargeRiseV, iDischargeA, iChargeA =
         getBatteryTerminalVoltage(ocvV, iAltAvail, iLoads, isCranking, rIntOhm)
+    spec.rawBatteryTerminalVoltageV = batteryTerminalV
 
     local alternatorHealth = 1.0
     if spec.systems ~= nil and spec.systems.electrical ~= nil then
@@ -5520,6 +5807,7 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
 
     local rawSystemV, regulatedV, deficitA, sagV, regulationHealth, healthDeficitMult, chargeHeadroomV =
         getSystemVoltage(isMotorStarted, batteryTerminalV, iAltAvail, iLoads, alternatorHealth)
+    spec.rawSystemVoltageV = rawSystemV
 
     local C = ADS_Config.ELECTRICAL
     local batteryVAlpha = math.min((dt or 0) / ((C.BATTERY_VOLTAGE_TAU_MS or 300) + (dt or 0)), 1)
@@ -5535,8 +5823,10 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
         local dbg = spec.debugData.battery
         dbg.ocvV = ocvV
         dbg.batteryTerminalV = batteryTerminalV
+        dbg.rawBatteryTerminalVoltageV = spec.rawBatteryTerminalVoltageV or batteryTerminalV
         dbg.batteryTerminalVoltageV = spec.batteryTerminalVoltageV or batteryTerminalV
         dbg.systemVoltageV = rawSystemV
+        dbg.rawSystemVoltageV = spec.rawSystemVoltageV or rawSystemV
         dbg.systemVoltageVSmoothed = spec.systemVoltageV or rawSystemV
         dbg.regulatedVoltageV = regulatedV
         dbg.altDeficitA = deficitA
@@ -6494,11 +6784,43 @@ function AdvancedDamageSystem.ConsoleCommands:getTargetVehicle()
     return vehicle
 end
 
-local function parseArguments(argString)
+local function parseArguments(argString, ...)
+    local extraArgs = { ... }
+    local hasExtraArgs = #extraArgs > 0
+
+    if hasExtraArgs then
+        local args = {}
+
+        local function appendToken(token)
+            if token == nil then
+                return
+            end
+            token = tostring(token)
+            if token == "" then
+                return
+            end
+
+            if string.find(token, "%s") then
+                for splitToken in string.gmatch(token, "[^%s]+") do
+                    table.insert(args, splitToken)
+                end
+            else
+                table.insert(args, token)
+            end
+        end
+
+        appendToken(argString)
+        for _, extraArg in ipairs(extraArgs) do
+            appendToken(extraArg)
+        end
+
+        return args
+    end
+
     if argString == nil or type(argString) ~= 'string' or argString == '' then
         return {}
     end
-    
+
     local args = {}
     for arg in string.gmatch(argString, "[^%s]+") do
         table.insert(args, arg)
@@ -6547,6 +6869,7 @@ local function parseConsoleValue(rawValue)
 
     return rawValue, true
 end
+
 
 local function resolvePathParent(rootTable, fullPath)
     if type(rootTable) ~= "table" then
@@ -6720,13 +7043,13 @@ function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()
     print("----------------------------")
 end
 
-function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs)
+function AdvancedDamageSystem.ConsoleCommands:addBreakdown(rawArgs, rawArgTwo)
     if not g_currentMission:getIsServer() then
         local vehicle = self:getTargetVehicle()
-        if vehicle then ADS_ConsoleCommandEvent.sendToServer("addBreakdown", rawArgs, nil, vehicle) end
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("addBreakdown", rawArgs, rawArgTwo, vehicle) end
         return
     end
-    local args = parseArguments(rawArgs)
+    local args = parseArguments(rawArgs, rawArgTwo)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
@@ -6836,27 +7159,17 @@ function AdvancedDamageSystem.ConsoleCommands:advanceBreakdown(rawArgs)
     end
 end
 
-function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
+function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs, rawArgTwo)
     if not g_currentMission:getIsServer() then
         local vehicle = self:getTargetVehicle()
-        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemCondition", rawArgs, nil, vehicle) end
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemCondition", rawArgs, rawArgTwo, vehicle) end
         return
     end
-    local args = parseArguments(rawArgs)
+    local args = parseArguments(rawArgs, rawArgTwo)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
     
     local spec = vehicle.spec_AdvancedDamageSystem
-    local value = 1.0
-
-    if args and args[1] then
-        local parsedValue = tonumber(args[1])
-        if parsedValue == nil or parsedValue < 0 or parsedValue > 1 then
-            print("ADS Error: Invalid value. Please provide a number between 0.0 and 1.0.")
-            return
-        end
-        value = parsedValue
-    end
 
     local function resolveSystemKey(rawSystem)
         if rawSystem == nil or rawSystem == "" then
@@ -6873,7 +7186,12 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
         return false
     end
 
-    local requestedSystem = args and args[2] or nil
+    local requestedSystem = args and args[1] or nil
+    if requestedSystem == nil then
+        print("ADS Error: Missing system. Usage: ads_setSystemCondition [system] [0.0-1.0]")
+        return
+    end
+
     local systemKey = resolveSystemKey(requestedSystem)
 
     if systemKey == false then
@@ -6886,49 +7204,73 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemCondition(rawArgs)
         return
     end
 
-    if systemKey == nil then
-        for key, systemData in pairs(spec.systems or {}) do
-            if type(systemData) == "table" then
-                systemData.condition = value
-            else
-                spec.systems[key] = value
-            end
-        end
-        print(string.format("ADS: Set condition for all systems on '%s' to %.2f.", vehicle:getFullName(), value))
-    else
-        local systemData = spec.systems[systemKey]
-        if type(systemData) == "table" then
-            systemData.condition = value
-        else
-            spec.systems[systemKey] = value
-        end
-        print(string.format("ADS: Set condition for system '%s' on '%s' to %.2f.", tostring(systemKey), vehicle:getFullName(), value))
+    local value = tonumber(args and args[2] or nil)
+    if value == nil or value < 0 or value > 1 then
+        print("ADS Error: Invalid value. Please provide a number between 0.0 and 1.0.")
+        return
     end
+
+    local systemData = spec.systems[systemKey]
+    if type(systemData) == "table" then
+        systemData.condition = value
+    else
+        spec.systems[systemKey] = value
+    end
+    print(string.format("ADS: Set condition for system '%s' on '%s' to %.2f.", tostring(systemKey), vehicle:getFullName(), value))
 
     vehicle:updateConditionLevel()
 end
 
-function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
+function AdvancedDamageSystem.ConsoleCommands:setCondition(rawArgs)
     if not g_currentMission:getIsServer() then
         local vehicle = self:getTargetVehicle()
-        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStress", rawArgs, nil, vehicle) end
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setCondition", rawArgs, nil, vehicle) end
         return
     end
+
     local args = parseArguments(rawArgs)
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then
+        return
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local targetCondition = tonumber(args and args[1] or nil)
+    if targetCondition == nil or targetCondition < 0 or targetCondition > 1 then
+        print("ADS Error: Invalid value. Please provide a number between 0.0 and 1.0.")
+        return
+    end
+
+    local changedSystems = 0
+
+    for _, systemData in pairs(spec.systems or {}) do
+        if type(systemData) == "table" and systemData.enabled ~= false then
+            systemData.condition = targetCondition
+            changedSystems = changedSystems + 1
+        end
+    end
+
+    if changedSystems == 0 then
+        print("ADS Error: No enabled systems were found on the current vehicle.")
+        return
+    end
+
+    vehicle:updateConditionLevel()
+    print(string.format("ADS: Set condition for %d enabled systems on '%s' to %.3f. Final overall condition: %.3f.",
+        changedSystems, vehicle:getFullName(), targetCondition, vehicle.spec_AdvancedDamageSystem.conditionLevel or 0))
+end
+
+function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs, rawArgTwo)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStress", rawArgs, rawArgTwo, vehicle) end
+        return
+    end
+    local args = parseArguments(rawArgs, rawArgTwo)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
     local spec = vehicle.spec_AdvancedDamageSystem
-    local value = 0.0
-
-    if args and args[1] then
-        local parsedValue = tonumber(args[1])
-        if parsedValue == nil or parsedValue < 0 then
-            print("ADS Error: Invalid value. Please provide a number >= 0.0.")
-            return
-        end
-        value = parsedValue
-    end
 
     local function resolveSystemKey(rawSystem)
         if rawSystem == nil or rawSystem == "" then
@@ -6945,7 +7287,12 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
         return false
     end
 
-    local requestedSystem = args and args[2] or nil
+    local requestedSystem = args and args[1] or nil
+    if requestedSystem == nil then
+        print("ADS Error: Missing system. Usage: ads_setSystemStress [system] [>=0.0]")
+        return
+    end
+
     local systemKey = resolveSystemKey(requestedSystem)
 
     if systemKey == false then
@@ -6958,33 +7305,28 @@ function AdvancedDamageSystem.ConsoleCommands:setSystemStress(rawArgs)
         return
     end
 
-    if systemKey == nil then
-        for key, systemData in pairs(spec.systems or {}) do
-            if type(systemData) == "table" then
-                systemData.stress = value
-            else
-                spec.systems[key] = { condition = systemData or 1.0, stress = value }
-            end
-        end
-        print(string.format("ADS: Set stress for all systems on '%s' to %.4f.", vehicle:getFullName(), value))
-    else
-        local systemData = spec.systems[systemKey]
-        if type(systemData) == "table" then
-            systemData.stress = value
-        else
-            spec.systems[systemKey] = { condition = systemData or 1.0, stress = value }
-        end
-        print(string.format("ADS: Set stress for system '%s' on '%s' to %.4f.", tostring(systemKey), vehicle:getFullName(), value))
-    end
-end
-
-function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs)
-    if not g_currentMission:getIsServer() then
-        local vehicle = self:getTargetVehicle()
-        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStressMultiplier", rawArgs, nil, vehicle) end
+    local value = tonumber(args and args[2] or nil)
+    if value == nil or value < 0 then
+        print("ADS Error: Invalid value. Please provide a number >= 0.0.")
         return
     end
-    local args = parseArguments(rawArgs)
+
+    local systemData = spec.systems[systemKey]
+    if type(systemData) == "table" then
+        systemData.stress = value
+    else
+        spec.systems[systemKey] = { condition = systemData or 1.0, stress = value }
+    end
+    print(string.format("ADS: Set stress for system '%s' on '%s' to %.4f.", tostring(systemKey), vehicle:getFullName(), value))
+end
+
+function AdvancedDamageSystem.ConsoleCommands:setSystemStressMultiplier(rawArgs, rawArgTwo)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setSystemStressMultiplier", rawArgs, rawArgTwo, vehicle) end
+        return
+    end
+    local args = parseArguments(rawArgs, rawArgTwo)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
@@ -7144,13 +7486,13 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     print(string.format("ADS: Fully reset state for '%s'.", vehicle:getFullName()))
 end
 
-function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs)
+function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs, rawArgTwo)
     if not g_currentMission:getIsServer() then
         local vehicle = self:getTargetVehicle()
-        if vehicle then ADS_ConsoleCommandEvent.sendToServer("startMaintance", rawArgs, nil, vehicle) end
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("startMaintance", rawArgs, rawArgTwo, vehicle) end
         return
     end
-    local args = parseArguments(rawArgs)
+    local args = parseArguments(rawArgs, rawArgTwo)
     local vehicle = self:getTargetVehicle()
     if not vehicle then return end
 
@@ -7319,8 +7661,13 @@ function AdvancedDamageSystem.ConsoleCommands:getServiceState()
         spec.maintenanceTimer or 0, spec.pendingProgressElapsedTime or 0, spec.pendingProgressTotalTime or 0, progressPercent, spec.pendingProgressStepIndex or 0))
     print(string.format("Options: optionOne=%s optionTwo=%s optionThree=%s price=%s",
         tostring(spec.serviceOptionOne), tostring(spec.serviceOptionTwo), tostring(spec.serviceOptionThree), tostring(spec.pendingServicePrice)))
-    print(string.format("Targets: serviceStart=%s serviceTarget=%s conditionStart=%s conditionTarget=%s",
-        tostring(spec.pendingMaintenanceServiceStart), tostring(spec.pendingMaintenanceServiceTarget), tostring(spec.pendingOverhaulConditionStart), tostring(spec.pendingOverhaulConditionTarget)))
+    local pendingOverhaulSystemsCount = 0
+    for _, _ in pairs(spec.pendingOverhaulSystemTarget or {}) do
+        pendingOverhaulSystemsCount = pendingOverhaulSystemsCount + 1
+    end
+
+    print(string.format("Targets: serviceStart=%s serviceTarget=%s overhaulSystems=%d",
+        tostring(spec.pendingMaintenanceServiceStart), tostring(spec.pendingMaintenanceServiceTarget), pendingOverhaulSystemsCount))
     print(string.format("Levels: service=%.4f condition=%.4f", spec.serviceLevel or 0, spec.conditionLevel or 0))
     print(string.format("Queues: selected=%d inspection=%d repair=%d", #(spec.pendingSelectedBreakdowns or {}), #(spec.pendingInspectionQueue or {}), #(spec.pendingRepairQueue or {})))
     print(string.format("Breakdowns: active=%d selectedForRepair=%d totalOccurred=%d", activeBreakdownsCount, selectedForRepairCount, spec.totalBreakdownsOccurred or 0))
@@ -7690,8 +8037,9 @@ addConsoleCommand("ads_listBreakdowns", "Lists all available breakdown IDs.", "l
 addConsoleCommand("ads_addBreakdown", "Adds a breakdown. Usage: ads_addBreakdown [id] [stage]", "addBreakdown", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_removeBreakdown", "Removes a breakdown. Usage: ads_removeBreakdown [id]", "removeBreakdown", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_advanceBreakdown", "Advances a breakdown to the next stage. Usage: ads_advanceBreakdown [id]", "advanceBreakdown", AdvancedDamageSystem.ConsoleCommands)
-addConsoleCommand("ads_setSystemCondition", "Sets system condition. Usage: ads_setSystemCondition [0.0-1.0] [system]", "setSystemCondition", AdvancedDamageSystem.ConsoleCommands)
-addConsoleCommand("ads_setSystemStress", "Sets system stress. Usage: ads_setSystemStress [>=0.0] [system]", "setSystemStress", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setCondition", "Sets condition for all enabled systems. Usage: ads_setCondition [0.0-1.0]", "setCondition", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setSystemCondition", "Sets system condition. Usage: ads_setSystemCondition [system] [0.0-1.0]", "setSystemCondition", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setSystemStress", "Sets system stress. Usage: ads_setSystemStress [system] [>=0.0]", "setSystemStress", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSystemStressMultiplier", "Sets stress accumulation multiplier. Usage: ads_setSystemStressMultiplier [>=0.0] [system]", "setSystemStressMultiplier", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setService", "Sets vehicle service. Usage: ads_setService [0.0-1.0]", "setService", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_resetVehicle", "Resets vehicle state.", "resetVehicle", AdvancedDamageSystem.ConsoleCommands)
@@ -7707,5 +8055,6 @@ addConsoleCommand("ads_toggleHudDebugView", "Switch debug HUD view. Usage: ads_t
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)
+
 
 

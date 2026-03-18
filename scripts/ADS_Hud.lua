@@ -584,8 +584,13 @@ function ADS_Hud:drawActiveVehicleHUD()
     local serviceWearRate = serviceDbg.totalWearRate or ADS_Config.CORE.BASE_SERVICE_WEAR or 0
     local weatherFactor = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
     addLine(overviewLines, string.format(
-        "service: %.2f%% (service_wear: %.2f%%) | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s",
-        asPercent(spec.serviceLevel or 0),
+        "condition: %.2f%% | service: %.2f%%",
+        asPercent(spec.conditionLevel or 0),
+        asPercent(spec.serviceLevel or 0)
+    ), {1, 1, 1, 1}, 0.95)
+
+    addLine(overviewLines, string.format(
+        "service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s",
         asPercent(serviceWearRate),
         asPercent(spec.reliability or 0),
         asPercent(spec.maintainability or 0),
@@ -776,6 +781,25 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "lhf", statKey = "lhf", value = workprocessDbg.longHarvestFactor or 0, extraInfo = string.format("t: %.0fs", workprocessDbg.longHarvestTimer or 0) },
         { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 }
     })
+
+    if isSystemEnabled("workprocess") then
+        local isTurnedOn = vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() or false
+        local dischargeState = vehicle.spec_dischargeable ~= nil and vehicle.spec_dischargeable.currentDischargeState or -1
+        local harvestPercent = workprocessDbg.currentHarvestPercent or 100
+        local unloadPercent = workprocessDbg.lastUnloadPercent or 100
+        local unloadFactor = workprocessDbg.lastUnloadFactor or 1
+        local unloadOriginalFactor = workprocessDbg.lastUnloadOriginalFactor or 1
+
+        addLine(workprocessLines, string.format(
+            "proc: on %s | ds %s | yield %.1f%% | unload %.1f%% (%.3f/%.3f)",
+            tostring(isTurnedOn),
+            tostring(dischargeState),
+            harvestPercent,
+            unloadPercent,
+            unloadFactor,
+            unloadOriginalFactor
+        ), {0.92, 0.98, 1.0, 1}, 0.90)
+    end
 
     local systemSections = {}
     if isSystemEnabled("engine") then
@@ -1026,7 +1050,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         addLine(serviceDataLines, "rep: " .. listToString(pendingRepairQueue), {1, 0.95, 0.75, 1}, 0.95)
     end
 
-    local overviewSection = {title = "System", lines = overviewLines}
+    local overviewSection = {title = "Overall", lines = overviewLines}
     local sections = {
         {title = "Engine Temp", lines = engineTempLines}
     }

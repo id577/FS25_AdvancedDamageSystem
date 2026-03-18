@@ -123,7 +123,6 @@ local breakdownPriceMultipliers = {
     FUEL_FILTER_CLOGGING = 0.35,
     FUEL_LINE_AIR_LEAK = 0.45,
     HARVEST_PROCESSING_SYSTEM_WEAR = 0.85,
-    MATERIAL_FLOW_SYSTEM_WEAR = 0.35,
     UNLOADING_AUGER_MALFUNCTION = 0.40,
 }
 
@@ -155,7 +154,6 @@ local breakdownProgressMultipliers = {
     FUEL_FILTER_CLOGGING = 1.2,
     FUEL_LINE_AIR_LEAK = 0.8,
     HARVEST_PROCESSING_SYSTEM_WEAR = 1.35,
-    MATERIAL_FLOW_SYSTEM_WEAR = 1.0,
     UNLOADING_AUGER_MALFUNCTION = 1.2
 }
 
@@ -163,241 +161,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
 
--- additional debuffs for aging equipment, in addition to the standard ones (torque for motorized, fillDelta for combine)
-    ENGINE_WEAR = {
-        system = systems.ENGINE,
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {
-                    {
-                        id = "ENGINE_TORQUE_MODIFIER",
-                        value = function(vehicle)
-                            local baseEffect = -0.30
-                            local condition = vehicle:getConditionLevel()
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end,
-                        aggregation = "sum"
-                    }
-                },
-                indicators = {}
-            }
-        }
-    },
-
-    TRANSMISSION_WEAR = {
-        system = systems.TRANSMISSION,
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {},
-                indicators = {}
-            }
-        }
-    },
-
-    HYDRAULICS_WEAR = {
-        system = systems.HYDRAULICS,
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {},
-                indicators = {}
-            }
-        }
-    },
-
-    COOLING_WEAR = {
-        system = systems.COOLING,
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {
-                    {
-                        id = "THERMOSTAT_HEALTH_MODIFIER",
-                        value = function(vehicle)
-                            local baseEffect = -0.30
-                            local condition = vehicle:getConditionLevel()
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end,
-                        aggregation = "min"
-                    }
-                },
-                indicators = {}
-            }
-        }
-    },
-
-    ELECTRICAL_WEAR = {
-        system = systems.ELECTRICAL,
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {
-                    {
-                        id = "ENGINE_HARD_START_MODIFIER",
-                        value = function(vehicle)
-                            local baseEffect = 10
-                            local condition = vehicle:getConditionLevel()
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end,
-                        aggregation = "max",
-                        extraData = {timer = 0, status = 'IDLE', count = 0}
-                    }
-                },
-                indicators = {}
-            }
-        }
-    },
-
-    CHASSIS_WEAR = {
-        system = systems.CHASSIS,
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {
-                    {
-                        id = "BRAKE_FORCE_MODIFIER",
-                        value = function(vehicle)
-                            local baseEffect = -0.3
-                            local condition = vehicle:getConditionLevel()
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end,
-                        aggregation = "min"
-                    }
-                },
-                indicators = {}
-            }
-        }
-    },
-
-    WORKPROCESS_WEAR = {
-        system = systems.WORKPROCESS,
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {
-                    {
-                        id = "YIELD_REDUCTION_MODIFIER",
-                        value = function(vehicle)
-                            local baseEffect = -0.30
-                            local condition = vehicle:getConditionLevel()
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end,
-                        aggregation = "sum",
-                        extraData = {timer = 0, status = 'IDLE'}
-                    }
-                },
-                indicators = {}
-            }
-        }
-    },
-
-    FUEL_WEAR = {
-        system = systems.FUEL,
+    GENERAL_WEAR = {
         isSelectable = false,
         isApplicable = function(vehicle)
             return true
@@ -1408,11 +1172,6 @@ ADS_Breakdowns.BreakdownRegistry = {
             local motor = vehicle:getMotor()
             if not motor then return false end
             if motor.minForwardGearRatio == nil then return false end
-            local spec = vehicle.spec_AdvancedDamageSystem
-            local activeBreakdowns = spec and spec.activeBreakdowns
-            if activeBreakdowns ~= nil and activeBreakdowns.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION ~= nil then
-                return false
-            end
             return true
         end,
         isCanProgress = function(vehicle)
@@ -1427,8 +1186,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = {
                     { id = "CVT_SLIP_EFFECT", value = 0.2, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
-                    { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" }
-                    
+                    { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" }  
                 }
             },
             {
@@ -1489,11 +1247,6 @@ ADS_Breakdowns.BreakdownRegistry = {
             local motor = vehicle:getMotor()
             if not motor then return false end
             if motor.minForwardGearRatio == nil then return false end
-            local spec = vehicle.spec_AdvancedDamageSystem
-            local activeBreakdowns = spec and spec.activeBreakdowns
-            if activeBreakdowns ~= nil and activeBreakdowns.CVT_CHAIN_WEAR ~= nil then
-                return false
-            end
             return true
         end,
         isCanProgress = function(vehicle)
@@ -1507,7 +1260,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0 * breakdownProgressMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 repairPrice = 1.0 * breakdownPriceMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 effects = {
-                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.5, aggregation = "max", extraData = {timer = 0, duration = 200, status = 'IDLE'}},
+                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 2.0, aggregation = "max", extraData = {timer = 0, duration = 200, status = 'IDLE'}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
                     { id = "CVT_MAX_RATIO_MODIFIER", value = 0.3, aggregation = "max" },
                 },
@@ -1519,7 +1272,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0 * breakdownProgressMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 repairPrice = 2.0 * breakdownPriceMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 effects = {
-                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.25, aggregation = "max", extraData = {timer = 0, duration = 250, status = 'IDLE'}},
+                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 1.0, aggregation = "max", extraData = {timer = 0, duration = 250, status = 'IDLE'}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.1, aggregation = "sum" },
                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" },
                     { id = "CVT_MAX_RATIO_MODIFIER", value = 0.4, aggregation = "max" },
@@ -1536,7 +1289,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 repairPrice = 4.0 * breakdownPriceMultipliers.CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION,
                 effects = { 
-                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.1, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
+                    { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.5, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.2, aggregation = "sum" },
                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.1, aggregation = "sum" },
                     { id = "CVT_MAX_RATIO_MODIFIER", value = 0.5, aggregation = "max" },
@@ -1555,7 +1308,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "CVT_MAX_RATIO_MODIFIER", value = 0.8, aggregation = "max" },
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.15, aggregation = "sum" },
                      { id = "ENGINE_TORQUE_MODIFIER", value = -0.3, aggregation = "sum" },
-                     { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.05, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
+                     { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.1, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
                      { id = "ENGINE_LIMP_EFFECT", value = -0.2, aggregation = "min", extraData = {reason = "BREAKDOWN", message = "ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message", disableAi = true } },
                 },
                 indicators = {
@@ -2664,85 +2417,10 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-    
-    MATERIAL_FLOW_SYSTEM_WEAR = {
-        isSelectable = true,
-        system = systems.MATERIALFLOW,
-        isApplicable = function(vehicle)
-            local vtype = vehicle.type.name
-            return (vtype == 'combineDrivable' or vtype == 'combineCutter')
-        end,
-        probability = function(vehicle)
-            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
-                return 100.0
-            else
-                return 1.0
-            end
-        end,
-        isCanProgress = function(vehicle)
-            if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
-                return true
-            else
-                return false
-            end
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_material_flow_system_wear_stage1_description",
-                detectionChance = 1.0,
-                progressMultiplier = 2.0 * breakdownProgressMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
-                repairPrice = 1.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
-                effects = {
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.02, aggregation = "sum" }
-                }
-            },
-            {
-                severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_material_flow_system_wear_stage2_description",
-                detectionChance = 1.0,
-                progressMultiplier = 1.0 * breakdownProgressMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
-                repairPrice = 2.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
-                effects = {
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.05, aggregation = "sum" },
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum"}
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_material_flow_system_wear_stage3_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0.5 * breakdownProgressMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
-                repairPrice = 4.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
-                effects = { 
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.10, aggregation = "sum" },
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
-                },
-                indicators = {
-                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            },
-            { 
-                severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_material_flow_system_wear_stage4_description",
-                detectionChance = 1.0,
-                progressMultiplier = 0,
-                repairPrice = 8.0 * breakdownPriceMultipliers.MATERIAL_FLOW_SYSTEM_WEAR,
-                effects = { 
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.80, aggregation = "sum", extraData = {message = "ads_breakdowns_material_flow_system_wear_stage4_message", disableAi = true}},
-                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.30, aggregation = "sum"},
-                },
-                indicators = {
-                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false },
-                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
-                }
-            }
-        }
-    },
 
     UNLOADING_AUGER_MALFUNCTION = {
         isSelectable = true,
-        system = systems.MATERIALFLOW,
+        system = systems.WORKPROCESS,
         isApplicable = function(vehicle)
             local vtype = vehicle.type.name
             return (vtype == 'combineDrivable' or vtype == 'combineCutter') and vehicle.spec_pipe ~= nil
@@ -2814,6 +2492,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
+
+    -- TO-DO: WORKPROCESS_POWER_DEMAND_MODIFIER
+    -- TO-DO: ROLLING_RESISTANCE_MODIFIER
     
 }
 -- ==========================================================
@@ -3671,6 +3352,7 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
 
         -- CVT_SLIP_EFFECT
         local cvtSlipEffect = spec_ads.activeEffects.CVT_SLIP_EFFECT
+        local isSliping = false
         if cvtSlipEffect ~= nil and cvtSlipEffect.value ~= nil and self.minForwardGearRatio ~= nil then
             local modifier = tonumber(cvtSlipEffect.value) or 0
 
@@ -3686,7 +3368,7 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
             local loadFactor = vehicle:getMotorLoadPercentage() + 0.2
             local massFactor = vehicle:getTotalMass() / vehicle:getTotalMass(true)
 
-            if modifier > 0 and minRatio ~= 0 and maxRatio ~= 0 then
+            if modifier > 0 and minRatio ~= 0 and maxRatio ~= 0 and speedFactor < 0.5 then
                 local decatPerSecond = 0.01 / modifier * math.max(speedFactor, 0.1) * 1 / loadFactor * 1 / massFactor
                 local motorAccel = self.motorRotAccelerationSmoothed
                 local accelLimit = math.max(tonumber(self.motorRotationAccelerationLimit) or 0, 0.000001)
@@ -3695,6 +3377,8 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
                     accelerationFactor = math.clamp(lastAccelerationFactor - decatPerSecond * dtSec, 0, 1)
                 end
                 cvtSlipEffect.extraData.lastAccelerationFactor = accelerationFactor
+                isSliping = accelerationFactor >= 0.98 and speedFactor < 0.8
+                print(accelerationFactor)
 
                 local clampMin = math.min(minRatio, minRatio * 10)
                 local clampMax = math.max(minRatio, minRatio * 10)
@@ -3704,17 +3388,18 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
 
         -- CVT_MAX_RATIO_MODIFIER
         local cvtMaxEffect = spec_ads.activeEffects.CVT_MAX_RATIO_MODIFIER
-        if cvtMaxEffect ~= nil and cvtMaxEffect.value ~= nil and self.minForwardGearRatio ~= nil then
+        local speedFactor = math.min(self.vehicle:getLastSpeed() / (self:getMaximumForwardSpeed() * 3.6 / 2), 1.0)
+        if cvtMaxEffect ~= nil and cvtMaxEffect.value ~= nil and self.minForwardGearRatio ~= nil and not isSliping and speedFactor > 0.5 then
             local value = tonumber(cvtMaxEffect.value) or 0
-            minRatio = minRatio + minRatio * value
+            minRatio = minRatio + minRatio * value * speedFactor
         end
 
         -- CVT_PRESSURE_DROP_CHANCE
         local pressureDropEffect = spec_ads.activeEffects.CVT_PRESSURE_DROP_CHANCE
-        if pressureDropEffect ~= nil and pressureDropEffect.extraData ~= nil
+        if pressureDropEffect ~= nil and pressureDropEffect.extraData ~= nil 
             and pressureDropEffect.extraData.status == "PROGRESS"
             and (pressureDropEffect.extraData.timer or 0) > 0 then
-            minRatio = minRatio * 3
+            minRatio = minRatio * 1.5
         end
 
         return minRatio, maxRatio
@@ -4246,13 +3931,24 @@ ADS_Breakdowns.EffectApplicators.YIELD_REDUCTION_MODIFIER = {
 
 function ADS_Breakdowns.addCutterAreaOverwrite(vehicle, superFunc, area, realArea, ...)
     local spec_ads = vehicle.spec_AdvancedDamageSystem
+    local workprocessDbg = spec_ads ~= nil and spec_ads.debugData ~= nil and spec_ads.debugData.workprocess or nil
+    if workprocessDbg ~= nil then
+        workprocessDbg.currentHarvestRatio = 1.0
+        workprocessDbg.currentHarvestPercent = 100.0
+    end
+
     if spec_ads ~= nil and spec_ads.activeEffects ~= nil then
         local effect = spec_ads.activeEffects.YIELD_REDUCTION_MODIFIER
         if effect ~= nil and effect.value ~= nil then
             local spec_combine = vehicle.spec_combine
             if spec_combine ~= nil then
                 local originalScale = spec_combine.threshingScale
-                spec_combine.threshingScale = math.max(originalScale * (1 + effect.value), 0)
+                local currentHarvestRatio = math.max(1 + effect.value, 0)
+                if workprocessDbg ~= nil then
+                    workprocessDbg.currentHarvestRatio = currentHarvestRatio
+                    workprocessDbg.currentHarvestPercent = currentHarvestRatio * 100
+                end
+                spec_combine.threshingScale = math.max(originalScale * currentHarvestRatio, 0)
                 local result = superFunc(vehicle, area, realArea, ...)
                 spec_combine.threshingScale = originalScale
                 return result
@@ -4276,13 +3972,23 @@ ADS_Breakdowns.EffectApplicators.UNLOADING_SPEED_MODIFIER = {
 function ADS_Breakdowns.getDischargeNodeEmptyFactorOverwrite(vehicle, superFunc, dischargeNode, ...)
     local originalFactor = superFunc(vehicle, dischargeNode, ...)
     local spec_ads = vehicle.spec_AdvancedDamageSystem
+    local workprocessDbg = spec_ads ~= nil and spec_ads.debugData ~= nil and spec_ads.debugData.workprocess or nil
+    local currentFactor = originalFactor
+
     if spec_ads ~= nil and spec_ads.activeEffects ~= nil then
         local effect = spec_ads.activeEffects.UNLOADING_SPEED_MODIFIER
         if effect ~= nil and effect.value ~= nil then
-            return originalFactor * (1 + effect.value)
+            currentFactor = originalFactor * (1 + effect.value)
         end
     end
-    return originalFactor
+
+    if workprocessDbg ~= nil then
+        workprocessDbg.lastUnloadOriginalFactor = originalFactor
+        workprocessDbg.lastUnloadFactor = currentFactor
+        workprocessDbg.lastUnloadPercent = originalFactor > 0 and (currentFactor / originalFactor) * 100 or 100
+    end
+
+    return currentFactor
 end
 
 -- ==========================================================

@@ -365,7 +365,7 @@ Beyond random failures, low condition can trigger a permanent "General Wear and 
 > <details>
 > <summary><strong>⚙️ Click here for technical details on the "General Wear and Tear" effect</strong></summary>
 >
-> The "General Wear and Tear" effect begins to apply once a vehicle's `Condition` drops below **50%** (configurable in `ADS_Config.lua` via `GENERAL_WEAR_THRESHOLD`). Its impact is calculated using a cubic formula, so effects are mild at first and become much stronger as `Condition` approaches zero.
+> The "General Wear and Tear" effect begins to apply once a vehicle's `Condition` drops below **50%** (configurable in `ADS_Config.lua` via `GENERAL_WEAR_EARLY_STAGE_THRESHOLD `). Its impact is calculated using a cubic formula, so effects are mild at first and become much stronger as `Condition` approaches zero.
 >
 > This effect applies several penalties, which reach their maximum values at 0% `Condition`:
 >

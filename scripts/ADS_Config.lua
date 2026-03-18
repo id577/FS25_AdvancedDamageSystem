@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 81,
+    VER = 82,
 
     DEBUG = false,
 
@@ -173,7 +173,7 @@ ADS_Config = {
         CVT_SHIFT_SPEED_THRESHOLD = 1.0,
         CVT_SHOCK_MULTIPLIER = 100.0,
 
-        CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 5,
+        CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 15,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
         AI_WORKER_PID = {
             MIN_SPEED = 3.0,
@@ -202,7 +202,8 @@ ADS_Config = {
             EMERGENCY_ENGINE_TEMP = 105.0,
             EMERGENCY_TRANS_TEMP = 105.0
         },
-        GENERAL_WEAR_THRESHOLD = 0.5,
+        GENERAL_WEAR_EARLY_STAGE_THRESHOLD = 0.66,
+        GENERAL_WEAR_LATE_STAGE_THRESHOLD = 0.33,
 
         RELIABILITY_YEAR_FACTOR = 0.01,
         RELIABILITY_YEAR_FACTOR_THRESHOLD = 2000,

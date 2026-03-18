@@ -9,6 +9,7 @@ InitEventClass(ADS_ConsoleCommandEvent, "ADS_ConsoleCommandEvent")
 
 ADS_ConsoleCommandEvent.ALLOWED_COMMANDS = {
     setService = true,
+    setCondition = true,
     setSystemCondition = true,
     setSystemStress = true,
     setSystemStressMultiplier = true,
