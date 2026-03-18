@@ -322,6 +322,8 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.STRING, condKey .. "#activeIndicators", "Active Indicators")
     schemaSavegame:register(XMLValueType.FLOAT,  condKey .. "#reliability", "Reliability")
     schemaSavegame:register(XMLValueType.FLOAT,  condKey .. "#maintainability", "Maintainability")
+    schemaSavegame:register(XMLValueType.STRING, condKey .. "#systems", "Per-system snapshot")
+    schemaSavegame:register(XMLValueType.FLOAT,  condKey .. "#batterySoc", "Battery State Of Charge")
     
     schema:setXMLSpecializationType()
 end
@@ -452,6 +454,8 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
     streamWriteFloat32(streamId, spec.rawEngineTemperature or -99)
     streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
     streamWriteFloat32(streamId, spec.batterySoc or 1.0)
+    streamWriteFloat32(streamId, spec.batteryChargeAh or 0)
+    streamWriteFloat32(streamId, spec.batteryTerminalVoltageV or 0)
     streamWriteFloat32(streamId, spec.systemVoltageV or 0)
     streamWriteFloat32(streamId, spec.thermostatState or 0)
     streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
@@ -524,8 +528,11 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
     spec.engineTemperature = syncRawEngTemp
     spec.transmissionTemperature = syncRawTransTemp
     spec.batterySoc = streamReadFloat32(streamId)
-    spec.batteryChargeAh = nil
+    spec.batteryChargeAh = streamReadFloat32(streamId)
+    spec.batteryTerminalVoltageV = streamReadFloat32(streamId)
+    spec.rawBatteryTerminalVoltageV = spec.batteryTerminalVoltageV
     spec.systemVoltageV = streamReadFloat32(streamId)
+    spec.rawSystemVoltageV = spec.systemVoltageV
     spec.thermostatState = streamReadFloat32(streamId)
     if spec.engTermPID ~= nil then
         spec.engTermPID.mechPos = spec.thermostatState
@@ -592,6 +599,8 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
             streamWriteFloat32(streamId, spec.rawEngineTemperature or -99)
             streamWriteFloat32(streamId, spec.rawTransmissionTemperature or -99)
             streamWriteFloat32(streamId, spec.batterySoc or 1.0)
+            streamWriteFloat32(streamId, spec.batteryChargeAh or 0)
+            streamWriteFloat32(streamId, spec.batteryTerminalVoltageV or 0)
             streamWriteFloat32(streamId, spec.systemVoltageV or 0)
             streamWriteFloat32(streamId, spec.thermostatState or 0)
             streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
@@ -644,8 +653,11 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             spec._netTargetEngineTemp = syncRawEngTemp
             spec._netTargetTransmissionTemp = syncRawTransTemp
             spec.batterySoc = streamReadFloat32(streamId)
-            spec.batteryChargeAh = nil
+            spec.batteryChargeAh = streamReadFloat32(streamId)
+            spec.batteryTerminalVoltageV = streamReadFloat32(streamId)
+            spec.rawBatteryTerminalVoltageV = spec.batteryTerminalVoltageV
             spec.systemVoltageV = streamReadFloat32(streamId)
+            spec.rawSystemVoltageV = spec.systemVoltageV
             spec.thermostatState = streamReadFloat32(streamId)
             if spec.engTermPID ~= nil then
                 spec.engTermPID.mechPos = spec.thermostatState
@@ -769,6 +781,8 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
                     xmlFile:setValue(condKey .. "#service", entry.conditionData.service or 1)
                     xmlFile:setValue(condKey .. "#reliability", entry.conditionData.reliability or 1)
                     xmlFile:setValue(condKey .. "#maintainability", entry.conditionData.maintainability or 1)
+                    xmlFile:setValue(condKey .. "#systems", ADS_Utils.serializeSystemsState(ADS_Utils.createSystemsSnapshot(entry.conditionData.systems)))
+                    xmlFile:setValue(condKey .. "#batterySoc", entry.conditionData.batterySoc or 1)
 
                     if entry.conditionData.activeBreakdowns then
                         xmlFile:setValue(condKey .. "#activeBreakdowns", ADS_Utils.serializeBreakdowns(entry.conditionData.activeBreakdowns))
@@ -1359,6 +1373,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 entry.conditionData.service = savegame.xmlFile:getValue(condKey .. "#service", 1)
                 entry.conditionData.reliability = savegame.xmlFile:getValue(condKey .. "#reliability", 1)
                 entry.conditionData.maintainability = savegame.xmlFile:getValue(condKey .. "#maintainability", 1)
+                entry.conditionData.systems = ADS_Utils.createSystemsSnapshot(ADS_Utils.deserializeSystemsState(savegame.xmlFile:getValue(condKey .. "#systems", "")))
+                entry.conditionData.batterySoc = savegame.xmlFile:getValue(condKey .. "#batterySoc", 1)
 
                 local bdStr = savegame.xmlFile:getValue(condKey .. "#activeBreakdowns", "")
                 entry.conditionData.activeBreakdowns = ADS_Utils.deserializeBreakdowns(bdStr) or {}
@@ -1414,6 +1430,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 entry.conditionData.age = self.age or 0
                 entry.conditionData.condition = 1
                 entry.conditionData.service = 1
+                entry.conditionData.systems = {}
+                entry.conditionData.batterySoc = 1
                 entry.conditionData.activeBreakdowns = {}
                 entry.conditionData.selectedBreakdowns = legacyBreakdowns
                 entry.conditionData.activeEffects = {}
@@ -1818,6 +1836,7 @@ local function syncVoltageSagEffect(vehicle, dt)
     local breakdownId = 'VOLTAGE_SAG'
     local systemVoltageV = spec.rawSystemVoltageV or spec.systemVoltageV or 0
     local isVoltageSagging = (motorState == 1 and systemVoltageV < 12.0 and not isCranking) or (motorState == 4 and systemVoltageV < 13.0)
+    local clearToRemove = not isCranking
 
     if isVoltageSagging then
         if not vehicle:hasBreakdown(breakdownId) then
@@ -1829,7 +1848,7 @@ local function syncVoltageSagEffect(vehicle, dt)
         else
             spec.syncVoltageSagEffectTimer = triggerDelayMs
         end
-    else
+    elseif clearToRemove and not isVoltageSagging then
         spec.syncVoltageSagEffectTimer = triggerDelayMs
         if vehicle:hasBreakdown(breakdownId) then
             vehicle:removeBreakdown(breakdownId)
@@ -1988,6 +2007,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local prevRawEngineTemp = spec.rawEngineTemperature
     local prevRawTransTemp = spec.rawTransmissionTemperature
     local prevBatterySoc = spec.batterySoc
+    local prevBatteryChargeAh = spec.batteryChargeAh
+    local prevBatteryTerminalVoltage = spec.batteryTerminalVoltageV
     local prevSystemVoltage = spec.systemVoltageV
     local prevThermostatState = spec.thermostatState
     local prevSystemsHash = 0
@@ -2051,6 +2072,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         or math.abs((spec.rawEngineTemperature or 0) - (prevRawEngineTemp or 0)) > 0.25
         or math.abs((spec.rawTransmissionTemperature or 0) - (prevRawTransTemp or 0)) > 0.25
         or math.abs((spec.batterySoc or 0) - (prevBatterySoc or 0)) > 0.0025
+        or math.abs((spec.batteryChargeAh or 0) - (prevBatteryChargeAh or 0)) > 0.01
+        or math.abs((spec.batteryTerminalVoltageV or 0) - (prevBatteryTerminalVoltage or 0)) > 0.02
         or math.abs((spec.systemVoltageV or 0) - (prevSystemVoltage or 0)) > 0.02
         or spec.thermostatState ~= prevThermostatState
         or math.abs((spec._fuelUsageRaw or 0) - (spec._prevSyncFuelUsage or 0)) > 0.3 then
@@ -5280,6 +5303,7 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
     local entryId = (#spec.maintenanceLog or 0) + 1
     local env = g_currentMission.environment
     local selectedBreakdowns = ADS_Utils.shallowCopy(spec.pendingSelectedBreakdowns or {})
+    local systemsSnapshot = ADS_Utils.createSystemsSnapshot(spec.systems)
 
     local entry = {
         id = entryId,                     
@@ -5305,7 +5329,9 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
             age = self.age,
             condition = self:getConditionLevel(),
             service = self:getServiceLevel(),
-            activeBreakdowns = self:getActiveBreakdowns(),
+            systems = systemsSnapshot,
+            batterySoc = tonumber(spec.batterySoc) or 1,
+            activeBreakdowns = ADS_Utils.deepCopy(self:getActiveBreakdowns()),
             selectedBreakdowns = selectedBreakdowns,
             activeEffects = ADS_Utils.shallowCopy(spec.activeEffects),
             activeIndicators = ADS_Utils.shallowCopy(spec.activeIndicators),
@@ -7726,6 +7752,12 @@ function AdvancedDamageSystem.ConsoleCommands:showServiceLog(rawArgs)
         if verbose then
             print(string.format("    conditionData: year=%s opHours=%s age=%s condition=%s service=%s reliability=%s maintainability=%s",
                 tostring(cond.year), tostring(cond.operatingHours), tostring(cond.age), tostring(cond.condition), tostring(cond.service), tostring(cond.reliability), tostring(cond.maintainability)))
+            local systemsCount = 0
+            for _, _ in pairs(cond.systems or {}) do
+                systemsCount = systemsCount + 1
+            end
+            print(string.format("    conditionData: batterySoc=%s systems=%d",
+                tostring(cond.batterySoc), systemsCount))
             print(string.format("    conditionData: activeBreakdowns=%d selectedBreakdowns=%d", activeBreakdownsCount, #selectedBreakdowns))
             print("    selectedBreakdowns: " .. formatList(selectedBreakdowns))
         end
@@ -8055,6 +8087,9 @@ addConsoleCommand("ads_toggleHudDebugView", "Switch debug HUD view. Usage: ads_t
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)
+
+
+
 
 
 

@@ -893,7 +893,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {1, 1, 1, 1}, 0.95)
 
     local batteryLines = {}
-    local soc = batteryDbg.soc or spec.batterySoc or 0
+    local soc = spec.batterySoc or batteryDbg.soc or 0
     local ocvV = batteryDbg.ocvV or 0
     local termV = spec.batteryTerminalVoltageV or batteryDbg.batteryTerminalVoltageV or batteryDbg.batteryTerminalV or ocvV
     local systemV = spec.systemVoltageV or batteryDbg.systemVoltageVSmoothed or batteryDbg.systemVoltageV or termV
@@ -1551,6 +1551,7 @@ function ADS_Hud:showInfoVehicle(box)
 end
 
 Vehicle.showInfo = Utils.appendedFunction(Vehicle.showInfo, ADS_Hud.showInfoVehicle)
+
 
 
 

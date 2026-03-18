@@ -115,6 +115,26 @@ function ADS_Utils.serializeDate(dateTable)
     return string.format("%d,%d,%d", dateTable.day, dateTable.month, dateTable.year)
 end
 
+function ADS_Utils.encodeDelimitedString(value)
+    if value == nil then
+        return ""
+    end
+
+    return (tostring(value):gsub("([^%w%-%._~])", function(char)
+        return string.format("%%%02X", string.byte(char))
+    end))
+end
+
+function ADS_Utils.decodeDelimitedString(value)
+    if value == nil or value == "" then
+        return ""
+    end
+
+    return (tostring(value):gsub("%%(%x%x)", function(hex)
+        return string.char(tonumber(hex, 16))
+    end))
+end
+
 
 function ADS_Utils.deserializeDate(dateString)
     if dateString == nil or dateString == "" then
@@ -619,6 +639,31 @@ function ADS_Utils.deserializeSystemsState(serialized)
     return result
 end
 
+function ADS_Utils.createSystemsSnapshot(systems)
+    local snapshot = {}
+    if systems == nil then
+        return snapshot
+    end
+
+    for systemKey, systemData in pairs(systems) do
+        if type(systemData) == "table" then
+            snapshot[systemKey] = {
+                condition = tonumber(systemData.condition) or 1.0,
+                stress = tonumber(systemData.stress) or 0.0,
+                enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
+            }
+        else
+            snapshot[systemKey] = {
+                condition = tonumber(systemData) or 1.0,
+                stress = 0.0,
+                enabled = true
+            }
+        end
+    end
+
+    return snapshot
+end
+
 function ADS_Utils.serializeNumericMap(valueMap)
     local entries = {}
     if valueMap == nil then
@@ -709,6 +754,7 @@ end
 function ADS_Utils.serializeMaintenanceLogEntry(entry)
     if entry == nil then return "" end
     local cd = entry.conditionData or {}
+    local serializedSystems = ADS_Utils.encodeDelimitedString(ADS_Utils.serializeSystemsState(ADS_Utils.createSystemsSnapshot(cd.systems)))
     local parts = {
         tostring(entry.id or 0),
         tostring(entry.type or ""),
@@ -727,7 +773,9 @@ function ADS_Utils.serializeMaintenanceLogEntry(entry)
         tostring(cd.condition or 1),
         tostring(cd.service or 1),
         tostring(cd.reliability or 1),
-        tostring(cd.maintainability or 1)
+        tostring(cd.maintainability or 1),
+        serializedSystems,
+        tostring(cd.batterySoc or 1)
     }
     return table.concat(parts, "|")
 end
@@ -760,6 +808,8 @@ function ADS_Utils.deserializeMaintenanceLogEntry(serialized)
             service = tonumber(parts[16]) or 1,
             reliability = tonumber(parts[17]) or 1,
             maintainability = tonumber(parts[18]) or 1,
+            systems = ADS_Utils.createSystemsSnapshot(ADS_Utils.deserializeSystemsState(ADS_Utils.decodeDelimitedString(parts[19] or ""))),
+            batterySoc = tonumber(parts[20]) or 1,
             activeBreakdowns = {},
             selectedBreakdowns = {},
             activeEffects = {},
