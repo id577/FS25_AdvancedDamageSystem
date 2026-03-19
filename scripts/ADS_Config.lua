@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 82,
+    VER = 84,
 
     DEBUG = false,
 
@@ -46,7 +46,7 @@ ADS_Config = {
             cooling=0.12, 
             electrical=0.10, 
             chassis=0.10, 
-            workProcess=0.10,  -- TO-DO: overall condition level calculations
+            workProcess=0.10,
             fuel=0.08
         },
 
@@ -169,7 +169,7 @@ ADS_Config = {
             HIGH_PRESSURE_FACTOR_THRESSHOLD = 0.9
         },
 
-        STRESS_COOLDOWN = 0.5,
+        STRESS_COOLDOWN = 0.65,
         CVT_SHIFT_SPEED_THRESHOLD = 1.0,
         CVT_SHOCK_MULTIPLIER = 100.0,
 
@@ -212,7 +212,7 @@ ADS_Config = {
         PLANNED_BREAKDOWN_TIME = 4800000,
 
         BREAKDOWN_PROBABILITIES = {
-            STRESS_THRESHOLD = 0.1,
+            STRESS_THRESHOLD = 0.2,
             MIN_MTBF = 60,
             MAX_MTBF = 3200,
             DEGREE = 3.0,
@@ -251,48 +251,55 @@ ADS_Config = {
         GLOBAL_SERVICE_PRICE_MULTIPLIER = 1.0,
         GLOBAL_SERVICE_TIME_MULTIPLIER = 1.0,
 
-        INSPECTION_TIME = 3600000,
+        INSPECTION_TIME = 1 * 3600000,
         INSPECTION_TIME_MULTIPLIERS = {
             [1] = 1.0,  STANDARD = 1.0,
             [2] = 0.1,  VISUAL   = 0.1,
             [3] = 4.0,  COMPLETE = 4.0,
         },
-        MAINTENANCE_TIME = 21600000,
+        MAINTENANCE_TIME = 6 * 3600000,
         MAINTENANCE_TIME_MULTIPLIERS = {
             [1] = 1.0,  STANDARD = 1.0,
             [2] = 0.25, MINIMAL  = 0.25,
             [3] = 1.5,  EXTENDED = 1.5,
+            [4] = 1.75,  PREVENTIVE = 1.75,
         },
-        REPAIR_TIME = 14400000,
+        REPAIR_TIME = 4 * 3600000,
         REPAIR_TIME_MULTIPLIERS = {
             [1] = 1.0, MEDIUM = 1.0,
             [2] = 0.3, LOW   = 0.3,
             [3] = 2.0, HIGH    = 2.0,
         },
-        OVERHAUL_TIME = 86400000,
+        OVERHAUL_TIME = 24 * 3600000,
         OVERHAUL_TIME_MULTIPLIERS = {
             [1] = 1.0, STANDARD = 1.0,
-            [2] = 0.5, PARTIAL  = 0.5,
+            [2] = 1.2, PARTIAL  = 1.2,
             [3] = 2.0, FULL     = 2.0,
         },
+
+        REPAINT_TIME = 8 * 3600000,
 
         MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS = {
             [1] = 1.0,  STANDARD = 1.0,
             [2] = 0.75, MINIMAL  = 0.75,
             [3] = 1.2,  EXTENDED = 1.2,
+            [4] = 1.0,  PREVENTIVE = 1.0,
         },
+
+        MAINTENANCE_PREVENTIVE_STRESS_REMOVE_MULTIPLIER = 0.6,
+        MAINTENANCE_PREVENTIVE_SYSTEMS_COUNT = 3,
 
         REPAIR_MIN_CONDITION_RESTORE_MULTIPLIER = 0.07,
         REPAIR_MAX_CONDITION_RESTORE_MULTIPLIER = 0.13,
 
         OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS = {
             [1] = 0.61, STANDARD = 0.61,
-            [2] = 0.41, PARTIAL  = 0.41,
+            [2] = 0.61, PARTIAL  = 0.61,
             [3] = 0.81, FULL     = 0.81,
         },
         OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS = {
             [1] = 0.79, STANDARD = 0.79,
-            [2] = 0.59, PARTIAL  = 0.59,
+            [2] = 0.79, PARTIAL  = 0.79,
             [3] = 0.99, FULL     = 0.99,
         },
 
@@ -316,7 +323,9 @@ ADS_Config = {
             [1] = 1.0,  STANDARD = 1.0,
             [2] = 0.65, MINIMAL  = 0.65,
             [3] = 1.25, EXTENDED = 1.25,
+            [4] = 2.5,  PREVENTIVE = 2.5,
         },
+
         REPAIR_PRICE_MULTIPLIERS = {
             [1] = 1.0, MEDIUM = 1.0,
             [2] = 0.2, LOW    = 0.2,
@@ -324,7 +333,7 @@ ADS_Config = {
         },
         OVERHAUL_PRICE_MULTIPLIERS = {
             [1] = 0.5, STANDARD = 0.5,
-            [2] = 0.3, PARTIAL  = 0.3,
+            [2] = 0.6, PARTIAL  = 0.6,
             [3] = 0.8, FULL     = 0.8,
         },
         INSPECTION_PRICE_MULTIPLIERS = {

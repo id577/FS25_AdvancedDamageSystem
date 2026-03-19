@@ -250,6 +250,16 @@
         <text name="ads_spec_workshop_dealer" text="Dealer"/>
         <text name="ads_spec_workshop_own" text="Owned"/>
         <text name="ads_spec_workshop_mobile" text="Mobile"/>
+
+        <text name="ads_spec_system_engine" text="Engine"/>
+        <text name="ads_spec_system_transmission" text="Transmission"/>
+        <text name="ads_spec_system_hydraulics" text="Hydraulics / PTO"/>
+        <text name="ads_spec_system_cooling" text="Cooling System"/>
+        <text name="ads_spec_system_electrical" text="Electrical System"/>
+        <text name="ads_spec_system_chassis" text="Chassis"/>
+        <text name="ads_spec_system_workprocess" text="Work Systems"/>
+        <text name="ads_spec_system_fuel" text="Fuel System"/>
+
         <text name="ads_spec_state_ready" text="Ready"/>
         <text name="ads_spec_state_inspection" text="Inspection"/>
         <text name="ads_spec_state_maintenance" text="Maintenance"/>
@@ -287,6 +297,7 @@
         <text name="ads_spec_maintenance_minimal" text="Minimal"/>
         <text name="ads_spec_maintenance_standard" text="Standard"/>
         <text name="ads_spec_maintenance_extended" text="Extended"/>
+        <text name="ads_spec_maintenance_preventive" text="Preventive"/>
         <text name="ads_spec_overhaul_partial" text="Partial"/>
         <text name="ads_spec_overhaul_standard" text="Standard"/>
         <text name="ads_spec_overhaul_full" text="Full"/>
@@ -302,7 +313,7 @@
         <text name="ads_option_menu_option_two_title_repair" text="Select spare parts quality"/>
         <text name="ads_option_menu_option_three_title_repair" text="Perform maintenance after repair"/>
         <text name="ads_option_menu_option_one_title_overhaul" text="Select scope of work"/>
-        <text name="ads_option_menu_option_two_title_overhaul" text="Renew paintwork"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="Select system"/>
         <text name="ads_option_menu_price_text" text="Price: "/>
         <text name="ads_option_menu_warranty_repair_text" text="Warranty repair"/>
         <text name="ads_option_menu_duration_text" text="Duration: "/>
@@ -315,10 +326,11 @@
         <text name="ads_option_menu_maintenance_minimal_description" text="* Basic service. Significantly cheaper and faster, but does not fully restore the Service Level."/>
         <text name="ads_option_menu_maintenance_standard_description" text="* Routine maintenance according to manufacturer specifications. Restores Service Level to normal."/>
         <text name="ads_option_menu_maintenance_extended_description" text="* Comprehensive service. Takes longer and costs more, but boosts Service Level by an additional ~20%"/>   
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Preventive maintenance beyond standard manufacturer service. Restores Service Level to normal and addresses the most problematic systems to reduce breakdown risk."/>
         <text name="ads_option_menu_repair_type_fix_description" text="* A quick fix to get you through the season, but with a high chance the breakdown will return"/>
         <text name="ads_option_menu_repair_type_replacement_description" text="* Standard replacement of the failed component"/>
         <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Repair with replacement of all related parts. Slightly restores the overall condition of the subsystem"/>
-        <text name="ads_option_menu_overhaul_partial_description" text="* Restores Condition to normal level and takes less time and resources than a full overhaul."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Rebuilds the selected system to a good operating condition. Faster and less expensive than a full-vehicle overhaul."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Comprehensive work on all major components. Restores Condition to good level."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Complete remanufacturing. High cost and duration, but restores Condition to excellent level."/>
         <text name="ads_option_menu_part_used_description" text="* Salvaged parts. Very cheap, but extremely risky (~50% chance of defects)"/>
@@ -335,6 +347,10 @@
         <text name="ads_report_vehicle_operating_hours_title" text="Operating Hours"/>
         <text name="ads_report_inspection_type_title" text="Inspection Type"/>
         <text name="ads_report_inspection_location_title" text="Location"/>
+        <text name="ads_report_overall_assessment_title" text="Overall Condition Assessment"/>
+        <text name="ads_report_vehicle_specs_title" text="Vehicle Specs"/>
+        <text name="ads_report_detected_breakdowns_title" text="Detected Breakdowns"/>
+        <text name="ads_report_recommendations_title" text="Conclusion and Recommendations"/>
         <text name="ads_report_state_optimal" text="Optimal"/>
         <text name="ads_report_state_normal" text="Normal"/>
         <text name="ads_report_state_degraded" text="Degraded"/>
@@ -349,15 +365,31 @@
         <text name="ads_report_overall_assessment_wear_rate" text="Wear Rate (%/hr)"/>
         <text name="ads_report_overall_assessment_nominal_wear_rate" text="Nominal Wear Rate (%/h)"/>
         <text name="ads_report_overall_assessment_wear_index" text="Wear Index"/>
-        <text name="ads_report_system_condition_title" text="System Condition"/>
+        <text name="ads_report_system_condition_title" text="System Condition | Failure Risk"/>
         <text name="ads_report_system_condition_power" text="Current Power"/>
         <text name="ads_report_system_condition_brakes" text="Brakes Efficiency"/>
-        <text name="ads_report_system_condition_transmission" text="Transmission Efficiency"/>
+        <text name="ads_report_system_condition_transmission" text="Transmission"/>
         <text name="ads_report_system_condition_harvest" text="Harvest Efficiency"/>
         <text name="ads_report_system_condition_cooling" text="Cooling Efficiency"/>
         <text name="ads_report_system_condition_cvt_cooling" text="CVT Cooling Efficiency"/>
         <text name="ads_report_system_condition_consumption" text="Fuel Consumption"/>
         <text name="ads_report_system_condition_hydraulic" text="Hydraulic Efficiency"/>
+        <text name="ads_reports_transmission_slipping" text="Slipping"/>
+        <text name="ads_reports_transmission_shifting_impaired" text="Shifting Impaired"/>
+        <text name="ads_reports_transmission_gear_rejection" text="Gear Rejection"/>
+        <text name="ads_reports_transmission_shift_delay" text="Shift Delay"/>
+        <text name="ads_reports_transmission_cvt_slipping" text="Belt/Chain Slip"/>
+        <text name="ads_reports_transmission_cvt_ratio_limited" text="Ratio Reduced"/>
+        <text name="ads_reports_transmission_cvt_pressure_instability" text="Pressure Instability"/>
+        <text name="ads_reports_transmission_failed" text="Failed"/>
+        <text name="ads_report_vehicle_spec_max_alternator_current" text="Max Alternator Current"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="Battery Charge"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="Battery Capacity"/>
+        <text name="ads_report_stress_absent" text="Absent"/>
+        <text name="ads_report_stress_low" text="Low"/>
+        <text name="ads_report_stress_moderate" text="Moderate"/>
+        <text name="ads_report_stress_elevated" text="Elevated"/>
+        <text name="ads_report_stress_high" text="High"/>
         <text name="ads_report_system_symptoms_none" text="No abnormal symptoms observed during inspection."/>
         <text name="ads_report_system_symptoms_dark_exhaust" text="Exhaust opacity is elevated under load."/>
         <text name="ads_report_system_symptoms_turbo_grinding" text="Turbocharger emits periodic metallic grinding."/>
@@ -377,6 +409,8 @@
         <text name="ads_report_recommendation_service_due" text="Service interval threshold reached. Perform maintenance."/>
         <text name="ads_report_recommendation_service_urgent" text="Service interval has been violated. Perform maintenance urgently!"/>
         <text name="ads_report_recommendation_overhaul" text="Degradation of core components detected. Perform an overhaul."/>
+        <text name="ads_report_recommendation_system_overhaul" text="Critical degradation detected in the %s. Perform a partial overhaul of this system."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="Elevated breakdown risk detected in the %s. Perform preventive maintenance to reduce the risk of failure."/>
         <text name="ads_report_recommendation_operating_conditions" text="Signs of intensive overuse detected. Improve operating conditions."/>
         <text name="ads_report_recommendation_repeat_maintenance" text="Defective consumables detected. Repeat maintenance to replace faulty components."/>
         <text name="ads_report_recommendation_all_ok" text="No critical recommendations. Vehicle is in serviceable condition."/>

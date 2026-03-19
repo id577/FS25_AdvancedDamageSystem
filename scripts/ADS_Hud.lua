@@ -324,7 +324,7 @@ end
 
 function ADS_Hud:drawFuelConsumption()
     local vehicle = self.vehicle
-    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or vehicle.spec_motorized == nil or vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or vehicle.spec_motorized == nil then
         return
     end
     local sm = g_currentMission.hud.speedMeter
@@ -337,7 +337,16 @@ function ADS_Hud:drawFuelConsumption()
         return
     end
 
-    local consumption = vehicle:getIsMotorStarted() and (vehicle.spec_AdvancedDamageSystem.fuelUsage or 0) or 0
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local consumption = 0
+    if vehicle:getIsMotorStarted() then
+        if spec.isExcludedVehicle then
+            consumption = vehicle.spec_motorized.lastFuelUsageDisplay or vehicle.spec_motorized.lastFuelUsage or 0
+        else
+            consumption = spec.fuelUsage or 0
+        end
+    end
+
     local isElectric  = (fuelType == FillType.ELECTRICCHARGE)
     local unit        = isElectric and "kW" or "L/h"
 
@@ -437,6 +446,29 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
 
         return table.concat(list, ",")
+    end
+
+    local function buildPendingSystemTransitionEntries(startMap, targetMap, currentValueGetter, formatter)
+        local entries = {}
+        startMap = startMap or {}
+        targetMap = targetMap or {}
+
+        for systemKey, startValue in pairs(startMap) do
+            local targetValue = targetMap[systemKey]
+            if targetValue ~= nil then
+                local currentValue = currentValueGetter(systemKey)
+                table.insert(entries, string.format(
+                    "%s: %s->%s (cur %s)",
+                    tostring(systemKey),
+                    formatter(startValue),
+                    formatter(targetValue),
+                    formatter(currentValue)
+                ))
+            end
+        end
+
+        table.sort(entries)
+        return entries
     end
 
     local function localizeDebugValue(value)
@@ -1005,11 +1037,9 @@ function ADS_Hud:drawActiveVehicleHUD()
             #pendingRepairQueue
         ), {1, 0.95, 0.75, 1}, 0.95)
         addLine(serviceDataLines, string.format(
-            "svc s->t: %s->%s | cond(avg) s->t: %s->%s | cur s/c: %.4f/%.4f",
+            "svc s->t: %s->%s | cur s/c: %.4f/%.4f",
             tostring(spec.pendingMaintenanceServiceStart),
             tostring(spec.pendingMaintenanceServiceTarget),
-            tostring(spec.pendingOverhaulConditionStart),
-            tostring(spec.pendingOverhaulConditionTarget),
             spec.serviceLevel or 0,
             spec.conditionLevel or 0
         ), {1, 0.95, 0.75, 1}, 0.95)
@@ -1017,30 +1047,84 @@ function ADS_Hud:drawActiveVehicleHUD()
         if spec.currentState == states.OVERHAUL then
             local overhaulSystemStart = spec.pendingOverhaulSystemStart or {}
             local overhaulSystemTarget = spec.pendingOverhaulSystemTarget or {}
-            local systemEntries = {}
-
-            for systemKey, systemStart in pairs(overhaulSystemStart) do
-                local systemTarget = overhaulSystemTarget[systemKey]
-                local systemData = spec.systems and spec.systems[systemKey]
-                local currentSystemCondition = 0
-                if type(systemData) == "table" then
-                    currentSystemCondition = tonumber(systemData.condition) or 0
-                else
-                    currentSystemCondition = tonumber(systemData) or 0
+            local overhaulStressStart = spec.pendingOverhaulSystemStressStart or {}
+            local overhaulStressTarget = spec.pendingOverhaulSystemStressTarget or {}
+            local conditionEntries = buildPendingSystemTransitionEntries(
+                overhaulSystemStart,
+                overhaulSystemTarget,
+                function(systemKey)
+                    local systemData = spec.systems and spec.systems[systemKey]
+                    return type(systemData) == "table" and (tonumber(systemData.condition) or 0) or 0
+                end,
+                function(value)
+                    return string.format("%.3f", tonumber(value) or 0)
                 end
-
-                if systemTarget ~= nil then
-                    table.insert(
-                        systemEntries,
-                        string.format("%s: %.3f->%.3f (cur %.3f)", tostring(systemKey), tonumber(systemStart) or 0, tonumber(systemTarget) or 0, currentSystemCondition)
-                    )
+            )
+            local stressEntries = buildPendingSystemTransitionEntries(
+                overhaulStressStart,
+                overhaulStressTarget,
+                function(systemKey)
+                    local systemData = spec.systems and spec.systems[systemKey]
+                    return type(systemData) == "table" and (tonumber(systemData.stress) or 0) or 0
+                end,
+                function(value)
+                    return string.format("%.3f", tonumber(value) or 0)
                 end
+            )
+
+            addLine(serviceDataLines, "ovh cond:", {1, 0.95, 0.75, 1}, 0.95)
+            local conditionLines = packEntries(conditionEntries, 2, {1, 0.95, 0.75, 1}, 0.95)
+            for _, line in ipairs(conditionLines) do
+                table.insert(serviceDataLines, line)
             end
 
-            table.sort(systemEntries)
-            addLine(serviceDataLines, "ovh systems:", {1, 0.95, 0.75, 1}, 0.95)
-            local systemLines = packEntries(systemEntries, 2, {1, 0.95, 0.75, 1}, 0.95)
-            for _, line in ipairs(systemLines) do
+            addLine(serviceDataLines, "ovh stress:", {1, 0.95, 0.75, 1}, 0.95)
+            local stressLines = packEntries(stressEntries, 2, {1, 0.95, 0.75, 1}, 0.95)
+            for _, line in ipairs(stressLines) do
+                table.insert(serviceDataLines, line)
+            end
+        elseif spec.currentState == states.REPAIR then
+            local repairStressEntries = buildPendingSystemTransitionEntries(
+                spec.pendingRepairSystemStressStart or {},
+                spec.pendingRepairSystemStressTarget or {},
+                function(systemKey)
+                    local systemData = spec.systems and spec.systems[systemKey]
+                    return type(systemData) == "table" and (tonumber(systemData.stress) or 0) or 0
+                end,
+                function(value)
+                    return string.format("%.3f", tonumber(value) or 0)
+                end
+            )
+
+            if #repairStressEntries > 0 then
+                addLine(serviceDataLines, "rep stress:", {1, 0.95, 0.75, 1}, 0.95)
+                local repairStressLines = packEntries(repairStressEntries, 2, {1, 0.95, 0.75, 1}, 0.95)
+                for _, line in ipairs(repairStressLines) do
+                    table.insert(serviceDataLines, line)
+                end
+            end
+        elseif spec.currentState == states.MAINTENANCE and spec.serviceOptionOne == AdvancedDamageSystem.MAINTENANCE_TYPES.PREVENTIVE then
+            local preventiveStressEntries = buildPendingSystemTransitionEntries(
+                spec.pendingPreventiveSystemStressStart or {},
+                spec.pendingPreventiveSystemStressTarget or {},
+                function(systemKey)
+                    local systemData = spec.systems and spec.systems[systemKey]
+                    return type(systemData) == "table" and (tonumber(systemData.stress) or 0) or 0
+                end,
+                function(value)
+                    return string.format("%.3f", tonumber(value) or 0)
+                end
+            )
+
+            addLine(serviceDataLines, string.format(
+                "prev sys: %d/%d | factor: %.3f",
+                #preventiveStressEntries,
+                tonumber(ADS_Config.MAINTENANCE.MAINTENANCE_PREVENTIVE_SYSTEMS_COUNT) or 0,
+                tonumber(ADS_Config.MAINTENANCE.MAINTENANCE_PREVENTIVE_STRESS_REMOVE_MULTIPLIER) or 0
+            ), {1, 0.95, 0.75, 1}, 0.95)
+
+            local preventiveStressLines = packEntries(preventiveStressEntries, 2, {1, 0.95, 0.75, 1}, 0.95)
+            for _, line in ipairs(preventiveStressLines) do
                 table.insert(serviceDataLines, line)
             end
         end

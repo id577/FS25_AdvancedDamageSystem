@@ -58,7 +58,7 @@
                 
                 <!-- LEFT PART -->
                 <Bitmap profile="ads_tableList" id="tableHeaderBox" position="20px -15px" size="380px 50px">
-                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="Overall Condition Assessment"/>
+                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="$l10n_ads_report_overall_assessment_title"/>
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 
@@ -71,7 +71,7 @@
 
                 <!-- MIDDLE PART -->
                 <Bitmap profile="ads_tableList" id="tableHeaderBox" position="500px -15px" size="380px 50px">
-                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="System Condition"/>
+                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="$l10n_ads_report_system_condition_title"/>
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 
@@ -84,13 +84,14 @@
 
                 <!-- RIGHT PART -->
                 <Bitmap profile="ads_tableList" id="tableHeaderBox" position="980px -15px" size="380px 50px">
-                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="Suspicious Symptoms"/>
+                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="$l10n_ads_report_vehicle_specs_title"/>
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 
-                <SmoothList profile="ads_tableList" id="suspiciousSymptomsTable" position="980px -75px" size="380px 510px">
-                    <ListItem profile="ads_tableListItemAlt" name="suspiciousSymptomsRowTemplate" size="380px 40.77px" >
-                        <Text profile="ads_tableRowCellLeftAlt" position="20px 0px" size="340px 40.77px" name="reportTableSuspiciousSymptomsTitle" textLayoutMode="scrolling" />
+                <SmoothList profile="ads_tableList" id="vehicleSpecTable" position="980px -75px" size="380px 510px">
+                    <ListItem profile="ads_tableListItemAlt" name="vehicleSpecRowTemplate" size="380px 40.77px" >
+                        <Text profile="ads_tableRowCellLeftAlt" position="10px 0px" size="220px 40.77px" name="reportTableVehicleSpecTitle" textLayoutMode="scrolling" />
+                        <Text profile="ads_tableRowCellRightAlt" position="235px 0px" size="135px 40.77px" name="reportTableVehicleSpecValue" />
                     </ListItem>
                 </SmoothList>
                 
@@ -104,7 +105,7 @@
                 <ThreePartBitmap profile="ads_containerFrame"/>
 
                 <Bitmap profile="ads_tableList" id="reportBreakdwonsTableHeader" position="20px 0px" size="650px 50px">
-                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="Detected breakdowns"/>
+                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="$l10n_ads_report_detected_breakdowns_title"/>
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 
@@ -119,7 +120,7 @@
                 <ThreePartBitmap profile="ads_containerFrame"/>
 
                 <Bitmap profile="ads_tableList" id="recommendationsTableHeader" position="20px 0px" size="650px 50px">
-                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="Сonclusion and recommendations"/>
+                    <Text profile="ads_tableHeaderLeft" position="10px 0px" size="380px 40.77px" text="$l10n_ads_report_recommendations_title"/>
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px 2px" />
                 </Bitmap>
                 

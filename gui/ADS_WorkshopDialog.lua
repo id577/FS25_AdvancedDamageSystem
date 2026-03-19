@@ -342,7 +342,7 @@ function ADS_WorkshopDialog:onClickRepair()
 end
 
 function ADS_WorkshopDialog:onClickOverhaul()
-    ADS_MaintenanceTwoOptionsDialog.show(self.vehicle, AdvancedDamageSystem.STATUS.OVERHAUL)
+    ADS_MaintenanceThreeOptionsDialog.show(self.vehicle, AdvancedDamageSystem.STATUS.OVERHAUL)
 end
 
 function ADS_WorkshopDialog:onClickCancelService()

@@ -41,7 +41,15 @@ AdvancedDamageSystem = {
         ELECTRICAL = "ads_spec_system_electrical",
         CHASSIS = "ads_spec_system_chassis",
         WORKPROCESS = "ads_spec_system_workprocess",
-        FUEL = "ads_spec_system_fuel"
+        FUEL = "ads_spec_system_fuel",
+        [1] = "ads_spec_system_engine",
+        [2] = "ads_spec_system_transmission",
+        [3] = "ads_spec_system_hydraulics",
+        [4] = "ads_spec_system_cooling",
+        [5] = "ads_spec_system_electrical",
+        [6] = "ads_spec_system_chassis",
+        [7] = "ads_spec_system_workprocess",
+        [8] = "ads_spec_system_fuel"
     },
 
     WORKSHOP = {
@@ -77,9 +85,11 @@ AdvancedDamageSystem = {
     STANDARD = "ads_spec_maintenance_standard",
     MINIMAL  = "ads_spec_maintenance_minimal",
     EXTENDED = "ads_spec_maintenance_extended",
+    PREVENTIVE = "ads_spec_maintenance_preventive",
     [1] = "ads_spec_maintenance_standard",
     [2] = "ads_spec_maintenance_minimal",
     [3] = "ads_spec_maintenance_extended",
+    [4] = "ads_spec_maintenance_preventive",
     },
 
     REPAIR_TYPES = {
@@ -287,10 +297,17 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingProgressElapsedTime", "Pending Progress Elapsed Time")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingMaintenanceServiceStart", "Pending Maintenance Service Start")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#pendingMaintenanceServiceTarget", "Pending Maintenance Service Target")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingPreventiveSystemStressStart", "Pending preventive per-system stress start values")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingPreventiveSystemStressTarget", "Pending preventive per-system stress target values")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#systemsState", "Systems state snapshot")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#factorStats", "Per-system accumulated factor stats")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingOverhaulSystemStart", "Pending overhaul per-system start values")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingOverhaulSystemTarget", "Pending overhaul per-system target values")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingOverhaulSystemStressStart", "Pending overhaul per-system stress start values")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingOverhaulSystemStressTarget", "Pending overhaul per-system stress target values")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingRepairSystemStressStart", "Pending repair per-system stress start values")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingRepairSystemStressTarget", "Pending repair per-system stress target values")
+    schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingRepairSystemStressStartRatio", "Pending repair per-system stress start ratios")
     schemaSavegame:register(XMLValueType.INT,    baseKey .. "#totalBreakdownsOccurred", "Total Breakdowns Occurred")
     
     local logKey = baseKey .. ".maintenanceLog.entry(?)"
@@ -750,10 +767,17 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime or 0)
         xmlFile:setValue(key .. "#pendingMaintenanceServiceStart", ADS_Utils.encodeOptionalFloat(spec.pendingMaintenanceServiceStart))
         xmlFile:setValue(key .. "#pendingMaintenanceServiceTarget", ADS_Utils.encodeOptionalFloat(spec.pendingMaintenanceServiceTarget))
+        xmlFile:setValue(key .. "#pendingPreventiveSystemStressStart", ADS_Utils.serializeNumericMap(spec.pendingPreventiveSystemStressStart))
+        xmlFile:setValue(key .. "#pendingPreventiveSystemStressTarget", ADS_Utils.serializeNumericMap(spec.pendingPreventiveSystemStressTarget))
         xmlFile:setValue(key .. "#systemsState", ADS_Utils.serializeSystemsState(spec.systems))
         xmlFile:setValue(key .. "#factorStats", ADS_Utils.serializeNumericMap(flattenFactorStats(spec.factorStats)))
         xmlFile:setValue(key .. "#pendingOverhaulSystemStart", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemStart))
         xmlFile:setValue(key .. "#pendingOverhaulSystemTarget", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemTarget))
+        xmlFile:setValue(key .. "#pendingOverhaulSystemStressStart", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemStressStart))
+        xmlFile:setValue(key .. "#pendingOverhaulSystemStressTarget", ADS_Utils.serializeNumericMap(spec.pendingOverhaulSystemStressTarget))
+        xmlFile:setValue(key .. "#pendingRepairSystemStressStart", ADS_Utils.serializeNumericMap(spec.pendingRepairSystemStressStart))
+        xmlFile:setValue(key .. "#pendingRepairSystemStressTarget", ADS_Utils.serializeNumericMap(spec.pendingRepairSystemStressTarget))
+        xmlFile:setValue(key .. "#pendingRepairSystemStressStartRatio", ADS_Utils.serializeNumericMap(spec.pendingRepairSystemStressStartRatio))
         xmlFile:setValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred or 0)
 
         if spec.maintenanceLog and #spec.maintenanceLog > 0 then
@@ -793,11 +817,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
                     end
                     
                     if entry.conditionData.activeEffects then
-                        local effKeys = {}
-                        for effId, _ in pairs(entry.conditionData.activeEffects) do 
-                            table.insert(effKeys, tostring(effId)) 
-                        end
-                        xmlFile:setValue(condKey .. "#activeEffects", table.concat(effKeys, ","))
+                        xmlFile:setValue(condKey .. "#activeEffects", ADS_Utils.serializeEffectSnapshot(entry.conditionData.activeEffects))
                     end
                     
                     if entry.conditionData.activeIndicators then
@@ -1155,8 +1175,15 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.pendingProgressElapsedTime = 0
     self.spec_AdvancedDamageSystem.pendingMaintenanceServiceStart = nil
     self.spec_AdvancedDamageSystem.pendingMaintenanceServiceTarget = nil
+    self.spec_AdvancedDamageSystem.pendingPreventiveSystemStressStart = {}
+    self.spec_AdvancedDamageSystem.pendingPreventiveSystemStressTarget = {}
     self.spec_AdvancedDamageSystem.pendingOverhaulSystemStart = {}
     self.spec_AdvancedDamageSystem.pendingOverhaulSystemTarget = {}
+    self.spec_AdvancedDamageSystem.pendingOverhaulSystemStressStart = {}
+    self.spec_AdvancedDamageSystem.pendingOverhaulSystemStressTarget = {}
+    self.spec_AdvancedDamageSystem.pendingRepairSystemStressStart = {}
+    self.spec_AdvancedDamageSystem.pendingRepairSystemStressTarget = {}
+    self.spec_AdvancedDamageSystem.pendingRepairSystemStressStartRatio = {}
     self.spec_AdvancedDamageSystem.totalBreakdownsOccurred = 0
     self.spec_AdvancedDamageSystem.isElectricVehicle = false
     self.spec_AdvancedDamageSystem.hydraulicsMoveAlphaCache = {}
@@ -1284,8 +1311,15 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.pendingProgressElapsedTime = savegame.xmlFile:getValue(key .. "#pendingProgressElapsedTime", spec.pendingProgressElapsedTime)
         spec.pendingMaintenanceServiceStart = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceStart", spec.pendingMaintenanceServiceStart))
         spec.pendingMaintenanceServiceTarget = ADS_Utils.decodeOptionalFloat(savegame.xmlFile:getValue(key .. "#pendingMaintenanceServiceTarget", spec.pendingMaintenanceServiceTarget))
+        spec.pendingPreventiveSystemStressStart = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingPreventiveSystemStressStart", ""))
+        spec.pendingPreventiveSystemStressTarget = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingPreventiveSystemStressTarget", ""))
         spec.pendingOverhaulSystemStart = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemStart", ""))
         spec.pendingOverhaulSystemTarget = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemTarget", ""))
+        spec.pendingOverhaulSystemStressStart = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemStressStart", ""))
+        spec.pendingOverhaulSystemStressTarget = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingOverhaulSystemStressTarget", ""))
+        spec.pendingRepairSystemStressStart = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingRepairSystemStressStart", ""))
+        spec.pendingRepairSystemStressTarget = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingRepairSystemStressTarget", ""))
+        spec.pendingRepairSystemStressStartRatio = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#pendingRepairSystemStressStartRatio", ""))
         local loadedFactorStatsFlat = ADS_Utils.deserializeNumericMap(savegame.xmlFile:getValue(key .. "#factorStats", ""))
 
         local loadedSystemsStateRaw = ADS_Utils.deserializeSystemsState(savegame.xmlFile:getValue(key .. "#systemsState", ""))
@@ -1382,11 +1416,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 local selBdStr = savegame.xmlFile:getValue(condKey .. "#selectedBreakdowns", "")
                 entry.conditionData.selectedBreakdowns = ADS_Utils.parseCsvList(selBdStr)
 
-                entry.conditionData.activeEffects = {}
-                local effectIds = ADS_Utils.parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeEffects", ""))
-                for _, effId in ipairs(effectIds) do
-                    entry.conditionData.activeEffects[effId] = true
-                end
+                entry.conditionData.activeEffects = ADS_Utils.deserializeEffectSnapshot(savegame.xmlFile:getValue(condKey .. "#activeEffects", ""))
 
                 entry.conditionData.activeIndicators = {}
                 local indicatorIds = ADS_Utils.parseCsvList(savegame.xmlFile:getValue(condKey .. "#activeIndicators", ""))
@@ -1475,8 +1505,15 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.pendingProgressStepIndex == nil then spec.pendingProgressStepIndex = 0 end
         if spec.pendingProgressTotalTime == nil then spec.pendingProgressTotalTime = 0 end
         if spec.pendingProgressElapsedTime == nil then spec.pendingProgressElapsedTime = 0 end
+        if spec.pendingPreventiveSystemStressStart == nil then spec.pendingPreventiveSystemStressStart = {} end
+        if spec.pendingPreventiveSystemStressTarget == nil then spec.pendingPreventiveSystemStressTarget = {} end
         if spec.pendingOverhaulSystemStart == nil then spec.pendingOverhaulSystemStart = {} end
         if spec.pendingOverhaulSystemTarget == nil then spec.pendingOverhaulSystemTarget = {} end
+        if spec.pendingOverhaulSystemStressStart == nil then spec.pendingOverhaulSystemStressStart = {} end
+        if spec.pendingOverhaulSystemStressTarget == nil then spec.pendingOverhaulSystemStressTarget = {} end
+        if spec.pendingRepairSystemStressStart == nil then spec.pendingRepairSystemStressStart = {} end
+        if spec.pendingRepairSystemStressTarget == nil then spec.pendingRepairSystemStressTarget = {} end
+        if spec.pendingRepairSystemStressStartRatio == nil then spec.pendingRepairSystemStressStartRatio = {} end
         if spec.totalBreakdownsOccurred == nil then spec.totalBreakdownsOccurred = 0 end
         if spec.aiWorkerPid == nil then
             spec.aiWorkerPid = {
@@ -3841,7 +3878,7 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
         local stressThreshold = probabilityData.STRESS_THRESHOLD
         local hourlyProb = 0.0
 
-        if systemStress >= stressThreshold then
+        if systemStress / systemCondition >= stressThreshold then
             local stressOverload = math.max(systemCondition - systemStress, 0.001)
             local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(stressOverload, probabilityData, dt)
             hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
@@ -3869,7 +3906,7 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
                         systemData.stress = systemStress * ADS_Config.CORE.STRESS_COOLDOWN
                         systemStress = math.max(systemData.stress or 0.0, 0.0)
 
-                        if systemStress >= stressThreshold then
+                        if systemStress / systemCondition >= stressThreshold then
                             local cooledStressOverload = math.max(systemCondition - systemStress, 0.001)
                             local cooledFailureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(cooledStressOverload, probabilityData, dt)
                             hourlyProb = 1 - (1 - cooledFailureChancePerFrame) ^ (3600000 / dt)
@@ -4759,8 +4796,146 @@ local function resetPendingServiceProgress(spec)
     spec.pendingProgressElapsedTime = 0
     spec.pendingMaintenanceServiceStart = nil
     spec.pendingMaintenanceServiceTarget = nil
+    spec.pendingPreventiveSystemStressStart = {}
+    spec.pendingPreventiveSystemStressTarget = {}
     spec.pendingOverhaulSystemStart = {}
     spec.pendingOverhaulSystemTarget = {}
+    spec.pendingOverhaulSystemStressStart = {}
+    spec.pendingOverhaulSystemStressTarget = {}
+    spec.pendingRepairSystemStressStart = {}
+    spec.pendingRepairSystemStressTarget = {}
+    spec.pendingRepairSystemStressStartRatio = {}
+end
+
+local function applyPendingSystemStressInterpolation(spec, startMap, targetMap, ratio)
+    if spec == nil or spec.systems == nil then
+        return
+    end
+
+    if startMap == nil or targetMap == nil then
+        return
+    end
+
+    for systemKey, startStress in pairs(startMap) do
+        local systemData = spec.systems[systemKey]
+        local targetStress = targetMap[systemKey]
+        if systemData ~= nil and targetStress ~= nil then
+            local interpolatedStress = startStress + (targetStress - startStress) * ratio
+            systemData.stress = math.max(interpolatedStress, 0)
+        end
+    end
+end
+
+local function applyPendingPreventiveStressInterpolation(spec, ratio)
+    applyPendingSystemStressInterpolation(spec, spec.pendingPreventiveSystemStressStart, spec.pendingPreventiveSystemStressTarget, ratio)
+end
+
+local function applyPendingOverhaulStressInterpolation(spec, ratio)
+    applyPendingSystemStressInterpolation(spec, spec.pendingOverhaulSystemStressStart, spec.pendingOverhaulSystemStressTarget, ratio)
+end
+
+local function markRepairStressReduction(spec, systemKey)
+    if spec == nil or spec.systems == nil or systemKey == nil or systemKey == "" then
+        return
+    end
+
+    local systemData = spec.systems[systemKey]
+    if systemData == nil then
+        return
+    end
+
+    spec.pendingRepairSystemStressStart = spec.pendingRepairSystemStressStart or {}
+    spec.pendingRepairSystemStressTarget = spec.pendingRepairSystemStressTarget or {}
+    spec.pendingRepairSystemStressStartRatio = spec.pendingRepairSystemStressStartRatio or {}
+
+    if spec.pendingRepairSystemStressTarget[systemKey] == nil then
+        spec.pendingRepairSystemStressStart[systemKey] = math.max(tonumber(systemData.stress) or 0, 0)
+        spec.pendingRepairSystemStressTarget[systemKey] = 0
+        local totalTime = math.max(tonumber(spec.pendingProgressTotalTime) or 0, 0.0001)
+        spec.pendingRepairSystemStressStartRatio[systemKey] = math.min(math.max((tonumber(spec.pendingProgressElapsedTime) or 0) / totalTime, 0), 1)
+    end
+end
+
+local function applyPendingRepairStressInterpolation(spec, ratio)
+    if spec == nil or spec.systems == nil then
+        return
+    end
+
+    if spec.pendingRepairSystemStressStart == nil
+        or spec.pendingRepairSystemStressTarget == nil
+        or spec.pendingRepairSystemStressStartRatio == nil then
+        return
+    end
+
+    for systemKey, startStress in pairs(spec.pendingRepairSystemStressStart) do
+        local systemData = spec.systems[systemKey]
+        local targetStress = spec.pendingRepairSystemStressTarget[systemKey]
+        local startRatio = tonumber(spec.pendingRepairSystemStressStartRatio[systemKey]) or 0
+        if systemData ~= nil and targetStress ~= nil then
+            local localRatio = 1
+            if startRatio < 1 then
+                localRatio = math.min(math.max((ratio - startRatio) / (1 - startRatio), 0), 1)
+            end
+            local interpolatedStress = startStress + (targetStress - startStress) * localRatio
+            systemData.stress = math.max(interpolatedStress, 0)
+        end
+    end
+end
+
+local function collectPreventiveMaintenanceStressTargets(vehicle)
+    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    if spec == nil or type(spec.systems) ~= "table" then
+        return {}, {}
+    end
+
+    local config = ADS_Config.MAINTENANCE or {}
+    local systemsCount = math.max(math.floor(tonumber(config.MAINTENANCE_PREVENTIVE_SYSTEMS_COUNT) or 0), 0)
+    if systemsCount <= 0 then
+        return {}, {}
+    end
+
+    local targetMultiplier = math.clamp(tonumber(config.MAINTENANCE_PREVENTIVE_STRESS_REMOVE_MULTIPLIER) or 0, 0, 1)
+    local candidates = {}
+
+    for systemKey, systemData in pairs(spec.systems) do
+        if type(systemData) == "table" and systemData.enabled ~= false then
+            local condition = math.clamp(tonumber(systemData.condition) or spec.conditionLevel or 1.0, 0.001, 1.0)
+            local currentStress = math.max(tonumber(systemData.stress) or 0, 0)
+            local targetStress = math.min(currentStress, condition * targetMultiplier)
+            local removableStress = currentStress - targetStress
+
+            if removableStress > 0.0001 then
+                table.insert(candidates, {
+                    systemKey = systemKey,
+                    startStress = currentStress,
+                    targetStress = targetStress,
+                    mtbf = ADS_Utils.getEstimatedMTBF(condition, currentStress),
+                    removableStress = removableStress
+                })
+            end
+        end
+    end
+
+    table.sort(candidates, function(a, b)
+        if a.mtbf ~= b.mtbf then
+            return a.mtbf < b.mtbf
+        end
+        if a.removableStress ~= b.removableStress then
+            return a.removableStress > b.removableStress
+        end
+        return tostring(a.systemKey) < tostring(b.systemKey)
+    end)
+
+    local startMap = {}
+    local targetMap = {}
+    local selectedCount = math.min(systemsCount, #candidates)
+    for i = 1, selectedCount do
+        local candidate = candidates[i]
+        startMap[candidate.systemKey] = candidate.startStress
+        targetMap[candidate.systemKey] = candidate.targetStress
+    end
+
+    return startMap, targetMap
 end
 
 function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionTwo, optionThree)
@@ -4777,6 +4952,13 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
     end
 
     if vehicleState ~= states.READY or (spec.maintenanceTimer or 0) ~= 0 then
+        return
+    end
+
+    if type == states.OVERHAUL
+        and optionOne == AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL
+        and ADS_Utils.getEffectiveSystemWeight(self, optionTwo, AdvancedDamageSystem.SYSTEMS) <= 0 then
+        log_dbg(string.format("Skipping partial overhaul for %s: invalid or disabled target system '%s'", self:getFullName(), tostring(optionTwo)))
         return
     end
 
@@ -4821,6 +5003,12 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         totalTimeMs = C.MAINTENANCE_TIME * C.GLOBAL_SERVICE_TIME_MULTIPLIER * C.MAINTENANCE_TIME_MULTIPLIERS[key]
         spec.pendingMaintenanceServiceStart = spec.serviceLevel
         spec.pendingMaintenanceServiceTarget = math.max(spec.pendingMaintenanceServiceStart, C.MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS[key])
+        spec.pendingPreventiveSystemStressStart = {}
+        spec.pendingPreventiveSystemStressTarget = {}
+
+        if key == "PREVENTIVE" then
+            spec.pendingPreventiveSystemStressStart, spec.pendingPreventiveSystemStressTarget = collectPreventiveMaintenanceStressTargets(self)
+        end
 
         if self:hasBreakdown("MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES") then
             self:removeBreakdown("MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES")
@@ -4845,12 +5033,24 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
     elseif type == states.OVERHAUL then
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.OVERHAUL_TYPES, optionOne)
         totalTimeMs = C.OVERHAUL_TIME * C.GLOBAL_SERVICE_TIME_MULTIPLIER * C.OVERHAUL_TIME_MULTIPLIERS[key]
+        local targetOverhaulSystemKey = nil
+        if optionOne == AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL then 
+            local systemWeight = ADS_Utils.getEffectiveSystemWeight(self, optionTwo, AdvancedDamageSystem.SYSTEMS)
+            totalTimeMs = totalTimeMs * systemWeight
+            targetOverhaulSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, optionTwo)
+            if (targetOverhaulSystemKey == nil or targetOverhaulSystemKey == "") and type(optionTwo) == "string" then
+                targetOverhaulSystemKey = string.lower(optionTwo)
+            end
+        end
 
         if next(spec.activeBreakdowns) ~= nil then
             local idsToRepair = {}
             for id, _ in pairs(spec.activeBreakdowns) do
                 if ADS_Breakdowns.BreakdownRegistry[id] and ADS_Breakdowns.BreakdownRegistry[id].isSelectable then
-                    table.insert(idsToRepair, id)
+                    local breakdownSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, ADS_Breakdowns.BreakdownRegistry[id].system)
+                    if optionOne ~= AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL or targetOverhaulSystemKey == breakdownSystemKey then
+                        table.insert(idsToRepair, id)
+                    end
                 end
             end
             selectedBreakdowns = idsToRepair
@@ -4861,15 +5061,36 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         local maxRestore = C.OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS[key] - C.OVERHAUL_MAX_CONDITION_RESTORE_MULTIPLIERS[key] * C.RE_OVERHAUL_FACTOR * overhaulPerformedCount
         spec.pendingOverhaulSystemStart = {}
         spec.pendingOverhaulSystemTarget = {}
+        spec.pendingOverhaulSystemStressStart = {}
+        spec.pendingOverhaulSystemStressTarget = {}
 
         for systemKey, systemData in pairs(spec.systems) do
-            local startCondition = math.clamp(tonumber(systemData.condition) or spec.conditionLevel or 1.0, 0.001, 1.0)
-            local restoreAmount = math.min((minRestore + math.random() * (maxRestore - minRestore)) * spec.maintainability, spec.baseConditionLevel)
-            local desiredSystemTarget = math.max(restoreAmount, C.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[key])
-            local targetCondition = math.max(startCondition, desiredSystemTarget)
+            if optionOne ~= AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL or systemKey == targetOverhaulSystemKey or optionTwo == systemData.name then
+                local startCondition = math.clamp(tonumber(systemData.condition) or spec.conditionLevel or 1.0, 0.001, 1.0)
+                local startStress = math.max(tonumber(systemData.stress) or 0, 0)
+                local restoreAmount = math.min((minRestore + math.random() * (maxRestore - minRestore)) * spec.maintainability, spec.baseConditionLevel)
+                local desiredSystemTarget = math.max(restoreAmount, C.OVERHAUL_MIN_CONDITION_RESTORE_MULTIPLIERS[key])
+                local targetCondition = math.max(startCondition, desiredSystemTarget)
+                spec.pendingOverhaulSystemStart[systemKey] = startCondition
+                spec.pendingOverhaulSystemTarget[systemKey] = targetCondition
+                spec.pendingOverhaulSystemStressStart[systemKey] = startStress
+                spec.pendingOverhaulSystemStressTarget[systemKey] = 0
+            end
+        end
 
-            spec.pendingOverhaulSystemStart[systemKey] = startCondition
-            spec.pendingOverhaulSystemTarget[systemKey] = targetCondition
+        if optionOne == AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL and next(spec.pendingOverhaulSystemTarget) == nil then
+            log_dbg(string.format("Skipping partial overhaul for %s: no valid system targets resolved for '%s'", self:getFullName(), tostring(optionTwo)))
+            spec.currentState = states.READY
+            spec.plannedState = states.READY
+            spec.workshopType = workshopType
+            spec.serviceOptionOne = nil
+            spec.serviceOptionTwo = nil
+            spec.serviceOptionThree = false
+            resetPendingServiceProgress(spec)
+            if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil and C.PARK_VEHICLE then
+                self.spec_enterable:setIsTabbable(true)
+            end
+            return
         end
 
         self:updateConditionLevel()
@@ -4973,7 +5194,9 @@ function AdvancedDamageSystem:processService(dt)
         
                     if optionOne ~= AdvancedDamageSystem.REPAIR_TYPES.LOW then
                         if systemData ~= nil then
-                            systemData.stress = 0
+                            markRepairStressReduction(spec, systemKey)
+                            systemData.plannedBreakdown = ""
+                            systemData.plannedBreakdownTimer = 0
                             if optionOne == AdvancedDamageSystem.REPAIR_TYPES.HIGH then
                                 local currentCondition = tonumber(systemData.condition) or spec.conditionLevel or 1.0
                                 local minRestore = tonumber(C.REPAIR_MIN_CONDITION_RESTORE_MULTIPLIER) or 0
@@ -4998,14 +5221,22 @@ function AdvancedDamageSystem:processService(dt)
                     end
                 end
             end
-            self:updateConditionLevel()
         end
+
+        if spec.pendingProgressTotalTime > 0 then
+            local ratio = math.min(math.max(spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime, 0), 1)
+            applyPendingRepairStressInterpolation(spec, ratio)
+        end
+        self:updateConditionLevel()
     end
 
     if serviceType == states.MAINTENANCE and spec.pendingMaintenanceServiceStart ~= nil and spec.pendingMaintenanceServiceTarget ~= nil and spec.pendingProgressTotalTime > 0 then
         local ratio = math.min(math.max(spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime, 0), 1)
         local interpolatedService = spec.pendingMaintenanceServiceStart + (spec.pendingMaintenanceServiceTarget - spec.pendingMaintenanceServiceStart) * ratio
         spec.serviceLevel = math.max(spec.pendingMaintenanceServiceStart, interpolatedService)
+        applyPendingPreventiveStressInterpolation(spec, ratio)
+    
+    --- overhaul
     elseif serviceType == states.OVERHAUL and spec.pendingProgressTotalTime > 0 then
         local ratio = math.min(math.max(spec.pendingProgressElapsedTime / spec.pendingProgressTotalTime, 0), 1)
         local hasPerSystemTargets = spec.pendingOverhaulSystemStart ~= nil and next(spec.pendingOverhaulSystemStart) ~= nil and spec.pendingOverhaulSystemTarget ~= nil and next(spec.pendingOverhaulSystemTarget) ~= nil
@@ -5018,6 +5249,7 @@ function AdvancedDamageSystem:processService(dt)
                     systemData.condition = math.max(startCondition, interpolatedCondition)
                 end
             end
+            applyPendingOverhaulStressInterpolation(spec, ratio)
             self:updateConditionLevel()
         end
     end
@@ -5043,9 +5275,27 @@ function AdvancedDamageSystem:completeService()
     local selectedBreakdowns = ADS_Utils.shallowCopy(spec.pendingSelectedBreakdowns or {})
     local plannedRepairCandidateIds = {}
 
+    if serviceType ~= states.INSPECTION then
+        local nominalCapacityAh = math.max(spec.batteryCapacityAh or 0, 1)
+        local usableCapacityAh = math.max(
+            nominalCapacityAh * ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR,
+            0.01
+        )
+        local effectiveCapacityAh = math.max(usableCapacityAh * math.max(spec.batteryHealth or 0, 0.0001), 0.01)
+        spec.batterySoc = 1.0
+        spec.batteryChargeAh = effectiveCapacityAh
+    end
+
+    --- charge battery
     if serviceType == states.MAINTENANCE and spec.pendingMaintenanceServiceTarget ~= nil then
         local maintenanceStart = spec.pendingMaintenanceServiceStart or spec.serviceLevel
         spec.serviceLevel = math.max(maintenanceStart, spec.pendingMaintenanceServiceTarget)
+        for systemKey, targetStress in pairs(spec.pendingPreventiveSystemStressTarget or {}) do
+            local systemData = spec.systems[systemKey]
+            if systemData ~= nil then
+                systemData.stress = math.max(tonumber(targetStress) or 0, 0)
+            end
+        end
     end
 
     if serviceType == states.OVERHAUL then
@@ -5055,24 +5305,41 @@ function AdvancedDamageSystem:completeService()
                 local systemData = spec.systems[systemKey]
                 if systemData ~= nil then
                     systemData.condition = math.clamp(tonumber(targetCondition) or systemData.condition or 1.0, 0.001, 1.0)
+                    systemData.stress = 0
+                    systemData.plannedBreakdown = ""
+                    systemData.plannedBreakdownTimer = 0
                 end
             end
             self:updateConditionLevel()
         end
-        spec.serviceLevel = 1.0
+        
+        spec.serviceLevel = optionOne ~= AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL and 1.0 or spec.serviceLevel
 
         local idsToRepair = {}
         for id, _ in pairs(spec.activeBreakdowns) do
             if ADS_Breakdowns.BreakdownRegistry[id] and ADS_Breakdowns.BreakdownRegistry[id].isSelectable then
-                table.insert(idsToRepair, id)
+                if optionOne ~= AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL or optionTwo == ADS_Breakdowns.BreakdownRegistry[id].system then
+                    table.insert(idsToRepair, id)
+                end
             end
         end
+
         selectedBreakdowns = idsToRepair
         if #idsToRepair > 0 then
             self:removeBreakdown(table.unpack(idsToRepair))
         end
-    elseif serviceType == states.REPAIR and optionThree == true then
-        spec.plannedState = states.MAINTENANCE
+    elseif serviceType == states.REPAIR then
+        for systemKey, targetStress in pairs(spec.pendingRepairSystemStressTarget or {}) do
+            local systemData = spec.systems[systemKey]
+            if systemData ~= nil then
+                systemData.stress = math.max(tonumber(targetStress) or 0, 0)
+            end
+        end
+        self:updateConditionLevel()
+
+        if optionThree == true then
+            spec.plannedState = states.MAINTENANCE
+        end
     end
 
     if serviceType == states.INSPECTION or serviceType == states.MAINTENANCE then
@@ -6568,7 +6835,6 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
     local spec = self.spec_AdvancedDamageSystem
     local ageFactor = math.min(math.max(math.log10(self.age), 1), 2)
     local C = ADS_Config.MAINTENANCE
-    local optionTwoKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.PART_TYPES, optionTwo) or AdvancedDamageSystem.PART_TYPES.OEM
 
     if not maintenanceType then maintenanceType = spec.currentState end
 
@@ -6590,6 +6856,7 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
     -- maintenance
     elseif maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.MAINTENANCE_TYPES, optionOne)
+        local optionTwoKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.PART_TYPES, optionTwo) or AdvancedDamageSystem.PART_TYPES.OEM
         local maintenancePrice = math.ceil(math.max((C.GLOBAL_SERVICE_PRICE_MULTIPLIER * C.MAINTENANCE_PRICE_MULTIPLIERS[key] * C.PARTS_PRICE_MULTIPLIERS[optionTwoKey] * ownWorkshopDiscount * price * ageFactor * 0.01 / 10) / spec.maintainability, 2)) * 10
         log_dbg(string.format("Calculated maintenance price: %.2f (base price: %.2f, multiplier: %.2f, own workshop discount: %.2f, age factor: %.2f, maintainability: %.2f)", maintenancePrice, price, C.MAINTENANCE_PRICE_MULTIPLIERS[key] * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * C.PARTS_PRICE_MULTIPLIERS[optionTwoKey], ownWorkshopDiscount, ageFactor, spec.maintainability))
         return  maintenancePrice
@@ -6597,13 +6864,24 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
     -- overhaul
     elseif maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.OVERHAUL_TYPES, optionOne)
-        local overhaulPrice = (price * C.OVERHAUL_PRICE_MULTIPLIERS[key] * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * ownWorkshopDiscount ) / spec.maintainability
+        local overhaulPrice = 0
+
+        if optionOne == AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL then
+            local systemWeight = ADS_Utils.getEffectiveSystemWeight(self, optionTwo, AdvancedDamageSystem.SYSTEMS)
+            if systemWeight <= 0 then
+                return 0
+            end
+            overhaulPrice = (price * C.OVERHAUL_PRICE_MULTIPLIERS[key] * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * systemWeight * ownWorkshopDiscount ) / spec.maintainability
+        else
+            overhaulPrice = (price * C.OVERHAUL_PRICE_MULTIPLIERS[key] * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * ownWorkshopDiscount ) / spec.maintainability
+        end
         if optionThree then
             overhaulPrice = overhaulPrice + Wearable.calculateRepaintPrice(self:getSellPrice(), self:getWearTotalAmount()) * 0.25
         end
         overhaulPrice = math.max(overhaulPrice, 100)
         log_dbg(string.format("Calculated overhaul price: %.2f (base price: %.2f, multiplier: %.2f, own workshop discount: %.2f, maintainability: %.2f)", overhaulPrice, price, C.OVERHAUL_PRICE_MULTIPLIERS[key] * C.GLOBAL_SERVICE_PRICE_MULTIPLIER, ownWorkshopDiscount, spec.maintainability))
         return overhaulPrice
+    
     -- repair
     elseif maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
         if self:isWarrantyRepairCovered(optionOne, optionTwo) then
@@ -6611,6 +6889,7 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
         end
 
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.REPAIR_TYPES, optionOne)
+        local optionTwoKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.PART_TYPES, optionTwo) or AdvancedDamageSystem.PART_TYPES.OEM
         local repairPrice = 0
         local activeBreakdowns = self:getActiveBreakdowns()
         
@@ -6689,6 +6968,16 @@ function AdvancedDamageSystem:getServiceDuration(maintenanceType, optionOne, opt
         elseif maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
             local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.OVERHAUL_TYPES, optionOne)
             totalDurationMs = C.OVERHAUL_TIME * C.GLOBAL_SERVICE_TIME_MULTIPLIER * C.OVERHAUL_TIME_MULTIPLIERS[key] / spec.maintainability
+            if optionOne == AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL then
+                 local systemWeight = ADS_Utils.getEffectiveSystemWeight(self, optionTwo, AdvancedDamageSystem.SYSTEMS)
+                 if systemWeight <= 0 then
+                    return 0
+                 end
+                 totalDurationMs = totalDurationMs * systemWeight
+            end
+            if optionThree then
+                totalDurationMs = totalDurationMs + C.REPAINT_TIME
+            end
         -- repair
         elseif maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
             local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.REPAIR_TYPES, optionOne)

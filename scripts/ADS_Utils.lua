@@ -21,11 +21,32 @@ function ADS_Utils.calculateQuadraticMultiplier(level, threshold, lessIsWorse, c
     end
 end
 
-function ADS_Utils.getEstimatedMTBF(level, p)
-    local wear = 1 - math.max(0, math.min(1, level))
-    local exponent = math.max(p.DEGREE - p.DEGREE * wear, 0.1)
-    local calculatedMtbf = p.MAX_MTBF + (p.MIN_MTBF - p.MAX_MTBF) * (wear ^ exponent)
-    local mtbfInMinutes = math.max(calculatedMtbf, p.MIN_MTBF)
+function ADS_Utils.getEstimatedMTBF(systemCondition, systemStress)
+    local probabilityData = ADS_Config.CORE.BREAKDOWN_PROBABILITIES
+    if type(systemStress) == "table" then
+        probabilityData = systemStress
+        systemStress = nil
+    end
+
+    local condition = math.max(math.min(systemCondition or 1.0, 1.0), 0.001)
+    if systemStress == nil then
+        local wear = 1 - condition
+        local exponent = math.max(probabilityData.DEGREE - probabilityData.DEGREE * wear, 0.1)
+        local calculatedMtbf = probabilityData.MAX_MTBF + (probabilityData.MIN_MTBF - probabilityData.MAX_MTBF) * (wear ^ exponent)
+        return math.max(calculatedMtbf, probabilityData.MIN_MTBF)
+    end
+
+    local stress = math.max(systemStress, 0.0)
+    local stressThreshold = probabilityData.STRESS_THRESHOLD or 0.0
+    if stress / condition >= stressThreshold then
+        return math.huge
+    end
+
+    local stressOverload = math.max(condition - stress, 0.001)
+    local wear = 1 - math.max(0, math.min(1, stressOverload))
+    local exponent = math.max(probabilityData.DEGREE - probabilityData.DEGREE * wear, 0.1)
+    local calculatedMtbf = probabilityData.MAX_MTBF + (probabilityData.MIN_MTBF - probabilityData.MAX_MTBF) * (wear ^ exponent)
+    local mtbfInMinutes = math.max(calculatedMtbf, probabilityData.MIN_MTBF)
     return mtbfInMinutes
 end
 
@@ -548,6 +569,65 @@ function ADS_Utils.parseCsvList(csvString)
     return result
 end
 
+function ADS_Utils.serializeEffectSnapshot(effects)
+    local entries = {}
+    if effects == nil then
+        return ""
+    end
+
+    for effectId, effectData in pairs(effects) do
+        local key = tostring(effectId or "")
+        if key ~= "" then
+            local encodedValue = ""
+
+            if type(effectData) == "table" then
+                local numericValue = tonumber(effectData.value)
+                if numericValue ~= nil then
+                    encodedValue = string.format("%.6f", numericValue)
+                end
+            elseif type(effectData) == "number" then
+                encodedValue = string.format("%.6f", effectData)
+            end
+
+            table.insert(entries, string.format("%s|%s", key, tostring(encodedValue)))
+        end
+    end
+
+    table.sort(entries)
+    return table.concat(entries, ";")
+end
+
+function ADS_Utils.deserializeEffectSnapshot(serialized)
+    local result = {}
+    if serialized == nil or serialized == "" then
+        return result
+    end
+
+    if not string.find(serialized, "|") then
+        for _, effectId in ipairs(ADS_Utils.parseCsvList(serialized)) do
+            result[effectId] = true
+        end
+        return result
+    end
+
+    for entry in string.gmatch(serialized, "([^;]+)") do
+        local effectId, rawValue = string.match(entry, "([^|]+)|([^|]*)")
+        if effectId ~= nil and effectId ~= "" then
+            local value = tonumber(rawValue)
+            if value ~= nil then
+                result[effectId] = {
+                    id = effectId,
+                    value = value
+                }
+            else
+                result[effectId] = true
+            end
+        end
+    end
+
+    return result
+end
+
 function ADS_Utils.getSystemNameByKey(systems, systemKey)
     if systems == nil then
         return tostring(systemKey)
@@ -713,6 +793,98 @@ function ADS_Utils.getSystemKey(systems, systemName)
     return string.lower(ADS_Utils.getNameByValue(systems, systemName) or "")
 end
 
+function ADS_Utils.getEffectiveSystemWeight(vehicle, systemName, systems)
+    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    if spec == nil or type(spec.systems) ~= "table" or type(systemName) ~= "string" then
+        return 0
+    end
+
+    local systemWeights = ADS_Config ~= nil and ADS_Config.CORE ~= nil and ADS_Config.CORE.SYSTEM_WEIGHTS or nil
+    if type(systemWeights) ~= "table" then
+        return 0
+    end
+
+    local function getConfiguredWeight(systemKey)
+        if systemKey == nil then
+            return 0
+        end
+
+        local directWeight = tonumber(systemWeights[systemKey])
+        if directWeight ~= nil then
+            return math.max(directWeight, 0)
+        end
+
+        local loweredKey = string.lower(tostring(systemKey))
+        for weightedKey, weight in pairs(systemWeights) do
+            if string.lower(tostring(weightedKey)) == loweredKey then
+                return math.max(tonumber(weight) or 0, 0)
+            end
+        end
+
+        return 0
+    end
+
+    local function resolveSystemKey(name)
+        if spec.systems[name] ~= nil then
+            return name
+        end
+
+        if type(systems) == "table" then
+            local enumValue = systems[string.upper(name)]
+            if type(enumValue) == "string" then
+                local enumKey = string.lower(string.upper(name))
+                if spec.systems[enumKey] ~= nil then
+                    return enumKey
+                end
+            end
+
+            local systemKeyByValue = ADS_Utils.getNameByValue(systems, name)
+            if type(systemKeyByValue) == "string" then
+                local loweredEnumKey = string.lower(systemKeyByValue)
+                if spec.systems[loweredEnumKey] ~= nil then
+                    return loweredEnumKey
+                end
+            end
+        end
+
+        local loweredName = string.lower(name)
+        for existingKey, _ in pairs(spec.systems) do
+            if string.lower(tostring(existingKey)) == loweredName then
+                return existingKey
+            end
+        end
+
+        return loweredName
+    end
+
+    local resolvedSystemKey = resolveSystemKey(systemName)
+    local targetSystemData = spec.systems[resolvedSystemKey]
+    if targetSystemData == nil or (type(targetSystemData) == "table" and targetSystemData.enabled == false) then
+        return 0
+    end
+
+    local targetWeight = getConfiguredWeight(resolvedSystemKey)
+    if targetWeight <= 0 then
+        return 0
+    end
+
+    local totalEnabledWeight = 0
+    for existingKey, systemData in pairs(spec.systems) do
+        if type(systemData) ~= "table" or systemData.enabled ~= false then
+            local configuredWeight = getConfiguredWeight(existingKey)
+            if configuredWeight > 0 then
+                totalEnabledWeight = totalEnabledWeight + configuredWeight
+            end
+        end
+    end
+
+    if totalEnabledWeight <= 0 then
+        return 0
+    end
+
+    return targetWeight / totalEnabledWeight
+end
+
 function ADS_Utils.shallowCopy(original)
     local result = {}
     if type(original) ~= "table" then
@@ -755,6 +927,7 @@ function ADS_Utils.serializeMaintenanceLogEntry(entry)
     if entry == nil then return "" end
     local cd = entry.conditionData or {}
     local serializedSystems = ADS_Utils.encodeDelimitedString(ADS_Utils.serializeSystemsState(ADS_Utils.createSystemsSnapshot(cd.systems)))
+    local serializedEffects = ADS_Utils.encodeDelimitedString(ADS_Utils.serializeEffectSnapshot(cd.activeEffects))
     local parts = {
         tostring(entry.id or 0),
         tostring(entry.type or ""),
@@ -775,7 +948,8 @@ function ADS_Utils.serializeMaintenanceLogEntry(entry)
         tostring(cd.reliability or 1),
         tostring(cd.maintainability or 1),
         serializedSystems,
-        tostring(cd.batterySoc or 1)
+        tostring(cd.batterySoc or 1),
+        serializedEffects
     }
     return table.concat(parts, "|")
 end
@@ -812,7 +986,7 @@ function ADS_Utils.deserializeMaintenanceLogEntry(serialized)
             batterySoc = tonumber(parts[20]) or 1,
             activeBreakdowns = {},
             selectedBreakdowns = {},
-            activeEffects = {},
+            activeEffects = ADS_Utils.deserializeEffectSnapshot(ADS_Utils.decodeDelimitedString(parts[21] or "")),
             activeIndicators = {}
         }
     }
