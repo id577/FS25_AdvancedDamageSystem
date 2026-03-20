@@ -157,6 +157,89 @@ local breakdownProgressMultipliers = {
     UNLOADING_AUGER_MALFUNCTION = 1.2
 }
 
+local function getBreakdownFactorWeightPercent(vehicle, systemName, ...)
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+        return 0
+    end
+
+    local factorStats = vehicle.spec_AdvancedDamageSystem.factorStats
+    if type(factorStats) ~= "table" then
+        return 0
+    end
+
+    local targetSystem = systemName
+    if type(targetSystem) == "string" and systems[targetSystem] ~= nil then
+        targetSystem = systems[targetSystem]
+    end
+
+    local systemKey = ADS_Utils ~= nil and ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, targetSystem) or nil
+    if systemKey == nil or systemKey == "" then
+        systemKey = string.lower(tostring(targetSystem or ""))
+    end
+
+    local systemStats = factorStats[systemKey]
+    if type(systemStats) ~= "table" then
+        return 0
+    end
+
+    local requestedAliases = {}
+    local rawArgs = {...}
+    for _, arg in ipairs(rawArgs) do
+        if type(arg) == "table" then
+            for _, alias in ipairs(arg) do
+                if alias ~= nil then
+                    table.insert(requestedAliases, tostring(alias))
+                end
+            end
+        elseif arg ~= nil then
+            table.insert(requestedAliases, tostring(arg))
+        end
+    end
+
+    if #requestedAliases == 0 then
+        return 0
+    end
+
+    local numerator = 0
+    local denominator = 0
+    for statKey, statValue in pairs(systemStats) do
+        local numericValue = math.max(tonumber(statValue) or 0, 0)
+        if statKey ~= "total" and statKey ~= "stress" then
+            denominator = denominator + numericValue
+            for _, alias in ipairs(requestedAliases) do
+                if statKey == alias then
+                    numerator = numerator + numericValue
+                    break
+                end
+            end
+        end
+    end
+
+    if denominator <= 0 or numerator <= 0 then
+        return 0
+    end
+
+    return math.max((numerator / denominator) * 100, 0)
+end
+
+local BREAKDOWN_SECONDARY_FACTOR_WEIGHT = 0.35
+local BREAKDOWN_FALLBACK_WEIGHT = 1.0
+
+local function getBreakdownProbabilityWeightPercent(vehicle, systemName, primaryAliases, secondaryAliases, fallbackWeight, secondaryWeight)
+    local resolvedFallbackWeight = math.max(tonumber(fallbackWeight) or BREAKDOWN_FALLBACK_WEIGHT, 0)
+    local resolvedSecondaryWeight = math.max(tonumber(secondaryWeight) or BREAKDOWN_SECONDARY_FACTOR_WEIGHT, 0)
+
+    local primaryWeight = getBreakdownFactorWeightPercent(vehicle, systemName, primaryAliases)
+    local secondaryWeightPercent = getBreakdownFactorWeightPercent(vehicle, systemName, secondaryAliases)
+    local weightedPercent = primaryWeight + secondaryWeightPercent * resolvedSecondaryWeight
+
+    if weightedPercent <= 0 then
+        return resolvedFallbackWeight
+    end
+
+    return math.max(weightedPercent, resolvedFallbackWeight)
+end
+
 ADS_Breakdowns.BreakdownRegistry = {
 
 --------------------- NOT SELECTEBLE BREAKDOWNS (does not happen by chance, but is the result of various conditions) ---------------------
@@ -450,7 +533,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return false
         end,
         probability = function(vehicle)
-            return 1.0 
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ELECTRICAL, {"ohf"}, {"crf", "idfg", "sf"})
         end,
         stages = {
             {
@@ -538,7 +621,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return spec.year >= 2000 and vehicle.spec_lights ~= nil
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ELECTRICAL, {"wef"}, {"sf", "ltf"})
         end,
         stages = {
             {
@@ -610,7 +693,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return true
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ELECTRICAL, {"crf", "idfg"}, {"sf"})
         end,
         stages = {
             {
@@ -676,7 +759,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return true
         end,
         probability = function(vehicle)
-            return 1.0
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ELECTRICAL, {"ohf", "crf", "idfg"}, {"ltf", "sf"})
         end,
         stages = {
             {
@@ -744,7 +827,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return false
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"hmf", "mlf"}, {"sf"})
         end,
         stages = {
             {
@@ -819,7 +902,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"sf", "hmf"}, {"cmf"})
         end,
         stages = {
             {
@@ -889,16 +972,13 @@ ADS_Breakdowns.BreakdownRegistry = {
     -- misfires under load, and eventual engine shutdown.
 
     VALVE_TRAIN_MALFUNCTION = { -- TO-DO: $l10n
-        isSelectable = false,
+        isSelectable = true,
         system = systems.ENGINE,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            local spec = vehicle.spec_AdvancedDamageSystem
-            if spec.service < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-                return 3.0
-            end
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"sf", "hmf"}, {"cmf", "mlf"})
         end,
         stages = {
             {
@@ -957,8 +1037,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_valve_train_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} },
                 },
                 indicators = {
-                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
-                
+                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }         
                 }
             }
         }
@@ -974,7 +1053,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return motor.minForwardGearRatio == nil
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.TRANSMISSION, {"wsf", "lf"}, {"pof", "sf"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1044,7 +1123,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return motor.minForwardGearRatio == nil and motor.gearType ~= VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.TRANSMISSION, {"lf", "pof"}, {"sf"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1103,6 +1182,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             local motor = vehicle:getMotor()
             if not motor then return false end
             return motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
+        end,
+        probability = function(vehicle)
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.TRANSMISSION, {"hotf"}, {"pof", "sf"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1173,6 +1255,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             if not motor then return false end
             if motor.minForwardGearRatio == nil then return false end
             return true
+        end,
+        probability = function(vehicle)
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.TRANSMISSION, {"wsf", "lf"}, {"hotf", "pof"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1248,6 +1333,9 @@ ADS_Breakdowns.BreakdownRegistry = {
             if not motor then return false end
             if motor.minForwardGearRatio == nil then return false end
             return true
+        end,
+        probability = function(vehicle)
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.TRANSMISSION, {"hotf"}, {"ctf", "sf"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1330,7 +1418,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return vtype ~= "car" and vtype ~= "carFillable" and vtype ~= "motorbike" and spec.year >= 1960
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.HYDRAULICS, {"hlf", "of"}, {"cof", "sf"})
         end,
         stages = {
             {
@@ -1401,7 +1489,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return vtype ~= "car" and vtype ~= "carFillable" and vtype ~= "motorbike" and spec.year >= 1960
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.HYDRAULICS, {"hlf", "of"}, {"sf"})
         end,
         stages = {
             {
@@ -1471,7 +1559,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return hasPtoCapability(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.HYDRAULICS, {"saf"}, {"of", "sf"})
         end,
         stages = {
             {
@@ -1542,7 +1630,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             end
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.CHASSIS, {"bmf"}, {"sf"})
         end,
         isCanProgress = function(vehicle)
             return true
@@ -1616,7 +1704,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             end
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.CHASSIS, {"vf"}, {"bmf", "sf"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1703,7 +1791,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return true
         end,
         probability = function(vehicle)
-            return 1.0
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.CHASSIS, {"slf"}, {"vf", "sf"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1778,7 +1866,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return false
         end,
         probability = function(vehicle)
-            return 1.0
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.CHASSIS, {"vf"}, {"slf"})
         end,
         isCanProgress = function(vehicle)
             return vehicle:getLastSpeed() > 0.01
@@ -1861,7 +1949,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.COOLING, {"hcf"}, {"csf", "sf"})
         end,
         stages = {
             {
@@ -1927,7 +2015,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.COOLING, {"ohf"}, {"csf"})
         end,
         stages = {
             {
@@ -1993,7 +2081,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.COOLING, {"hcf"}, {"ohf", "sf"})
         end,
         stages = {
             {
@@ -2059,7 +2147,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.FUEL, {"lff"}, {"hpf", "idf", "sf"})
         end,
         stages = {
             {
@@ -2145,7 +2233,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.FUEL, {"idf", "hpf"}, {"cff"})
         end,
         stages = {
             {
@@ -2222,7 +2310,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0   
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.FUEL, {"idf"}, {"cff", "sf"})
         end,
         stages = {
             {
@@ -2284,7 +2372,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return 1.0
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.FUEL, {"lff"}, {"sf"})
         end,
         stages = {
             {
@@ -2352,11 +2440,11 @@ ADS_Breakdowns.BreakdownRegistry = {
             return false
         end,
         probability = function(vehicle)
+            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.WORKPROCESS, {"lhf"}, {"wcf", "sf"})
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
-                return 100.0
-            else
-                return 1.0
+                return weight * 1.5
             end
+            return weight
         end,
         isCanProgress = function(vehicle)
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
@@ -2426,15 +2514,14 @@ ADS_Breakdowns.BreakdownRegistry = {
             return (vtype == 'combineDrivable' or vtype == 'combineCutter') and vehicle.spec_pipe ~= nil
         end,
         probability = function(vehicle)
+            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.WORKPROCESS, {"lhf"}, {"wcf", "sf"})
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
                 if vehicle.spec_dischargeable.currentDischargeState ~= Dischargeable.DISCHARGE_STATE_OFF then
-                    return 200.0
-                else
-                    return 50.0
+                    return weight * 2.0
                 end
-            else
-                return 1.0
+                return weight * 1.25
             end
+            return weight
         end,
         isCanProgress = function(vehicle)
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
@@ -2515,6 +2602,58 @@ local function removeFuncFromActive(v, effectName)
     end
 end
 
+local function getStarterCrankingPitchOffset(preCrankVoltageV)
+    local resolvedVoltage = preCrankVoltageV or 12.2
+    local t = math.clamp((12.2 - resolvedVoltage) / 0.5, 0, 1)
+    return -0.25 * (t * t)
+end
+
+local function getActiveStarterCrankingEffect(spec)
+    if spec == nil or spec.activeEffects == nil then
+        return nil
+    end
+
+    local engineFailure = spec.activeEffects.ENGINE_FAILURE
+    if engineFailure ~= nil and engineFailure.extraData ~= nil and engineFailure.extraData.status == "CRANKING" then
+        return engineFailure
+    end
+
+    local engineHardStart = spec.activeEffects.ENGINE_HARD_START_MODIFIER
+    if engineHardStart ~= nil and engineHardStart.extraData ~= nil and engineHardStart.extraData.status == "CRANKING" then
+        return engineHardStart
+    end
+
+    return nil
+end
+
+local function syncStarterCrankingSample(vehicle)
+    if vehicle == nil or not vehicle.isClient then
+        return
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local starterCrankingSample = spec ~= nil and spec.samples ~= nil and spec.samples.starterCranking or nil
+    if starterCrankingSample == nil then
+        return
+    end
+
+    local activeEffect = getActiveStarterCrankingEffect(spec)
+    local shouldPlay = activeEffect ~= nil and spec.startButtonHeld == true and not vehicle:getIsMotorStarted()
+
+    if shouldPlay then
+        local pitchOffset = getStarterCrankingPitchOffset(activeEffect.extraData.preCrankVoltageV)
+        g_soundManager:setSamplePitchOffset(starterCrankingSample, pitchOffset)
+        if not g_soundManager:getIsSamplePlaying(starterCrankingSample) then
+            g_soundManager:playSample(starterCrankingSample)
+        end
+    else
+        if g_soundManager:getIsSamplePlaying(starterCrankingSample) then
+            g_soundManager:stopSample(starterCrankingSample, 0, 0)
+        end
+        g_soundManager:setSamplePitchOffset(starterCrankingSample, 0)
+    end
+end
+
 -- ==========================================================
 -- SELF_DISAPPEARING_BREAKDOWN_EFFECT
 ADS_Breakdowns.EffectApplicators.SELF_DISAPPEARING_BREAKDOWN_EFFECT = {
@@ -2544,48 +2683,30 @@ ADS_Breakdowns.EffectApplicators.ENGINE_FAILURE = {
                 return
             end
 
-            local crankingPitchOffset = 0
             if currentEffect.extraData.status ~= nil and currentEffect.extraData.status == 'CRANKING' then
                 if currentEffect.extraData.preCrankVoltageV == nil then
                     currentEffect.extraData.preCrankVoltageV = spec.batteryTerminalVoltageV or spec.batteryOpenCircuitVoltageV or 12.2
                 end
-
-                local preCrankVoltageV = currentEffect.extraData.preCrankVoltageV or 12.2
-                local t = math.clamp((12.2 - preCrankVoltageV) / 0.5, 0, 1)
-                crankingPitchOffset = -0.25 * (t * t)
-            elseif currentEffect.extraData.preCrankVoltageV ~= nil then
-                local preCrankVoltageV = currentEffect.extraData.preCrankVoltageV
-                local t = math.clamp((12.2 - preCrankVoltageV) / 0.5, 0, 1)
-                crankingPitchOffset = -0.25 * (t * t)
             end
 
             if v:getIsMotorStarted() then
                 v:stopMotor()
             end
             if currentEffect.extraData.status ~= nil and currentEffect.extraData.status == 'CRANKING' then
-                if spec.startButtonHeld then
-                    if v.isClient and not g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
-                        g_soundManager:setSamplePitchOffset(spec.samples.starterCranking, crankingPitchOffset)
-                        g_soundManager:playSample(spec.samples.starterCranking)
-                    end
-                else
-                    if g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
-                        g_soundManager:stopSample(spec.samples.starterCranking, 0, 0)
-                        g_soundManager:setSamplePitchOffset(spec.samples.starterCranking, 0)
-                    end
+                if not spec.startButtonHeld then
                     currentEffect.extraData.status = 'IDLE'
                     currentEffect.extraData.preCrankVoltageV = nil
                     ADS_EffectSyncEvent.send(v, effectName, "IDLE", 0, 0, 0)
                 end
             end
+
+            syncStarterCrankingSample(v)
         end
         addFuncToActive(vehicle, effectName, activeFunc)
     end,
     remove = function(vehicle, handler)
         log_dbg("Removing ENGINE_FAILURE effect.")
-        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and vehicle.spec_AdvancedDamageSystem.samples ~= nil and vehicle.spec_AdvancedDamageSystem.samples.starterCranking ~= nil then
-            g_soundManager:setSamplePitchOffset(vehicle.spec_AdvancedDamageSystem.samples.starterCranking, 0)
-        end
+        syncStarterCrankingSample(vehicle)
         removeFuncFromActive(vehicle, handler.getEffectName())
     end,
 }
@@ -4714,13 +4835,9 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HARD_START_MODIFIER = {
                     effect.extraData.preCrankVoltageV = spec.batteryTerminalVoltageV or spec.batteryOpenCircuitVoltageV or 12.2
                 end
 
-                local preCrankVoltageV = effect.extraData.preCrankVoltageV or 12.2
-                local t = math.clamp((12.2 - preCrankVoltageV) / 0.5, 0, 1)
-                crankingPitchOffset = -0.25 * (t * t)
+                crankingPitchOffset = getStarterCrankingPitchOffset(effect.extraData.preCrankVoltageV)
             elseif effect.extraData.preCrankVoltageV ~= nil then
-                local preCrankVoltageV = effect.extraData.preCrankVoltageV
-                local t = math.clamp((12.2 - preCrankVoltageV) / 0.5, 0, 1)
-                crankingPitchOffset = -0.25 * (t * t)
+                crankingPitchOffset = getStarterCrankingPitchOffset(effect.extraData.preCrankVoltageV)
             end
 
             effect.extraData.timer = math.max((effect.extraData.timer or 0) - dt, endFadeMs)
@@ -4752,13 +4869,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HARD_START_MODIFIER = {
                 effect.extraData.preCrankVoltageV = nil
             end
 
-            -- play starter sound while startButtonHeld and roll dices
             if not v:getIsMotorStarted() and spec.startButtonHeld and effect.extraData.status == 'CRANKING' then
-                if v.isClient and not g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
-                    g_soundManager:setSamplePitchOffset(spec.samples.starterCranking, crankingPitchOffset)
-                    g_soundManager:playSample(spec.samples.starterCranking)
-                end
-
                 local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
                 if v.isServer and tryStartMotor(dt, effect.value, rawEngineTemp, effect.extraData.preCrankVoltageV) then
                     effect.extraData.timer = motorStartDelay
@@ -4766,16 +4877,14 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HARD_START_MODIFIER = {
                     ADS_EffectSyncEvent.send(vehicle, handler.getEffectName(), "PASSED", motorStartDelay, 0, 0)
                 end
 
-            -- stor play starter sound if not startButtonHeld or start successful
-            elseif (not spec.startButtonHeld and effect.extraData.status == 'CRANKING') or effect.extraData.status == 'PASSED' or effect.extraData.status == 'IDLE' then
-                if g_soundManager:getIsSamplePlaying(spec.samples.starterCranking) then
-                    g_soundManager:stopSample(spec.samples.starterCranking, 0, 0)
-                end
+            elseif not spec.startButtonHeld and effect.extraData.status == 'CRANKING' then
                 if effect.extraData.status == 'CRANKING' then 
                     effect.extraData.status = 'IDLE'
                     effect.extraData.preCrankVoltageV = nil
                 end
             end
+
+            syncStarterCrankingSample(v)
         end
         addFuncToActive(vehicle, effectName, activeFunc)
     end,
@@ -4803,6 +4912,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HARD_START_MODIFIER = {
             extra.timer = 0
             extra.preCrankVoltageV = nil
         end
+        syncStarterCrankingSample(vehicle)
         removeFuncFromActive(vehicle, handler.getEffectName())
     end
 }
@@ -4835,6 +4945,11 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
     local spec = self.spec_AdvancedDamageSystem
     local engineFailure = spec and spec.activeEffects.ENGINE_FAILURE
     local engineHardStart = spec and spec.activeEffects.ENGINE_HARD_START_MODIFIER
+    local automaticMotorStartEnabled = g_currentMission ~= nil
+        and g_currentMission.missionInfo ~= nil
+        and g_currentMission.missionInfo.automaticMotorStartEnabled == true
+    local hasManualStartInput = spec ~= nil and (spec.startButtonHeld == true or spec.startButtonDown == true)
+    local isAutomaticStartAttempt = automaticMotorStartEnabled and not hasManualStartInput
 
 
     if self.spec_AdvancedDamageSystem == nil or (engineFailure == nil and engineHardStart == nil) or passed then
@@ -4844,6 +4959,9 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
 
     if engineFailure then
         if engineFailure.extraData.starter then
+            if isAutomaticStartAttempt then
+                return
+            end
             engineFailure.extraData.status = 'CRANKING'
             ADS_EffectSyncEvent.send(self, 'ENGINE_FAILURE', "CRANKING", 0, 0, 0)
         end
@@ -4851,11 +4969,7 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
     end
 
     if engineHardStart and engineHardStart.extraData.status == 'IDLE' then
-        local automaticMotorStartEnabled = g_currentMission ~= nil
-            and g_currentMission.missionInfo ~= nil
-            and g_currentMission.missionInfo.automaticMotorStartEnabled == true
-        local hasManualStartInput = spec.startButtonHeld == true or spec.startButtonDown == true
-        if automaticMotorStartEnabled and not hasManualStartInput then
+        if isAutomaticStartAttempt then
             return
         end
         engineHardStart.extraData.status = 'CRANKING'

@@ -38,11 +38,12 @@ function ADS_Utils.getEstimatedMTBF(systemCondition, systemStress)
 
     local stress = math.max(systemStress, 0.0)
     local stressThreshold = probabilityData.STRESS_THRESHOLD or 0.0
-    if stress / condition >= stressThreshold then
+    local effectiveCondition = math.max(condition, ADS_Config.CORE.CONDITION_EFFECTIVE_FLOOR or 0.15)
+    if stress / effectiveCondition < stressThreshold then
         return math.huge
     end
 
-    local stressOverload = math.max(condition - stress, 0.001)
+    local stressOverload = math.max(effectiveCondition - stress, 0.001)
     local wear = 1 - math.max(0, math.min(1, stressOverload))
     local exponent = math.max(probabilityData.DEGREE - probabilityData.DEGREE * wear, 0.1)
     local calculatedMtbf = probabilityData.MAX_MTBF + (probabilityData.MIN_MTBF - probabilityData.MAX_MTBF) * (wear ^ exponent)

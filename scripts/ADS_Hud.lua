@@ -633,13 +633,11 @@ function ADS_Hud:drawActiveVehicleHUD()
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
         engineDbg.expiredServiceFactor or 0,
-        engineDbg.weatherFactor or 0,
         engineDbg.coldMotorFactor or 0,
         engineDbg.hotMotorFactor or 0
     ) * bcw
     local transmissionMaxFactor = math.max(
         transmissionDbg.expiredServiceFactor or 0,
-        transmissionDbg.weatherFactor or 0,
         transmissionDbg.pullOverloadFactor or 0,
         transmissionDbg.heavyTrailerFactor or 0,
         transmissionDbg.luggingFactor or 0,
@@ -649,7 +647,6 @@ function ADS_Hud:drawActiveVehicleHUD()
     ) * bcw
     local hydraulicsMaxFactor = math.max(
         hydraulicsDbg.expiredServiceFactor or 0,
-        hydraulicsDbg.weatherFactor or 0,
         hydraulicsDbg.heavyLiftFactor or 0,
         hydraulicsDbg.operatingFactor or 0,
         hydraulicsDbg.coldOilFactor or 0,
@@ -658,28 +655,25 @@ function ADS_Hud:drawActiveVehicleHUD()
     ) * bcw
     local coolingMaxFactor = math.max(
         coolingDbg.expiredServiceFactor or 0,
-        coolingDbg.weatherFactor or 0,
         coolingDbg.highCoolingFactor or 0,
         coolingDbg.overheatFactor or 0,
         coolingDbg.coldShockFactor or 0
     ) * bcw
     local electricalMaxFactor = math.max(
         electricalDbg.expiredServiceFactor or 0,
-        electricalDbg.weatherFactor or 0,
+        electricalDbg.weatherExposureFactor or 0,
         electricalDbg.lightsFactor or 0,
         electricalDbg.crankingStressFactor or 0,
         electricalDbg.overheatFactor or 0
     ) * bcw
     local chassisMaxFactor = math.max(
         chassisDbg.expiredServiceFactor or 0,
-        chassisDbg.weatherFactor or 0,
         chassisDbg.vibFactor or 0,
         chassisDbg.steerLoadFactor or 0,
         chassisDbg.brakeMassFactor or 0
     ) * bcw
     local fuelMaxFactor = math.max(
         fuelDbg.expiredServiceFactor or 0,
-        fuelDbg.weatherFactor or 0,
         fuelDbg.lowFuelStarvationFactor or 0,
         fuelDbg.coldFuelFactor or 0,
         fuelDbg.idleDepositFactor or 0,
@@ -687,7 +681,6 @@ function ADS_Hud:drawActiveVehicleHUD()
     ) * bcw
     local workprocessMaxFactor = math.max(
         workprocessDbg.expiredServiceFactor or 0,
-        workprocessDbg.weatherFactor or 0,
         workprocessDbg.longHarvestFactor or 0,
         workprocessDbg.wetCropFactor or 0
     ) * bcw
@@ -707,17 +700,21 @@ function ADS_Hud:drawActiveVehicleHUD()
         return tonumber(stats[statKey]) or 0
     end
 
-    local function formatFactorLine(systemKey, shortName, factorValue, statKey, extraInfo)
+    local function formatFactorLine(systemKey, shortName, factorValue, statKey, extraInfo, systemStressMultiplier)
         local currentPct = asPercent((factorValue or 0) * bcw)
-        local sumPct = asPercent(getAccumulatedStat(systemKey, statKey))
+        local conditionSum = getAccumulatedStat(systemKey, statKey)
+        local sumPct = asPercent(conditionSum)
+        local stressPct = asPercent(conditionSum * (systemStressMultiplier or 1))
+        local extraText = ""
         if extraInfo ~= nil and tostring(extraInfo) ~= "" then
-            return string.format("%s: %.2f (%s, %.2f)", shortName, currentPct, tostring(extraInfo), sumPct)
+            extraText = " (" .. tostring(extraInfo) .. ")"
         end
-        return string.format("%s: %.2f (%.2f)", shortName, currentPct, sumPct)
+        return string.format("%s: %.2f%% | %.2f%% | %.2f%%%s", shortName, currentPct, sumPct, stressPct, extraText)
     end
 
     local function buildSystemLines(systemKey, dbg, maxFactor, factorEntries)
         local lines = {}
+        local systemStressMultiplier = tonumber(ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey]) or 1
         addLine(lines, string.format(
             "C: %.1f (-%.2f)",
             asPercent(getSystemCondition(systemKey)),
@@ -729,27 +726,30 @@ function ADS_Hud:drawActiveVehicleHUD()
             asPercent(getAccumulatedStat(systemKey, "stress"))
         ), {1, 1, 1, 1}, 0.84)
 
-        for _, entry in ipairs(factorEntries) do
-            addLine(
-                lines,
-                formatFactorLine(systemKey, entry.shortName, entry.value, entry.statKey, entry.extraInfo),
-                {0.92, 0.96, 1.0, 1},
-                0.80
-            )
-        end
-
         addLine(lines, string.format(
             "B: %.2f | %.2f",
             asPercent(dbg.breakdownProbability or 0),
             asPercent(dbg.critBreakdownProbability or 0)
         ), {1, 0.82, 0.82, 1}, 0.80)
 
+        if #factorEntries > 0 then
+            addLine(lines, "", {1, 1, 1, 1}, 0.80)
+        end
+
+        for _, entry in ipairs(factorEntries) do
+            addLine(
+                lines,
+                formatFactorLine(systemKey, entry.shortName, entry.value, entry.statKey, entry.extraInfo, systemStressMultiplier),
+                {0.92, 0.96, 1.0, 1},
+                0.80
+            )
+        end
+
         return lines
     end
 
     local engineLines = buildSystemLines("engine", engineDbg, engineMaxFactor, {
         { shortName = "sf", statKey = "sf", value = engineDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = engineDbg.weatherFactor or 0 },
         { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0 },
         { shortName = "cmf", statKey = "cmf", value = engineDbg.coldMotorFactor or 0 },
         { shortName = "hmf", statKey = "hmf", value = engineDbg.hotMotorFactor or 0 }
@@ -757,7 +757,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local transmissionLines = buildSystemLines("transmission", transmissionDbg, transmissionMaxFactor, {
         { shortName = "sf", statKey = "sf", value = transmissionDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = transmissionDbg.weatherFactor or 0 },
         { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("t: %.1fs", transmissionDbg.pullOverloadTimer or 0) },
         { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
         { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("wsi: %.2f", asPercent(transmissionDbg.wheelSlipIntensity or 0)) },
@@ -767,7 +766,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local hydraulicsLines = buildSystemLines("hydraulics", hydraulicsDbg, hydraulicsMaxFactor, {
         { shortName = "sf", statKey = "sf", value = hydraulicsDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = hydraulicsDbg.weatherFactor or 0 },
         { shortName = "hlf", statKey = "hlf", value = hydraulicsDbg.heavyLiftFactor or 0, extraInfo = string.format("mr: %.2f", asPercent(hydraulicsDbg.heavyLiftMassRatio or 0)) },
         { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0 },
         { shortName = "cof", statKey = "cof", value = hydraulicsDbg.coldOilFactor or 0 },
@@ -776,7 +774,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local coolingLines = buildSystemLines("cooling", coolingDbg, coolingMaxFactor, {
         { shortName = "sf", statKey = "sf", value = coolingDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = coolingDbg.weatherFactor or 0 },
         { shortName = "hcf", statKey = "hcf", value = coolingDbg.highCoolingFactor or 0, extraInfo = string.format("ts: %.1f", asPercent(spec.thermostatState or 0)) },
         { shortName = "ohf", statKey = "ohf", value = coolingDbg.overheatFactor or 0 },
         { shortName = "csf", statKey = "csf", value = coolingDbg.coldShockFactor or 0 }
@@ -784,7 +781,7 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local electricalLines = buildSystemLines("electrical", electricalDbg, electricalMaxFactor, {
         { shortName = "sf", statKey = "sf", value = electricalDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = electricalDbg.weatherFactor or 0 },
+        { shortName = "wef", statKey = "wef", value = electricalDbg.weatherExposureFactor or 0 },
         { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
         { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s", tostring(spec.systems ~= nil and spec.systems.electrical ~= nil and spec.systems.electrical.isCranking == true)) },
         { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 }
@@ -792,7 +789,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local chassisLines = buildSystemLines("chassis", chassisDbg, chassisMaxFactor, {
         { shortName = "sf", statKey = "sf", value = chassisDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = chassisDbg.weatherFactor or 0 },
         { shortName = "vf", statKey = "vf", value = chassisDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(chassisDbg.vibRaw or 0), asPercent(chassisDbg.vibSignal or 0)) },
         { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("d: %.2f", asPercent(chassisDbg.steerDeltaRate or 0)) },
         { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("mr: %.2f", chassisDbg.brakeMassRatio or 0) }
@@ -800,7 +796,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local fuelLines = buildSystemLines("fuel", fuelDbg, fuelMaxFactor, {
         { shortName = "sf", statKey = "sf", value = fuelDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = fuelDbg.weatherFactor or 0 },
         { shortName = "lff", statKey = "lff", value = fuelDbg.lowFuelStarvationFactor or 0, extraInfo = string.format("lvl: %.2f", asPercent(fuelDbg.fuelLevel or 0)) },
         { shortName = "cff", statKey = "cff", value = fuelDbg.coldFuelFactor or 0, extraInfo = string.format("ft: %.1f C", fuelDbg.fuelTemperature or 0) },
         { shortName = "idf", statKey = "idf", value = fuelDbg.idleDepositFactor or 0, extraInfo = string.format("t: %.0fs", fuelDbg.idleTimer or 0) },
@@ -809,7 +804,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local workprocessLines = buildSystemLines("workprocess", workprocessDbg, workprocessMaxFactor, {
         { shortName = "sf", statKey = "sf", value = workprocessDbg.expiredServiceFactor or 0 },
-        { shortName = "wf", statKey = "wf", value = workprocessDbg.weatherFactor or 0 },
         { shortName = "lhf", statKey = "lhf", value = workprocessDbg.longHarvestFactor or 0, extraInfo = string.format("t: %.0fs", workprocessDbg.longHarvestTimer or 0) },
         { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 }
     })
@@ -1339,6 +1333,98 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
         return names[systemKey] or tostring(systemKey)
     end
 
+    local aliasToDebugKey = {}
+    for debugKey, alias in pairs(AdvancedDamageSystem.FACTOR_STATS_ALIASES or {}) do
+        aliasToDebugKey[tostring(alias)] = tostring(debugKey)
+    end
+
+    local function buildFactorExtraInfo(debugKey, dbg)
+        if type(dbg) ~= "table" then
+            return nil
+        end
+
+        if debugKey == "heavyLiftFactor" then
+            local ratio = tonumber(dbg.heavyLiftMassRatio)
+            if ratio ~= nil then
+                return string.format("massRatio %.3f", ratio)
+            end
+        elseif debugKey == "sharpAngleFactor" then
+            local angle = tonumber(dbg.ptoSharpAngleDeg)
+            if angle ~= nil then
+                return string.format("angle %.1fdeg", angle)
+            end
+        elseif debugKey == "steerLoadFactor" then
+            local parts = {}
+            if dbg.steerInputAbs ~= nil then
+                table.insert(parts, string.format("steer %.3f", tonumber(dbg.steerInputAbs) or 0))
+            end
+            if dbg.steerLowSpeedFactor ~= nil then
+                table.insert(parts, string.format("lowSp %.3f", tonumber(dbg.steerLowSpeedFactor) or 0))
+            end
+            if #parts > 0 then
+                return table.concat(parts, " | ")
+            end
+        elseif debugKey == "brakeMassFactor" then
+            local parts = {}
+            if dbg.brakeMassRatio ~= nil then
+                table.insert(parts, string.format("massRatio %.3f", tonumber(dbg.brakeMassRatio) or 0))
+            end
+            if dbg.brakePedal ~= nil then
+                table.insert(parts, string.format("brake %.3f", tonumber(dbg.brakePedal) or 0))
+            end
+            if #parts > 0 then
+                return table.concat(parts, " | ")
+            end
+        elseif debugKey == "vibFactor" then
+            local parts = {}
+            if dbg.vibSignal ~= nil then
+                table.insert(parts, string.format("signal %.3f", tonumber(dbg.vibSignal) or 0))
+            end
+            if dbg.vibFieldMultiplier ~= nil then
+                table.insert(parts, string.format("field %.3f", tonumber(dbg.vibFieldMultiplier) or 0))
+            end
+            if #parts > 0 then
+                return table.concat(parts, " | ")
+            end
+        elseif debugKey == "motorLoadFactor" then
+            if dbg.motorLoad ~= nil then
+                return string.format("load %.3f", tonumber(dbg.motorLoad) or 0)
+            end
+        elseif debugKey == "coldMotorFactor" then
+            local parts = {}
+            if dbg.engineTemperature ~= nil then
+                table.insert(parts, string.format("temp %.1fC", tonumber(dbg.engineTemperature) or 0))
+            end
+            if dbg.rpmLoad ~= nil then
+                table.insert(parts, string.format("rpm %.3f", tonumber(dbg.rpmLoad) or 0))
+            end
+            if #parts > 0 then
+                return table.concat(parts, " | ")
+            end
+        elseif debugKey == "hotMotorFactor" or debugKey == "overheatFactor" then
+            if dbg.engineTemperature ~= nil then
+                return string.format("temp %.1fC", tonumber(dbg.engineTemperature) or 0)
+            end
+        elseif debugKey == "coldShockFactor" then
+            local parts = {}
+            if dbg.engineTemperature ~= nil then
+                table.insert(parts, string.format("temp %.1fC", tonumber(dbg.engineTemperature) or 0))
+            end
+            if dbg.rpmLoad ~= nil then
+                table.insert(parts, string.format("rpm %.3f", tonumber(dbg.rpmLoad) or 0))
+            end
+            if #parts > 0 then
+                return table.concat(parts, " | ")
+            end
+        elseif debugKey == "highCoolingFactor" then
+            if dbg.thermostatState ~= nil then
+                return string.format("therm %.3f", tonumber(dbg.thermostatState) or 0)
+            end
+        end
+
+        return nil
+    end
+
     local sections = {}
     local factorStatsRaw = spec.factorStats or {}
     local factorStats = {}
@@ -1376,11 +1462,21 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
         if type(stats) == "table" then
             usedSystems[systemKey] = true
             local lines = {}
+            local dbg = type(spec.debugData) == "table" and spec.debugData[systemKey] or nil
+            local systemStressMultiplier = tonumber(ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey]) or 1
             addLine(lines, string.format(
                 "total: %.3f%% | stress: %.3f%%",
                 toPct(stats.total),
                 toPct(stats.stress)
             ), {1, 1, 1, 1}, 0.95)
+
+            if type(dbg) == "table" then
+                addLine(lines, string.format(
+                    "breakdown: %.3f%% | critical: %.3f%%",
+                    toPct(dbg.breakdownProbability or 0),
+                    toPct(dbg.critBreakdownProbability or 0)
+                ), {1, 0.92, 0.78, 1}, 0.9)
+            end
 
             local factorEntries = {}
             for key, value in pairs(stats) do
@@ -1396,14 +1492,34 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
                 return math.abs(a.value) > math.abs(b.value)
             end)
 
-            local formattedEntries = {}
-            for _, entry in ipairs(factorEntries) do
-                table.insert(formattedEntries, string.format("%s: %.3f%%", entry.key, toPct(entry.value)))
+            if #factorEntries > 0 then
+                addLine(lines, "", {1, 1, 1, 1}, 0.9)
             end
 
-            local packedLines = packEntries(formattedEntries, 4, {0.92, 0.96, 1.0, 1}, 0.9)
-            for _, packedLine in ipairs(packedLines) do
-                table.insert(lines, packedLine)
+            for _, entry in ipairs(factorEntries) do
+                local alias = tostring(entry.key)
+                local accumulatedConditionDamage = tonumber(entry.value) or 0
+                local accumulatedStressDamage = accumulatedConditionDamage * systemStressMultiplier
+                local debugKey = aliasToDebugKey[alias]
+                local currentValue = 0
+                if debugKey ~= nil and type(dbg) == "table" then
+                    currentValue = tonumber(dbg[debugKey]) or 0
+                end
+
+                local lineText = string.format(
+                    "%s: %.3f%% | %.3f%% | %.3f%%",
+                    alias,
+                    toPct(currentValue),
+                    toPct(accumulatedConditionDamage),
+                    toPct(accumulatedStressDamage)
+                )
+
+                local extraInfo = buildFactorExtraInfo(debugKey, dbg)
+                if extraInfo ~= nil and extraInfo ~= "" then
+                    lineText = lineText .. " (" .. extraInfo .. ")"
+                end
+
+                addLine(lines, lineText, {0.92, 0.96, 1.0, 1}, 0.9)
             end
 
             table.insert(sections, { title = getSystemTitle(systemKey), lines = lines })
@@ -1413,11 +1529,19 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
     for systemKey, stats in pairs(factorStats) do
         if type(stats) == "table" and not usedSystems[systemKey] then
             local lines = {}
+            local dbg = type(spec.debugData) == "table" and spec.debugData[systemKey] or nil
             addLine(lines, string.format(
                 "total: %.3f%% | stress: %.3f%%",
                 toPct(stats.total),
                 toPct(stats.stress)
             ), {1, 1, 1, 1}, 0.95)
+            if type(dbg) == "table" then
+                addLine(lines, string.format(
+                    "breakdown: %.3f%% | critical: %.3f%%",
+                    toPct(dbg.breakdownProbability or 0),
+                    toPct(dbg.critBreakdownProbability or 0)
+                ), {1, 0.92, 0.78, 1}, 0.9)
+            end
             table.insert(sections, { title = getSystemTitle(systemKey), lines = lines })
         end
     end

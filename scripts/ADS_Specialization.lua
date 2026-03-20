@@ -115,7 +115,6 @@ AdvancedDamageSystem.modDirectory = g_currentModDirectory
 
 AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     expiredServiceFactor = "sf",
-    weatherFactor = "wf",
     -- engine
     motorLoadFactor = "mlf",
     coldMotorFactor = "cmf",
@@ -139,6 +138,7 @@ AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     coldShockFactor = "csf",
 
     -- electrical
+    weatherExposureFactor = "wef",
     lightsFactor = "ltf",
     crankingStressFactor = "crf",
 
@@ -953,7 +953,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0, 
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             breakdownInSystemFactor = 0, 
             motorLoadFactor = 0, 
             coldMotorFactor = 0, 
@@ -967,7 +966,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0, 
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             breakdownInSystemFactor = 0,
             pullOverloadFactor = 0,
             heavyTrailerFactor = 0,
@@ -986,7 +984,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             heavyLiftFactor = 0,
             heavyLiftMassRatio = 0,
             operatingFactor = 0,
@@ -1004,7 +1001,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             highCoolingFactor = 0,
             overheatFactor = 0,
             coldShockFactor = 0,
@@ -1018,7 +1014,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             lightsFactor = 0,
             crankingStressFactor = 0,
             overheatFactor = 0,
@@ -1032,7 +1027,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             vibFactor = 0,
             vibSignal = 0,
             vibRaw = 0,
@@ -1063,7 +1057,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             longHarvestFactor = 0,
             wetCropFactor = 0,
             longHarvestTimer = 0,
@@ -1082,7 +1075,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
-            weatherFactor = 0,
             lowFuelStarvationFactor = 0,
             coldFuelFactor = 0,
             idleDepositFactor = 0,
@@ -1743,7 +1735,7 @@ local function registerVehicle(vehicle)
                         -- Used vehicle logic
                         spec.serviceLevel = 1 - vehicle:getDamageAmount()
                         for _, systemData in pairs(spec.systems) do
-                            systemData.condition = math.max(1 - vehicle:getFormattedOperatingTime() / 150, math.random() * 0.3)
+                            systemData.condition = math.max(1 - vehicle:getFormattedOperatingTime() / 150 * (0.2 * math.random() + 0.9), (0.2 * math.random() + 0.9) * 0.25)
                         end
                         vehicle:setDamageAmount(0.0, true)
                     end
@@ -2583,7 +2575,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
-    local motorLoadFactor, expiredServiceFactor, weatherFactor, coldMotorFactor, hotMotorFactor = 0, 0, 0, 0, 0
+    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor = 0, 0, 0, 0
     local expiredServiceMultiplier = 1.0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
@@ -2643,18 +2635,9 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         end
     end
 
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
-       
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         motorLoadFactor = motorLoadFactor,
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor,
         coldMotorFactor = coldMotorFactor,
         hotMotorFactor = hotMotorFactor
     })
@@ -2669,7 +2652,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local systemData = spec.systems.transmission
     systemData.pullOverloadTimer = tonumber(systemData.pullOverloadTimer) or 0
     local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
-    local expiredServiceFactor, weatherFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor, wheelSlipIntensity, coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0, 0, 0, 0
+    local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor, wheelSlipIntensity, coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0, 0, 0
     local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
@@ -2823,17 +2806,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         end
     end
 
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
-
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor,
         pullOverloadFactor = pullOverloadFactor,
         pullOverloadTimer = systemData.pullOverloadTimer,
         heavyTrailerFactor = heavyTrailerFactor,
@@ -2852,7 +2826,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.hydraulics.name)
     local systemData = spec.systems.hydraulics
     local expiredServiceFactor = 0
-    local weatherFactor = 0
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
     local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor = 0, 0, 0, 0, 0
     local ptoSharpAngleDeg = 0
@@ -3100,6 +3073,29 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
 
         spec.hydraulicsMoveAlphaCache = nextMoveAlphaCache
 
+        if ADS_Config.DEBUG then
+            spec.hydraulicsImplementDebugTimer = (spec.hydraulicsImplementDebugTimer or 0) - dt
+            if spec.hydraulicsImplementDebugTimer <= 0 then
+                spec.hydraulicsImplementDebugTimer = 1000
+
+                for index, impl in ipairs(implements) do
+                    log_dbg(string.format(
+                        "Hydraulics implement[%d] head=%s mass=%.2f jointTypeId=%s isLowered=%s supportWheelCount=%d isMoving=%s isFoldMoving=%s isPlowRotationMoving=%s isCylinderedMoving=%s",
+                        index,
+                        tostring(impl.isHead),
+                        tonumber(impl.mass) or 0,
+                        tostring(impl.jointTypeId),
+                        tostring(impl.isLowered),
+                        tonumber(impl.supportWheelCount) or 0,
+                        tostring(impl.isMoving),
+                        tostring(impl.isFoldMoving),
+                        tostring(impl.isPlowRotationMoving),
+                        tostring(impl.isCylinderedMoving)
+                    ))
+                end
+            end
+        end
+
         local isImplementLifted = false
         local isImplementOperating = false
         local liftedMass = 0
@@ -3110,9 +3106,9 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 liftedMass = liftedMass + (impl.mass or 0)
                 isImplementLifted = true
             end
-            if (impl.isMoving and impl.jointTypeId ~= 0) or impl.isFoldMoving or impl.isPlowRotationMoving or impl.isCylinderedMoving then
+            if (impl.isMoving and impl.jointTypeId ~= 0) or impl.isFoldMoving or impl.isPlowRotationMoving or (impl.isCylinderedMoving and not impl.isHead) then
                 isImplementOperating  = true
-                operatingMass = operatingMass + (impl.mass or 0)
+                if not impl.isHead then operatingMass = operatingMass + (impl.mass or 0) end
             end
         end
 
@@ -3182,16 +3178,8 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         end
     end
 
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor,
         heavyLiftFactor = heavyLiftFactor,
         heavyLiftMassRatio = heavyLiftMassRatio,
         operatingFactor = operatingFactor,
@@ -3209,7 +3197,6 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.cooling.name)
     local systemData = spec.systems.cooling
     local expiredServiceFactor = 0
-    local weatherFactor = 0
     local C = ADS_Config.CORE.COOLING_FACTOR_DATA
     local highCoolingFactor, overheatFactor, coldShockFactor = 0, 0, 0
     local wearRate = 1.0
@@ -3265,16 +3252,8 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         end
     end
 
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor,
         highCoolingFactor = highCoolingFactor,
         overheatFactor = overheatFactor,
         coldShockFactor = coldShockFactor
@@ -3287,7 +3266,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
     local systemData = spec.systems.electrical
     if systemData == nil then return end
-    local expiredServiceFactor, weatherFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor = 0, 0, 0, 0, 0, 0
+    local expiredServiceFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
@@ -3363,17 +3342,9 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         end
     end
 
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         crankingStressFactor = crankingStressFactor,
-        weatherFactor = weatherFactor,
         weatherExposureFactor = weatherExposureFactor,
         lightsFactor = lightsFactor,
         overheatFactor = overheatFactor
@@ -3386,7 +3357,6 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.chassis.name)
     local systemData = spec.systems.chassis
     local expiredServiceFactor = 0
-    local weatherFactor = 0
     local vibFactor = 0
     local vibSignal = 0
     local vibRaw = 0
@@ -3543,7 +3513,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
 
                 if steerChangeFactor > 0 and steerLowSpeedFactor > 0 then
                     local steerSignal = (0.35 + 0.65 * steerAngleFactor) * steerChangeFactor * steerLowSpeedFactor
-                    steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
+                    local aiMultiplier = self:getIsAIActive() and 0.25 or 1.0
+                    steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0) * aiMultiplier
                     wearRate = wearRate + steerLoadFactor
                 end
             end
@@ -3600,17 +3571,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         end
     end
 
-    -- weather
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor,
         vibFactor = vibFactor,
         vibSignal = vibSignal,
         vibRaw = vibRaw,
@@ -3638,7 +3600,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.fuel.name)
     local systemData = spec.systems.fuel
     if systemData == nil then return end
-    local weatherFactor, lowFuelStarvationFactor, coldFuelFactor = 0, 0, 0
+    local lowFuelStarvationFactor, coldFuelFactor = 0, 0
     local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
@@ -3756,17 +3718,8 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         end
     end
 
-    -- weather
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor,
         lowFuelStarvationFactor = lowFuelStarvationFactor,
         coldFuelFactor = coldFuelFactor,
         idleDepositFactor = idleDepositFactor,
@@ -3785,7 +3738,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workprocess.name)
     local systemData = ensureSystemData(spec, systemKey)
     local expiredServiceFactor = 0
-    local weatherFactor, longHarvestFactor, wetCropFactor = 0, 0, 0
+    local longHarvestFactor, wetCropFactor = 0, 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
 
@@ -3846,16 +3799,8 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         end
     end
 
-    if spec.isUnderRoof ~= true then
-        local weatherMultiplier = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
-        weatherMultiplier = math.max(weatherMultiplier, 0.001)
-        local wearRateWithoutWeather = wearRate
-        wearRate = wearRate * weatherMultiplier
-        weatherFactor = wearRate - wearRateWithoutWeather
-    end
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        weatherFactor = weatherFactor,
         longHarvestFactor = longHarvestFactor,
         wetCropFactor = wetCropFactor,
         longHarvestTimer = systemData.longHarvestTimer or 0
@@ -3871,15 +3816,17 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
     end
 
     local probabilityData = ADS_Config.CORE.BREAKDOWN_PROBABILITIES
+    local conditionEffectiveFloor = ADS_Config.CORE.CONDITION_EFFECTIVE_FLOOR or 0.15
 
     for systemName, systemData in pairs(spec.systems) do
         local systemCondition = math.max(systemData.condition or 1.0, 0.001)
+        local effectiveCondition = math.max(systemCondition, conditionEffectiveFloor)
         local systemStress = math.max(systemData.stress or 0.0, 0.0)
         local stressThreshold = probabilityData.STRESS_THRESHOLD
         local hourlyProb = 0.0
 
-        if systemStress / systemCondition >= stressThreshold then
-            local stressOverload = math.max(systemCondition - systemStress, 0.001)
+        if systemStress / effectiveCondition >= stressThreshold then
+            local stressOverload = math.max(effectiveCondition - systemStress, 0.001)
             local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(stressOverload, probabilityData, dt)
             hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
 
@@ -3906,8 +3853,8 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
                         systemData.stress = systemStress * ADS_Config.CORE.STRESS_COOLDOWN
                         systemStress = math.max(systemData.stress or 0.0, 0.0)
 
-                        if systemStress / systemCondition >= stressThreshold then
-                            local cooledStressOverload = math.max(systemCondition - systemStress, 0.001)
+                        if systemStress / effectiveCondition >= stressThreshold then
+                            local cooledStressOverload = math.max(effectiveCondition - systemStress, 0.001)
                             local cooledFailureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(cooledStressOverload, probabilityData, dt)
                             hourlyProb = 1 - (1 - cooledFailureChancePerFrame) ^ (3600000 / dt)
                         else
@@ -4035,25 +3982,62 @@ function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
                 if probability > 0 then
                     table.insert(applicableBreakdowns, {id = id, probability = probability})
                     totalProbability = totalProbability + probability
+                    log_dbg(string.format(
+                        "Breakdown candidate [%s] system=%s weight=%.6f",
+                        tostring(id),
+                        tostring(targetSystemKey),
+                        tonumber(probability) or 0
+                    ))
                 end
             end
         end
     end
 
     if #applicableBreakdowns == 0 or totalProbability <= 0 then
+        log_dbg(string.format(
+            "Breakdown selection skipped for system=%s candidates=%d totalWeight=%.6f",
+            tostring(targetSystemKey),
+            #applicableBreakdowns,
+            tonumber(totalProbability) or 0
+        ))
         return nil
     end
 
     local randomNumber = math.random() * totalProbability
+    log_dbg(string.format(
+        "Breakdown selection random system=%s random=%.6f totalWeight=%.6f",
+        tostring(targetSystemKey),
+        tonumber(randomNumber) or 0,
+        tonumber(totalProbability) or 0
+    ))
 
     local cumulativeProbability = 0
     for _, breakdown in ipairs(applicableBreakdowns) do
         cumulativeProbability = cumulativeProbability + breakdown.probability
+        log_dbg(string.format(
+            "Breakdown roll [%s] cumulative=%.6f threshold=%.6f",
+            tostring(breakdown.id),
+            tonumber(cumulativeProbability) or 0,
+            tonumber(randomNumber) or 0
+        ))
         if randomNumber <= cumulativeProbability then
+            log_dbg(string.format(
+                "Breakdown selected [%s] system=%s random=%.6f cumulative=%.6f",
+                tostring(breakdown.id),
+                tostring(targetSystemKey),
+                tonumber(randomNumber) or 0,
+                tonumber(cumulativeProbability) or 0
+            ))
             return breakdown.id
         end
     end
 
+    log_dbg(string.format(
+        "Breakdown selection fell through system=%s random=%.6f totalWeight=%.6f",
+        tostring(targetSystemKey),
+        tonumber(randomNumber) or 0,
+        tonumber(totalProbability) or 0
+    ))
     return nil
 end
 
