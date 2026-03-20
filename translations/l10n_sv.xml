@@ -221,7 +221,7 @@
         <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Koppla ur växeln"/>
         <text name="ads_breakdown_at_progress_message" text="pågår"/>
-        <text name="ads_cold_engine_message" text="Motorn är kall! Höga varvtal orsakar slitage!"/>
+        <text name="ads_spec_cold_engine_message" text="Motorn är kall! Höga varvtal orsakar slitage!"/>
         <text name="ads_spec_this_month" text="Denna månaden"/>
         <text name="ads_spec_months_ago" text="månader sedan"/>
         <text name="ads_spec_never" text="Aldrig"/>

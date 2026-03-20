@@ -1904,7 +1904,7 @@ local function syncMessages(vehicle)
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
         if rpmLoad > 0.75 then
-            g_currentMission:showBlinkingWarning(g_i18n:getText('ads_cold_engine_message'), 2800)
+            g_currentMission:showBlinkingWarning(g_i18n:getText('ads_spec_cold_engine_message'), 2800)
         end
     end
 
@@ -5197,16 +5197,6 @@ function AdvancedDamageSystem:processService(dt)
                             markRepairStressReduction(spec, systemKey)
                             systemData.plannedBreakdown = ""
                             systemData.plannedBreakdownTimer = 0
-                            if optionOne == AdvancedDamageSystem.REPAIR_TYPES.HIGH then
-                                local currentCondition = tonumber(systemData.condition) or spec.conditionLevel or 1.0
-                                local minRestore = tonumber(C.REPAIR_MIN_CONDITION_RESTORE_MULTIPLIER) or 0
-                                local maxRestore = tonumber(C.REPAIR_MAX_CONDITION_RESTORE_MULTIPLIER) or minRestore
-                                if maxRestore < minRestore then
-                                    maxRestore = minRestore
-                                end
-                                local conditionToAdd = minRestore + math.random() * (maxRestore - minRestore)
-                                systemData.condition = math.min(currentCondition + conditionToAdd, 1.0)
-                            end
                         else
                             log_dbg(string.format("Repair effect skipped: missing system mapping for breakdown '%s' (system='%s')", tostring(breakdownId), tostring(systemName)))
                         end

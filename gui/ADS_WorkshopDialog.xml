@@ -1,8 +1,9 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
+    <RoundCorner profile="ads_dialogScreenBlocker" id="dialogScreenBlocker"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
 
-    <GuiElement profile="ads_dialogBg" id="dialogElement">
+    <GuiElement profile="ads_dialogBg" id="dialogElement" with="anchorMiddleCenter"  position="0px -50px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -15,7 +16,7 @@
                     <Text profile="fs25_menuHeaderTitle" id="headerText" text="$l10n_ads_ws_header_title"/>
                 <RoundCorner profile="fs25_shopMoneyBoxBg" id="moneyBoxBg"/>
                 <BoxLayout profile="fs25_shopMoneyBox" id="moneyBox">
-                    <Text profile="fs25_shopBalance" text="$l10n_ui_balance" />
+                    <Text profile="fs25_shopBalance" id="balanceTitleElement" text="$l10n_ui_balance" />
                     <Text profile="fs25_shopMoney" id="balanceElement"/>
                 </BoxLayout>
             </GuiElement>
@@ -128,9 +129,15 @@
             <Preset name="colorBalanceGreen" value="0.659 0.847 0.286 1"/>
         </Presets>
 
+        <Profile name="ads_dialogScreenBlocker" extends="baseReference" with="anchorStretchingYStretchingX pivotTopCenter">
+            <size value="100% 100%"/>
+            <color value="$preset_fs25_colorMainDark"/>
+            <cornerSize value="0"/>
+        </Profile>
+
         <Profile name="ads_dialogBg" extends="fs25_dialogBg">
             <width value="1440px"/>
-            <height value="900px"/> 
+            <height value="900px"/>
         </Profile>
 
         <Profile name="ads_vehicleInfoContainer" extends="emptyPanel" with="anchorTopCenter">

@@ -108,7 +108,7 @@ local RECOMMENDATION_RULES = {
     {
         l10nKey = "ads_report_recommendation_system_preventive_maintenance",
         check = function(vehicle, reportEntry, metrics)
-            if reportEntry == nil or reportEntry.conditionData == nil then
+            if reportEntry == nil or reportEntry.conditionData == nil or not metrics.isCompleteInspection then
                 return false
             end
 
@@ -314,7 +314,16 @@ function ADS_ReportDialog:updateScreen()
     self.breakdownsData = {}
     self.recommendationsData = {}
 
-    self.balanceElement:setText(g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true))
+    local balanceText = g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true)
+    self.balanceElement:setText(balanceText)
+    ADS_Utils.updateMoneyBoxLayout(
+        self.balanceTitleElement,
+        self.balanceElement,
+        self.moneyBox,
+        self.moneyBoxBg,
+        g_i18n:getText("ui_balance"),
+        balanceText
+    )
 
 -- ==========================================================
 --                          HEADER  
@@ -585,7 +594,7 @@ function ADS_ReportDialog:updateScreen()
         hasTransmissionIssues = true
         addTransmissionTextSpec(
             "ads_report_system_condition_transmission",
-            transmissionSlipValue >= 1.0 and "ads_reports_transmission_failed" or "ads_reports_transmission_slipping",
+            transmissionSlipValue >= 1.0 and "ads_report_transmission_failed" or "ads_report_transmission_slipping",
             1.0 - transmissionSlipValue
         )
     end
@@ -595,7 +604,7 @@ function ADS_ReportDialog:updateScreen()
         hasTransmissionIssues = true
         addTransmissionTextSpec(
             "ads_report_system_condition_transmission",
-            gearShiftFailureValue >= 1.0 and "ads_reports_transmission_failed" or "ads_reports_transmission_shifting_impaired",
+            gearShiftFailureValue >= 1.0 and "ads_report_transmission_failed" or "ads_report_transmission_shifting_impaired",
             1.0 - gearShiftFailureValue
         )
     end
@@ -605,7 +614,7 @@ function ADS_ReportDialog:updateScreen()
         hasTransmissionIssues = true
         addTransmissionTextSpec(
             "ads_report_system_condition_transmission",
-            gearRejectionValue <= 3.0 and "ads_reports_transmission_failed" or "ads_reports_transmission_gear_rejection",
+            gearRejectionValue <= 3.0 and "ads_report_transmission_failed" or "ads_report_transmission_gear_rejection",
             gearRejectionValue / 20.0
         )
     end
@@ -615,7 +624,7 @@ function ADS_ReportDialog:updateScreen()
         hasTransmissionIssues = true
         addTransmissionTextSpec(
             "ads_report_system_condition_transmission",
-            powershiftLagValue >= 1.0 and "ads_reports_transmission_failed" or "ads_reports_transmission_shift_delay",
+            powershiftLagValue >= 1.0 and "ads_report_transmission_failed" or "ads_report_transmission_shift_delay",
             1.0 - powershiftLagValue
         )
     end
@@ -625,7 +634,7 @@ function ADS_ReportDialog:updateScreen()
         hasTransmissionIssues = true
         addTransmissionTextSpec(
             "ads_report_system_condition_transmission",
-            cvtSlipValue >= 1.0 and "ads_reports_transmission_failed" or "ads_reports_transmission_cvt_slipping",
+            cvtSlipValue >= 1.0 and "ads_report_transmission_failed" or "ads_report_transmission_cvt_slipping",
             1.0 - cvtSlipValue
         )
     end
@@ -635,7 +644,7 @@ function ADS_ReportDialog:updateScreen()
         hasTransmissionIssues = true
         addTransmissionTextSpec(
             "ads_report_system_condition_transmission",
-            cvtRatioLimitValue >= 0.8 and "ads_reports_transmission_failed" or "ads_reports_transmission_cvt_ratio_limited",
+            cvtRatioLimitValue >= 0.8 and "ads_report_transmission_failed" or "ads_report_transmission_cvt_ratio_limited",
             1.0 - cvtRatioLimitValue
         )
     end
@@ -645,7 +654,7 @@ function ADS_ReportDialog:updateScreen()
         hasTransmissionIssues = true
         addTransmissionTextSpec(
             "ads_report_system_condition_transmission",
-            cvtPressureDropValue <= 0.1 and "ads_reports_transmission_failed" or "ads_reports_transmission_cvt_pressure_instability",
+            cvtPressureDropValue <= 0.1 and "ads_report_transmission_failed" or "ads_report_transmission_cvt_pressure_instability",
             cvtPressureDropValue / 2.0
         )
     end
@@ -914,10 +923,13 @@ function ADS_ReportDialog:populateSystemConditionCell(index, cell)
     if data.isPadding then
         local titleElement = cell:getAttribute("reportTableSystemConditionTitle")
         local valueElement = cell:getAttribute("reportTableSystemConditionValue")
+        local riskElement = cell:getAttribute("reportTableSystemRiskValue")
         titleElement:setText("")
         valueElement:setText("")
+        riskElement:setText("")
         titleElement:setTextColor(1.0, 1.0, 1.0, 1.0)
         valueElement:setTextColor(1.0, 1.0, 1.0, 1.0)
+        riskElement:setTextColor(1.0, 1.0, 1.0, 1.0)
         return
     end
 
@@ -925,21 +937,31 @@ function ADS_ReportDialog:populateSystemConditionCell(index, cell)
     local condition = tonumber(data[2]) or 0
     local val = condition * 100
     local stress = data[3] or 0
+    local safeCondition = math.max(condition, 0.001)
+    local normalizedRisk = math.max(math.min((tonumber(stress) or 0) / safeCondition, 1.0), 0.0)
+    local riskValue = normalizedRisk * 100
     local stressLabel = getStressLabel(stress, condition)
 
-    local function getColor(smooth)
+    local function getConditionColor(smooth)
         return ADS_Utils.getValueColor(val, 80, 60, 40, 20, smooth)
+    end
+
+    local function getRiskColor(smooth)
+        return ADS_Utils.getValueColorInverted(riskValue, 20, 40, 60, 80, smooth)
     end
 
     cell:getAttribute("reportTableSystemConditionTitle"):setText(g_i18n:getText(key))
     
 
     local valueElement = cell:getAttribute("reportTableSystemConditionValue")
+    local riskElement = cell:getAttribute("reportTableSystemRiskValue")
 
     if self.isCompleteInspection then
         cell:getAttribute("reportTableSystemConditionTitle"):setTextColor(1.0, 1.0, 1.0, 1.0)
-        valueElement:setText(string.format("%.1f %% | %s", val, stressLabel))
-        valueElement:setTextColor(getColor(true))
+        valueElement:setText(string.format("%.1f %%", val))
+        riskElement:setText(stressLabel)
+        valueElement:setTextColor(getConditionColor(true))
+        riskElement:setTextColor(getRiskColor(true))
     else
         local stateTexts = {
             g_i18n:getText("ads_spec_state_excellent"),
@@ -950,8 +972,10 @@ function ADS_ReportDialog:populateSystemConditionCell(index, cell)
         }
 
         cell:getAttribute("reportTableSystemConditionTitle"):setTextColor(1.0, 1.0, 1.0, 1.0)
-        valueElement:setText(string.format("%s | %s", ADS_Utils.getValueLabel(val, 80, 60, 40, 20, table.unpack(stateTexts)), stressLabel))
-        valueElement:setTextColor(getColor(false))
+        valueElement:setText(ADS_Utils.getValueLabel(val, 80, 60, 40, 20, table.unpack(stateTexts)))
+        riskElement:setText(g_i18n:getText("ads_report_state_not_available"))
+        valueElement:setTextColor(getConditionColor(false))
+        riskElement:setTextColor(0.5, 0.5, 0.5, 1.0)
     end
 end
 

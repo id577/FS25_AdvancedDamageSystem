@@ -61,7 +61,16 @@ function ADS_WorkshopDialog:updateScreen()
     -- 1: Vehicle Info Panel
     -- ====================================================================
 
-    self.balanceElement:setText(g_i18n:formatMoney(g_currentMission:getMoney() , 2, true, true))
+    local balanceText = g_i18n:formatMoney(math.floor(g_currentMission:getMoney()), 2, true, true)
+    self.balanceElement:setText(balanceText)
+    ADS_Utils.updateMoneyBoxLayout(
+        self.balanceTitleElement,
+        self.balanceElement,
+        self.moneyBox,
+        self.moneyBoxBg,
+        g_i18n:getText("ui_balance"),
+        balanceText
+    )
     self.vehicleImage:setImageFilename(vehicle:getImageFilename())
     self.vehicleNameValue:setText(self.vehicle:getFullName())
     self.valueValue:setText(g_i18n:formatMoney(vehicle:getSellPrice() * EconomyManager.DIRECT_SELL_MULTIPLIER))

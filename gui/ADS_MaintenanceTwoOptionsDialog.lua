@@ -24,7 +24,13 @@ function ADS_MaintenanceTwoOptionsDialog.new(target, customMt)
     local dialog = MessageDialog.new(target, customMt or ADS_MaintenanceTwoOptionsDialog_mt)
     dialog.vehicle = nil
     dialog.inspectionOptionValues = nil
+    dialog.serviceInfoData = {}
     return dialog
+end
+
+local function ensureTrailingColon(text)
+    local normalized = tostring(text or ""):gsub("%s*:%s*$", "")
+    return normalized .. ":"
 end
 
 function ADS_MaintenanceTwoOptionsDialog.show(vehicle, maintenanceType)
@@ -37,7 +43,11 @@ function ADS_MaintenanceTwoOptionsDialog.show(vehicle, maintenanceType)
 
     dialog.optionThree.useYesNoTexts = true
     dialog.optionOne:setState(1)
-    dialog.optionThree:setState(BinaryOptionElement.STATE_LEFT)
+    if dialog.optionThree.setIsChecked ~= nil then
+        dialog.optionThree:setIsChecked(false, false, false)
+    else
+        dialog.optionThree:setState(BinaryOptionElement.STATE_LEFT)
+    end
 
     if dialog.maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
         dialog.selectedOptionOne = AdvancedDamageSystem.INSPECTION_TYPES[1]
@@ -104,13 +114,24 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
 
     -- price, duration, finishtime
     local workshopType = ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.workshopType or spec.workshopType
-    self.maintenancePrice:setText(g_i18n:getText("ads_option_menu_price_text") .. g_i18n:formatMoney(self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)))
+    local priceValue = g_i18n:formatMoney(self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType))
+    local durationValue = ""
     if ADS_Config.MAINTENANCE.INSTANT_INSPECTION and  self.maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
-        self.maintenanceDuration:setText(g_i18n:getText("ads_option_menu_duration_text") .. g_i18n:getText("ads_option_menu_duration_instant"))
+        durationValue = g_i18n:getText("ads_option_menu_duration_instant")
     else
-        self.maintenanceDuration:setText(g_i18n:getText("ads_option_menu_duration_text") .. ADS_Utils.formatDuration(self.vehicle:getServiceDuration(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)))
+        durationValue = ADS_Utils.formatDuration(self.vehicle:getServiceDuration(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType))
     end
-    self.maintenanceFinishTime:setText(g_i18n:getText("ads_option_menu_finish_time_text") .. ADS_Utils.formatFinishTime(self.vehicle:getServiceFinishTime(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType)))
+    local finishTimeValue = ADS_Utils.formatFinishTime(self.vehicle:getServiceFinishTime(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType))
+
+    self.serviceInfoData = {
+        {title = ensureTrailingColon(g_i18n:getText("ads_option_menu_price_text")), value = priceValue},
+        {title = ensureTrailingColon(g_i18n:getText("ads_option_menu_duration_text")), value = durationValue},
+        {title = ensureTrailingColon(g_i18n:getText("ads_option_menu_finish_time_text")), value = finishTimeValue}
+    }
+
+    self.serviceInfoTable:setDataSource(self)
+    self.serviceInfoTable:setDelegate(self)
+    self.serviceInfoTable:reloadData()
 
 
     -- disclaimers
@@ -196,7 +217,42 @@ function ADS_MaintenanceTwoOptionsDialog:onClickBack()
     self:close()
 end
 
+function ADS_MaintenanceTwoOptionsDialog:getNumberOfItemsInSection(list, section)
+    if list == self.serviceInfoTable then
+        return #self.serviceInfoData
+    end
+
+    return 0
+end
+
+function ADS_MaintenanceTwoOptionsDialog:populateCellForItemInSection(list, section, index, cell)
+    if list ~= self.serviceInfoTable then
+        return
+    end
+
+    local data = self.serviceInfoData[index]
+    if data == nil then
+        return
+    end
+
+    local titleElement = cell:getAttribute("serviceInfoTitle")
+    local valueElement = cell:getAttribute("serviceInfoValue")
+    titleElement:setText(data.title or "")
+    valueElement:setText(data.value or "")
+    titleElement:setTextColor(1, 1, 1, 1)
+    valueElement:setTextColor(1, 1, 1, 1)
+end
+
 function ADS_MaintenanceTwoOptionsDialog:onOpen(superFunc)
+    if self.optionThree ~= nil then
+        self.optionThree.useYesNoTexts = true
+        if self.optionThree.setIsChecked ~= nil then
+            self.optionThree:setIsChecked(self.selectedOptionThree == true, false, false)
+        elseif self.optionThree.getState ~= nil then
+            self.optionThree:setState(self.optionThree:getState())
+        end
+    end
+
     g_messageCenter:subscribe(MessageType.MONEY_CHANGED, self.updateScreen, self)
 end
 

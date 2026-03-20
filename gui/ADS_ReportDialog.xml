@@ -1,8 +1,9 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
+    <RoundCorner profile="ads_dialogScreenBlocker" id="dialogScreenBlocker"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
 
-    <GuiElement profile="ads_dialogBg" id="dialogElement">
+    <GuiElement profile="ads_dialogBg" id="dialogElement" with="anchorMiddleCenter"  position="0px -50px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -16,7 +17,7 @@
                 <Text profile="fs25_menuHeaderTitle" id="headerText" text="$l10n_ads_report_header_title"/>
                 <RoundCorner profile="fs25_shopMoneyBoxBg" id="moneyBoxBg"/>
                 <BoxLayout profile="fs25_shopMoneyBox" id="moneyBox">
-                    <Text profile="fs25_shopBalance" text="$l10n_ui_balance" />
+                    <Text profile="fs25_shopBalance" id="balanceTitleElement" text="$l10n_ui_balance" />
                     <Text profile="fs25_shopMoney" id="balanceElement"/>
                 </BoxLayout>
             </GuiElement>
@@ -78,7 +79,8 @@
                 <SmoothList profile="ads_tableList" id="systemConditionTable" position="500px -75px" size="380px 510px">
                     <ListItem profile="ads_tableListItem" name="systemConditionRowTemplate" size="380px 40.77px" >
                         <Text profile="ads_tableRowCellLeft" position="10px 0px" size="190px 40.77px" name="reportTableSystemConditionTitle" />
-                        <Text profile="ads_tableRowCellRight" position="200px 0px" size="170px 40.77px" name="reportTableSystemConditionValue" />
+                        <Text profile="ads_tableRowCellRight" position="200px 0px" size="80px 40.77px" name="reportTableSystemConditionValue" />
+                        <Text profile="ads_tableRowCellRight" position="290px 0px" size="80px 40.77px" name="reportTableSystemRiskValue" />
                     </ListItem>
                 </SmoothList>
 
@@ -139,6 +141,12 @@
     </GuiElement>
 
     <GUIProfiles>
+        <Profile name="ads_dialogScreenBlocker" extends="baseReference" with="anchorStretchingYStretchingX pivotTopCenter">
+            <size value="100% 100%"/>
+            <color value="$preset_fs25_colorMainDark"/>
+            <cornerSize value="0"/>
+        </Profile>
+
         <Profile name="ads_reportStatsContainer" extends="emptyPanel" with="anchorTopStretchingX">
             <size value="1410px 470px"/>
             <position value="0px -170px"/>

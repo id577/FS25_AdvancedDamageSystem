@@ -221,7 +221,7 @@
         <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Disinnesto marcia"/>
         <text name="ads_breakdown_at_progress_message" text="In corso"/>
-        <text name="ads_cold_engine_message" text="Motore freddo! I giri elevati causano usura!"/>
+        <text name="ads_spec_cold_engine_message" text="Motore freddo! I giri elevati causano usura!"/>
         <text name="ads_spec_this_month" text="Questo mese"/>
         <text name="ads_spec_months_ago" text="mesi fa"/>
         <text name="ads_spec_never" text="Mai"/>

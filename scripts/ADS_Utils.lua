@@ -65,6 +65,44 @@ function ADS_Utils.convertHoursToHoursAndMinutes(totalHours)
     return hours, minutes
 end
 
+function ADS_Utils.updateMoneyBoxLayout(labelElement, valueElement, boxElement, bgElement, labelText, valueText)
+    if labelElement == nil or valueElement == nil or boxElement == nil or bgElement == nil then
+        return
+    end
+
+    if labelElement.setText ~= nil then
+        labelElement:setText(tostring(labelText or ""))
+    end
+    if valueElement.setText ~= nil then
+        valueElement:setText(tostring(valueText or ""))
+    end
+
+    if boxElement.invalidateLayout ~= nil then
+        boxElement:invalidateLayout()
+    end
+
+    local targetWidth = nil
+    if boxElement.flowSizes ~= nil then
+        targetWidth = boxElement.flowSizes[1]
+    end
+
+    if targetWidth == nil or targetWidth <= 0 then
+        return
+    end
+
+    local horizontalPadding = 50 * (g_pixelSizeScaledX or 0)
+    local bgHeight = (bgElement.size ~= nil and bgElement.size[2]) or ((boxElement.size ~= nil and boxElement.size[2]) or 0.03)
+    targetWidth = targetWidth + horizontalPadding
+
+    if bgElement.setSize ~= nil then
+        bgElement:setSize(targetWidth, bgHeight)
+    end
+
+    if bgElement.invalidateLayout ~= nil then
+        bgElement:invalidateLayout()
+    end
+end
+
 function ADS_Utils.tableToString(tbl)
     if not tbl or next(tbl) == nil then
         return "{}" 

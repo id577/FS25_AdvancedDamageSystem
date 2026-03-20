@@ -87,7 +87,16 @@ function ADS_MaintenanceLogDialog:updateScreen()
     self.logDataAll = spec.maintenanceLog or {}
     self:rebuildVisibleLogData()
 
-    self.balanceElement:setText(g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true))
+    local balanceText = g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true)
+    self.balanceElement:setText(balanceText)
+    ADS_Utils.updateMoneyBoxLayout(
+        self.balanceTitleElement,
+        self.balanceElement,
+        self.moneyBox,
+        self.moneyBoxBg,
+        g_i18n:getText("ui_balance"),
+        balanceText
+    )
     self.vehicleNameValue:setText(g_i18n:getText('ads_log_title') .. " " .. self.vehicle:getFullName())
 
     local totalCost = 0

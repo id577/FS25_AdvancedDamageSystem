@@ -3,9 +3,9 @@
     <GuiElement profile="newLayer" />
     <Bitmap profile="dialogFullscreenBg" id="dialogBg" />
     
-    <GuiElement profile="dialogBg" id="dialogElement" size="600px 450px">
-        <ThreePartBitmap profile="fs25_dialogBgMiddle" />
-        <ThreePartBitmap profile="fs25_dialogBgTop" />
+    <GuiElement profile="ads_dialogBgSmall" id="dialogElement">
+        <ThreePartBitmap profile="fs25_dialogBgMiddleSmall" />
+        <ThreePartBitmap profile="fs25_dialogBgTopSmall" />
         <ThreePartBitmap profile="fs25_dialogBgBottom" />
         
         <GuiElement profile="fs25_dialogContentContainer">
@@ -18,16 +18,20 @@
             <Text profile="fs25_dialogText" id="optionOneText" position="0px -80px" text="Select the extent of maintenance:"/>
             <MultiTextOption profile="ads_multiTextOption" id="optionOne" position="0px -110px" focusInit="onOpen" onClick="onClickOptionOne" texts="1|2|3|4" />
                 
-            <Text profile="ads_greenText" id="maintenancePrice" text="Price: $ 68500" position="-25px -160px"/>
-            <Text profile="ads_greenText" id="maintenanceDuration" text="Duration: 1 day(s) 14 hour(s)" position="-25px -180px"/>
-            <Text profile="ads_greenText" id="maintenanceFinishTime" text="Finish time: after tomorrow at 08:19" position="-25px -200px"/>       
+            <!-- Price, duration, finish time -->
+            <SmoothList profile="ads_dialogInfoTable" id="serviceInfoTable" position="0px -165px" size="400px 78px">
+                <ListItem profile="ads_dialogInfoRow" name="serviceInfoRowTemplate" size="400px 26px">
+                    <Text profile="ads_dialogInfoTitle" position="20px 0px" size="160px 26px" name="serviceInfoTitle" textLayoutMode="scrolling" />
+                    <Text profile="ads_dialogInfoValue" position="190px 0px" size="190px 26px" name="serviceInfoValue" textLayoutMode="scrolling" />
+                </ListItem>
+            </SmoothList>
 
             <!-- Disclaimers -->
-            <Text profile="ads_disclaimerText" position="40px -240px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
+            <Text profile="ads_disclaimerText" position="40px -270px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
         
             <!-- Option Three -->
-            <Text profile="fs25_dialogText" id="optionThreeText" position="0px -290px" text="Repair any faults found"/>
-            <BinaryOption profile="fs25_binaryOption" id="optionThree" onClick="onClickOptionThree" size="300px 30px" position="0px 20px"/>
+            <Text profile="fs25_dialogText" id="optionThreeText" position="0px -320px" text="Repair any faults found"/>
+            <BinaryOption profile="fs25_binaryOption" id="optionThree" onClick="onClickOptionThree" size="300px 30px" position="0px 30px"/>
 
         </GuiElement>
         <BoxLayout profile="fs25_dialogButtonBox">
@@ -35,4 +39,50 @@
             <Button profile="buttonOK" text="$l10n_ads_option_menu_start_text" onClick="onClickStartService" />
         </BoxLayout>
     </GuiElement>
+
+    <GUIProfiles>
+        <Profile name="ads_dialogBgSmall" extends="fs25_dialogBg">
+            <size value="600px 490px" />
+        </Profile>
+
+        <Profile name="ads_dialogSeparator" extends="baseReference" with="anchorTopCenter">
+            <size value="500px 1dp" />
+            <absoluteSizeOffset value="0px 0px" />
+            <imageColor value="$preset_fs25_colorGreyLight_50" />
+            <startImageSize value="30px 0px" />
+            <startImageSliceId value="gui.list_divider" />
+            <endImageSize value="0px 0px" />
+            <endImageInvertX value="true" />
+            <endImageSliceId value="gui.list_divider" />
+        </Profile>
+
+        <Profile name="ads_dialogInfoTable" extends="emptyPanel" with="anchorTopCenter">
+        </Profile>
+
+        <Profile name="ads_dialogInfoRow" extends="baseReference" with="anchorTopStretchingX alternating">
+            <height value="26px" />
+            <imageColor value="$preset_fs25_colorGrey" />
+            <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
+        </Profile>
+
+        <Profile name="ads_dialogInfoTitle" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false" />
+            <textSize value="14px" />
+            <textUpperCase value="true" />
+            <textColor value="$preset_colorWhite_50" />
+            <textAlignment value="left" />
+            <textVerticalAlignment value="middle" />
+            <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+
+        <Profile name="ads_dialogInfoValue" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false" />
+            <textSize value="14px" />
+            <textColor value="$preset_colorWhite_50" />
+            <textAlignment value="right" />
+            <textVerticalAlignment value="middle" />
+            <textDisabledColor value="$preset_colorDisabled" />
+        </Profile>
+    </GUIProfiles>
+
 </GUI>
