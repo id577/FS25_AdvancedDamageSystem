@@ -613,7 +613,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    CORRODED_WIRING = {  -- TO-DO: $l10n
+    CORRODED_WIRING = {
         isSelectable = true,
         system = systems.ELECTRICAL,
         isApplicable = function(vehicle)
@@ -654,7 +654,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             { 
                 severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_corroded_wiring_stage2_description",
+                description = "ads_breakdowns_corroded_wiring_stage3_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.CORRODED_WIRING,
                 repairPrice = 4.0 * breakdownPriceMultipliers.CORRODED_WIRING,
@@ -677,7 +677,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 8.0 * breakdownPriceMultipliers.CORRODED_WIRING,
                 effects = { 
                     { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
-                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_electrical_system_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
+                    { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_corroded_wiring_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -686,7 +686,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    BATTERY_SULFATION = {  -- TO-DO: $l10n
+    BATTERY_SULFATION = {
         isSelectable = true,
         system = systems.ELECTRICAL,
         isApplicable = function(vehicle)
@@ -752,7 +752,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    ALTERNATOR_REGULATOR_FAILURE = {  -- TO-DO: $l10n
+    ALTERNATOR_REGULATOR_FAILURE = {
         isSelectable = true,
         system = systems.ELECTRICAL,
         isApplicable = function(vehicle)
@@ -889,13 +889,8 @@ ADS_Breakdowns.BreakdownRegistry = {
                 }
             }
     },
-    
-    -- Oil Pump Malfunction
-    -- Reduced oil pressure and unstable lubrication. 
-    -- Engine knocking appears, power drops, overheating risk increases, 
-    -- and in advanced stages the engine may stall or fail.
 
-    OIL_PUMP_MALFUNCTION = { -- TO-DO: $l10n
+    OIL_PUMP_MALFUNCTION = {
         isSelectable = true,
         system = systems.ENGINE,
         isApplicable = function(vehicle)
@@ -935,7 +930,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             {
                 severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_oil_pump_malfunction_stage2_description",
+                description = "ads_breakdowns_oil_pump_malfunction_stage3_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.OIL_PUMP_MALFUNCTION,
                 repairPrice = 4.0 * breakdownPriceMultipliers.OIL_PUMP_MALFUNCTION,
@@ -966,12 +961,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Valve Train Failure
-    -- Progressive wear of camshaft/rocker/valve components. 
-    -- Causes metallic ticking, rough running, loss of power at higher RPM, 
-    -- misfires under load, and eventual engine shutdown.
-
-    VALVE_TRAIN_MALFUNCTION = { -- TO-DO: $l10n
+    VALVE_TRAIN_MALFUNCTION = {
         isSelectable = true,
         system = systems.ENGINE,
         isApplicable = function(vehicle)
@@ -1012,7 +1002,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             {
                 severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_valve_train_malfunction_stage4_description",
+                description = "ads_breakdowns_valve_train_malfunction_stage3_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.VALVE_TRAIN_MALFUNCTION,
                 repairPrice = 4.0 * breakdownPriceMultipliers.VALVE_TRAIN_MALFUNCTION,
@@ -1242,12 +1232,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- CVT Chain/Belt Wear
-    -- Progressive wear of CVT chain/belt contact surfaces and pulleys.
-    -- Causes ratio response lag and slip under load, increases heat generation,
-    -- and in advanced stages leads to severe pull loss and drivability issues.
-
-    CVT_CHAIN_WEAR = { -- TO-DO: $l10n
+    CVT_CHAIN_WEAR = {
         isSelectable = true,
         system = systems.TRANSMISSION,
         isApplicable = function(vehicle)
@@ -1320,12 +1305,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- CVT Hydraulic Control Valve Malfunction
-    -- Pressure control instability in the CVT hydraulic block.
-    -- Causes intermittent pressure drops, torque interruptions and jerky behavior,
-    -- with worsening response and potential limp-home operation at critical stage.
-
-    CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = { -- TO-DO: $l10n
+    CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = {
         isSelectable = true,
         system = systems.TRANSMISSION,
         isApplicable = function(vehicle)
@@ -1472,13 +1452,8 @@ ADS_Breakdowns.BreakdownRegistry = {
             }
         }
     },
-
-    -- Hydraulic Cylinder Internal Leak
-    -- Progressive internal bypass/leak inside lift cylinders and seals.
-    -- Reduces lift/raise responsiveness and holding ability, causing gradual
-    -- implement drift when loaded and severe control loss at critical stage.
     
-    HYDRAULIC_CYLINDER_INTERNAL_LEAK  = { -- TO-DO: $l10n
+    HYDRAULIC_CYLINDER_INTERNAL_LEAK  = {
         isSelectable = true,
         system = systems.HYDRAULICS,
         isApplicable = function(vehicle)
@@ -1548,11 +1523,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- PTO Clutch Slip
-    -- Progressive wear of PTO clutch/friction pack under load.
-    -- Reduces transmitted PTO torque and causes intermittent auto-disengage,
-    -- ending in complete PTO unusable state on critical stage.
-    PTO_CLUTCH_SLIP   = { -- TO-DO: $l10n
+    PTO_CLUTCH_SLIP   = {
         isSelectable = true,
         system = systems.HYDRAULICS,
         isApplicable = function(vehicle)
@@ -1589,7 +1560,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             { 
                 severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_pto_clutch_slip_stage2_description",
+                description = "ads_breakdowns_pto_clutch_slip_stage3_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.PTO_CLUTCH_SLIP,
                 repairPrice = 4.0 * breakdownPriceMultipliers.PTO_CLUTCH_SLIP,
@@ -1603,7 +1574,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             { 
                 severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_pto_clutch_slip_stage2_description",
+                description = "ads_breakdowns_pto_clutch_slip_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
                 repairPrice = 8.0 * breakdownPriceMultipliers.PTO_CLUTCH_SLIP,
@@ -1688,12 +1659,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Wheel Hub Bearing Wear
-    -- Progressive wear of wheel hub bearings and adjacent running components.
-    -- Creates speed-dependent humming and chassis vibration, increases drag and
-    -- rolling losses, and at critical stage can lead to wheel seizure.
-
-    BEARING_WEAR = { -- TO-DO: $l10n
+    BEARING_WEAR = {
         isSelectable = true,
         system = systems.CHASSIS,
         isApplicable = function(vehicle)
@@ -1773,12 +1739,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Steering Linkage Wear
-    -- Progressive wear in tie rods, joints and steering linkage geometry.
-    -- Causes constant pull to one side and reduced steering responsiveness,
-    -- degrading handling precision and controllability at higher stages.
-
-    STEERING_LINKAGE_WEAR = { -- TO-DO: $l10n
+    STEERING_LINKAGE_WEAR = {
         isSelectable = true,
         system = systems.CHASSIS,
         isApplicable = function(vehicle)
@@ -1851,12 +1812,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Track Tensioner Malfunction
-    -- Progressive wear/failure of track tensioning mechanism and guide alignment.
-    -- Causes drag, vibration and directional instability under load, with growing
-    -- risk of track seizure behavior and severe drivability loss at critical stage.
-
-    TRACK_TENSIONER_MALFUNCTION = { -- TO-DO: $l10n
+    TRACK_TENSIONER_MALFUNCTION = {
         isSelectable = true,
         system = systems.CHASSIS,
         isApplicable = function(vehicle)
@@ -1941,7 +1897,6 @@ ADS_Breakdowns.BreakdownRegistry = {
     },
 
     -- cooling system
- 
     THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
         system = systems.COOLING,
@@ -2004,11 +1959,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Coolant Leak
-    -- Progressive coolant loss from hoses, seals, radiator joints, or pump area.
-    -- Gradually lowers effective cooling reserve and heat rejection capacity,
-    -- with strong overheating tendency as the fault worsens.
-    COOLANT_LEAK = { -- TO-DO: $l10n
+    COOLANT_LEAK = {
         isSelectable = true,
         system = systems.COOLING,
         isApplicable = function(vehicle)
@@ -2070,11 +2021,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Fan Clutch Failure
-    -- Progressive degradation of viscous/mechanical fan clutch engagement.
-    -- Reduces fan drive efficiency and airflow at critical thermal moments,
-    -- increasing overheating risk under sustained load.
-    FAN_CLUTCH_FAILURE = { -- TO-DO: $l10n
+    FAN_CLUTCH_FAILURE = {
         isSelectable = true,
         system = systems.COOLING,
         isApplicable = function(vehicle)
@@ -2299,11 +2246,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Fuel Filter Clogging
-    -- Progressive fuel filter restriction from contamination/wax/water load.
-    -- Limits fuel flow at demand peaks, causing hesitation and power drop,
-    -- with stalling/start problems as blockage becomes severe.
-    FUEL_FILTER_CLOGGING = { -- TO-DO: $l10n
+    FUEL_FILTER_CLOGGING = {
         isSelectable = true,
         system = systems.FUEL,
         isApplicable = function(vehicle)
@@ -2361,11 +2304,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- Fuel Line Air Leak
-    -- Progressive air ingress in low-pressure fuel lines and connections.
-    -- Destabilizes supply pressure and fuel column continuity, producing
-    -- harder starts, intermittent hesitation, and eventual run failure.
-    FUEL_LINE_AIR_LEAK = { -- TO-DO: $l10n
+    FUEL_LINE_AIR_LEAK = {
         isSelectable = true,
         system = systems.FUEL,
         isApplicable = function(vehicle)
@@ -2456,7 +2395,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         stages = {
             {
                 severity = "ads_breakdowns_severity_minor",
-                description = "ads_breakdowns_yield_sensor_malfunction_stage1_description",
+                description = "ads_breakdowns_harvest_processing_system_wear_stage1_description",
                 detectionChance = 1.0,
                 progressMultiplier = 2.0 * breakdownProgressMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 repairPrice = 1.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
@@ -2466,7 +2405,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             {
                 severity = "ads_breakdowns_severity_moderate",
-                description = "ads_breakdowns_yield_sensor_malfunction_stage2_description",
+                description = "ads_breakdowns_harvest_processing_system_wear_stage2_description",
                 detectionChance = 1.0,
                 progressMultiplier = 1.0 * breakdownProgressMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 repairPrice = 2.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
@@ -2479,7 +2418,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             { 
                 severity = "ads_breakdowns_severity_major",
-                description = "ads_breakdowns_yield_sensor_malfunction_stage3_description",
+                description = "ads_breakdowns_harvest_processing_system_wear_stage3_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 repairPrice = 4.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
@@ -2492,12 +2431,12 @@ ADS_Breakdowns.BreakdownRegistry = {
             },
             { 
                 severity = "ads_breakdowns_severity_critical",
-                description = "ads_breakdowns_yield_sensor_malfunction_stage4_description",
+                description = "ads_breakdowns_harvest_processing_system_wear_stage4_description",
                 detectionChance = 1.0,
                 progressMultiplier = 0,
                 repairPrice = 8.0 * breakdownPriceMultipliers.HARVEST_PROCESSING_SYSTEM_WEAR,
                 effects = { 
-                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.4, aggregation = "sum", extraData = {message = 'ads_breakdowns_yield_sensor_malfunction_stage4_message', disableAi = true} },
+                    { id = "YIELD_REDUCTION_MODIFIER", value = -0.4, aggregation = "sum", extraData = {message = 'ads_breakdowns_harvest_processing_system_wear_stage4_message', disableAi = true} },
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -2538,7 +2477,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0 * breakdownProgressMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 repairPrice = 1.0 * breakdownPriceMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 effects = {
-                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.20, aggregation = "min" }
+                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.50, aggregation = "min" }
                 }
             },
             {
@@ -2548,7 +2487,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0 * breakdownProgressMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 repairPrice = 2.0 * breakdownPriceMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 effects = {
-                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.40, aggregation = "min" }
+                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.75, aggregation = "min" }
                 }
             },
             { 
@@ -2558,7 +2497,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 repairPrice = 4.0 * breakdownPriceMultipliers.UNLOADING_AUGER_MALFUNCTION,
                 effects = { 
-                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.60, aggregation = "min" }
+                    { id = "UNLOADING_SPEED_MODIFIER", value = -0.90, aggregation = "min" }
                 },
                 indicators = {
                     { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }

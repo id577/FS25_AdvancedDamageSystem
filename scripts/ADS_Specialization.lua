@@ -115,6 +115,7 @@ AdvancedDamageSystem.modDirectory = g_currentModDirectory
 
 AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     expiredServiceFactor = "sf",
+    breakdownPresenceFactor = "bpf",
     -- engine
     motorLoadFactor = "mlf",
     coldMotorFactor = "cmf",
@@ -385,6 +386,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "addBreakdown", AdvancedDamageSystem.addBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "removeBreakdown", AdvancedDamageSystem.removeBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "hasBreakdown", AdvancedDamageSystem.hasBreakdown)
+    SpecializationUtil.registerFunction(vehicleType, "hasSystemBreakdowns", AdvancedDamageSystem.hasSystemBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "processBreakdowns", AdvancedDamageSystem.processBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "advanceBreakdown", AdvancedDamageSystem.advanceBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "getActiveBreakdowns", AdvancedDamageSystem.getActiveBreakdowns)
@@ -2422,6 +2424,40 @@ local function getExpiredServiceMultiplier(serviceLevel, serviceMultiplier)
     return 1.0
 end
 
+local function getBreakdownsStageSum(vehicle, system)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return 0 end
+
+    local activeBreakdowns = vehicle:getActiveBreakdowns()
+    if activeBreakdowns == nil or next(activeBreakdowns) == nil then
+        return 0
+    end
+
+    local breadownsRegistry = ADS_Breakdowns.BreakdownRegistry
+    local targetSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
+    if targetSystemKey == nil or targetSystemKey == "" then
+        targetSystemKey = type(system) == "string" and string.lower(system) or ""
+    end
+
+    if targetSystemKey == "" then
+        return 0
+    end
+
+    local sumOfStages = 0
+
+    for breakdownId, breakdownData in pairs(activeBreakdowns) do
+        local registryBreakdown = breadownsRegistry[breakdownId]
+        if registryBreakdown ~= nil then
+            local breakdownSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, registryBreakdown.system)
+            if breakdownSystemKey == targetSystemKey then
+                sumOfStages = sumOfStages + (tonumber(breakdownData.stage) or 0)
+            end
+        end
+    end
+
+    return sumOfStages
+end
+
 -- service
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -2575,7 +2611,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
-    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor = 0, 0, 0, 0
+    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0
     local expiredServiceMultiplier = 1.0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
@@ -2614,13 +2650,17 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             hotMotorFactor = hotMotorFactor * (C.OVERHEAT_MOTOR_MULTIPLIER or C.OVERHEAT_MOTOR_MULTIPLIER or 0) * motorLoadInf
             wearRate = wearRate + hotMotorFactor
         end
-        
-        -- TO-DO: any engine breakdowns increase wearRate
-        -- TO-DO: critical failure at 0 health
 
         -- idling
         if motorLoad < C.MOTOR_IDLING_THRESHOLD and self:getLastSpeed() < 0.003 then
             wearRate = wearRate * C.MOTOR_IDLING_MULTIPLIER
+        end
+
+        -- breakdown presence factor
+        if self:hasSystemBreakdowns(systemKey) then
+            local stagesSum = getBreakdownsStageSum(self, systemKey)
+            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+            wearRate = wearRate + breakdownPresenceFactor
         end
 
         expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
@@ -2639,7 +2679,8 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         motorLoadFactor = motorLoadFactor,
         expiredServiceFactor = expiredServiceFactor,
         coldMotorFactor = coldMotorFactor,
-        hotMotorFactor = hotMotorFactor
+        hotMotorFactor = hotMotorFactor,
+        breakdownPresenceFactor = breakdownPresenceFactor
     })
 end
 
@@ -2652,7 +2693,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local systemData = spec.systems.transmission
     systemData.pullOverloadTimer = tonumber(systemData.pullOverloadTimer) or 0
     local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
-    local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor, wheelSlipIntensity, coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0, 0, 0
+    local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor, wheelSlipIntensity, coldTransFactor, hotTransFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0, 0, 0, 0
     local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
@@ -2771,6 +2812,13 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
 
         spec.systems.transmission.wheelSlipIntensity = wheelSlipIntensity
 
+        -- breakdown presence factor
+        if self:hasSystemBreakdowns(systemKey) then
+            local stagesSum = getBreakdownsStageSum(self, systemKey)
+            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+            wearRate = wearRate + breakdownPresenceFactor
+        end
+
         if vehicleHaveCVT then
             -- cold CVT factor
             if (spec.transmissionTemperature or -99) < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
@@ -2816,7 +2864,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         wheelSlipIntensity = wheelSlipIntensity,
         coldTransFactor = coldTransFactor,
         coldMotorFactor = coldTransFactor,
-        hotTransFactor = hotTransFactor
+        hotTransFactor = hotTransFactor,
+        breakdownPresenceFactor = breakdownPresenceFactor
     })
 end
 
@@ -2827,7 +2876,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local systemData = spec.systems.hydraulics
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
-    local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor = 0, 0, 0, 0, 0
+    local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
     local ptoSharpAngleDeg = 0
     local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
@@ -3164,6 +3213,13 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
             wearRate = wearRate * C.HYDRAULICS_IDLING_MULTIPLIER
         end
 
+        -- breakdown presence factor
+        if self:hasSystemBreakdowns(systemKey) then
+            local stagesSum = getBreakdownsStageSum(self, systemKey)
+            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+            wearRate = wearRate + breakdownPresenceFactor
+        end
+
         -- service factor
         expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
@@ -3185,6 +3241,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         operatingFactor = operatingFactor,
         coldOilFactor = coldOilFactor,
         ptoOperatingFactor = ptoOperatingFactor,
+        breakdownPresenceFactor = breakdownPresenceFactor,
         sharpAngleFactor = sharpAngleFactor,
         ptoSharpAngleDeg = ptoSharpAngleDeg
     })
@@ -3198,7 +3255,7 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     local systemData = spec.systems.cooling
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.COOLING_FACTOR_DATA
-    local highCoolingFactor, overheatFactor, coldShockFactor = 0, 0, 0
+    local highCoolingFactor, overheatFactor, coldShockFactor, breakdownPresenceFactor = 0, 0, 0, 0
     local wearRate = 1.0
 
     if not systemData.enabled then
@@ -3234,6 +3291,13 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
             wearRate = wearRate + coldShockFactor
         end
 
+        -- breakdown presence factor
+        if self:hasSystemBreakdowns(systemKey) then
+            local stagesSum = getBreakdownsStageSum(self, systemKey)
+            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+            wearRate = wearRate + breakdownPresenceFactor
+        end
+
         -- idling
         if spec.thermostatState == 0 and overheatFactor == 0 and coldShockFactor == 0 then
             wearRate = wearRate * C.COOLING_IDLING_MULTIPLIER
@@ -3256,7 +3320,8 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         expiredServiceFactor = expiredServiceFactor,
         highCoolingFactor = highCoolingFactor,
         overheatFactor = overheatFactor,
-        coldShockFactor = coldShockFactor
+        coldShockFactor = coldShockFactor,
+        breakdownPresenceFactor = breakdownPresenceFactor
     })
 end
 
@@ -3266,7 +3331,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
     local systemData = spec.systems.electrical
     if systemData == nil then return end
-    local expiredServiceFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor = 0, 0, 0, 0, 0
+    local expiredServiceFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
@@ -3334,6 +3399,13 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
             overheatFactor = overheatFactor * (C.OVERHEAT_FACTOR_MULTIPLIER or 0)
             wearRate = wearRate + overheatFactor
         end
+
+        -- breakdown presence factor
+        if self:hasSystemBreakdowns(systemKey) then
+            local stagesSum = getBreakdownsStageSum(self, systemKey)
+            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+            wearRate = wearRate + breakdownPresenceFactor
+        end
     else
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -3347,7 +3419,8 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         crankingStressFactor = crankingStressFactor,
         weatherExposureFactor = weatherExposureFactor,
         lightsFactor = lightsFactor,
-        overheatFactor = overheatFactor
+        overheatFactor = overheatFactor,
+        breakdownPresenceFactor = breakdownPresenceFactor
     })
 end
 
@@ -3374,6 +3447,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local brakeMassFactor = 0
     local brakeMassRatio = 0
     local brakePedal = 0
+    local breakdownPresenceFactor = 0
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
     local wearRate = 1.0
 
@@ -3462,98 +3536,105 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
                 vibFactor = vibFactor * vibMultiplier
                 wearRate = wearRate + vibFactor
             end
+
+            -- steering load at standstill / low speed
+            local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
+            if steerSpeedThreshold > 0 and speed <= steerSpeedThreshold then
+                local steerState = spec.chassisSteerState
+                if steerState == nil then
+                    steerState = {
+                        prevSteerAbs = nil
+                    }
+                    spec.chassisSteerState = steerState
+                end
+
+                local steeringDirectionAbs = 0
+                if self.spec_wheels ~= nil and self.spec_wheels.rotatedTime ~= nil then
+                    steeringDirectionAbs = math.abs(tonumber(self.spec_wheels.rotatedTime) or 0)
+                elseif self.getSteeringDirection ~= nil then
+                    steeringDirectionAbs = math.abs(tonumber(self:getSteeringDirection()) or 0)
+                end
+                steerInputAbs = math.clamp(steeringDirectionAbs, 0, 1)
+
+                local prevSteerAbs = tonumber(steerState.prevSteerAbs) or steerInputAbs
+                steerState.prevSteerAbs = steerInputAbs
+                local dtSafe = math.max(tonumber(dt) or 0, 1)
+                steerDeltaRate = math.clamp(math.abs(steerInputAbs - prevSteerAbs) * 1000 / dtSafe, 0, 1)
+
+                if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
+                    for _, wheel in ipairs(self.spec_wheels.wheels) do
+                        local hasGroundContact = false
+                        if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
+                            hasGroundContact = wheel.physics.hasGroundContact == true
+                        elseif wheel.hasGroundContact ~= nil then
+                            hasGroundContact = wheel.hasGroundContact == true
+                        end
+
+                        if hasGroundContact then
+                            steerGroundContact = 1
+                            break
+                        end
+                    end
+                end
+
+                if steerGroundContact > 0 then
+                    steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
+                    steerAngleFactor = ADS_Utils.calculateQuadraticMultiplier(steerInputAbs, tonumber(C.STEER_LOAD_STEER_THRESHOLD) or 0.2, false, 1.0)
+                    steerChangeFactor = ADS_Utils.calculateQuadraticMultiplier(steerDeltaRate, tonumber(C.STEER_LOAD_CHANGE_THRESHOLD) or 0.08, false, 1.0)
+
+                    if steerChangeFactor > 0 and steerLowSpeedFactor > 0 then
+                        local steerSignal = (0.35 + 0.65 * steerAngleFactor) * steerChangeFactor * steerLowSpeedFactor
+                        local aiMultiplier = self:getIsAIActive() and 0.25 or 1.0
+                        steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0) * aiMultiplier
+                        wearRate = wearRate + steerLoadFactor
+                    end
+                end
+            end
+
+            -- braking under mass
+            local drivable = self.spec_drivable
+            if drivable ~= nil and self.spec_wheels ~= nil then
+                local brakePedalRaw = tonumber(self.spec_wheels.brakePedal) or 0
+                local axisForward = tonumber(drivable.axisForward or drivable.axisForwardSend or (drivable.lastInputValues and drivable.lastInputValues.axisForward) or 0) or 0
+                local movingDirection = tonumber(self.movingDirection) or 0
+                local directionMode = self.getDirectionChangeMode ~= nil and self:getDirectionChangeMode() or 1
+                local isBrakingByAxis = false
+                if directionMode == 2 then
+                    isBrakingByAxis = axisForward < -0.01
+                else
+                    isBrakingByAxis = movingDirection ~= 0 and axisForward ~= 0 and math.sign(movingDirection) ~= math.sign(axisForward)
+                end
+
+                local brakePedalThreshold = tonumber(C.BRAKE_PEDAL_THRESHOLD) or 0.15
+                brakePedal = math.clamp(brakePedalRaw, 0, 1)
+                local isBraking = isBrakingByAxis or brakePedal > brakePedalThreshold
+
+                if isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
+                    local ownMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
+                    local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
+                    if ownMass > 0 then
+                        brakeMassRatio = math.max(totalMass / ownMass, 0)
+                        local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 1.0
+                        local ratioMax = math.max(tonumber(C.BRAKE_MASS_RATIO_MAX) or 1.5, ratioThreshold + 0.01)
+                        if brakeMassRatio > ratioThreshold then
+                            local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(brakeMassRatio, ratioThreshold, false, ratioMax)
+                            local brakeInputFactor = math.max(brakePedal, isBrakingByAxis and 1 or 0)
+                            brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
+                            wearRate = wearRate + brakeMassFactor
+                        end
+                    end
+                end
+
+            end
+
+            -- breakdown presence factor
+            if self:hasSystemBreakdowns(systemKey) then
+                local stagesSum = getBreakdownsStageSum(self, systemKey)
+                breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+                wearRate = wearRate + breakdownPresenceFactor
+            end
         else
             wearRate = wearRate * C.CHASSIS_IDLING_MULTIPLIER    
-        end
-
-        -- steering load at standstill / low speed
-        local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
-        if steerSpeedThreshold > 0 and speed <= steerSpeedThreshold then
-            local steerState = spec.chassisSteerState
-            if steerState == nil then
-                steerState = {
-                    prevSteerAbs = nil
-                }
-                spec.chassisSteerState = steerState
-            end
-
-            local steeringDirectionAbs = 0
-            if self.spec_wheels ~= nil and self.spec_wheels.rotatedTime ~= nil then
-                steeringDirectionAbs = math.abs(tonumber(self.spec_wheels.rotatedTime) or 0)
-            elseif self.getSteeringDirection ~= nil then
-                steeringDirectionAbs = math.abs(tonumber(self:getSteeringDirection()) or 0)
-            end
-            steerInputAbs = math.clamp(steeringDirectionAbs, 0, 1)
-
-            local prevSteerAbs = tonumber(steerState.prevSteerAbs) or steerInputAbs
-            steerState.prevSteerAbs = steerInputAbs
-            local dtSafe = math.max(tonumber(dt) or 0, 1)
-            steerDeltaRate = math.clamp(math.abs(steerInputAbs - prevSteerAbs) * 1000 / dtSafe, 0, 1)
-
-            if self.spec_wheels ~= nil and self.spec_wheels.wheels ~= nil then
-                for _, wheel in ipairs(self.spec_wheels.wheels) do
-                    local hasGroundContact = false
-                    if wheel.physics ~= nil and wheel.physics.hasGroundContact ~= nil then
-                        hasGroundContact = wheel.physics.hasGroundContact == true
-                    elseif wheel.hasGroundContact ~= nil then
-                        hasGroundContact = wheel.hasGroundContact == true
-                    end
-
-                    if hasGroundContact then
-                        steerGroundContact = 1
-                        break
-                    end
-                end
-            end
-
-            if steerGroundContact > 0 then
-                steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
-                steerAngleFactor = ADS_Utils.calculateQuadraticMultiplier(steerInputAbs, tonumber(C.STEER_LOAD_STEER_THRESHOLD) or 0.2, false, 1.0)
-                steerChangeFactor = ADS_Utils.calculateQuadraticMultiplier(steerDeltaRate, tonumber(C.STEER_LOAD_CHANGE_THRESHOLD) or 0.08, false, 1.0)
-
-                if steerChangeFactor > 0 and steerLowSpeedFactor > 0 then
-                    local steerSignal = (0.35 + 0.65 * steerAngleFactor) * steerChangeFactor * steerLowSpeedFactor
-                    local aiMultiplier = self:getIsAIActive() and 0.25 or 1.0
-                    steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0) * aiMultiplier
-                    wearRate = wearRate + steerLoadFactor
-                end
-            end
-        end
-
-        -- braking under mass
-        local drivable = self.spec_drivable
-        if drivable ~= nil and self.spec_wheels ~= nil then
-            local brakePedalRaw = tonumber(self.spec_wheels.brakePedal) or 0
-            local axisForward = tonumber(drivable.axisForward or drivable.axisForwardSend or (drivable.lastInputValues and drivable.lastInputValues.axisForward) or 0) or 0
-            local movingDirection = tonumber(self.movingDirection) or 0
-            local directionMode = self.getDirectionChangeMode ~= nil and self:getDirectionChangeMode() or 1
-            local isBrakingByAxis = false
-            if directionMode == 2 then
-                isBrakingByAxis = axisForward < -0.01
-            else
-                isBrakingByAxis = movingDirection ~= 0 and axisForward ~= 0 and math.sign(movingDirection) ~= math.sign(axisForward)
-            end
-
-            local brakePedalThreshold = tonumber(C.BRAKE_PEDAL_THRESHOLD) or 0.15
-            brakePedal = math.clamp(brakePedalRaw, 0, 1)
-            local isBraking = isBrakingByAxis or brakePedal > brakePedalThreshold
-
-            if isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
-                local ownMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
-                local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
-                if ownMass > 0 then
-                    brakeMassRatio = math.max(totalMass / ownMass, 0)
-                    local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 1.0
-                    local ratioMax = math.max(tonumber(C.BRAKE_MASS_RATIO_MAX) or 1.5, ratioThreshold + 0.01)
-                    if brakeMassRatio > ratioThreshold then
-                        local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(brakeMassRatio, ratioThreshold, false, ratioMax)
-                        local brakeInputFactor = math.max(brakePedal, isBrakingByAxis and 1 or 0)
-                        brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
-                        wearRate = wearRate + brakeMassFactor
-                    end
-                end
-            end
-
         end
 
         -- service
@@ -3590,7 +3671,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         steerGroundContact = steerGroundContact,
         brakeMassFactor = brakeMassFactor,
         brakeMassRatio = brakeMassRatio,
-        brakePedal = brakePedal
+        brakePedal = brakePedal,
+        breakdownPresenceFactor = breakdownPresenceFactor
     })
 end
 
@@ -3601,7 +3683,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     local systemData = spec.systems.fuel
     if systemData == nil then return end
     local lowFuelStarvationFactor, coldFuelFactor = 0, 0
-    local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor = 0, 0, 0, 0, 0
+    local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
 
@@ -3693,7 +3775,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
                 wearRate = wearRate + idleDepositFactor
             end
         else
-            idleTimer = math.max(idleTimer - 10 * dt / 1000, 0)
+            idleTimer = 0
         end
         systemData.idleTimer = idleTimer
 
@@ -3703,6 +3785,13 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
             highPressureFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, highPressureThreshold, false)
             highPressureFactor = highPressureFactor * (C.HIGH_PRESSURE_FACTOR_MULTIPLIER or 0)
             wearRate = wearRate + highPressureFactor
+        end
+
+        -- breakdown presence factor
+        if self:hasSystemBreakdowns(systemKey) then
+            local stagesSum = getBreakdownsStageSum(self, systemKey)
+            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+            wearRate = wearRate + breakdownPresenceFactor
         end
 
         -- service
@@ -3724,6 +3813,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         coldFuelFactor = coldFuelFactor,
         idleDepositFactor = idleDepositFactor,
         highPressureFactor = highPressureFactor,
+        breakdownPresenceFactor = breakdownPresenceFactor,
         idleTimer = systemData.idleTimer or 0,
         fuelLevel = fuelLevel,
         fuelTemperature = fuelTemperature
@@ -3738,7 +3828,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workprocess.name)
     local systemData = ensureSystemData(spec, systemKey)
     local expiredServiceFactor = 0
-    local longHarvestFactor, wetCropFactor = 0, 0
+    local longHarvestFactor, wetCropFactor, breakdownPresenceFactor = 0, 0, 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
 
@@ -3786,6 +3876,13 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
             wearRate = wearRate + wetCropFactor
         end
 
+        -- breakdown presence factor
+        if self:hasSystemBreakdowns(systemKey) then
+            local stagesSum = getBreakdownsStageSum(self, systemKey)
+            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
+            wearRate = wearRate + breakdownPresenceFactor
+        end        
+
         -- service
         local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         local wearRateWithoutService = wearRate
@@ -3803,6 +3900,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         expiredServiceFactor = expiredServiceFactor,
         longHarvestFactor = longHarvestFactor,
         wetCropFactor = wetCropFactor,
+        breakdownPresenceFactor = breakdownPresenceFactor,
         longHarvestTimer = systemData.longHarvestTimer or 0
     })
 end
@@ -4134,6 +4232,34 @@ function AdvancedDamageSystem:hasBreakdown(breakdownId)
     end
 
     return spec.activeBreakdowns[breakdownId] ~= nil
+end
+
+function AdvancedDamageSystem:hasSystemBreakdowns(system)
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec or not spec.activeBreakdowns or next(spec.activeBreakdowns) == nil then
+        return false
+    end
+
+    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
+    if systemKey == nil or systemKey == "" then
+        systemKey = type(system) == "string" and string.lower(system) or ""
+    end
+
+    if systemKey == "" then
+        return false
+    end
+
+    for breakdownId, _ in pairs(spec.activeBreakdowns) do
+        local registryBreakdown = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+        if registryBreakdown ~= nil then
+            local breakdownSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, registryBreakdown.system)
+            if breakdownSystemKey == systemKey then
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 function AdvancedDamageSystem:advanceBreakdown(breakdownId)

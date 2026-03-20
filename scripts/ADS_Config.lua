@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 87,
+    VER = 89,
 
     DEBUG = false,
 
@@ -36,6 +36,7 @@ ADS_Config = {
         RAIN_FACTOR = 1.1,
         HALL_FACTOR = 1.3,
         SNOW_FACTOR = 1.1,
+        BREAKDOWN_PRESENCE_FACTOR = 1.0,
 
         SERVICE_EXPIRED_THRESHOLD = 0.5,
 
@@ -79,10 +80,10 @@ ADS_Config = {
             PULL_OVERLOAD_MULTIPLIER = 14.0,    
             PULL_OVERLOAD_THRESHOLD = 0.82,
             PULL_OVERLOAD_TIMER_THRESHOLD = 30,
-            LUGGING_MULTIPLIER = 35.0,       
+            LUGGING_MULTIPLIER = 50.0,       
             LUGGING_RPM_THRESHOLD = 0.8,
             LUGGING_MOTORLOAD_THRESHOLD = 0.80,
-            WHEEL_SLIP_MULTIPLIER = 90.0,        
+            WHEEL_SLIP_MULTIPLIER = 80.0,        
             WHEEL_SLIP_THRESHOLD = 0.3,
             COLD_TRANSMISSION_MULTIPLIER = 180.0,
             COLD_TRANSMISSION_THRESHOLD = 50,
@@ -169,8 +170,6 @@ ADS_Config = {
 
         STRESS_COOLDOWN = 0.65,
         CONDITION_EFFECTIVE_FLOOR = 0.10,
-        CVT_SHIFT_SPEED_THRESHOLD = 1.0,
-        CVT_SHOCK_MULTIPLIER = 100.0,
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 15,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
