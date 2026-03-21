@@ -163,6 +163,7 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
         end
         if isHaveBreakdownToBeReplaced then
             table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.MEDIUM)
+            table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.HIGH)
         end
 
     else
@@ -305,7 +306,11 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
             for _, part in ipairs(choosenPartsForRepair) do
                 table.insert(choosenPartsLabels, g_i18n:getText(part))
             end
-            self.optionOneDisclaimer:setText(g_i18n:getText("ads_option_menu_repair_type_replacement_description"))
+            if self.selectedOptionOne == AdvancedDamageSystem.REPAIR_TYPES.MEDIUM then
+                self.optionOneDisclaimer:setText(g_i18n:getText("ads_option_menu_repair_type_replacement_description"))
+            else
+                self.optionOneDisclaimer:setText(g_i18n:getText("ads_option_menu_repair_type_advanced_description"))
+            end
         end
         if #choosenPartsLabels > 0 then
             choosenPartsText = choosenPartsText .. " " .. table.concat(choosenPartsLabels, ", ")

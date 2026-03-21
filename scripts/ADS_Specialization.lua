@@ -101,8 +101,10 @@ AdvancedDamageSystem = {
     REPAIR_TYPES = {
     LOW    = "ads_spec_repair_type_fix",
     MEDIUM = "ads_spec_repair_type_replacement",
+    HIGH = "ads_spec_repair_type_advanced",
     [1] = "ads_spec_repair_type_fix",
     [2] = "ads_spec_repair_type_replacement",
+    [3] = "ads_spec_repair_type_advanced",
     },
 
     OVERHAUL_TYPES = {
@@ -1734,6 +1736,16 @@ local function registerVehicle(vehicle)
                             systemData.condition = math.max(1 - vehicle:getFormattedOperatingTime() / 150 * (0.2 * math.random() + 0.9), (0.2 * math.random() + 0.9) * 0.25)
                         end
                         vehicle:setDamageAmount(0.0, true)
+                        --- breakdown presence chance
+                        if vehicle:getOperatingTime() > 0 then
+                            local operatingHours = tonumber(vehicle:getFormattedOperatingTime()) or 0
+                            local chance = operatingHours / 100
+                            chance = math.clamp(chance * ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MUL, 0, ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MAX)
+
+                            if math.random() < chance then
+                                vehicle:addBreakdown(vehicle:getRandomBreakdown())
+                            end
+                        end
                     end
 
                     --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
@@ -4893,7 +4905,7 @@ local function isBreakdownSelectedForPlayerRepair(breakdownId, breakdown, option
     end
 
     local isSelectedForQuickFix = breakdown.isSelectedForRepair and breakdown.isVisible and (optionOne == AdvancedDamageSystem.REPAIR_TYPES.LOW and breakdown.isActive)
-    local isSelectedForStandartRepair = breakdown.isSelectedForRepair and breakdown.isVisible and optionOne == AdvancedDamageSystem.REPAIR_TYPES.MEDIUM
+    local isSelectedForStandartRepair = breakdown.isSelectedForRepair and breakdown.isVisible and (optionOne == AdvancedDamageSystem.REPAIR_TYPES.MEDIUM or optionOne == AdvancedDamageSystem.REPAIR_TYPES.HIGH)
     return isSelectedForStandartRepair or isSelectedForQuickFix
 end
 
@@ -4945,7 +4957,7 @@ local function applyPendingOverhaulStressInterpolation(spec, ratio)
     applyPendingSystemStressInterpolation(spec, spec.pendingOverhaulSystemStressStart, spec.pendingOverhaulSystemStressTarget, ratio)
 end
 
-local function markRepairStressReduction(spec, systemKey)
+local function markRepairStressReduction(spec, systemKey, optionOne)
     if spec == nil or spec.systems == nil or systemKey == nil or systemKey == "" then
         return
     end
@@ -4955,13 +4967,15 @@ local function markRepairStressReduction(spec, systemKey)
         return
     end
 
+    local optionOneKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.REPAIR_TYPES, optionOne)
+
     spec.pendingRepairSystemStressStart = spec.pendingRepairSystemStressStart or {}
     spec.pendingRepairSystemStressTarget = spec.pendingRepairSystemStressTarget or {}
     spec.pendingRepairSystemStressStartRatio = spec.pendingRepairSystemStressStartRatio or {}
 
     if spec.pendingRepairSystemStressTarget[systemKey] == nil then
         spec.pendingRepairSystemStressStart[systemKey] = math.max(tonumber(systemData.stress) or 0, 0)
-        spec.pendingRepairSystemStressTarget[systemKey] = 0
+        spec.pendingRepairSystemStressTarget[systemKey] = math.max(ADS_Config.MAINTENANCE.REPAIR_REMAINING_STRESS_RATIO[optionOneKey] * systemData.stress * (0.9 + math.random() * 0.2), 0)
         local totalTime = math.max(tonumber(spec.pendingProgressTotalTime) or 0, 0.0001)
         spec.pendingRepairSystemStressStartRatio[systemKey] = math.min(math.max((tonumber(spec.pendingProgressElapsedTime) or 0) / totalTime, 0), 1)
     end
@@ -5211,7 +5225,7 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
     spec.pendingServicePrice = repairPrice
 
     if totalTimeMs > 0 then
-        local adjustedTotalTimeMs = totalTimeMs / spec.reliability
+        local adjustedTotalTimeMs = totalTimeMs / spec.maintainability
         spec.maintenanceTimer = adjustedTotalTimeMs
         spec.pendingProgressTotalTime = adjustedTotalTimeMs
         spec.pendingProgressElapsedTime = 0
@@ -5266,16 +5280,19 @@ function AdvancedDamageSystem:processService(dt)
                 local breakdownId = spec.pendingInspectionQueue[spec.pendingProgressStepIndex]
                 local breakdown = self:getActiveBreakdowns()[breakdownId]
                 if breakdown ~= nil and not breakdown.isVisible then
-                    if optionOne ~= AdvancedDamageSystem.INSPECTION_TYPES.VISUAL or breakdown.stage > 1 then
-                        local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
-                        if breakdownDef ~= nil and breakdownDef.stages ~= nil and breakdownDef.stages[breakdown.stage] ~= nil then
-                            local chance = breakdownDef.stages[breakdown.stage].detectionChance or 0
-                            if math.random() < chance then
-                                if breakdown.isActive or optionOne == AdvancedDamageSystem.INSPECTION_TYPES.COMPLETE then
-                                    breakdown.isVisible = true
-                                    breakdownsRevealed = true
-                                    table.insert(spec.pendingSelectedBreakdowns, breakdownId)
-                                end
+                    local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+                    if breakdownDef ~= nil and breakdownDef.stages ~= nil and breakdownDef.stages[breakdown.stage] ~= nil then
+                        local inspectionDetectionMul = 1.0
+                        if serviceType == states.INSPECTION then
+                            local optionOneKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.INSPECTION_TYPES, optionOne)
+                            inspectionDetectionMul = C.INSPECTION_DETECTION_CHANCE_MULTIPLIERS[optionOneKey] or 1.0
+                        end
+                        local chance = (breakdownDef.stages[breakdown.stage].detectionChance * inspectionDetectionMul) or 0
+                        if math.random() < chance then
+                            if breakdown.isActive or optionOne == AdvancedDamageSystem.INSPECTION_TYPES.COMPLETE then
+                                breakdown.isVisible = true
+                                breakdownsRevealed = true
+                                table.insert(spec.pendingSelectedBreakdowns, breakdownId)
                             end
                         end
                     end
@@ -5310,7 +5327,7 @@ function AdvancedDamageSystem:processService(dt)
                         local stage = self:getActiveBreakdowns()[breakdownId].stage
                         self:removeBreakdown(breakdownId)
                         if systemData ~= nil then
-                            markRepairStressReduction(spec, systemKey)
+                            markRepairStressReduction(spec, systemKey, optionOne)
                         else
                             log_dbg(string.format("Repair effect skipped: missing system mapping for breakdown '%s' (system='%s')", tostring(breakdownId), tostring(systemName)))
                         end

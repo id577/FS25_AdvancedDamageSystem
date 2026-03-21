@@ -389,6 +389,7 @@
         <text name="ads_spec_overhaul_full" text="Full"/>
         <text name="ads_spec_repair_type_fix" text="Quick fix"/>
         <text name="ads_spec_repair_type_replacement" text="Standard"/>
+        <text name="ads_spec_repair_type_advanced" text="Advanced"/>
 
         <text name="ads_option_menu_option_one_title_inspection" text="Select inspection type"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Repair discovered faults"/>
@@ -404,15 +405,16 @@
         <text name="ads_option_menu_finish_time_text" text="Finish Time: "/>
         <text name="ads_option_menu_start_text" text="Start"/>
         <text name="ads_option_menu_duration_instant" text="Instant"/>
-        <text name="ads_option_menu_inspection_visual_description" text="* Quick external check. Low cost and immediate result. Detects only serious faults (moderate severity+) and provides no data on the vehicle's technical state."/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Quick external inspection. Low cost and immediate result. Detects visible faults, with only a small chance of missing some defects. Does not provide technical condition data."/>
         <text name="ads_option_menu_inspection_standard_description" text="* Routine diagnostic procedure. Identifies all active faults and generates a general report on the vehicle's condition."/>
-        <text name="ads_option_menu_inspection_complete_description" text="* Deep diagnostics. Guarantees detection of all faults and provides a comprehensive report with exact health percentages for all components."/>
-        <text name="ads_option_menu_maintenance_minimal_description" text="* Basic service. Significantly cheaper and faster, but does not fully restore the Service Level."/>
-        <text name="ads_option_menu_maintenance_standard_description" text="* Routine maintenance according to manufacturer specifications. Restores Service Level to normal."/>
-        <text name="ads_option_menu_maintenance_extended_description" text="* Comprehensive service. Takes longer and costs more, but boosts Service Level by an additional ~20%"/>   
+        <text name="ads_option_menu_inspection_complete_description" text="* Deep diagnostics. Guarantees detection of all faults, including potential ones, and provides a comprehensive report with exact health percentages for all components."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Basic service. Significantly cheaper and faster, but does not fully restore the Service Level and provides a shorter service interval until the next maintenance."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Routine maintenance according to manufacturer specifications. Restores Service Level to normal and provides the standard service interval until the next maintenance."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Comprehensive service. Takes longer and costs more, but restores Service Level beyond the standard level and provides a longer service interval until the next maintenance."/>   
         <text name="ads_option_menu_maintenance_preventive_description" text="* Preventive maintenance beyond standard manufacturer service. Restores Service Level to normal and addresses the most problematic systems to reduce breakdown risk."/>
-        <text name="ads_option_menu_repair_type_fix_description" text="* A quick fix to get you through the season, but with a high chance the breakdown will return"/>
-        <text name="ads_option_menu_repair_type_replacement_description" text="* Standard replacement of the failed component"/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Temporary repair intended to keep the machine operational for urgent work. Quickly and inexpensively restores basic functionality, however the fault remains unresolved and will reappear after some time."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Standard replacement of the failed component. Fully eliminates the current fault and restores the affected unit to normal operating condition."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* In-depth repair including replacement of the failed component and servicing of related parts within the system. Significantly reduces the risk of repeated faults in the affected system."/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Rebuilds the selected system to a good operating condition. Faster and less expensive than a full-vehicle overhaul."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Comprehensive work on all major components. Restores Condition to good level."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Complete remanufacturing. High cost and duration, but restores Condition to excellent level."/>

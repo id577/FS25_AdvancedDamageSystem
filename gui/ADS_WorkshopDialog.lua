@@ -154,11 +154,21 @@ function ADS_WorkshopDialog:updateScreen()
     -- 4: Action Buttons
     -- ====================================================================
 
+    local hasSystemEligibleForOverhaul = false
+    if spec.systems ~= nil then
+        for _, systemData in pairs(spec.systems) do
+            if type(systemData) == "table" and systemData.enabled ~= false and (tonumber(systemData.condition) or 1.0) < 0.5 then
+                hasSystemEligibleForOverhaul = true
+                break
+            end
+        end
+    end
+
     if g_workshopScreen.isDealer or g_workshopScreen.isOwnWorkshop then
         self.inscpectionButton.disabled = buttonsDisabled 
         self.maintenanceButton.disabled = buttonsDisabled
         self.repairButton.disabled = buttonsDisabled
-        self.overhaulButton.disabled = buttonsDisabled or self.vehicle:getConditionLevel() >= 0.5
+        self.overhaulButton.disabled = buttonsDisabled or not hasSystemEligibleForOverhaul
     else
         self.inscpectionButton.disabled = false or spec.currentState ~= STATUS.READY
         self.maintenanceButton.disabled = not (g_workshopScreen.isMobileWorkshop and spec.maintainability >= 1.1) or spec.currentState ~= STATUS.READY
