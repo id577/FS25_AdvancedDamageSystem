@@ -264,11 +264,25 @@ function ADS_WorkshopDialog:populateCellForItemInSection(list, section, index, c
     local data = self.activeBreakdowns[breadownId]
     if data == nil then return end
 
-    local part_key = self.breakdonRegistry[breadownId].system
+    local part_key = self.breakdonRegistry[breadownId].part or self.breakdonRegistry[breadownId].system
     local stage_key = self.breakdonRegistry[breadownId].stages[data.stage].severity
     local description_key = self.breakdonRegistry[breadownId].stages[data.stage].description
     local price = self.vehicle:getBreakdownRepairPrice(breadownId, data.stage, AdvancedDamageSystem.PART_TYPES.OEM)
     local selected = data.isSelectedForRepair
+
+    local stageText = ""
+    local descriptionText = ""
+
+    if data.isActive == false and data.source == AdvancedDamageSystem.BREAKDOWN_SOURCES.QUICK_FIX then
+        stageText = g_i18n:getText("ads_breakdowns_quick_fix_stage")
+        descriptionText = g_i18n:getText("ads_breakdowns_temporarily_repaired_description")
+    elseif data.isActive == false and data.source == AdvancedDamageSystem.BREAKDOWN_SOURCES.POOR_PARTS then
+        stageText = g_i18n:getText("ads_breakdowns_defected_parts_stage")
+        descriptionText = g_i18n:getText("ads_breakdowns_defected_parts_detected_description")
+    else
+        stageText = g_i18n:getText(stage_key)
+        descriptionText = g_i18n:getText(description_key)
+    end
 
     if data.stage == 1 then
         cell:getAttribute("ads_tableBreakdownStage"):setTextColor(1, 1, 1, 1)
@@ -281,8 +295,8 @@ function ADS_WorkshopDialog:populateCellForItemInSection(list, section, index, c
     end
 
     cell:getAttribute("ads_tableBreakdownName"):setText(g_i18n:getText(part_key))
-    cell:getAttribute("ads_tableBreakdownDisc"):setText(g_i18n:getText(description_key))
-    cell:getAttribute("ads_tableBreakdownStage"):setText(g_i18n:getText(stage_key))
+    cell:getAttribute("ads_tableBreakdownDisc"):setText(descriptionText)
+    cell:getAttribute("ads_tableBreakdownStage"):setText(stageText)
     cell:getAttribute("ads_tableBreakdownPrice"):setText(g_i18n:formatMoney(price))
     
     

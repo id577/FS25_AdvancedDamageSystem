@@ -109,6 +109,41 @@
         <text name="ads_breakdowns_severity_major" text="Major"/>
         <text name="ads_breakdowns_severity_critical" text="Critical"/>
         <text name="ads_breakdowns_general_wear_stage1_description" text="The accumulated stress of years of hard work. Minor, irreversible wear on core components slightly reduces overall performance."/>
+        <text name="ads_breakdowns_part_vehicle" text="Vehicle"/>
+        <text name="ads_breakdowns_part_consumables" text="Consumables"/>
+        <text name="ads_breakdowns_part_engine" text="Engine"/>
+        <text name="ads_breakdowns_part_battery" text="Battery"/>
+        <text name="ads_breakdowns_part_ecu" text="ECU"/>
+        <text name="ads_breakdowns_part_wiring" text="Wiring and connectors"/>
+        <text name="ads_breakdowns_part_alternator_regulator" text="Alternator regulator"/>
+        <text name="ads_breakdowns_part_turbocharger" text="Turbocharger"/>
+        <text name="ads_breakdowns_part_oil_pump" text="Oil pump"/>
+        <text name="ads_breakdowns_part_valve_train" text="Valve train"/>
+        <text name="ads_breakdowns_part_clutch" text="Clutch"/>
+        <text name="ads_breakdowns_part_synchronizer" text="Synchronizer"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift hydraulic pump"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="CVT chain"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT hydraulic control valve"/>
+        <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulic pump"/>
+        <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulic cylinder"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="PTO clutch"/>
+        <text name="ads_breakdowns_part_brake_system" text="Brake system"/>
+        <text name="ads_breakdowns_part_wheel_bearing" text="Wheel bearing"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="Steering linkage"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="Track tensioner"/>
+        <text name="ads_breakdowns_part_thermostat" text="Thermostat"/>
+        <text name="ads_breakdowns_part_cooling_system" text="Cooling system"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="Fan clutch"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="Fuel pump"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="Fuel injectors"/>
+        <text name="ads_breakdowns_part_fuel_filter" text="Fuel filter"/>
+        <text name="ads_breakdowns_part_fuel_line" text="Fuel line"/>
+        <text name="ads_breakdowns_part_harvest_processing_system" text="Harvest processing system"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Unloading auger"/>
+        <text name="ads_breakdowns_quick_fix_stage" text="Patched"/>
+        <text name="ads_breakdowns_defected_parts_stage" text="Defective"/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="The unit is functioning normally, but diagnostics have revealed a defective part. Due to a critically low safety margin, preventive replacement is recommended to avoid sudden failure."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="The unit is functioning normally, but relies entirely on a quick repair of the worn elements. To avoid an inevitable breakdown under load, a full replacement of the parts is recommended as soon as possible."/>
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Engine protection mode"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="Engine limp mode active! Power reduced!"/>
         <text name="ads_breakdowns_overheat_protection_stage2_description" text="Engine protection mode"/>
@@ -272,6 +307,8 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Damaged gearbox or heavily worn belt. The auger struggles to turn, operating at a very low speed."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Drive belt snapped or gearbox seized. The unloading auger is completely jammed."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Unloading Auger Jammed"/>
+        <text name="ads_breakdowns_dead_battery_message" text="Battery charge depleted"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="Insufficient system voltage"/>
         <text name="ads_breakdowns_engine_stalled_message" text="Engine stalled"/>
         <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Gear disengage"/>
@@ -352,13 +389,12 @@
         <text name="ads_spec_overhaul_full" text="Full"/>
         <text name="ads_spec_repair_type_fix" text="Quick fix"/>
         <text name="ads_spec_repair_type_replacement" text="Standard"/>
-        <text name="ads_spec_repair_type_with_related_parts" text="Full replacement"/>
 
         <text name="ads_option_menu_option_one_title_inspection" text="Select inspection type"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Repair discovered faults"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Select maintenance level"/>
         <text name="ads_option_menu_option_two_title_maintenance" text="Select consumables quality"/>
-        <text name="ads_option_menu_option_one_title_repair" text="Select repair urgency"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Select repair type"/>
         <text name="ads_option_menu_option_two_title_repair" text="Select spare parts quality"/>
         <text name="ads_option_menu_option_one_title_overhaul" text="Select scope of work"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="Select system"/>
@@ -377,7 +413,6 @@
         <text name="ads_option_menu_maintenance_preventive_description" text="* Preventive maintenance beyond standard manufacturer service. Restores Service Level to normal and addresses the most problematic systems to reduce breakdown risk."/>
         <text name="ads_option_menu_repair_type_fix_description" text="* A quick fix to get you through the season, but with a high chance the breakdown will return"/>
         <text name="ads_option_menu_repair_type_replacement_description" text="* Standard replacement of the failed component"/>
-        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Repair with replacement of all related parts. Reduces the chance of repeated failure compared to a standard repair"/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Rebuilds the selected system to a good operating condition. Faster and less expensive than a full-vehicle overhaul."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Comprehensive work on all major components. Restores Condition to good level."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Complete remanufacturing. High cost and duration, but restores Condition to excellent level."/>
@@ -388,6 +423,7 @@
         <text name="ads_option_menu_perform_repair" text="Repair any faults found"/>
         <text name="ads_option_menu_perform_maintenance" text="Perform maintenance after repair"/>
         <text name="ads_option_menu_perform_renew_paint" text="Renew paintwork"/>
+        <text name="ads_option_menu_choosen_parts_text" text="* Choosen for repair:"/>
 
         <text name="ads_report_header_title" text="Inspection Report"/>
         <text name="ads_report_vehicle_name_title" text="Vehicle Name"/>
@@ -437,7 +473,9 @@
         <text name="ads_report_stress_moderate" text="Moderate"/>
         <text name="ads_report_stress_elevated" text="Elevated"/>
         <text name="ads_report_stress_high" text="High"/>
-        <text name="ads_report_recommendation_repair_active_breakdowns" text="Faults detected. Repair all active faults."/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Active faults detected. Standard repair of all active faults is recommended."/>
+        <text name="ads_report_recommendation_defective_parts" text="Defective replacement parts detected: %s. Preventive replacement is recommended to avoid sudden failure."/>
+        <text name="ads_report_recommendation_quick_fix" text="Temporary repair condition detected: %s. Standard replacement is recommended at the earliest opportunity."/>
         <text name="ads_report_recommendation_service_due" text="Service interval threshold reached. Perform maintenance."/>
         <text name="ads_report_recommendation_service_urgent" text="Service interval has been violated. Perform maintenance urgently!"/>
         <text name="ads_report_recommendation_overhaul" text="Degradation of core components detected. Perform an overhaul."/>

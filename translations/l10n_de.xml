@@ -292,7 +292,6 @@
         <text name="ads_spec_overhaul_full" text="Voll"/>
         <text name="ads_spec_repair_type_fix" text="Notlösung"/>
         <text name="ads_spec_repair_type_replacement" text="Standard"/>
-        <text name="ads_spec_repair_type_with_related_parts" text="Komplettersatz"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Wählen Sie den Inspektionstyp aus"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Beheben Sie festgestellte Fehler"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Wartungsstufe auswählen"/>
@@ -317,7 +316,6 @@
         <text name="ads_option_menu_maintenance_extended_description" text="* Umfassender Service. Dauert länger und kostet mehr, steigert aber das Serviceniveau um zusätzliche ~20 %"/>
         <text name="ads_option_menu_repair_type_fix_description" text="* Eine schnelle Reparatur, um die Saison zu überstehen, aber mit hoher Wahrscheinlichkeit, dass der Defekt zurückkehrt"/>
         <text name="ads_option_menu_repair_type_replacement_description" text="* Standardaustausch des defekten Bauteils"/>
-        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Reparatur mit Austausch aller zugehörigen Teile. Stellt den Gesamtzustand des Subsystems leicht wieder her"/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Stellt den normalen Zustand wieder her und erfordert weniger Zeit und Ressourcen als eine vollständige Überholung."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Umfassende Arbeiten an allen wichtigen Komponenten. Stellt den Zustand auf ein gutes Niveau wieder her."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Komplette Überholung. Hohe Kosten und Dauer, aber stellt den Zustand auf ein ausgezeichnetes Niveau wieder her."/>

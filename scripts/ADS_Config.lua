@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 89,
+    VER = 91,
 
     DEBUG = false,
 
@@ -170,6 +170,7 @@ ADS_Config = {
 
         STRESS_COOLDOWN = 0.65,
         CONDITION_EFFECTIVE_FLOOR = 0.10,
+        REPEAT_BREAKDOWN_TIME = 1.3 * 3600000,
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 15,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
@@ -206,9 +207,7 @@ ADS_Config = {
         RELIABILITY_YEAR_FACTOR = 0.01,
         RELIABILITY_YEAR_FACTOR_THRESHOLD = 2000,
 
-        BASE_BREAKDOWN_PROGRESS_TIME = 3600000,
-        PLANNED_BREAKDOWN_TIME = 4800000,
-
+        BASE_BREAKDOWN_PROGRESS_TIME = 1 * 3600000,
         BREAKDOWN_PROBABILITIES = {
             STRESS_THRESHOLD = 0.2,
             MIN_MTBF = 60,
@@ -260,13 +259,12 @@ ADS_Config = {
             [1] = 1.0,  STANDARD = 1.0,
             [2] = 0.25, MINIMAL  = 0.25,
             [3] = 1.5,  EXTENDED = 1.5,
-            [4] = 1.75,  PREVENTIVE = 1.75,
+            [4] = 2.0,  PREVENTIVE = 2.0,
         },
         REPAIR_TIME = 4 * 3600000,
         REPAIR_TIME_MULTIPLIERS = {
-            [1] = 1.0, MEDIUM = 1.0,
-            [2] = 0.3, LOW   = 0.3,
-            [3] = 2.0, HIGH    = 2.0,
+            [1] = 0.3, LOW    = 0.3,
+            [2] = 1.0, MEDIUM = 1.0,
         },
         OVERHAUL_TIME = 24 * 3600000,
         OVERHAUL_TIME_MULTIPLIERS = {
@@ -318,13 +316,12 @@ ADS_Config = {
             [1] = 1.0,  STANDARD = 1.0,
             [2] = 0.65, MINIMAL  = 0.65,
             [3] = 1.25, EXTENDED = 1.25,
-            [4] = 2.5,  PREVENTIVE = 2.5,
+            [4] = 4.0,  PREVENTIVE = 4.0,
         },
 
         REPAIR_PRICE_MULTIPLIERS = {
-            [1] = 1.0, MEDIUM = 1.0,
-            [2] = 0.2, LOW    = 0.2,
-            [3] = 2.0, HIGH   = 2.0,
+            [1] = 0.2, LOW    = 0.2,
+            [2] = 1.0, MEDIUM = 1.0,
         },
         OVERHAUL_PRICE_MULTIPLIERS = {
             [1] = 0.5, STANDARD = 0.5,

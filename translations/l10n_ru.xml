@@ -292,7 +292,6 @@
         <text name="ads_spec_overhaul_full" text="Полный"/>
         <text name="ads_spec_repair_type_fix" text="На коленке"/>
         <text name="ads_spec_repair_type_replacement" text="Стандарт"/>
-        <text name="ads_spec_repair_type_with_related_parts" text="Полная замена"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Выберите тип проверки"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Ремонт обнаруженных неисправностей"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Выберите уровень обслуживания"/>
@@ -317,7 +316,6 @@
         <text name="ads_option_menu_maintenance_extended_description" text="* Комплексное обслуживание. Это занимает больше времени и стоит дороже, но повышает уровень обслуживания еще примерно на 20 %."/>
         <text name="ads_option_menu_repair_type_fix_description" text="* Заполняющие работы, когда механики свободны. Занимает на 50 % больше времени, но предлагает 10 % скидку на работу."/>
         <text name="ads_option_menu_repair_type_replacement_description" text="* Стандартный график семинаров. Сбалансированная стоимость рабочей силы и продолжительность ремонта."/>
-        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Аварийно-ремонтная бригада. Сокращает время простоя на 50%, но увеличивает затраты на рабочую силу на 10%."/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Восстанавливает состояние до нормального уровня и требует меньше времени и ресурсов, чем полный капитальный ремонт."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Комплексная работа по всем основным компонентам. Восстанавливает состояние до хорошего уровня."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Полная переработка. Высокая стоимость и длительность, но восстанавливает Состояние до отличного уровня."/>

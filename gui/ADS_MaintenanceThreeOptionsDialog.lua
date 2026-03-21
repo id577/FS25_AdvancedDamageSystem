@@ -24,6 +24,7 @@ function ADS_MaintenanceThreeOptionsDialog.new(target, customMt)
     local dialog = MessageDialog.new(target, customMt or ADS_MaintenanceThreeOptionsDialog_mt)
     dialog.vehicle = nil
     dialog.overhaulSystemValues = nil
+    dialog.optionOneValues = nil
     dialog.serviceInfoData = {}
     return dialog
 end
@@ -124,29 +125,67 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
     -- option one
     local optionOneText = ""
     local optionOneOptions = {}
+    local optionOneValues = {}
+    local choosenPartsForQuickFix = {}
+    local choosenPartsForRepair = {}
 
     if self.maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
         optionOneText = g_i18n:getText("ads_option_menu_option_one_title_maintenance")
-        optionOneOptions = {
-            g_i18n:getText(AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD),
-            g_i18n:getText(AdvancedDamageSystem.MAINTENANCE_TYPES.MINIMAL),
-            g_i18n:getText(AdvancedDamageSystem.MAINTENANCE_TYPES.EXTENDED),
-            g_i18n:getText(AdvancedDamageSystem.MAINTENANCE_TYPES.PREVENTIVE)
+        optionOneValues = {
+            AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD,
+            AdvancedDamageSystem.MAINTENANCE_TYPES.MINIMAL,
+            AdvancedDamageSystem.MAINTENANCE_TYPES.EXTENDED,
+            AdvancedDamageSystem.MAINTENANCE_TYPES.PREVENTIVE
         }
     elseif self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
         optionOneText = g_i18n:getText("ads_option_menu_option_one_title_repair")
-        optionOneOptions = {
-            g_i18n:getText(AdvancedDamageSystem.REPAIR_TYPES.LOW),
-            g_i18n:getText(AdvancedDamageSystem.REPAIR_TYPES.MEDIUM),
-            g_i18n:getText(AdvancedDamageSystem.REPAIR_TYPES.HIGH)
-        }
+
+        local isHaveBreakdownToBeQuickFixed = false
+        local isHaveBreakdownToBeReplaced = false
+        local activeBreakdowns = self.vehicle:getActiveBreakdowns()
+        local breakdownRegistry = ADS_Breakdowns.BreakdownRegistry
+        for breakdownId, breakdownData in pairs(activeBreakdowns) do
+            if breakdownData.isSelectedForRepair and breakdownData.isVisible then
+                if breakdownData.isActive then
+                    isHaveBreakdownToBeQuickFixed = true
+                    isHaveBreakdownToBeReplaced = true
+                    table.insert(choosenPartsForQuickFix, breakdownRegistry[breakdownId].part)
+                    table.insert(choosenPartsForRepair, breakdownRegistry[breakdownId].part)
+                else 
+                    isHaveBreakdownToBeReplaced = true
+                    table.insert(choosenPartsForRepair, breakdownRegistry[breakdownId].part)
+                end
+            end
+        end
+
+        if isHaveBreakdownToBeQuickFixed then
+            table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.LOW)
+        end
+        if isHaveBreakdownToBeReplaced then
+            table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.MEDIUM)
+        end
+
     else
         optionOneText = g_i18n:getText("ads_option_menu_option_one_title_overhaul")
-        optionOneOptions = {
-            g_i18n:getText(AdvancedDamageSystem.OVERHAUL_TYPES.STANDARD),
-            g_i18n:getText(AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL),
-            g_i18n:getText(AdvancedDamageSystem.OVERHAUL_TYPES.FULL)
+        optionOneValues = {
+            AdvancedDamageSystem.OVERHAUL_TYPES.STANDARD,
+            AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL,
+            AdvancedDamageSystem.OVERHAUL_TYPES.FULL
         }
+    end
+
+    for _, optionValue in ipairs(optionOneValues) do
+        table.insert(optionOneOptions, g_i18n:getText(optionValue))
+    end
+
+    self.optionOneValues = optionOneValues
+    if self.optionOneValues[1] == nil then
+        self.selectedOptionOne = nil
+    elseif ADS_Utils.getIndexByValue(self.optionOneValues, self.selectedOptionOne) == nil then
+        self.selectedOptionOne = self.optionOneValues[1]
+        if self.optionOne.setState ~= nil then
+            self.optionOne:setState(1)
+        end
     end
 
     self.optionOneText:setText(optionOneText)
@@ -189,12 +228,8 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
     if self.optionOne ~= nil and self.optionOne.getState ~= nil then
         local optionOneState = tonumber(self.optionOne:getState())
         if optionOneState ~= nil then
-            if self.maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE and AdvancedDamageSystem.MAINTENANCE_TYPES[optionOneState] ~= nil then
-                self.selectedOptionOne = AdvancedDamageSystem.MAINTENANCE_TYPES[optionOneState]
-            elseif self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR and AdvancedDamageSystem.REPAIR_TYPES[optionOneState] ~= nil then
-                self.selectedOptionOne = AdvancedDamageSystem.REPAIR_TYPES[optionOneState]
-            elseif self.maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL and AdvancedDamageSystem.OVERHAUL_TYPES[optionOneState] ~= nil then
-                self.selectedOptionOne = AdvancedDamageSystem.OVERHAUL_TYPES[optionOneState]
+            if self.optionOneValues ~= nil and self.optionOneValues[optionOneState] ~= nil then
+                self.selectedOptionOne = self.optionOneValues[optionOneState]
             end
         end
     end
@@ -257,13 +292,27 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
             g_i18n:getText("ads_option_menu_maintenance_preventive_description")
         }
         self.optionOneDisclaimer:setText(optionOneDisclaimers[ADS_Utils.getIndexByValue(AdvancedDamageSystem.MAINTENANCE_TYPES, self.selectedOptionOne)] or "")
+        self.choosenPartsText:setVisible(false)
     elseif self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
-        optionOneDisclaimers = {
-            g_i18n:getText("ads_option_menu_repair_type_fix_description"),
-            g_i18n:getText("ads_option_menu_repair_type_replacement_description"),
-            g_i18n:getText("ads_option_menu_repair_type_with_related_parts_description")
-        }
-        self.optionOneDisclaimer:setText(optionOneDisclaimers[ADS_Utils.getIndexByValue(AdvancedDamageSystem.REPAIR_TYPES, self.selectedOptionOne)] or "")
+        local choosenPartsText = g_i18n:getText("ads_option_menu_choosen_parts_text")
+        local choosenPartsLabels = {}
+        if self.selectedOptionOne == AdvancedDamageSystem.REPAIR_TYPES.LOW then
+            for _, part in ipairs(choosenPartsForQuickFix) do
+                table.insert(choosenPartsLabels, g_i18n:getText(part))
+            end
+            self.optionOneDisclaimer:setText(g_i18n:getText("ads_option_menu_repair_type_fix_description"))
+        else
+            for _, part in ipairs(choosenPartsForRepair) do
+                table.insert(choosenPartsLabels, g_i18n:getText(part))
+            end
+            self.optionOneDisclaimer:setText(g_i18n:getText("ads_option_menu_repair_type_replacement_description"))
+        end
+        if #choosenPartsLabels > 0 then
+            choosenPartsText = choosenPartsText .. " " .. table.concat(choosenPartsLabels, ", ")
+        end
+        self.choosenPartsText:setTextColor(0.88, 0.45, 0.10, 1)
+        self.choosenPartsText:setText(choosenPartsText)
+        self.choosenPartsText:setVisible(true)
     else
         optionOneDisclaimers = {
             g_i18n:getText("ads_option_menu_overhaul_standard_description"),
@@ -271,6 +320,7 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
             g_i18n:getText("ads_option_menu_overhaul_full_description")
         }
         self.optionOneDisclaimer:setText(optionOneDisclaimers[ADS_Utils.getIndexByValue(AdvancedDamageSystem.OVERHAUL_TYPES, self.selectedOptionOne)] or "")
+        self.choosenPartsText:setVisible(false)
     end
 
     if self.maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
@@ -302,12 +352,8 @@ end
 -- ====================================================================
 
 function ADS_MaintenanceThreeOptionsDialog:onClickOptionOne(index)
-    if self.maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
-        self.selectedOptionOne = AdvancedDamageSystem.MAINTENANCE_TYPES[index]
-    elseif self.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
-        self.selectedOptionOne = AdvancedDamageSystem.REPAIR_TYPES[index]
-    elseif self.maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
-        self.selectedOptionOne = AdvancedDamageSystem.OVERHAUL_TYPES[index]
+    if self.optionOneValues ~= nil and self.optionOneValues[index] ~= nil then
+        self.selectedOptionOne = self.optionOneValues[index]
     end
     self:updateScreen()
 end

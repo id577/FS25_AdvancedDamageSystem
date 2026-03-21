@@ -292,7 +292,6 @@
         <text name="ads_spec_overhaul_full" text="Pieno"/>
         <text name="ads_spec_repair_type_fix" text="Arrangiato"/>
         <text name="ads_spec_repair_type_replacement" text="Standard"/>
-        <text name="ads_spec_repair_type_with_related_parts" text="Sostituzione totale"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Seleziona il tipo di ispezione"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Riparare i difetti rilevati"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Seleziona il livello di manutenzione"/>
@@ -317,7 +316,6 @@
         <text name="ads_option_menu_maintenance_extended_description" text="* Servizio completo. Richiede più tempo e costa di più, ma aumenta il livello di servizio di un ulteriore 20% circa"/>
         <text name="ads_option_menu_repair_type_fix_description" text="* Una riparazione rapida per arrivare a fine stagione, ma con alta probabilità che il guasto si ripresenti"/>
         <text name="ads_option_menu_repair_type_replacement_description" text="* Sostituzione standard del componente guasto"/>
-        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Riparazione con sostituzione di tutte le parti correlate. Ripristina leggermente lo stato generale del sottosistema"/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Ripristina le condizioni al livello normale e richiede meno tempo e risorse rispetto a una revisione completa."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Lavoro completo su tutti i componenti principali. Ripristina le condizioni a un buon livello."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Rigenerazione completa. Costo e durata elevati, ma ripristinano le condizioni a un livello eccellente."/>

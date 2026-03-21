@@ -34,7 +34,41 @@ local RECOMMENDATION_RULES = {
             if metrics == nil then
                 return false
             end
-            return (metrics.visibleSelectableBreakdownsCount or 0) > 0
+            return (metrics.visibleSelectableActiveBreakdownsCount or 0) > 0
+        end
+    },
+    {
+        l10nKey = "ads_report_recommendation_defective_parts",
+        check = function(vehicle, reportEntry, metrics)
+            if metrics == nil then
+                return false
+            end
+
+            local partsText = joinRecommendationParts(metrics.inactivePoorPartsNames)
+            if partsText ~= nil then
+                return {
+                    params = {partsText}
+                }
+            end
+
+            return false
+        end
+    },
+    {
+        l10nKey = "ads_report_recommendation_quick_fix",
+        check = function(vehicle, reportEntry, metrics)
+            if metrics == nil then
+                return false
+            end
+
+            local partsText = joinRecommendationParts(metrics.inactiveQuickFixPartsNames)
+            if partsText ~= nil then
+                return {
+                    params = {partsText}
+                }
+            end
+
+            return false
         end
     },
     {
@@ -108,7 +142,7 @@ local RECOMMENDATION_RULES = {
     {
         l10nKey = "ads_report_recommendation_system_preventive_maintenance",
         check = function(vehicle, reportEntry, metrics)
-            if reportEntry == nil or reportEntry.conditionData == nil or not metrics.isCompleteInspection then
+            if reportEntry == nil or reportEntry.conditionData == nil or metrics == nil or not metrics.isCompleteInspection then
                 return false
             end
 
@@ -228,6 +262,24 @@ local function padRowsToCount(rows, minRows, makePaddingRow)
     while #rows < minRows do
         table.insert(rows, makePaddingRow())
     end
+end
+
+local function appendUniqueText(list, seen, value)
+    if value == nil or value == "" or seen[value] then
+        return
+    end
+
+    seen[value] = true
+    table.insert(list, value)
+end
+
+local function joinRecommendationParts(parts)
+    if type(parts) ~= "table" or #parts == 0 then
+        return nil
+    end
+
+    table.sort(parts)
+    return table.concat(parts, ", ")
 end
 
 local function buildRecommendationsData(vehicle, reportEntry, metrics)
@@ -727,11 +779,16 @@ function ADS_ReportDialog:updateScreen()
 
     local reportMetrics = {
         visibleSelectableBreakdownsCount = 0,
+        visibleSelectableActiveBreakdownsCount = 0,
         wearRate = wearRate,
         nominalWearRate = nominalWearRate,
         hasPoorQualityConsumablesBreakdown = false,
-        isCompleteInspection = self.isCompleteInspection == true
+        isCompleteInspection = self.isCompleteInspection == true,
+        inactivePoorPartsNames = {},
+        inactiveQuickFixPartsNames = {}
     }
+    local inactivePoorPartsSeen = {}
+    local inactiveQuickFixSeen = {}
 
     local reportActiveBreakdowns = (self.lastReport.conditionData and self.lastReport.conditionData.activeBreakdowns) or {}
     local breakdownIds = {}
@@ -753,9 +810,28 @@ function ADS_ReportDialog:updateScreen()
             local stage = breakdownData.stage or 1
             local stageData = registryEntry.stages and registryEntry.stages[stage]
             if stageData ~= nil then
-                local partText = g_i18n:getText(registryEntry.system)
+                local partKey = registryEntry.part or registryEntry.system
+                local partText = partKey ~= nil and g_i18n:getText(partKey) or tostring(breakdownId)
+
+                if breakdownData.isActive ~= false then
+                    reportMetrics.visibleSelectableActiveBreakdownsCount = reportMetrics.visibleSelectableActiveBreakdownsCount + 1
+                elseif breakdownData.source == AdvancedDamageSystem.BREAKDOWN_SOURCES.POOR_PARTS then
+                    appendUniqueText(reportMetrics.inactivePoorPartsNames, inactivePoorPartsSeen, partText)
+                elseif breakdownData.source == AdvancedDamageSystem.BREAKDOWN_SOURCES.QUICK_FIX then
+                    appendUniqueText(reportMetrics.inactiveQuickFixPartsNames, inactiveQuickFixSeen, partText)
+                end
+
                 local severityText = g_i18n:getText(stageData.severity)
                 local descriptionText = g_i18n:getText(stageData.description)
+
+                if breakdownData.isActive == false and breakdownData.source == AdvancedDamageSystem.BREAKDOWN_SOURCES.QUICK_FIX then
+                    severityText = g_i18n:getText("ads_breakdowns_quick_fix_stage")
+                    descriptionText = g_i18n:getText("ads_breakdowns_temporarily_repaired_description")
+                elseif breakdownData.isActive == false and breakdownData.source == AdvancedDamageSystem.BREAKDOWN_SOURCES.POOR_PARTS then
+                    severityText = g_i18n:getText("ads_breakdowns_defected_parts_stage")
+                    descriptionText = g_i18n:getText("ads_breakdowns_defected_parts_detected_description")
+                end
+
                 table.insert(self.breakdownsData, string.format("- %s (%s): %s", partText, severityText, descriptionText))
             end
         end

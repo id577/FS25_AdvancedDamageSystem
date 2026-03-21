@@ -292,7 +292,6 @@
         <text name="ads_spec_overhaul_full" text="Plný"/>
         <text name="ads_spec_repair_type_fix" text="Provizorní"/>
         <text name="ads_spec_repair_type_replacement" text="Standardní"/>
-        <text name="ads_spec_repair_type_with_related_parts" text="Kompletní výměna"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Vyberte typ kontroly"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Opravou zjištěné závady"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Vyberte úroveň údržby"/>
@@ -317,7 +316,6 @@
         <text name="ads_option_menu_maintenance_extended_description" text="* Komplexní servis. Trvá déle a stojí více, ale zvyšuje úroveň služeb o dalších ~20 %"/>
         <text name="ads_option_menu_repair_type_fix_description" text="* Rychlá oprava, která vás dostane do konce sezóny, ale s vysokou pravděpodobností, že se porucha vrátí"/>
         <text name="ads_option_menu_repair_type_replacement_description" text="* Standardní výměna poškozeného dílu"/>
-        <text name="ads_option_menu_repair_type_with_related_parts_description" text="* Oprava s výměnou všech souvisejících dílů. Mírně obnovuje celkový stav subsystému"/>    
         <text name="ads_option_menu_overhaul_partial_description" text="* Obnoví stav na normální úroveň a zabere méně času a prostředků než úplná oprava."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Komplexní práce na všech hlavních komponentách. Obnovuje stav na dobrou úroveň."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Kompletní renovace. Vysoká cena a doba trvání, ale obnovuje stav na vynikající úroveň."/>

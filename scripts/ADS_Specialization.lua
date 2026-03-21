@@ -52,6 +52,12 @@ AdvancedDamageSystem = {
         [8] = "ads_spec_system_fuel"
     },
 
+    BREAKDOWN_SOURCES = {
+        RANDOM = 1,
+        POOR_PARTS = 2,
+        QUICK_FIX = 3
+    },
+
     WORKSHOP = {
     DEALER  = "ads_spec_workshop_dealer",
     MOBILE  = "ads_spec_workshop_mobile",
@@ -93,12 +99,10 @@ AdvancedDamageSystem = {
     },
 
     REPAIR_TYPES = {
-    MEDIUM = "ads_spec_repair_type_replacement",
     LOW    = "ads_spec_repair_type_fix",
-    HIGH   = "ads_spec_repair_type_with_related_parts",
+    MEDIUM = "ads_spec_repair_type_replacement",
     [1] = "ads_spec_repair_type_fix",
     [2] = "ads_spec_repair_type_replacement",
-    [3] = "ads_spec_repair_type_with_related_parts",
     },
 
     OVERHAUL_TYPES = {
@@ -384,6 +388,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getRandomBreakdownBySystem", AdvancedDamageSystem.getRandomBreakdownBySystem)
     SpecializationUtil.registerFunction(vehicleType, "getRandomBreakdown", AdvancedDamageSystem.getRandomBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "addBreakdown", AdvancedDamageSystem.addBreakdown)
+    SpecializationUtil.registerFunction(vehicleType, "suspendBreakdown", AdvancedDamageSystem.suspendBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "removeBreakdown", AdvancedDamageSystem.removeBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "hasBreakdown", AdvancedDamageSystem.hasBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "hasSystemBreakdowns", AdvancedDamageSystem.hasSystemBreakdowns)
@@ -530,8 +535,6 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
             spec.systems[sysKey].condition = sysData.condition
             spec.systems[sysKey].stress = sysData.stress
             spec.systems[sysKey].enabled = sysData.enabled
-            spec.systems[sysKey].plannedBreakdown = sysData.plannedBreakdown
-            spec.systems[sysKey].plannedBreakdownTimer = sysData.plannedBreakdownTimer
         end
     end
 
@@ -701,8 +704,6 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
                     spec.systems[sysKey].condition = sysData.condition
                     spec.systems[sysKey].stress = sysData.stress
                     spec.systems[sysKey].enabled = sysData.enabled
-                    spec.systems[sysKey].plannedBreakdown = sysData.plannedBreakdown
-                    spec.systems[sysKey].plannedBreakdownTimer = sysData.plannedBreakdownTimer
                 end
             end
         end
@@ -849,14 +850,14 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem._prevConditionLevel = 0
 
     self.spec_AdvancedDamageSystem.systems = {
-        engine = { name = AdvancedDamageSystem.SYSTEMS.ENGINE, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
-        transmission = { name = AdvancedDamageSystem.SYSTEMS.TRANSMISSION, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
-        hydraulics = { name = AdvancedDamageSystem.SYSTEMS.HYDRAULICS, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
-        cooling = { name = AdvancedDamageSystem.SYSTEMS.COOLING, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
-        electrical = { name = AdvancedDamageSystem.SYSTEMS.ELECTRICAL, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
-        chassis = { name = AdvancedDamageSystem.SYSTEMS.CHASSIS, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
-        workprocess = { name = AdvancedDamageSystem.SYSTEMS.WORKPROCESS, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 },
-        fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true, plannedBreakdown = "", plannedBreakdownTimer = 0 }
+        engine = { name = AdvancedDamageSystem.SYSTEMS.ENGINE, condition = 1.0, stress = 0.0, enabled = true },
+        transmission = { name = AdvancedDamageSystem.SYSTEMS.TRANSMISSION, condition = 1.0, stress = 0.0, enabled = true },
+        hydraulics = { name = AdvancedDamageSystem.SYSTEMS.HYDRAULICS, condition = 1.0, stress = 0.0, enabled = true },
+        cooling = { name = AdvancedDamageSystem.SYSTEMS.COOLING, condition = 1.0, stress = 0.0, enabled = true },
+        electrical = { name = AdvancedDamageSystem.SYSTEMS.ELECTRICAL, condition = 1.0, stress = 0.0, enabled = true },
+        chassis = { name = AdvancedDamageSystem.SYSTEMS.CHASSIS, condition = 1.0, stress = 0.0, enabled = true },
+        workprocess = { name = AdvancedDamageSystem.SYSTEMS.WORKPROCESS, condition = 1.0, stress = 0.0, enabled = true },
+        fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true }
     }
     self.spec_AdvancedDamageSystem.factorStats = createEmptyFactorStats(self.spec_AdvancedDamageSystem.systems)
 
@@ -907,7 +908,6 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.rawSystemVoltageV = 12.7
     self.spec_AdvancedDamageSystem.systemVoltageV = 12.7
     self.spec_AdvancedDamageSystem.alternatorHealth = 1.0
-
 
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
@@ -1331,9 +1331,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 systemData = {
                     condition = tonumber(systemData) or 1.0,
                     stress = 0.0,
-                    enabled = true,
-                    plannedBreakdown = "",
-                    plannedBreakdownTimer = 0.0
+                    enabled = true
                 }
                 spec.systems[systemKey] = systemData
             end
@@ -1343,8 +1341,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 systemData.condition = math.clamp(tonumber(loadedData.condition) or systemData.condition or 1.0, 0.001, 1.0)
                 systemData.stress = math.max(tonumber(loadedData.stress) or systemData.stress or 0.0, 0.0)
                 systemData.enabled = ADS_Utils.normalizeBoolValue(loadedData.enabled, systemData.enabled ~= false)
-                systemData.plannedBreakdown = tostring(loadedData.plannedBreakdown or systemData.plannedBreakdown or "")
-                systemData.plannedBreakdownTimer = math.max(tonumber(loadedData.plannedBreakdownTimer) or systemData.plannedBreakdownTimer or 0.0, 0.0)
             else
                 if not hasSerializedSystemsState and spec.conditionLevel ~= nil then
                     systemData.condition = math.clamp(tonumber(spec.conditionLevel) or systemData.condition or 1.0, 0.001, 1.0)
@@ -1353,8 +1349,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
                 end
                 systemData.stress = math.max(tonumber(systemData.stress) or 0.0, 0.0)
                 systemData.enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
-                systemData.plannedBreakdown = tostring(systemData.plannedBreakdown or "")
-                systemData.plannedBreakdownTimer = math.max(tonumber(systemData.plannedBreakdownTimer) or 0.0, 0.0)
             end
 
             systemData.name = ADS_Utils.getSystemNameByKey(AdvancedDamageSystem.SYSTEMS, systemKey)
@@ -2051,12 +2045,10 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         table.sort(sortedKeys)
         for i, sysKey in ipairs(sortedKeys) do
             local sysData = spec.systems[sysKey]
-            local c = sysData.condition or 0
-            local s = sysData.stress    or 0
-            local e = sysData.enabled ~= false and 1 or 0
-            local p = sysData.plannedBreakdownTimer or 0
-            local b = (sysData.plannedBreakdown ~= nil and sysData.plannedBreakdown ~= "") and 1 or 0
-            prevSystemsHash = prevSystemsHash + (c + s * 0.001 + e * 0.0001 + p * 0.00001 + b * 0.000001) * i
+                local c = sysData.condition or 0
+                local s = sysData.stress    or 0
+                local e = sysData.enabled ~= false and 1 or 0
+                prevSystemsHash = prevSystemsHash + (c + s * 0.001 + e * 0.0001) * i
         end
     end
 
@@ -2072,7 +2064,6 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     else
         if self:getIsOperating() and self.propertyState ~= 4 then
             self:processBreakdowns(dt)
-            self:processPlannedBreakdowns(dt)
             self:tryTriggerBreakdown(dt)
             spec.isUnderRoof = self:isUnderRoof()
         end
@@ -2125,9 +2116,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
                 local c = sysData.condition or 0
                 local s = sysData.stress    or 0
                 local e = sysData.enabled ~= false and 1 or 0
-                local p = sysData.plannedBreakdownTimer or 0
-                local b = (sysData.plannedBreakdown ~= nil and sysData.plannedBreakdown ~= "") and 1 or 0
-                postSystemsHash = postSystemsHash + (c + s * 0.001 + e * 0.0001 + p * 0.00001 + b * 0.000001) * i
+                postSystemsHash = postSystemsHash + (c + s * 0.001 + e * 0.0001) * i
             end
         end
         if math.abs((spec.conditionLevel or 0) - (prevConditionLevel or 0)) > 0.001 or postSystemsHash ~= prevSystemsHash then
@@ -2449,7 +2438,7 @@ local function getBreakdownsStageSum(vehicle, system)
         local registryBreakdown = breadownsRegistry[breakdownId]
         if registryBreakdown ~= nil then
             local breakdownSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, registryBreakdown.system)
-            if breakdownSystemKey == targetSystemKey then
+            if breakdownSystemKey == targetSystemKey and breakdownData.isActive ~= false then
                 sumOfStages = sumOfStages + (tonumber(breakdownData.stage) or 0)
             end
         end
@@ -3121,29 +3110,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         end
 
         spec.hydraulicsMoveAlphaCache = nextMoveAlphaCache
-
-        if ADS_Config.DEBUG then
-            spec.hydraulicsImplementDebugTimer = (spec.hydraulicsImplementDebugTimer or 0) - dt
-            if spec.hydraulicsImplementDebugTimer <= 0 then
-                spec.hydraulicsImplementDebugTimer = 1000
-
-                for index, impl in ipairs(implements) do
-                    log_dbg(string.format(
-                        "Hydraulics implement[%d] head=%s mass=%.2f jointTypeId=%s isLowered=%s supportWheelCount=%d isMoving=%s isFoldMoving=%s isPlowRotationMoving=%s isCylinderedMoving=%s",
-                        index,
-                        tostring(impl.isHead),
-                        tonumber(impl.mass) or 0,
-                        tostring(impl.jointTypeId),
-                        tostring(impl.isLowered),
-                        tonumber(impl.supportWheelCount) or 0,
-                        tostring(impl.isMoving),
-                        tostring(impl.isFoldMoving),
-                        tostring(impl.isPlowRotationMoving),
-                        tostring(impl.isCylinderedMoving)
-                    ))
-                end
-            end
-        end
 
         local isImplementLifted = false
         local isImplementOperating = false
@@ -4046,14 +4012,6 @@ function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
     local applicableBreakdowns = {}
     local totalProbability = 0
 
-    local plannedBreakdownId = tostring(targetSystemData.plannedBreakdown or "")
-    if plannedBreakdownId ~= "" then
-        targetSystemData.plannedBreakdown = ""
-        if not activeBreakdowns[plannedBreakdownId] and ADS_Breakdowns.BreakdownRegistry[plannedBreakdownId] ~= nil then
-            return plannedBreakdownId
-        end
-    end
-
     for id, breakdownData in pairs(ADS_Breakdowns.BreakdownRegistry) do
         local breakdownSystem = breakdownData.system
         if type(breakdownSystem) == "string" and AdvancedDamageSystem.SYSTEMS[breakdownSystem] ~= nil then
@@ -4139,9 +4097,19 @@ function AdvancedDamageSystem:getRandomBreakdownBySystem(systemName)
     return nil
 end
 
-function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
+function AdvancedDamageSystem:addBreakdown(breakdownId, stageOrOptions)
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
+
+    local options
+    if type(stageOrOptions) == "table" then
+        options = stageOrOptions
+    else
+        options = {
+            stage = stageOrOptions,
+            isActive = true,
+        }
+    end
 
     local activeBreakdowns = self:getActiveBreakdowns()
     local breakdownRegistry = ADS_Breakdowns ~= nil and ADS_Breakdowns.BreakdownRegistry or nil
@@ -4151,8 +4119,10 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
     end
     
     local activeBreakdownsCount = 0
-    for _, _ in pairs(activeBreakdowns) do
-        activeBreakdownsCount = activeBreakdownsCount + 1
+    for _, breakdownData in pairs(activeBreakdowns) do
+        if type(breakdownData) == "table" and breakdownData.isActive ~= false then
+            activeBreakdownsCount = activeBreakdownsCount + 1
+        end
     end
 
     local registryEntry = breakdownRegistry[breakdownId]
@@ -4173,11 +4143,26 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
         spec.totalBreakdownsOccurred = (spec.totalBreakdownsOccurred or 0) + 1
     end
 
+    local currentIsActive = false
+    if options.isActive == nil then
+        currentIsActive = true
+    else
+        currentIsActive = options.isActive
+    end
+
+    local resumeTimer = math.max(tonumber(options.resumeTimer) or 0, 0)
+    if not currentIsActive and resumeTimer <= 0 then
+        resumeTimer = ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * (math.random() + 0.5)
+    end
+
     spec.activeBreakdowns[breakdownId] = {
-        stage = stage or 1,
-        progressTimer = 0,
-        isVisible = false,
-        isSelectedForRepair = true
+        stage = math.max(math.floor(tonumber(options.stage) or 1), 1),
+        progressTimer = math.max(tonumber(options.progressTimer) or 0, 0),
+        isVisible = ADS_Utils.normalizeBoolValue(options.isVisible, false),
+        isSelectedForRepair = ADS_Utils.normalizeBoolValue(options.isSelectedForRepair, true),
+        isActive = currentIsActive,
+        resumeTimer = resumeTimer,
+        source = options.source or AdvancedDamageSystem.BREAKDOWN_SOURCES.RANDOM
     }
     
     self:recalculateAndApplyEffects()
@@ -4188,6 +4173,28 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stage)
         if registryEntry.isSelectable == true and spec.adsDirtyFlag_service ~= nil then
             self:raiseDirtyFlags(spec.adsDirtyFlag_service)
         end
+    end
+end
+
+function AdvancedDamageSystem:suspendBreakdown(breakdownId, resumeTimer)
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec or not spec.activeBreakdowns then
+        return
+    end
+
+    local breakdown = spec.activeBreakdowns[breakdownId]
+    if breakdown == nil then
+        return
+    end
+
+    breakdown.isActive = false
+    breakdown.resumeTimer = math.max(tonumber(resumeTimer) or 0, 0)
+    breakdown.source = AdvancedDamageSystem.BREAKDOWN_SOURCES.QUICK_FIX
+
+    self:recalculateAndApplyEffects()
+
+    if self.isServer and spec.adsDirtyFlag_breakdown ~= nil then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
     end
 end
 
@@ -4295,8 +4302,20 @@ function AdvancedDamageSystem:processBreakdowns(dt)
         local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
 
         if registryEntry then
-            
-            if registryEntry.stages[breakdown.stage] then
+            breakdown.isActive = breakdown.isActive ~= false
+            breakdown.resumeTimer = math.max(tonumber(breakdown.resumeTimer) or 0, 0)
+
+            if not breakdown.isActive then
+                if breakdown.resumeTimer > 0 then
+                    breakdown.resumeTimer = math.max(breakdown.resumeTimer - dt, 0)
+                end
+
+                if breakdown.resumeTimer <= 0 then
+                    breakdown.resumeTimer = 0
+                    breakdown.isActive = true
+                    effectsNeedRecalculation = true
+                end
+            elseif registryEntry.stages[breakdown.stage] then
                 local stageData = registryEntry.stages[breakdown.stage]
                 
                 if stageData.progressMultiplier and stageData.progressMultiplier > 0 then
@@ -4633,26 +4652,6 @@ function AdvancedDamageSystem:processGeneralWearBreakdown()
     end
 end
 
-function AdvancedDamageSystem:processPlannedBreakdowns(dt)
-    local spec = self.spec_AdvancedDamageSystem
-    local systems = spec.systems
-    local effectsNeedRecalculation = false
-
-    for _, systemData in pairs(systems) do
-        if systemData.plannedBreakdownTimer > 0 then
-            systemData.plannedBreakdownTimer = math.max(systemData.plannedBreakdownTimer - dt, 0)
-        end
-        if systemData.plannedBreakdownTimer == 0 and systemData.plannedBreakdown ~= '' then
-            self:addBreakdown(systemData.plannedBreakdown)
-            systemData.plannedBreakdown = ''
-            effectsNeedRecalculation = true
-        end
-    end
-    if effectsNeedRecalculation then
-        self:recalculateAndApplyEffects()
-    end
-end
-
 function AdvancedDamageSystem:recalculateAndApplyEffects()
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return end
@@ -4673,7 +4672,7 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
 
         if registryEntry == nil then
             table.insert(unknownBreakdownIds, id)
-        elseif registryEntry.stages[breakdown.stage] then
+        elseif breakdown.isActive ~= false and registryEntry.stages[breakdown.stage] then
             local stageData = registryEntry.stages[breakdown.stage]
 
             if stageData.effects then
@@ -4887,13 +4886,15 @@ end
 
 --------------------- maintenance --------------------------------
 
-local function isBreakdownSelectedForPlayerRepair(breakdownId, breakdown)
+local function isBreakdownSelectedForPlayerRepair(breakdownId, breakdown, optionOne)
     local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
     if breakdownDef == nil or breakdownDef.isSelectable ~= true then
         return false
     end
 
-    return breakdown ~= nil and breakdown.isSelectedForRepair == true and breakdown.isVisible == true
+    local isSelectedForQuickFix = breakdown.isSelectedForRepair and breakdown.isVisible and (optionOne == AdvancedDamageSystem.REPAIR_TYPES.LOW and breakdown.isActive)
+    local isSelectedForStandartRepair = breakdown.isSelectedForRepair and breakdown.isVisible and optionOne == AdvancedDamageSystem.REPAIR_TYPES.MEDIUM
+    return isSelectedForStandartRepair or isSelectedForQuickFix
 end
 
 local function resetPendingServiceProgress(spec)
@@ -5013,7 +5014,6 @@ local function collectPreventiveMaintenanceStressTargets(vehicle)
             local currentStress = math.max(tonumber(systemData.stress) or 0, 0)
             local targetStress = math.min(currentStress, condition * targetMultiplier)
             local removableStress = currentStress - targetStress
-
             if removableStress > 0.0001 then
                 table.insert(candidates, {
                     systemKey = systemKey,
@@ -5129,7 +5129,7 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.REPAIR_TYPES, optionOne)
         local idsToRepair = {}
         for id, breakdown in pairs(self:getActiveBreakdowns()) do
-            if isBreakdownSelectedForPlayerRepair(id, breakdown) then
+            if isBreakdownSelectedForPlayerRepair(id, breakdown, optionOne) then
                 table.insert(idsToRepair, id)
             end
         end
@@ -5271,9 +5271,11 @@ function AdvancedDamageSystem:processService(dt)
                         if breakdownDef ~= nil and breakdownDef.stages ~= nil and breakdownDef.stages[breakdown.stage] ~= nil then
                             local chance = breakdownDef.stages[breakdown.stage].detectionChance or 0
                             if math.random() < chance then
-                                breakdown.isVisible = true
-                                breakdownsRevealed = true
-                                table.insert(spec.pendingSelectedBreakdowns, breakdownId)
+                                if breakdown.isActive or optionOne == AdvancedDamageSystem.INSPECTION_TYPES.COMPLETE then
+                                    breakdown.isVisible = true
+                                    breakdownsRevealed = true
+                                    table.insert(spec.pendingSelectedBreakdowns, breakdownId)
+                                end
                             end
                         end
                     end
@@ -5294,31 +5296,41 @@ function AdvancedDamageSystem:processService(dt)
                 spec.pendingProgressStepIndex = spec.pendingProgressStepIndex + 1
                 local breakdownId = spec.pendingRepairQueue[spec.pendingProgressStepIndex]
                 if breakdownId ~= nil and self:getActiveBreakdowns()[breakdownId] ~= nil then
-                    self:removeBreakdown(breakdownId)
                     table.insert(spec.pendingSelectedBreakdowns, breakdownId)
-                    --- new repair effects for systems
+
                     local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
                     local systemName = breakdownDef ~= nil and breakdownDef.system or nil
                     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemName)
                     local systemData = (systemKey ~= nil and systemKey ~= "" and spec.systems ~= nil) and spec.systems[systemKey] or nil
         
-                    if optionOne ~= AdvancedDamageSystem.REPAIR_TYPES.LOW then
+                    if optionOne == AdvancedDamageSystem.REPAIR_TYPES.LOW then
+                        local random = math.random()
+                        self:suspendBreakdown(breakdownId, ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * (random + 0.5))
+                    else
+                        local stage = self:getActiveBreakdowns()[breakdownId].stage
+                        self:removeBreakdown(breakdownId)
                         if systemData ~= nil then
                             markRepairStressReduction(spec, systemKey)
-                            systemData.plannedBreakdown = ""
-                            systemData.plannedBreakdownTimer = 0
                         else
                             log_dbg(string.format("Repair effect skipped: missing system mapping for breakdown '%s' (system='%s')", tostring(breakdownId), tostring(systemName)))
                         end
+                        --- roll for defected parts
+                        if optionTwo ~= AdvancedDamageSystem.PART_TYPES.PREMIUM then
+                            local defectChance = C.PARTS_BREAKDOWN_CHANCES[optionTwoKey]
+                            if math.random() < defectChance then
+                                self:addBreakdown(breakdownId, {
+                                    stage = stage,
+                                    isVisible = false,
+                                    isSelectedForRepair = true,
+                                    isActive = false,
+                                    resumeTimer =  ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * (math.random() + 0.5),
+                                    progressTimer = 0,
+                                    source = AdvancedDamageSystem.BREAKDOWN_SOURCES.POOR_PARTS
+                                })
+                            end
+                        end
                     end
-                    -- defects check after each repaired part
-                    if optionOne == AdvancedDamageSystem.REPAIR_TYPES.LOW or math.random() < C.PARTS_BREAKDOWN_CHANCES[optionTwoKey] then
-                        if systemData ~= nil and systemData.plannedBreakdown == '' then
-                            systemData.plannedBreakdown = breakdownId
-                            local random = math.random()
-                            systemData.plannedBreakdownTimer = ADS_Config.CORE.PLANNED_BREAKDOWN_TIME * (random + 0.5)
-                        end         
-                    end
+                    
                 end
             end
         end
@@ -5406,8 +5418,6 @@ function AdvancedDamageSystem:completeService()
                 if systemData ~= nil then
                     systemData.condition = math.clamp(tonumber(targetCondition) or systemData.condition or 1.0, 0.001, 1.0)
                     systemData.stress = 0
-                    systemData.plannedBreakdown = ""
-                    systemData.plannedBreakdownTimer = 0
                 end
             end
             self:updateConditionLevel()
@@ -5559,7 +5569,7 @@ function AdvancedDamageSystem:completeService()
         if nextWork == states.REPAIR then
             local repairQueueCount = 0
             for breakdownId, breakdown in pairs(self:getActiveBreakdowns()) do
-                if isBreakdownSelectedForPlayerRepair(breakdownId, breakdown) then
+                if isBreakdownSelectedForPlayerRepair(breakdownId, breakdown, optionOne) then
                     repairQueueCount = repairQueueCount + 1
                 end
             end
@@ -6994,7 +7004,7 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
         local activeBreakdowns = self:getActiveBreakdowns()
         
         for id, breakdown in pairs(activeBreakdowns) do
-            if breakdown.isSelectedForRepair and breakdown.isVisible then
+            if isBreakdownSelectedForPlayerRepair(id, breakdown, optionOne) then
                 local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
                 if registryEntry ~= nil then
                     repairPrice = repairPrice + registryEntry.stages[breakdown.stage].repairPrice * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * C.PARTS_PRICE_MULTIPLIERS[optionTwoKey] * C.REPAIR_PRICE_MULTIPLIERS[key] * ownWorkshopDiscount * (price / 100) * ageFactor
@@ -7086,7 +7096,7 @@ function AdvancedDamageSystem:getServiceDuration(maintenanceType, optionOne, opt
 
             if breakdowns ~= nil and next(breakdowns) ~= nil then
                 for id, breakdown in pairs(breakdowns) do
-                    if isBreakdownSelectedForPlayerRepair(id, breakdown) then
+                    if isBreakdownSelectedForPlayerRepair(id, breakdown, optionOne) then
                         repairCount = repairCount + 1
                     end
                 end
@@ -7446,7 +7456,7 @@ function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()
     
     local breakdownIds = {}
     for id, data in pairs(ADS_Breakdowns.BreakdownRegistry) do
-        table.insert(breakdownIds, string.format(" - %s (%s)", id, data.system or "No name"))
+        table.insert(breakdownIds, string.format(" - %s (%s)", id, data.part or data.system or "No name"))
     end
 
     if #breakdownIds > 0 then

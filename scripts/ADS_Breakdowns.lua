@@ -95,6 +95,42 @@ local systems = (AdvancedDamageSystem ~= nil and AdvancedDamageSystem.SYSTEMS) o
     FUEL = "ads_spec_system_fuel"
 }
 
+ADS_Breakdowns.PARTS = {
+    VEHICLE = "ads_breakdowns_part_vehicle",
+    CONSUMABLES = "ads_breakdowns_part_consumables",
+    ENGINE = "ads_breakdowns_part_engine",
+    BATTERY = "ads_breakdowns_part_battery",
+    ECU = "ads_breakdowns_part_ecu",
+    WIRING = "ads_breakdowns_part_wiring",
+    ALTERNATOR_REGULATOR = "ads_breakdowns_part_alternator_regulator",
+    TURBOCHARGER = "ads_breakdowns_part_turbocharger",
+    OIL_PUMP = "ads_breakdowns_part_oil_pump",
+    VALVE_TRAIN = "ads_breakdowns_part_valve_train",
+    CLUTCH = "ads_breakdowns_part_clutch",
+    SYNCHRONIZER = "ads_breakdowns_part_synchronizer",
+    POWERSHIFT_HYDRAULIC_PUMP = "ads_breakdowns_part_powershift_hydraulic_pump",
+    CVT_CHAIN = "ads_breakdowns_part_cvt_chain",
+    CVT_HYDRAULIC_CONTROL_VALVE = "ads_breakdowns_part_cvt_hydraulic_control_valve",
+    HYDRAULIC_PUMP = "ads_breakdowns_part_hydraulic_pump",
+    HYDRAULIC_CYLINDER = "ads_breakdowns_part_hydraulic_cylinder",
+    PTO_CLUTCH = "ads_breakdowns_part_pto_clutch",
+    BRAKE_SYSTEM = "ads_breakdowns_part_brake_system",
+    WHEEL_BEARING = "ads_breakdowns_part_wheel_bearing",
+    STEERING_LINKAGE = "ads_breakdowns_part_steering_linkage",
+    TRACK_TENSIONER = "ads_breakdowns_part_track_tensioner",
+    THERMOSTAT = "ads_breakdowns_part_thermostat",
+    COOLING_SYSTEM = "ads_breakdowns_part_cooling_system",
+    FAN_CLUTCH = "ads_breakdowns_part_fan_clutch",
+    FUEL_PUMP = "ads_breakdowns_part_fuel_pump",
+    FUEL_INJECTORS = "ads_breakdowns_part_fuel_injectors",
+    FUEL_FILTER = "ads_breakdowns_part_fuel_filter",
+    FUEL_LINE = "ads_breakdowns_part_fuel_line",
+    HARVEST_PROCESSING_SYSTEM = "ads_breakdowns_part_harvest_processing_system",
+    UNLOADING_AUGER = "ads_breakdowns_part_unloading_auger"
+}
+
+local parts = ADS_Breakdowns.PARTS
+
 local breakdownPriceMultipliers = {
     ECU_MALFUNCTION = 0.60,
     CORRODED_WIRING = 0.45,
@@ -246,6 +282,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     GENERAL_WEAR = {
         isSelectable = false,
+        part = parts.VEHICLE,
         isApplicable = function(vehicle)
             return true
         end,
@@ -270,6 +307,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     COLD_ENGINE = {
         system = systems.ENGINE,
+        part = parts.ENGINE,
         isSelectable = false,
         isApplicable = function(vehicle)
             return true
@@ -300,8 +338,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    DEAD_BATTERY = { -- TO-DO: $l10n
+    DEAD_BATTERY = {
         system = systems.ELECTRICAL,
+        part = parts.BATTERY,
         isSelectable = false,
         isApplicable = function(vehicle)
             return true
@@ -330,8 +369,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    VOLTAGE_SAG = { -- TO-DO: $l10n
+    VOLTAGE_SAG = {
         system = systems.ELECTRICAL,
+        part = parts.VEHICLE,
         isSelectable = false,
         isApplicable = function(vehicle)
             return true
@@ -353,7 +393,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "LIGHTS_FLICKER_CHANCE", value = 0.1, extraData = {timer = 0, status = 'IDLE', duration = 200, maskBackup = 0}, aggregation = "min"},
                     { id = "PTO_AUTO_DISENGAGE_CHANCE", value = 1, aggregation = "min", extraData = {status = 'IDLE'} },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
-                    { id = "ENGINE_HARD_START_MODIFIER", value = 3, extraData = { timer = 0, status = 'IDLE'}},
+                    { id = "ENGINE_HARD_START_MODIFIER", value = 3, extraData = { timer = 0, status = 'IDLE', message = "ads_breakdowns_voltage_sag_message"}},
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -364,7 +404,7 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES = {
         isSelectable = false,
-        system = "ads_breakdowns_part_vehicle",
+        part = parts.CONSUMABLES,
         isApplicable = function(vehicle)
             return true
         end,
@@ -401,7 +441,8 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     OVERHEAT_PROTECTION = {
         isSelectable = false,
-        system = "ads_breakdowns_part_engine",
+        system = systems.ENGINE,
+        part = parts.VEHICLE,
         isApplicable = function(vehicle)
             return true
         end,
@@ -489,7 +530,8 @@ ADS_Breakdowns.BreakdownRegistry = {
 
     ENGINE_JAM = {
         isSelectable = false,
-        system = "ads_breakdowns_part_engine",
+        system = systems.ENGINE,
+        part = parts.ENGINE,
         isApplicable = function(vehicle)
             return true
         end,
@@ -525,6 +567,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     ECU_MALFUNCTION = {
         isSelectable = true,
         system = systems.ELECTRICAL,
+        part = parts.ECU,
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
             if spec.year >= 2000 and not getIsElectricVehicle(vehicle) then
@@ -616,6 +659,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     CORRODED_WIRING = {
         isSelectable = true,
         system = systems.ELECTRICAL,
+        part = parts.WIRING,
         isApplicable = function(vehicle)
             local spec = vehicle.spec_AdvancedDamageSystem
             return spec.year >= 2000 and vehicle.spec_lights ~= nil
@@ -689,6 +733,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     BATTERY_SULFATION = {
         isSelectable = true,
         system = systems.ELECTRICAL,
+        part = parts.BATTERY,
         isApplicable = function(vehicle)
             return true
         end,
@@ -755,6 +800,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     ALTERNATOR_REGULATOR_FAILURE = {
         isSelectable = true,
         system = systems.ELECTRICAL,
+        part = parts.ALTERNATOR_REGULATOR,
         isApplicable = function(vehicle)
             return true
         end,
@@ -821,6 +867,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     TURBOCHARGER_MALFUNCTION = { -- TO-DO: add names
         isSelectable = true,
         system = systems.ENGINE,
+        part = parts.TURBOCHARGER,
         isApplicable = function(vehicle)
             local name = vehicle:getFullName()
             if name == "Fiat 160-90 DT" then return true end
@@ -893,6 +940,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     OIL_PUMP_MALFUNCTION = {
         isSelectable = true,
         system = systems.ENGINE,
+        part = parts.OIL_PUMP,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -964,6 +1012,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     VALVE_TRAIN_MALFUNCTION = {
         isSelectable = true,
         system = systems.ENGINE,
+        part = parts.VALVE_TRAIN,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -1037,6 +1086,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     MANUAL_TRANSMISSION_CLUTCH_WEAR = {
         isSelectable = true,
         system = systems.TRANSMISSION,
+        part = parts.CLUTCH,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -1107,6 +1157,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     MANUAL_TRANSMISSION_SYNCHRONIZER_MALFUNCTION = {
         isSelectable = true,
         system = systems.TRANSMISSION,
+        part = parts.SYNCHRONIZER,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -1168,6 +1219,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
         system = systems.TRANSMISSION,
+        part = parts.POWERSHIFT_HYDRAULIC_PUMP,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -1235,6 +1287,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     CVT_CHAIN_WEAR = {
         isSelectable = true,
         system = systems.TRANSMISSION,
+        part = parts.CVT_CHAIN,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -1308,6 +1361,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = {
         isSelectable = true,
         system = systems.TRANSMISSION,
+        part = parts.CVT_HYDRAULIC_CONTROL_VALVE,
         isApplicable = function(vehicle)
             local motor = vehicle:getMotor()
             if not motor then return false end
@@ -1390,6 +1444,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     HYDRAULIC_PUMP_MALFUNCTION = {
         isSelectable = true,
         system = systems.HYDRAULICS,
+        part = parts.HYDRAULIC_PUMP,
         isApplicable = function(vehicle)
             local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
             if storeItem.categoryName == "TRUCKS" then return false end
@@ -1456,6 +1511,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     HYDRAULIC_CYLINDER_INTERNAL_LEAK  = {
         isSelectable = true,
         system = systems.HYDRAULICS,
+        part = parts.HYDRAULIC_CYLINDER,
         isApplicable = function(vehicle)
             local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
             if storeItem.categoryName == "TRUCKS" then return false end
@@ -1526,6 +1582,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     PTO_CLUTCH_SLIP   = {
         isSelectable = true,
         system = systems.HYDRAULICS,
+        part = parts.PTO_CLUTCH,
         isApplicable = function(vehicle)
             return hasPtoCapability(vehicle)
         end,
@@ -1593,6 +1650,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     BRAKE_MALFUNCTION = {
         isSelectable = true,
         system = systems.CHASSIS,
+        part = parts.BRAKE_SYSTEM,
         isApplicable = function(vehicle)
             if vehicle.spec_crawlers ~= nil then
                 return #vehicle.spec_crawlers.crawlers == 0
@@ -1662,6 +1720,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     BEARING_WEAR = {
         isSelectable = true,
         system = systems.CHASSIS,
+        part = parts.WHEEL_BEARING,
         isApplicable = function(vehicle)
             if vehicle.spec_crawlers ~= nil then
                 return #vehicle.spec_crawlers.crawlers == 0
@@ -1742,6 +1801,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     STEERING_LINKAGE_WEAR = {
         isSelectable = true,
         system = systems.CHASSIS,
+        part = parts.STEERING_LINKAGE,
         isApplicable = function(vehicle)
             if vehicle.spec_wheels == nil or vehicle.spec_wheels.wheels == nil or #vehicle.spec_wheels.wheels == 0 then
                 return false
@@ -1815,6 +1875,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     TRACK_TENSIONER_MALFUNCTION = {
         isSelectable = true,
         system = systems.CHASSIS,
+        part = parts.TRACK_TENSIONER,
         isApplicable = function(vehicle)
             if vehicle.spec_crawlers ~= nil and #vehicle.spec_crawlers.crawlers > 0 then
                 return true
@@ -1900,6 +1961,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     THERMOSTAT_MALFUNCTION = {
         isSelectable = true,
         system = systems.COOLING,
+        part = parts.THERMOSTAT,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -1962,6 +2024,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     COOLANT_LEAK = {
         isSelectable = true,
         system = systems.COOLING,
+        part = parts.COOLING_SYSTEM,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2024,6 +2087,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     FAN_CLUTCH_FAILURE = {
         isSelectable = true,
         system = systems.COOLING,
+        part = parts.FAN_CLUTCH,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2090,6 +2154,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     FUEL_PUMP_MALFUNCTION = {
         isSelectable = true,
         system = systems.FUEL,
+        part = parts.FUEL_PUMP,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2176,6 +2241,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     FUEL_INJECTOR_MALFUNCTION = {
         isSelectable = true,
         system = systems.FUEL,
+        part = parts.FUEL_INJECTORS,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2249,6 +2315,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     FUEL_FILTER_CLOGGING = {
         isSelectable = true,
         system = systems.FUEL,
+        part = parts.FUEL_FILTER,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2307,6 +2374,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     FUEL_LINE_AIR_LEAK = {
         isSelectable = true,
         system = systems.FUEL,
+        part = parts.FUEL_LINE,
         isApplicable = function(vehicle)
             return not getIsElectricVehicle(vehicle)
         end,
@@ -2366,6 +2434,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     HARVEST_PROCESSING_SYSTEM_WEAR  = {
         isSelectable = true,
         system = systems.WORKPROCESS,
+        part = parts.HARVEST_PROCESSING_SYSTEM,
         isApplicable = function(vehicle)
             local vtype = vehicle.type.name
             if  vtype == 'combineDrivable' or
@@ -2448,6 +2517,7 @@ ADS_Breakdowns.BreakdownRegistry = {
     UNLOADING_AUGER_MALFUNCTION = {
         isSelectable = true,
         system = systems.WORKPROCESS,
+        part = parts.UNLOADING_AUGER,
         isApplicable = function(vehicle)
             local vtype = vehicle.type.name
             return (vtype == 'combineDrivable' or vtype == 'combineCutter') and vehicle.spec_pipe ~= nil

@@ -524,12 +524,37 @@ function ADS_Hud:drawActiveVehicleHUD()
         }
     end
 
+    local function getBreakdownSourceLabel(source)
+        if source == AdvancedDamageSystem.BREAKDOWN_SOURCES.POOR_PARTS then
+            return "PARTS"
+        elseif source == AdvancedDamageSystem.BREAKDOWN_SOURCES.QUICK_FIX then
+            return "QFIX"
+        end
+        return "RAND"
+    end
+
     local breakdownEntries = {}
     if spec.activeBreakdowns and next(spec.activeBreakdowns) ~= nil then
         for id, breakdown in pairs(spec.activeBreakdowns) do
             local visible = breakdown.isVisible and "V" or "-"
             local selected = breakdown.isSelectedForRepair and "S" or "-"
-            table.insert(breakdownEntries, string.format("%s[S%d|%.0fs|%s%s]", id, breakdown.stage, breakdown.progressTimer / 1000, visible, selected))
+            local active = breakdown.isActive ~= false and "A" or "-"
+            local resumeTimerS = math.max((tonumber(breakdown.resumeTimer) or 0) / 1000, 0)
+            local source = getBreakdownSourceLabel(breakdown.source)
+            local stage = tonumber(breakdown.stage) or 0
+            local progressTimerS = math.max((tonumber(breakdown.progressTimer) or 0) / 1000, 0)
+
+            table.insert(breakdownEntries, string.format(
+                "%s[st:%d|pr:%.0fs|rs:%.0fs|%s%s%s|src:%s]",
+                id,
+                stage,
+                progressTimerS,
+                resumeTimerS,
+                visible,
+                selected,
+                active,
+                source
+            ))
         end
     end
     table.sort(breakdownEntries)

@@ -160,8 +160,11 @@ function ADS_Utils.serializeBreakdowns(breakdownsTable)
     for id, breakdown in pairs(breakdownsTable) do
         local visible = breakdown.isVisible and 1 or 0
         local selected = breakdown.isSelectedForRepair and 1 or 0
-        
-        local system = string.format("%s,%d,%.2f,%d,%d", id, breakdown.stage, breakdown.progressTimer or 0, visible, selected)
+        local active = breakdown.isActive ~= false and 1 or 0
+        local resumeTimer = math.max(tonumber(breakdown.resumeTimer) or 0, 0)
+        local source = math.max(math.floor(tonumber(breakdown.source) or 0), 0)
+
+        local system = string.format("%s,%d,%.2f,%d,%d,%d,%.2f,%d", id, breakdown.stage, breakdown.progressTimer or 0, visible, selected, active, resumeTimer, source)
         table.insert(parts, system)
     end
     return table.concat(parts, ";")
@@ -220,24 +223,56 @@ function ADS_Utils.deserializeBreakdowns(breakdownString)
     end
     
     for part in string.gmatch(breakdownString, "([^;]+)") do
-        local id, stage, timer, isVisible, isSelected = string.match(part, "([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)")
+        local id, stage, timer, isVisible, isSelected, isActive, resumeTimer, source = string.match(part, "([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)")
         
         if id then
             breakdowns[id] = { 
                 stage = tonumber(stage),
                 progressTimer = tonumber(timer),
                 isVisible = (tonumber(isVisible) == 1),
-                isSelectedForRepair = (tonumber(isSelected) == 1)
+                isSelectedForRepair = (tonumber(isSelected) == 1),
+                isActive = (tonumber(isActive) == 1),
+                resumeTimer = math.max(tonumber(resumeTimer) or 0, 0),
+                source = tonumber(source) or AdvancedDamageSystem.BREAKDOWN_SOURCES.RANDOM
             }
         else
-            id, stage, timer = string.match(part, "([^,]+),([^,]+),([^,]+)")
+            id, stage, timer, isVisible, isSelected, isActive, resumeTimer = string.match(part, "([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)")
             if id then
                 breakdowns[id] = {
                     stage = tonumber(stage),
                     progressTimer = tonumber(timer),
-                    isVisible = false,
-                    isSelectedForRepair = true
+                    isVisible = (tonumber(isVisible) == 1),
+                    isSelectedForRepair = (tonumber(isSelected) == 1),
+                    isActive = (tonumber(isActive) == 1),
+                    resumeTimer = math.max(tonumber(resumeTimer) or 0, 0),
+                    source = AdvancedDamageSystem.BREAKDOWN_SOURCES.RANDOM
                 }
+            else
+                id, stage, timer, isVisible, isSelected = string.match(part, "([^,]+),([^,]+),([^,]+),([^,]+),([^,]+)")
+                if id then
+                    breakdowns[id] = {
+                        stage = tonumber(stage),
+                        progressTimer = tonumber(timer),
+                        isVisible = (tonumber(isVisible) == 1),
+                        isSelectedForRepair = (tonumber(isSelected) == 1),
+                        isActive = true,
+                        resumeTimer = 0,
+                        source = AdvancedDamageSystem.BREAKDOWN_SOURCES.RANDOM
+                    }
+                else
+                    id, stage, timer = string.match(part, "([^,]+),([^,]+),([^,]+)")
+                    if id then
+                        breakdowns[id] = {
+                            stage = tonumber(stage),
+                            progressTimer = tonumber(timer),
+                            isVisible = false,
+                            isSelectedForRepair = true,
+                            isActive = true,
+                            resumeTimer = 0,
+                            source = AdvancedDamageSystem.BREAKDOWN_SOURCES.RANDOM
+                        }
+                    end
+                end
             end
         end
     end
@@ -692,20 +727,16 @@ function ADS_Utils.serializeSystemsState(systems)
         local condition = 1.0
         local stress = 0.0
         local enabled = true
-        local plannedBreakdown = ""
-        local plannedBreakdownTimer = 0.0
 
         if type(systemData) == "table" then
             condition = tonumber(systemData.condition) or 1.0
             stress = tonumber(systemData.stress) or 0.0
             enabled = ADS_Utils.normalizeBoolValue(systemData.enabled, true)
-            plannedBreakdown = tostring(systemData.plannedBreakdown or "")
-            plannedBreakdownTimer = math.max(tonumber(systemData.plannedBreakdownTimer) or 0.0, 0.0)
         else
             condition = tonumber(systemData) or 1.0
         end
 
-        table.insert(entries, string.format("%s|%.6f|%.6f|%d|%s|%.6f", tostring(systemKey), condition, stress, enabled and 1 or 0, plannedBreakdown, plannedBreakdownTimer))
+        table.insert(entries, string.format("%s|%.6f|%.6f|%d", tostring(systemKey), condition, stress, enabled and 1 or 0))
     end
 
     table.sort(entries)
@@ -735,22 +766,11 @@ function ADS_Utils.deserializeSystemsState(serialized)
             local condition = tonumber(parts[2]) or 1.0
             local stress = tonumber(parts[3]) or 0.0
             local enabled = ADS_Utils.normalizeBoolValue(tonumber(parts[4]), true)
-            local plannedBreakdown = ""
-            local plannedBreakdownTimer = 0.0
-
-            if #parts >= 5 and parts[5] ~= nil then
-                plannedBreakdown = tostring(parts[5] or "")
-            end
-            if #parts >= 6 and parts[6] ~= nil then
-                plannedBreakdownTimer = math.max(tonumber(parts[6]) or 0.0, 0.0)
-            end
 
             result[key] = {
                 condition = condition,
                 stress = stress,
-                enabled = enabled,
-                plannedBreakdown = plannedBreakdown,
-                plannedBreakdownTimer = plannedBreakdownTimer
+                enabled = enabled
             }
         end
     end

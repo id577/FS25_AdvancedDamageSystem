@@ -19,7 +19,7 @@
             <MultiTextOption profile="ads_multiTextOption" id="optionOne" position="0px -110px" focusInit="onOpen" onClick="onClickOptionOne" texts="1|2|3|4" />
                 
             <!-- Price, duration, finish time -->
-            <SmoothList profile="ads_dialogInfoTable" id="serviceInfoTable" position="0px -165px" size="400px 78px">
+            <SmoothList profile="ads_dialogInfoTable" id="serviceInfoTable" position="0px -185px" size="400px 78px">
                 <ListItem profile="ads_dialogInfoRow" name="serviceInfoRowTemplate" size="400px 26px">
                     <Text profile="ads_dialogInfoTitle" position="20px 0px" size="160px 26px" name="serviceInfoTitle" textLayoutMode="scrolling" />
                     <Text profile="ads_dialogInfoValue" position="190px 0px" size="190px 26px" name="serviceInfoValue" textLayoutMode="scrolling" />
@@ -27,10 +27,10 @@
             </SmoothList>
 
             <!-- Disclaimers -->
-            <Text profile="ads_disclaimerText" position="40px -270px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
+            <Text profile="ads_disclaimerText" position="40px -310px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
         
             <!-- Option Three -->
-            <Text profile="fs25_dialogText" id="optionThreeText" position="0px -320px" text="Repair any faults found"/>
+            <Text profile="fs25_dialogText" id="optionThreeText" position="0px -360px" text="Repair any faults found"/>
             <BinaryOption profile="fs25_binaryOption" id="optionThree" onClick="onClickOptionThree" size="300px 30px" position="0px 30px"/>
 
         </GuiElement>
@@ -42,7 +42,7 @@
 
     <GUIProfiles>
         <Profile name="ads_dialogBgSmall" extends="fs25_dialogBg">
-            <size value="600px 490px" />
+            <size value="600px 530px" />
         </Profile>
 
         <Profile name="ads_dialogSeparator" extends="baseReference" with="anchorTopCenter">
