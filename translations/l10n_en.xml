@@ -486,6 +486,20 @@
         <text name="ads_report_recommendation_operating_conditions" text="Signs of intensive overuse detected. Improve operating conditions."/>
         <text name="ads_report_recommendation_repeat_maintenance" text="Defective consumables detected. Repeat maintenance to replace faulty components."/>
         <text name="ads_report_recommendation_all_ok" text="No critical recommendations. Vehicle is in serviceable condition."/>
+
+        <text name="ads_grease_gun_name" text="Grease Gun"/>
+        <text name="ads_grease_gun_function" text="Used for lubrication service procedures"/>
+        <text name="ads_grease_gun_action" text="Apply grease"/>
+        <text name="ads_grease_gun_no_vehicle" text="No vehicle in lubrication range"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s does not require lubrication"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s is already lubricated"/>
+        <text name="ads_air_blower_name" text="Air Blower"/>
+        <text name="ads_air_blower_function" text="Used to clean radiators and air intakes"/>
+        <text name="ads_air_blower_action" text="Clean radiator and air intake"/>
+        <text name="ads_air_blower_no_vehicle" text="No vehicle in cleaning range"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s does not require cleaning"/>
+        <text name="ads_air_blower_already_clean" text="%s: radiator and air intake are already clean"/>
+
     </texts>
 </l10n>
 

@@ -66,6 +66,10 @@ Changelog 0.9.0.0:
 - Lagt till stöd för flera spelare
 - Lagt till HUD-visning av bränsleförbrukning]]></sv>
     </description>
+    <storeItems>
+        <storeItem xmlFilename="objects/greaseGun/greaseGun.xml"/>
+        <storeItem xmlFilename="objects/airBlower/airBlower.xml"/>
+    </storeItems>
     <iconFilename>icon_ads.dds</iconFilename>
     <multiplayer supported="true"/>
     <extraSourceFiles>

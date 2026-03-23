@@ -378,6 +378,15 @@
         <text name="ads_report_recommendation_operating_conditions" text="Se detectaron signos de uso excesivo intensivo. Mejorar las condiciones de operación."/>
         <text name="ads_report_recommendation_repeat_maintenance" text="Se detectaron consumibles defectuosos. Repita el mantenimiento para reemplazar los componentes defectuosos."/>
         <text name="ads_report_recommendation_all_ok" text="Sin recomendaciones críticas. El vehículo está en condiciones de funcionamiento."/>
+        <text name="ads_grease_gun_name" text="Pistola de engrase"/>
+        <text name="ads_grease_gun_function" text="Utilizado para procedimientos de lubricación"/>
+        <text name="ads_grease_gun_action" text="Aplicar grasa"/>
+        <text name="ads_air_blower_name" text="Soplador de aire"/>
+        <text name="ads_air_blower_function" text="Se utiliza para limpiar radiadores y tomas de aire"/>
+        <text name="ads_air_blower_action" text="Limpiar radiador y toma de aire"/>
+        <text name="ads_air_blower_no_vehicle" text="Ningún vehículo en alcance de limpieza"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s no requiere limpieza"/>
+        <text name="ads_air_blower_already_clean" text="%s: el radiador y la admisión ya están limpios"/>
     </texts>
 </l10n>
 

@@ -1,5 +1,8 @@
 ADS_Main = {}
 
+local modDirectory = g_currentModDirectory
+local modName = g_currentModName
+
 source(g_currentModDirectory .. "scripts/ADS_Config.lua")
 source(g_currentModDirectory .. "scripts/ADS_Utils.lua")
 source(g_currentModDirectory .. "scripts/ADS_Breakdowns.lua")
@@ -19,6 +22,7 @@ source(g_currentModDirectory .. "events/ADS_EffectSyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_LogEntrySyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_ConsoleCommandEvent.lua")
 source(g_currentModDirectory .. "events/ADS_StartButtonEvent.lua")
+source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
 
 -- Network hook: wrap every settings callback so changes made by an admin
 -- client are automatically replicated to the dedicated server (and then
@@ -110,6 +114,30 @@ function ADS_Main.registerSpecializationToVehicles()
 	end
     log_dbg("Specialization applied!")
 end
+
+-- ===========================================================
+--                  HANDTOOLS REGISTRATION
+-- ===========================================================
+
+local htPath = modDirectory .. "xml/handTools.xml"
+local xmlFile = XMLFile.loadIfExists("adsHandTools", htPath)
+
+if xmlFile ~= nil then
+    xmlFile:iterate("handTools.specializations.specialization", function(_, key)
+        local name = xmlFile:getString(key .. "#name")
+        local className = xmlFile:getString(key .. "#className")
+        local filename = xmlFile:getString(key .. "#filename")
+
+        g_handToolSpecializationManager:addSpecialization(name, className, modDirectory .. filename)
+    end)
+
+    xmlFile:iterate("handTools.types.type", function(_, key)
+        g_handToolTypeManager:loadTypeFromXML(xmlFile.handle, key, false, nil, modName)
+    end)
+
+    xmlFile:delete()
+end
+
 
 -- ==========================================================
 --             HUD, GUI and Workshop Screen Reg

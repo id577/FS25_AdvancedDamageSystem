@@ -1,0 +1,35 @@
+<handTool type="greaseGun" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../shared/xml/schema/handTool.xsd">
+    <storeData>
+        <name>$l10n_ads_grease_gun_name</name>
+        <functions>
+            <function>$l10n_ads_grease_gun_function</function>
+        </functions>
+        <image>objects/greaseGun/store_greaseGun.dds</image>
+        <price>500</price>
+        <lifetime>1000</lifetime>
+        <dailyUpkeep>0</dailyUpkeep>
+        <rotation>0</rotation>
+        <brand>LIZARD</brand>
+        <species>HANDTOOL</species>
+        <category>handtoolsMisc</category>
+    </storeData>
+
+    <base canBeDropped="true" canBeSaved="true">
+        <filename>objects/greaseGun/greaseGun.i3d</filename>
+        <typeDesc>$l10n_ads_grease_gun_name</typeDesc>
+        <graphics node="graphics" lockFirstPerson="true"/>
+        <handNode node="handNode"/>
+        <firstPersonNode node="firstPersonNode"/>
+    </base>
+
+    <storable>
+        <holderType type="GREASEGUN" node="0>"/>
+    </storable>
+
+    <i3dMappings>
+        <i3dMapping id="graphics" node="0>0"/>
+        <i3dMapping id="handNode" node="0>1"/>
+        <i3dMapping id="firstPersonNode" node="0>2"/>
+        <i3dMapping id="raycastNode" node="0>1|0"/>
+    </i3dMappings>
+</handTool>

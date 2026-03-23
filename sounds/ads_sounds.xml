@@ -126,5 +126,26 @@
         <lowpassCutoffFrequency indoor="700" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </wheelSeizureGrind>
+    <airBlowerTool file="sounds/airBlower.ogg" linkNode="raycastNode" innerRadius="1.5" outerRadius="12.0" >
+        <volume indoor="1.0" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </airBlowerTool>
+    <airBlowerAirResistanceTool file="sounds/airBlowerAirResistance.ogg" linkNode="raycastNode" innerRadius="1.5" outerRadius="12.0" >
+        <volume indoor="0.9" outdoor="0.9" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </airBlowerAirResistanceTool>
+    <greaseGunTool file="sounds/greaseGun.ogg" linkNode="raycastNode" innerRadius="1.5" outerRadius="8.0" >
+        <volume indoor="1.0" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </greaseGunTool>
     <maintenanceCompleted2D file="sounds/maintenanceCompleted.ogg" volume="1.0" pitch="1.0" />
 </sounds>

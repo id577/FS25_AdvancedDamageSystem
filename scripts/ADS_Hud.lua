@@ -640,6 +640,23 @@ function ADS_Hud:drawActiveVehicleHUD()
     local overviewLines = {}
     local serviceWearRate = serviceDbg.totalWearRate or ADS_Config.CORE.BASE_SERVICE_WEAR or 0
     local weatherFactor = tonumber((ADS_Main ~= nil and ADS_Main.currentWeatherFactor) or 1.0) or 1.0
+    local dirtLevel = tonumber(vehicle.getDirtAmount ~= nil and vehicle:getDirtAmount() or 0) or 0
+    local radiatorClogging = tonumber(spec.radiatorClogging or 0) or 0
+    local airIntakeClogging = tonumber(spec.airIntakeClogging or 0) or 0
+    local lubricationLevel = tonumber(spec.lubricationLevel or 0) or 0
+    local paintState = math.max(1 - (tonumber(vehicle.getWearTotalAmount ~= nil and vehicle:getWearTotalAmount() or 0) or 0), 0)
+    local radiatorDbg = spec.debugData.radiator or {}
+    local airIntakeDbg = spec.debugData.airIntake or {}
+    local radiatorFieldFactor = tonumber(radiatorDbg.fieldFactor or 1) or 1
+    local radiatorDustFactor = tonumber(radiatorDbg.dustFactor or 0) or 0
+    local radiatorDebrisFactor = tonumber(radiatorDbg.debrisFactor or 0) or 0
+    local radiatorWetness = tonumber(radiatorDbg.wetness or 0) or 0
+    local radiatorWetnessFactor = tonumber(radiatorDbg.wetnessFactor or 1) or 1
+    local airIntakeFieldFactor = tonumber(airIntakeDbg.fieldFactor or 1) or 1
+    local airIntakeDustFactor = tonumber(airIntakeDbg.dustFactor or 0) or 0
+    local airIntakeDebrisFactor = tonumber(airIntakeDbg.debrisFactor or 0) or 0
+    local airIntakeWetness = tonumber(airIntakeDbg.wetness or 0) or 0
+    local airIntakeWetnessFactor = tonumber(airIntakeDbg.wetnessFactor or 1) or 1
     addLine(overviewLines, string.format(
         "condition: %.2f%% | service: %.2f%%",
         asPercent(spec.conditionLevel or 0),
@@ -647,16 +664,32 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {1, 1, 1, 1}, 0.95)
 
     addLine(overviewLines, string.format(
-        "service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s",
+        "service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | dirt: %.2f%% | rad: %.2f%% (fld: %.2f | dst: %.2f | deb: %.2f | wet: %.2f | wtf: %.2f) | intake: %.2f%% (fld: %.2f | dst: %.2f | deb: %.2f | wet: %.2f | wtf: %.2f) | lube: %.2f%% | paint: %.2f%%",
         asPercent(serviceWearRate),
         asPercent(spec.reliability or 0),
         asPercent(spec.maintainability or 0),
         weatherFactor,
-        tostring(spec.isUnderRoof == true)
+        tostring(spec.isUnderRoof == true),
+        asPercent(dirtLevel),
+        asPercent(radiatorClogging),
+        radiatorFieldFactor,
+        radiatorDustFactor,
+        radiatorDebrisFactor,
+        radiatorWetness,
+        radiatorWetnessFactor,
+        asPercent(airIntakeClogging),
+        airIntakeFieldFactor,
+        airIntakeDustFactor,
+        airIntakeDebrisFactor,
+        airIntakeWetness,
+        airIntakeWetnessFactor,
+        asPercent(lubricationLevel),
+        asPercent(paintState)
     ), {1, 1, 1, 1}, 0.95)
 
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
+        engineDbg.airIntakeCloggingFactor or 0,
         engineDbg.expiredServiceFactor or 0,
         engineDbg.coldMotorFactor or 0,
         engineDbg.hotMotorFactor or 0
@@ -707,7 +740,8 @@ function ADS_Hud:drawActiveVehicleHUD()
     local workprocessMaxFactor = math.max(
         workprocessDbg.expiredServiceFactor or 0,
         workprocessDbg.longHarvestFactor or 0,
-        workprocessDbg.wetCropFactor or 0
+        workprocessDbg.wetCropFactor or 0,
+        workprocessDbg.lubricationFactor or 0
     ) * bcw
 
     local factorStats = {}
@@ -777,6 +811,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "sf", statKey = "sf", value = engineDbg.expiredServiceFactor or 0 },
         { shortName = "bpf", statKey = "bpf", value = engineDbg.breakdownPresenceFactor or 0 },
         { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0 },
+        { shortName = "aicf", statKey = "aicf", value = engineDbg.airIntakeCloggingFactor or 0 },
         { shortName = "cmf", statKey = "cmf", value = engineDbg.coldMotorFactor or 0 },
         { shortName = "hmf", statKey = "hmf", value = engineDbg.hotMotorFactor or 0 }
     })
@@ -838,7 +873,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "sf", statKey = "sf", value = workprocessDbg.expiredServiceFactor or 0 },
         { shortName = "bpf", statKey = "bpf", value = workprocessDbg.breakdownPresenceFactor or 0 },
         { shortName = "lhf", statKey = "lhf", value = workprocessDbg.longHarvestFactor or 0, extraInfo = string.format("t: %.0fs", workprocessDbg.longHarvestTimer or 0) },
-        { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 }
+        { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 },
+        { shortName = "lubf", statKey = "lubf", value = workprocessDbg.lubricationFactor or 0, extraInfo = string.format("lvl: %.1f%%", asPercent(lubricationLevel)) }
     })
 
     if isSystemEnabled("workprocess") then
@@ -1422,6 +1458,10 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
         elseif debugKey == "motorLoadFactor" then
             if dbg.motorLoad ~= nil then
                 return string.format("load %.3f", tonumber(dbg.motorLoad) or 0)
+            end
+        elseif debugKey == "airIntakeCloggingFactor" then
+            if dbg.airIntakeClogging ~= nil then
+                return string.format("clog %.1f%%", (tonumber(dbg.airIntakeClogging) or 0) * 100)
             end
         elseif debugKey == "coldMotorFactor" then
             local parts = {}

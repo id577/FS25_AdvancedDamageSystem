@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 92,
+    VER = 93,
 
     DEBUG = false,
 
@@ -66,12 +66,14 @@ ADS_Config = {
             MOTOR_IDLING_MULTIPLIER = 0.5,
             SERVICE_EXPIRED_MULTIPLIER = 32.0,
             MOTOR_IDLING_THRESHOLD = 0.3,
-            MOTOR_OVERLOADED_MULTIPLIER = 12.0, -- 1
+            MOTOR_OVERLOADED_MULTIPLIER = 12.0, 
             MOTOR_OVERLOADED_THRESHOLD = 0.90,
-            COLD_MOTOR_THRESHOLD = 50,         -- 3
+            COLD_MOTOR_THRESHOLD = 50,         
             COLD_MOTOR_MULTIPLIER = 220.0,
-            OVERHEAT_MOTOR_MULTIPLIER = 500.0,  -- 3
+            OVERHEAT_MOTOR_MULTIPLIER = 500.0, 
             OVERHEAT_MOTOR_THRESHOLD = 95,
+            AIR_INTAKE_CLOGGING_MULTIPLIER = 3.0,
+            AIR_INTAKE_CLOGGING_THRESHOLD = 0.5
         },
 
         TRANSMISSION_FACTOR_DATA = {
@@ -151,7 +153,8 @@ ADS_Config = {
             LONG_HARVEST_TIMER_THRESHOLD = 0,
             LONG_HARVEST_TIMER_MAX = 7200,
             WET_CROP_FACTOR_MULTIPLIER = 10.0,
-
+            LUBRICATION_FACTOR_THRESHOLD = 0.5,
+            LUBRICATION_FACTOR_MULTIPLIER = 5.0
         },
 
         FUEL_FACTOR_DATA = {
@@ -376,8 +379,8 @@ ADS_Config = {
         DELTATEMP_FACTOR_DEGREE = 1.25,
 
         -- The maximum reduction in radiator effectiveness due to dirt.
-        -- 0.2 means a fully dirty vehicle's radiator is 20% less effective.
-        MAX_DIRT_INFLUENCE = 0.15,
+        -- 0.20 means a fully dirty vehicle's radiator is 20% less effective.
+        MAX_DIRT_INFLUENCE = 0.20,
         
         -- The time constant for the low-pass filter on the temperature gauge.
         -- Higher value means the needle on the dashboard will move more slowly and smoothly,
@@ -442,6 +445,11 @@ ADS_Config = {
         ELECTRONIC_THERMOSTAT_MAX_WAX_SPEED = 0.10,
         ELECTRONIC_THERMOSTAT_MIN_STICTION = 0.01,
         ELECTRONIC_THERMOSTAT_MAX_STICTION = 0.05
+    },
+
+    FIELD_CARE = {
+        CLEANING_SPEED = 0.1,
+        AIR_INTAKE_BREAKDOWN_THRESHOLD = 0.5,
     },
 
     ELECTRICAL = {

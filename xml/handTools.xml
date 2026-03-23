@@ -1,0 +1,17 @@
+<handTools>
+    <types>
+        <type name="greaseGun" parent="base" xmlFile="objects/greaseGun/greaseGun.xml">
+            <specialization name="adsHandTools"/>
+        </type>
+        <type name="airBlower" parent="base" xmlFile="objects/airBlower/airBlower.xml">
+            <specialization name="adsHandTools"/>
+        </type>
+    </types>
+
+    <specializations>
+        <specialization
+            name="adsHandTools"
+            className="adsHandTools"
+            filename="scripts/ADS_HandTools.lua"/>
+    </specializations>
+</handTools>

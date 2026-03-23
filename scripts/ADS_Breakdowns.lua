@@ -402,6 +402,70 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    AIRINTAKE_CLOGGING = {
+        system = systems.ENGINE,
+        part = parts.VEHICLE,
+        isSelectable = false,
+        isApplicable = function(vehicle)
+            local spec = vehicle.spec_AdvancedDamageSystem
+            if spec == nil then return end
+            if spec.isVEhicleNeedBlowOut then
+                return true
+            end
+            return false
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.03, aggregation = "sum"},
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.06, aggregation = "sum" },
+
+                },
+                indicators = {
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_moderate",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.06, aggregation = "sum"},
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.12, aggregation = "sum" },
+
+                },
+                indicators = {
+                }
+            },
+                        {
+                severity = "ads_breakdowns_severity_major",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum"},
+                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.18, aggregation = "sum" },
+                    { id = "ENGINE_HEAT_MODIFIER", value = 0.05, aggregation = "sum" }
+                },
+                indicators = {
+                }
+            }
+        }
+    },
+
     MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES = {
         isSelectable = false,
         part = parts.CONSUMABLES,
@@ -874,7 +938,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return false
         end,
         probability = function(vehicle)
-            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"hmf", "mlf"}, {"sf"})
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"hmf", "mlf"}, {"aicf", "sf"})
         end,
         stages = {
             {
@@ -945,7 +1009,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"sf", "hmf"}, {"cmf"})
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"sf"}, {"hmf", "cmf"})
         end,
         stages = {
             {
@@ -1017,7 +1081,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return not getIsElectricVehicle(vehicle)
         end,
         probability = function(vehicle)
-            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"sf", "hmf"}, {"cmf", "mlf"})
+            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"sf", "cmf"}, {"hmf", "mlf"})
         end,
         stages = {
             {
@@ -1082,7 +1146,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
-    -- transmission system -- TO-DO: indicators
+    -- transmission system
     MANUAL_TRANSMISSION_CLUTCH_WEAR = {
         isSelectable = true,
         system = systems.TRANSMISSION,
@@ -1121,7 +1185,6 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" }
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1135,7 +1198,6 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.50, aggregation = "sum" }
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1148,7 +1210,6 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "TRANSMISSION_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_transmission_slip_stage4_message", disableAi = true}, aggregation = "max" }
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             }
         }
@@ -1252,7 +1313,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.5, extraData = {timer = 0, status = "IDLE", duration = 1000, backup = 0}, aggregation = "max"}
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1265,7 +1326,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.99, extraData = {timer = 0, status = "IDLE", duration = 1500, backup = 0}, aggregation = "max"}
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1278,7 +1339,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0, disableAi = true}, aggregation = "max"}
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             }
         }
@@ -1324,7 +1385,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.1, aggregation = "sum" }
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1339,7 +1400,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.15, aggregation = "sum" }
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1352,7 +1413,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "CVT_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_cvt_chain_wear_stage4_message", disableAi = true}, aggregation = "max" }
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             }
         }
@@ -1401,7 +1462,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.WARNING, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1417,7 +1478,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "CVT_MAX_RATIO_MODIFIER", value = 0.5, aggregation = "max" },
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             },
             { 
@@ -1434,7 +1495,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "ENGINE_LIMP_EFFECT", value = -0.2, aggregation = "min", extraData = {reason = "BREAKDOWN", message = "ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message", disableAi = true } },
                 },
                 indicators = {
-                    { id = db.TRANSMISSION, color = color.CRITICAL, switchOn = true, switchOff = false }
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
             }
         }
@@ -2441,14 +2502,14 @@ ADS_Breakdowns.BreakdownRegistry = {
                 vtype == 'combineCutter' or
                 vtype == 'combineCutterFruitPreparer' or
                 vtype == 'cottonHarvester' or
-                vtype == 'riceHarvester' and
+                vtype == 'riceHarvester' or
                 vtype == 'vineHarvester' then
                     return true
             end
             return false
         end,
         probability = function(vehicle)
-            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.WORKPROCESS, {"lhf"}, {"wcf", "sf"})
+            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.WORKPROCESS, {"lhf", "lubf"}, {"wcf", "sf"})
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
                 return weight * 1.5
             end
@@ -2523,7 +2584,7 @@ ADS_Breakdowns.BreakdownRegistry = {
             return (vtype == 'combineDrivable' or vtype == 'combineCutter') and vehicle.spec_pipe ~= nil
         end,
         probability = function(vehicle)
-            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.WORKPROCESS, {"lhf"}, {"wcf", "sf"})
+            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.WORKPROCESS, {"lhf"}, {"lubf", "wcf", "sf"})
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
                 if vehicle.spec_dischargeable.currentDischargeState ~= Dischargeable.DISCHARGE_STATE_OFF then
                     return weight * 2.0
@@ -2593,6 +2654,43 @@ ADS_Breakdowns.BreakdownRegistry = {
     -- TO-DO: ROLLING_RESISTANCE_MODIFIER
     
 }
+
+local function wrapBreakdownApplicabilityByEnabledSystem()
+    for _, entry in pairs(ADS_Breakdowns.BreakdownRegistry or {}) do
+        if type(entry) == "table" and entry.system ~= nil and type(entry.isApplicable) == "function" then
+            local originalIsApplicable = entry.isApplicable
+
+            entry.isApplicable = function(vehicle)
+                if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+                    return false
+                end
+
+                local spec = vehicle.spec_AdvancedDamageSystem
+                local systemKey = nil
+
+                if ADS_Utils ~= nil and AdvancedDamageSystem ~= nil and AdvancedDamageSystem.SYSTEMS ~= nil then
+                    systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, entry.system)
+                end
+
+                if (systemKey == nil or systemKey == "") and type(entry.system) == "string" then
+                    systemKey = string.lower(entry.system)
+                end
+
+                if systemKey ~= nil and systemKey ~= "" then
+                    local systemData = spec.systems ~= nil and spec.systems[systemKey] or nil
+                    if type(systemData) == "table" and systemData.enabled == false then
+                        return false
+                    end
+                end
+
+                return originalIsApplicable(vehicle) == true
+            end
+        end
+    end
+end
+
+wrapBreakdownApplicabilityByEnabledSystem()
+
 -- ==========================================================
 --                     BREAKDOWN EFFECTS
 -- ==========================================================

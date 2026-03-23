@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="airBlower.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.11"/>
+  </Asset>
+
+  <Files>
+    <File fileId="1" filename="texture.dds"/>
+    <File fileId="2" filename="texture_normal.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="Material.001" materialId="5" specularColor="0.8 1 0.8">
+      <Texture fileId="1"/>
+      <Normalmap fileId="2" bumpDepth="0"/>
+    </Material>
+    <Material name="UnnamedMaterial" materialId="18" diffuseColor="1 1 1 1">
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="airBlower.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="airBlower" lockedgroup="true" nodeId="8">
+      <TransformGroup name="graphics" nodeId="9">
+        <Shape name="body" translation="3.90336e-08 -0.129256 1.58323e-10" rotation="-180 -89.5352 -180" shapeId="1" nodeId="10" castsShadows="true" receiveShadows="true" distanceBlending="false" materialIds="5"/>
+      </TransformGroup>
+      <TransformGroup name="handNode" translation="-0.0117173 0.32997 -7.39185e-05" rotation="-49.3208 13.2875 91.924" nodeId="11">
+        <TransformGroup name="raycastNode" translation="0.205864 0.222989 -0.218835" rotation="49.8188 -8.69255 -9.74645" scale="1.01395 1.0149 1.0149" nodeId="12"/>
+      </TransformGroup>
+      <TransformGroup name="firstPersonNode" translation="-0.211465 0.367123 0.743932" rotation="-180 5.17004 -180" nodeId="13"/>
+      <TransformGroup name="dustEmitterNode" translation="0 0.5 -1" scale="1 1.16163 1" nodeId="14">
+        <Shape name="dustEmitterShape" scale="0.001 0.001 0.001" shapeId="2" nodeId="24" castsShadows="false" receiveShadows="false" distanceBlending="false" materialIds="18"/>
+      </TransformGroup>
+    </TransformGroup>
+  </Scene>
+
+</i3D>
