@@ -16,11 +16,11 @@
         <text name="ads_workshopAvailable_label" text="Werkstatt rund um die Uhr geöffnet"/>
         <text name="ads_workshopAvailable_tooltip" text="Aktiviert oder deaktiviert den 24/7-Betrieb der Werkstatt."/>
         <text name="ads_instantInspection_label" text="Sofortige Inspektion"/>
-        <text name="ads_instantInspection_tooltip" text="Aktiviert oder deaktiviert die sofortige Fahrzeuginspektion ohne Wartezeit."/>
+        <text name="ads_instantInspection_tooltip" text="Wenn aktiviert, werden alle Inspektionen sofort abgeschlossen (es vergeht keine Zeit). Hinweis: Die Inspektionsoption „Sichtprüfung“ ist dann nicht verfügbar."/>
         <text name="ads_parkVehicle_label" text="Fahrzeug während Wartung parken"/>
         <text name="ads_parkVehicle_tooltip" text="Wenn aktiviert, werden Fahrzeuge während der Wartung beim Durchschalten (TAB) übersprungen."/>
-        <text name="ads_warrantyEnabled_label" text="Warranty for New Equipment"/>
-        <text name="ads_warrantyEnabled_tooltip" text="Applies warranty coverage to repairs on new vehicles (up to 20 operating hours or 12 months). Only OEM parts are covered at no cost."/>
+        <text name="ads_warrantyEnabled_label" text="Garantie für neue Fahrzeuge"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Aktiviert Garantieleistungen für Reparaturen an Neufahrzeugen (bis zu 20 Betriebsstunden oder 12 Monate). Nur OEM-Teile werden kostenlos übernommen."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="KI-Überlastungs- und Überhitzungskontrolle"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Der KI-Helfer reduziert die Motorlast bei drohender Überlastung oder Überhitzung."/>
         <text name="ads_debugMode_label" text="Debug-Modus"/>
@@ -29,9 +29,9 @@
         <text name="ads_vehicleLifespan_label" text="Zustandsverschleißrate"/>
         <text name="ads_breakdownFrequency_label" text="Grund-MTBF (Zeit zw. Ausfällen)"/>
         <text name="ads_thermalSensitivity_label" text="Thermische Empfindlichkeit"/>
-        <text name="ads_serviceInterval_tooltip" text="Steuert die Verschleißrate des 'Wartungs'-Levels pro Betriebsstunde. Bei 10% ist der Wartungslevel nach 10 Betriebsstunden vollständig aufgebraucht. Ein höherer Wert bedeutet, dass eine Wartung häufiger erforderlich ist."/>
-        <text name="ads_vehicleLifespan_tooltip" text="Steuert die Verschleißrate des 'Zustands'-Levels pro Betriebsstunde. Bei 1% verschlechtert sich der Zustand des Fahrzeugs nach 100 Betriebsstunden vollständig. Ein höherer Wert führt zu einer schnelleren Verschlechterung des Gesamtzustands."/>
-        <text name="ads_breakdownFrequency_tooltip" text="Legt die mittlere Zeit zwischen Ausfällen (MTBF) in Minuten fest, wenn der Zustand des Fahrzeugs 100% beträgt. Mit abnehmendem Zustand des Fahrzeugs verringert sich auch die tatsächliche MTBF."/>
+        <text name="ads_serviceInterval_tooltip" text="Legt das Basis-Wartungsintervall fest, nach dem eine Wartung erforderlich ist. Das tatsächliche Intervall variiert je nach Fahrzeugmarke, Alter und Qualität früherer Wartungen."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Legt die grundlegende Fahrzeuglebensdauer fest, nach der der Zustand 0 % erreicht. Je näher der Zustand an null liegt, desto unzuverlässiger wird das Fahrzeug."/>
+        <text name="ads_breakdownFrequency_tooltip" text="Bestimmt, wie oft zufällige Ausfälle auftreten. Bei 100 % hat ein vollständig funktionsfähiges Fahrzeug ungefähr alle 20 Stunden einen Ausfall. Mit sinkendem Zustand steigt die Häufigkeit stark an – bis auf etwa einen Ausfall pro Stunde bei kritischem Zustand."/>
         <text name="ads_thermalSensitivity_tooltip" text="Passt das Verhalten des thermischen Modells an. Höhere Einstellungen machen Motor und Getriebe empfindlicher gegenüber Last, Umgebungstemperatur und Kühlerverschmutzung und erzeugen unter gleichen Bedingungen mehr Wärme."/>
         <text name="ads_thermal_none" text="Passiv"/>
         <text name="ads_thermal_mild" text="Leicht"/>
@@ -42,9 +42,6 @@
         <text name="ads_ws_label_operating_hours" text="Betriebsstunden"/>
         <text name="ads_ws_label_service" text="Wartung"/>
         <text name="ads_ws_label_condition" text="Zustand"/>
-        <text name="ads_ws_label_current_power" text="Aktuelle Leistung"/>
-        <text name="ads_ws_label_brake_efficiency" text="Bremsleistung"/>
-        <text name="ads_ws_label_harvest_efficiency" text="Ernteeffizienz"/>
         <text name="ads_ws_label_maintainability" text="Wartbarkeit"/>
         <text name="ads_ws_label_maintenance_log" text="Wartungsprotokoll"/>
         <text name="ads_ws_label_last_report" text="Letzter Bericht"/>
@@ -63,11 +60,9 @@
         <text name="ads_ws_action_repair" text="Reparatur"/>
         <text name="ads_ws_action_overhaul" text="Generalüberholung"/>
         <text name="ads_ws_action_cancel_service" text="Vorgang abbrechen"/>
-        <text name="ads_ws_button_log" text="Wartungsprotokoll"/>
         <text name="ads_ws_button_show" text="Anzeigen"/>
         <text name="ads_ws_age_unit" text="Monate"/>
         <text name="ads_ws_hours_unit" text="h"/>
-        <text name="ads_ws_button_ok" text="OK"/>
         <text name="ads_ws_option_yes" text="Ja"/>
         <text name="ads_ws_option_no" text="Nein"/>
         <text name="ads_ws_status_open" text="Werkstatt ist geöffnet"/>
@@ -76,14 +71,11 @@
         <text name="ads_ws_status_in_progress_format" text="%s läuft bis %s..."/>
         <text name="ads_ws_task_inspection" text="Inspektion"/>
         <text name="ads_ws_task_maintenance" text="Wartung"/>
-        <text name="ads_ws_task_repair" text="Reparatur"/>
         <text name="ads_ws_task_overhaul" text="Generalüberholung"/>
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
-        <text name="ads_ws_info_nothing_to_repair_title" text="Nichts zu reparieren"/>
-        <text name="ads_ws_info_nothing_to_repair_text" text="Bitte wählen Sie ein oder mehrere zu reparierende Teile aus der Liste aus."/>
         <text name="ads_ws_no_last_report_message" text="Es liegen noch keine Berichte vor"/>
         <text name="ads_ws_no_report_message" text="Kein Bericht vorhanden"/>
-        <text name="ads_ws_no_log_empty_message" text="Das Protokoll ist noch leer"/>
+        <text name="ads_ws_no_log_empty_message" text="Protokoll ist noch leer"/>
         <text name="ads_ws_cancel_confirm_title" text="Abbrechen %s?"/>
         <text name="ads_ws_cancel_confirm_text" text="Der aktuelle Fortschritt wird unverändert gespeichert. Es wird kein Geld zurückerstattet."/>
         <text name="ads_log_header_title" text="Wartungsprotokoll"/>
@@ -91,7 +83,7 @@
         <text name="ads_log_total_cost_title" text="Gesamtausgaben"/>
         <text name="ads_log_cost_per_month_title" text="Monatliche Kosten"/>
         <text name="ads_log_ownership_months_title" text="Besitzdauer"/>
-        <text name="ads_log_total_breakdowns_count_title" text="Gesamtzahl behobener Pannen"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Gesamte Ausfälle"/>
         <text name="ads_log_average_breakdowns_interval_title" text="Ø Pannenintervall"/>
         <text name="ads_log_average_maintenance_interval_title" text="Ø Wartungsintervall"/>
         <text name="ads_log_performed" text="%s durchgeführt"/>
@@ -106,22 +98,6 @@
         <text name="ads_log_description" text="Beschreibung"/>
         <text name="ads_log_price" text="Kosten"/>
         <text name="ads_log_empty" text="Protokoll ist leer"/>
-        <text name="ads_breakdowns_part_ecu" text="ECU"/>
-        <text name="ads_breakdowns_part_vehicle" text="Fahrzeug"/>
-        <text name="ads_breakdowns_part_engine" text="Motor"/>
-        <text name="ads_breakdowns_part_turbocharger" text="Turbolader"/>
-        <text name="ads_breakdowns_part_fuel_pump" text="Kraftstoffpumpe"/>
-        <text name="ads_breakdowns_part_fuel_injectors" text="Einspritzdüsen"/>
-        <text name="ads_breakdowns_part_brake_system" text="Bremssystem"/>
-        <text name="ads_breakdowns_part_transmission" text="Getriebe"/>
-        <text name="ads_breakdowns_part_cvt_cooling_system" text="Kühlsystem des CVT-Getriebes"/>
-        <text name="ads_breakdowns_part_cooling_system" text="Kühlsystem"/>
-        <text name="ads_breakdowns_part_hydraulic_lift_system" text="Hydrauliksystem"/>
-        <text name="ads_breakdowns_part_electrical_system" text="Elektrisches System"/>
-        <text name="ads_breakdowns_part_carburetor" text="Vergaser"/>
-        <text name="ads_breakdowns_part_yield_sensor" text="Ertragssensor"/>
-        <text name="ads_breakdowns_part_material_flow_system" text="Materialflusssystem"/>
-        <text name="ads_breakdowns_part_unloading_auger" text="Abtankschnecke"/>
         <text name="ads_breakdowns_severity_permanent" text="Dauerhaft"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Leistungsreduzierung"/>
         <text name="ads_breakdowns_severity_shutdown" text="Motorabschaltung"/>
@@ -130,6 +106,41 @@
         <text name="ads_breakdowns_severity_major" text="Schwerwiegend"/>
         <text name="ads_breakdowns_severity_critical" text="Kritisch"/>
         <text name="ads_breakdowns_general_wear_stage1_description" text="Die angesammelte Belastung jahrelanger harter Arbeit. Geringfügiger, irreversibler Verschleiß an Kernkomponenten reduziert die Gesamtleistung leicht."/>
+        <text name="ads_breakdowns_part_vehicle" text="Fahrzeug"/>
+        <text name="ads_breakdowns_part_consumables" text="Verbrauchsmaterialien"/>
+        <text name="ads_breakdowns_part_engine" text="Motor"/>
+        <text name="ads_breakdowns_part_battery" text="Batterie"/>
+        <text name="ads_breakdowns_part_ecu" text="ECU"/>
+        <text name="ads_breakdowns_part_wiring" text="Verkabelung und Steckverbindungen"/>
+        <text name="ads_breakdowns_part_alternator_regulator" text="Lichtmaschinenregler"/>
+        <text name="ads_breakdowns_part_turbocharger" text="Turbolader"/>
+        <text name="ads_breakdowns_part_oil_pump" text="Ölpumpe"/>
+        <text name="ads_breakdowns_part_valve_train" text="Ventiltrieb"/>
+        <text name="ads_breakdowns_part_clutch" text="Kupplung"/>
+        <text name="ads_breakdowns_part_synchronizer" text="Synchronring"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift-Hydraulikpumpe"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="CVT-Kette"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT-Hydraulikregelventil"/>
+        <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulikpumpe"/>
+        <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulikzylinder"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="Zapfwellenkupplung"/>
+        <text name="ads_breakdowns_part_brake_system" text="Bremssystem"/>
+        <text name="ads_breakdowns_part_wheel_bearing" text="Radlager"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="Lenkgestänge"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="Kettenspanner"/>
+        <text name="ads_breakdowns_part_thermostat" text="Thermostat"/>
+        <text name="ads_breakdowns_part_cooling_system" text="Kühlsystem"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="Lüfterkupplung"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="Kraftstoffpumpe"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="Einspritzdüsen"/>
+        <text name="ads_breakdowns_part_fuel_filter" text="Kraftstofffilter"/>
+        <text name="ads_breakdowns_part_fuel_line" text="Kraftstoffleitung"/>
+        <text name="ads_breakdowns_part_harvest_processing_system" text="Ernteverarbeitungssystem"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Abtankschnecke"/>
+        <text name="ads_breakdowns_quick_fix_stage" text="Provisorisch repariert"/>
+        <text name="ads_breakdowns_defected_parts_stage" text="Defekt"/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="Die Baugruppe funktioniert derzeit normal, aber die Diagnose hat ein defektes Teil festgestellt. Aufgrund der kritisch geringen Sicherheitsreserve wird ein vorsorglicher Austausch empfohlen, um einen plötzlichen Ausfall zu vermeiden."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="Die Baugruppe funktioniert derzeit normal, ist aber vollständig von einer provisorischen Reparatur verschlissener Teile abhängig. Um einen unvermeidlichen Ausfall unter Last zu vermeiden, wird ein vollständiger Teileaustausch so bald wie möglich empfohlen."/>
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Motorschutzmodus"/>
         <text name="ads_breakdowns_overheat_protection_stage1_message" text="Motor-Notlaufprogramm aktiv! Leistung reduziert!"/>
         <text name="ads_breakdowns_overheat_protection_stage2_description" text="Motorschutzmodus"/>
@@ -145,10 +156,35 @@
         <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Kritische Fehlfunktion des Steuergeräts. Erheblicher Leistungsverlust, hoher Kraftstoffverbrauch und Gefahr des Motorabwürgens."/>
         <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Totalausfall des Steuergeräts. Der Motor kann nicht gesteuert werden und startet nicht."/>
         <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Motorfehler"/>
+        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="Korrosion an Verkabelung und elektrischen Steckverbindungen. Erhöhter Kontaktwiderstand verursacht gelegentliches Flackern der Beleuchtung, instabile Spannungsversorgung und erschwerten Motorstart."/>
+        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="Mäßige Korrosion an Verkabelung und elektrischen Steckverbindungen. Kontaktverluste verursachen häufiges Flackern der Beleuchtung, instabile Spannungsversorgung, erschwerten Motorstart und mögliche Motorabsteller."/>
+        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="Starke Korrosion an Verkabelung und elektrischen Steckverbindungen. Die Versorgung kritischer Stromkreise ist instabil, die Beleuchtung kann vollständig ausfallen, das Motordrehmoment ist reduziert, Motorabsteller sind wahrscheinlich und der Start ist unzuverlässig."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="Ausfall des Starter-Steuerkreises durch starke Kabelkorrosion. Die Beleuchtung ist funktionslos und ein Motorstart ist unmöglich."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_message" text="Ausfall des Starterkreises"/>
+        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="Batteriesulfatierung. Die effektive Batteriekapazität ist reduziert, wodurch die elektrische Reserve unter Last sinkt."/>
+        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="Mäßige Batteriesulfatierung. Die nutzbare Batteriekapazität ist deutlich reduziert und das Starten des Motors wird erschwert."/>
+        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="Starke Batteriesulfatierung. Die nutzbare Batteriekapazität ist kritisch niedrig und die Startleistung instabil."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="Kritische Batteriesulfatierung. Die effektive Batteriekapazität ist nahezu nicht mehr vorhanden und die Startleistung reicht für einen zuverlässigen Motorstart nicht aus."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="Unzureichende Startleistung der Batterie"/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage1_description" text="Fehlfunktion des Lichtmaschinenreglers. Die Ladeleistung ist reduziert, wodurch die Batterie schlechter geladen wird."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="Mäßige Fehlfunktion des Lichtmaschinenreglers. Die Ladeleistung ist instabil und reduziert, was zu schlechter Batterieladung und erhöhten Spannungsverlusten im Bordnetz führt."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="Schwere Fehlfunktion des Lichtmaschinenreglers. Die Ladeleistung ist kritisch reduziert, die Spannungsversorgung instabil und das elektrische System arbeitet mit erheblichen Verlusten."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="Vollständiger Ausfall des Lichtmaschinenreglers. Die Batterie wird nicht mehr geladen und das Bordnetz arbeitet nur noch aus der verbleibenden Batteriereserve."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_message" text="Ausfall des Ladesystems"/>
         <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Verschlissene Turbolager. Ein leises Pfeifen ist zu hören, und es gibt einen leichten Leistungsverlust bei hohen Drehzahlen."/>
         <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Undichte Turboladerdichtungen. Spürbarer Leistungsverlust, erhöhter Kraftstoffverbrauch."/>
         <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Beschädigte Turbinenschaufeln. Starker Leistungsverlust und Gefahr des Motorabwürgens unter hoher Last."/>
         <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Katastrophaler Turboschaden. Der Motor hat den größten Teil seiner Leistung verloren und ist in Gefahr, schwere interne Schäden zu erleiden."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="Fehlfunktion der Ölpumpe. Der Öldruck ist reduziert, das Motordrehmoment leicht verringert, die Motortemperatur erhöht und mechanisches Klopfen kann hörbar sein."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="Mäßige Fehlfunktion der Ölpumpe. Der Öldruck ist unzureichend, das Motordrehmoment deutlich reduziert, die Motortemperatur erhöht und mechanisches Klopfen klar hörbar."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="Schwere Fehlfunktion der Ölpumpe. Der Öldruck ist kritisch niedrig, das Motordrehmoment stark reduziert, Motorüberhitzung wahrscheinlich, mechanisches Klopfen stark ausgeprägt und Motorabsteller möglich."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="Kritischer Ausfall der Ölpumpe. Die Ölzirkulation reicht für einen sicheren Motorbetrieb nicht mehr aus und ein Start oder weiterer Betrieb ist nicht möglich."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_message" text="Öldruckausfall"/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="Fehlfunktion des Ventiltriebs. Das Motordrehmoment ist leicht reduziert, der Kraftstoffverbrauch erhöht und ein ungewöhnliches Ventiltriebgeräusch vorhanden."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="Mäßige Fehlfunktion des Ventiltriebs. Das Motordrehmoment ist deutlich reduziert, der Kraftstoffverbrauch erhöht, das Ventiltriebgeräusch ausgeprägt und unter Last kann der Motor stottern."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="Schwere Fehlfunktion des Ventiltriebs. Das Motordrehmoment ist stark reduziert, der Kraftstoffverbrauch hoch, das mechanische Geräusch stark ausgeprägt und Motorabsteller sind möglich."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="Kritischer Ventiltriebschaden. Der Motor kann nicht mehr zuverlässig betrieben werden und Start oder weiterer Betrieb sind nicht möglich."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_message" text="Ventiltriebsausfall"/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Früher Verschleiß der Kraftstoffpumpe. Leicht reduzierte Motorleistung und erhöhter Kraftstoffverbrauch."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Kraftstoffdruck fällt ab. Spürbarer Leistungsverlust, höherer Kraftstoffverbrauch und gelegentliches Abwürgen des Motors."/>
         <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kritischer Kraftstoffdruck. Starker Leistungsverlust, sehr hoher Kraftstoffverbrauch und häufiges Abwürgen des Motors."/>
@@ -178,10 +214,16 @@
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Verschlissene Dichtungen der Hydraulikpumpe. Spürbare Verzögerung und Ruckeln beim Schalten."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Ausfallende Hydraulikpumpe. Starke Verzögerung und heftige Stöße beim Schalten."/>
         <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Hydraulikpumpe des Lastschaltgetriebes ausgefallen. Getriebe steckt im Leerlauf fest."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage1_description" text="Thermostat beginnt zu klemmen. Das CVT-Getriebe erwärmt sich langsam oder läuft unter Last etwas heißer als normal."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage2_description" text="Der Thermostat klemmt teilweise. Die Temperatur des CVT ist instabil, was bei längerer Arbeit zu Überhitzungsgefahr führt."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage3_description" text="Der Thermostat ist größtenteils funktionslos. Das CVT neigt zu starker Überhitzung, was zu internen Schäden führen kann."/>
-        <text name="ads_breakdowns_cvt_thermostat_malfunction_stage4_description" text="Der Thermostat ist vollständig ausgefallen, wahrscheinlich in geschlossener Position. Die Kühlung ist minimal, was zu einer schnellen und gefährlichen Überhitzung des CVT führt."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="Verschleiß der CVT-Kette. Unter Last tritt leichtes Schlupfen auf, wodurch die Übertragungseffizienz geringfügig sinkt."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="Mäßiger Verschleiß der CVT-Kette. Der Schlupf wird unter Last deutlich spürbar und das Übersetzungsverhältnis wird ungenauer geregelt."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="Starker Verschleiß der CVT-Kette. Der Schlupf ist erheblich, die Effizienz sinkt stark und das Getriebe kann die angeforderte Übersetzung kaum halten."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="Kritischer Ausfall der CVT-Kette. Das Getriebe kann das Drehmoment nicht mehr korrekt übertragen und das Fahrzeug ist praktisch nicht mehr einsatzfähig."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="Ausfall der CVT-Kette"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="Leichte Fehlfunktion des Hydraulikregelventils. Die Hydraulik reagiert etwas langsamer und weniger präzise."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Mäßige Fehlfunktion des Hydraulikregelventils. Der Durchfluss ist instabil, die Hydraulik reagiert verzögert und die Effizienz sinkt deutlich."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Schwere Fehlfunktion des Hydraulikregelventils. Der Durchfluss ist stark ungleichmäßig, die Steuerung reagiert schlecht und die verfügbare Hydraulikleistung sinkt deutlich."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Kritischer Ausfall des Hydraulikregelventils. Der Hydraulikfluss kann nicht mehr korrekt geregelt werden und ein normaler Betrieb ist unmöglich."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Ausfall des Hydraulikregelventils"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Motorthermostat beginnt auszufallen. Der Motor braucht länger, um die optimale Temperatur zu erreichen, oder läuft etwas zu heiß."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Schlechte Reaktion des Thermostats. Die Motortemperaturregelung ist instabil, was den Verschleiß erhöht."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Der Thermostat klemmt in geschlossener Position. Der Motor wird unter Last ständig überhitzen."/>
@@ -191,6 +233,51 @@
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Beschädigte Hydraulikpumpe. Anbaugeräte sind extrem langsam und schwach."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Ausfall der Hydraulikpumpe. Das Hydrauliksystem ist außer Betrieb."/>
         <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hydraulikausfall"/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="Leckage im Hydraulikzylinder. Die Haltekraft ist leicht reduziert und Bewegungen werden etwas langsamer."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="Mäßige interne Leckage im Hydraulikzylinder. Der Druck fällt schneller ab, die Kraft sinkt deutlich und Bewegungen werden sichtbar langsamer."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="Schwere interne Leckage im Hydraulikzylinder. Die Hydraulikkraft ist stark reduziert, Lasten können nur unzuverlässig gehalten werden und die Funktion ist stark beeinträchtigt."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="Kritischer Ausfall des Hydraulikzylinders. Der Innendruck kann nicht mehr gehalten werden und ein normaler Hydraulikbetrieb ist unmöglich."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="Ausfall des Hydraulikzylinders"/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="Leichter Schlupf der Zapfwellenkupplung. Ein kleiner Teil der Leistung geht bei der Übertragung auf das Anbaugerät verloren."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="Mäßiger Schlupf der Zapfwellenkupplung. Die Leistungsübertragung wird unter Last deutlich ineffizienter."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="Starker Schlupf der Zapfwellenkupplung. Die Leistungsübertragung ist stark reduziert und der Betrieb des Anbaugeräts wird instabil."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="Kritischer Ausfall der Zapfwellenkupplung. Die Zapfwelle kann die Leistung nicht mehr zuverlässig übertragen."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="Schlupf der Zapfwellenkupplung"/>
+        <text name="ads_breakdowns_bearing_wear_stage1_description" text="Leichter Lagerverschleiß. Der mechanische Widerstand steigt leicht an und ungewöhnliche Laufgeräusche können auftreten."/>
+        <text name="ads_breakdowns_bearing_wear_stage2_description" text="Mäßiger Lagerverschleiß. Die Reibung steigt deutlich, das Geräusch wird stärker und die mechanische Effizienz sinkt."/>
+        <text name="ads_breakdowns_bearing_wear_stage3_description" text="Starker Lagerverschleiß. Die Reibung ist hoch, die Geräuschentwicklung deutlich und unter Last besteht echte Fressgefahr."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_description" text="Kritischer Lagerverschleiß. Das betroffene Bauteil steht kurz vor vollständigem Festfressen und ein Betrieb ist nicht mehr möglich."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_message" text="Lagerschaden"/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="Leichter Verschleiß des Lenkgestänges. Die Lenkung wird etwas unpräziser."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="Mäßiger Verschleiß des Lenkgestänges. Das Spiel nimmt zu, die Präzision sinkt deutlich und das Fahrverhalten verschlechtert sich."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="Starker Verschleiß des Lenkgestänges. Das Spiel ist groß, die Lenkung reagiert schlecht und die Fahrzeugkontrolle wird schwierig."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="Kritischer Ausfall des Lenkgestänges. Die Lenkung ist nicht mehr zuverlässig und die Weiterfahrt gefährlich."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="Lenkungsausfall"/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="Leichte Fehlfunktion des Kettenspanners. Die Kettenspannung ist etwas instabiler, was Widerstand und Verschleiß geringfügig erhöht."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="Mäßige Fehlfunktion des Kettenspanners. Die Kettenspannung wird instabil, die Laufeffizienz sinkt und das Risiko einer Fehlführung steigt."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="Schwere Fehlfunktion des Kettenspanners. Die Kettenspannung ist stark gestört, die Kraftübertragung ineffizient und das Risiko des Abspringens steigt."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="Kritischer Ausfall des Kettenspanners. Die Kette kann nicht mehr korrekt gespannt werden und das Fahrzeug ist nicht mehr sicher einsetzbar."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="Ausfall des Kettenspanners"/>
+        <text name="ads_breakdowns_coolant_leak_stage1_description" text="Leck im Kühlmittelkreislauf. Die Kühlleistung ist leicht reduziert."/>
+        <text name="ads_breakdowns_coolant_leak_stage2_description" text="Mäßiges Leck im Kühlmittelkreislauf. Die Kühlleistung sinkt deutlich und die Motortemperatur steigt schneller an."/>
+        <text name="ads_breakdowns_coolant_leak_stage3_description" text="Starkes Leck im Kühlmittelkreislauf. Der Kühlverlust ist erheblich und die Überhitzungsgefahr steigt stark."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_description" text="Kritischer Ausfall des Kühlsystems. Es steht nicht mehr genügend Kühlmittel für einen sicheren Motorbetrieb zur Verfügung."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_message" text="Kühlmittelverlust"/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="Leichter Ausfall der Lüfterkupplung. Der Lüfter reagiert träger und die Kühlung ist leicht eingeschränkt."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="Mäßiger Ausfall der Lüfterkupplung. Die Lüfterzuschaltung erfolgt unregelmäßig und die Kühlleistung sinkt deutlich."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="Schwerer Ausfall der Lüfterkupplung. Der Lüfter liefert nicht mehr ausreichend Luftdurchsatz und der Motor überhitzt leichter."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="Kritischer Ausfall der Lüfterkupplung. Der Lüfter kann die notwendige Kühlleistung nicht mehr bereitstellen."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="Ausfall der Lüfterkupplung"/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="Leichte Verstopfung des Kraftstofffilters. Der Kraftstoffdurchfluss sinkt unter hoher Last geringfügig."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="Mäßige Verstopfung des Kraftstofffilters. Unter Last wird die Kraftstoffversorgung spürbar eingeschränkt, die Leistung sinkt und der Motor verschluckt sich gelegentlich."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="Starke Verstopfung des Kraftstofffilters. Die Kraftstoffversorgung ist stark eingeschränkt, die Leistung bricht deutlich ein und Motorabsteller sind möglich."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="Der Kraftstofffilter ist nahezu vollständig zugesetzt. Der Motor erhält nicht mehr genug Kraftstoff für einen zuverlässigen Betrieb."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="Kraftstofffilter verstopft"/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="Leichter Lufteintritt in der Kraftstoffleitung. Die Kraftstoffversorgung wird leicht ungleichmäßig."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="Mäßiger Lufteintritt in der Kraftstoffleitung. Die Versorgung wird instabil, die Leistung sinkt und der Motor verschluckt sich."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="Starker Lufteintritt in der Kraftstoffleitung. Der Motor läuft sehr unruhig und die Gefahr von Motorabstellern ist hoch."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="Kritischer Defekt der Kraftstoffleitung mit starkem Lufteintritt. Der Motor kann nicht mehr korrekt mit Kraftstoff versorgt werden."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="Luftleck in der Kraftstoffleitung"/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Verschlissene Isolierung, gelegentliche Spannungsabfälle. Kleinere elektrische Störungen können beobachtet werden."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Korrodierte Kontakte und instabile Leistung der Lichtmaschine. Lichter können ausfallen, der Motorstart ist unzuverlässig."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Gefahr von Kurzschlüssen. Kritische Systeme sind unzuverlässig und die Lichter können komplett ausfallen."/>
@@ -202,11 +289,11 @@
         <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Starke Vergaserblockade. Der Motor läuft sehr unrund, geht häufig aus und hat Mühe, die Leistung zu halten."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Kraftstoffmangel durch einen komplett verstopften Vergaser. Der Motor läuft nicht."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Vergaser verstopft"/>
-        <text name="ads_breakdowns_yield_sensor_malfunction_stage1_description" text="Leichte Sensorverschmutzung oder Kalibrierungsabweichung. Das automatische Dreschsystem ist etwas weniger effizient, was zu minimalen Ernteverlusten führt."/>
-        <text name="ads_breakdowns_yield_sensor_malfunction_stage2_description" text="Ungenauigkeiten der Sensormessungen führen zu suboptimalen Einstellungen der Dresch- und Abscheidesysteme. Der Ertragsverlust ist spürbar."/>
-        <text name="ads_breakdowns_yield_sensor_malfunction_stage3_description" text="Kritische Sensorfehlfunktion. Die Steuereinheit erhält stark fehlerhafte Daten, was zu erheblichen Verlusten führt, da das Korn falsch von der Spreu getrennt wird."/>
-        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_description" text="Totalausfall des Ertragsüberwachungssystems. Der Mähdrescher arbeitet 'blind', was zu massiver Ineffizienz und schweren Ernteverlusten führt."/>
-        <text name="ads_breakdowns_yield_sensor_malfunction_stage4_message" text="Ausfall der Ertragsüberwachung"/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="Leichter Verschleiß des Ernte- und Verarbeitungssystems. Die Verarbeitungseffizienz sinkt leicht, was zu geringem Ertragsverlust führt."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="Mäßiger Verschleiß des Ernte- und Verarbeitungssystems. Die Verarbeitungseffizienz sinkt merklich, was zu messbarem Ertragsverlust führt."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="Starker Verschleiß des Ernte- und Verarbeitungssystems. Die Verarbeitungseffizienz ist deutlich reduziert, was zu hohem Ertragsverlust führt."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="Kritischer Verschleiß des Ernte- und Verarbeitungssystems. Die Verarbeitungseffizienz ist auf ein kritisches Niveau gesunken und verursacht extreme Verluste während des Betriebs."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_message" text="Ernteverarbeitungseffizienz kritisch reduziert"/>
         <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Leichter Verschleiß an internen Schnecken und Aufzugsketten. Eine geringe Menge Erntegut geht beim internen Transport verloren."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Verschlissene Schneckenwindungen und rutschende Förderbänder verursachen erhöhten Verlust im Inneren der Maschine. Gelegentlich sind Schleifgeräusche zu hören."/>
         <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Beschädigte Elevatorpaddel und Schnecken haben Schwierigkeiten, die Erntemasse zu bewegen, was zu erheblichen Verlusten und der Gefahr einer großen Verstopfung führt."/>
@@ -217,8 +304,10 @@
         <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Beschädigtes Getriebe oder stark verschlissener Riemen. Die Schnecke dreht sich nur schwer und arbeitet mit sehr niedriger Geschwindigkeit."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Antriebsriemen gerissen oder Getriebe festgefressen. Die Abtankschnecke ist komplett blockiert."/>
         <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Abtankschnecke blockiert"/>
+        <text name="ads_breakdowns_dead_battery_message" text="Batterieladung erschöpft"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="Unzureichende Bordspannung"/>
         <text name="ads_breakdowns_engine_stalled_message" text="Motor abgewürgt"/>
-        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO auto-disengaged"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="Zapfwelle automatisch ausgekuppelt"/>
         <text name="ads_breakdowns_gear_disengage_message" text="Gang ausgelegt"/>
         <text name="ads_breakdown_at_progress_message" text="in Arbeit"/>
         <text name="ads_spec_cold_engine_message" text="Motor ist kalt! Hohe Drehzahlen verursachen Verschleiß!"/>
@@ -232,13 +321,11 @@
         <text name="ads_spec_day_s" text="Tag(e)"/>
         <text name="ads_spec_hour_s" text="Stunde(n)"/>
         <text name="ads_spec_minute_s" text="Minute(n)"/>
-        <text name="ads_spec_and" text="und"/>
         <text name="ads_spec_duration_format_hours" text="%d %s"/>
         <text name="ads_spec_duration_format_minutes" text="%d %s"/>
         <text name="ads_spec_duration_format_combined" text="%s und %s"/>
         <text name="ads_spec_months_ago_unit" text="Monate"/>
         <text name="ads_spec_months_ago_format" text="vor %s %s"/>
-        <text name="ads_spec_last_maintenance_format" text="%s (%s)"/>
         <text name="ads_spec_last_maintenance_until_format" text="%s bis %s"/>
         <text name="ads_spec_service_interval_format" text="%s Bst."/>
         <text name="ads_spec_maintenance_complete_notification" text="abgeschlossen"/>
@@ -250,6 +337,14 @@
         <text name="ads_spec_workshop_dealer" text="Händler"/>
         <text name="ads_spec_workshop_own" text="Eigen"/>
         <text name="ads_spec_workshop_mobile" text="Mobil"/>
+        <text name="ads_spec_system_engine" text="Motor"/>
+        <text name="ads_spec_system_transmission" text="Getriebe"/>
+        <text name="ads_spec_system_hydraulics" text="Hydraulik / Zapfwelle"/>
+        <text name="ads_spec_system_cooling" text="Kühlsystem"/>
+        <text name="ads_spec_system_electrical" text="Elektrik"/>
+        <text name="ads_spec_system_chassis" text="Fahrwerk"/>
+        <text name="ads_spec_system_workprocess" text="Arbeitssysteme"/>
+        <text name="ads_spec_system_fuel" text="Kraftstoffsystem"/>
         <text name="ads_spec_state_ready" text="Bereit"/>
         <text name="ads_spec_state_inspection" text="Inspektion"/>
         <text name="ads_spec_state_maintenance" text="Wartung"/>
@@ -260,7 +355,7 @@
         <text name="ads_spec_state_good" text="Gut"/>
         <text name="ads_spec_state_normal" text="Normal"/>
         <text name="ads_spec_state_bad" text="Schlecht"/>
-        <text name="ads_spec_state_terrible" text="Schrecklich"/>
+        <text name="ads_spec_state_terrible" text="Sehr schlecht"/>
         <text name="ads_spec_state_unknown" text="Unbekannt"/>
         <text name="ads_spec_state_optimal" text="Optimal"/>
         <text name="ads_spec_state_recommended" text="Empfohlen"/>
@@ -270,9 +365,6 @@
         <text name="ads_spec_state_premium" text="Premium"/>
         <text name="ads_spec_state_standart" text="Standard"/>
         <text name="ads_spec_state_budget" text="Budget"/>
-        <text name="ads_spec_state_complex" text="Komplex"/>
-        <text name="ads_spec_state_robust" text="Robust"/>
-        <text name="ads_spec_state_extreme" text="Extrem"/>
         <text name="ads_spec_state_low" text="Niedrig"/>
         <text name="ads_spec_state_average" text="Durchschnittlich"/>
         <text name="ads_spec_state_high" text="Hoch"/>
@@ -280,42 +372,44 @@
         <text name="ads_spec_part_types_used" text="Gebraucht"/>
         <text name="ads_spec_part_types_aftermarket" text="Aftermarket"/>
         <text name="ads_spec_part_types_oem" text="OEM"/>
-        <text name="ads_spec_part_types_premium" text="Prämie"/>
+        <text name="ads_spec_part_types_premium" text="Premium"/>
         <text name="ads_spec_inspection_visual" text="Visuell"/>
         <text name="ads_spec_inspection_standard" text="Standard"/>
         <text name="ads_spec_inspection_complete" text="Vollständige Defektoskopie"/>
         <text name="ads_spec_maintenance_minimal" text="Minimal"/>
         <text name="ads_spec_maintenance_standard" text="Standard"/>
         <text name="ads_spec_maintenance_extended" text="Erweitert"/>
+        <text name="ads_spec_maintenance_preventive" text="Präventiv"/>
         <text name="ads_spec_overhaul_partial" text="Teilweise"/>
         <text name="ads_spec_overhaul_standard" text="Standard"/>
         <text name="ads_spec_overhaul_full" text="Voll"/>
         <text name="ads_spec_repair_type_fix" text="Notlösung"/>
         <text name="ads_spec_repair_type_replacement" text="Standard"/>
+        <text name="ads_spec_repair_type_advanced" text="Erweitert"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Wählen Sie den Inspektionstyp aus"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Beheben Sie festgestellte Fehler"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Wartungsstufe auswählen"/>
         <text name="ads_option_menu_option_two_title_maintenance" text="Wählen Sie die Qualität der Verbrauchsmaterialien"/>
-        <text name="ads_option_menu_option_three_title_maintenance" text="Beheben Sie festgestellte Fehler"/>
         <text name="ads_option_menu_option_one_title_repair" text="Wählen Sie die Reparaturdringlichkeit aus"/>
         <text name="ads_option_menu_option_two_title_repair" text="Wählen Sie Ersatzteilqualität"/>
-        <text name="ads_option_menu_option_three_title_repair" text="Führen Sie nach der Reparatur eine Wartung durch"/>
         <text name="ads_option_menu_option_one_title_overhaul" text="Arbeitsumfang auswählen"/>
         <text name="ads_option_menu_option_two_title_overhaul" text="Lack erneuern"/>
         <text name="ads_option_menu_price_text" text="Preis: "/>
-        <text name="ads_option_menu_warranty_repair_text" text="Warranty repair"/>
+        <text name="ads_option_menu_warranty_repair_text" text="Garantiereparatur"/>
         <text name="ads_option_menu_duration_text" text="Dauer: "/>
         <text name="ads_option_menu_finish_time_text" text="Endzeit: "/>
         <text name="ads_option_menu_start_text" text="Starten"/>
         <text name="ads_option_menu_duration_instant" text="Sofort"/>
-        <text name="ads_option_menu_inspection_visual_description" text="* Schnelle externe Überprüfung. Niedrige Kosten und sofortiges Ergebnis. Erkennt nur schwerwiegende Fehler (mittlerer Schweregrad+) und liefert keine Daten zum technischen Zustand des Fahrzeugs."/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Schnelle äußere Sichtprüfung. Geringe Kosten und sofortiges Ergebnis. Erkennt sichtbare Fehler, mit nur geringer Wahrscheinlichkeit, einzelne Defekte zu übersehen. Liefert keine technischen Zustandsdaten."/>
         <text name="ads_option_menu_inspection_standard_description" text="* Routinediagnostisches Verfahren. Identifiziert alle aktiven Fehler und erstellt einen allgemeinen Bericht über den Zustand des Fahrzeugs."/>
-        <text name="ads_option_menu_inspection_complete_description" text="* Umfassende Diagnose. Garantiert die Erkennung aller Fehler und liefert einen umfassenden Bericht mit genauen Zustandsprozentsätzen für alle Komponenten."/>
-        <text name="ads_option_menu_maintenance_minimal_description" text="* Grundversorgung. Deutlich günstiger und schneller, stellt den Service Level jedoch nicht vollständig wieder her."/>
-        <text name="ads_option_menu_maintenance_standard_description" text="* Regelmäßige Wartung gemäß Herstellervorgaben. Stellt den normalen Servicelevel wieder her."/>
-        <text name="ads_option_menu_maintenance_extended_description" text="* Umfassender Service. Dauert länger und kostet mehr, steigert aber das Serviceniveau um zusätzliche ~20 %"/>
-        <text name="ads_option_menu_repair_type_fix_description" text="* Eine schnelle Reparatur, um die Saison zu überstehen, aber mit hoher Wahrscheinlichkeit, dass der Defekt zurückkehrt"/>
-        <text name="ads_option_menu_repair_type_replacement_description" text="* Standardaustausch des defekten Bauteils"/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Tiefendiagnose. Garantiert die Erkennung aller Fehler, einschließlich potenzieller Defekte, und liefert einen umfassenden Bericht mit exakten Zustandsprozenten aller Komponenten."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Grundwartung. Deutlich günstiger und schneller, stellt den Wartungszustand jedoch nicht vollständig wieder her und bietet ein kürzeres Intervall bis zur nächsten Wartung."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Reguläre Wartung gemäß Herstellervorgaben. Stellt den Wartungszustand auf normal zurück und bietet das Standardintervall bis zur nächsten Wartung."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Umfassende Wartung. Dauert länger und kostet mehr, stellt den Wartungszustand jedoch über das Standardniveau hinaus wieder her und verlängert das Intervall bis zur nächsten Wartung."/>
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Präventive Wartung über den Herstellerstandard hinaus. Stellt den Servicezustand auf normal zurück und bearbeitet die problematischsten Systeme, um das Ausfallrisiko zu senken."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Temporäre Reparatur, um die Maschine für dringende Arbeiten betriebsfähig zu halten. Stellt die Grundfunktion schnell und günstig wieder her, behebt den Fehler jedoch nicht dauerhaft; er wird nach einiger Zeit wieder auftreten."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Standardmäßiger Austausch des ausgefallenen Bauteils. Beseitigt den aktuellen Fehler vollständig und stellt den Normalzustand der betroffenen Baugruppe wieder her."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* Gründliche Reparatur inklusive Austausch des defekten Bauteils und Wartung verwandter Teile innerhalb des Systems. Verringert das Risiko wiederholter Ausfälle im betroffenen System deutlich."/>
         <text name="ads_option_menu_overhaul_partial_description" text="* Stellt den normalen Zustand wieder her und erfordert weniger Zeit und Ressourcen als eine vollständige Überholung."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Umfassende Arbeiten an allen wichtigen Komponenten. Stellt den Zustand auf ein gutes Niveau wieder her."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Komplette Überholung. Hohe Kosten und Dauer, aber stellt den Zustand auf ein ausgezeichnetes Niveau wieder her."/>
@@ -326,6 +420,7 @@
         <text name="ads_option_menu_perform_repair" text="Beheben Sie alle festgestellten Fehler"/>
         <text name="ads_option_menu_perform_maintenance" text="Führen Sie nach der Reparatur eine Wartung durch"/>
         <text name="ads_option_menu_perform_renew_paint" text="Lack erneuern"/>
+        <text name="ads_option_menu_choosen_parts_text" text="* Für die Reparatur ausgewählt:"/>
         <text name="ads_report_header_title" text="Inspektionsbericht"/>
         <text name="ads_report_vehicle_name_title" text="Fahrzeugname"/>
         <text name="ads_report_date_title" text="Datum"/>
@@ -333,6 +428,10 @@
         <text name="ads_report_vehicle_operating_hours_title" text="Betriebsstunden"/>
         <text name="ads_report_inspection_type_title" text="Inspektionsart"/>
         <text name="ads_report_inspection_location_title" text="Ort"/>
+        <text name="ads_report_overall_assessment_title" text="Gesamtzustandsbewertung"/>
+        <text name="ads_report_vehicle_specs_title" text="Fahrzeugspezifikationen"/>
+        <text name="ads_report_detected_breakdowns_title" text="Erkannte Ausfälle"/>
+        <text name="ads_report_recommendations_title" text="Fazit und Empfehlungen"/>
         <text name="ads_report_state_optimal" text="Optimal"/>
         <text name="ads_report_state_normal" text="Normal"/>
         <text name="ads_report_state_degraded" text="Degradiert"/>
@@ -346,38 +445,52 @@
         <text name="ads_report_overall_assessment_rul" text="Restlebensdauer (Stunden)"/>
         <text name="ads_report_overall_assessment_wear_rate" text="Verschleißrate (%/h)"/>
         <text name="ads_report_overall_assessment_nominal_wear_rate" text="Nominale Verschleißrate (%/h)"/>
-        <text name="ads_report_overall_assessment_wear_index" text="Verschleißindex"/>
-        <text name="ads_report_system_condition_title" text="Systemzustand"/>
+        <text name="ads_report_system_condition_title" text="Systemzustand | Ausfallrisiko"/>
         <text name="ads_report_system_condition_power" text="Aktuelle Leistung"/>
         <text name="ads_report_system_condition_brakes" text="Bremseffizienz"/>
         <text name="ads_report_system_condition_transmission" text="Übertragungseffizienz"/>
         <text name="ads_report_system_condition_harvest" text="Ernteeffizienz"/>
         <text name="ads_report_system_condition_cooling" text="Kühleffizienz"/>
-        <text name="ads_report_system_condition_cvt_cooling" text="CVT-Kühleffizienz"/>
         <text name="ads_report_system_condition_consumption" text="Kraftstoffverbrauch"/>
         <text name="ads_report_system_condition_hydraulic" text="Hydraulische Effizienz"/>
-        <text name="ads_report_system_symptoms_none" text="Bei der Inspektion wurden keine ungewöhnlichen Symptome beobachtet."/>
-        <text name="ads_report_system_symptoms_dark_exhaust" text="Unter Last ist die Abgastrübung erhöht."/>
-        <text name="ads_report_system_symptoms_turbo_grinding" text="Der Turbolader gibt periodisches metallisches Knirschen von sich."/>
-        <text name="ads_report_system_symptoms_lights_flicker" text="Der Beleuchtungskreis zeigt zeitweiliges Flackern."/>
-        <text name="ads_report_system_symptoms_lights_failure" text="Die Außenbeleuchtung ist außer Betrieb."/>
-        <text name="ads_report_system_symptoms_engine_stalls" text="Der Motor geht während des Betriebs zeitweise aus."/>
-        <text name="ads_report_system_symptoms_start_failure" text="Wiederholtes Kurbel-Kein-Start-Verhalten liegt vor."/>
-        <text name="ads_report_system_symptoms_idle_hunting" text="Die Leerlaufdrehzahl ist instabil mit zyklischen Drehzahlschwankungen."/>
-        <text name="ads_report_system_symptoms_engine_hesitation" text="Die Gasannahme zeigt unter Last ein vorübergehendes Zögern."/>
-        <text name="ads_report_system_symptoms_engine_failure" text="Motorabschaltbedingung bestätigt."/>
-        <text name="ads_report_system_symptoms_transmission_slip" text="Unter Last ist Getriebeschlupf erkennbar."/>
-        <text name="ads_report_system_symptoms_gear_shift_failure" text="Gangwechsel scheitern zeitweise."/>
-        <text name="ads_report_system_symptoms_gear_rejection" text="Unter Last fällt das Getriebe gelegentlich in die Neutralstellung."/>
-        <text name="ads_report_system_symptoms_powershift_lag_harsh" text="Das Einlegen des Lastschaltgetriebes erfolgt verzögert und rau."/>
-        <text name="ads_report_system_symptoms_unloading_speed" text="Der Entladedurchsatz liegt unter dem Nennwert."/>
+        <text name="ads_report_transmission_slipping" text="Schlupf"/>
+        <text name="ads_report_transmission_shifting_impaired" text="Schaltvorgänge beeinträchtigt"/>
+        <text name="ads_report_transmission_gear_rejection" text="Gangspringen"/>
+        <text name="ads_report_transmission_shift_delay" text="Schaltverzögerung"/>
+        <text name="ads_report_transmission_cvt_slipping" text="Riemen-/Kettenschlupf"/>
+        <text name="ads_report_transmission_cvt_ratio_limited" text="Übersetzung begrenzt"/>
+        <text name="ads_report_transmission_cvt_pressure_instability" text="Druckinstabilität"/>
+        <text name="ads_report_transmission_failed" text="Ausgefallen"/>
+        <text name="ads_report_vehicle_spec_max_alternator_current" text="Max. Lichtmaschinenstrom"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="Batterieladung"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="Batteriekapazität"/>
+        <text name="ads_report_stress_absent" text="Nicht vorhanden"/>
+        <text name="ads_report_stress_low" text="Niedrig"/>
+        <text name="ads_report_stress_moderate" text="Mäßig"/>
+        <text name="ads_report_stress_elevated" text="Erhöht"/>
+        <text name="ads_report_stress_high" text="Hoch"/>
         <text name="ads_report_recommendation_repair_active_breakdowns" text="Fehler erkannt. Beheben Sie alle aktiven Fehler."/>
+        <text name="ads_report_recommendation_defective_parts" text="Defekte Ersatzteile erkannt: %s. Ein vorsorglicher Austausch wird empfohlen, um plötzliche Ausfälle zu vermeiden."/>
+        <text name="ads_report_recommendation_quick_fix" text="Provisorischer Reparaturzustand erkannt: %s. Ein Standardaustausch wird bei nächster Gelegenheit empfohlen."/>
         <text name="ads_report_recommendation_service_due" text="Serviceintervallschwelle erreicht. Führen Sie Wartungsarbeiten durch."/>
         <text name="ads_report_recommendation_service_urgent" text="Das Serviceintervall wurde verletzt. Führen Sie dringend eine Wartung durch!"/>
         <text name="ads_report_recommendation_overhaul" text="Verschlechterung der Kernkomponenten festgestellt. Führen Sie eine Überholung durch."/>
+        <text name="ads_report_recommendation_system_overhaul" text="Kritische Degradation im %s festgestellt. Führe eine Teilüberholung dieses Systems durch."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="Erhöhtes Ausfallrisiko im %s festgestellt. Führe eine präventive Wartung durch, um das Risiko zu senken."/>
         <text name="ads_report_recommendation_operating_conditions" text="Anzeichen einer intensiven Überbeanspruchung festgestellt. Betriebsbedingungen verbessern."/>
         <text name="ads_report_recommendation_repeat_maintenance" text="Defekte Verbrauchsmaterialien erkannt. Wiederholen Sie die Wartung, um fehlerhafte Komponenten auszutauschen."/>
         <text name="ads_report_recommendation_all_ok" text="Keine kritischen Empfehlungen. Das Fahrzeug ist einsatzbereit."/>
+        <text name="ads_grease_gun_name" text="Fettpresse"/>
+        <text name="ads_grease_gun_function" text="Wird für Schmierarbeiten verwendet"/>
+        <text name="ads_grease_gun_action" text="Fett auftragen"/>
+        <text name="ads_grease_gun_no_vehicle" text="Kein Fahrzeug in Schmierreichweite"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s benötigt keine Schmierung"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s ist bereits geschmiert"/>
+        <text name="ads_air_blower_name" text="Luftgebläse"/>
+        <text name="ads_air_blower_function" text="Wird zum Reinigen von Kühlern und Lufteinlässen verwendet"/>
+        <text name="ads_air_blower_action" text="Kühler und Lufteinlass reinigen"/>
+        <text name="ads_air_blower_no_vehicle" text="Kein Fahrzeug in Reinigungsreichweite"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s benötigt keine Reinigung"/>
+        <text name="ads_air_blower_already_clean" text="%s: Kühler und Lufteinlass sind bereits sauber"/>
     </texts>
 </l10n>
-

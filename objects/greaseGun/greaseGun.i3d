@@ -6,13 +6,13 @@
   </Asset>
 
   <Files>
+    <File fileId="1" filename="texture.dds"/>
     <File fileId="2" filename="texture_normal.dds"/>
-    <File fileId="1" filename="../../../../../../../Downloads/LAST/Meshy_AI_test_2_0323124402_texture_fbx/texture.dds"/>
   </Files>
 
 
   <Materials>
-    <Material name="Material.001" materialId="51" specularColor="0.8 1 0.8">
+    <Material name="Material.001" materialId="18" specularColor="0.8 1 0.8">
       <Texture fileId="1"/>
       <Normalmap fileId="2"/>
     </Material>
@@ -25,7 +25,7 @@
   <Scene>
     <TransformGroup name="greaseGun" lockedgroup="true" nodeId="8">
       <TransformGroup name="graphics" nodeId="9">
-        <Shape name="body" translation="0.0880418 3.23752e-05 -5.95374e-06" rotation="-37.0022 -72.4608 35.7002" scale="1.5 1.5 1.5" shapeId="1" nodeId="46" castsShadows="true" receiveShadows="true" distanceBlending="false" materialIds="51"/>
+        <Shape name="body" translation="0.0880418 3.23752e-05 -5.95374e-06" rotation="-37.0022 -72.4608 35.7002" scale="1.5 1.5 1.5" shapeId="1" nodeId="10" castsShadows="true" receiveShadows="true" distanceBlending="false" materialIds="18"/>
       </TransformGroup>
       <TransformGroup name="handNode" translation="-0.0117173 0.32997 -7.39185e-05" rotation="-49.3208 13.2875 91.924" nodeId="11">
         <TransformGroup name="raycastNode" translation="0.0728855 0.0142458 -0.0299484" rotation="49.8188 -8.69255 -9.74645" scale="1.01395 1.0149 1.0149" nodeId="12"/>

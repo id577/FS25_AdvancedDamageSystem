@@ -5,7 +5,7 @@
             <function>$l10n_ads_grease_gun_function</function>
         </functions>
         <image>objects/greaseGun/store_greaseGun.dds</image>
-        <price>500</price>
+        <price>50</price>
         <lifetime>1000</lifetime>
         <dailyUpkeep>0</dailyUpkeep>
         <rotation>0</rotation>
