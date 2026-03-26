@@ -26,6 +26,7 @@ function ADS_WorkshopDialog.new(target, customMt)
     local dialog = MessageDialog.new(target, customMt or ADS_WorkshopDialog_mt)
     dialog.vehicle = nil
     dialog.isDialogOpen = false
+    dialog.lastObservedStatus = nil
     return dialog
 end
 
@@ -42,6 +43,7 @@ function ADS_WorkshopDialog.show(vehicle)
     dialog.visibleBreakdowns = {}
     dialog.breakdonRegistry = ADS_Breakdowns.BreakdownRegistry
     dialog.workshopType = AdvancedDamageSystem.WORKSHOP.DEALER
+    dialog.lastObservedStatus = vehicle:getCurrentStatus()
 
     if g_workshopScreen.isMobileWorkshop then  dialog.workshopType = AdvancedDamageSystem.WORKSHOP.MOBILE end
     if g_workshopScreen.isOwnWorkshop then  dialog.workshopType = AdvancedDamageSystem.WORKSHOP.OWN end
@@ -56,6 +58,7 @@ function ADS_WorkshopDialog:updateScreen()
     local spec = self.vehicle.spec_AdvancedDamageSystem
     local vehicle = self.vehicle
     local STATUS = AdvancedDamageSystem.STATUS
+    self.lastObservedStatus = self.vehicle:getCurrentStatus()
 
     -- ====================================================================
     -- 1: Vehicle Info Panel
@@ -433,6 +436,7 @@ end
 
 function ADS_WorkshopDialog:onClose(superFunc)
     self.isDialogOpen = false
+    self.lastObservedStatus = nil
     self.vehicle = nil
     g_messageCenter:unsubscribeAll(self)
     g_currentMission:showMoneyChange(MoneyType.VEHICLE_RUNNING_COSTS)

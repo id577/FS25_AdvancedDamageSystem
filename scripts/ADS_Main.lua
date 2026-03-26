@@ -346,8 +346,18 @@ end
 
 
 function ADS_Main:update(dt)
-    if ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.isDialogOpen then
-        ADS_WorkshopDialog.INSTANCE:updateServiceProgressText()
+    local function updateOpenWorkshopDialog()
+        local dialog = ADS_WorkshopDialog.INSTANCE
+        if dialog == nil or not dialog.isDialogOpen or dialog.vehicle == nil or dialog.vehicle.spec_AdvancedDamageSystem == nil then
+            return
+        end
+
+        local currentStatus = dialog.vehicle:getCurrentStatus()
+        if dialog.lastObservedStatus ~= currentStatus then
+            dialog:updateScreen()
+        elseif currentStatus ~= AdvancedDamageSystem.STATUS.READY then
+            dialog:updateServiceProgressText()
+        end
     end
 
     --- workshop
@@ -362,6 +372,7 @@ function ADS_Main:update(dt)
 
     if not g_currentMission:getIsServer() or self.numVehicles == 0 then
         self.previousKey = nil
+        updateOpenWorkshopDialog()
         return
     end
 
@@ -372,6 +383,7 @@ function ADS_Main:update(dt)
     local vehiclesToUpdate = math.floor(self.updateAlphaTimer / timePerVehicle)
 
     if vehiclesToUpdate < 1 then
+        updateOpenWorkshopDialog()
         return
     end
 
@@ -414,6 +426,7 @@ function ADS_Main:update(dt)
         end
     end
     self.updateAlphaTimer = self.updateAlphaTimer - vehiclesToUpdate * timePerVehicle
+    updateOpenWorkshopDialog()
 end
 
 function ADS_Main:loadMap()
