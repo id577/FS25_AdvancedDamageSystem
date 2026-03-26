@@ -27,11 +27,11 @@
         <text name="ads_debugMode_tooltip" text="Active ou désactive le panneau de débogage et la journalisation de débogage étendue dans la console."/>
         <text name="ads_serviceInterval_label" text="Intervalle d'entretien"/>
         <text name="ads_vehicleLifespan_label" text="Durée de vie du véhicule"/>
-        <text name="ads_breakdownFrequency_label" text="Fréquence des pannes"/>
+        <text name="ads_systemStressRate_label" text="Vitesse d'accumulation du stress"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilité thermique"/>
         <text name="ads_serviceInterval_tooltip" text="Définit l'intervalle de maintenance de base après lequel un entretien est requis. L'intervalle réel varie selon la marque, l'âge du véhicule et la qualité des entretiens précédents."/>
         <text name="ads_vehicleLifespan_tooltip" text="Définit la durée de vie de base du véhicule, après laquelle son état atteindra 0 %. Plus l'état approche de zéro, plus le véhicule devient peu fiable."/>
-        <text name="ads_breakdownFrequency_tooltip" text="Détermine la fréquence des pannes aléatoires. À 100 %, un véhicule pleinement opérationnel subira environ une panne toutes les 20 heures. Lorsque l'état se dégrade, la fréquence augmente fortement, jusqu'à environ une panne par heure dans un état critique."/>
+        <text name="ads_systemStressRate_tooltip" text="Definit la vitesse d'accumulation du stress des systemes sous l'effet de la surcharge, de la chaleur, du patinage et d'autres conditions d'utilisation severes. Des valeurs plus elevees amenent plus vite les systemes a un niveau critique."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajuste le comportement du modèle thermique. Des réglages plus élevés rendent le moteur et la transmission plus sensibles à la charge, à la température ambiante et à l'encrassement du radiateur, générant ainsi plus de chaleur dans les mêmes conditions."/>
         <text name="ads_thermal_none" text="Passif"/>
         <text name="ads_thermal_mild" text="Modérée"/>

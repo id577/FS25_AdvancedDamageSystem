@@ -35,12 +35,12 @@ function ADS_InGameSettings:onFrameOpen()
         g_i18n:getText("ads_vehicleLifespan_tooltip")
     )
 
-    -- Breakdown Frequency (ex.: Breakdown Probability)
-self.ads_breakdownProbability = ADS_InGameSettings:addMultiTextOption(
-        self, "onBreakdownProbabilityChanged",
-        ADS_InGameSettings.steps.breakdown.texts,
-        g_i18n:getText("ads_breakdownFrequency_label"),
-        g_i18n:getText("ads_breakdownFrequency_tooltip")
+    -- System Stress Rate
+    self.ads_systemStressRate = ADS_InGameSettings:addMultiTextOption(
+        self, "onSystemStressRateChanged",
+        ADS_InGameSettings.steps.systemStressRate.texts,
+        g_i18n:getText("ads_systemStressRate_label"),
+        g_i18n:getText("ads_systemStressRate_tooltip")
     )
 
     -- Instant Inspection (Binary)
@@ -172,8 +172,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
         element:setState(1)
     end
 
-     local currentBreakdownPct = math.floor((1200 / ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF) * 100 + 0.5)
-    setIndex(currentPage.ads_breakdownProbability, steps.breakdown.values, currentBreakdownPct)
+    setIndex(currentPage.ads_systemStressRate, steps.systemStressRate.values, ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER)
     setIndex(currentPage.ads_serviceWear,       steps.serviceWear.values,    ADS_Config.CORE.BASE_SERVICE_WEAR)
     setIndex(currentPage.ads_conditionWear,     steps.conditionWear.values,  ADS_Config.CORE.BASE_SYSTEMS_WEAR)
     setIndex(currentPage.ads_maintenancePrice,    steps.maintPrice.values,    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER * 100)
@@ -203,7 +202,8 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
 
     currentPage.ads_serviceWear:setDisabled(disableAll)
     currentPage.ads_conditionWear:setDisabled(disableAll)
-    currentPage.ads_breakdownProbability:setDisabled(disableAll)
+
+    currentPage.ads_systemStressRate:setDisabled(disableAll)
     currentPage.ads_instantInspection:setDisabled(disableAll)
     currentPage.ads_parkVehicle:setDisabled(disableAll)
     currentPage.ads_warrantyEnabled:setDisabled(disableAll)
@@ -302,9 +302,9 @@ function ADS_InGameSettings:onWorkshopCloseHourChanged(state)
     ADS_Main:forceWorkshopUpdate()
 end
 
-function ADS_InGameSettings:onBreakdownProbabilityChanged(state)
-    local pct = ADS_InGameSettings.steps.breakdown.values[state]
-    ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF = math.floor(1200 / (pct / 100) + 0.5)
+
+function ADS_InGameSettings:onSystemStressRateChanged(state)
+    ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = ADS_InGameSettings.steps.systemStressRate.values[state]
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
@@ -457,13 +457,12 @@ function ADS_InGameSettings:generateAllSteps()
         self.steps.conditionWear = data
     end
 
-    -- Breakdown Frequency:
-    -- 100% = 1200 MTBF (дефолт), 200% = 600, 50% = 2400
-    self.steps.breakdown = createSteps(20, 15, 20, function(v)
-        return string.format("%.0f%%", v)
+    -- System Stress Rate: 10% to 300%
+    self.steps.systemStressRate = createSteps(0.1, 30, 0.1, function(v)
+        return string.format("%.0f%%", v * 100)
     end)
 
--- Maint Price: 10% to 300%
+    -- Maint Price: 10% to 300%
     self.steps.maintPrice = createSteps(10, 30, 10, function(v)
         return string.format("%.0f%%", v)
     end)

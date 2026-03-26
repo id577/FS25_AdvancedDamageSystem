@@ -27,11 +27,11 @@
         <text name="ads_debugMode_tooltip" text="Abilita o disabilita il pannello di debug e la registrazione estesa nella console."/>
         <text name="ads_serviceInterval_label" text="Intervallo di manutenzione"/>
         <text name="ads_vehicleLifespan_label" text="Durata utile del veicolo"/>
-        <text name="ads_breakdownFrequency_label" text="Frequenza dei guasti"/>
+        <text name="ads_systemStressRate_label" text="Velocita accumulo stress di sistema"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilita termica"/>
         <text name="ads_serviceInterval_tooltip" text="Imposta l'intervallo di manutenzione di base oltre il quale e richiesta la manutenzione. L'intervallo reale varia in base alla marca del veicolo, all'eta e alla qualita delle manutenzioni precedenti."/>
         <text name="ads_vehicleLifespan_tooltip" text="Imposta la durata utile di base del veicolo, oltre la quale la sua condizione raggiungera lo 0%. Piu la condizione si avvicina allo zero, piu il veicolo diventa inaffidabile."/>
-        <text name="ads_breakdownFrequency_tooltip" text="Controlla la frequenza dei guasti casuali. Al 100%, un veicolo pienamente operativo subira un guasto circa ogni 20 ore. Con il peggiorare delle condizioni, la frequenza aumenta sensibilmente fino a circa un guasto all'ora in stato critico."/>
+        <text name="ads_systemStressRate_tooltip" text="Controlla la velocita con cui lo stress di sistema si accumula a causa di sovraccarico, calore, slittamento e altre condizioni operative gravose. Valori piu alti portano i sistemi al livello critico piu rapidamente."/>
         <text name="ads_thermalSensitivity_tooltip" text="Regola il comportamento del modello termico. Impostazioni piu elevate rendono motore e trasmissione piu sensibili al carico, alla temperatura ambiente e all'imbrattamento del radiatore, generando piu calore nelle stesse condizioni."/>
         <text name="ads_thermal_none" text="Passivo"/>
         <text name="ads_thermal_mild" text="Leggero"/>

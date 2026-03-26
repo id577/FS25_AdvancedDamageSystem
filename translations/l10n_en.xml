@@ -27,11 +27,11 @@
         <text name="ads_debugMode_tooltip" text="Enables or disables debug panel and extensive debug logging in the console."/>
         <text name="ads_serviceInterval_label" text="Service Interval"/>
         <text name="ads_vehicleLifespan_label" text="Vehicle Lifespan"/>
-        <text name="ads_breakdownFrequency_label" text="Breakdown Frequency"/>
+        <text name="ads_systemStressRate_label" text="System Stress Rate"/>
         <text name="ads_thermalSensitivity_label" text="Thermal Sensitivity"/>
         <text name="ads_serviceInterval_tooltip" text="Sets the base service interval after which maintenance is required. The actual interval will vary depending on the vehicle brand, age, and quality of previous maintenance."/>
         <text name="ads_vehicleLifespan_tooltip" text="Sets the base lifespan of the vehicle, after which its condition will reach 0%. The closer the condition is to zero, the more unreliable the vehicle becomes."/>
-        <text name="ads_breakdownFrequency_tooltip" text="Controls how often random breakdowns occur. At 100%, a fully operational vehicle will experience a breakdown roughly every 20 hours. As condition deteriorates, the frequency increases significantly — down to once per hour at critical condition."/>
+        <text name="ads_systemStressRate_tooltip" text="Controls how quickly system stress accumulates from overload, heat, slippage, and other harmful operating conditions. Higher values make systems reach critical stress sooner."/>
         <text name="ads_thermalSensitivity_tooltip" text="Adjusts the thermal model behavior. Higher settings make the engine and transmission more sensitive to load, ambient temperature, and radiator fouling — generating more heat under the same conditions."/>
         <text name="ads_thermal_none" text="Passive"/>
         <text name="ads_thermal_mild" text="Mild"/>

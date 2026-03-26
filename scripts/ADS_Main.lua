@@ -30,8 +30,8 @@ source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
 -- re-broadcast to all other clients via ADS_SettingsSyncEvent).
 do
     local cbs = {
-        "onServiceWearChanged", "onConditionWearChanged", "onBreakdownProbabilityChanged",
-        "onInstantInspectionChanged", "onParkVehicleChanged", "onWarrantyEnabledChanged",
+        "onServiceWearChanged", "onConditionWearChanged",
+        "onSystemStressRateChanged", "onInstantInspectionChanged", "onParkVehicleChanged", "onWarrantyEnabledChanged",
         "onMaintenancePriceChanged", "onMaintenanceDurationChanged", "onWorkshopAvailableChanged",
         "onWorkshopOpenHourChanged", "onWorkshopCloseHourChanged", "onThermalSensitivityChanged",
         "onDirtInfluenceChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"

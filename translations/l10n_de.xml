@@ -27,11 +27,11 @@
         <text name="ads_debugMode_tooltip" text="Aktiviert oder deaktiviert das Debug-Panel und die umfangreiche Debug-Protokollierung in der Konsole."/>
         <text name="ads_serviceInterval_label" text="Wartungsintervall"/>
         <text name="ads_vehicleLifespan_label" text="Fahrzeuglebensdauer"/>
-        <text name="ads_breakdownFrequency_label" text="Pannenhäufigkeit"/>
+        <text name="ads_systemStressRate_label" text="Systemstress-Aufbau"/>
         <text name="ads_thermalSensitivity_label" text="Thermische Empfindlichkeit"/>
         <text name="ads_serviceInterval_tooltip" text="Legt das Basis-Wartungsintervall fest, nach dem eine Wartung erforderlich ist. Das tatsächliche Intervall variiert je nach Fahrzeugmarke, Alter und Qualität früherer Wartungen."/>
         <text name="ads_vehicleLifespan_tooltip" text="Legt die grundlegende Fahrzeuglebensdauer fest, nach der der Zustand 0 % erreicht. Je näher der Zustand an null liegt, desto unzuverlässiger wird das Fahrzeug."/>
-        <text name="ads_breakdownFrequency_tooltip" text="Bestimmt, wie oft zufällige Ausfälle auftreten. Bei 100 % hat ein vollständig funktionsfähiges Fahrzeug ungefähr alle 20 Stunden einen Ausfall. Mit sinkendem Zustand steigt die Häufigkeit stark an – bis auf etwa einen Ausfall pro Stunde bei kritischem Zustand."/>
+        <text name="ads_systemStressRate_tooltip" text="Bestimmt, wie schnell sich Systemstress durch Uberlastung, Hitze, Schlupf und andere schadliche Betriebsbedingungen aufbaut. Hohere Werte bringen Systeme schneller in den kritischen Bereich."/>
         <text name="ads_thermalSensitivity_tooltip" text="Passt das Verhalten des thermischen Modells an. Höhere Einstellungen machen Motor und Getriebe empfindlicher gegenüber Last, Umgebungstemperatur und Kühlerverschmutzung und erzeugen unter gleichen Bedingungen mehr Wärme."/>
         <text name="ads_thermal_none" text="Passiv"/>
         <text name="ads_thermal_mild" text="Leicht"/>

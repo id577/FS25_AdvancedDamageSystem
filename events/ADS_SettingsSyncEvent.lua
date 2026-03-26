@@ -19,7 +19,7 @@ function ADS_SettingsSyncEvent.new()
 
     self.baseServiceWear           = ADS_Config.CORE.BASE_SERVICE_WEAR
     self.baseSystemsWear           = ADS_Config.CORE.BASE_SYSTEMS_WEAR
-    self.maxMtbf                   = ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF
+    self.systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER
     self.aiOverloadControl         = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL
     self.instantInspection         = ADS_Config.MAINTENANCE.INSTANT_INSPECTION
     self.parkVehicle               = ADS_Config.MAINTENANCE.PARK_VEHICLE
@@ -41,7 +41,7 @@ end
 function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.baseServiceWear       or 0)
     streamWriteFloat32(streamId, self.baseSystemsWear       or 0)
-    streamWriteFloat32(streamId, self.maxMtbf                or 1200)
+    streamWriteFloat32(streamId, self.systemStressGlobalMultiplier or 1.0)
     streamWriteBool(streamId,    self.aiOverloadControl      or false)
     streamWriteBool(streamId,    self.instantInspection      or false)
     streamWriteBool(streamId,    self.parkVehicle            or false)
@@ -61,7 +61,7 @@ end
 function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.baseServiceWear           = streamReadFloat32(streamId)
     self.baseSystemsWear           = streamReadFloat32(streamId)
-    self.maxMtbf                   = streamReadFloat32(streamId)
+    self.systemStressGlobalMultiplier = streamReadFloat32(streamId)
     self.aiOverloadControl         = streamReadBool(streamId)
     self.instantInspection         = streamReadBool(streamId)
     self.parkVehicle               = streamReadBool(streamId)
@@ -84,7 +84,7 @@ end
 local function applyConfig(event)
     ADS_Config.CORE.BASE_SERVICE_WEAR                      = event.baseServiceWear
     ADS_Config.CORE.BASE_SYSTEMS_WEAR                      = event.baseSystemsWear
-    ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF       = event.maxMtbf
+    ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER        = event.systemStressGlobalMultiplier
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL       = event.aiOverloadControl
     ADS_Config.MAINTENANCE.INSTANT_INSPECTION               = event.instantInspection
     ADS_Config.MAINTENANCE.PARK_VEHICLE                     = event.parkVehicle

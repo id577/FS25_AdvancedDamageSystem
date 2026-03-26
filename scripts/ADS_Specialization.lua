@@ -2673,9 +2673,10 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
 
     local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
     local systemStressMultiplier = stressMultipliers[systemName] or 1.0
+    local globalStressMultiplier = math.max(tonumber(ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER) or 1.0, 0.0)
     local dtMultiplier = ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
 
-    local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier
+    local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier * globalStressMultiplier
     systemData.stress = math.max((systemData.stress or 0) + stressToAdd, 0)
 
     local conditionToRemove = wearRate * dtMultiplier

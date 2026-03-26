@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 95,
+    VER = 96,
 
     DEBUG = false,
 
@@ -51,6 +51,7 @@ ADS_Config = {
             fuel=0.08
         },
 
+        SYSTEM_STRESS_GLOBAL_MULTIPLIER = 1.0,
         SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS = {
             engine=12.0, 
             transmission=12.0, 
@@ -625,7 +626,7 @@ function ADS_Config.saveToXMLFile()
     -- CORE
     setXMLFloat(xmlFile, root .. ".BASE_SERVICE_WEAR",      ADS_Config.CORE.BASE_SERVICE_WEAR)
     setXMLFloat(xmlFile, root .. ".BASE_SYSTEMS_WEAR",      ADS_Config.CORE.BASE_SYSTEMS_WEAR)
-    setXMLFloat(xmlFile, root .. ".MAX_MTBF",               ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF)
+    setXMLFloat(xmlFile, root .. ".SYSTEM_STRESS_GLOBAL_MULTIPLIER", ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER)
     setXMLBool (xmlFile, root .. ".AI_OVERLOAD_CONTROL",    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL)
 
     -- MAINTENANCE
@@ -712,8 +713,9 @@ function ADS_Config.loadFromXMLFile()
     v = getXMLFloat(xmlFile, root .. ".BASE_SYSTEMS_WEAR")
     if v ~= nil then ADS_Config.CORE.BASE_SYSTEMS_WEAR = v end
 
-    v = getXMLFloat(xmlFile, root .. ".MAX_MTBF")
-    if v ~= nil then ADS_Config.CORE.BREAKDOWN_PROBABILITIES.MAX_MTBF = v end
+
+    v = getXMLFloat(xmlFile, root .. ".SYSTEM_STRESS_GLOBAL_MULTIPLIER")
+    if v ~= nil then ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = v end
 
     v = getXMLBool(xmlFile, root .. ".AI_OVERLOAD_CONTROL")
     if v ~= nil then ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = v end
