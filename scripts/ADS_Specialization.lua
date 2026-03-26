@@ -437,7 +437,9 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "getSmoothedTemperature", AdvancedDamageSystem.getSmoothedTemperature)
      
     SpecializationUtil.registerFunction(vehicleType, "updateBatteryChargingModel", AdvancedDamageSystem.updateBatteryChargingModel)
-
+    SpecializationUtil.registerFunction(vehicleType, "establishExternalPowerConnection", AdvancedDamageSystem.establishExternalPowerConnection)
+    SpecializationUtil.registerFunction(vehicleType, "clearExternalPowerConnection", AdvancedDamageSystem.clearExternalPowerConnection)
+    
     SpecializationUtil.registerFunction(vehicleType, "updateRadiatorClogging", AdvancedDamageSystem.updateRadiatorClogging)
     SpecializationUtil.registerFunction(vehicleType, "updateAirIntakeClogging", AdvancedDamageSystem.updateAirIntakeClogging)
     SpecializationUtil.registerFunction(vehicleType, "cleanRadiatorAndAirIntake", AdvancedDamageSystem.cleanRadiatorAndAirIntake)
@@ -943,6 +945,9 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.rawSystemVoltageV = 12.7
     self.spec_AdvancedDamageSystem.systemVoltageV = 12.7
     self.spec_AdvancedDamageSystem.alternatorHealth = 1.0
+    self.spec_AdvancedDamageSystem.iAltAvail = 0
+    self.spec_AdvancedDamageSystem.iLoads = 0
+    self.spec_AdvancedDamageSystem.externalPowerConnection = nil
 
     self.spec_AdvancedDamageSystem.engineTemperature = -99
     self.spec_AdvancedDamageSystem.rawEngineTemperature = -99
@@ -997,6 +1002,10 @@ function AdvancedDamageSystem:onLoad(savegame)
             debrisFactor = 0.0,
             wetness = 0,
             wetnessFactor = 1.0
+        },
+        externalPower = {
+            isValidConnection = false,
+            distance = 0
         },
 
         engine = {
@@ -1874,7 +1883,7 @@ local function syncDeadBatteryEffect(vehicle)
     local breakdownId = 'DEAD_BATTERY'
     if spec.batterySoc < 0.001 and vehicle.isServer then
         if (vehicle:getIsMotorStarted() and spec.alternatorHealth < 0.01) or not vehicle:getIsMotorStarted() then
-            if not vehicle:hasBreakdown(breakdownId) then
+            if not vehicle:hasBreakdown(breakdownId) and spec.externalPowerConnection == nil then
                 vehicle:addBreakdown(breakdownId)
                 if spec.systems.electrical.isCranking then
                     local engineHardStartEffect = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_HARD_START_MODIFIER or nil
@@ -2081,6 +2090,7 @@ local function syncFuelConsumption(vehicle)
         spec.fuelUsage = vehicle.spec_motorized.lastFuelUsageDisplay or 0
     end
 end
+
 
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
@@ -3632,7 +3642,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
             vibRaw = countSuspNorm > 0 and (sumSuspNorm / countSuspNorm) or 0
             vibWheelCount = countSuspNorm
             local speedForDamage = math.clamp(speed, 0.0, 50.0)
-            vibSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(speedForDamage, 0.0, false, 40.0)
+            vibSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(speedForDamage, 0.0, false, 30.0)
             local vibSignalRaw = vibRaw * vibSpeedFactor
             local alpha = dt / (300 + dt)
             vibState.smoothed = vibState.smoothed + (vibSignalRaw - vibState.smoothed) * alpha
@@ -5920,6 +5930,7 @@ end
 
 local getBatteryChargeAcceptance
 
+
 local function evaluateAlternatorRpmCurve(curveData, rpmNorm)
     rpmNorm = math.clamp(rpmNorm or 0, 0, 1)
     if type(curveData) ~= "table" then
@@ -5965,17 +5976,28 @@ local function evaluateAlternatorRpmCurve(curveData, rpmNorm)
     return points[#points].y
 end
 
-local function calculateAlternatorOutput(vehicle, isMotorStarted, iLoads)
+local function calculateAlternatorOutput(vehicle, isMotorStarted, iLoads, batteryState)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
-        return
+        return 0
     end
 
     local cfg = ADS_Config.ELECTRICAL or {}
+
     local iAltAvail = 0
     local iAltRaw = 0
     local altFactor = 0
     local acceptK, tempK, socK, healthK = 1.0, 1.0, 1.0, 1.0
+
+    local batteryTempC = spec.batteryTempC
+    local batterySoc = spec.batterySoc
+    local batteryHealth = spec.batteryHealth
+
+    if batteryState ~= nil then
+        batteryTempC = batteryState.tempC
+        batterySoc = batteryState.soc
+        batteryHealth = batteryState.health
+    end
 
     if isMotorStarted then
         local motor = vehicle:getMotor()
@@ -5991,11 +6013,13 @@ local function calculateAlternatorOutput(vehicle, isMotorStarted, iLoads)
             end
 
             altFactor = math.max(curveFactor, 0)
-            iAltRaw = (ADS_Config.ELECTRICAL.ALT_MAX_OUTPUT or 0) * altFactor * math.max(spec.alternatorHealth or 1, 0)
+            iAltRaw = (cfg.ALT_MAX_OUTPUT or 0) * altFactor * math.max(spec.alternatorHealth or 1, 0)
 
             local loadA = math.max(iLoads or 0, 0)
             local chargeHeadroomA = math.max(iAltRaw - loadA, 0)
-            acceptK, tempK, socK, healthK = getBatteryChargeAcceptance(spec.batteryTempC, spec.batterySoc, spec.batteryHealth)
+
+            acceptK, tempK, socK, healthK =
+                getBatteryChargeAcceptance(batteryTempC, batterySoc, batteryHealth)
 
             if iAltRaw <= loadA then
                 iAltAvail = iAltRaw
@@ -6014,7 +6038,12 @@ local function calculateAlternatorOutput(vehicle, isMotorStarted, iLoads)
         dbg.acceptTempK = tempK
         dbg.acceptSocK = socK
         dbg.acceptHealthK = healthK
+        dbg.acceptSourceSoc = batterySoc or 0
+        dbg.acceptSourceTempC = batteryTempC or 0
+        dbg.acceptSourceHealth = batteryHealth or 1
+        dbg.acceptUsesExternalState = batteryState ~= nil
     end
+
     return iAltAvail
 end
 
@@ -6089,6 +6118,7 @@ local function calculateCurrentLoadAmps(vehicle, isMotorStarted, envTemp)
         dbg.peakPulseA = pulseA
     end
 
+    spec.iLoads = iLoads
     return iLoads
 end
 
@@ -6184,7 +6214,6 @@ local function getSystemVoltage(isMotorStarted, batteryTerminalV, iAltAvail, iLo
 
     return rawSystemV, regulatedV, deficitA, sagV, regulationHealth, healthDeficitMult, chargeHeadroomV
 end
-
 
 getBatteryChargeAcceptance = function(tempC, soc, health)
     local C = ADS_Config.ELECTRICAL or {}
@@ -6288,45 +6317,518 @@ function AdvancedDamageSystem.updateBatteryTemperatureC(vehicle, dtS, ambientC, 
     end
 end
 
-function AdvancedDamageSystem.updateBatterySoc(vehicle, dtS, iAltAvail, iLoads, capF)
+local function buildBatteryContext(vehicle, dtS)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
+        return nil
+    end
+
+    local isMotorStarted = vehicle.getIsMotorStarted ~= nil and vehicle:getIsMotorStarted() or false
+
+    local environmentTemp = 15
+    if g_currentMission ~= nil
+        and g_currentMission.environment ~= nil
+        and g_currentMission.environment.weather ~= nil then
+        local weather = g_currentMission.environment.weather.forecast:getCurrentWeather()
+        environmentTemp = (weather ~= nil and weather.temperature) or 15
+    end
+
+    local capF, rintF = getBatteryTempFactors(spec.batteryTempC)
+    local iLoads = calculateCurrentLoadAmps(vehicle, isMotorStarted, environmentTemp) or 0
+
+    local nominalCapacityAh = math.max(spec.batteryCapacityAh or 0, 1)
+    local batteryHealth = math.max(spec.batteryHealth or 0, 0.0001)
+
+    local usableCapacityAh = math.max(
+        nominalCapacityAh * capF * ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR,
+        0.01
+    )
+
+    local effectiveCapacityAh = math.max(usableCapacityAh * batteryHealth, 0.01)
+
+    local chargeAh = spec.batteryChargeAh
+    if chargeAh == nil then
+        chargeAh = math.clamp((spec.batterySoc or 1.0) * effectiveCapacityAh, 0, effectiveCapacityAh)
+    end
+
+    local soc = math.clamp(chargeAh / effectiveCapacityAh, 0, 1)
+
+    local cfg = ADS_Config.ELECTRICAL or {}
+    local rRef = math.max(cfg.RINT_REF_OHM or 0.005, 0.0001)
+    local maxHealthRintMult = math.max(cfg.BATTERY_HEALTH_RINT_MAX_MULT or 3.0, 1.0)
+    local healthRintMult = 1 + (1 - batteryHealth) * (maxHealthRintMult - 1)
+    local rIntOhm = rRef * (rintF or 1) * healthRintMult
+
+    local iAltAvail = calculateAlternatorOutput(vehicle, isMotorStarted, iLoads) or 0
+
+    local ocvV = getBatteryOpenCircuitVoltage(soc)
+
+    return {
+        vehicle = vehicle,
+        spec = spec,
+        dtS = dtS,
+
+        isMotorStarted = isMotorStarted,
+        environmentTemp = environmentTemp,
+
+        batteryTempC = spec.batteryTempC or environmentTemp,
+        batteryHealth = batteryHealth,
+
+        capF = capF,
+        rintF = rintF,
+
+        nominalCapacityAh = nominalCapacityAh,
+        usableCapacityAh = usableCapacityAh,
+        capacityAh = effectiveCapacityAh,
+
+        chargeAh = chargeAh,
+        soc = soc,
+
+        rIntOhm = rIntOhm,
+        ocvV = ocvV,
+
+        iLoads = iLoads,
+        iAltAvail = iAltAvail
+    }
+end
+
+local function orderExternalPowerContexts(ctxA, ctxB)
+    if ctxA == nil or ctxB == nil then
+        return ctxA, ctxB
+    end
+
+    local aStarted = ctxA.isMotorStarted == true
+    local bStarted = ctxB.isMotorStarted == true
+    if aStarted ~= bStarted then
+        if aStarted then
+            return ctxB, ctxA
+        end
+
+        return ctxA, ctxB
+    end
+
+    local aOcv = tonumber(ctxA.ocvV) or 0
+    local bOcv = tonumber(ctxB.ocvV) or 0
+    if math.abs(aOcv - bOcv) > 0.001 then
+        if aOcv < bOcv then
+            return ctxA, ctxB
+        end
+
+        return ctxB, ctxA
+    end
+
+    local aSoc = tonumber(ctxA.soc) or 0
+    local bSoc = tonumber(ctxB.soc) or 0
+    if math.abs(aSoc - bSoc) > 0.0001 then
+        if aSoc < bSoc then
+            return ctxA, ctxB
+        end
+
+        return ctxB, ctxA
+    end
+
+    local aCharge = tonumber(ctxA.chargeAh) or 0
+    local bCharge = tonumber(ctxB.chargeAh) or 0
+    if math.abs(aCharge - bCharge) > 0.0001 then
+        if aCharge < bCharge then
+            return ctxA, ctxB
+        end
+
+        return ctxB, ctxA
+    end
+
+    local aKey = tonumber(ctxA.vehicle ~= nil and (ctxA.vehicle.rootNode or ctxA.vehicle.id or ctxA.vehicle.uniqueId) or 0) or 0
+    local bKey = tonumber(ctxB.vehicle ~= nil and (ctxB.vehicle.rootNode or ctxB.vehicle.id or ctxB.vehicle.uniqueId) or 0) or 0
+    if aKey <= bKey then
+        return ctxA, ctxB
+    end
+
+    return ctxB, ctxA
+end
+
+local function buildCompositeBatteryContext(consumerCtx, donorCtx)
+    if consumerCtx == nil or donorCtx == nil then
+        return nil
+    end
+
+    local cableResistanceOhm = 0.010
+
+    local totalCapacityAh = math.max(
+        (consumerCtx.capacityAh or 0) + (donorCtx.capacityAh or 0),
+        0.01
+    )
+
+    local totalChargeAh = math.max(
+        (consumerCtx.chargeAh or 0) + (donorCtx.chargeAh or 0),
+        0
+    )
+
+    local compositeSoc = math.clamp(totalChargeAh / totalCapacityAh, 0, 1)
+
+    local compositeTempC =
+        ((consumerCtx.batteryTempC or 20) * (consumerCtx.capacityAh or 0) +
+         (donorCtx.batteryTempC or 20) * (donorCtx.capacityAh or 0))
+        / totalCapacityAh
+
+    local compositeHealth =
+        ((consumerCtx.batteryHealth or 1.0) * (consumerCtx.capacityAh or 0) +
+         (donorCtx.batteryHealth or 1.0) * (donorCtx.capacityAh or 0))
+        / totalCapacityAh
+
+    local rConsumer = math.max(consumerCtx.rIntOhm or 0.01, 0.0001)
+    local rDonorPath = math.max((donorCtx.rIntOhm or 0.01) + cableResistanceOhm, 0.0001)
+
+    local gConsumer = 1 / rConsumer
+    local gDonor = 1 / rDonorPath
+
+    local compositeRintOhm = 1 / math.max(gConsumer + gDonor, 0.0001)
+    local compositeOcvV = getBatteryOpenCircuitVoltage(compositeSoc)
+
+    return {
+        capacityAh = totalCapacityAh,
+        chargeAh = totalChargeAh,
+        soc = compositeSoc,
+
+        tempC = compositeTempC,
+        health = compositeHealth,
+
+        ocvV = compositeOcvV,
+        rIntOhm = compositeRintOhm,
+
+        cableResistanceOhm = cableResistanceOhm,
+
+        conductanceConsumer = gConsumer,
+        conductanceDonor = gDonor
+    }
+end
+
+local function calculateBatteryBalanceCurrent(consumerCtx, donorCtx, compositeCtx)
+    if consumerCtx == nil or donorCtx == nil or compositeCtx == nil then
+        return 0
+    end
+
+    local cableResistanceOhm = math.max(compositeCtx.cableResistanceOhm or 0.01, 0.0001)
+    local maxCableCurrentA = ADS_Config.ELECTRICAL.EXTERNAL_POWER_MAX_CABLE_CURRENT_A or 400
+
+    local consumerOcvV = tonumber(consumerCtx.ocvV) or 0
+    local donorOcvV = tonumber(donorCtx.ocvV) or 0
+
+    local consumerRint = math.max(tonumber(consumerCtx.rIntOhm) or 0.01, 0.0001)
+    local donorRint = math.max(tonumber(donorCtx.rIntOhm) or 0.01, 0.0001)
+
+    local totalPathResistanceOhm = consumerRint + donorRint + cableResistanceOhm
+
+    local balanceCurrentA = (donorOcvV - consumerOcvV) / totalPathResistanceOhm
+
+    balanceCurrentA = math.clamp(balanceCurrentA, -maxCableCurrentA, maxCableCurrentA)
+
+    return balanceCurrentA
+end
+
+local function applyBatteryBalanceCurrent(consumerCtx, donorCtx, balanceCurrentA, dtS)
+    if consumerCtx == nil or donorCtx == nil then
+        return consumerCtx, donorCtx
+    end
+
+    local dAhBalance = (balanceCurrentA * dtS) / 3600
+
+    consumerCtx.chargeAh = math.clamp(
+        (consumerCtx.chargeAh or 0) + dAhBalance,
+        0,
+        math.max(consumerCtx.capacityAh or 0.01, 0.01)
+    )
+
+    donorCtx.chargeAh = math.clamp(
+        (donorCtx.chargeAh or 0) - dAhBalance,
+        0,
+        math.max(donorCtx.capacityAh or 0.01, 0.01)
+    )
+
+    consumerCtx.soc = math.clamp(
+        consumerCtx.chargeAh / math.max(consumerCtx.capacityAh or 0.01, 0.01),
+        0,
+        1
+    )
+
+    donorCtx.soc = math.clamp(
+        donorCtx.chargeAh / math.max(donorCtx.capacityAh or 0.01, 0.01),
+        0,
+        1
+    )
+
+    consumerCtx.ocvV = getBatteryOpenCircuitVoltage(consumerCtx.soc)
+    donorCtx.ocvV = getBatteryOpenCircuitVoltage(donorCtx.soc)
+
+    consumerCtx.balanceCurrentA = balanceCurrentA
+    donorCtx.balanceCurrentA = balanceCurrentA
+
+    consumerCtx.balanceDeltaAh = dAhBalance
+    donorCtx.balanceDeltaAh = -dAhBalance
+
+    return consumerCtx, donorCtx
+end
+
+local function ensureBatteryDebugData(spec)
+    if spec.debugData == nil then
+        spec.debugData = {}
+    end
+    if spec.debugData.battery == nil then
+        spec.debugData.battery = {}
+    end
+    return spec.debugData.battery
+end
+
+local function resetExternalPowerDebug(spec)
+    local dbg = ensureBatteryDebugData(spec)
+    dbg.isValidConnection = false
+    dbg.distance = 0
+    dbg.externalConnected = 0
+    dbg.externalRole = "-"
+    dbg.externalPartnerName = "-"
+    dbg.externalCompositeSoc = 0
+    dbg.externalCompositeCapacityAh = 0
+    dbg.externalCompositeChargeAh = 0
+    dbg.externalCompositeRintOhm = 0
+    dbg.externalBalanceCurrentA = 0
+    dbg.externalCommonNetA = 0
+    dbg.externalCommonDeltaAh = 0
+    dbg.externalLocalDeltaAh = 0
+    dbg.externalAltBeforeA = 0
+    dbg.externalAltAfterA = 0
+end
+
+local function normalizeExternalPowerConnection(connection)
+    if connection == nil then
+        return nil
+    end
+
+    if type(connection) == "table" and connection.object ~= nil then
+        return connection.object
+    end
+
+    return connection
+end
+
+local function commitBatteryContext(vehicle, ctx, dt)
+    if vehicle == nil or ctx == nil or ctx.spec == nil then
         return
     end
 
-    local iNetRaw = iAltAvail - iLoads
-    local iNet = iNetRaw
-    local dAh = iNet * dtS / 3600
+    local spec = ctx.spec
+    local dbg = ensureBatteryDebugData(spec)
 
-    local nominalCapacityAh = math.max(spec.batteryCapacityAh or 0, 1)
-    local capFactor = capF or 1
-    local health = math.max(spec.batteryHealth or 0, 0.0001)
-    local usableCapacityAh = math.max(
-        nominalCapacityAh * capFactor * ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR,
-        0.01
+    spec.batteryChargeAh = math.clamp(ctx.chargeAh or 0, 0, math.max(ctx.capacityAh or 0.01, 0.01))
+    spec.batterySoc = math.clamp(ctx.soc or 0, 0, 1)
+    spec.batteryOpenCircuitVoltageV = ctx.ocvV or getBatteryOpenCircuitVoltage(spec.batterySoc)
+    spec.rawBatteryTerminalVoltageV = ctx.rawBatteryTerminalVoltageV or spec.batteryOpenCircuitVoltageV
+    spec.rawSystemVoltageV = ctx.rawSystemVoltageV or spec.rawBatteryTerminalVoltageV
+
+    local C = ADS_Config.ELECTRICAL or {}
+    local batteryVAlpha = math.min((dt or 0) / ((C.BATTERY_VOLTAGE_TAU_MS or 300) + (dt or 0)), 1)
+    local systemVAlpha = math.min((dt or 0) / ((C.SYSTEM_VOLTAGE_TAU_MS or 250) + (dt or 0)), 1)
+
+    spec.batteryTerminalVoltageV = (spec.batteryTerminalVoltageV or spec.rawBatteryTerminalVoltageV)
+        + batteryVAlpha * (spec.rawBatteryTerminalVoltageV - (spec.batteryTerminalVoltageV or spec.rawBatteryTerminalVoltageV))
+
+    spec.systemVoltageV = (spec.systemVoltageV or spec.rawSystemVoltageV)
+        + systemVAlpha * (spec.rawSystemVoltageV - (spec.systemVoltageV or spec.rawSystemVoltageV))
+
+    dbg.soc = spec.batterySoc or 0
+    dbg.chargeAh = spec.batteryChargeAh or 0
+    dbg.capacityNominalAh = ctx.nominalCapacityAh or spec.batteryCapacityAh or 0
+    dbg.capacityFactor = ctx.capF or 1
+    dbg.capacityUsableAh = ctx.usableCapacityAh or ctx.capacityAh or 0
+    dbg.capacityEffectiveAh = ctx.capacityAh or 0
+    dbg.batteryHealth = ctx.batteryHealth or spec.batteryHealth or 0
+    dbg.iNetRaw = ctx.iNetA or ((ctx.iAltAvail or 0) - (ctx.iLoads or 0))
+    dbg.iNet = dbg.iNetRaw
+    dbg.dAh = ctx.dAhTotal or (dbg.iNet * ((ctx.dtS or 0) / 3600))
+    dbg.ocvV = spec.batteryOpenCircuitVoltageV or 0
+    dbg.batteryTerminalV = spec.rawBatteryTerminalVoltageV or 0
+    dbg.rawBatteryTerminalVoltageV = spec.rawBatteryTerminalVoltageV or 0
+    dbg.batteryTerminalVoltageV = spec.batteryTerminalVoltageV or 0
+    dbg.systemVoltageV = spec.rawSystemVoltageV or 0
+    dbg.rawSystemVoltageV = spec.rawSystemVoltageV or 0
+    dbg.systemVoltageVSmoothed = spec.systemVoltageV or 0
+
+    if ctx.termLoadDropV ~= nil then dbg.termLoadDropV = ctx.termLoadDropV end
+    if ctx.termChargeRiseV ~= nil then dbg.termChargeRiseV = ctx.termChargeRiseV end
+    if ctx.termDischargeA ~= nil then dbg.termDischargeA = ctx.termDischargeA end
+    if ctx.termChargeA ~= nil then dbg.termChargeA = ctx.termChargeA end
+    if ctx.regulatedVoltageV ~= nil then dbg.regulatedVoltageV = ctx.regulatedVoltageV end
+    if ctx.altDeficitA ~= nil then dbg.altDeficitA = ctx.altDeficitA end
+    if ctx.altSagV ~= nil then dbg.altSagV = ctx.altSagV end
+    if ctx.altRegulationHealth ~= nil then dbg.altRegulationHealth = ctx.altRegulationHealth end
+    if ctx.altHealthDeficitMult ~= nil then dbg.altHealthDeficitMult = ctx.altHealthDeficitMult end
+    if ctx.altChargeHeadroomV ~= nil then dbg.altChargeHeadroomV = ctx.altChargeHeadroomV end
+end
+
+local function solveExternalPowerConnection(consumerCtx, donorCtx, dtS)
+    if consumerCtx == nil or donorCtx == nil then
+        return consumerCtx, donorCtx, nil
+    end
+
+    local donorAltBeforeA = donorCtx.iAltAvail or 0
+    local consumerAltBeforeA = consumerCtx.iAltAvail or 0
+    local compositeCtx = buildCompositeBatteryContext(consumerCtx, donorCtx)
+    if compositeCtx == nil then
+        return consumerCtx, donorCtx, nil
+    end
+
+    local externalBatteryState = {
+        soc = compositeCtx.soc,
+        tempC = compositeCtx.tempC,
+        health = compositeCtx.health
+    }
+
+    if donorCtx.isMotorStarted then
+        donorCtx.iAltAvail = calculateAlternatorOutput(donorCtx.vehicle, donorCtx.isMotorStarted, donorCtx.iLoads, externalBatteryState) or 0
+    end
+
+    if consumerCtx.isMotorStarted then
+        consumerCtx.iAltAvail = calculateAlternatorOutput(consumerCtx.vehicle, consumerCtx.isMotorStarted, consumerCtx.iLoads, externalBatteryState) or 0
+    end
+
+    local totalLoadsA = math.max((consumerCtx.iLoads or 0) + (donorCtx.iLoads or 0), 0)
+    local totalAltA = math.max((consumerCtx.iAltAvail or 0) + (donorCtx.iAltAvail or 0), 0)
+    local commonNetA = totalAltA - totalLoadsA
+    local dAhCommon = commonNetA * dtS / 3600
+
+    local totalConductance = math.max(
+        (compositeCtx.conductanceConsumer or 0) + (compositeCtx.conductanceDonor or 0),
+        0.0001
     )
-    local effectiveCapacityAh = math.max(usableCapacityAh * health, 0.01)
+    local consumerShare = (compositeCtx.conductanceConsumer or 0) / totalConductance
+    local donorShare = (compositeCtx.conductanceDonor or 0) / totalConductance
 
-    if spec.batteryChargeAh == nil then
-        spec.batteryChargeAh = math.clamp((spec.batterySoc or 1) * effectiveCapacityAh, 0, effectiveCapacityAh)
-    end
+    local dAhConsumerCommon = dAhCommon * consumerShare
+    local dAhDonorCommon = dAhCommon * donorShare
 
-    spec.batteryChargeAh = math.clamp((spec.batteryChargeAh or 0) + dAh, 0, effectiveCapacityAh)
-    spec.batterySoc = math.clamp(spec.batteryChargeAh / effectiveCapacityAh, 0, 1)
+    consumerCtx.chargeAh = math.clamp(
+        (consumerCtx.chargeAh or 0) + dAhConsumerCommon,
+        0,
+        math.max(consumerCtx.capacityAh or 0.01, 0.01)
+    )
+    donorCtx.chargeAh = math.clamp(
+        (donorCtx.chargeAh or 0) + dAhDonorCommon,
+        0,
+        math.max(donorCtx.capacityAh or 0.01, 0.01)
+    )
 
-    if ADS_Config.DEBUG then
-        local dbg = spec.debugData.battery
-        dbg.soc = spec.batterySoc or 0
-        dbg.chargeAh = spec.batteryChargeAh or 0
-        dbg.capacityNominalAh = nominalCapacityAh
-        dbg.capacityFactor = capFactor
-        dbg.capacityUsableAh = usableCapacityAh
-        dbg.capacityEffectiveAh = effectiveCapacityAh
-        dbg.batteryHealth = health
-        dbg.iNetRaw = iNetRaw
-        dbg.iNet = iNet
-        dbg.dAh = dAh
-    end
+    consumerCtx.soc = math.clamp(consumerCtx.chargeAh / math.max(consumerCtx.capacityAh or 0.01, 0.01), 0, 1)
+    donorCtx.soc = math.clamp(donorCtx.chargeAh / math.max(donorCtx.capacityAh or 0.01, 0.01), 0, 1)
+    consumerCtx.ocvV = getBatteryOpenCircuitVoltage(consumerCtx.soc)
+    donorCtx.ocvV = getBatteryOpenCircuitVoltage(donorCtx.soc)
+
+    compositeCtx = buildCompositeBatteryContext(consumerCtx, donorCtx)
+    local balanceCurrentA = calculateBatteryBalanceCurrent(consumerCtx, donorCtx, compositeCtx)
+    consumerCtx, donorCtx = applyBatteryBalanceCurrent(consumerCtx, donorCtx, balanceCurrentA, dtS)
+
+    local dAhConsumerTotal = dAhConsumerCommon + (consumerCtx.balanceDeltaAh or 0)
+    local dAhDonorTotal = dAhDonorCommon + (donorCtx.balanceDeltaAh or 0)
+
+    local consumerBatteryA = math.abs(dAhConsumerTotal * 3600 / math.max(dtS, 0.0001))
+    local donorBatteryA = math.abs(dAhDonorTotal * 3600 / math.max(dtS, 0.0001))
+
+    AdvancedDamageSystem.updateBatteryTemperatureC(
+        consumerCtx.vehicle,
+        dtS,
+        consumerCtx.environmentTemp,
+        consumerCtx.spec.rawEngineTemperature or consumerCtx.spec.engineTemperature,
+        consumerBatteryA,
+        consumerCtx.rintF
+    )
+    AdvancedDamageSystem.updateBatteryTemperatureC(
+        donorCtx.vehicle,
+        dtS,
+        donorCtx.environmentTemp,
+        donorCtx.spec.rawEngineTemperature or donorCtx.spec.engineTemperature,
+        donorBatteryA,
+        donorCtx.rintF
+    )
+
+    local finalCompositeCtx = buildCompositeBatteryContext(consumerCtx, donorCtx)
+    local networkMotorStarted = consumerCtx.isMotorStarted or donorCtx.isMotorStarted
+    local networkIsCranking =
+        (consumerCtx.spec.systems.electrical ~= nil and consumerCtx.spec.systems.electrical.isCranking == true)
+        or (donorCtx.spec.systems.electrical ~= nil and donorCtx.spec.systems.electrical.isCranking == true)
+
+    local batteryTerminalV, loadDropV, chargeRiseV, iDischargeA, iChargeA =
+        getBatteryTerminalVoltage(finalCompositeCtx.ocvV, totalAltA, totalLoadsA, networkIsCranking, finalCompositeCtx.rIntOhm)
+
+    local networkAlternatorHealth = math.max(
+        tonumber(consumerCtx.spec.alternatorHealth) or 0,
+        tonumber(donorCtx.spec.alternatorHealth) or 0
+    )
+
+    local rawSystemV, regulatedV, deficitA, sagV, regulationHealth, healthDeficitMult, chargeHeadroomV =
+        getSystemVoltage(networkMotorStarted, batteryTerminalV, totalAltA, totalLoadsA, networkAlternatorHealth)
+
+    consumerCtx.rawBatteryTerminalVoltageV = batteryTerminalV
+    consumerCtx.rawSystemVoltageV = rawSystemV
+    donorCtx.rawBatteryTerminalVoltageV = batteryTerminalV
+    donorCtx.rawSystemVoltageV = rawSystemV
+
+    consumerCtx.termLoadDropV = loadDropV
+    consumerCtx.termChargeRiseV = chargeRiseV
+    consumerCtx.termDischargeA = iDischargeA
+    consumerCtx.termChargeA = iChargeA
+    consumerCtx.regulatedVoltageV = regulatedV
+    consumerCtx.altDeficitA = deficitA
+    consumerCtx.altSagV = sagV
+    consumerCtx.altRegulationHealth = regulationHealth
+    consumerCtx.altHealthDeficitMult = healthDeficitMult
+    consumerCtx.altChargeHeadroomV = chargeHeadroomV
+
+    donorCtx.termLoadDropV = loadDropV
+    donorCtx.termChargeRiseV = chargeRiseV
+    donorCtx.termDischargeA = iDischargeA
+    donorCtx.termChargeA = iChargeA
+    donorCtx.regulatedVoltageV = regulatedV
+    donorCtx.altDeficitA = deficitA
+    donorCtx.altSagV = sagV
+    donorCtx.altRegulationHealth = regulationHealth
+    donorCtx.altHealthDeficitMult = healthDeficitMult
+    donorCtx.altChargeHeadroomV = chargeHeadroomV
+
+    consumerCtx.iNetA = totalAltA - totalLoadsA
+    donorCtx.iNetA = totalAltA - totalLoadsA
+    consumerCtx.dAhTotal = dAhConsumerTotal
+    donorCtx.dAhTotal = dAhDonorTotal
+
+    consumerCtx.externalPowerDebug = {
+        connected = true,
+        role = "consumer",
+        partnerName = donorCtx.vehicle.getFullName ~= nil and donorCtx.vehicle:getFullName() or tostring(donorCtx.vehicle),
+        compositeSoc = finalCompositeCtx.soc,
+        compositeCapacityAh = finalCompositeCtx.capacityAh,
+        compositeChargeAh = finalCompositeCtx.chargeAh,
+        compositeRintOhm = finalCompositeCtx.rIntOhm,
+        balanceCurrentA = balanceCurrentA,
+        commonNetA = commonNetA,
+        commonDeltaAh = dAhCommon,
+        localDeltaAh = dAhConsumerTotal,
+        altBeforeA = consumerAltBeforeA,
+        altAfterA = consumerCtx.iAltAvail or 0
+    }
+
+    donorCtx.externalPowerDebug = {
+        connected = true,
+        role = "donor",
+        partnerName = consumerCtx.vehicle.getFullName ~= nil and consumerCtx.vehicle:getFullName() or tostring(consumerCtx.vehicle),
+        compositeSoc = finalCompositeCtx.soc,
+        compositeCapacityAh = finalCompositeCtx.capacityAh,
+        compositeChargeAh = finalCompositeCtx.chargeAh,
+        compositeRintOhm = finalCompositeCtx.rIntOhm,
+        balanceCurrentA = balanceCurrentA,
+        commonNetA = commonNetA,
+        commonDeltaAh = dAhCommon,
+        localDeltaAh = dAhDonorTotal,
+        altBeforeA = donorAltBeforeA,
+        altAfterA = donorCtx.iAltAvail or 0
+    }
+
+    return consumerCtx, donorCtx, finalCompositeCtx
 end
 
 function AdvancedDamageSystem:updateBatteryChargingModel(dt)
@@ -6340,46 +6842,131 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
         return
     end
 
-    if spec.debugData == nil then
-        spec.debugData = {}
-    end
-    if spec.debugData.battery == nil then
-        spec.debugData.battery = {}
-    end
+    ensureBatteryDebugData(spec)
 
-    local isMotorStarted = self.getIsMotorStarted ~= nil and self:getIsMotorStarted()
-
-    local environmentTemp = 15
-    if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather ~= nil then
-        local weather = g_currentMission.environment.weather.forecast:getCurrentWeather()
-        environmentTemp = (weather ~= nil and weather.temperature) or 15
+    --- check for external connection
+    local solveStamp = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+    if spec._externalPowerSolveStamp == solveStamp then
+        return
     end
 
-    local capF, rintF = getBatteryTempFactors(spec.batteryTempC)
+    resetExternalPowerDebug(spec)
 
-    local iLoads = calculateCurrentLoadAmps(self, isMotorStarted, environmentTemp)
-    local iAltAvail = calculateAlternatorOutput(self, isMotorStarted, iLoads)
-    local iBatteryA = math.abs((iAltAvail or 0) - (iLoads or 0))
+    local connectionVehicle = normalizeExternalPowerConnection(spec.externalPowerConnection)
+    local connectionSpec = connectionVehicle ~= nil and connectionVehicle.spec_AdvancedDamageSystem or nil
 
-    AdvancedDamageSystem.updateBatteryTemperatureC(self, dtS, environmentTemp, spec.rawEngineTemperature or spec.engineTemperature, iBatteryA, rintF)
-    AdvancedDamageSystem.updateBatterySoc(self, dtS, iAltAvail, iLoads, capF)
+    if connectionVehicle ~= nil
+        and connectionVehicle ~= self
+        and connectionSpec ~= nil
+        and (connectionVehicle.rootNode == nil or entityExists(connectionVehicle.rootNode)) then
+
+        local selfSpeed = math.abs(tonumber(self.getLastSpeed ~= nil and self:getLastSpeed() or 0) or 0)
+        local connectionSpeed = math.abs(tonumber(connectionVehicle.getLastSpeed ~= nil and connectionVehicle:getLastSpeed() or 0) or 0)
+        if self.isServer and (selfSpeed > 1 or connectionSpeed > 1) then
+            self:clearExternalPowerConnection(connectionVehicle)
+            connectionVehicle = nil
+            connectionSpec = nil
+        end
+    end
+
+    if connectionVehicle ~= nil
+        and connectionVehicle ~= self
+        and connectionSpec ~= nil
+        and (connectionVehicle.rootNode == nil or entityExists(connectionVehicle.rootNode)) then
+
+        ensureBatteryDebugData(connectionSpec)
+        resetExternalPowerDebug(connectionSpec)
+
+        local selfCtx = buildBatteryContext(self, dtS)
+        local connectionCtx = buildBatteryContext(connectionVehicle, dtS)
+
+        if selfCtx ~= nil and connectionCtx ~= nil then
+            local consumerCtx, donorCtx = orderExternalPowerContexts(selfCtx, connectionCtx)
+            consumerCtx, donorCtx = solveExternalPowerConnection(consumerCtx, donorCtx, dtS)
+
+            if consumerCtx ~= nil and donorCtx ~= nil then
+                commitBatteryContext(consumerCtx.vehicle, consumerCtx, dt)
+                commitBatteryContext(donorCtx.vehicle, donorCtx, dt)
+
+                local selfIsConsumer = consumerCtx.vehicle == self
+                local selfExt = selfIsConsumer and consumerCtx.externalPowerDebug or donorCtx.externalPowerDebug
+                local connectionExt = selfIsConsumer and donorCtx.externalPowerDebug or consumerCtx.externalPowerDebug
+
+                local selfDbg = ensureBatteryDebugData(spec)
+                local connectionDbg = ensureBatteryDebugData(connectionSpec)
+
+                if selfExt ~= nil then
+                    selfDbg.externalConnected = 1
+                    selfDbg.externalRole = selfExt.role or "-"
+                    selfDbg.externalPartnerName = selfExt.partnerName or "-"
+                    selfDbg.externalCompositeSoc = selfExt.compositeSoc or 0
+                    selfDbg.externalCompositeCapacityAh = selfExt.compositeCapacityAh or 0
+                    selfDbg.externalCompositeChargeAh = selfExt.compositeChargeAh or 0
+                    selfDbg.externalCompositeRintOhm = selfExt.compositeRintOhm or 0
+                    selfDbg.externalBalanceCurrentA = selfExt.balanceCurrentA or 0
+                    selfDbg.externalCommonNetA = selfExt.commonNetA or 0
+                    selfDbg.externalCommonDeltaAh = selfExt.commonDeltaAh or 0
+                    selfDbg.externalLocalDeltaAh = selfExt.localDeltaAh or 0
+                    selfDbg.externalAltBeforeA = selfExt.altBeforeA or 0
+                    selfDbg.externalAltAfterA = selfExt.altAfterA or 0
+                end
+
+                if connectionExt ~= nil then
+                    connectionDbg.externalConnected = 1
+                    connectionDbg.externalRole = connectionExt.role or "-"
+                    connectionDbg.externalPartnerName = connectionExt.partnerName or "-"
+                    connectionDbg.externalCompositeSoc = connectionExt.compositeSoc or 0
+                    connectionDbg.externalCompositeCapacityAh = connectionExt.compositeCapacityAh or 0
+                    connectionDbg.externalCompositeChargeAh = connectionExt.compositeChargeAh or 0
+                    connectionDbg.externalCompositeRintOhm = connectionExt.compositeRintOhm or 0
+                    connectionDbg.externalBalanceCurrentA = connectionExt.balanceCurrentA or 0
+                    connectionDbg.externalCommonNetA = connectionExt.commonNetA or 0
+                    connectionDbg.externalCommonDeltaAh = connectionExt.commonDeltaAh or 0
+                    connectionDbg.externalLocalDeltaAh = connectionExt.localDeltaAh or 0
+                    connectionDbg.externalAltBeforeA = connectionExt.altBeforeA or 0
+                    connectionDbg.externalAltAfterA = connectionExt.altAfterA or 0
+                end
+
+                spec._externalPowerSolveStamp = solveStamp
+                connectionSpec._externalPowerSolveStamp = solveStamp
+                return
+            end
+        end
+    end
+
+    local ctx = buildBatteryContext(self, dtS)
+    if ctx == nil then
+        return
+    end
+
+    local iBatteryA = math.abs((ctx.iAltAvail or 0) - (ctx.iLoads or 0))
+    AdvancedDamageSystem.updateBatteryTemperatureC(
+        self,
+        dtS,
+        ctx.environmentTemp,
+        spec.rawEngineTemperature or spec.engineTemperature,
+        iBatteryA,
+        ctx.rintF
+    )
+
+    local dAh = ((ctx.iAltAvail or 0) - (ctx.iLoads or 0)) * dtS / 3600
+    ctx.chargeAh = math.clamp((ctx.chargeAh or 0) + dAh, 0, math.max(ctx.capacityAh or 0.01, 0.01))
+    ctx.soc = math.clamp(ctx.chargeAh / math.max(ctx.capacityAh or 0.01, 0.01), 0, 1)
+    ctx.ocvV = getBatteryOpenCircuitVoltage(ctx.soc)
 
     local cfg = ADS_Config.ELECTRICAL or {}
     local health = math.clamp(spec.batteryHealth or 1, 0.0001, 1.0)
     local rRef = math.max(cfg.RINT_REF_OHM or 0.005, 0.0001)
     local maxHealthRintMult = math.max(cfg.BATTERY_HEALTH_RINT_MAX_MULT or 3.0, 1.0)
     local healthRintMult = 1 + (1 - health) * (maxHealthRintMult - 1)
-    local rIntOhm = rRef * (rintF or 1) * healthRintMult
-    local ocvV = getBatteryOpenCircuitVoltage(spec.batterySoc)
-    spec.batteryOpenCircuitVoltageV = ocvV
+    local rIntOhm = rRef * (ctx.rintF or 1) * healthRintMult
 
     local isCranking = spec.systems.electrical ~= nil
         and spec.systems.electrical.isCranking ~= nil
         and spec.systems.electrical.isCranking
 
     local batteryTerminalV, loadDropV, chargeRiseV, iDischargeA, iChargeA =
-        getBatteryTerminalVoltage(ocvV, iAltAvail, iLoads, isCranking, rIntOhm)
-    spec.rawBatteryTerminalVoltageV = batteryTerminalV
+        getBatteryTerminalVoltage(ctx.ocvV, ctx.iAltAvail, ctx.iLoads, isCranking, rIntOhm)
 
     local alternatorHealth = 1.0
     if spec.systems ~= nil and spec.systems.electrical ~= nil then
@@ -6387,43 +6974,144 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
     end
 
     local rawSystemV, regulatedV, deficitA, sagV, regulationHealth, healthDeficitMult, chargeHeadroomV =
-        getSystemVoltage(isMotorStarted, batteryTerminalV, iAltAvail, iLoads, alternatorHealth)
-    spec.rawSystemVoltageV = rawSystemV
+        getSystemVoltage(ctx.isMotorStarted, batteryTerminalV, ctx.iAltAvail, ctx.iLoads, alternatorHealth)
 
-    local C = ADS_Config.ELECTRICAL
-    local batteryVAlpha = math.min((dt or 0) / ((C.BATTERY_VOLTAGE_TAU_MS or 300) + (dt or 0)), 1)
-    local systemVAlpha = math.min((dt or 0) / ((C.SYSTEM_VOLTAGE_TAU_MS or 250) + (dt or 0)), 1)
+    ctx.rawBatteryTerminalVoltageV = batteryTerminalV
+    ctx.rawSystemVoltageV = rawSystemV
+    ctx.termLoadDropV = loadDropV
+    ctx.termChargeRiseV = chargeRiseV
+    ctx.termDischargeA = iDischargeA
+    ctx.termChargeA = iChargeA
+    ctx.regulatedVoltageV = regulatedV
+    ctx.altDeficitA = deficitA
+    ctx.altSagV = sagV
+    ctx.altRegulationHealth = regulationHealth
+    ctx.altHealthDeficitMult = healthDeficitMult
+    ctx.altChargeHeadroomV = chargeHeadroomV
+    ctx.iNetA = (ctx.iAltAvail or 0) - (ctx.iLoads or 0)
+    ctx.dAhTotal = dAh
 
-    spec.batteryTerminalVoltageV = (spec.batteryTerminalVoltageV or batteryTerminalV)
-        + batteryVAlpha * (batteryTerminalV - (spec.batteryTerminalVoltageV or batteryTerminalV))
+    commitBatteryContext(self, ctx, dt)
 
-    spec.systemVoltageV = (spec.systemVoltageV or rawSystemV)
-        + systemVAlpha * (rawSystemV - (spec.systemVoltageV or rawSystemV))
+    local dbg = ensureBatteryDebugData(spec)
+    dbg.rIntHealthFactor = healthRintMult
+    dbg.termIsCranking = isCranking and 1 or 0
+end
 
-    if ADS_Config.DEBUG then
-        local dbg = spec.debugData.battery
-        dbg.ocvV = ocvV
-        dbg.batteryTerminalV = batteryTerminalV
-        dbg.rawBatteryTerminalVoltageV = spec.rawBatteryTerminalVoltageV or batteryTerminalV
-        dbg.batteryTerminalVoltageV = spec.batteryTerminalVoltageV or batteryTerminalV
-        dbg.systemVoltageV = rawSystemV
-        dbg.rawSystemVoltageV = spec.rawSystemVoltageV or rawSystemV
-        dbg.systemVoltageVSmoothed = spec.systemVoltageV or rawSystemV
-        dbg.regulatedVoltageV = regulatedV
-        dbg.altDeficitA = deficitA
-        dbg.altSagV = sagV
-        dbg.altRegulationHealth = regulationHealth
-        dbg.altHealthDeficitMult = healthDeficitMult
-        dbg.altChargeHeadroomV = chargeHeadroomV
-        dbg.termLoadDropV = loadDropV
-        dbg.termChargeRiseV = chargeRiseV
-        dbg.termIsCranking = isCranking and 1 or 0
-        dbg.termDischargeA = iDischargeA
-        dbg.termChargeA = iChargeA
-        dbg.rIntHealthFactor = healthRintMult
+
+function AdvancedDamageSystem.isValidPowerPair(vehicleA, vehicleB)
+    if vehicleA == nil or vehicleB == nil or vehicleA == vehicleB then
+        return false, ''
+    end
+
+    if vehicleA.getRootVehicle ~= nil then
+        vehicleA = vehicleA:getRootVehicle()
+    end
+
+    if vehicleB.getRootVehicle ~= nil then
+        vehicleB = vehicleB:getRootVehicle()
+    end
+
+    if vehicleA == nil or vehicleB == nil or vehicleA == vehicleB then
+        return false, 'SAME'
+    end
+
+    if vehicleA.spec_AdvancedDamageSystem == nil or vehicleB.spec_AdvancedDamageSystem == nil then
+        return false, 'NO_ADS'
+    end
+
+    local nodeA = vehicleA.rootNode
+    if nodeA == nil and vehicleA.components ~= nil and vehicleA.components[1] ~= nil then
+        nodeA = vehicleA.components[1].node
+    end
+
+    local nodeB = vehicleB.rootNode
+    if nodeB == nil and vehicleB.components ~= nil and vehicleB.components[1] ~= nil then
+        nodeB = vehicleB.components[1].node
+    end
+
+    if nodeA == nil or nodeB == nil then
+        return false, ''
+    end
+
+    local ax, ay, az = getWorldTranslation(nodeA)
+    local bx, by, bz = getWorldTranslation(nodeB)
+    local dx = bx - ax
+    local dy = by - ay
+    local dz = bz - az
+    
+    if MathUtil.vector3Length(dx, dy, dz) > 5.0 then
+        return false, 'TOO_FAR'
+    end
+    
+    return true
+end
+
+function AdvancedDamageSystem:establishExternalPowerConnection(externalConnection)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil or not self.isServer then
+        return
+    end
+
+    local otherVehicle = externalConnection
+    if otherVehicle ~= nil and otherVehicle.getRootVehicle ~= nil then
+        otherVehicle = otherVehicle:getRootVehicle()
+    end
+
+    local otherSpec = otherVehicle ~= nil and otherVehicle.spec_AdvancedDamageSystem or nil
+    local isValid = AdvancedDamageSystem.isValidPowerPair(self, otherVehicle)
+
+    if isValid then
+        spec.externalPowerConnection = otherVehicle
+        if otherSpec ~= nil then
+            otherSpec.externalPowerConnection = self
+        end
+        return true
+    else
+        spec.externalPowerConnection = nil
+        if otherSpec ~= nil and otherSpec.externalPowerConnection == self then
+            otherSpec.externalPowerConnection = nil
+        end
+        return false
     end
 end
 
+function AdvancedDamageSystem:clearExternalPowerConnection(otherVehicle)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil or not self.isServer then
+        return false
+    end
+
+    local normalizedOther = otherVehicle
+    if normalizedOther ~= nil and normalizedOther.getRootVehicle ~= nil then
+        normalizedOther = normalizedOther:getRootVehicle()
+    end
+
+    local currentConnection = spec.externalPowerConnection
+    if type(currentConnection) == "table" and currentConnection.object ~= nil then
+        currentConnection = currentConnection.object
+    end
+
+    if normalizedOther == nil then
+        normalizedOther = currentConnection
+    end
+
+    spec.externalPowerConnection = nil
+
+    local otherSpec = normalizedOther ~= nil and normalizedOther.spec_AdvancedDamageSystem or nil
+    if otherSpec ~= nil then
+        local reverseConnection = otherSpec.externalPowerConnection
+        if type(reverseConnection) == "table" and reverseConnection.object ~= nil then
+            reverseConnection = reverseConnection.object
+        end
+
+        if reverseConnection == self then
+            otherSpec.externalPowerConnection = nil
+        end
+    end
+
+    return true
+end
 
 -- ==========================================================
 --                       THERMAL
@@ -6797,7 +7485,6 @@ local function getIsThereDust(vehicle)
     return false
 end
 
-
 function AdvancedDamageSystem:updateRadiatorClogging(dt)
     local C = ADS_Config.FIELD_CARE
     local spec = self.spec_AdvancedDamageSystem
@@ -6939,10 +7626,21 @@ function AdvancedDamageSystem:cleanRadiatorAndAirIntake(dt)
         return
     end
 
+    local prevRadiatorClogging = tonumber(spec.radiatorClogging) or 0
+    local prevAirIntakeClogging = tonumber(spec.airIntakeClogging) or 0
     local cleaningDelta = (C.CLEANING_SPEED / 1000) * dt
 
-    spec.radiatorClogging = math.max(spec.radiatorClogging - cleaningDelta, 0)
-    spec.airIntakeClogging = math.max(spec.airIntakeClogging - cleaningDelta, 0)
+    spec.radiatorClogging = math.max(prevRadiatorClogging - cleaningDelta, 0)
+    spec.airIntakeClogging = math.max(prevAirIntakeClogging - cleaningDelta, 0)
+
+    if self.isServer
+        and spec.adsDirtyFlag_state ~= nil
+        and (
+            math.abs((spec.radiatorClogging or 0) - prevRadiatorClogging) > 0.0001
+            or math.abs((spec.airIntakeClogging or 0) - prevAirIntakeClogging) > 0.0001
+        ) then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_state)
+    end
 end
 
 function AdvancedDamageSystem:updateLubricationLevel(dt)
@@ -6963,7 +7661,15 @@ function AdvancedDamageSystem:lubricateVehicle()
     if spec == nil then
         return
     end
-    spec.lubricationLevel = math.min(spec.lubricationLevel + 0.2, 1.0)
+
+    local prevLubricationLevel = tonumber(spec.lubricationLevel) or 0
+    spec.lubricationLevel = math.min(prevLubricationLevel + 0.2, 1.0)
+
+    if self.isServer
+        and spec.adsDirtyFlag_state ~= nil
+        and math.abs((spec.lubricationLevel or 0) - prevLubricationLevel) > 0.0001 then
+        self:raiseDirtyFlags(spec.adsDirtyFlag_state)
+    end
 end
 
 
@@ -7755,6 +8461,33 @@ local function getPrimaryFuelConsumerInfo(vehicle)
     return nil, nil
 end
 
+local function syncConsoleCloggingState(vehicle, spec, parent, key)
+    if vehicle == nil or spec == nil or parent ~= spec then
+        return false
+    end
+
+    if key ~= "radiatorClogging" and key ~= "airIntakeClogging" then
+        return false
+    end
+
+    spec.radiatorClogging = math.clamp(tonumber(spec.radiatorClogging) or 0, 0.0, 1.0)
+    spec.airIntakeClogging = math.clamp(tonumber(spec.airIntakeClogging) or 0, 0.0, 1.0)
+
+    if vehicle.spec_washable ~= nil and vehicle.setDirtAmount ~= nil and vehicle.getDirtAmount ~= nil then
+        local currentDirtAmount = math.clamp(tonumber(vehicle:getDirtAmount()) or 0, 0.0, 1.0)
+        local requiredDirtAmount = math.max(spec.radiatorClogging or 0, spec.airIntakeClogging or 0)
+        if requiredDirtAmount > currentDirtAmount + 0.0001 then
+            vehicle:setDirtAmount(requiredDirtAmount)
+        end
+    end
+
+    if vehicle.isServer and spec.adsDirtyFlag_state ~= nil then
+        vehicle:raiseDirtyFlags(spec.adsDirtyFlag_state)
+    end
+
+    return true
+end
+
 function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
     if not g_currentMission:getIsServer() then
         ADS_ConsoleCommandEvent.sendToServer("setConfigVar", rawArgs, rawValue, nil)
@@ -7839,7 +8572,18 @@ function AdvancedDamageSystem.ConsoleCommands:setSpecVar(rawArgs, rawValue)
     local oldValue = parent[key]
     parent[key] = value
 
+    local syncedCloggingState = syncConsoleCloggingState(vehicle, spec, parent, key)
+
     print(string.format("ADS: spec_AdvancedDamageSystem.%s changed on '%s': %s -> %s", path, vehicle:getFullName(), tostring(oldValue), tostring(value)))
+    if syncedCloggingState then
+        print(string.format(
+            "ADS: clogging state synced on '%s' (dirt=%.2f, radiator=%.2f, airIntake=%.2f).",
+            vehicle:getFullName(),
+            tonumber(vehicle.getDirtAmount ~= nil and vehicle:getDirtAmount() or 0) or 0,
+            tonumber(spec.radiatorClogging) or 0,
+            tonumber(spec.airIntakeClogging) or 0
+        ))
+    end
 end
 
 function AdvancedDamageSystem.ConsoleCommands:listBreakdowns()

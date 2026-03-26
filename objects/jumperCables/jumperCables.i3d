@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="jumperCables.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.4"/>
+  </Asset>
+
+  <Files>
+    <File fileId="1" filename="texture.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="Material.001" materialId="41">
+      <Texture fileId="1"/>
+    </Material>
+    <Material name="Material.001" materialId="31">
+      <Texture fileId="1"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="jumperCables.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="jumperCables" lockedgroup="true" nodeId="10">
+      <TransformGroup name="graphics" translation="0 0 0.0513875" nodeId="11">
+        <TransformGroup name="leftPair" nodeId="255">
+          <Shape name="aRedLeft" translation="-0.16 0.016 0" rotation="-70 -15 -5" shapeId="1" nodeId="52" castsShadows="true" receiveShadows="true" distanceBlending="false" materialIds="31"/>
+          <Shape name="aBlackLeft" translation="-0.12 0.05 0.021" rotation="-70 -17 -6" shapeId="2" nodeId="53" castsShadows="true" receiveShadows="true" distanceBlending="false" materialIds="41"/>
+        </TransformGroup>
+        <TransformGroup name="rightPair" nodeId="256">
+          <Shape name="aRedRight" translation="0.12 0.05 0.0211809" rotation="-70 17 6" shapeId="1" nodeId="15" castsShadows="true" receiveShadows="true" distanceBlending="false" materialIds="31"/>
+          <Shape name="aBlackRight" translation="0.16 0.0162098 0" rotation="-70 15 5" shapeId="2" nodeId="16" castsShadows="true" receiveShadows="true" distanceBlending="false" materialIds="41"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="handNode" translation="-0.0117173 0.32997 -7.39185e-05" rotation="-49.3208 13.2875 91.924" nodeId="12">
+        <TransformGroup name="raycastNode" translation="0.0728855 0.0142458 -0.0299484" rotation="49.8188 -8.69255 -9.74645" scale="1.01395 1.0149 1.0149" nodeId="13"/>
+      </TransformGroup>
+      <TransformGroup name="firstPersonNode" translation="0 0.431383 0.764936" rotation="-180 0 -180" nodeId="14"/>
+    </TransformGroup>
+  </Scene>
+
+</i3D>

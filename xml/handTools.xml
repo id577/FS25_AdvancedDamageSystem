@@ -6,6 +6,9 @@
         <type name="airBlower" parent="base" xmlFile="objects/airBlower/airBlower.xml">
             <specialization name="adsHandTools"/>
         </type>
+        <type name="jumperCables" parent="base" xmlFile="objects/jumperCables/jumperCables.xml">
+            <specialization name="adsHandTools"/>
+        </type>
     </types>
 
     <specializations>

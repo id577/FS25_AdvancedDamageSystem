@@ -1065,6 +1065,29 @@ function ADS_Hud:drawActiveVehicleHUD()
         batteryDbg.termChargeA or 0
     ), {0.9, 1.0, 0.9, 1}, 0.95)
 
+    addLine(batteryLines, string.format(
+        "ext: valid %s @ %.2fm | on %d | role %s | pair soc %.1f%% | pair cap %.1fAh | pair q %.1fAh | pair r %.5f",
+        tostring(batteryDbg.isValidConnection),
+        batteryDbg.distance or 0,
+        batteryDbg.externalConnected or 0,
+        tostring(batteryDbg.externalRole or "-"),
+        asPercent(batteryDbg.externalCompositeSoc or 0),
+        batteryDbg.externalCompositeCapacityAh or 0,
+        batteryDbg.externalCompositeChargeAh or 0,
+        batteryDbg.externalCompositeRintOhm or 0
+    ), {0.85, 0.95, 1.0, 1}, 0.95)
+
+    addLine(batteryLines, string.format(
+        "ext flow: %s | bal %.1fA | common %.1fA | dAh %.4f/%.4f | alt %.1f->%.1fA",
+        tostring(batteryDbg.externalPartnerName or "-"),
+        batteryDbg.externalBalanceCurrentA or 0,
+        batteryDbg.externalCommonNetA or 0,
+        batteryDbg.externalCommonDeltaAh or 0,
+        batteryDbg.externalLocalDeltaAh or 0,
+        batteryDbg.externalAltBeforeA or 0,
+        batteryDbg.externalAltAfterA or 0
+    ), {0.85, 0.95, 1.0, 1}, 0.95)
+
     local serviceDataLines = {}
     local states = AdvancedDamageSystem.STATUS
     local isUnderService = spec.currentState ~= states.READY

@@ -38,6 +38,10 @@ local function getToolKind(handTool)
         return "greaseGun"
     end
 
+    if string.find(configFileName, "jumpercables", 1, true) then
+        return "jumperCables"
+    end
+
     return "unknown"
 end
 
@@ -87,6 +91,12 @@ local function getDefaultActionText(handTool)
         return g_i18n:getText("ads_air_blower_action")
     elseif toolKind == "greaseGun" then
         return g_i18n:getText("ads_grease_gun_action")
+    elseif toolKind == "jumperCables" then
+        if g_i18n ~= nil and g_i18n.hasText ~= nil and g_i18n:hasText("ads_jumper_cables_action") then
+            return g_i18n:getText("ads_jumper_cables_action")
+        end
+
+        return "Connect jumper cables"
     end
 
     return ""
@@ -168,23 +178,99 @@ local function setDustEmitterDistance(handTool, distance)
     )
 end
 
-local function sendHandToolStateToServer(handTool, state, force)
+local function sendHandToolStateToServer(handTool, state, force, targetVehicle)
     if handTool.isServer or g_client == nil then
         return
     end
 
     local spec = ensureSpec(handTool)
+    if state == "use" then
+        if not force and spec.lastSentUseTargetVehicle == targetVehicle then
+            return
+        end
+
+        ADS_HandToolSyncEvent.send(handTool, state, targetVehicle)
+        spec.lastSentUseTargetVehicle = targetVehicle
+        return
+    end
+
     if not force and spec.lastSentNetworkState == state then
         return
     end
 
-    ADS_HandToolSyncEvent.send(handTool, state)
+    ADS_HandToolSyncEvent.send(handTool, state, targetVehicle)
 
-    if state == "use" then
-        return
+    if state == "stop" then
+        spec.lastSentUseTargetVehicle = nil
     end
 
     spec.lastSentNetworkState = state
+end
+
+local function broadcastJumperCablesState(handTool, state, targetVehicle)
+    local spec = ensureSpec(handTool)
+
+    if g_server ~= nil then
+        ADS_JumperCablesEvent.broadcastState(handTool, state, targetVehicle, spec.connectedVehicleA, spec.connectedVehicleB)
+    end
+
+    if handTool.isClient then
+        handTool:applyJumperCablesState(state, targetVehicle, spec.connectedVehicleA, spec.connectedVehicleB)
+    end
+end
+
+local function updateJumperCablesVisibility(handTool)
+    local spec = ensureSpec(handTool)
+    if spec.toolKind ~= "jumperCables" then
+        return
+    end
+
+    if spec.leftPairNode ~= nil and spec.leftPairNode ~= 0 then
+        setVisibility(spec.leftPairNode, spec.connectedVehicleA == nil)
+    end
+
+    if spec.rightPairNode ~= nil and spec.rightPairNode ~= 0 then
+        setVisibility(spec.rightPairNode, spec.connectedVehicleB == nil)
+    end
+end
+
+local function normalizeConnectedVehicle(vehicle)
+    if vehicle == nil then
+        return nil
+    end
+
+    if vehicle.getRootVehicle ~= nil then
+        return vehicle:getRootVehicle()
+    end
+
+    return vehicle
+end
+
+local function areVehiclesExternallyConnected(vehicleA, vehicleB)
+    vehicleA = normalizeConnectedVehicle(vehicleA)
+    vehicleB = normalizeConnectedVehicle(vehicleB)
+
+    if vehicleA == nil or vehicleB == nil or vehicleA == vehicleB then
+        return false
+    end
+
+    local specA = vehicleA.spec_AdvancedDamageSystem
+    local specB = vehicleB.spec_AdvancedDamageSystem
+    if specA == nil or specB == nil then
+        return false
+    end
+
+    local connectionA = specA.externalPowerConnection
+    if type(connectionA) == "table" and connectionA.object ~= nil then
+        connectionA = connectionA.object
+    end
+
+    local connectionB = specB.externalPowerConnection
+    if type(connectionB) == "table" and connectionB.object ~= nil then
+        connectionB = connectionB.object
+    end
+
+    return connectionA == vehicleB and connectionB == vehicleA
 end
 
 -- ==========================================================
@@ -198,7 +284,10 @@ end
 function adsHandTools.registerFunctions(handTool)
     SpecializationUtil.registerFunction(handTool, "handToolRaycastCallback", adsHandTools.handToolRaycastCallback)
     SpecializationUtil.registerFunction(handTool, "setAirBlowerActiveServer", adsHandTools.setAirBlowerActiveServer)
+    SpecializationUtil.registerFunction(handTool, "setAirBlowerTargetServer", adsHandTools.setAirBlowerTargetServer)
     SpecializationUtil.registerFunction(handTool, "tryUseGreaseGunServer", adsHandTools.tryUseGreaseGunServer)
+    SpecializationUtil.registerFunction(handTool, "handleJumperCablesActionServer", adsHandTools.handleJumperCablesActionServer)
+    SpecializationUtil.registerFunction(handTool, "applyJumperCablesState", adsHandTools.applyJumperCablesState)
 end
 
 function adsHandTools.registerEventListeners(handTool)
@@ -230,6 +319,8 @@ function adsHandTools:onPostLoad(savegame)
     spec.raycastHitNY = nil
     spec.raycastHitNZ = nil
     spec.raycastNode = resolveMappedNode(self, "raycastNode")
+    spec.leftPairNode = nil
+    spec.rightPairNode = nil
     spec.dustEmitterNode = nil
     spec.dustEmitterRootNode = nil
     spec.dustEmitterBaseX = nil
@@ -238,7 +329,9 @@ function adsHandTools:onPostLoad(savegame)
     spec.dustParticleSystem = nil
     spec.lastAirBlowerHintKey = nil
     spec.serverUseActive = false
+    spec.serverTargetVehicle = nil
     spec.lastSentNetworkState = nil
+    spec.lastSentUseTargetVehicle = nil
     spec.toolSoundPlaying = false
     spec.airResistanceSoundPlaying = false
     spec.samples = spec.samples or {}
@@ -251,6 +344,10 @@ function adsHandTools:onPostLoad(savegame)
                 spec.samples.airBlowerAirResistance = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "airBlowerAirResistanceTool", self.baseDirectory, self.components, 0, AudioGroup.VEHICLE, self.i3dMappings, self)
             elseif spec.toolKind == "greaseGun" then
                 spec.samples.greaseGun = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "greaseGunTool", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+            elseif spec.toolKind == "jumperCables" then
+                spec.samples.jumperCablesConnect = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "jumperCablesConnectTool", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+                spec.samples.jumperCablesDisconnect = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "jumperCablesDisconnectTool", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
+                spec.samples.jumperCablesSparks = g_soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "jumperCablesSparksTool", self.baseDirectory, self.components, 1, AudioGroup.VEHICLE, self.i3dMappings, self)
             end
 
             delete(xmlSoundFile)
@@ -283,6 +380,14 @@ function adsHandTools:onPostLoad(savegame)
             end
         end
     end
+
+    if spec.toolKind == "jumperCables" then
+        spec.leftPairNode = resolveMappedNode(self, "leftPair")
+        spec.rightPairNode = resolveMappedNode(self, "rightPair")
+        spec.connectedVehicleA = nil
+        spec.connectedVehicleB = nil
+        updateJumperCablesVisibility(self)
+    end
 end
 
 function adsHandTools:onDelete()
@@ -302,6 +407,18 @@ function adsHandTools:onDelete()
 
         if spec.samples.greaseGun ~= nil then
             g_soundManager:deleteSample(spec.samples.greaseGun)
+        end
+
+        if spec.samples.jumperCablesConnect ~= nil then
+            g_soundManager:deleteSample(spec.samples.jumperCablesConnect)
+        end
+
+        if spec.samples.jumperCablesDisconnect ~= nil then
+            g_soundManager:deleteSample(spec.samples.jumperCablesDisconnect)
+        end
+
+        if spec.samples.jumperCablesSparks ~= nil then
+            g_soundManager:deleteSample(spec.samples.jumperCablesSparks)
         end
     end
 
@@ -324,8 +441,10 @@ function adsHandTools:onHeldStart()
     spec.isActive = true
     spec.activatePressed = false
     spec.serverUseActive = false
+    spec.serverTargetVehicle = nil
     spec.lastAirBlowerHintKey = nil
     spec.lastSentNetworkState = nil
+    spec.lastSentUseTargetVehicle = nil
 
     log_dbg("Hand tool equipped:", getToolKind(self))
 end
@@ -340,7 +459,9 @@ function adsHandTools:onHeldEnd()
     spec.isActive = false
     spec.activatePressed = false
     spec.serverUseActive = false
+    spec.serverTargetVehicle = nil
     spec.lastAirBlowerHintKey = nil
+    spec.lastSentUseTargetVehicle = nil
     setActionText(self, spec.activateText)
     setToolSoundState(self, false)
     setAirResistanceSoundState(self, false)
@@ -367,10 +488,43 @@ function adsHandTools:setAirBlowerActiveServer(isActive, connection)
     end
 
     spec.serverUseActive = isActive == true
+    if not spec.serverUseActive then
+        spec.serverTargetVehicle = nil
+    end
+
     return true
 end
 
-function adsHandTools:tryUseGreaseGunServer(connection)
+function adsHandTools:setAirBlowerTargetServer(targetVehicle, connection)
+    if not self.isServer then
+        return false
+    end
+
+    local spec = ensureSpec(self)
+    if spec.toolKind ~= "airBlower" then
+        return false
+    end
+
+    if connection ~= nil then
+        local player = g_currentMission ~= nil and g_currentMission.connectionsToPlayer ~= nil and g_currentMission.connectionsToPlayer[connection] or nil
+        if player == nil or self.getCarryingPlayer == nil or self:getCarryingPlayer() ~= player then
+            return false
+        end
+    end
+
+    spec.serverUseActive = true
+
+    local vehicle = normalizeConnectedVehicle(targetVehicle)
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+        spec.serverTargetVehicle = nil
+        return false
+    end
+
+    spec.serverTargetVehicle = vehicle
+    return true
+end
+
+function adsHandTools:tryUseGreaseGunServer(targetVehicle, connection)
     if not self.isServer then
         return false
     end
@@ -387,7 +541,11 @@ function adsHandTools:tryUseGreaseGunServer(connection)
         end
     end
 
-    local vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
+    local vehicle = normalizeConnectedVehicle(targetVehicle)
+    if vehicle == nil then
+        vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
+    end
+
     if vehicle == nil then
         return false
     end
@@ -404,6 +562,143 @@ function adsHandTools:tryUseGreaseGunServer(connection)
     vehicle:lubricateVehicle()
     return true
 end
+
+function adsHandTools:handleJumperCablesActionServer(state, targetVehicle, connection)
+    if not self.isServer then
+        return false
+    end
+
+    local spec = ensureSpec(self)
+    if spec.toolKind ~= "jumperCables" then
+        return false
+    end
+
+    if connection ~= nil then
+        local player = g_currentMission ~= nil and g_currentMission.connectionsToPlayer ~= nil and g_currentMission.connectionsToPlayer[connection] or nil
+        if player == nil or self.getCarryingPlayer == nil or self:getCarryingPlayer() ~= player then
+            return false
+        end
+    end
+
+    local resultState = "jumperInvalid"
+    local vehicle = targetVehicle
+
+    if state ~= "jumperInteract" then
+        return false
+    end
+
+    -- no ads
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+        resultState = "jumperInvalid"
+
+    -- disconect
+    elseif vehicle == spec.connectedVehicleA or vehicle == spec.connectedVehicleB then
+        if spec.connectedVehicleA ~= nil and spec.connectedVehicleA.clearExternalPowerConnection ~= nil then
+            spec.connectedVehicleA:clearExternalPowerConnection(spec.connectedVehicleB)
+        elseif spec.connectedVehicleB ~= nil and spec.connectedVehicleB.clearExternalPowerConnection ~= nil then
+            spec.connectedVehicleB:clearExternalPowerConnection(spec.connectedVehicleA)
+        end
+
+        if vehicle == spec.connectedVehicleA then
+            spec.connectedVehicleA = nil
+        else
+            spec.connectedVehicleB = nil
+        end
+
+        resultState = "jumperDisconnected"
+
+    -- connect first
+    elseif spec.connectedVehicleA == nil and spec.connectedVehicleB == nil then
+        spec.connectedVehicleA = vehicle
+        resultState = "jumperSelected"
+
+    -- connect second
+    elseif spec.connectedVehicleA == nil or spec.connectedVehicleB == nil then
+        local firstVehicle = spec.connectedVehicleA or spec.connectedVehicleB
+        local isValid, reason = AdvancedDamageSystem.isValidPowerPair(firstVehicle, vehicle)
+
+        if not isValid then
+            if reason == "TOO_FAR" then
+                resultState = "jumperTooFar"
+            else
+                resultState = "jumperInvalid"
+            end
+        else
+            if spec.connectedVehicleB == nil then
+                spec.connectedVehicleB = vehicle
+            else
+                spec.connectedVehicleA = vehicle
+            end
+
+            if firstVehicle:establishExternalPowerConnection(vehicle) then
+                resultState = "jumperConnected"
+            else
+                if spec.connectedVehicleA == vehicle then
+                    spec.connectedVehicleA = nil
+                elseif spec.connectedVehicleB == vehicle then
+                    spec.connectedVehicleB = nil
+                end
+
+                resultState = "jumperInvalid"
+            end
+        end
+    else
+        resultState = "jumperFull"
+    end
+
+    broadcastJumperCablesState(self, resultState, vehicle)
+    return resultState == "jumperSelected" or resultState == "jumperConnected" or resultState == "jumperDisconnected"
+end
+
+function adsHandTools:applyJumperCablesState(state, targetVehicle, connectedVehicleA, connectedVehicleB)
+    local spec = ensureSpec(self)
+    spec.connectedVehicleA = connectedVehicleA
+    spec.connectedVehicleB = connectedVehicleB
+    updateJumperCablesVisibility(self)
+
+    if not self.isClient or g_localPlayer == nil or self.getCarryingPlayer == nil or self:getCarryingPlayer() ~= g_localPlayer then
+        return
+    end
+
+    local targetName = targetVehicle ~= nil and targetVehicle.getFullName ~= nil and targetVehicle:getFullName() or nil
+    local firstVehicle = spec.connectedVehicleA or spec.connectedVehicleB
+    local firstVehicleName = firstVehicle ~= nil and firstVehicle.getFullName ~= nil and firstVehicle:getFullName() or nil
+
+    if state == "jumperSelected" and targetName ~= nil then
+        g_currentMission:showBlinkingWarning(string.format(g_i18n:getText("ads_jumper_cables_connected"), targetName), 2200)
+        if spec.samples ~= nil and spec.samples.jumperCablesConnect ~= nil then
+            g_soundManager:playSample(spec.samples.jumperCablesConnect)
+        end
+    elseif state == "jumperConnected" and targetName ~= nil then
+        g_currentMission:showBlinkingWarning(string.format(g_i18n:getText("ads_jumper_cables_connected"), targetName), 2200)
+        if spec.samples ~= nil and spec.samples.jumperCablesConnect ~= nil then
+            g_soundManager:playSample(spec.samples.jumperCablesConnect)
+        end
+        if spec.samples ~= nil and spec.samples.jumperCablesSparks ~= nil then
+            g_soundManager:playSample(spec.samples.jumperCablesSparks)
+        end
+    elseif state == "jumperDisconnected" and targetName ~= nil then
+        g_currentMission:showBlinkingWarning(string.format(g_i18n:getText("ads_jumper_cables_disconnected"), targetName), 2200)
+        if spec.samples ~= nil and spec.samples.jumperCablesDisconnect ~= nil then
+            g_soundManager:playSample(spec.samples.jumperCablesDisconnect)
+        end
+    elseif state == "jumperAutoDisconnected" then
+        g_currentMission:showBlinkingWarning(g_i18n:getText("ads_jumper_cables_auto_disconnected"), 2200)
+        if spec.samples ~= nil and spec.samples.jumperCablesDisconnect ~= nil then
+            g_soundManager:playSample(spec.samples.jumperCablesDisconnect)
+        end
+    elseif state == "jumperTooFar" and targetName ~= nil and firstVehicleName ~= nil then
+        g_currentMission:showBlinkingWarning(string.format(g_i18n:getText("ads_jumper_cables_is_too_far"), targetName, firstVehicleName), 2200)
+    elseif state == "jumperFull" and spec.connectedVehicleA ~= nil and spec.connectedVehicleB ~= nil then
+        g_currentMission:showBlinkingWarning(string.format(g_i18n:getText("ads_jumper_cables_both_already_connected"), spec.connectedVehicleA:getFullName(), spec.connectedVehicleB:getFullName()), 2200)
+    elseif state == "jumperInvalid" then
+        g_currentMission:showBlinkingWarning(g_i18n:getText("ads_jumper_cables_impossible_to_connect"), 2200)
+    end
+end
+
+-- ==========================================================
+--                        CALLBACKS
+-- ==========================================================
 
 function adsHandTools:onRegisterActionEvents()
     local spec = ensureSpec(self)
@@ -445,10 +740,12 @@ function adsHandTools:onActionCallback(actionName, inputValue)
 
     spec.activatePressed = isPressed
 
+    --- airBlower
     if not isPressed then
         if spec.toolKind == "airBlower" then
             if self.isServer then
                 spec.serverUseActive = false
+                spec.serverTargetVehicle = nil
             else
                 sendHandToolStateToServer(self, "stop")
             end
@@ -472,13 +769,14 @@ function adsHandTools:onActionCallback(actionName, inputValue)
 
     local vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
 
+    --- greaseGun
     if vehicle ~= nil and spec.toolKind == "greaseGun" then
         local vehicleSpec = vehicle.spec_AdvancedDamageSystem
         if vehicleSpec ~= nil and vehicleSpec.isVehicleNeedLubricate and (tonumber(vehicleSpec.lubricationLevel) or 0) < 1.0 then
             if self.isServer then
-                self:tryUseGreaseGunServer()
+                self:tryUseGreaseGunServer(vehicle)
             else
-                sendHandToolStateToServer(self, "use", true)
+                sendHandToolStateToServer(self, "use", true, vehicle)
             end
 
             if self.isClient and spec.samples ~= nil and spec.samples.greaseGun ~= nil then
@@ -495,6 +793,21 @@ function adsHandTools:onActionCallback(actionName, inputValue)
         end
     end
 
+    --- jumperCables
+    if vehicle ~= nil and spec.toolKind == "jumperCables" then
+        local vehicleSpec = vehicle.spec_AdvancedDamageSystem
+        if vehicleSpec ~= nil then
+            if self.isServer then
+                self:handleJumperCablesActionServer("jumperInteract", vehicle)
+            else
+                ADS_JumperCablesEvent.sendRequest(self, "jumperInteract", vehicle)
+            end
+        else
+            g_currentMission:showBlinkingWarning(g_i18n:getText("ads_jumper_cables_impossible_to_connect"), 2200)
+        end
+    end
+
+    --- airBlower
     if vehicle ~= nil and spec.toolKind == "airBlower" then
         local vehicleSpec = vehicle.spec_AdvancedDamageSystem
         local needsBlowOut = vehicleSpec ~= nil and vehicleSpec.isVehicleNeedBlowOut == true
@@ -517,10 +830,6 @@ function adsHandTools:onActionCallback(actionName, inputValue)
         end
     end
 end
-
--- ==========================================================
---                        CALLBACKS
--- ==========================================================
 
 function adsHandTools:handToolRaycastCallback(hitActorId, x, y, z, distance, nx, ny, nz, subShapeIndex, hitShapeId)
     local spec = ensureSpec(self)
@@ -558,6 +867,18 @@ function adsHandTools:onUpdate(dt)
     local isUsing = spec.activatePressed or (self.isServer and spec.serverUseActive)
     local isOperational = spec.isActive or (self.isServer and spec.serverUseActive)
 
+    if spec.toolKind == "jumperCables"
+        and self.isServer
+        and spec.connectedVehicleA ~= nil
+        and spec.connectedVehicleB ~= nil
+        and not areVehiclesExternallyConnected(spec.connectedVehicleA, spec.connectedVehicleB) then
+
+        spec.connectedVehicleA = nil
+        spec.connectedVehicleB = nil
+        updateJumperCablesVisibility(self)
+        broadcastJumperCablesState(self, "jumperAutoDisconnected", nil)
+    end
+
     if not isOperational then
         spec.lastAirBlowerHintKey = nil
         setToolSoundState(self, false)
@@ -582,8 +903,18 @@ function adsHandTools:onUpdate(dt)
 
     setToolSoundState(self, spec.toolKind == "airBlower")
 
-    local vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
+    local vehicle = nil
+    if spec.toolKind == "airBlower" and self.isServer and not self.isClient then
+        vehicle = normalizeConnectedVehicle(spec.serverTargetVehicle)
+    else
+        vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
+    end
+
     if vehicle == nil then
+        if spec.toolKind == "airBlower" and not self.isServer then
+            sendHandToolStateToServer(self, "use", false, nil)
+        end
+
         spec.lastAirBlowerHintKey = nil
         setActionText(self, spec.activateText)
         setAirResistanceSoundState(self, false)
@@ -621,6 +952,11 @@ function adsHandTools:onUpdate(dt)
 
         spec.lastAirBlowerHintKey = hintKey
         setAirResistanceSoundState(self, true)
+
+        if not self.isServer then
+            local targetVehicle = needsBlowOut and not isAlreadyClean and vehicle or nil
+            sendHandToolStateToServer(self, "use", false, targetVehicle)
+        end
 
         if self.isServer and needsBlowOut then
             vehicle:cleanRadiatorAndAirIntake(dt)

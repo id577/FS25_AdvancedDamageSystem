@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 93,
+    VER = 95,
 
     DEBUG = false,
 
@@ -132,9 +132,9 @@ ADS_Config = {
             SERVICE_EXPIRED_MULTIPLIER = 18.0,
             CHASSIS_IDLING_MULTIPLIER = 0.2,
             VIB_FACTOR_THRESHOLD = 0.06,
-            VIB_FACTOR_MAX_SIGNAL = 0.22,
+            VIB_FACTOR_MAX_SIGNAL = 0.36,
             VIB_FACTOR_MULTIPLIER = 50.0,
-            VIB_FIELD_MULTIPLIER = 1.3,
+            VIB_FIELD_MULTIPLIER = 2.0,
             STEER_LOAD_FACTOR_MULTIPLIER = 50.0,
             STEER_LOAD_SPEED_THRESHOLD = 4.0,
             STEER_LOAD_STEER_THRESHOLD = 0.2,
@@ -454,7 +454,7 @@ ADS_Config = {
 
     ELECTRICAL = {
         BATTART_NOMINAL_CAPACITY = 150,
-        BATTERY_USABLE_CAPACITY_FACTOR = 0.2,
+        BATTERY_USABLE_CAPACITY_FACTOR = 0.1,
         AMBIENT_DEFAULT_C = 15,
         BATTERY_THERMAL_TAU_S = 600,
         BATTERY_THERMAL_CAPACITY_J_PER_K = 2400,

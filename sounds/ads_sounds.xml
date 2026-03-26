@@ -147,5 +147,26 @@
         <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </greaseGunTool>
+    <jumperCablesConnectTool file="sounds/jumperCablesConnect.ogg" linkNode="raycastNode" innerRadius="1.5" outerRadius="8.0" >
+        <volume indoor="1.0" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </jumperCablesConnectTool>
+    <jumperCablesDisconnectTool file="sounds/jumperCablesDisconnect.ogg" linkNode="raycastNode" innerRadius="1.5" outerRadius="8.0" >
+        <volume indoor="1.0" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </jumperCablesDisconnectTool>
+    <jumperCablesSparksTool file="sounds/jumperCablesSparks.ogg" linkNode="raycastNode" innerRadius="1.5" outerRadius="8.0" >
+        <volume indoor="1.0" outdoor="1.0" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </jumperCablesSparksTool>
     <maintenanceCompleted2D file="sounds/maintenanceCompleted.ogg" volume="1.0" pitch="1.0" />
 </sounds>

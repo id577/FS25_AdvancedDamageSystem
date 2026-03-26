@@ -23,6 +23,7 @@ source(g_currentModDirectory .. "events/ADS_LogEntrySyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_ConsoleCommandEvent.lua")
 source(g_currentModDirectory .. "events/ADS_StartButtonEvent.lua")
 source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
+source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
 
 -- Network hook: wrap every settings callback so changes made by an admin
 -- client are automatically replicated to the dedicated server (and then

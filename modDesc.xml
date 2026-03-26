@@ -69,6 +69,7 @@ Changelog 0.9.0.0:
     <storeItems>
         <storeItem xmlFilename="objects/greaseGun/greaseGun.xml"/>
         <storeItem xmlFilename="objects/airBlower/airBlower.xml"/>
+        <storeItem xmlFilename="objects/jumperCables/jumperCables.xml"/>
     </storeItems>
     <iconFilename>icon_ads.dds</iconFilename>
     <multiplayer supported="true"/>

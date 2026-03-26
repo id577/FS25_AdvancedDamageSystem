@@ -499,6 +499,14 @@
         <text name="ads_air_blower_no_vehicle" text="No vehicle in cleaning range"/>
         <text name="ads_air_blower_cleaning_not_require" text="%s does not require cleaning"/>
         <text name="ads_air_blower_already_clean" text="%s: radiator and air intake are already clean"/>
+        <text name="ads_jumper_cables_action" text="Connect jumper cables"/>
+        <text name="ads_jumper_cables_connected" text="Jumper cables connected to %s"/>
+        <text name="ads_jumper_cables_already_connected" text="Jumper cables already connected to %s"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="Vehicle is not suitable for connecting jumper cables"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Jumper cables already connected to %s and %s"/>
+        <text name="ads_jumper_cables_disconnected" text="Jumper cables disconnected from %s"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Jumper cables disconnected because one of the vehicles started moving"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s is too far from %s"/>
 
     </texts>
 </l10n>

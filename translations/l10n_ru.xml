@@ -492,5 +492,13 @@
         <text name="ads_air_blower_no_vehicle" text="Нет техники в зоне очистки"/>
         <text name="ads_air_blower_cleaning_not_require" text="%s не требует очистки"/>
         <text name="ads_air_blower_already_clean" text="%s: радиатор и воздухозаборник уже чистые"/>
+        <text name="ads_jumper_cables_action" text="Подключить пусковые провода"/>
+        <text name="ads_jumper_cables_connected" text="Пусковые провода подключены к %s"/>
+        <text name="ads_jumper_cables_already_connected" text="Пусковые провода уже подключены к %s"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="Эта техника не подходит для подключения пусковых проводов"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Пусковые провода уже подключены к %s и %s"/>
+        <text name="ads_jumper_cables_disconnected" text="Пусковые провода отключены от %s"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Пусковые провода отключены, потому что одна из машин начала движение"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s находится слишком далеко от %s"/>
     </texts>
 </l10n>
