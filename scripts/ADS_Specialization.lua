@@ -994,14 +994,24 @@ function AdvancedDamageSystem:onLoad(savegame)
             dustFactor = 0.0,
             debrisFactor = 0.0,
             wetness = 0,
-            wetnessFactor = 1.0
+            wetnessFactor = 1.0,
+            baseWetnessFactor = 1.0,
+            isOnField = false,
+            hasDust = false,
+            hasDebris = false,
+            totalMultiplier = 0.0
         },
         airIntake = {
             fieldFactor = 1.0,
             dustFactor = 0.0,
             debrisFactor = 0.0,
             wetness = 0,
-            wetnessFactor = 1.0
+            wetnessFactor = 1.0,
+            baseWetnessFactor = 1.0,
+            isOnField = false,
+            hasDust = false,
+            hasDebris = false,
+            totalMultiplier = 0.0
         },
         externalPower = {
             isValidConnection = false,
@@ -1163,9 +1173,16 @@ function AdvancedDamageSystem:onLoad(savegame)
 
         radiator = {
             fieldFactor = 1.0,
+            dustFactor = 0.0,
+            debrisFactor = 0.0,
             workFactor = 1.0,
             wetness = 0,
-            wetnessFactor = 1.0
+            wetnessFactor = 1.0,
+            baseWetnessFactor = 1.0,
+            isOnField = false,
+            hasDust = false,
+            hasDebris = false,
+            totalMultiplier = 0.0
         },
 
         engineTemp = {
@@ -5758,7 +5775,7 @@ function AdvancedDamageSystem:completeService()
         if nextWork == states.REPAIR then
             local repairQueueCount = 0
             for breakdownId, breakdown in pairs(self:getActiveBreakdowns()) do
-                if isBreakdownSelectedForPlayerRepair(breakdownId, breakdown, optionOne) then
+                if isBreakdownSelectedForPlayerRepair(breakdownId, breakdown, AdvancedDamageSystem.REPAIR_TYPES.MEDIUM) then
                     repairQueueCount = repairQueueCount + 1
                 end
             end
@@ -7502,51 +7519,57 @@ function AdvancedDamageSystem:updateRadiatorClogging(dt)
             dustFactor = 0.0,
             debrisFactor = 0.0,
             wetness = 0,
-            wetnessFactor = 1.0
+            wetnessFactor = 1.0,
+            baseWetnessFactor = 1.0,
+            isOnField = false,
+            hasDust = false,
+            hasDebris = false,
+            totalMultiplier = 0.0
         }
     end
     local dbg = spec.debugData.radiator
 
     local dirtLevel = self:getDirtAmount()
     local lastSpeed = self:getLastSpeed()
+    local washableSpec = self.spec_washable
+    local weather = g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather or nil
+    local wetness = weather ~= nil and weather:getGroundWetness() or 0
+    local baseWetnessFactor = math.max(1 - wetness, 0)
+    local wetnessFactor = math.max(baseWetnessFactor ^ 3, 0)
+    local isOnField = self:getIsOnField()
+    local hasDust = getIsThereDust(self)
+    local hasDebris = getIsThereDebris(self)
+    local fieldFactor = 0.0
+    local dustFactor = hasDust and 1.0 or 0.0
+    local debrisFactor = hasDebris and 2.0 or 0.0
+
+    if washableSpec ~= nil then
+        fieldFactor = isOnField and (washableSpec.fieldMultiplier or 1.0) or 0.0
+    end
+
+    dbg.fieldFactor = fieldFactor
+    dbg.dustFactor = dustFactor
+    dbg.debrisFactor = debrisFactor
+    dbg.wetness = wetness
+    dbg.wetnessFactor = wetnessFactor
+    dbg.baseWetnessFactor = baseWetnessFactor
+    dbg.isOnField = isOnField
+    dbg.hasDust = hasDust
+    dbg.hasDebris = hasDebris
+    dbg.totalMultiplier = 0.0
 
     if lastSpeed > 0.5 and spec.radiatorClogging < dirtLevel then
-        local washableSpec = self.spec_washable
         if washableSpec == nil then
-            dbg.fieldFactor = 1.0
-            dbg.dustFactor = 0.0
-            dbg.debrisFactor = 0.0
-            dbg.wetness = 0
-            dbg.wetnessFactor = 1.0
             return
         end
 
-        local dirtDuration = washableSpec.dirtDuration / 2 or 0
-        local weather = g_currentMission.environment.weather
-        local wetness = weather:getGroundWetness()
-        local wetnessFactor = math.max((1 - wetness)^3, 0)
+        local dirtDuration = washableSpec.dirtDuration / 5 or 0
+        local totalMultiplier = wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED
+        dbg.totalMultiplier = totalMultiplier
 
-        local isOnField = self:getIsOnField()
-        local fieldFactor = isOnField and (washableSpec.fieldMultiplier or 1.0) or 0.0
-
-        local dustFactor = (getIsThereDust(self) and 1.0) or 0.0
-        local debrisFactor = (getIsThereDebris(self) and 2.0) or 0.0
-
-        dbg.fieldFactor = fieldFactor
-        dbg.dustFactor = dustFactor
-        dbg.debrisFactor = debrisFactor
-        dbg.wetness = wetness
-        dbg.wetnessFactor = wetnessFactor
-
-        local change = dirtDuration * wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED * dt
+        local change = dirtDuration * totalMultiplier * dt
         spec.radiatorClogging = math.min(spec.radiatorClogging + change, dirtLevel)
     else
-        dbg.fieldFactor = dbg.fieldFactor or 1.0
-        dbg.dustFactor = dbg.dustFactor or 0.0
-        dbg.debrisFactor = dbg.debrisFactor or 0.0
-        dbg.wetness = dbg.wetness or 0
-        dbg.wetnessFactor = dbg.wetnessFactor or 1.0
-
         if spec.radiatorClogging > dirtLevel then
             spec.radiatorClogging = dirtLevel
         end
@@ -7569,51 +7592,57 @@ function AdvancedDamageSystem:updateAirIntakeClogging(dt)
             dustFactor = 0.0,
             debrisFactor = 0.0,
             wetness = 0,
-            wetnessFactor = 1.0
+            wetnessFactor = 1.0,
+            baseWetnessFactor = 1.0,
+            isOnField = false,
+            hasDust = false,
+            hasDebris = false,
+            totalMultiplier = 0.0
         }
     end
     local dbg = spec.debugData.airIntake
 
     local dirtLevel = self:getDirtAmount()
     local lastSpeed = self:getLastSpeed()
+    local washableSpec = self.spec_washable
+    local weather = g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather or nil
+    local wetness = weather ~= nil and weather:getGroundWetness() or 0
+    local baseWetnessFactor = math.max(1 - wetness, 0)
+    local wetnessFactor = baseWetnessFactor
+    local isOnField = self:getIsOnField()
+    local hasDust = getIsThereDust(self)
+    local hasDebris = getIsThereDebris(self)
+    local fieldFactor = 1.0
+    local dustFactor = hasDust and 2.0 or 0.0
+    local debrisFactor = hasDebris and 1.0 or 0.0
+
+    if washableSpec ~= nil then
+        fieldFactor = isOnField and (washableSpec.fieldMultiplier or 2.0) or 1.0
+    end
+
+    dbg.fieldFactor = fieldFactor
+    dbg.dustFactor = dustFactor
+    dbg.debrisFactor = debrisFactor
+    dbg.wetness = wetness
+    dbg.wetnessFactor = wetnessFactor
+    dbg.baseWetnessFactor = baseWetnessFactor
+    dbg.isOnField = isOnField
+    dbg.hasDust = hasDust
+    dbg.hasDebris = hasDebris
+    dbg.totalMultiplier = 0.0
 
     if lastSpeed > 0.5 and spec.airIntakeClogging < dirtLevel then
-        local washableSpec = self.spec_washable
         if washableSpec == nil then
-            dbg.fieldFactor = 1.0
-            dbg.dustFactor = 0.0
-            dbg.debrisFactor = 0.0
-            dbg.wetness = 0
-            dbg.wetnessFactor = 1.0
             return
         end
 
-        local dirtDuration = washableSpec.dirtDuration / 3
-        local weather = g_currentMission.environment.weather
-        local wetness = weather:getGroundWetness()
-        local wetnessFactor = math.max(1 - wetness, 0)
+        local dirtDuration = washableSpec.dirtDuration / 5
+        local totalMultiplier = wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED
+        dbg.totalMultiplier = totalMultiplier
 
-        local isOnField = self:getIsOnField()
-        local fieldFactor = isOnField and (washableSpec.fieldMultiplier or 2.0) or 1.0
-
-        local dustFactor = (getIsThereDust(self) and 2.0) or 0.0
-        local debrisFactor = (getIsThereDebris(self) and 1.0) or 0.0
-
-        dbg.fieldFactor = fieldFactor
-        dbg.dustFactor = dustFactor
-        dbg.debrisFactor = debrisFactor
-        dbg.wetness = wetness
-        dbg.wetnessFactor = wetnessFactor
-
-        local change = dirtDuration * wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED * dt
+        local change = dirtDuration * totalMultiplier * dt
         spec.airIntakeClogging = math.min(spec.airIntakeClogging + change, dirtLevel)
     else
-        dbg.fieldFactor = dbg.fieldFactor or 1.0
-        dbg.dustFactor = dbg.dustFactor or 0.0
-        dbg.debrisFactor = dbg.debrisFactor or 0.0
-        dbg.wetness = dbg.wetness or 0
-        dbg.wetnessFactor = dbg.wetnessFactor or 1.0
-
         if spec.airIntakeClogging > dirtLevel then
             spec.airIntakeClogging = dirtLevel
         end

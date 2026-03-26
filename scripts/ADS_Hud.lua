@@ -602,6 +602,13 @@ function ADS_Hud:drawActiveVehicleHUD()
         return (value or 0) * 100
     end
 
+    local function formatAppliedMultiplier(value)
+        local formatted = string.format("%.2f", tonumber(value) or 0)
+        formatted = formatted:gsub("(%..-)0+$", "%1")
+        formatted = formatted:gsub("%.$", "")
+        return "x" .. formatted
+    end
+
     local function getSystemCondition(systemKey)
         local systemData = spec.systems and spec.systems[systemKey]
         if type(systemData) == "table" then
@@ -647,16 +654,12 @@ function ADS_Hud:drawActiveVehicleHUD()
     local paintState = math.max(1 - (tonumber(vehicle.getWearTotalAmount ~= nil and vehicle:getWearTotalAmount() or 0) or 0), 0)
     local radiatorDbg = spec.debugData.radiator or {}
     local airIntakeDbg = spec.debugData.airIntake or {}
-    local radiatorFieldFactor = tonumber(radiatorDbg.fieldFactor or 1) or 1
-    local radiatorDustFactor = tonumber(radiatorDbg.dustFactor or 0) or 0
-    local radiatorDebrisFactor = tonumber(radiatorDbg.debrisFactor or 0) or 0
-    local radiatorWetness = tonumber(radiatorDbg.wetness or 0) or 0
-    local radiatorWetnessFactor = tonumber(radiatorDbg.wetnessFactor or 1) or 1
-    local airIntakeFieldFactor = tonumber(airIntakeDbg.fieldFactor or 1) or 1
-    local airIntakeDustFactor = tonumber(airIntakeDbg.dustFactor or 0) or 0
-    local airIntakeDebrisFactor = tonumber(airIntakeDbg.debrisFactor or 0) or 0
-    local airIntakeWetness = tonumber(airIntakeDbg.wetness or 0) or 0
-    local airIntakeWetnessFactor = tonumber(airIntakeDbg.wetnessFactor or 1) or 1
+    local radiatorMultiplier = tonumber(radiatorDbg.totalMultiplier or 0) or 0
+    local airIntakeMultiplier = tonumber(airIntakeDbg.totalMultiplier or 0) or 0
+    local cloggingIsOnField = radiatorDbg.isOnField == true or airIntakeDbg.isOnField == true
+    local cloggingHasDust = radiatorDbg.hasDust == true or airIntakeDbg.hasDust == true
+    local cloggingHasDebris = radiatorDbg.hasDebris == true or airIntakeDbg.hasDebris == true
+    local cloggingWetnessFactor = tonumber(airIntakeDbg.baseWetnessFactor or radiatorDbg.baseWetnessFactor or 1) or 1
     addLine(overviewLines, string.format(
         "condition: %.2f%% | service: %.2f%%",
         asPercent(spec.conditionLevel or 0),
@@ -664,27 +667,27 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {1, 1, 1, 1}, 0.95)
 
     addLine(overviewLines, string.format(
-        "service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | dirt: %.2f%% | rad: %.2f%% (fld: %.2f | dst: %.2f | deb: %.2f | wet: %.2f | wtf: %.2f) | intake: %.2f%% (fld: %.2f | dst: %.2f | deb: %.2f | wet: %.2f | wtf: %.2f) | lube: %.2f%% | paint: %.2f%%",
+        "service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
         asPercent(serviceWearRate),
         asPercent(spec.reliability or 0),
         asPercent(spec.maintainability or 0),
         weatherFactor,
         tostring(spec.isUnderRoof == true),
-        asPercent(dirtLevel),
-        asPercent(radiatorClogging),
-        radiatorFieldFactor,
-        radiatorDustFactor,
-        radiatorDebrisFactor,
-        radiatorWetness,
-        radiatorWetnessFactor,
-        asPercent(airIntakeClogging),
-        airIntakeFieldFactor,
-        airIntakeDustFactor,
-        airIntakeDebrisFactor,
-        airIntakeWetness,
-        airIntakeWetnessFactor,
         asPercent(lubricationLevel),
         asPercent(paintState)
+    ), {1, 1, 1, 1}, 0.95)
+
+    addLine(overviewLines, string.format(
+        "Clogging: Dirt %.2f%% | Rad: %.2f%% (%s) | AI: %.2f%% (%s) | field: %s, dust: %s, derbis: %s, wtf: %.3f",
+        asPercent(dirtLevel),
+        asPercent(radiatorClogging),
+        formatAppliedMultiplier(radiatorMultiplier),
+        asPercent(airIntakeClogging),
+        formatAppliedMultiplier(airIntakeMultiplier),
+        tostring(cloggingIsOnField),
+        tostring(cloggingHasDust),
+        tostring(cloggingHasDebris),
+        cloggingWetnessFactor
     ), {1, 1, 1, 1}, 0.95)
 
     local engineMaxFactor = math.max(
