@@ -446,6 +446,10 @@ function adsHandTools:onHeldStart()
     spec.lastSentNetworkState = nil
     spec.lastSentUseTargetVehicle = nil
 
+    if spec.toolKind == 'jumperCables' and self.isClient and spec.connectedVehicleA ~= nil and spec.connectedVehicleB ~= nil then
+        g_currentMission:showBlinkingWarning(string.format(g_i18n:getText("ads_jumper_cables_both_already_connected"), spec.connectedVehicleA:getFullName(), spec.connectedVehicleB:getFullName()), 2200)
+    end
+
     log_dbg("Hand tool equipped:", getToolKind(self))
 end
 
