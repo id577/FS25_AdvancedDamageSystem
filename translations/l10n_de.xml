@@ -11,13 +11,13 @@
         <text name="ads_engineMaxHeat_label" text="Max. Motorhitze"/>
         <text name="ads_engineMaxHeat_tooltip" text="Die Basiswärmeerzeugung des Motors bei maximaler Last. Höhere Werte lassen den Motor schneller aufheizen."/>
         <text name="ads_dirtInfluence_label" text="Schmutzeinfluss auf Kühlung"/>
-        <text name="ads_dirtInfluence_tooltip" text="Die maximale Reduzierung der Kühlereffizienz durch Schmutz. 20 % bedeutet, dass die Kühlung eines vollständig verschmutzten Fahrzeugs um 20 % weniger effektiv ist."/>
+        <text name="ads_dirtInfluence_tooltip" text="Die maximale Verringerung der Kühlerleistung durch Schmutz. 15 % bedeutet, dass die Kühlung eines vollständig verschmutzten Fahrzeugs um 15 % weniger effektiv arbeitet."/>
         <text name="ads_ws_header_title" text="Werkstatt"/>
-        <text name="ads_workshopAvailable_label" text="Werkstatt rund um die Uhr geöffnet"/>
+        <text name="ads_workshopAvailable_label" text="Werkstatt 24/7 geöffnet"/>
         <text name="ads_workshopAvailable_tooltip" text="Aktiviert oder deaktiviert den 24/7-Betrieb der Werkstatt."/>
         <text name="ads_instantInspection_label" text="Sofortige Inspektion"/>
         <text name="ads_instantInspection_tooltip" text="Wenn aktiviert, werden alle Inspektionen sofort abgeschlossen (es vergeht keine Zeit). Hinweis: Die Inspektionsoption „Sichtprüfung“ ist dann nicht verfügbar."/>
-        <text name="ads_parkVehicle_label" text="Fahrzeug während Wartung parken"/>
+        <text name="ads_parkVehicle_label" text="Fahrzeug während der Wartung parken"/>
         <text name="ads_parkVehicle_tooltip" text="Wenn aktiviert, werden Fahrzeuge während der Wartung beim Durchschalten (TAB) übersprungen."/>
         <text name="ads_warrantyEnabled_label" text="Garantie für neue Fahrzeuge"/>
         <text name="ads_warrantyEnabled_tooltip" text="Aktiviert Garantieleistungen für Reparaturen an Neufahrzeugen (bis zu 20 Betriebsstunden oder 12 Monate). Nur OEM-Teile werden kostenlos übernommen."/>
@@ -25,9 +25,9 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Der KI-Helfer reduziert die Motorlast bei drohender Überlastung oder Überhitzung."/>
         <text name="ads_debugMode_label" text="Debug-Modus"/>
         <text name="ads_debugMode_tooltip" text="Aktiviert oder deaktiviert das Debug-Panel und die umfangreiche Debug-Protokollierung in der Konsole."/>
-        <text name="ads_serviceInterval_label" text="Wartungsverschleißrate"/>
-        <text name="ads_vehicleLifespan_label" text="Zustandsverschleißrate"/>
-        <text name="ads_breakdownFrequency_label" text="Grund-MTBF (Zeit zw. Ausfällen)"/>
+        <text name="ads_serviceInterval_label" text="Wartungsintervall"/>
+        <text name="ads_vehicleLifespan_label" text="Fahrzeuglebensdauer"/>
+        <text name="ads_breakdownFrequency_label" text="Pannenhäufigkeit"/>
         <text name="ads_thermalSensitivity_label" text="Thermische Empfindlichkeit"/>
         <text name="ads_serviceInterval_tooltip" text="Legt das Basis-Wartungsintervall fest, nach dem eine Wartung erforderlich ist. Das tatsächliche Intervall variiert je nach Fahrzeugmarke, Alter und Qualität früherer Wartungen."/>
         <text name="ads_vehicleLifespan_tooltip" text="Legt die grundlegende Fahrzeuglebensdauer fest, nach der der Zustand 0 % erreicht. Je näher der Zustand an null liegt, desto unzuverlässiger wird das Fahrzeug."/>
@@ -335,7 +335,7 @@
         <text name="ads_spec_next_planned_service_notification" text="%s durchgeführt"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Geplanter Termin %s wegen unzureichender Mittel abgesagt"/>
         <text name="ads_spec_workshop_dealer" text="Händler"/>
-        <text name="ads_spec_workshop_own" text="Eigen"/>
+        <text name="ads_spec_workshop_own" text="Eigene"/>
         <text name="ads_spec_workshop_mobile" text="Mobil"/>
         <text name="ads_spec_system_engine" text="Motor"/>
         <text name="ads_spec_system_transmission" text="Getriebe"/>
@@ -343,7 +343,7 @@
         <text name="ads_spec_system_cooling" text="Kühlsystem"/>
         <text name="ads_spec_system_electrical" text="Elektrik"/>
         <text name="ads_spec_system_chassis" text="Fahrwerk"/>
-        <text name="ads_spec_system_workprocess" text="Arbeitssysteme"/>
+        <text name="ads_spec_system_workprocess" text="Arbeitsorgane"/>
         <text name="ads_spec_system_fuel" text="Kraftstoffsystem"/>
         <text name="ads_spec_state_ready" text="Bereit"/>
         <text name="ads_spec_state_inspection" text="Inspektion"/>
@@ -370,12 +370,12 @@
         <text name="ads_spec_state_high" text="Hoch"/>
         <text name="ads_spec_state_workhorse" text="Arbeitstier"/>
         <text name="ads_spec_part_types_used" text="Gebraucht"/>
-        <text name="ads_spec_part_types_aftermarket" text="Aftermarket"/>
-        <text name="ads_spec_part_types_oem" text="OEM"/>
+        <text name="ads_spec_part_types_aftermarket" text="Nachbau"/>
+        <text name="ads_spec_part_types_oem" text="Original"/>
         <text name="ads_spec_part_types_premium" text="Premium"/>
         <text name="ads_spec_inspection_visual" text="Visuell"/>
         <text name="ads_spec_inspection_standard" text="Standard"/>
-        <text name="ads_spec_inspection_complete" text="Vollständige Defektoskopie"/>
+        <text name="ads_spec_inspection_complete" text="Komplettdiagnose"/>
         <text name="ads_spec_maintenance_minimal" text="Minimal"/>
         <text name="ads_spec_maintenance_standard" text="Standard"/>
         <text name="ads_spec_maintenance_extended" text="Erweitert"/>
@@ -383,17 +383,17 @@
         <text name="ads_spec_overhaul_partial" text="Teilweise"/>
         <text name="ads_spec_overhaul_standard" text="Standard"/>
         <text name="ads_spec_overhaul_full" text="Voll"/>
-        <text name="ads_spec_repair_type_fix" text="Notlösung"/>
+        <text name="ads_spec_repair_type_fix" text="Behelfsreparatur"/>
         <text name="ads_spec_repair_type_replacement" text="Standard"/>
-        <text name="ads_spec_repair_type_advanced" text="Erweitert"/>
+        <text name="ads_spec_repair_type_advanced" text="Gründlich"/>
         <text name="ads_option_menu_option_one_title_inspection" text="Wählen Sie den Inspektionstyp aus"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Beheben Sie festgestellte Fehler"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Wartungsstufe auswählen"/>
         <text name="ads_option_menu_option_two_title_maintenance" text="Wählen Sie die Qualität der Verbrauchsmaterialien"/>
-        <text name="ads_option_menu_option_one_title_repair" text="Wählen Sie die Reparaturdringlichkeit aus"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Wählen Sie die Reparaturart aus"/>
         <text name="ads_option_menu_option_two_title_repair" text="Wählen Sie Ersatzteilqualität"/>
         <text name="ads_option_menu_option_one_title_overhaul" text="Arbeitsumfang auswählen"/>
-        <text name="ads_option_menu_option_two_title_overhaul" text="Lack erneuern"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="System auswählen"/>
         <text name="ads_option_menu_price_text" text="Preis: "/>
         <text name="ads_option_menu_warranty_repair_text" text="Garantiereparatur"/>
         <text name="ads_option_menu_duration_text" text="Dauer: "/>
@@ -406,15 +406,15 @@
         <text name="ads_option_menu_maintenance_minimal_description" text="* Grundwartung. Deutlich günstiger und schneller, stellt den Wartungszustand jedoch nicht vollständig wieder her und bietet ein kürzeres Intervall bis zur nächsten Wartung."/>
         <text name="ads_option_menu_maintenance_standard_description" text="* Reguläre Wartung gemäß Herstellervorgaben. Stellt den Wartungszustand auf normal zurück und bietet das Standardintervall bis zur nächsten Wartung."/>
         <text name="ads_option_menu_maintenance_extended_description" text="* Umfassende Wartung. Dauert länger und kostet mehr, stellt den Wartungszustand jedoch über das Standardniveau hinaus wieder her und verlängert das Intervall bis zur nächsten Wartung."/>
-        <text name="ads_option_menu_maintenance_preventive_description" text="* Präventive Wartung über den Herstellerstandard hinaus. Stellt den Servicezustand auf normal zurück und bearbeitet die problematischsten Systeme, um das Ausfallrisiko zu senken."/>
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Präventive Wartung über den Herstellerstandard hinaus. Stellt den Wartungszustand auf normal zurück und bearbeitet die problematischsten Systeme, um das Ausfallrisiko zu senken."/>
         <text name="ads_option_menu_repair_type_fix_description" text="* Temporäre Reparatur, um die Maschine für dringende Arbeiten betriebsfähig zu halten. Stellt die Grundfunktion schnell und günstig wieder her, behebt den Fehler jedoch nicht dauerhaft; er wird nach einiger Zeit wieder auftreten."/>
         <text name="ads_option_menu_repair_type_replacement_description" text="* Standardmäßiger Austausch des ausgefallenen Bauteils. Beseitigt den aktuellen Fehler vollständig und stellt den Normalzustand der betroffenen Baugruppe wieder her."/>
         <text name="ads_option_menu_repair_type_advanced_description" text="* Gründliche Reparatur inklusive Austausch des defekten Bauteils und Wartung verwandter Teile innerhalb des Systems. Verringert das Risiko wiederholter Ausfälle im betroffenen System deutlich."/>
-        <text name="ads_option_menu_overhaul_partial_description" text="* Stellt den normalen Zustand wieder her und erfordert weniger Zeit und Ressourcen als eine vollständige Überholung."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Setzt das gewählte System wieder in einen guten Betriebszustand. Schneller und günstiger als eine vollständige Überholung des Fahrzeugs."/>
         <text name="ads_option_menu_overhaul_standard_description" text="* Umfassende Arbeiten an allen wichtigen Komponenten. Stellt den Zustand auf ein gutes Niveau wieder her."/>
         <text name="ads_option_menu_overhaul_full_description" text="* Komplette Überholung. Hohe Kosten und Dauer, aber stellt den Zustand auf ein ausgezeichnetes Niveau wieder her."/>
         <text name="ads_option_menu_part_used_description" text="* Geborgene Teile. Sehr günstig, aber extrem riskant (~50 % Fehlerwahrscheinlichkeit)"/>
-        <text name="ads_option_menu_part_aftermarket_description" text="* Billige Aftermarket-Kopien. Reduzierte Kosten, birgt jedoch ein moderates Fehlerrisiko (33 %)."/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Günstige Nachbauteile. Niedrigere Kosten, aber ein moderates Fehlerrisiko (33 %)."/>
         <text name="ads_option_menu_part_oem_description" text="* Originalteile des Herstellers. Standardzuverlässigkeit (10 % Fehlerrisiko) zum Vollpreis."/>
         <text name="ads_option_menu_part_premium_description" text="* Verstärkte Leistungsteile. Teuer, aber streng qualitätskontrolliert (0 % Fehlerrisiko)."/>
         <text name="ads_option_menu_perform_repair" text="Beheben Sie alle festgestellten Fehler"/>
@@ -427,7 +427,7 @@
         <text name="ads_report_vehicle_age_title" text="Alter"/>
         <text name="ads_report_vehicle_operating_hours_title" text="Betriebsstunden"/>
         <text name="ads_report_inspection_type_title" text="Inspektionsart"/>
-        <text name="ads_report_inspection_location_title" text="Ort"/>
+        <text name="ads_report_inspection_location_title" text="Ort der Inspektion"/>
         <text name="ads_report_overall_assessment_title" text="Gesamtzustandsbewertung"/>
         <text name="ads_report_vehicle_specs_title" text="Fahrzeugspezifikationen"/>
         <text name="ads_report_detected_breakdowns_title" text="Erkannte Ausfälle"/>
@@ -437,22 +437,22 @@
         <text name="ads_report_state_degraded" text="Degradiert"/>
         <text name="ads_report_state_impaired" text="Beeinträchtigt"/>
         <text name="ads_report_state_critical" text="Kritisch"/>
-        <text name="ads_report_state_not_available" text="N / A"/>
-        <text name="ads_report_overall_assessment_condition" text="Zustandsebene"/>
-        <text name="ads_report_overall_assessment_service" text="Servicelevel"/>
+        <text name="ads_report_state_not_available" text="k. A."/>
+        <text name="ads_report_overall_assessment_condition" text="Zustand"/>
+        <text name="ads_report_overall_assessment_service" text="Wartungszustand"/>
         <text name="ads_report_overall_assessment_mtbf" text="MTBF (Stunden)"/>
-        <text name="ads_report_overall_assessment_crit_fail_risk" text="Krit. Ausfallrisiko"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="Risiko eines kritischen Ausfalls"/>
         <text name="ads_report_overall_assessment_rul" text="Restlebensdauer (Stunden)"/>
         <text name="ads_report_overall_assessment_wear_rate" text="Verschleißrate (%/h)"/>
         <text name="ads_report_overall_assessment_nominal_wear_rate" text="Nominale Verschleißrate (%/h)"/>
         <text name="ads_report_system_condition_title" text="Systemzustand | Ausfallrisiko"/>
         <text name="ads_report_system_condition_power" text="Aktuelle Leistung"/>
         <text name="ads_report_system_condition_brakes" text="Bremseffizienz"/>
-        <text name="ads_report_system_condition_transmission" text="Übertragungseffizienz"/>
+        <text name="ads_report_system_condition_transmission" text="Getriebe"/>
         <text name="ads_report_system_condition_harvest" text="Ernteeffizienz"/>
-        <text name="ads_report_system_condition_cooling" text="Kühleffizienz"/>
+        <text name="ads_report_system_condition_cooling" text="Kühlleistung"/>
         <text name="ads_report_system_condition_consumption" text="Kraftstoffverbrauch"/>
-        <text name="ads_report_system_condition_hydraulic" text="Hydraulische Effizienz"/>
+        <text name="ads_report_system_condition_hydraulic" text="Hydraulikeffizienz"/>
         <text name="ads_report_transmission_slipping" text="Schlupf"/>
         <text name="ads_report_transmission_shifting_impaired" text="Schaltvorgänge beeinträchtigt"/>
         <text name="ads_report_transmission_gear_rejection" text="Gangspringen"/>
@@ -469,28 +469,38 @@
         <text name="ads_report_stress_moderate" text="Mäßig"/>
         <text name="ads_report_stress_elevated" text="Erhöht"/>
         <text name="ads_report_stress_high" text="Hoch"/>
-        <text name="ads_report_recommendation_repair_active_breakdowns" text="Fehler erkannt. Beheben Sie alle aktiven Fehler."/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Aktive Fehler erkannt. Eine Standardreparatur aller aktiven Fehler wird empfohlen."/>
         <text name="ads_report_recommendation_defective_parts" text="Defekte Ersatzteile erkannt: %s. Ein vorsorglicher Austausch wird empfohlen, um plötzliche Ausfälle zu vermeiden."/>
         <text name="ads_report_recommendation_quick_fix" text="Provisorischer Reparaturzustand erkannt: %s. Ein Standardaustausch wird bei nächster Gelegenheit empfohlen."/>
         <text name="ads_report_recommendation_service_due" text="Serviceintervallschwelle erreicht. Führen Sie Wartungsarbeiten durch."/>
         <text name="ads_report_recommendation_service_urgent" text="Das Serviceintervall wurde verletzt. Führen Sie dringend eine Wartung durch!"/>
         <text name="ads_report_recommendation_overhaul" text="Verschlechterung der Kernkomponenten festgestellt. Führen Sie eine Überholung durch."/>
-        <text name="ads_report_recommendation_system_overhaul" text="Kritische Degradation im %s festgestellt. Führe eine Teilüberholung dieses Systems durch."/>
-        <text name="ads_report_recommendation_system_preventive_maintenance" text="Erhöhtes Ausfallrisiko im %s festgestellt. Führe eine präventive Wartung durch, um das Risiko zu senken."/>
+        <text name="ads_report_recommendation_system_overhaul" text="Kritische Verschlechterung im %s festgestellt. Führen Sie eine Teilüberholung dieses Systems durch."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="Erhöhtes Ausfallrisiko im %s festgestellt. Führen Sie eine präventive Wartung durch, um das Risiko zu senken."/>
         <text name="ads_report_recommendation_operating_conditions" text="Anzeichen einer intensiven Überbeanspruchung festgestellt. Betriebsbedingungen verbessern."/>
         <text name="ads_report_recommendation_repeat_maintenance" text="Defekte Verbrauchsmaterialien erkannt. Wiederholen Sie die Wartung, um fehlerhafte Komponenten auszutauschen."/>
         <text name="ads_report_recommendation_all_ok" text="Keine kritischen Empfehlungen. Das Fahrzeug ist einsatzbereit."/>
         <text name="ads_grease_gun_name" text="Fettpresse"/>
-        <text name="ads_grease_gun_function" text="Wird für Schmierarbeiten verwendet"/>
+        <text name="ads_grease_gun_function" text="Wird für Schmierarbeiten im Rahmen der Wartung verwendet"/>
         <text name="ads_grease_gun_action" text="Fett auftragen"/>
         <text name="ads_grease_gun_no_vehicle" text="Kein Fahrzeug in Schmierreichweite"/>
         <text name="ads_grease_gun_lubrication_not_require" text="%s benötigt keine Schmierung"/>
         <text name="ads_grease_gun_already_lubricated" text="%s ist bereits geschmiert"/>
-        <text name="ads_air_blower_name" text="Luftgebläse"/>
+        <text name="ads_air_blower_name" text="Druckluftgebläse"/>
         <text name="ads_air_blower_function" text="Wird zum Reinigen von Kühlern und Lufteinlässen verwendet"/>
         <text name="ads_air_blower_action" text="Kühler und Lufteinlass reinigen"/>
         <text name="ads_air_blower_no_vehicle" text="Kein Fahrzeug in Reinigungsreichweite"/>
         <text name="ads_air_blower_cleaning_not_require" text="%s benötigt keine Reinigung"/>
         <text name="ads_air_blower_already_clean" text="%s: Kühler und Lufteinlass sind bereits sauber"/>
+        <text name="ads_jumper_cables_name" text="Starthilfekabel"/>
+        <text name="ads_jumper_cables_function" text="Werden verwendet, um Fahrzeugbatterien zu verbinden und Motoren mit entladener Batterie per Starthilfe zu starten"/>
+        <text name="ads_jumper_cables_action" text="Starthilfekabel anschließen"/>
+        <text name="ads_jumper_cables_connected" text="Starthilfekabel mit %s verbunden"/>
+        <text name="ads_jumper_cables_already_connected" text="Starthilfekabel bereits mit %s verbunden"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="Dieses Fahrzeug ist nicht für den Anschluss von Starthilfekabeln geeignet"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Starthilfekabel bereits mit %s und %s verbunden"/>
+        <text name="ads_jumper_cables_disconnected" text="Starthilfekabel von %s getrennt"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Starthilfekabel wurden getrennt, weil eines der Fahrzeuge losgefahren ist"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s ist zu weit von %s entfernt"/>
     </texts>
 </l10n>

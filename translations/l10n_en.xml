@@ -499,6 +499,8 @@
         <text name="ads_air_blower_no_vehicle" text="No vehicle in cleaning range"/>
         <text name="ads_air_blower_cleaning_not_require" text="%s does not require cleaning"/>
         <text name="ads_air_blower_already_clean" text="%s: radiator and air intake are already clean"/>
+        <text name="ads_jumper_cables_name" text="Jumper Cables"/>
+        <text name="ads_jumper_cables_function" text="Used to to connect vehicle batteries and jump-start dead engines"/>
         <text name="ads_jumper_cables_action" text="Connect jumper cables"/>
         <text name="ads_jumper_cables_connected" text="Jumper cables connected to %s"/>
         <text name="ads_jumper_cables_already_connected" text="Jumper cables already connected to %s"/>
