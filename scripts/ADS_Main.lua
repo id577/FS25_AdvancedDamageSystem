@@ -34,7 +34,7 @@ do
         "onSystemStressRateChanged", "onInstantInspectionChanged", "onParkVehicleChanged", "onWarrantyEnabledChanged",
         "onMaintenancePriceChanged", "onMaintenanceDurationChanged", "onWorkshopAvailableChanged",
         "onWorkshopOpenHourChanged", "onWorkshopCloseHourChanged", "onThermalSensitivityChanged",
-        "onDirtInfluenceChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"
+        "onCloggingSpeedChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"
     }
     for _, name in ipairs(cbs) do
         local orig = ADS_InGameSettings[name]

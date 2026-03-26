@@ -10,8 +10,8 @@
         <text name="ads_workshopCloseHour_tooltip" text="Час, в который закрывается мастерская. Ремонтные работы будут приостановлены после этого времени."/>
         <text name="ads_engineMaxHeat_label" text="Макс. нагрев двигателя"/>
         <text name="ads_engineMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого двигателем при максимальной нагрузке. Более высокие значения заставят двигатель нагреваться быстрее."/>
-        <text name="ads_dirtInfluence_label" text="Влияние грязи на охлаждение"/>
-        <text name="ads_dirtInfluence_tooltip" text="Максимальное снижение эффективности радиатора из-за загрязнения. 15% означает, что у полностью грязной техники охлаждение работает на 15% хуже."/>
+        <text name="ads_cloggingSpeed_label" text="Скорость засорения"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Регулирует, как быстро радиатор и воздухозаборник засоряются во время работы в пыли, полове и растительных остатках. Более высокие значения ускоряют накопление засорения."/>
         <text name="ads_ws_header_title" text="Мастерская"/>
         <text name="ads_workshopAvailable_label" text="Мастерская 24/7"/>
         <text name="ads_workshopAvailable_tooltip" text="Включает или отключает круглосуточную работу мастерской."/>

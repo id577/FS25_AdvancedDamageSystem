@@ -449,6 +449,7 @@ ADS_Config = {
     },
 
     FIELD_CARE = {
+        CLOGGING_SPEED = 1.0,
         CLEANING_SPEED = 0.1,
         AIR_INTAKE_BREAKDOWN_THRESHOLD = 0.5,
     },
@@ -646,6 +647,9 @@ function ADS_Config.saveToXMLFile()
     setXMLFloat(xmlFile, root .. ".TRANS_MAX_HEAT",         ADS_Config.THERMAL.TRANS_MAX_HEAT)
     setXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE",     ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
 
+    -- FIELD CARE
+    setXMLFloat(xmlFile, root .. ".CLOGGING_SPEED",         ADS_Config.FIELD_CARE.CLOGGING_SPEED)
+
     -- DEBUG
     setXMLBool (xmlFile, root .. ".DEBUG_MODE",             ADS_Config.DEBUG)
 
@@ -755,6 +759,10 @@ function ADS_Config.loadFromXMLFile()
 
     v = getXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE")
     if v ~= nil then ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = v end
+
+    -- FIELD CARE
+    v = getXMLFloat(xmlFile, root .. ".CLOGGING_SPEED")
+    if v ~= nil then ADS_Config.FIELD_CARE.CLOGGING_SPEED = v end
 
     -- DEBUG
     v = getXMLBool(xmlFile, root .. ".DEBUG_MODE")

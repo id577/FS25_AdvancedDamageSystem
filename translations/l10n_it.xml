@@ -10,8 +10,8 @@
         <text name="ads_workshopCloseHour_tooltip" text="L'ora del giorno in cui l'officina chiude. Le riparazioni verranno sospese dopo questo orario."/>
         <text name="ads_engineMaxHeat_label" text="Calore max motore"/>
         <text name="ads_engineMaxHeat_tooltip" text="Il tasso base di calore generato dal motore al carico massimo. Valori piu alti fanno riscaldare il motore piu rapidamente."/>
-        <text name="ads_dirtInfluence_label" text="Influenza dello sporco sul raffreddamento"/>
-        <text name="ads_dirtInfluence_tooltip" text="La riduzione massima dell'efficienza del radiatore dovuta allo sporco. Il 15% significa che il raffreddamento di un veicolo completamente sporco e efficace il 15% in meno."/>
+        <text name="ads_cloggingSpeed_label" text="Velocita di intasamento"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Regola la velocita con cui radiatore e presa d'aria si intasano lavorando in polvere, pula e residui colturali. Valori piu alti accelerano l'accumulo di intasamento."/>
         <text name="ads_ws_header_title" text="Officina"/>
         <text name="ads_workshopAvailable_label" text="Officina aperta 24/7"/>
         <text name="ads_workshopAvailable_tooltip" text="Abilita o disabilita il funzionamento continuo dell'officina."/>

@@ -32,7 +32,7 @@
             </SmoothList>
 
             <!-- Disclaimers -->
-            <Text profile="ads_disclaimerText" position="40px -395px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
+            <Text profile="ads_disclaimerText" position="40px -380px" size="500px 30px" id="optionOneDisclaimer" text="*Extended maintenance is more expensive and takes longer, but includes additional procedures that significantly extend the service interval until the next maintenance."/>
             <Text profile="ads_disclaimerText" position="40px -435px" size="500px 30px" id="optionTwoDisclaimer" text="**Premium parts have no risk of defects, but their cost is higher."/>
         
             <!-- Option Three -->

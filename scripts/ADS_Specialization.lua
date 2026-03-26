@@ -7538,7 +7538,7 @@ function AdvancedDamageSystem:updateRadiatorClogging(dt)
         dbg.wetness = wetness
         dbg.wetnessFactor = wetnessFactor
 
-        local change = dirtDuration * wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * dt
+        local change = dirtDuration * wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED * dt
         spec.radiatorClogging = math.min(spec.radiatorClogging + change, dirtLevel)
     else
         dbg.fieldFactor = dbg.fieldFactor or 1.0
@@ -7605,7 +7605,7 @@ function AdvancedDamageSystem:updateAirIntakeClogging(dt)
         dbg.wetness = wetness
         dbg.wetnessFactor = wetnessFactor
 
-        local change = dirtDuration * wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * dt
+        local change = dirtDuration * wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED * dt
         spec.airIntakeClogging = math.min(spec.airIntakeClogging + change, dirtLevel)
     else
         dbg.fieldFactor = dbg.fieldFactor or 1.0

@@ -10,8 +10,8 @@
         <text name="ads_workshopCloseHour_tooltip" text="Die Stunde des Tages, zu der die Werkstatt schließt. Reparaturen werden nach dieser Zeit pausiert."/>
         <text name="ads_engineMaxHeat_label" text="Max. Motorhitze"/>
         <text name="ads_engineMaxHeat_tooltip" text="Die Basiswärmeerzeugung des Motors bei maximaler Last. Höhere Werte lassen den Motor schneller aufheizen."/>
-        <text name="ads_dirtInfluence_label" text="Schmutzeinfluss auf Kühlung"/>
-        <text name="ads_dirtInfluence_tooltip" text="Die maximale Verringerung der Kühlerleistung durch Schmutz. 15 % bedeutet, dass die Kühlung eines vollständig verschmutzten Fahrzeugs um 15 % weniger effektiv arbeitet."/>
+        <text name="ads_cloggingSpeed_label" text="Verschmutzungstempo"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Regelt, wie schnell sich Kühler und Lufteinlass bei Arbeit in Staub, Spreu und Ernteresten zusetzen. Höhere Werte lassen Verschmutzungen schneller ansteigen."/>
         <text name="ads_ws_header_title" text="Werkstatt"/>
         <text name="ads_workshopAvailable_label" text="Werkstatt 24/7 geöffnet"/>
         <text name="ads_workshopAvailable_tooltip" text="Aktiviert oder deaktiviert den 24/7-Betrieb der Werkstatt."/>

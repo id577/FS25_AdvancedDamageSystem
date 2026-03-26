@@ -31,7 +31,7 @@ function ADS_SettingsSyncEvent.new()
     self.closeHour                 = ADS_Config.WORKSHOP.CLOSE_HOUR
     self.engineMaxHeat             = ADS_Config.THERMAL.ENGINE_MAX_HEAT
     self.transMaxHeat              = ADS_Config.THERMAL.TRANS_MAX_HEAT
-    self.maxDirtInfluence          = ADS_Config.THERMAL.MAX_DIRT_INFLUENCE
+    self.cloggingSpeed            = ADS_Config.FIELD_CARE.CLOGGING_SPEED
     self.debugMode                 = ADS_Config.DEBUG
 
     return self
@@ -53,7 +53,7 @@ function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.closeHour              or 19)
     streamWriteFloat32(streamId, self.engineMaxHeat          or 1.05)
     streamWriteFloat32(streamId, self.transMaxHeat           or 1.05)
-    streamWriteFloat32(streamId, self.maxDirtInfluence       or 0)
+    streamWriteFloat32(streamId, self.cloggingSpeed         or 1.0)
     streamWriteBool(streamId,    self.debugMode              or false)
 end
 
@@ -73,7 +73,7 @@ function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.closeHour                 = streamReadFloat32(streamId)
     self.engineMaxHeat             = streamReadFloat32(streamId)
     self.transMaxHeat              = streamReadFloat32(streamId)
-    self.maxDirtInfluence          = streamReadFloat32(streamId)
+    self.cloggingSpeed            = streamReadFloat32(streamId)
     self.debugMode                 = streamReadBool(streamId)
 
     self:run(connection)
@@ -96,7 +96,7 @@ local function applyConfig(event)
     ADS_Config.WORKSHOP.CLOSE_HOUR                          = event.closeHour
     ADS_Config.THERMAL.ENGINE_MAX_HEAT                      = event.engineMaxHeat
     ADS_Config.THERMAL.TRANS_MAX_HEAT                       = event.transMaxHeat
-    ADS_Config.THERMAL.MAX_DIRT_INFLUENCE                   = event.maxDirtInfluence
+    ADS_Config.FIELD_CARE.CLOGGING_SPEED                    = event.cloggingSpeed
     ADS_Config.DEBUG                                        = event.debugMode
 
     ADS_Main:forceWorkshopUpdate()

@@ -119,13 +119,13 @@ function ADS_InGameSettings:onFrameOpen()
         g_i18n:getText("ads_thermalSensitivity_tooltip")
     )
 
-    -- Dirt Influence
-    self.ads_dirtInfluence = ADS_InGameSettings:addMultiTextOption(
+    -- Clogging Speed
+    self.ads_cloggingSpeed = ADS_InGameSettings:addMultiTextOption(
         self,
-        "onDirtInfluenceChanged",
-        ADS_InGameSettings.steps.dirt.texts,
-        g_i18n:getText("ads_dirtInfluence_label"),
-        g_i18n:getText("ads_dirtInfluence_tooltip")
+        "onCloggingSpeedChanged",
+        ADS_InGameSettings.steps.cloggingSpeed.texts,
+        g_i18n:getText("ads_cloggingSpeed_label"),
+        g_i18n:getText("ads_cloggingSpeed_tooltip")
     )
 
     -- AI overload and overheat control (Binary)
@@ -178,7 +178,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     setIndex(currentPage.ads_maintenancePrice,    steps.maintPrice.values,    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER * 100)
     setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER * 100)
     setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, ADS_Config.THERMAL.ENGINE_MAX_HEAT)
-    setIndex(currentPage.ads_dirtInfluence,     steps.dirt.values,           ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
+    setIndex(currentPage.ads_cloggingSpeed,    steps.cloggingSpeed.values,  ADS_Config.FIELD_CARE.CLOGGING_SPEED)
     
     currentPage.ads_instantInspection:setIsChecked(ADS_Config.MAINTENANCE.INSTANT_INSPECTION, false, false)
     currentPage.ads_parkVehicle:setIsChecked(ADS_Config.MAINTENANCE.PARK_VEHICLE, false, false)
@@ -211,7 +211,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_maintenanceDuration:setDisabled(disableAll)
     currentPage.ads_workshopAvailable:setDisabled(disableAll)
     currentPage.ads_thermalSensitivity:setDisabled(disableAll)
-    currentPage.ads_dirtInfluence:setDisabled(disableAll)
+    currentPage.ads_cloggingSpeed:setDisabled(disableAll)
     currentPage.ads_aiOverloadAndOverheatControl:setDisabled(disableAll)
     currentPage.ads_debugMode:setDisabled(disableAll)
 
@@ -315,8 +315,8 @@ function ADS_InGameSettings:onThermalSensitivityChanged(state)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
-function ADS_InGameSettings:onDirtInfluenceChanged(state)
-    ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = ADS_InGameSettings.steps.dirt.values[state]
+function ADS_InGameSettings:onCloggingSpeedChanged(state)
+    ADS_Config.FIELD_CARE.CLOGGING_SPEED = ADS_InGameSettings.steps.cloggingSpeed.values[state]
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
@@ -488,8 +488,8 @@ function ADS_InGameSettings:generateAllSteps()
         }
     }
 
-    -- Dirt Influence: 0% to 30%
-    self.steps.dirt = createSteps(0.00, 31, 0.01, function(v)
+    -- Clogging Speed: 10% to 300%
+    self.steps.cloggingSpeed = createSteps(0.1, 30, 0.1, function(v)
         return string.format("%.0f%%", v * 100)
     end)
 

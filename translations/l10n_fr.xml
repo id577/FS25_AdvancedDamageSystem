@@ -10,8 +10,8 @@
         <text name="ads_workshopCloseHour_tooltip" text="Heure de fermeture de l'atelier. Les réparations seront suspendues après cette heure."/>
         <text name="ads_engineMaxHeat_label" text="Chaleur max. moteur"/>
         <text name="ads_engineMaxHeat_tooltip" text="Le taux de base de chaleur générée par le moteur à charge maximale. Des valeurs plus élevées feront chauffer le moteur plus rapidement."/>
-        <text name="ads_dirtInfluence_label" text="Influence de la saleté sur le refroidissement"/>
-        <text name="ads_dirtInfluence_tooltip" text="La réduction maximale de l'efficacité du radiateur due à la saleté. 15 % signifie que le refroidissement d'un véhicule entièrement sale est 15 % moins efficace."/>
+        <text name="ads_cloggingSpeed_label" text="Vitesse d'encrassement"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Règle la vitesse à laquelle le radiateur et l'admission d'air s'encrassent lors du travail dans la poussière, la menue paille et les résidus de culture. Des valeurs plus élevées accélèrent l'encrassement."/>
         <text name="ads_ws_header_title" text="Atelier"/>
         <text name="ads_workshopAvailable_label" text="Atelier ouvert 24/7"/>
         <text name="ads_workshopAvailable_tooltip" text="Active ou désactive l'ouverture de l'atelier 24h/24 et 7j/7."/>
