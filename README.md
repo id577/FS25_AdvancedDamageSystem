@@ -1,6 +1,8 @@
 # FS25_AdvancedDamageSystem
 
-Advanced Damage System is a complete overhaul of the vehicle maintenance system, transforming it into a deep and strategic layer of gameplay. Forget the simple "Repair" button—now every tractor requires a thoughtful approach.
+Advanced Damage System is a mod that completely reworks the standard vehicle damage and maintenance system in Farming Simulator 25. A machine's reliability now depends directly on how carefully and efficiently you use it: the harder you push your equipment and the worse you maintain it, the more often it will break down.
+
+Forget about one-click repairs. Maintenance now takes time, resources, and proper planning. You will need to manage wear, schedule repairs in advance, and organize your fleet so that breakdowns do not ruin the season.
 
 <table>
 <tr>
@@ -27,12 +29,14 @@ A huge thank you to **Frvetz** (https://github.com/Frvetz), creator of the Reali
 Also, a big thank you to **Derwen Modding** for testing the early builds.
 
 # Key Features
-- **Complete Replacement of the Vanilla Damage System:** Wear now accumulates based on how you operate your vehicle. Harsh usage (for example, overloading the engine) causes significantly faster deterioration.
+- **Complete Replacement of the Vanilla Damage System:** Every vehicle in the game is now divided into multiple individual systems: engine, transmission, hydraulics, cooling system, fuel system, working systems, electrical system, and chassis. Each system tracks how the machine is actually being used. For example, chassis wear increases faster if you drive quickly over rough terrain. The harsher the operating conditions, the faster wear builds up and the more often breakdowns occur.
 - **Regular Maintenance Becomes Essential:** Scheduled service is now required to prevent accelerated wear and avoid costly failures.
-- **Dynamic Breakdowns:** Dozens of unique malfunctions can occur, each with its own gameplay effects.
+- **Dynamic Breakdowns:** Dozens of different failures tied to specific systems, each with its own gameplay effects and consequences.
 - **Fully Reworked Workshop Menu and Logic:** The workshop now supports inspection, repair, maintenance, and overhaul. Each procedure has configurable options and takes time to complete, so there is no one-click repair.
 - **Realistic Thermal Simulation:** Engines need proper warm-up, and they can overheat under heavy load in hot conditions. Ignoring temperature can lead to serious consequences.
+- **Realistic Battery and Alternator Simulation:** The battery can now discharge, and the alternator can fail, leading to difficult engine starts. However, you can always jump-start a vehicle from another machine.
 - **Vehicle-Specific Characteristics:** Vehicles differ by brand and production year in Reliability (affecting wear rate, breakdown probability, and service intervals) and Maintainability (affecting service cost and service time). Premium brands are generally more reliable than budget alternatives, while older machines are often mechanically simpler and therefore more maintainable.
+- **Pre-Operation Inspection:** Before heading to the field, vehicles need to be inspected and serviced at the start of each shift: greasing components, blowing out the radiator and air intakes, and carrying out other essential routine procedures.
 
   ... More information below in the guide
 
@@ -45,17 +49,26 @@ For testing and debugging, ADS includes console commands. Most commands require 
 | --- | --- | --- |
 | **ads_debug** | Toggles ADS debug mode on/off. | `ads_debug` |
 | **ads_listBreakdowns** | Lists all available breakdown IDs from the registry. | `ads_listBreakdowns` |
-| **ads_addBreakdown** | Adds a breakdown to the current vehicle. If no ID is provided, a random one is added at stage 1. | `ads_addBreakdown ECU_MALFUNCTION 2` |
-| **ads_removeBreakdown** | Removes a specific breakdown from the current vehicle. If no ID is provided, removes all active breakdowns. | `ads_removeBreakdown ECU_MALFUNCTION` |
-| **ads_advanceBreakdown** | Advances a specific active breakdown by one stage. If no ID is provided, advances all active breakdowns (if possible). | `ads_advanceBreakdown ECU_MALFUNCTION` |
-| **ads_setCondition** | Sets the current vehicle's Condition level (`0.0`-`1.0`). | `ads_setCondition 0.5` |
+| **ads_addBreakdown** | Adds a breakdown to the current vehicle. Optional arguments: breakdown ID and stage. | `ads_addBreakdown ECU_MALFUNCTION 2` |
+| **ads_removeBreakdown** | Removes a specific breakdown from the current vehicle. If no ID is provided, all active breakdowns are removed. | `ads_removeBreakdown ECU_MALFUNCTION` |
+| **ads_advanceBreakdown** | Advances a specific active breakdown to the next stage. If no ID is provided, all active breakdowns are advanced where possible. | `ads_advanceBreakdown ECU_MALFUNCTION` |
+| **ads_setCondition** | Sets the Condition value for all enabled systems on the current vehicle (`0.0`-`1.0`). | `ads_setCondition 0.5` |
+| **ads_setSystemCondition** | Sets Condition for one specific system on the current vehicle (`0.0`-`1.0`). | `ads_setSystemCondition engine 0.75` |
+| **ads_setSystemStress** | Sets Stress for one specific system on the current vehicle (`>= 0.0`). | `ads_setSystemStress electrical 0.25` |
+| **ads_setSystemStressMultiplier** | Sets the stress accumulation multiplier for one system, or for all systems if no system is specified. | `ads_setSystemStressMultiplier 12 electrical` |
 | **ads_setService** | Sets the current vehicle's Service level (`0.0`-`1.0`). | `ads_setService 0.2` |
-| **ads_resetVehicle** | Fully resets the current vehicle state (Condition and Service to `1.0`, clears breakdowns). | `ads_resetVehicle` |
-| **ads_startService** | Starts workshop service for the current vehicle. Types: `inspection`, `maintenance`, `repair`, `overhaul`. Optional `[count]` is used with `repair` to select how many visible breakdowns to repair. | `ads_startService repair 2` |
+| **ads_resetVehicle** | Fully resets the current vehicle state: condition, service, and active breakdowns. | `ads_resetVehicle` |
+| **ads_startService** | Starts service on the current vehicle. Types: `inspection`, `maintenance`, `repair`, `overhaul`. With `repair`, optional `[count]` selects how many visible breakdowns to repair. | `ads_startService repair 2` |
 | **ads_finishService** | Instantly finishes the currently active service on the current vehicle. | `ads_finishService` |
-| **ads_getServiceState** | Prints detailed current workshop/service state variables for the current vehicle. | `ads_getServiceState` |
-| **ads_showServiceLog** | Shows maintenance/service log entries. Optional `[index]` prints a detailed single entry. | `ads_showServiceLog 1` |
-| **ads_getDebugVehicleInfo** | Prints debug information about the current vehicle. Optional argument prints attached specializations list. | `ads_getDebugVehicleInfo 1` |
+| **ads_getServiceState** | Prints the current workshop and service state variables for the current vehicle. | `ads_getServiceState` |
+| **ads_showServiceLog** | Prints the vehicle's service log. Optional `[index]` shows one entry in detailed form. | `ads_showServiceLog 1` |
+| **ads_getDebugVehicleInfo** | Prints detailed debug information about the current vehicle. Optional argument also lists attached specializations. | `ads_getDebugVehicleInfo 1` |
+| **ads_setDirtAmount** | Sets the current vehicle's dirt level (`0.0`-`1.0`). | `ads_setDirtAmount 0.8` |
+| **ads_setFuelLevel** | Sets the current vehicle's fuel level using either a `0.0`-`1.0` value or `0`-`100` percent. | `ads_setFuelLevel 25` |
+| **ads_resetFactorStats** | Resets the accumulated factor statistics for the current vehicle. | `ads_resetFactorStats` |
+| **ads_toggleHudDebugView** | Switches the ADS HUD debug view between normal and factor stats modes. | `ads_toggleHudDebugView stats` |
+| **ads_setConfigVar** | Changes a value inside `ADS_Config` at runtime. Intended for testing and debugging. | `ads_setConfigVar CORE.BASE_SYSTEMS_WEAR 0.02` |
+| **ads_setSpecVar** | Changes a value inside `spec_AdvancedDamageSystem` on the current vehicle. Intended for testing and debugging. | `ads_setSpecVar systems.engine.condition 0.85` |
 
 # Screenshots
 <img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-29-33_123" src="https://github.com/user-attachments/assets/c7fcaecf-2814-4ac8-a12e-631be8617d18" />
@@ -71,72 +84,35 @@ The Advanced Damage System (ADS) mod completely replaces the standard damage sys
 This guide will help you understand all aspects of the mod.
 
 
-## 1. Core Mechanics: Condition and Service
+## 1. Core Mechanics: Condition, Stress and Service
 
-ADS introduces two key parameters for each of your vehicles:
+Each vehicle can contain all or only some of the following systems: engine, transmission, hydraulics, cooling system, fuel system, working systems, electrical system, and chassis. Every system has two key parameters: `Condition` and `Stress`.
 
 ### ⚙️ Condition
 
-This is the main indicator of your vehicle's "health." It reflects the overall physical wear of the engine, transmission, hydraulics, and other key components.
+This is the main indicator of a system's health and remaining service life.
 
 - **What does Condition affect?**
-It directly impacts the probability of breakdowns occurring and the speed of their progression. The lower the condition, the more often the vehicle breaks down, and the faster a malfunction reaches a critical stage.
+Condition determines how resistant a system is to breakdowns. As Stress builds up through poor or demanding operation, the Condition value defines the threshold at which breakdown risk becomes critical. In simple terms: the lower the Condition, the less abuse the system can take before it starts to fail.
 
 - **How does it decrease?**
-It decreases as the vehicle is used. With default settings and for a vehicle of average quality, this is about 1% per operating hour. However, the rate of wear is heavily influenced by the following factors:
+Condition decreases as the vehicle is used. With the default settings, this is roughly `1%` per hour under normal operation. However, harsh or improper use increases wear significantly, and each system has its own factors that accelerate deterioration. Condition also decreases very slowly over time if the vehicle is stored outdoors instead of under cover.
 
-  - Working Under Load: The harder the engine is working, the faster the vehicle wears out.
-
-  - Overdue Service: If you don't change the oil and filters, the wear of all components accelerates significantly.
-
-  - Operating a Cold Engine: Putting a heavy load on an unheated engine causes increased wear.
-
-  - Overheating: Operating at critical engine or transmission temperatures will rapidly "kill" your vehicle.
-
-  - Vehicle Reliability: Each brand and model has its own reliability rating. Premium brand vehicles wear out more slowly.
- 
 - **How to restore Condition?**
-It can only be partically restored through the Overhaul procedure in the workshop.
+Condition can be partially restored through the `Overhaul` procedure in the workshop. You can restore individual systems or rebuild several systems at once.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for a detailed breakdown of Condition wear mechanics</strong></summary>
->
-> The final wear rate is calculated using a formula that combines a base rate with several dynamic multipliers.
-> 
-> ### 1. Base Wear Rate
-> This is the starting point for wear calculation (these parameters can be adjusted in the settings):
-> - **Standard Operation:** `1%` per operating hour.
-> - **Engine Idling:** `0.5%` per operating hour (wear is halved).
-> - **Passive Wear (Engine Off):** `0.05%` per hour, simulating natural degradation from environmental factors.
-> 
-> ### 2. Wear Multipliers (Cumulative)
-> These factors are applied on top of the base rate. They are designed with a quadratic curve, meaning their effect grows exponentially as the situation worsens.
-> 
-> - **Working Under Load:**
->   - **Threshold:** Activates above 80% engine load.
->   - **Max Penalty:** `+100%` wear at full load (effectively doubling the wear rate).
-> 
-> - **Overdue Service:**
->   - **Threshold:** Activates when `Service` level drops below 50%.
->   - **Max Penalty:** `+1000%` wear at 0% service. This is a major penalty for neglecting maintenance!
-> 
-> - **Operating a Cold Engine:**
->   - **Threshold:** Activates when engine temperature is below 50°C.
->   - **Max Penalty:** `+5000%` wear at 0°C. This is one of the most significant wear factors, so always warm up your engines!
-> 
-> - **Overheating:**
->   - **Threshold:** Activates above 95°C engine temperature.
->   - **Max Penalty:** `+5000%` wear at 120°C. This penalty is extremely high and is designed to rapidly degrade a vehicle if overheating is ignored.
->
-> ### 3. Vehicle Reliability Modifier
-> This is a final divisor applied to the total calculated wear rate. The `0.8` to `1.2` reliability range is used here as an example; actual brand values can be lower (e.g., `0.7`) or higher.
-> 
-> - **Reliability of 1.2 (Premium Brand):** The final wear rate is divided by 1.2, resulting in a **~17% reduction** in wear.
-> - **Reliability of 1.0 (Average Brand):** The final wear rate is divided by 1.0, resulting in **no change**.
-> - **Reliability of 0.8 (Budget Brand):** The final wear rate is divided by 0.8, resulting in a **25% increase** in wear.
->
-> </details>
+### ⚠️ Stress
+
+This is the accumulated result of misuse, overload, and operating mistakes that a system suffers during vehicle use.
+
+- **What does Stress affect?**
+Stress directly affects the probability of failures appearing in a specific system. The higher the Stress, the higher the breakdown risk. The upper limit of Stress, where the probability becomes critical, is the current `Condition` value of that system.
+
+- **How does it increase?**
+Stress does not build up during normal operation. It increases only through improper use: overload, overheating, running a cold machine under load, wheel slip, harsh working conditions, and other mistakes specific to each system.
+
+- **How to reduce Stress?**
+Stress can be reduced through preventive maintenance in the workshop. In addition, Stress is automatically lowered after a breakdown occurs. Repairs also give you options: a standard repair significantly reduces Stress, while a full repair with replacement of adjacent components removes all Stress from the system.
 
 
 ### 💧 Service
@@ -144,7 +120,7 @@ It can only be partically restored through the Overhaul procedure in the worksho
 This parameter reflects the state of consumables: oil, filters, technical fluids, etc.
 
 - **What does Service affect?**
-This is a critically important parameter. A low Service level significantly accelerates the decline of Condition. Furthermore, it drastically increases the probability of random component failures. Timely maintenance is the best way to save money on expensive repairs in the future.
+This is a critically important parameter. A low Service level significantly accelerates the decline of Condition in every system, but not all systems are affected equally. For example, the engine suffers much more from overdue service than the cooling system. Timely maintenance is the best way to save money on expensive repairs in the future.
 
 - **How does it decrease?**
 It decreases with engine operating hours, simulating the natural wear of consumables.
@@ -152,41 +128,109 @@ It decreases with engine operating hours, simulating the natural wear of consuma
 - **How to restore it?**
 It is restored to 100% through the Maintenance procedure in the workshop (depending on the selected maintenance scope, this value can be lower or higher).
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on Service wear and its impact</strong></summary>
-> 
-> ### 1. Service Wear Rate
-> The base wear rate for the `Service` level is much faster than for `Condition`, as it simulates consumable usage (these parameters can be adjusted in the settings).
-> - **Standard Operation:** `10%` per operating hour.
-> - **Engine Idling:** `5%` per operating hour (wear is halved).
-> - **Passive Wear (Engine Off):** `0.5%` per hour.
-> 
-> The only modifier affecting this rate is the vehicle's **Reliability**. Just like with `Condition`, the brand's reliability rating acts as a final divisor for the total `Service` wear.
->
-> ### 2. The Penalty for Overdue Service
-> The mod calculates a recommended service interval for each vehicle based on its brand quality. While you are free to choose your own schedule, delaying maintenance has severe consequences. The table below shows how the penalty multiplier applied to `Condition` wear (same penalty to breakdown probability) grows exponentially as the `Service` level drops below the 50% threshold.
-> 
-> | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear | Service Level | Penalty on `Condition` Wear |
-> | :-----------: | :-------------------------: | :-----------: | :-------------------------: | :-----------: | :-------------------------: |
-> | **100% - 50%**| **`+0%`**                   | **30%**       | `+160%`                     | **10%**       | `+640%`                     |
-> | **45%**       | `+10%`                      | **25%**       | `+250%`                     | **5%**        | `+810%`                     |
-> | **40%**       | `+40%`                      | **20%**       | `+360%`                     | **0%**        | **`+1000%`**                |
-> | **35%**       | `+90%`                      | **15%**       | `+490%`                     |               |                             |
-
-> 
-> </details>
 
 ### A Note on Player Knowledge: Hidden Values
-You can check `Condition` and `Service` in the workshop by running an Inspection. In most cases, the result is an approximate status (for example: Service is `OPTIMAL`, `NOT REQUIRED`, `REQUIRED`, or `OVERDUE`).
+You can check overall `Condition`, system `Condition`, system `Stress`, and `Service` in the workshop by running an Inspection. In most cases, the result is an approximate status (for example: Service is `OPTIMAL`, `NOT REQUIRED`, `REQUIRED`, or `OVERDUE`).
 
 Exact percentage values are available only through a full diagnostic (defectoscopy) procedure, which is expensive and time-consuming.
 
 In practice, this level of precision is usually unnecessary. A responsible farmer follows the manufacturer-recommended service interval for each machine, performs maintenance on schedule, and when the time comes, either carries out an overhaul or replaces the vehicle.
 
-## 2. Breakdowns
+## 2. Wear Factors
 
-The most interesting part of the mod. As the vehicle's Condition drops, the probability of random breakdowns increases.
+Each system has its own set of wear factors that accelerate `Condition` loss and increase `Stress`. At the same time, there are several global factors that can affect multiple systems at once:
+
+- **Service Factor:** The effect of overdue maintenance. The longer the service interval is overdue, the stronger this factor becomes.
+
+- **Breakdown Presence Factor:** An active breakdown in a system accelerates the wear of its remaining components.
+
+- **Idle Factor:** If a system is not being actively used, its wear rate is significantly reduced. For example, the transmission experiences very little wear while the vehicle is not moving.
+
+- **Downtime Factor:** A small passive wear effect that applies when the vehicle is not running and is stored outdoors.
+
+### Engine
+
+- **Motor Overload Factor:** Triggers when engine load exceeds `90%`. The effect becomes stronger as load gets closer to `100%`.
+
+- **Air Intake Clogging Factor:** Triggers when air intake clogging exceeds `50%`. The effect becomes stronger as clogging increases.
+
+- **Cold Engine Factor:** Triggers when engine temperature is below `50C` and RPM load is above `75%`. This factor does not apply to AI vehicles.
+
+- **Overheated Engine Factor:** Triggers when engine temperature is above `95C` and engine load is above `30%`. The effect becomes stronger as temperature and load increase.
+
+### Transmission
+
+- **Pull Overload Factor:** Triggers when engine load is above `82%` and the vehicle is moving faster than `0.5 km/h`. The effect builds up over time and reaches its maximum after `30` seconds of continuous overload.
+
+- **Lugging Factor:** Triggers when engine load is above `80%`, RPM load is below `80%`, and the vehicle is moving faster than `0.5 km/h`. The effect becomes stronger as the gap between load and RPM increases.
+
+- **Wheel Slip Factor:** Triggers when wheel slip exceeds `30%`. The effect becomes stronger as slip increases.
+
+- **Cold Transmission Factor:** Applies only to CVT transmissions. Triggers when transmission temperature is below `50C` and RPM load is above `75%`. This factor does not apply to AI vehicles.
+
+- **Overheated Transmission Factor:** Applies only to CVT transmissions. Triggers when transmission temperature is above `95C` and engine load is above `30%`. The effect becomes stronger as temperature increases.
+
+- **Heavy Trailer Factor:** Activates when the mass of the towed trailer exceeds the tractor's own mass by more than `1.2x`.
+
+### Hydraulics
+
+- **Operating Factor:** Triggers during active hydraulic work. The effect becomes stronger as the working mass ratio increases.
+
+- **Heavy Lift Factor:** Triggers when lifted mass exceeds `30%` of the vehicle's mass. The effect becomes stronger as lifted mass increases.
+
+- **Cold Oil Factor:** Triggers during active hydraulic work when engine temperature is below `30C`. The effect becomes stronger as temperature gets lower.
+
+- **PTO Operation Factor:** Triggers when the PTO is active. In the current config, this factor is set to `0`, so it currently has no effect.
+
+- **Sharp PTO Angle Factor:** Triggers when the connected PTO angle exceeds `20` degrees. The effect becomes stronger as the angle increases.
+
+### Cooling
+
+- **High Cooling Load Factor:** Triggers when thermostat state exceeds `90%`. The effect becomes stronger as cooling effort increases.
+
+- **Overheat Factor:** Triggers when engine temperature exceeds `95C`. The effect becomes stronger as temperature increases.
+
+- **Cold Shock Factor:** Triggers when engine temperature is below `50C` and RPM load is above `75%`. This factor does not apply to AI vehicles.
+
+### Electrical
+
+- **Lights Usage Factor:** Triggers when the main lights are on.
+
+- **Weather Exposure Factor:** Triggers when the vehicle is outdoors during rain, snow, or hail.
+
+- **Cranking Stress Factor:** Triggers while the starter is engaged.
+
+- **Overheat Factor:** Triggers when engine temperature exceeds `95C`.
+
+### Chassis
+
+- **Vibration Factor:** Triggers when the vibration signal exceeds its threshold. The effect becomes stronger at higher speed and on rougher surfaces.
+
+- **Steering Load Factor:** Triggers at speeds up to `4 km/h` when the steering input is active and changing while the wheels have ground contact. The effect becomes stronger with sharper steering input.
+
+- **Brake Mass Factor:** Triggers during braking above `2 km/h` when total vehicle mass is greater than its own mass. The effect becomes stronger with heavier mass and stronger braking input.
+
+### Fuel
+
+- **Low Fuel Starvation Factor:** Triggers when fuel level drops below `20%`. The effect becomes stronger as fuel level gets lower and engine load increases.
+
+- **Cold Fuel Factor:** Triggers when fuel temperature is below `20C` and engine load is above `50%`. The effect becomes stronger as temperature gets lower.
+
+- **Idle Deposit Factor:** Triggers after `60` seconds of idling. The effect continues to grow up to `600` seconds of idling.
+
+- **High Pressure Factor:** Triggers when engine load exceeds `90%`. The effect becomes stronger as load gets closer to `100%`.
+
+### Work Process
+
+- **Long Operation Factor:** Triggers whenever the machine is turned on. The effect grows with continuous operation and reaches its maximum after `7200` seconds.
+
+- **Wet Crop Factor:** Triggers when the machine is turned on, harvesting is in progress, and the weather is wet.
+
+- **Lubrication Factor:** Triggers when the machine requires lubrication and lubrication level is below `50%`. The effect becomes stronger as lubrication level drops.
+
+## 3. Breakdowns
+
+In ADS, your vehicles can suffer real breakdowns. Some failures are minor and only reduce performance, while others can make the machine completely inoperable.
 
 > [!NOTE]
 > <details>
@@ -196,129 +240,184 @@ The most interesting part of the mod. As the vehicle's Condition drops, the prob
 >
 > ---
 > 
-> ### ⚙️ Engine Systems
-> 
+> ### ⚡ Electrical Systems
+>
 > #### ECU Malfunction
-> * *Applicable to:* Modern vehicles (Year 2000+) with combustion engines.
-> * *Symptoms:* Progressive power loss, increased fuel consumption, engine stalls, difficulty starting, dark exhaust smoke.
-> * *Critical Effect:* **Complete engine failure.** The vehicle will not start.
-> 
-> #### Fuel Pump Malfunction
-> * *Applicable to:* All vehicles with combustion engines.
-> * *Symptoms:* Engine hesitation, occasional stalls, difficulty starting, progressive power loss, increased fuel consumption and fluctuating idle.
-> * *Critical Effect:* **Complete engine failure.** Fuel is not supplied, and the engine cannot be started.
-> 
-> #### Fuel Injector Malfunction
-> * *Applicable to:* All vehicles with combustion engines.
-> * *Symptoms:* Rough engine operation, misfires under load, significant power loss, unreliable starting, fluctuating idle.
-> * *Critical Effect:* **Complete engine failure.** The engine will not run correctly and may not start at all.
+> * *Applicable to:* Modern non-electric vehicles (`Year 2000+`).
+> * *Symptoms:* ECU errors cause reduced engine power, increased fuel consumption, dark exhaust smoke, and at advanced stages can lead to stalls and difficult starting.
+> * *Critical Effect:* **Complete ECU failure.** The engine can no longer be controlled and will not start.
 >
-> #### Cooling System Thermostat Malfunction
-> * *Applicable to:* All vehicles with combustion engines.
-> * *Symptoms:* Engine takes longer to warm up or runs hotter than normal, leading to increased wear and risk of overheating.
-> * *Critical Effect:* **Rapid and severe engine overheating,** as the thermostat fails completely and blocks coolant circulation.
+> #### Corroded Wiring
+> * *Applicable to:* Modern vehicles (`Year 2000+`) equipped with lights.
+> * *Symptoms:* Flickering or failed lights, unstable voltage supply, hard starting, occasional stalls, and loss of power in critical circuits.
+> * *Critical Effect:* **Starter control circuit failure.** Lighting is inoperative and engine start is impossible.
 >
-> #### Carburetor Clogging
-> * *Applicable to:* Older vehicles (Pre-1980) with combustion engines.
-> * *Symptoms:* Engine hesitation, sputtering, frequent stalls, difficulty maintaining power and fluctuating idle.
-> * *Critical Effect:* **Engine will not run** due to complete fuel starvation.
-> 
+> #### Battery Sulfation
+> * *Applicable to:* All vehicles.
+> * *Symptoms:* Reduced effective battery capacity, weak electrical reserve under load, unstable cranking, and progressively harder engine starts.
+> * *Critical Effect:* **Battery capacity is almost gone.** Cranking performance becomes too weak for reliable starting.
+>
+> #### Alternator Regulator Failure
+> * *Applicable to:* All vehicles.
+> * *Symptoms:* Reduced or unstable charging output, poor battery charging, voltage losses, and a steadily weakening electrical system.
+> * *Critical Effect:* **No battery charging.** The vehicle runs only on the remaining battery reserve.
+>
 > ---
-> 
-> ### 🔩 Transmission Systems
-> 
-> #### Transmission Slip
-> * *Applicable to:* Vehicles with conventional (non-CVT) transmissions.
-> * *Symptoms:* Occasional power loss as the transmission slips under load, especially during acceleration.
-> * *Critical Effect:* **Vehicle is unable to move.** The clutch is completely burned out.
-> 
+>
+> ### ⚙️ Engine Systems
+>
+> #### Turbocharger Wear
+> * *Applicable to:* Currently only enabled for the `Fiat 160-90 DT`.
+> * *Symptoms:* Turbo whistle, noticeable power loss at high RPM, rising fuel consumption, and possible engine stalls under heavy load.
+> * *Critical Effect:* **Catastrophic turbo failure.** The engine loses most of its power and is at serious risk of further damage.
+>
+> #### Oil Pump Malfunction
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Low oil pressure, reduced engine torque, rising engine temperature, mechanical knocking, and possible stalling as the failure worsens.
+> * *Critical Effect:* **Critical oil circulation failure.** Safe engine operation and reliable starting are no longer possible.
+>
+> #### Valve Train Malfunction
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Reduced engine torque, increased fuel consumption, abnormal valve train noise, hesitation under load, and possible stalls.
+> * *Critical Effect:* **Valve train failure.** The engine can no longer operate correctly and may not start at all.
+>
+> ---
+>
+> ### ⚙️ Transmission Systems
+>
+> #### Manual Transmission Clutch Wear
+> * *Applicable to:* Vehicles with manual transmissions.
+> * *Symptoms:* Transmission slip under load, weak power delivery to the wheels, and increasing fuel consumption as clutch wear progresses.
+> * *Critical Effect:* **Clutch burnout.** The vehicle is unable to move.
+>
 > #### Transmission Synchronizer Malfunction
-> * *Applicable to:* Vehicles with manual or synchro-shift transmissions.
-> * *Symptoms:* Grinding noises, difficulty shifting gears, and a high chance of failed shifts or gear rejection under load.
-> * *Critical Effect:* **Impossible to shift gears.**
-> 
+> * *Applicable to:* Vehicles with manual or synchro-shift transmissions, excluding Powershift.
+> * *Symptoms:* Grinding noises, difficult shifts, failed gear changes, and gear rejection under load.
+> * *Critical Effect:* **Synchronizer failure.** Shifting gears becomes impossible.
+>
 > #### Powershift Hydraulic Pump Malfunction
 > * *Applicable to:* Vehicles with Powershift transmissions.
-> * *Symptoms:* Delays, harshness, and violent shocks when shifting gears.
-> * *Critical Effect:* **Transmission is stuck in neutral** and cannot engage any gear.
-> 
-> #### CVT Thermostat Malfunction
-> * *Applicable to:* Modern vehicles (Year 2000+) with CVT transmissions.
-> * *Symptoms:* CVT temperature becomes unstable, leading to a high risk of overheating and internal damage during prolonged work.
-> * *Critical Effect:* **Rapid and dangerous overheating of the CVT** due to a complete cooling failure.
-> 
+> * *Symptoms:* Delays, harsh engagement, and violent shocks during gear changes as hydraulic pressure drops.
+> * *Critical Effect:* **Hydraulic pump failure.** The transmission is stuck in neutral.
+>
+> #### CVT Chain Wear
+> * *Applicable to:* Vehicles with CVT transmissions.
+> * *Symptoms:* Variator slip, higher fuel consumption, rising transmission temperature, and worsening torque transfer.
+> * *Critical Effect:* **Critical CVT chain wear.** Reliable vehicle movement can no longer be guaranteed.
+>
+> #### CVT Hydraulic Control Valve Malfunction
+> * *Applicable to:* Vehicles with CVT transmissions.
+> * *Symptoms:* Hydraulic pressure drops, reduced engine torque, restricted ratio range, rising transmission heat, and unstable CVT operation.
+> * *Critical Effect:* **Control valve failure.** The transmission falls into a severely restricted emergency mode.
+>
 > ---
-> 
-> ###  Other Systems
-> 
-> #### Brake Malfunction
-> * *Applicable to:* All wheeled vehicles.
-> * *Symptoms:* Increased braking distance, weak and unreliable brakes, unusual noises when braking.
-> * *Critical Effect:* **Complete brake system failure.** Braking is impossible.
-> 
+>
+> ### 🛠️ Hydraulic Systems
+>
 > #### Hydraulic Pump Malfunction
-> * *Applicable to:* Most non-truck vehicles (tractors, combines, etc.) from 1960 onwards.
-> * *Symptoms:* Hydraulic implements become progressively slower and weaker.
-> * *Critical Effect:* **The hydraulic system is completely inoperable.**
-> 
-> #### Electrical System Malfunction
-> * *Applicable to:* Modern vehicles (Year 2000+) with lights.
-> * *Symptoms:* Flickering lights, unreliable engine starting, occasional stalls.
-> * *Critical Effect:* **Complete electrical failure.** Lights do not work and the starter does not respond.
-> 
+> * *Applicable to:* Most non-truck, non-passenger hydraulic vehicles from `1960+`.
+> * *Symptoms:* Hydraulic implements become progressively slower, weaker, and less responsive.
+> * *Critical Effect:* **Hydraulic pump failure.** The hydraulic system becomes inoperable.
+>
+> #### Hydraulic Cylinder Internal Leak
+> * *Applicable to:* Most non-truck, non-passenger hydraulic vehicles from `1960+`.
+> * *Symptoms:* Slower hydraulic movement, weak actuation, and attached implements drifting or failing to hold position under load.
+> * *Critical Effect:* **Critical internal leakage.** Hydraulic movement is almost lost and load holding is no longer possible.
+>
+> #### PTO Clutch Slip
+> * *Applicable to:* Vehicles with PTO capability.
+> * *Symptoms:* Reduced PTO torque transfer and frequent automatic PTO disengagement under load.
+> * *Critical Effect:* **PTO clutch failure.** PTO operation is no longer possible.
+>
 > ---
-> 
-> ### 🚜 Harvester-Specific Systems
-> 
-> #### Yield Sensor Malfunction
-> * *Applicable to:* Modern combines (Year 2000+).
-> * *Symptoms:* The automatic threshing system becomes less efficient, leading to progressively higher crop losses as the combine fails to separate grain correctly.
-> * *Critical Effect:* **Severe crop loss (-40%)** as the monitoring system fails completely.
-> 
-> #### Material Flow System Wear
-> * *Applicable to:* All combines.
-> * *Symptoms:* Minor crop loss during internal transport, grinding noises, and a risk of major clogs.
-> * *Critical Effect:* **Severe material flow blockage** and massive crop loss (-80%) as a major component fails. The engine is placed under extreme strain.
-> 
+>
+> ### 🚜 Chassis Systems
+>
+> #### Brake Malfunction
+> * *Applicable to:* Wheeled vehicles.
+> * *Symptoms:* Reduced braking force, longer stopping distances, weak braking response, and dangerous loss of braking effectiveness.
+> * *Critical Effect:* **Brake system failure.** Braking becomes impossible.
+>
+> #### Bearing Wear
+> * *Applicable to:* Wheeled vehicles.
+> * *Symptoms:* Bearing noise, vibration, increased rolling resistance, lower maximum speed, and rising drivetrain load.
+> * *Critical Effect:* **Wheel bearing seizure.** Wheel rotation is blocked.
+>
+> #### Steering Linkage Wear
+> * *Applicable to:* Wheeled vehicles without tracks.
+> * *Symptoms:* Steering pull, reduced steering response, poor directional stability, and increasingly unreliable control.
+> * *Critical Effect:* **Steering linkage failure.** Safe directional control can no longer be ensured.
+>
+> #### Track Tensioner Malfunction
+> * *Applicable to:* Tracked vehicles only.
+> * *Symptoms:* Directional pull, vibration, drag noise, extra drivetrain load, reduced speed, and unstable track running.
+> * *Critical Effect:* **Track tensioner failure.** The running gear can seize.
+>
+> ---
+>
+> ### 🌡️ Cooling Systems
+>
+> #### Thermostat Malfunction
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Slow warm-up or unstable temperature regulation at first, followed by persistent overheating under load.
+> * *Critical Effect:* **Thermostat failure.** Coolant circulation is disrupted and severe overheating becomes unavoidable.
+>
+> #### Coolant Leak
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Reduced cooling efficiency, faster temperature rise under load, and an increasing likelihood of overheating.
+> * *Critical Effect:* **Critical coolant loss.** Safe engine temperature can no longer be maintained.
+>
+> #### Fan Clutch Failure
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Reduced fan efficiency, abnormal fan clutch noise, weak airflow through the cooling pack, and a high overheating risk.
+> * *Critical Effect:* **Fan clutch failure.** Adequate cooling airflow is no longer possible.
+>
+> ---
+>
+> ### ⛽ Fuel Systems
+>
+> #### Fuel Pump Malfunction
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Rough idle, reduced power, higher fuel consumption, hesitation, difficult starting, and frequent stalls as fuel pressure drops.
+> * *Critical Effect:* **Fuel pump failure.** Fuel is no longer supplied to the engine.
+>
+> #### Fuel Injector Malfunction
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Rough running, hesitation under load, reduced power, higher fuel consumption, and increasingly unreliable starting.
+> * *Critical Effect:* **Injector failure.** The engine will not run correctly and may not start at all.
+>
+> #### Fuel Filter Clogging
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Restricted fuel flow, hesitation under load, lower engine torque, and possible engine stalls.
+> * *Critical Effect:* **Critical filter blockage.** Fuel flow becomes insufficient for engine operation.
+>
+> #### Fuel Line Air Leak
+> * *Applicable to:* All non-electric vehicles.
+> * *Symptoms:* Unstable fuel supply, difficult starting, hesitation, and engine stalls caused by air entering the system.
+> * *Critical Effect:* **Critical air leak.** The engine cannot maintain fuel supply and will not run reliably.
+>
+> ---
+>
+> ### 🌾 Work Process Systems
+>
+> #### Harvest Processing System Wear
+> * *Applicable to:* Combines, cotton harvesters, rice harvesters, vine harvesters, and related harvesting machines.
+> * *Symptoms:* Reduced crop processing efficiency and progressively increasing yield loss during harvesting.
+> * *Critical Effect:* **Critical processing wear.** Yield loss becomes extreme during operation.
+>
 > #### Unloading Auger Malfunction
 > * *Applicable to:* Combines with unloading auger systems.
-> * *Symptoms:* Progressive unloading slowdown while discharging grain.
+> * *Symptoms:* Progressive unloading slowdown caused by belt, pulley, or gearbox wear in the auger drive.
 > * *Critical Effect:* **Unloading auger failure.** Grain unloading becomes unavailable until repaired.
 > 
 > </details>
 
 #### Chance and Severity of Breakdowns
-Breakdown probability is influenced by three key factors: the current `Condition` level, vehicle `Reliability`, and active wear multipliers. Lower `Condition` and lower `Reliability` increase the base chance of failure, while harsh real-time operating conditions (for example, running at near-100% engine load) can further raise the chance of a breakdown in that moment, in addition to accelerating wear. For heavily worn vehicles, the probability that a breakdown appears directly at a major or critical stage, skipping minor phases, also increases significantly.
+The probability of a breakdown depends entirely on the `Stress` level in a specific system. The closer the current `Stress` is to that system's current `Condition`, the higher the chance of a failure occurring.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on breakdown probability</strong></summary>
->
-> The probability of breakdowns is calculated using a formula designed to create a very noticeable difference between new and heavily-used equipment. Here are the key metrics for a vehicle of average quality:
->
-> ### 1. Breakdown Frequency (MTBF)
-> The system uses **Mean Time Between Failures (MTBF)** to determine breakdown frequency.
-> - **New Vehicle (100% Condition):** The MTBF is **1200 minutes (20 hours)** by default. This parameter is configurable in settings.
-> - **Worn-Out Vehicle (0% Condition):** The MTBF drops to **120 minutes (2 hours)**.
->
-> ### 2. Critical Failure Chance
-> This is the probability that a new breakdown will skip the minor stages and appear immediately as a **critical** failure.
-> - **New Vehicle (100% Condition):** The chance is only **5%**.
-> - **Worn-Out Vehicle (0% Condition):** The chance rises to **33%**.
->
-> ### 3. Lifetime Distribution, Curve Shape, and "Honeymoon" Modifier
-> Breakdown probability uses a third-degree baseline (`DEGREE = 3.0`), so the closer `Condition` gets to `0`, the faster failure probability grows.
->
-> In addition, new equipment receives a "honeymoon" modifier (`VEHICLE_HONEYMOON_HOURS = 10` by default), which makes early-life random failures extremely unlikely.
->
-> For a vehicle's full lifecycle (100% -> 0% Condition) without overhauls, expected breakdown counts are now roughly **2x lower** than before:
-> - **Total Expected Breakdowns:** Approximately **15**.
-> - **First Half of Life (100% -> 50% Condition):** Only **~2-3** breakdowns are expected.
-> - **Second Half of Life (50% -> 0% Condition):** The remaining **~12-13** breakdowns occur as condition rapidly deteriorates.
->
-> In practice, this means heavily worn equipment is at least **10x** more failure-prone than a new machine (and effectively even more during the honeymoon period).
->
-> </details>
+In addition, the `Condition` level determines the probability of a critical breakdown. A critical breakdown is a failure that appears immediately at `Stage 4`, skipping the earlier stages. The lower a system's `Condition`, the higher the chance that a breakdown will be critical from the start.
+
+The type of breakdown is not entirely random. First, it will always belong to the damaged system. Second, ADS keeps track of which wear factors have been active most often and uses that history to determine which failure is most likely to occur.
 
 #### Stages and Progression
 Most breakdowns go through several stages, gradually getting worse:
@@ -331,7 +430,9 @@ Most breakdowns go through several stages, gradually getting worse:
 
 - **Critical:** Complete failure of a component. The engine stalls, brakes fail, etc.
 
-If not addressed, a breakdown will progress over time. Progression is context-dependent: each breakdown has its own progression conditions. For example, unloading-system faults on combines progress only while the machine is unloading crop, which is intentionally modeled this way for realism.
+The stage at which a breakdown first appears depends on the system's `Condition`. The lower the `Condition`, the higher the starting stage is likely to be.
+
+If not addressed, a breakdown will progress over time and can advance to a more severe stage. Progression is context-dependent: each breakdown has its own progression conditions. For example, unloading-system faults on combines progress only while the machine is unloading crop, which is intentionally modeled this way for realism.
 
 #### Cost and Detection
 With each new stage, the cost of repair increases. A critical breakdown can be very costly. For modern vehicles, the mod adds dashboard indicators that usually report a problem starting from the second stage.
@@ -339,45 +440,14 @@ With each new stage, the cost of repair increases. A critical breakdown can be v
 #### It Pays to Be Attentive!
 The cheapest repair is a preventive one. Keep an eye on—and an ear out for—your equipment. The initial stages of a breakdown are accompanied by various visual and audio cues that serve as early warning signs. This might manifest as fluctuating engine RPMs, dark exhaust smoke, or other unusual noises like knocking or squeaking during operation. If you catch these symptoms during the first, hidden stage and promptly take your vehicle for an Inspection, you can fix the problem for a minimal price.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on progression and repair costs</strong></summary>
->
-> ### 1. Dashboard Indicators
-> In modern tractors, any deviation from the norm would typically trigger a dashboard warning. However, to make gameplay more engaging, indicators are intentionally disabled for the **first (Minor) stage** of a breakdown. This is designed to reward attentive players who can detect subtle changes in their vehicle's performance, allowing them to save significantly on repair costs. Most indicators will activate starting from the **second (Moderate) stage**.
->
-> ### 2. Repair Cost Scaling
-> The cost of fixing a breakdown scales exponentially with its progression:
-> - Each subsequent stage **doubles (x2)** the repair cost of the previous one.
-> - The base repair cost for a new breakdown is unique for each type of malfunction, but it generally hovers around **1% of the vehicle's total value**. The logic is based on realism: fixing the electrical system will naturally be much cheaper than repairing the transmission.
->
-> ### 3. Breakdown Progression Speed
-> Breakdown progression speed is not static.
-> - It depends on the current `Condition` level: the lower the condition, the faster breakdowns progress.
-> - Each breakdown has its own progression speed and behavior rules.
->
-> </details>
-
 #### General Wear and Tear
+In addition to having a higher chance of breakdowns, older vehicles also suffer from gradual degradation of their core performance. As wear accumulates, engine power may drop, the transmission may begin to slip, battery performance may weaken, cooling efficiency may decline, and other important characteristics may deteriorate.
+
+The closer a vehicle gets to the end of its service life, the more noticeable these degradation effects become. Even without a specific breakdown, a worn machine will already perform worse, less consistently, and less efficiently.
 Beyond random failures, low condition can trigger a permanent "General Wear and Tear" effect, simulating the sluggishness and aging behavior of worn machinery.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on the "General Wear and Tear" effect</strong></summary>
->
-> The "General Wear and Tear" effect begins to apply once a vehicle's `Condition` drops below **50%** (configurable in `ADS_Config.lua` via `GENERAL_WEAR_EARLY_STAGE_THRESHOLD `). Its impact is calculated using a cubic formula, so effects are mild at first and become much stronger as `Condition` approaches zero.
->
-> This effect applies several penalties, which reach their maximum values at 0% `Condition`:
->
-> - **Engine Power Reduction:** Up to **-30%**.
-> - **Braking Effectiveness Reduction:** Up to **-30%**.
-> - **Engine Start Reliability:** Start-failure chance increases (up to **66%**).
-> - **Cooling System Margin:** Thermostat health is reduced (up to **-30%**), increasing overheating risk.
-> - **Harvesting Efficiency Loss (for harvesters):** Up to **-30%**, simulating increased crop loss from worn-out components.
->
-> </details>
 
-## 3. Workshop Repairs and Service
+## 4. Workshop Repairs and Service
 
 The workshop system has been fully reworked. You now choose between four core procedures: **Inspection**, **Maintenance**, **Repair**, and **Overhaul**.
 
@@ -387,192 +457,72 @@ These options directly affect service **duration**, **cost**, and **quality**. A
 
 #### Inspection
 
-- **Inspection types:**
+- **What it does:** Helps you detect faults and understand the current condition of the vehicle. The quality of fault detection and the level of detail in the report depend on the selected inspection type:
 
-  - **Visual Inspection:** A quick external check. It can detect only breakdowns that have already reached stage 2+ (Moderate and above).
+  - **Visual Inspection:** A quick external check for when time is short. It can detect breakdowns, but because of the limited scope, there is a small chance that something important will be missed.
 
-  - **Standard Inspection:** Checks all breakdown stages (including early ones, subject to detection chance) and generates a standard report.
+  - **Standard Inspection:** A standard full inspection procedure. It detects faults and generates a standard condition report for the vehicle.
 
-  - **Complete Defectoscopy:** Checks all breakdown stages and generates a full report with exact numeric values (including precise `Condition`/`Service` percentages, estimated breakdown metrics, and detailed system health data).
+  - **Complete Defectoscopy:** A complete technical defectoscopy of the vehicle. It can detect even hidden and potential breakdowns, identify defective parts, and generates a comprehensive report with exact condition values for vehicle systems.
 
-- **When to use:** Whenever you feel something is "wrong" with the vehicle, when a warning light is on the dashboard, or when you want to know the exact state of your machine.
-
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on Inspection types, time, and price</strong></summary>
->
-> Values below are taken from `ADS_Config.lua` (`MAINTENANCE` section).
->
-> ### 1. Base Parameters
-> - `INSTANT_INSPECTION = false` (default)
-> - `INSPECTION_TIME = 3600000 ms` (**1 hour** base time)
-> - `INSPECTION_TIME_MULTIPLIERS`: `STANDARD = 1.0`, `VISUAL = 0.1`, `COMPLETE = 4.0`
-> - `INSPECTION_PRICE_MULTIPLIERS`: `STANDARD = 1.0`, `VISUAL = 0.1`, `COMPLETE = 4.0`
-> - If `INSTANT_INSPECTION = true`, inspection duration is forced to ~`1000 ms`; visual mode is internally converted to standard mode.
->
-> ### 2. Relative Time and Price vs Standard Inspection
-> - **Visual (`0.1x`)**: about **90% faster** and **90% cheaper**.
-> - **Standard (`1.0x`)**: baseline.
-> - **Complete (`4.0x`)**: about **4x longer** and **4x more expensive** (roughly **+300%**).
->
-> ### 3. Detection Logic by Type
-> - **Visual**: can only reveal breakdowns at stage **2+**.
-> - **Standard / Complete**: can reveal breakdowns from **all stages**.
->
-> ### 4. Report Depth by Type
-> - **Visual**: no full technical report.
-> - **Standard**: standard qualitative report (state labels and limited metrics).
-> - **Complete**: full quantitative report with exact values and advanced metrics.
->
-> ### 5. Additional Modifiers
-> Final duration and price are also influenced by other game variables (for example global service multipliers, workshop context, and vehicle characteristics), so actual values can differ from the base multipliers above.
->
-> </details>
+- **When to use:** Use it when you suspect a problem, when warning indicators appear, before expensive repairs, or when you want a clear picture of the vehicle's condition.
 
 #### Maintenance
 
-- **What it does:** Replaces all oils, filters, and fluids. Service outcome depends on the selected maintenance scope:
+- **What it does:** Replaces all oils, filters, and fluids, restores your vehicle's `Service` level, and also performs a standard inspection. The result depends on the selected maintenance scope:
 
-  - **Minimal:** Basic service. Significantly cheaper and faster, but does not fully restore the Service Level.
+  - **Minimal:** Basic service. Significantly cheaper and faster, but does not fully restore the `Service` level. A great choice when time is short and you just need to finish the season.
 
-  - **Standard:** Routine maintenance according to manufacturer specifications. Restores Service Level to normal.
+  - **Standard:** Routine maintenance according to manufacturer specifications. Restores `Service` to a normal level.
 
-  - **Extended:** Comprehensive service. Takes longer and costs more, but boosts Service Level by an additional ~20%.
+  - **Extended:** Comprehensive service. Takes longer and costs more, but restores `Service` above the standard level. An ideal choice for long campaigns.
 
-- **When to use:** Regularly! However, keep in mind that the cost of this procedure is **fixed** and does not depend on the actual Service level. This means servicing a vehicle at 90% costs the same as servicing it at 10%, so finding the right balance is key to managing your budget.
+  - **Preventive:** Preventive maintenance beyond the standard manufacturer service. Restores `Service` to a normal level and reduces `Stress` in the most problematic systems. It is expensive and time-consuming, but it significantly lowers the risk of breakdowns. An ideal choice for players who do not like unpleasant surprises in the middle of the season.
 
+- **When to use:** Regularly. Depending on its quality, each vehicle has its own service interval recommended by the manufacturer, and it should be followed closely. Small delays will not lead to immediate disaster, but if you ignore maintenance for too long, breakdowns will start to appear and the overall condition of the vehicle will decline rapidly. Also keep in mind that the cost of this procedure is **fixed** and does not depend on the actual `Service` level. This means servicing a vehicle at `90%` costs the same as servicing it at `10%`, so finding the right balance is key to managing your budget.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on Maintenance levels, time, and price</strong></summary>
->
-> Values below are taken from `ADS_Config.lua` (`MAINTENANCE` section).
->
-> ### 1. Base Parameters
-> - `MAINTENANCE_TIME = 21600000 ms` (**6 hours** base time)
-> - `MAINTENANCE_TIME_MULTIPLIERS`: `MINIMAL = 0.25`, `STANDARD = 1.0`, `EXTENDED = 1.5`
-> - `MAINTENANCE_PRICE_MULTIPLIERS`: `MINIMAL = 0.65`, `STANDARD = 1.0`, `EXTENDED = 1.25`
-> - `MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS`: `MINIMAL = 0.75`, `STANDARD = 1.0`, `EXTENDED = 1.2`
->
-> ### 2. Relative Time and Price vs Standard Maintenance
-> - **Minimal**: about **75% faster** and **35% cheaper**.
-> - **Standard**: baseline.
-> - **Extended**: about **50% longer** and **25% more expensive**.
->
-> ### 3. Service Restore Target by Level
-> - **Minimal:** target restore multiplier `0.75`
-> - **Standard:** target restore multiplier `1.0`
-> - **Extended:** target restore multiplier `1.2`
->
-> ### 4. Additional Modifiers
-> Final maintenance cost and duration are additionally affected by factors such as selected consumables quality, global service multipliers, workshop location multipliers, and vehicle characteristics.
->
-> </details>
 
 #### Repair
 
-- **What it does:** Fixes specific, diagnosed breakdowns. You can choose which malfunctions to fix and which to leave for later (e.g., if you're short on cash).
+- **What it does:** As the name suggests, repair removes detected breakdowns or makes them temporarily inactive. In addition, repair can also reduce the `Stress` level in the affected system.
 
-  Repair also supports urgency options:
+  Repair is available in three types:
 
-  - **When mechanics are free** (`Low Priority`)
-  - **Standard queue** (`Standard Queue`)
-  - **Urgent** (`Urgent`)
+  - **Quick Fix:** A fast and almost free procedure that removes the negative effects of a breakdown on the vehicle, but does not eliminate the fault itself. The fault will return after some time. A service for specific situations when time is extremely limited.
 
-  These options affect both repair duration and labor cost.
+  - **Standard:** Standard repair with replacement of the failed part. Fully removes the fault and significantly reduces `Stress` in the system.
 
-  You can also choose spare-parts quality for repairs (`Used`, `Aftermarket`, `OEM`, `Premium`). More details are provided below.
+  - **Advanced:** Comprehensive repair with replacement of all related parts around the failed component. Fully removes all consequences of the breakdown and reduces system `Stress` to zero.
 
-- **When to use:** When you have one or more diagnosed breakdowns that are hindering your work.
+- **When to use:** Always when something has broken.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on Repair urgency, time, and price</strong></summary>
->
-> Values below are taken from `ADS_Config.lua` (`MAINTENANCE` section).
->
-> ### 1. Base Parameters
-> - `REPAIR_TIME = 14400000 ms` (**4 hours** base time per selected breakdown)
-> - `REPAIR_TIME_MULTIPLIERS`: `LOW = 1.5`, `MEDIUM = 1.0`, `HIGH = 0.5`
-> - `REPAIR_PRICE_MULTIPLIERS`: `LOW = 0.8`, `MEDIUM = 1.0`, `HIGH = 1.2`
->
-> ### 2. Relative Time and Labor Cost vs Standard Queue
-> - **Low Priority (`1.5x` time / `0.8x` labor)**: about **50% slower**, about **20% cheaper** labor.
-> - **Standard Queue (`1.0x`)**: baseline.
-> - **Urgent (`0.5x` time / `1.2x` labor)**: about **50% faster**, about **20% more expensive** labor.
->
-> ### 3. Repair Scope Scaling
-> Repair duration scales with the number of selected breakdowns, so multi-fault repairs can take significantly longer.
->
-> ### 4. Spare-Parts Price Multipliers (for Repair Option Two)
-> - `USED = 0.33`
-> - `AFTERMARKET = 0.66`
-> - `OEM = 1.0`
-> - `PREMIUM = 1.2`
->
-> ### 5. Additional Modifiers
-> Final repair cost and duration are additionally affected by factors such as global service multipliers, workshop location multipliers, vehicle age, and vehicle characteristics.
->
-> </details>
 
 #### Overhaul
 
-- **What it does:** The most comprehensive and expensive type of work. It includes:
+- **What it does:** The most expensive and time-consuming type of work, capable of bringing old machinery back to life. Overhaul can:
 
-  - A full Maintenance service.
+  - restore the `Condition` of one system or all systems;
 
-  - Repair of all existing breakdowns.
+  - reduce `Stress` to zero in one or several systems;
 
-  - Partial restoration of the vehicle's Condition (worn parts are replaced).
+  - repair all breakdowns in one system or in the whole vehicle;
+
+  - perform maintenance as part of the procedure, unless it is a partial overhaul.
+
+  For an additional fee, you can also renew the vehicle's paintwork at a much lower cost than a normal repaint.
 
   Overhaul comes in three variants:
-  - **Partial**
-  - **Standard**
-  - **Factory Restoration** (`Full`)
 
-  Depending on the selected overhaul type, **price**, **duration**, and **Condition restoration level** are different.
+  - **Partial:** A partial overhaul that works on one selected system. Restores that system's `Condition` to a good level.
+
+  - **Standard:** A standard overhaul for the whole vehicle. Restores all systems to a good level.
+
+  - **Full** or **Factory Restoration:** A very long and expensive procedure, comparable in cost to buying another machine. Brings the vehicle back to an almost like-new state and restores system `Condition` to an excellent level.
 
 - **When to use:** For old, heavily worn-out vehicles with low Condition to bring them back to life.
 
-**Important:** This procedure is expensive and does not fully restore Condition to 100%. The amount of restored condition depends on vehicle maintainability, the number of previous overhauls, and a random restoration factor. For an additional fee (significantly lower than a regular repaint), you can also repaint the vehicle during overhaul.
+**Important:** This procedure is expensive and does not restore `Condition` to a fixed `100%`. The final restoration level depends on vehicle maintainability, the number of previous overhauls, and a random restoration factor.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on the Overhaul mechanic</strong></summary>
->
-> Values below are based on `ADS_Config.lua` and `initService` logic in `ADS_Specialization.lua`.
->
-> ### 1. Overhaul Types and Targets
-> - **Partial (`PARTIAL`)**: target range `0.41` to `0.59`
-> - **Standard (`STANDARD`)**: target range `0.61` to `0.79`
-> - **Factory Restoration (`FULL`)**: target range `0.81` to `0.99`
->
-> ### 2. Time and Price Multipliers
-> - `OVERHAUL_TIME = 86400000 ms` (**24 hours** base)
-> - `OVERHAUL_TIME_MULTIPLIERS`: `PARTIAL = 0.5`, `STANDARD = 1.0`, `FULL = 2.0`
-> - `OVERHAUL_PRICE_MULTIPLIERS`: `PARTIAL = 0.3`, `STANDARD = 0.5`, `FULL = 0.8`
->
-> Relative to **Standard**:
-> - **Partial**: about **50% faster**, about **40% cheaper**.
-> - **Factory Restoration (Full)**: about **100% longer**, about **60% more expensive**.
->
-> ### 3. Condition Restore Formula (current implementation)
-> For selected overhaul type with base range `[min, max]` and `n` previous overhauls:
-> - `minAdjusted = min * (1 - RE_OVERHAUL_FACTOR * n)`
-> - `maxAdjusted = max * (1 - RE_OVERHAUL_FACTOR * n)`
-> - `sampledRestore = random(minAdjusted, maxAdjusted) * maintainability`
-> - `targetCondition = max(currentCondition, max(sampledRestore, min))`
->
-> Where `RE_OVERHAUL_FACTOR = 0.1` by default.  
-> This means repeated overhauls reduce the effective restoration range over time.
->
-> ### 4. Optional Paint Renewal During Overhaul
-> If paint renewal is enabled during overhaul, extra repaint cost is added as:
-> - `0.25 * Wearable.calculateRepaintPrice(...)`
->
-> This is significantly cheaper than a regular full repaint.
->
-> </details>
 
 #### Parts Quality Options
 
@@ -583,41 +533,12 @@ For **Maintenance** and **Repair**, you can choose between four part qualities:
 - **Original parts** (`OEM`)
 - **Premium parts** (`Premium`)
 
-These options differ by cost and defect probability.
+These options differ by cost and defect probability. The cheaper the parts, the higher the chance that they will be defective.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on part quality, defect chance, and related breakdowns</strong></summary>
->
-> Values below are taken from `ADS_Config.lua` (`MAINTENANCE` section).
->
-> ### 1. Part Price Multipliers
-> - `USED = 0.33`
-> - `AFTERMARKET = 0.66`
-> - `OEM = 1.0`
-> - `PREMIUM = 1.2`
->
-> ### 2. Defect Probability by Part Quality
-> - `USED = 0.50` (**50%**)
-> - `AFTERMARKET = 0.33` (**33%**)
-> - `OEM = 0.10` (**10%**)
-> - `PREMIUM = 0.00` (**0%**)
->
-> ### 3. How Defect Rolls Are Applied
-> - During **Maintenance**, one defect roll is performed when service completes.
-> - During **Repair**, a defect roll is performed per repaired breakdown step.
->
-> ### 4. Service-Related Breakdown Effects from Defective Parts
-> - **`MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES`**
->   - Applies `CONDITION_WEAR_MODIFIER = +0.33`
->   - Applies `SERVICE_WEAR_MODIFIER = +0.33`
->   - Then self-removes automatically.
->
-> - **`REPAIR_WITH_POOR_QUALITY_PARTS`**
->   - Triggers `REPEATED_BREAKDOWN_EFFECT` (can re-introduce a repaired fault at stage 1)
->   - Then self-removes automatically.
->
-> </details>
+Depending on the procedure, defective parts have different negative effects. During **Maintenance**, defective or low-quality consumables significantly shorten the service interval and increase `Condition` wear across vehicle systems. During **Repair**, low-quality parts may fail again after some time and bring the same fault back.
+
+**Complete Defectoscopy** can detect defective parts and poor-quality consumables.
+
 
 #### ⏱️ Time and Planning
 Beyond money, all workshop procedures require time. The duration of a service or repair depends on the vehicle's Maintainability (simpler machines are fixed faster).
@@ -626,7 +547,7 @@ Beyond money, all workshop procedures require time. The duration of a service or
  
  This adds a new layer of strategy: you now need to plan when to take your vehicles in for service. An urgent repair on a combine during the harvest season might extend into the next day, leading to downtime and financial loss.
 
-## 4. Reliability and Maintainability
+## 5. Reliability and Maintainability
 
 Each brand of vehicle in the game now has two parameters based on its real-world reputation:
 
@@ -673,7 +594,7 @@ Examples: Simple, older vehicles are often more maintainable than modern machine
 >
 > </details>
 
-## 5. Thermal Dynamics
+## 6. Thermal Dynamics
 The mod simulates full engine heating/cooling behavior with thermostat operation. Temperature is not just visual data: it directly affects wear and failure risk.
 
 #### Engine Thermal Model
@@ -712,3 +633,17 @@ In practice, low-speed high-stress work and jerky driving can overheat CVT compo
 
 > [!NOTE]
 > Thermal behavior for both engine and transmission can be tuned through `ADS_Config.lua`.
+
+## 7. Alternator & Battery
+
+ADS simulates the vehicle electrical system as a real working model rather than a simple on/off mechanic. The mod tracks battery charge, alternator output, onboard electrical loads, battery temperature, internal resistance, and voltage behavior under charging and discharge.
+
+Battery behavior depends on several factors at once. Its available capacity drops in cold weather, internal resistance rises as the battery gets colder and more worn, and charge acceptance is reduced not only by low temperature, but also by high state of charge and poor battery health. In practice, this means a weak or cold battery does not just "have less charge" - it also charges worse, sags harder under load, and performs noticeably worse during starting.
+
+The alternator is also modeled dynamically. Its output depends on engine RPM, current electrical load, and alternator health. If the onboard consumers demand more current than the alternator can provide, system voltage starts to sag and the battery begins to discharge. If there is charging headroom, the battery recharges gradually rather than instantly, and the charging process is limited by its real acceptance capability.
+
+Battery temperature is simulated separately. It is influenced by ambient temperature, engine bay heat, and self-heating from current flowing through the battery's internal resistance. Because of that, the same battery can behave very differently in winter, after a cold start, or after long operation under heavy electrical load.
+
+This system also interacts with breakdowns. A failed alternator can leave the machine running only on battery reserve, while battery failure can lead to weak cranking, hard starting, or a complete no-start situation. Depending on the condition of the electrical system, the vehicle may suffer from unstable voltage, poor charging, or total loss of starting ability.
+
+If the battery is too weak to start the engine, you can use jumper cables and get power from another vehicle. ADS models this as an actual external power connection: both batteries are linked into a shared circuit, current flows between them, and the donor vehicle can support the receiver during cranking or temporary charging.

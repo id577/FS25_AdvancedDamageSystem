@@ -2850,6 +2850,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     })
 end
 
+-- TO-DO: heavy trailer factor
 -- transmission (pullOverload, lugging, slip, cvtCold, cvtOverheat)
 function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -3549,7 +3550,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
             breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
             wearRate = wearRate + breakdownPresenceFactor
         end
-        
+
     elseif lightsFactor == 0 and crankingStressFactor == 0 then 
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
