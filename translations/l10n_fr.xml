@@ -494,7 +494,7 @@
         <text name="ads_air_blower_already_clean" text="%s : le radiateur et la prise d'air sont déjà propres"/>
         <text name="ads_jumper_cables_name" text="Câbles de démarrage"/>
         <text name="ads_jumper_cables_function" text="Utilisés pour relier les batteries des véhicules et aider au démarrage des moteurs avec batterie déchargée"/>
-        <text name="ads_jumper_cables_action" text="Connecter les câbles de démarrage"/>
+        <text name="ads_jumper_cables_action" text="Connecter/débrancher les câbles de démarrage"/>
         <text name="ads_jumper_cables_connected" text="Câbles de démarrage connectés à %s"/>
         <text name="ads_jumper_cables_already_connected" text="Les câbles de démarrage sont déjà connectés à %s"/>
         <text name="ads_jumper_cables_impossible_to_connect" text="Le véhicule n'est pas adapté au branchement de câbles de démarrage"/>

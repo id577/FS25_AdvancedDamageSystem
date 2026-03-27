@@ -494,7 +494,7 @@
         <text name="ads_air_blower_already_clean" text="%s: Kühler und Lufteinlass sind bereits sauber"/>
         <text name="ads_jumper_cables_name" text="Starthilfekabel"/>
         <text name="ads_jumper_cables_function" text="Werden verwendet, um Fahrzeugbatterien zu verbinden und Motoren mit entladener Batterie per Starthilfe zu starten"/>
-        <text name="ads_jumper_cables_action" text="Starthilfekabel anschließen"/>
+        <text name="ads_jumper_cables_action" text="Starthilfekabel anschließen/abklemmen"/>
         <text name="ads_jumper_cables_connected" text="Starthilfekabel mit %s verbunden"/>
         <text name="ads_jumper_cables_already_connected" text="Starthilfekabel bereits mit %s verbunden"/>
         <text name="ads_jumper_cables_impossible_to_connect" text="Dieses Fahrzeug ist nicht für den Anschluss von Starthilfekabeln geeignet"/>

@@ -501,7 +501,7 @@
         <text name="ads_air_blower_already_clean" text="%s: radiatore e presa d'aria sono gia puliti"/>
         <text name="ads_jumper_cables_name" text="Cavi di avviamento"/>
         <text name="ads_jumper_cables_function" text="Utilizzati per collegare le batterie dei veicoli e avviare motori con batteria scarica"/>
-        <text name="ads_jumper_cables_action" text="Collega i cavi di avviamento"/>
+        <text name="ads_jumper_cables_action" text="Collega/scollega i cavi di avviamento"/>
         <text name="ads_jumper_cables_connected" text="Cavi di avviamento collegati a %s"/>
         <text name="ads_jumper_cables_already_connected" text="Cavi di avviamento gia collegati a %s"/>
         <text name="ads_jumper_cables_impossible_to_connect" text="Il veicolo non e adatto al collegamento dei cavi di avviamento"/>

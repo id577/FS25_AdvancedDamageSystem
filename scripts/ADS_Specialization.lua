@@ -3527,7 +3527,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         wearRate = wearRate + crankingStressFactor
     else
         systemData.isCranking = false
-    end
+    end    
 
     if self:getIsMotorStarted() and not spec.isElectricVehicle then
         -- service factor
@@ -3549,7 +3549,8 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
             breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
             wearRate = wearRate + breakdownPresenceFactor
         end
-    else
+        
+    elseif lightsFactor == 0 and crankingStressFactor == 0 then 
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
         else
@@ -6134,6 +6135,7 @@ local function calculateCurrentLoadAmps(vehicle, isMotorStarted, envTemp)
         dbg.cabFanA = cabFanA
         dbg.winterHeaterA = winterHeaterA
         dbg.peakPulseA = pulseA
+        dbg.crankingLoadA = crankingA
     end
 
     spec.iLoads = iLoads
@@ -7510,6 +7512,11 @@ function AdvancedDamageSystem:updateRadiatorClogging(dt)
         return
     end
 
+    if not spec.isVehicleNeedBlowOut then
+        spec.radiatorClogging = 0
+        return
+    end
+
     if spec.debugData == nil then
         spec.debugData = {}
     end
@@ -7580,6 +7587,11 @@ function AdvancedDamageSystem:updateAirIntakeClogging(dt)
     local C = ADS_Config.FIELD_CARE
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then
+        return
+    end
+
+    if not spec.isVehicleNeedBlowOut then
+        spec.airIntakeClogging = 0
         return
     end
 

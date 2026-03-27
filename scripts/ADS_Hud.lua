@@ -661,13 +661,9 @@ function ADS_Hud:drawActiveVehicleHUD()
     local cloggingHasDebris = radiatorDbg.hasDebris == true or airIntakeDbg.hasDebris == true
     local cloggingWetnessFactor = tonumber(airIntakeDbg.baseWetnessFactor or radiatorDbg.baseWetnessFactor or 1) or 1
     addLine(overviewLines, string.format(
-        "condition: %.2f%% | service: %.2f%%",
+        "condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
         asPercent(spec.conditionLevel or 0),
-        asPercent(spec.serviceLevel or 0)
-    ), {1, 1, 1, 1}, 0.95)
-
-    addLine(overviewLines, string.format(
-        "service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
+        asPercent(spec.serviceLevel or 0),
         asPercent(serviceWearRate),
         asPercent(spec.reliability or 0),
         asPercent(spec.maintainability or 0),
@@ -999,97 +995,53 @@ function ADS_Hud:drawActiveVehicleHUD()
     local targetC = batteryDbg.battTempTargetC or 0
     local iAlt = batteryDbg.iAltAvail or 0
     local iLoads = batteryDbg.iLoads or 0
-    local iNetRaw = batteryDbg.iNetRaw or (iAlt - iLoads)
-    local iNet = batteryDbg.iNet or iNetRaw
-    local iBatteryA = batteryDbg.iBatteryA or math.abs(iNetRaw)
+    local iNet = batteryDbg.iNet or batteryDbg.iNetRaw or (iAlt - iLoads)
+    local chargeAh = batteryDbg.chargeAh or spec.batteryChargeAh or 0
 
     addLine(batteryLines, string.format(
-        "state: soc %.1f%% | term %.2fV | sys %.2fV | ocv %.2fV | temp %.1fC -> %.1fC",
-        asPercent(soc),
-        termV,
+        "Voltage: sys %.2fV | term: %.2fV | ocv: %.1fV",
         systemV,
-        ocvV,
-        tempC,
-        targetC
+        termV,
+        ocvV
     ), {0.9, 1.0, 0.9, 1}, 0.95)
 
     addLine(batteryLines, string.format(
-        "flow: alt %.1fA (raw %.1f, k %.2f) | load %.1fA | net %.1fA (raw %.1fA) | iBat %.1fA",
+        "Battery: %.1fA | %.2f Ah (%.1f%%) | Temp %.1fC -> %.1fC | acc %.3f | rint %.5f",
+        iNet,
+        chargeAh,
+        asPercent(soc),
+        tempC,
+        targetC,
+        batteryDbg.acceptK or 1,
+        batteryDbg.rIntOhm or 0
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+
+    addLine(batteryLines, string.format(
+        "Alternator: %.1fA (raw: %.1fA | k %.2f)",
         iAlt,
         batteryDbg.iAltRaw or iAlt,
-        batteryDbg.altFactor or 0,
+        batteryDbg.altFactor or 0
+    ), {0.9, 1.0, 0.9, 1}, 0.95)
+
+    addLine(batteryLines, string.format(
+        "Loads: %.1fA (base: %.1fA | lights: %.1fA | cabFan: %.1fA | winHeat: %.1fA | pulse: %.1fA | crank: %.1fA)",
         iLoads,
-        iNet,
-        iNetRaw,
-        iBatteryA
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "bus: reg %.2fV | head %.2fV | deficit %.1fA | sag %.2fV | regK %.2f | sagK %.2f",
-        batteryDbg.regulatedVoltageV or 0,
-        batteryDbg.altChargeHeadroomV or 0,
-        batteryDbg.altDeficitA or 0,
-        batteryDbg.altSagV or 0,
-        batteryDbg.altRegulationHealth or 0,
-        batteryDbg.altHealthDeficitMult or 1
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "loads [b/l/c/h/p]: %.1f/%.1f/%.1f/%.1f/%.1f A",
         batteryDbg.baseLoadA or 0,
         batteryDbg.lightsLoadA or 0,
         batteryDbg.cabFanA or 0,
         batteryDbg.winterHeaterA or 0,
-        batteryDbg.peakPulseA or 0
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "model: acc %.3f (t %.3f * s %.3f * h %.3f) | cap %.1fAh * %.3f * h %.3f = %.1fAh | rInt %.5f (t %.3f * h %.3f) | p %.1fW dT %.4fC",
-        batteryDbg.acceptK or 1,
-        batteryDbg.acceptTempK or 1,
-        batteryDbg.acceptSocK or 1,
-        batteryDbg.acceptHealthK or 1,
-        batteryDbg.capacityNominalAh or spec.batteryCapacityAh or 0,
-        batteryDbg.capacityFactor or 1,
-        batteryDbg.batteryHealth or spec.batteryHealth or 0,
-        batteryDbg.capacityEffectiveAh or spec.batteryCapacityAh or 0,
-        batteryDbg.rIntOhm or 0,
-        batteryDbg.rintFactor or 1,
-        batteryDbg.rIntHealthFactor or 1,
-        batteryDbg.pJouleW or 0,
-        batteryDbg.dTJoule or 0
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-    addLine(batteryLines, string.format(
-        "vdrop/rise: load %.2fV | rise %.2fV | cranking %d | iDis/iCh %.1f/%.1fA",
-        batteryDbg.termLoadDropV or 0,
-        batteryDbg.termChargeRiseV or 0,
-        batteryDbg.termIsCranking or 0,
-        batteryDbg.termDischargeA or 0,
-        batteryDbg.termChargeA or 0
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "ext: valid %s @ %.2fm | on %d | role %s | pair soc %.1f%% | pair cap %.1fAh | pair q %.1fAh | pair r %.5f",
-        tostring(batteryDbg.isValidConnection),
-        batteryDbg.distance or 0,
-        batteryDbg.externalConnected or 0,
-        tostring(batteryDbg.externalRole or "-"),
-        asPercent(batteryDbg.externalCompositeSoc or 0),
-        batteryDbg.externalCompositeCapacityAh or 0,
-        batteryDbg.externalCompositeChargeAh or 0,
-        batteryDbg.externalCompositeRintOhm or 0
+        batteryDbg.peakPulseA or 0,
+        batteryDbg.crankingLoadA or 0
     ), {0.85, 0.95, 1.0, 1}, 0.95)
 
-    addLine(batteryLines, string.format(
-        "ext flow: %s | bal %.1fA | common %.1fA | dAh %.4f/%.4f | alt %.1f->%.1fA",
-        tostring(batteryDbg.externalPartnerName or "-"),
-        batteryDbg.externalBalanceCurrentA or 0,
-        batteryDbg.externalCommonNetA or 0,
-        batteryDbg.externalCommonDeltaAh or 0,
-        batteryDbg.externalLocalDeltaAh or 0,
-        batteryDbg.externalAltBeforeA or 0,
-        batteryDbg.externalAltAfterA or 0
-    ), {0.85, 0.95, 1.0, 1}, 0.95)
+    if (batteryDbg.externalConnected or 0) > 0 then
+        addLine(batteryLines, string.format(
+            "External: %s | bal %.1fA | com: %.1fA",
+            tostring(batteryDbg.externalPartnerName or "-"),
+            batteryDbg.externalBalanceCurrentA or 0,
+            batteryDbg.externalCommonNetA or 0
+        ), {0.85, 0.95, 1.0, 1}, 0.95)
+    end
 
     local serviceDataLines = {}
     local states = AdvancedDamageSystem.STATUS
@@ -1233,7 +1185,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     table.insert(sections, {title = "Drivetrain", lines = drivetrainLines})
-    table.insert(sections, {title = "Battery", lines = batteryLines})
+    table.insert(sections, {title = "Battery", lines = batteryLines, showTitle = false})
     if isUnderService then
         table.insert(sections, {title = "Service Data", lines = serviceDataLines})
     end
@@ -1307,9 +1259,12 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local function drawSection(section)
         local sectionLines = section.lines or {}
+        local showTitle = section.showTitle ~= false
         if #sectionLines == 0 then
             setTextColor(1, 1, 1, 1)
-            renderText(textStartX, currentY, activeNormalSize, section.title .. ":")
+            if showTitle then
+                renderText(textStartX, currentY, activeNormalSize, section.title .. ":")
+            end
             currentY = currentY - activeLineHeight
             return
         end
@@ -1318,7 +1273,11 @@ function ADS_Hud:drawActiveVehicleHUD()
         local firstColor = firstLine.color or {1, 1, 1, 1}
         local firstSize = activeNormalSize * (firstLine.sizeScale or 1.0)
         setTextColor(firstColor[1], firstColor[2], firstColor[3], firstColor[4] or 1)
-        renderText(textStartX, currentY, firstSize, section.title .. ": " .. (firstLine.text or ""))
+        local firstText = firstLine.text or ""
+        if showTitle then
+            firstText = section.title .. ": " .. firstText
+        end
+        renderText(textStartX, currentY, firstSize, firstText)
         currentY = currentY - activeLineHeight
 
         for index = 2, #sectionLines do
@@ -1327,7 +1286,7 @@ function ADS_Hud:drawActiveVehicleHUD()
             local lineColor = line.color or {1, 1, 1, 1}
             local lineSize = activeNormalSize * (line.sizeScale or 1.0)
             setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
-            renderText(textStartX + 0.01, currentY, lineSize, lineText)
+            renderText(textStartX, currentY, lineSize, lineText)
             currentY = currentY - activeLineHeight
         end
     end

@@ -485,7 +485,7 @@
         <text name="ads_grease_gun_action" text="Нанести смазку"/>
         <text name="ads_grease_gun_no_vehicle" text="Нет техники в зоне смазки"/>
         <text name="ads_grease_gun_lubrication_not_require" text="%s не требует смазки"/>
-        <text name="ads_grease_gun_already_lubricated" text="%s уже смазана"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s уже смазан"/>
         <text name="ads_air_blower_name" text="Воздуходувка"/>
         <text name="ads_air_blower_function" text="Используется для очистки радиаторов и воздухозаборников"/>
         <text name="ads_air_blower_action" text="Очистить радиатор и воздухозаборник"/>
@@ -494,7 +494,7 @@
         <text name="ads_air_blower_already_clean" text="%s: радиатор и воздухозаборник уже чистые"/>
         <text name="ads_jumper_cables_name" text="Пусковые провода"/>
         <text name="ads_jumper_cables_function" text="Используются для соединения аккумуляторов техники и пуска двигателя при разряженной батарее"/>
-        <text name="ads_jumper_cables_action" text="Подключить пусковые провода"/>
+        <text name="ads_jumper_cables_action" text="Подключить/отключить пусковые провода"/>
         <text name="ads_jumper_cables_connected" text="Пусковые провода подключены к %s"/>
         <text name="ads_jumper_cables_already_connected" text="Пусковые провода уже подключены к %s"/>
         <text name="ads_jumper_cables_impossible_to_connect" text="Данная техника не подходит для подключения пусковых проводов"/>
