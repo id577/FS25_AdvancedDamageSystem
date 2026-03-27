@@ -567,33 +567,6 @@ Examples: Premium European and American brands are generally more reliable than 
 
 Examples: Simple, older vehicles are often more maintainable than modern machines packed with electronics.
 
-> [!NOTE]
-> <details>
-> <summary><strong>⚙️ Click here for technical details on characteristic values</strong></summary>
->
-> ### Value Ranges
-> In the current `ADS_Config.BRANDS` defaults:
-> - **Reliability** ranges from **`0.70`** to **`1.25`**.
-> - **Maintainability** ranges from **`0.65`** to **`1.55`**.
->
-> ### Production Year Bonus
-> Maintainability gets an additional year-based bonus in `getBrandReliability(...)`:
-> - If `year < RELIABILITY_YEAR_FACTOR_THRESHOLD` (default `2000`), then
-> - `yearBonus = (2000 - year) * RELIABILITY_YEAR_FACTOR` (default factor `0.01`)
-> - Final maintainability (brand path): `brandMaintainability + yearBonus`
->
-> Examples with default settings:
-> - Year `1990` -> `+0.10` maintainability
-> - Year `1980` -> `+0.20` maintainability
-> - Year `1970` -> `+0.30` maintainability
->
-> Note: this bonus is applied on the brand-based path; explicit model entries from the same table are used as-is.
->
-> ### Configuration File
-> All brand-specific values for `Reliability` and `Maintainability` can be viewed and even customized in the `ADS_Config.lua` file, located in the mod's folder.
->
-> </details>
-
 ## 6. Thermal Dynamics
 The mod simulates full engine heating/cooling behavior with thermostat operation. Temperature is not just visual data: it directly affects wear and failure risk.
 
@@ -630,9 +603,6 @@ CVT vehicles use a dedicated transmission thermal model. Unlike the engine model
 - ambient temperature, vehicle dirt, and speed-based cooling.
 
 In practice, low-speed high-stress work and jerky driving can overheat CVT components even when engine temperature is still acceptable.
-
-> [!NOTE]
-> Thermal behavior for both engine and transmission can be tuned through `ADS_Config.lua`.
 
 ## 7. Alternator & Battery
 
