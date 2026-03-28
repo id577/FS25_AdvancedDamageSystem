@@ -158,8 +158,10 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
     -- option three
     if self.maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
         self.optionThreeText:setText(g_i18n:getText("ads_option_menu_perform_repair"))
+        self.optionThreeDisclaimer:setText(g_i18n:getText("ads_option_menu_option_three_disclaimer_repair_after_detection"))
     else
         self.optionThreeText:setText(g_i18n:getText("ads_option_menu_perform_renew_paint"))
+        self.optionThreeDisclaimer:setText(g_i18n:getText("ads_option_menu_option_three_disclaimer_overhaul_repaint"))
     end
 end
 

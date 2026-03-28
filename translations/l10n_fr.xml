@@ -420,6 +420,9 @@
         <text name="ads_option_menu_perform_repair" text="Réparer les défauts détectés"/>
         <text name="ads_option_menu_perform_maintenance" text="Effectuer l'entretien après réparation"/>
         <text name="ads_option_menu_perform_renew_paint" text="Renouveler la peinture"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Démarrer automatiquement une réparation standard avec des pièces OEM si des défauts sont détectés."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Démarrer automatiquement un entretien standard avec des consommables OEM après la réparation."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Repeindre le véhicule pendant la révision générale."/>
         <text name="ads_option_menu_choosen_parts_text" text="* Choisies pour la réparation :"/>
         <text name="ads_report_header_title" text="Rapport d'inspection"/>
         <text name="ads_report_vehicle_name_title" text="Nom du véhicule"/>

@@ -425,6 +425,9 @@
         <text name="ads_option_menu_perform_repair" text="Repair any faults found"/>
         <text name="ads_option_menu_perform_maintenance" text="Perform maintenance after repair"/>
         <text name="ads_option_menu_perform_renew_paint" text="Renew paintwork"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Automatically start standard repair with OEM parts if any faults are detected."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Automatically start standard maintenance with OEM consumables after repair."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Repaint the vehicle during overhaul."/>
         <text name="ads_option_menu_choosen_parts_text" text="* Choosen for repair:"/>
 
         <text name="ads_report_header_title" text="Inspection Report"/>

@@ -31,7 +31,8 @@
         
             <!-- Option Three -->
             <Text profile="fs25_dialogText" id="optionThreeText" position="0px -360px" text="Repair any faults found"/>
-            <BinaryOption profile="fs25_binaryOption" id="optionThree" onClick="onClickOptionThree" size="300px 30px" position="0px 30px"/>
+            <Text profile="ads_disclaimerText" position="40px -430px" size="500px 30px" id="optionThreeDisclaimer" text="* Automatically start standard repair with OEM parts if faults are detected."/>
+            <BinaryOption profile="fs25_binaryOption" id="optionThree" onClick="onClickOptionThree" size="300px 30px" position="0px 55px"/>
 
         </GuiElement>
         <BoxLayout profile="fs25_dialogButtonBox">
@@ -42,7 +43,7 @@
 
     <GUIProfiles>
         <Profile name="ads_dialogBgSmall" extends="fs25_dialogBg">
-            <size value="600px 530px" />
+            <size value="600px 550px" />
         </Profile>
 
         <Profile name="ads_dialogSeparator" extends="baseReference" with="anchorTopCenter">

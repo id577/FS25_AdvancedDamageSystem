@@ -425,6 +425,9 @@
         <text name="ads_option_menu_perform_repair" text="Ripara gli eventuali guasti rilevati"/>
         <text name="ads_option_menu_perform_maintenance" text="Esegui la manutenzione dopo la riparazione"/>
         <text name="ads_option_menu_perform_renew_paint" text="Rinnova la verniciatura"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Avvia automaticamente una riparazione standard con ricambi OEM se vengono rilevati guasti."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Avvia automaticamente una manutenzione standard con consumabili OEM dopo la riparazione."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Rivernicia il veicolo durante la revisione generale."/>
         <text name="ads_option_menu_choosen_parts_text" text="* Selezionati per la riparazione:"/>
 
         <text name="ads_report_header_title" text="Rapporto di ispezione"/>

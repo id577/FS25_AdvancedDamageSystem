@@ -420,6 +420,9 @@
         <text name="ads_option_menu_perform_repair" text="Beheben Sie alle festgestellten Fehler"/>
         <text name="ads_option_menu_perform_maintenance" text="Führen Sie nach der Reparatur eine Wartung durch"/>
         <text name="ads_option_menu_perform_renew_paint" text="Lack erneuern"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Standardreparatur mit OEM-Teilen automatisch starten, wenn Fehler erkannt werden."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Nach der Reparatur automatisch eine Standardwartung mit OEM-Verbrauchsmaterialien starten."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Das Fahrzeug im Zuge der Generalüberholung neu lackieren."/>
         <text name="ads_option_menu_choosen_parts_text" text="* Für die Reparatur ausgewählt:"/>
         <text name="ads_report_header_title" text="Inspektionsbericht"/>
         <text name="ads_report_vehicle_name_title" text="Fahrzeugname"/>

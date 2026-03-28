@@ -420,6 +420,9 @@
         <text name="ads_option_menu_perform_repair" text="Устранить все обнаруженные неисправности"/>
         <text name="ads_option_menu_perform_maintenance" text="Выполнить ТО после ремонта"/>
         <text name="ads_option_menu_perform_renew_paint" text="Обновить лакокрасочное покрытие"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Автоматически запустить стандартный ремонт с использованием оригинальных запчастей, если будут обнаружены неисправности."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Автоматически запустить стандартное техническое обслуживание с использованием оригинальных расходников после завершения ремонта."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Обновить лакокрасочное покрытие в процессе капитального ремонта."/>
         <text name="ads_option_menu_choosen_parts_text" text="* Выбрано для ремонта:"/>
         <text name="ads_report_header_title" text="Отчет об осмотре"/>
         <text name="ads_report_vehicle_name_title" text="Название техники"/>
