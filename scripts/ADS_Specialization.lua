@@ -1039,6 +1039,7 @@ function AdvancedDamageSystem:onLoad(savegame)
             breakdownInSystemFactor = 0,
             pullOverloadFactor = 0,
             heavyTrailerFactor = 0,
+            heavyTrailerMassRatio = 0,
             upHillLoadFactor = 0,
             wheelSlipFactor = 0,
             wheelSlipIntensity = 0,
@@ -2805,6 +2806,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldMotorFactor = coldMotorFactor * (C.COLD_MOTOR_MULTIPLIER or 0) * motorLoadInf
+            coldMotorFactor = math.min(coldMotorFactor, C.COLD_MOTOR_MULTIPLIER or coldMotorFactor)
             wearRate = wearRate + coldMotorFactor
 
         -- overheating engine factor
@@ -2812,6 +2814,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             hotMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_MOTOR_THRESHOLD, false, 120)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.3, false)
             hotMotorFactor = hotMotorFactor * (C.OVERHEAT_MOTOR_MULTIPLIER or C.OVERHEAT_MOTOR_MULTIPLIER or 0) * motorLoadInf
+            hotMotorFactor = math.min(hotMotorFactor, C.OVERHEAT_MOTOR_MULTIPLIER or hotMotorFactor)
             wearRate = wearRate + hotMotorFactor
         end
 
@@ -2863,6 +2866,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor, wheelSlipIntensity, coldTransFactor, hotTransFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0, 0, 0, 0
     local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
+    local massRatio = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
 
     if not systemData.enabled then
@@ -2875,6 +2879,9 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
         local speed = self:getLastSpeed()
+        local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
+        local selfMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
+        massRatio = selfMass > 0 and math.max(totalMass / selfMass, 0) or 1.0
 
         -- pull overload
         if motorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
@@ -2894,6 +2901,14 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false, maxDiff)
             luggingFactor = luggingFactor * C.LUGGING_MULTIPLIER
             wearRate = wearRate + luggingFactor
+        end
+
+        --- heavy trailer factor
+        if massRatio > C.HEAVY_TRAILER_THRESHOLD and speed > 0.5 then
+            heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(massRatio, C.HEAVY_TRAILER_THRESHOLD, false, 5.0)
+            heavyTrailerFactor = math.max(heavyTrailerFactor * C.HEAVY_TRAILER_MULTIPLIER * motorLoad, 0)
+            heavyTrailerFactor = math.min(heavyTrailerFactor, C.HEAVY_TRAILER_MULTIPLIER or heavyTrailerFactor)
+            wearRate = wearRate + heavyTrailerFactor
         end
 
         -- wheel slip (0 = no slip, 1 = max slip)
@@ -2992,6 +3007,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
                 coldTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.COLD_TRANSMISSION_THRESHOLD, true)
                 local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
                 coldTransFactor = coldTransFactor * C.COLD_TRANSMISSION_MULTIPLIER * motorLoadInf
+                coldTransFactor = math.min(coldTransFactor, C.COLD_TRANSMISSION_MULTIPLIER or coldTransFactor)
                 wearRate = wearRate + coldTransFactor
 
             -- overheating CVT factor
@@ -3000,6 +3016,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
                 hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(transTemp, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
                 local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
                 hotTransFactor = hotTransFactor * C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER * motorLoadInf
+                hotTransFactor = math.min(hotTransFactor, C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER or hotTransFactor)
                 wearRate = wearRate + hotTransFactor
             end
         end
@@ -3026,6 +3043,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         pullOverloadFactor = pullOverloadFactor,
         pullOverloadTimer = systemData.pullOverloadTimer,
         heavyTrailerFactor = heavyTrailerFactor,
+        heavyTrailerMassRatio = massRatio,
         luggingFactor = luggingFactor,
         wheelSlipFactor = wheelSlipFactor,
         wheelSlipIntensity = wheelSlipIntensity,
@@ -3315,10 +3333,12 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 end
                 operatingFactor = ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false)
                 operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0)
+                operatingFactor = math.min(operatingFactor, C.OPERATING_FACTOR_MULTIPLIER or operatingFactor)
                 wearRate = wearRate + operatingFactor
                 if (spec.engineTemperature or -99) < C.COLD_OIL_THRESHOLD then
                     coldOilFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_OIL_THRESHOLD, true)
                     coldOilFactor = coldOilFactor * (C.COLD_OIL_MULTIPLIER or 0) * (1 + ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false))
+                    coldOilFactor = math.min(coldOilFactor, (C.COLD_OIL_MULTIPLIER or 0) * 2)
                     wearRate = wearRate + coldOilFactor
                 end
             end
@@ -3328,6 +3348,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
             if heavyLiftMassRatio > (C.HEAVY_LIFT_FACTOR_THRESHOLD or 0) then
                 heavyLiftFactor = ADS_Utils.calculateQuadraticMultiplier(heavyLiftMassRatio, C.HEAVY_LIFT_FACTOR_THRESHOLD, false)
                 heavyLiftFactor = heavyLiftFactor * (C.HEAVY_LIFT_FACTOR_MULTIPLIER or 0)
+                heavyLiftFactor = math.min(heavyLiftFactor, C.HEAVY_LIFT_FACTOR_MULTIPLIER or heavyLiftFactor)
                 wearRate = wearRate + heavyLiftFactor
             end
 
@@ -3347,6 +3368,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 if hasConnectedPto and ptoAngleDeg > sharpAngleThreshold then
                     sharpAngleFactor = ADS_Utils.calculateQuadraticMultiplier(ptoAngleDeg, sharpAngleThreshold, false, 50)
                     sharpAngleFactor = sharpAngleFactor * (C.PTO_SHARP_ANGLE_FACTOR_MULTIPLIER or 0)
+                    sharpAngleFactor = math.min(sharpAngleFactor, C.PTO_SHARP_ANGLE_FACTOR_MULTIPLIER or sharpAngleFactor)
                     wearRate = wearRate + sharpAngleFactor
                 end
             end
@@ -3416,6 +3438,7 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
             if spec.thermostatState > C.HIGH_COOLING_FACTOR_THRESHOLD then
                 highCoolingFactor = ADS_Utils.calculateQuadraticMultiplier(spec.thermostatState, C.HIGH_COOLING_FACTOR_THRESHOLD, false)
                 highCoolingFactor = highCoolingFactor * (C.HIGH_COOLING_FACTOR_MULTIPLIER or 0)
+                highCoolingFactor = math.min(highCoolingFactor, C.HIGH_COOLING_FACTOR_MULTIPLIER or highCoolingFactor)
                 wearRate = wearRate + highCoolingFactor
             end
         end
@@ -3424,6 +3447,7 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         if (spec.engineTemperature or -99) > C.OVERHEAT_FACTOR_THRESHOLD then
             overheatFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_FACTOR_THRESHOLD, false, 120)
             overheatFactor = overheatFactor * (C.OVERHEAT_FACTOR_MULTIPLIER or 0)
+            overheatFactor = math.min(overheatFactor, C.OVERHEAT_FACTOR_MULTIPLIER or overheatFactor)
             wearRate = wearRate + overheatFactor
         end
 
@@ -3432,6 +3456,7 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
             coldShockFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_SHOCK_FACTOR_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
             coldShockFactor = coldShockFactor * (C.COLD_SHOCK_FACTOR_MULTIPLIER or 0) * motorLoadInf
+            coldShockFactor = math.min(coldShockFactor, C.COLD_SHOCK_FACTOR_MULTIPLIER or coldShockFactor)
             wearRate = wearRate + coldShockFactor
         end
 
@@ -3541,6 +3566,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         if (spec.engineTemperature or -99) > C.OVERHEAT_FACTOR_THRESHOLD then
             overheatFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.OVERHEAT_FACTOR_THRESHOLD, false, 120)
             overheatFactor = overheatFactor * (C.OVERHEAT_FACTOR_MULTIPLIER or 0)
+            overheatFactor = math.min(overheatFactor, C.OVERHEAT_FACTOR_MULTIPLIER or overheatFactor)
             wearRate = wearRate + overheatFactor
         end
 
@@ -3679,6 +3705,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
             if vibSignal > vibThreshold then
                 vibFactor = ADS_Utils.calculateQuadraticMultiplier(vibSignal, vibThreshold, false, vibMaxForCurve)
                 vibFactor = vibFactor * vibMultiplier
+                vibFactor = math.min(vibFactor, vibMultiplier)
                 wearRate = wearRate + vibFactor
             end
 
@@ -3765,6 +3792,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
                             local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(brakeMassRatio, ratioThreshold, false, ratioMax)
                             local brakeInputFactor = math.max(brakePedal, isBrakingByAxis and 1 or 0)
                             brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
+                            brakeMassFactor = math.min(brakeMassFactor, tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or brakeMassFactor)
                             wearRate = wearRate + brakeMassFactor
                         end
                     end
@@ -3898,6 +3926,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
             coldFuelFactor = ADS_Utils.calculateQuadraticMultiplier(fuelTemperature, C.COLD_FUEL_THRESHOLD, true)
             local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(motorLoad, 0.50, false)
             coldFuelFactor = coldFuelFactor * motorLoadInf * C.COLD_FUEL_FACTOR_MULTIPLIER
+            coldFuelFactor = math.min(coldFuelFactor, C.COLD_FUEL_FACTOR_MULTIPLIER or coldFuelFactor)
             wearRate = wearRate + coldFuelFactor
         end
 
@@ -4041,6 +4070,9 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
     else
+        if systemData.longHarvestTimer > 0 then
+                systemData.longHarvestTimer = math.max(systemData.longHarvestTimer - 4 * dt / 1000, 0)
+        end
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
         else

@@ -986,7 +986,17 @@ function ADS_Utils.serializeMaintenanceLogEntry(entry)
     if entry == nil then return "" end
     local cd = entry.conditionData or {}
     local serializedSystems = ADS_Utils.encodeDelimitedString(ADS_Utils.serializeSystemsState(ADS_Utils.createSystemsSnapshot(cd.systems)))
+    local serializedBreakdowns = ADS_Utils.encodeDelimitedString(ADS_Utils.serializeBreakdowns(cd.activeBreakdowns or {}))
+    local serializedSelectedBreakdowns = ADS_Utils.encodeDelimitedString(table.concat(cd.selectedBreakdowns or {}, ","))
     local serializedEffects = ADS_Utils.encodeDelimitedString(ADS_Utils.serializeEffectSnapshot(cd.activeEffects))
+    local activeIndicatorIds = {}
+    for indicatorId, isActive in pairs(cd.activeIndicators or {}) do
+        if isActive then
+            table.insert(activeIndicatorIds, tostring(indicatorId))
+        end
+    end
+    table.sort(activeIndicatorIds)
+    local serializedIndicators = ADS_Utils.encodeDelimitedString(table.concat(activeIndicatorIds, ","))
     local parts = {
         tostring(entry.id or 0),
         tostring(entry.type or ""),
@@ -1008,7 +1018,10 @@ function ADS_Utils.serializeMaintenanceLogEntry(entry)
         tostring(cd.maintainability or 1),
         serializedSystems,
         tostring(cd.batterySoc or 1),
-        serializedEffects
+        serializedEffects,
+        serializedBreakdowns,
+        serializedSelectedBreakdowns,
+        serializedIndicators
     }
     return table.concat(parts, "|")
 end
@@ -1021,7 +1034,7 @@ function ADS_Utils.deserializeMaintenanceLogEntry(serialized)
     end
     if #parts < 11 then return nil end
 
-    return {
+    local result = {
         id = tonumber(parts[1]) or 0,
         type = parts[2] ~= "" and parts[2] or nil,
         price = tonumber(parts[3]) or 0,
@@ -1043,10 +1056,16 @@ function ADS_Utils.deserializeMaintenanceLogEntry(serialized)
             maintainability = tonumber(parts[18]) or 1,
             systems = ADS_Utils.createSystemsSnapshot(ADS_Utils.deserializeSystemsState(ADS_Utils.decodeDelimitedString(parts[19] or ""))),
             batterySoc = tonumber(parts[20]) or 1,
-            activeBreakdowns = {},
-            selectedBreakdowns = {},
+            activeBreakdowns = ADS_Utils.deserializeBreakdowns(ADS_Utils.decodeDelimitedString(parts[22] or "")),
+            selectedBreakdowns = ADS_Utils.parseCsvList(ADS_Utils.decodeDelimitedString(parts[23] or "")),
             activeEffects = ADS_Utils.deserializeEffectSnapshot(ADS_Utils.decodeDelimitedString(parts[21] or "")),
             activeIndicators = {}
         }
     }
+    for _, indicatorId in ipairs(ADS_Utils.parseCsvList(ADS_Utils.decodeDelimitedString(parts[24] or ""))) do
+        if indicatorId ~= nil and indicatorId ~= "" then
+            result.conditionData.activeIndicators[indicatorId] = true
+        end
+    end
+    return result
 end

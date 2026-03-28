@@ -381,7 +381,7 @@ function ADS_ReportDialog:updateScreen()
 --                          HEADER  
 -- ==========================================================
     -- title
-    self.reportTitle:setText(g_i18n:getText("ads_report_header_title") .. " #" .. self.lastReport.id)
+    self.reportTitle:setText(g_i18n:getText("ads_report_header_title") .. " #" .. self.lastReport.id - 1)
 
     -- name
     self.vehicleNameValue:setText(self.vehicle:getFullName())

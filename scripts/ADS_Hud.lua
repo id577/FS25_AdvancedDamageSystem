@@ -819,6 +819,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "sf", statKey = "sf", value = transmissionDbg.expiredServiceFactor or 0 },
         { shortName = "bpf", statKey = "bpf", value = transmissionDbg.breakdownPresenceFactor or 0 },
         { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("t: %.1fs", transmissionDbg.pullOverloadTimer or 0) },
+        { shortName = "htf", statKey = "htf", value = transmissionDbg.heavyTrailerFactor or 0, extraInfo = string.format("mr: %.2f", transmissionDbg.heavyTrailerMassRatio or 0) },
         { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
         { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("wsi: %.2f", asPercent(transmissionDbg.wheelSlipIntensity or 0)) },
         { shortName = "ctf", statKey = "ctf", value = (transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0 },

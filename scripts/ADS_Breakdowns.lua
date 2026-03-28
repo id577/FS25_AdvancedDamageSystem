@@ -3606,7 +3606,6 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
                 end
                 cvtSlipEffect.extraData.lastAccelerationFactor = accelerationFactor
                 isSliping = accelerationFactor >= 0.98 and speedFactor < 0.8
-                print(accelerationFactor)
 
                 local clampMin = math.min(minRatio, minRatio * 10)
                 local clampMax = math.max(minRatio, minRatio * 10)
