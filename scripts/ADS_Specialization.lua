@@ -3211,20 +3211,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                             if output ~= nil and output.connectedInput ~= nil then
                                 hasLinkPto = true
                                 hasConnectedPto = true
-
-                                if output.outputNode ~= nil and output.connectedInput.inputNode ~= nil then
-                                    local x1, y1, z1 = getWorldTranslation(output.outputNode)
-                                    local x2, y2, z2 = getWorldTranslation(output.connectedInput.inputNode)
-                                    local dx = x1 - x2
-                                    local dy = y1 - y2
-                                    local dz = z1 - z2
-                                    local planarLength = MathUtil.vector2Length(dx, dz)
-                                    local length = MathUtil.vector3Length(dx, dy, dz)
-                                    if length > 0.0001 then
-                                        local verticalAngleDeg = math.deg(math.atan(math.abs(dy) / math.max(planarLength, 0.0001)))
-                                        linkAngleDeg = math.max(linkAngleDeg, verticalAngleDeg)
-                                    end
-                                end
                             end
                         end
                     end
@@ -4070,7 +4056,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
     else
-        if systemData.longHarvestTimer > 0 then
+        if systemData.longHarvestTimer ~= nil and systemData.longHarvestTimer > 0 then
                 systemData.longHarvestTimer = math.max(systemData.longHarvestTimer - 4 * dt / 1000, 0)
         end
         if spec.isUnderRoof then 
