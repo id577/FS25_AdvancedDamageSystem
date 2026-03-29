@@ -71,13 +71,13 @@ For testing and debugging, ADS includes console commands. Most commands require 
 | **ads_setSpecVar** | Changes a value inside `spec_AdvancedDamageSystem` on the current vehicle. Intended for testing and debugging. | `ads_setSpecVar systems.engine.condition 0.85` |
 
 # Screenshots
-<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-29-33_123" src="https://github.com/user-attachments/assets/c7fcaecf-2814-4ac8-a12e-631be8617d18" />
-<img width="962" height="589" alt="2" src="https://github.com/user-attachments/assets/f002ea0d-cb21-4c9d-a513-c7f771cbd62e" />
-<img width="963" height="595" alt="1" src="https://github.com/user-attachments/assets/194ff2d1-a715-43cb-919e-92c648a2fad8" />
-<img width="931" height="569" alt="3" src="https://github.com/user-attachments/assets/cda5e2a4-fa4b-491e-a817-078b8631470b" />
+<img width="2560" height="1440" alt="444" src="https://github.com/user-attachments/assets/4286276b-d204-4166-886f-4eebe964fba9" />
+<img width="1907" height="1308" alt="666" src="https://github.com/user-attachments/assets/aaa4f359-e4cb-4c77-857a-6e3af5a00304" />
+<img width="1314" height="839" alt="111" src="https://github.com/user-attachments/assets/66e7e049-59e6-4f26-937a-a74f1e19a247" />
 <img width="1253" height="763" alt="image" src="https://github.com/user-attachments/assets/18fe2f51-44f8-46fe-a1ac-8b892d25852c" />
-<img width="2560" height="1600" alt="FarmingSimulator2025Game 2025-07-17 18-34-40_109" src="https://github.com/user-attachments/assets/39c982bc-034d-4f9f-a025-6802d63f201f" />
-<img width="1967" height="1209" alt="Снимок экрана 2026-02-24 221501" src="https://github.com/user-attachments/assets/2c54b8a0-f5f6-4251-8ca5-397ac87be25b" />
+<img width="1233" height="832" alt="222" src="https://github.com/user-attachments/assets/64748b85-6e3c-43d6-b19a-d7027e66df49" />
+<img width="1334" height="788" alt="Снимок экрана 2026-03-29 224955" src="https://github.com/user-attachments/assets/77ca8ae3-a531-4934-96d0-b53c941e5095" />
+
 
 # Mod Guide
 The Advanced Damage System (ADS) mod completely replaces the standard damage system, offering a deep and detailed simulation of wear, breakdowns, and technical service.
