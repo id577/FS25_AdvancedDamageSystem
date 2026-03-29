@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 101,
+    VER = 102,
 
     DEBUG = false,
 
@@ -69,7 +69,8 @@ ADS_Config = {
             MOTOR_IDLING_THRESHOLD = 0.3,
             MOTOR_OVERLOADED_MULTIPLIER = 12.0, 
             MOTOR_OVERLOADED_THRESHOLD = 0.90,
-            COLD_MOTOR_THRESHOLD = 50,         
+            COLD_MOTOR_RPM_THRESHOLD = 0.5,
+            COLD_MOTOR_TEMP_THRESHOLD = 50,         
             COLD_MOTOR_MULTIPLIER = 220.0,
             OVERHEAT_MOTOR_MULTIPLIER = 500.0, 
             OVERHEAT_MOTOR_THRESHOLD = 95,
@@ -122,7 +123,7 @@ ADS_Config = {
 
         ELECTRICAL_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 8.0,
-            CRANKING_STRESS_MULTIPLIER = 120,
+            CRANKING_STRESS_MULTIPLIER = 30.0,
             RAIN_FACTOR_MULTIPLIER = 1.5,
             SNOW_FACTOR_MULTIPLIER = 1.0,
             HALL_FACTOR_MULTIPLIER = 2.5,
@@ -142,7 +143,7 @@ ADS_Config = {
             STEER_LOAD_SPEED_THRESHOLD = 4.0,
             STEER_LOAD_STEER_THRESHOLD = 0.2,
             STEER_LOAD_CHANGE_THRESHOLD = 0.08,
-            BRAKE_MASS_FACTOR_MULTIPLIER = 350.0,
+            BRAKE_MASS_FACTOR_MULTIPLIER = 80.0,
             BRAKE_MASS_RATIO_THRESHOLD = 1.0,
             BRAKE_MASS_RATIO_MAX = 5.0,
             BRAKE_MASS_SPEED_THRESHOLD = 2.0,
@@ -152,9 +153,9 @@ ADS_Config = {
         WORKPROCESS_FACTOR_DATA = {
             SERVICE_EXPIRED_MULTIPLIER = 6.0,
             WORKPROCESSS_IDLING_MULTIPLIER = 0.2,
-            LONG_HARVEST_FACTOR_MULTIPLIER = 18.0,
+            LONG_HARVEST_FACTOR_MULTIPLIER = 8.0,
             LONG_HARVEST_TIMER_THRESHOLD = 0,
-            LONG_HARVEST_TIMER_MAX = 7200,
+            LONG_HARVEST_TIMER_MAX = 3600,
             WET_CROP_FACTOR_MULTIPLIER = 10.0,
             LUBRICATION_FACTOR_THRESHOLD = 0.5,
             LUBRICATION_FACTOR_MULTIPLIER = 5.0

@@ -2041,7 +2041,7 @@ local function syncMessages(vehicle)
     if spec == nil then return end
 
     --- Cold engine message (guard: temperature must be initialized, i.e. > -90)
-    if vehicle:getIsMotorStarted() and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_THRESHOLD and vehicle:getIsActiveForInput(true) and not vehicle:getIsAIActive() and not spec.isElectricVehicle then
+    if vehicle:getIsMotorStarted() and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD and vehicle:getIsActiveForInput(true) and not vehicle:getIsAIActive() and not spec.isElectricVehicle then
         local spec_motorized = vehicle.spec_motorized
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
@@ -2312,7 +2312,8 @@ function AdvancedDamageSystem:resetAiWorkerCruiseControlState()
     if state == nil then return end
 
     if state.baseCruiseSpeed ~= nil and state.baseCruiseSpeed > 0 then
-        self:setCruiseControlMaxSpeed(state.baseCruiseSpeed, nil)
+        local motor = self:getMotor()
+        self:setCruiseControlMaxSpeed(motor:getMaximumForwardSpeed() * 3.6, nil)
     end
 
     state.integral = 0
@@ -2802,9 +2803,9 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         end
 
         -- cold engine factor
-        if (spec.engineTemperature or -99) < C.COLD_MOTOR_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
-            coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_THRESHOLD, true)
-            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
+        if (spec.engineTemperature or -99) < C.COLD_MOTOR_TEMP_THRESHOLD and rpmLoad > C.COLD_MOTOR_RPM_THRESHOLD and not spec.isElectricVehicle and not self:getIsAIActive() then
+            coldMotorFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_MOTOR_TEMP_THRESHOLD, true)
+            local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, C.COLD_MOTOR_RPM_THRESHOLD, false)
             coldMotorFactor = coldMotorFactor * (C.COLD_MOTOR_MULTIPLIER or 0) * motorLoadInf
             coldMotorFactor = math.min(coldMotorFactor, C.COLD_MOTOR_MULTIPLIER or coldMotorFactor)
             wearRate = wearRate + coldMotorFactor
