@@ -374,7 +374,7 @@ end
 function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanMotorRun", ADS_Breakdowns.getCanMotorRun)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "startMotor", ADS_Breakdowns.startMotor)
-    SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateDamageAmount", ADS_Breakdowns.updateDamageAmount)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateDamageAmount", AdvancedDamageSystem.updateDamageAmount)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "setLightsTypesMask", ADS_Breakdowns.setLightsTypesMask)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getSpeedLimit", ADS_Breakdowns.getSpeedLimitOverwrite)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateVehiclePhysics", ADS_Breakdowns.updateVehiclePhysics)
@@ -382,6 +382,8 @@ function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateConsumers", ADS_Breakdowns.updateConsumersOverwrite)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "addCutterArea", ADS_Breakdowns.addCutterAreaOverwrite)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDischargeNodeEmptyFactor", ADS_Breakdowns.getDischargeNodeEmptyFactorOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getSellPrice", AdvancedDamageSystem.getSellPrice)
+    
 end
 
 function AdvancedDamageSystem.registerFunctions(vehicleType)
@@ -1827,6 +1829,28 @@ end
 --                        UPDATE
 -- ==========================================================
 
+local function getConditionLevelFromSellPrice(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+    if storeItem == nil then
+        return 1.0
+    end
+
+    local price = StoreItemUtil.getDefaultPrice(storeItem, vehicle.configurations)
+    if price == nil or price <= 0 then
+        price = storeItem.price or vehicle:getPrice() or 0
+    end
+
+    local repaintPrice = Wearable.calculateRepaintPrice(price, vehicle:getWearTotalAmount())
+    local repairPrice = vehicle:getRepairPrice()
+    local vanillaSellPrice = Vehicle.calculateSellPrice(storeItem, vehicle.age, vehicle.operatingTime, price, repairPrice, repaintPrice)
+    local adsSellPriceForCondition = vanillaSellPrice + repairPrice + (repaintPrice * 0.75)
+    local targetCondition = math.clamp(adsSellPriceForCondition / price, 0.01, 1.0)
+    return targetCondition
+end
+
 local function registerVehicle(vehicle)
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[vehicle.uniqueId] == nil then
         if (vehicle.propertyState == 2 or vehicle.propertyState == 3 or vehicle.propertyState == 4) and vehicle.ownerFarmId ~= 0 and vehicle.ownerFarmId < 10 then
@@ -1844,8 +1868,10 @@ local function registerVehicle(vehicle)
                     if (vehicle:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel) or vehicle:getDamageAmount() > 0 then
                         -- Used vehicle logic
                         spec.serviceLevel = 1 - vehicle:getDamageAmount()
+                        local targetCondition = getConditionLevelFromSellPrice(vehicle)
                         for _, systemData in pairs(spec.systems) do
-                            systemData.condition = math.max(1 - vehicle:getFormattedOperatingTime() / 150 * (0.2 * math.random() + 0.9), (0.2 * math.random() + 0.9) * 0.25)
+                            local random = math.random() * 0.2 + 0.9
+                            systemData.condition = math.clamp(targetCondition * random, 0.2, 1.0)
                         end
                         vehicle:setDamageAmount(0.0, true)
                         --- breakdown presence chance
@@ -1877,6 +1903,8 @@ local function registerVehicle(vehicle)
         end
     end
 end
+
+
 
 local function syncColdEngineEffect(vehicle)
     local spec = vehicle.spec_AdvancedDamageSystem
@@ -5119,6 +5147,14 @@ local function isBreakdownSelectedForPlayerRepair(breakdownId, breakdown, option
     return isSelectedForStandartRepair or isSelectedForQuickFix
 end
 
+local function getIsSelectableBreakdown(breakdownId)
+    local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+    if breakdownDef == nil or breakdownDef.isSelectable ~= true then
+        return false
+    end
+    return true
+end
+
 local function resetPendingServiceProgress(spec)
     spec.pendingSelectedBreakdowns = {}
     spec.pendingServicePrice = nil
@@ -7734,6 +7770,32 @@ function AdvancedDamageSystem:lubricateVehicle()
     end
 end
 
+-- ==========================================================
+--                OVERWRITTEN FUNCTIONS
+-- ==========================================================
+
+function AdvancedDamageSystem.updateDamageAmount(wearable, superFunc, dt)
+	if wearable.spec_AdvancedDamageSystem ~= nil and not wearable.spec_AdvancedDamageSystem.isExcludedVehicle then
+		return 0
+	else
+		return superFunc(wearable, dt)
+	end
+end
+
+function AdvancedDamageSystem.getSellPrice(self, superFunc)
+	if self.spec_AdvancedDamageSystem ~= nil and not self.spec_AdvancedDamageSystem.isExcludedVehicle then
+		local overallCondition = self:getConditionLevel() or 1.0
+        local price = self:getPrice() or 0
+        local repaintPrice = Wearable.calculateRepaintPrice(price, self:getWearTotalAmount()) * 0.25
+        local repairPrice = self:getServicePrice(
+            AdvancedDamageSystem.STATUS.REPAIR,
+            AdvancedDamageSystem.REPAIR_TYPES.MEDIUM,
+            AdvancedDamageSystem.PART_TYPES.OEM, false, AdvancedDamageSystem.WORKSHOP.DEALER, true)
+        return math.clamp(price * overallCondition - repaintPrice - repairPrice, price * 0.03, price * 0.8)
+	else
+		return superFunc(self)
+	end
+end
 
 -- ==========================================================
 --                        GETTERS
@@ -8099,7 +8161,7 @@ function AdvancedDamageSystem:isWarrantyRepairCovered(repairType, partType)
     return true
 end
 
-function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, optionTwo, optionThree, workshopTypeOverride)
+function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, optionTwo, optionThree, workshopTypeOverride, allBreakdowns)
     local price = self:getPrice()
     local spec = self.spec_AdvancedDamageSystem
     local ageFactor = math.min(math.max(math.log10(self.age), 1), 2)
@@ -8163,7 +8225,7 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
         local activeBreakdowns = self:getActiveBreakdowns()
         
         for id, breakdown in pairs(activeBreakdowns) do
-            if isBreakdownSelectedForPlayerRepair(id, breakdown, optionOne) then
+            if isBreakdownSelectedForPlayerRepair(id, breakdown, optionOne) or (allBreakdowns and getIsSelectableBreakdown(id)) then
                 local registryEntry = ADS_Breakdowns.BreakdownRegistry[id]
                 if registryEntry ~= nil then
                     repairPrice = repairPrice + registryEntry.stages[breakdown.stage].repairPrice * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * C.PARTS_PRICE_MULTIPLIERS[optionTwoKey] * C.REPAIR_PRICE_MULTIPLIERS[key] * ownWorkshopDiscount * (price / 100) * ageFactor
@@ -8196,7 +8258,6 @@ function AdvancedDamageSystem:getBreakdownRepairPrice(breakdownId, breakdownStag
 
     local workshopKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.WORKSHOP, spec.workshopType)
     local ownWorkshopDiscount = ADS_Config.WORKSHOP.PRICE_MULTIPLIERS[workshopKey] or 1.0
-
 
     return price * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * (vehiclePrice / 100) * ageFactor * ownWorkshopDiscount / spec.maintainability
 end

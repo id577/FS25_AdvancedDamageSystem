@@ -75,8 +75,21 @@ function ADS_WorkshopDialog:updateScreen()
         balanceText
     )
     self.vehicleImage:setImageFilename(vehicle:getImageFilename())
-    self.vehicleNameValue:setText(self.vehicle:getFullName())
-    self.valueValue:setText(g_i18n:formatMoney(vehicle:getSellPrice() * EconomyManager.DIRECT_SELL_MULTIPLIER))
+    self.vehicleNameValue:setText(vehicle:getFullName())
+    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+    local currentValue = g_i18n:formatMoney(math.min(math.floor(vehicle:getSellPrice() * EconomyManager.DIRECT_SELL_MULTIPLIER), vehicle:getPrice()))
+    local newPrice = nil
+    if storeItem ~= nil then
+        newPrice = StoreItemUtil.getDefaultPrice(storeItem, vehicle.configurations)
+        if newPrice == nil or newPrice <= 0 then
+            newPrice = storeItem.price
+        end
+    end
+    if newPrice ~= nil and newPrice > 0 then
+        self.valueValue:setText(string.format("%s / %s", currentValue, g_i18n:formatMoney(newPrice)))
+    else
+        self.valueValue:setText(currentValue)
+    end
     
     self.ageValue:setText(string.format("%d %s", vehicle.age, g_i18n:getText("ads_ws_age_unit")))
     self.operatingHoursValue:setText(string.format("%s %s", vehicle:getFormattedOperatingTime(), g_i18n:getText("ads_ws_hours_unit")))
@@ -447,4 +460,3 @@ end
 function ADS_WorkshopDialog:onClickBack()
     self:close()
 end
-

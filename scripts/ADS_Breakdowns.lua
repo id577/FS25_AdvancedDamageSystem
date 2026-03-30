@@ -5313,14 +5313,6 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
 
 -- ==========================================================
 
-function ADS_Breakdowns.updateDamageAmount(wearable, superFunc, dt)
-	if wearable.spec_AdvancedDamageSystem ~= nil and not wearable.spec_AdvancedDamageSystem.isExcludedVehicle then
-		return 0
-	else
-		return superFunc(wearable, dt)
-	end
-end
-
 function ADS_Breakdowns.getCanMotorRun(self, superFunc)
     local spec = self.spec_AdvancedDamageSystem
     if (spec and spec.activeEffects.ENGINE_FAILURE) then
