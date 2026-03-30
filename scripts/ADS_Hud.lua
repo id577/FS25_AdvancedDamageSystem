@@ -246,7 +246,7 @@ function ADS_Hud:drawDashboard()
             if hudIndicatorId == self.indicators.transmission.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.transmission.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
 
-            local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 1) / (self.vehicle:getMaintenanceInterval() or 10)
+            local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 0) / (self.vehicle:getMaintenanceInterval() or 5)
             if hudIndicatorId == self.indicators.service.name and serviceInterval > 1.0 then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
 
@@ -265,7 +265,16 @@ function ADS_Hud:drawDashboard()
         if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle or hudIndicatorId == self.indicators.oil.name or hudIndicatorId == self.indicators.transmission.name then 
             icon:setVisible(false)
         else
-            icon:setVisible(hudIndicatorData.year < spec.year)
+            if vehicle:getLastSpeed() >= 100 then
+                if  hudIndicatorId == self.indicators.brakes.name or 
+                    hudIndicatorId == self.indicators.engine.name or
+                    hudIndicatorId == self.indicators.warning.name or
+                    hudIndicatorId == self.indicators.battery.name then
+                        icon:setVisible(false)
+                end
+            else
+                icon:setVisible(hudIndicatorData.year < spec.year)
+            end
         end
         icon:render()
         end
@@ -308,10 +317,12 @@ function ADS_Hud:drawDashboard()
         setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
         setTextBold(true)
         renderText(posX + self.engineTempText.offsetX, posY + self.engineTempText.offsetY, self.engineTempText.size, tempText)
-        setTextColor(motorLoadTextColor[1], motorLoadTextColor[2], motorLoadTextColor[3], motorLoadTextColor[4])
-        renderText(posX + self.motorLoadText.offsetX, posY + self.motorLoadText.offsetY, self.motorLoadText.size, motorText)
-        setTextColor(batteryVoltageTextColor[1], batteryVoltageTextColor[2], batteryVoltageTextColor[3], batteryVoltageTextColor[4])
-        renderText(posX + self.batteryVoltageText.offsetX, posY + self.batteryVoltageText.offsetY, self.batteryVoltageText.size, batteryVoltageText)
+        if vehicle:getLastSpeed() < 100 then
+            setTextColor(motorLoadTextColor[1], motorLoadTextColor[2], motorLoadTextColor[3], motorLoadTextColor[4])
+            renderText(posX + self.motorLoadText.offsetX, posY + self.motorLoadText.offsetY, self.motorLoadText.size, motorText)
+            setTextColor(batteryVoltageTextColor[1], batteryVoltageTextColor[2], batteryVoltageTextColor[3], batteryVoltageTextColor[4])
+            renderText(posX + self.batteryVoltageText.offsetX, posY + self.batteryVoltageText.offsetY, self.batteryVoltageText.size, batteryVoltageText)
+        end
     end
 
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
