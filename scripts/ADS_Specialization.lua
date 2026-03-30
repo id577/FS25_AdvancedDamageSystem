@@ -7273,7 +7273,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
 
     local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
     if isMotorStarted and rawEngineTemp > C.ENGINE_THERMOSTAT_MIN_TEMP then
-        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, rawEngineTemp, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
+        spec.thermostatState = AdvancedDamageSystem.getNewTermostatState(dt, rawEngineTemp, C.PID_TARGET_TEMP, spec.engTermPID, spec.thermostatHealth, spec.year, spec.thermostatStuckedPosition, dbg)
     else
         spec.thermostatState = 0.0
         spec.engTermPID.integral = 0
@@ -7375,7 +7375,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
 
     local rawTransmissionTemp = spec.rawTransmissionTemperature or spec.transmissionTemperature or -99
     if isMotorStarted and rawTransmissionTemp > C.TRANS_THERMOSTAT_MIN_TEMP then
-        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, rawTransmissionTemp, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
+        spec.transmissionThermostatState = AdvancedDamageSystem.getNewTermostatState(dt, rawTransmissionTemp, C.TRANS_PID_TARGET_TEMP, spec.transTermPID, spec.transmissionThermostatHealth, spec.year, spec.transmissionThermostatStuckedPosition, dbg)
     else
         spec.transmissionThermostatState = 0.0
         spec.transTermPID.integral = 0
@@ -7408,7 +7408,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     return dbg
 end
 
-function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, thermostatHealth, year, stuckedPosition, debugData)
+function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, targetTemp, pidData, thermostatHealth, year, stuckedPosition, debugData)
 
     if stuckedPosition ~= nil then
         return stuckedPosition
@@ -7422,8 +7422,8 @@ function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, the
     local maxOpening = 1.0
     
     if isMechanical then
-        local startOpenTemp = C.PID_TARGET_TEMP - 10 
-        local fullOpenTemp = C.PID_TARGET_TEMP + 3  
+        local startOpenTemp = targetTemp - 10 
+        local fullOpenTemp = targetTemp + 3  
         targetPos = (currentTemp - startOpenTemp) / (fullOpenTemp - startOpenTemp)
         pidData.integral = 0
         pidData.lastError = 0
@@ -7431,7 +7431,7 @@ function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, pidData, the
     else
         local pidKpYearFactor = (year - C.THERMOSTAT_TYPE_YEAR_DIVIDER) / (C.ELECTRONIC_THERMOSTAT_MAX_YEAR - C.THERMOSTAT_TYPE_YEAR_DIVIDER)
         local pid_kp = math.clamp(C.PID_KP_MIN + (C.PID_KP_MAX - C.PID_KP_MIN) * pidKpYearFactor, C.PID_KP_MIN, C.PID_KP_MAX)
-        local errorTemp = currentTemp - C.PID_TARGET_TEMP
+        local errorTemp = currentTemp - targetTemp
         
         local derivative = 0
         if dtSeconds > 0.001 then
