@@ -505,5 +505,62 @@
         <text name="ads_jumper_cables_disconnected" text="Пусковые провода отключены от %s"/>
         <text name="ads_jumper_cables_auto_disconnected" text="Пусковые провода отключены, так как одна из машин начала движение"/>
         <text name="ads_jumper_cables_is_too_far" text="%s находится слишком далеко от %s"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="Осмотр техники"/>
+        <text name="ads_field_inspection_action" text="Осмотреть технику"/>
+        <text name="ads_field_inspection_hold_to_start" text="Удерживайте для начала осмотра"/>
+        <text name="ads_field_inspection_starting" text="Начинаем осмотр..."/>
+        <text name="ads_field_inspection_progress" text="Выполняется визуальный осмотр... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Осмотр отменен"/>
+        <text name="ads_inspection_dialog_title" text="Предсменный визуальный осмотр"/>
+        <text name="ads_inspection_section_fluids" text="1. Технические жидкости"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Система охлаждения и забора воздуха"/>
+        <text name="ads_inspection_section_lubrication" text="3. Точки смазки"/>
+        <text name="ads_inspection_section_additional" text="4. Дополнительно"/>
+        <text name="ads_inspection_engine_oil" text="Моторное масло"/>
+        <text name="ads_inspection_coolant" text="Охлаждающая жидкость"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Гидравлическая жидкость"/>
+        <text name="ads_inspection_transmission_oil" text="Трансмиссионное масло"/>
+        <text name="ads_inspection_radiator" text="Радиатор"/>
+        <text name="ads_inspection_air_duct" text="Воздушный тракт"/>
+        <text name="ads_inspection_air_filter" text="Воздушный фильтр"/>
+        <text name="ads_inspection_lubrication_level" text="Уровень смазки"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Никаких подозрительных симптомов"/>
+        <text name="ads_inspection_ok" text="ОК"/>
+        <text name="ads_inspection_status_slightly_low" text="Незначительно снижен"/>
+        <text name="ads_inspection_status_low" text="Снижен"/>
+        <text name="ads_inspection_status_very_low" text="Сильно снижен"/>
+        <text name="ads_inspection_status_critically_low" text="Критически низкий"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Слегка потемнело"/>
+        <text name="ads_inspection_status_darkened" text="Потемнело"/>
+        <text name="ads_inspection_status_contaminated" text="Загрязнено"/>
+        <text name="ads_inspection_status_critical_condition" text="Критическое состояние"/>
+        <text name="ads_inspection_status_slight_moisture" text="Легкое запотевание"/>
+        <text name="ads_inspection_status_seepage" text="Подтекание"/>
+        <text name="ads_inspection_status_active_leak" text="Активная утечка"/>
+        <text name="ads_inspection_status_severe_leak" text="Сильная утечка"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Слегка загрязнен"/>
+        <text name="ads_inspection_status_dirty" text="Загрязнен"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Сильно забит"/>
+        <text name="ads_inspection_status_critically_clogged" text="Критически забит"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="В районе соединений системы охлаждения заметны слабые следы охлаждающей жидкости."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Следы охлаждающей жидкости заметны, а уровень жидкости ниже нормы."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Потеря охлаждающей жидкости уже хорошо заметна в районе системы охлаждения."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Уровень охлаждающей жидкости критически низкий, следы жидкости выражены сильно."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="Моторное масло выглядит слегка потемневшим."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="Моторное масло заметно темнее нормы."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="Моторное масло выглядит загрязненным."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Состояние масла выглядит критическим."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="В районе гидроцилиндра заметна слабая маслянистая пленка."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="В районе цилиндра заметно подтекание гидравлической жидкости."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Возле гидроцилиндра хорошо заметны следы гидравлической жидкости."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Следы гидравлической жидкости выражены сильно. Зона гидроцилиндра сильно загрязнена жидкостью."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="Поверхность радиатора слегка загрязнена."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Радиатор заметно загрязнен."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Радиатор сильно забит грязью и мусором."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Радиатор критически забит грязью и мусором."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="Воздуховод имеет легкие следы загрязнения."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Воздуховод заметно загрязнен."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Воздуховод сильно забит пылью и мусором."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Воздуховод критически забит пылью и мусором."/>
     </texts>
 </l10n>

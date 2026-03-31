@@ -512,7 +512,63 @@
         <text name="ads_jumper_cables_disconnected" text="Jumper cables disconnected from %s"/>
         <text name="ads_jumper_cables_auto_disconnected" text="Jumper cables disconnected because one of the vehicles started moving"/>
         <text name="ads_jumper_cables_is_too_far" text="%s is too far from %s"/>
-
+        <text name="input_ADS_FIELD_INSPECTION" text="Vehicle inspection"/>
+        <text name="ads_field_inspection_action" text="Inspect vehicle"/>
+        <text name="ads_field_inspection_hold_to_start" text="Hold to start inspection"/>
+        <text name="ads_field_inspection_starting" text="Starting inspection..."/>
+        <text name="ads_field_inspection_progress" text="Performing visual inspection... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Inspection cancelled"/>
+        <text name="ads_inspection_dialog_title" text="Pre-Shift Visual Inspection"/>
+        <text name="ads_inspection_section_fluids" text="1. Technical Fluids"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Cooling and Air Intake System"/>
+        <text name="ads_inspection_section_lubrication" text="3. Lubrication Points"/>
+        <text name="ads_inspection_section_additional" text="4. Additional Notes"/>
+        <text name="ads_inspection_engine_oil" text="Engine Oil"/>
+        <text name="ads_inspection_coolant" text="Coolant"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Hydraulic Fluid"/>
+        <text name="ads_inspection_transmission_oil" text="Transmission Oil"/>
+        <text name="ads_inspection_radiator" text="Radiator"/>
+        <text name="ads_inspection_air_duct" text="Air Intake Duct"/>
+        <text name="ads_inspection_air_filter" text="Air Filter"/>
+        <text name="ads_inspection_lubrication_level" text="Lubrication Level"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="No suspicious symptoms detected"/>
+        <text name="ads_inspection_ok" text="OK"/>
+        <text name="ads_inspection_status_slightly_low" text="Slightly Low"/>
+        <text name="ads_inspection_status_low" text="Low"/>
+        <text name="ads_inspection_status_very_low" text="Very Low"/>
+        <text name="ads_inspection_status_critically_low" text="Critically Low"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Slightly Darkened"/>
+        <text name="ads_inspection_status_darkened" text="Darkened"/>
+        <text name="ads_inspection_status_contaminated" text="Contaminated"/>
+        <text name="ads_inspection_status_critical_condition" text="Critical"/>
+        <text name="ads_inspection_status_slight_moisture" text="Light Moisture"/>
+        <text name="ads_inspection_status_seepage" text="Seepage"/>
+        <text name="ads_inspection_status_active_leak" text="Active Leak"/>
+        <text name="ads_inspection_status_severe_leak" text="Severe Leak"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Slightly Dirty"/>
+        <text name="ads_inspection_status_dirty" text="Dirty"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Heavily Clogged"/>
+        <text name="ads_inspection_status_critically_clogged" text="Critically Clogged"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="Slight traces of coolant are visible near the cooling system connections."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Coolant residue is visible, and the coolant level is below normal."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Noticeable coolant loss is visible around the cooling system area."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Coolant level is critically low, with heavy traces of coolant visible."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="The engine oil looks slightly darkened."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="The engine oil appears darker than normal."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="The engine oil looks contaminated."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="The oil condition appears critical."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="A faint oily film is visible around the hydraulic cylinder area."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Hydraulic seepage is visible around the cylinder."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Clear hydraulic fluid traces are visible near the cylinder."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Heavy hydraulic fluid traces are visible. The cylinder area is heavily contaminated with fluid."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="The radiator surface is slightly dirty."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="The radiator is noticeably dirty."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="The radiator is heavily clogged with dirt and debris."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="The radiator is critically clogged with dirt and debris."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="The air intake duct shows light contamination."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="The air intake duct is noticeably dirty."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="The air intake duct is heavily clogged with dust and debris."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="The air intake duct is critically clogged with dust and debris."/>
     </texts>
 </l10n>
 

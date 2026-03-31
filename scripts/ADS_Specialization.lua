@@ -447,7 +447,8 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "cleanRadiatorAndAirIntake", AdvancedDamageSystem.cleanRadiatorAndAirIntake)
     SpecializationUtil.registerFunction(vehicleType, "updateLubricationLevel", AdvancedDamageSystem.updateLubricationLevel)
     SpecializationUtil.registerFunction(vehicleType, "lubricateVehicle", AdvancedDamageSystem.lubricateVehicle)
-    
+    SpecializationUtil.registerFunction(vehicleType, "startFieldVisualInspectionProcess", AdvancedDamageSystem.startFieldVisualInspectionProcess)
+
     SpecializationUtil.registerFunction(vehicleType, "resetAiWorkerCruiseControlState", AdvancedDamageSystem.resetAiWorkerCruiseControlState)
     SpecializationUtil.registerFunction(vehicleType, "getAiWorkerImplementSpeedLimit", AdvancedDamageSystem.getAiWorkerImplementSpeedLimit)
     SpecializationUtil.registerFunction(vehicleType, "updateAiWorkerCruiseControl", AdvancedDamageSystem.updateAiWorkerCruiseControl)
@@ -1632,6 +1633,16 @@ function AdvancedDamageSystem:onPostLoad(savegame)
 
     spec.isUnderRoof = self:isUnderRoof()
 
+    spec.fieldInspection = spec.fieldInspection or {
+        isActive = false,
+        elapsedTime = 0,
+        duration = ADS_Config.FIELD_CARE.FIELD_INSPECTION_DURATION,
+        startTime = 0,
+        targetNode = nil,
+        targetVehicle = nil,
+        wasSoundStarted = false
+    }
+
     -- Sounds Loading
     local xmlSoundFile = loadXMLFile("ads_sounds", AdvancedDamageSystem.modDirectory .. "sounds/ads_sounds.xml")
     if spec.samples == nil then
@@ -1662,6 +1673,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.gearDisengage1 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "gearDisengage1", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.engineKnocking = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "engineKnocking", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.valveTrainNoise = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "valveTrainNoise", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.inspection = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "inspection", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         delete(xmlSoundFile)
     else
         log_dbg("ERROR: AdvancedDamageSystem - Could not load ads_sounds.xml")
@@ -7769,6 +7781,51 @@ function AdvancedDamageSystem:lubricateVehicle()
         self:raiseDirtyFlags(spec.adsDirtyFlag_state)
     end
 end
+
+function AdvancedDamageSystem:startFieldVisualInspectionProcess()
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil or spec.isExcludedVehicle then
+        return false
+    end
+
+    if self:getCurrentStatus() ~= AdvancedDamageSystem.STATUS.READY then
+        return false
+    end
+
+    local inspection = spec.fieldInspection
+    if inspection == nil then
+        return false
+    end
+
+    if inspection.isActive then
+        return false
+    end
+
+    inspection.isActive = true
+    inspection.elapsedTime = 0
+    inspection.duration = 5000
+    inspection.startTime = g_time
+    inspection.targetVehicle = self
+    inspection.wasSoundStarted = false
+
+    local node = self.rootNode
+    if (node == nil or node == 0) and self.components ~= nil and self.components[1] ~= nil then
+        node = self.components[1].node
+    end
+    inspection.targetNode = node
+
+    if self.isClient and spec.samples ~= nil and spec.samples.inspection ~= nil then
+        g_soundManager:playSample(spec.samples.inspection)
+        inspection.wasSoundStarted = true
+    end
+
+    if self.isClient and ADS_Hud ~= nil then
+        ADS_Hud.showNotification(string.format(g_i18n:getText("ads_field_inspection_progress"), 0), inspection.duration)
+    end
+
+    return true
+end
+
 
 -- ==========================================================
 --                OVERWRITTEN FUNCTIONS

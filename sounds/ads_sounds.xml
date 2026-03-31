@@ -168,5 +168,12 @@
         <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </jumperCablesSparksTool>
+    <inspection file="sounds/inspection.ogg" linkNode="0" innerRadius="4.0" outerRadius="20.0" >
+        <volume indoor="1.0" outdoor="1.1" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="0.8" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="5000" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </inspection>
     <maintenanceCompleted2D file="sounds/maintenanceCompleted.ogg" volume="1.0" pitch="1.0" />
 </sounds>

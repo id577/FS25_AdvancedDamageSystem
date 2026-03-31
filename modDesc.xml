@@ -76,6 +76,14 @@ Changelog 0.9.0.0:
     <extraSourceFiles>
         <sourceFile filename="scripts/ADS_Main.lua"/>
     </extraSourceFiles>
+    <actions>
+        <action name="ADS_FIELD_INSPECTION" axisType="HALF" displayCategory="PLAYER_INTERACTIVE"/>
+    </actions>
+    <inputBinding>
+        <actionBinding action="ADS_FIELD_INSPECTION">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_r"/>
+        </actionBinding>
+    </inputBinding>
     <l10n filenamePrefix="translations/l10n"/>
     <dependencies>
         <dependency>FS25_Vehicle_Years</dependency>

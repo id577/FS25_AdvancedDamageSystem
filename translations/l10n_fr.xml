@@ -505,5 +505,62 @@
         <text name="ads_jumper_cables_disconnected" text="Câbles de démarrage déconnectés de %s"/>
         <text name="ads_jumper_cables_auto_disconnected" text="Les câbles de démarrage ont été déconnectés parce que l'un des véhicules a commencé à bouger"/>
         <text name="ads_jumper_cables_is_too_far" text="%s est trop éloigné de %s"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="Inspection du véhicule"/>
+        <text name="ads_field_inspection_action" text="Inspecter le véhicule"/>
+        <text name="ads_field_inspection_hold_to_start" text="Maintenir pour commencer l'inspection"/>
+        <text name="ads_field_inspection_starting" text="Démarrage de l'inspection..."/>
+        <text name="ads_field_inspection_progress" text="Inspection visuelle en cours... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Inspection annulée"/>
+        <text name="ads_inspection_dialog_title" text="Inspection visuelle avant la prise de poste"/>
+        <text name="ads_inspection_section_fluids" text="1. Fluides techniques"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Système de refroidissement et admission d'air"/>
+        <text name="ads_inspection_section_lubrication" text="3. Points de graissage"/>
+        <text name="ads_inspection_section_additional" text="4. Observations complémentaires"/>
+        <text name="ads_inspection_engine_oil" text="Huile moteur"/>
+        <text name="ads_inspection_coolant" text="Liquide de refroidissement"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Liquide hydraulique"/>
+        <text name="ads_inspection_transmission_oil" text="Huile de transmission"/>
+        <text name="ads_inspection_radiator" text="Radiateur"/>
+        <text name="ads_inspection_air_duct" text="Conduit d'air"/>
+        <text name="ads_inspection_air_filter" text="Filtre à air"/>
+        <text name="ads_inspection_lubrication_level" text="Niveau de lubrification"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Aucun symptôme suspect détecté"/>
+        <text name="ads_inspection_ok" text="OK"/>
+        <text name="ads_inspection_status_slightly_low" text="Légèrement Bas"/>
+        <text name="ads_inspection_status_low" text="Bas"/>
+        <text name="ads_inspection_status_very_low" text="Très Bas"/>
+        <text name="ads_inspection_status_critically_low" text="Critiquement Bas"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Légèrement Assombri"/>
+        <text name="ads_inspection_status_darkened" text="Assombri"/>
+        <text name="ads_inspection_status_contaminated" text="Contaminé"/>
+        <text name="ads_inspection_status_critical_condition" text="Critique"/>
+        <text name="ads_inspection_status_slight_moisture" text="Légère Humidité"/>
+        <text name="ads_inspection_status_seepage" text="Suintement"/>
+        <text name="ads_inspection_status_active_leak" text="Fuite Active"/>
+        <text name="ads_inspection_status_severe_leak" text="Fuite Importante"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Légèrement Sale"/>
+        <text name="ads_inspection_status_dirty" text="Sale"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Fortement Encrassé"/>
+        <text name="ads_inspection_status_critically_clogged" text="Critiquement Encrassé"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="De légères traces de liquide de refroidissement sont visibles près des raccords du système de refroidissement."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Des résidus de liquide de refroidissement sont visibles et le niveau est inférieur à la normale."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Une perte notable de liquide de refroidissement est visible autour du système de refroidissement."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Le niveau de liquide de refroidissement est critique et de fortes traces sont visibles."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="L'huile moteur semble légèrement assombrie."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="L'huile moteur paraît plus sombre que la normale."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="L'huile moteur semble contaminée."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="L'état de l'huile semble critique."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="Un léger film huileux est visible autour du vérin hydraulique."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Un suintement de fluide hydraulique est visible autour du vérin."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Des traces nettes de fluide hydraulique sont visibles près du vérin."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="De fortes traces de fluide hydraulique sont visibles. La zone du vérin est fortement souillée par le fluide."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="La surface du radiateur est légèrement sale."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Le radiateur est visiblement sale."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Le radiateur est fortement encrassé par la saleté et les débris."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Le radiateur est critiquement encrassé par la saleté et les débris."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="Le conduit d'admission d'air présente une légère contamination."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Le conduit d'admission d'air est visiblement sale."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Le conduit d'admission d'air est fortement obstrué par la poussière et les débris."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Le conduit d'admission d'air est critiquement obstrué par la poussière et les débris."/>
     </texts>
 </l10n>

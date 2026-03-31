@@ -505,5 +505,62 @@
         <text name="ads_jumper_cables_disconnected" text="Starthilfekabel von %s getrennt"/>
         <text name="ads_jumper_cables_auto_disconnected" text="Starthilfekabel wurden getrennt, weil eines der Fahrzeuge losgefahren ist"/>
         <text name="ads_jumper_cables_is_too_far" text="%s ist zu weit von %s entfernt"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="Fahrzeuginspektion"/>
+        <text name="ads_field_inspection_action" text="Fahrzeug inspizieren"/>
+        <text name="ads_field_inspection_hold_to_start" text="Gedrückt halten, um die Inspektion zu starten"/>
+        <text name="ads_field_inspection_starting" text="Inspektion wird gestartet..."/>
+        <text name="ads_field_inspection_progress" text="Sichtprüfung läuft... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Inspektion abgebrochen"/>
+        <text name="ads_inspection_dialog_title" text="Sichtprüfung vor Schichtbeginn"/>
+        <text name="ads_inspection_section_fluids" text="1. Technische Flüssigkeiten"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Kühlsystem und Luftansaugung"/>
+        <text name="ads_inspection_section_lubrication" text="3. Schmierstellen"/>
+        <text name="ads_inspection_section_additional" text="4. Zusätzliche Hinweise"/>
+        <text name="ads_inspection_engine_oil" text="Motoröl"/>
+        <text name="ads_inspection_coolant" text="Kühlmittel"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Hydraulikflüssigkeit"/>
+        <text name="ads_inspection_transmission_oil" text="Getriebeöl"/>
+        <text name="ads_inspection_radiator" text="Kühler"/>
+        <text name="ads_inspection_air_duct" text="Lufttrakt"/>
+        <text name="ads_inspection_air_filter" text="Luftfilter"/>
+        <text name="ads_inspection_lubrication_level" text="Schmierstand"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Keine verdächtigen Symptome festgestellt"/>
+        <text name="ads_inspection_ok" text="OK"/>
+        <text name="ads_inspection_status_slightly_low" text="Leicht Niedrig"/>
+        <text name="ads_inspection_status_low" text="Niedrig"/>
+        <text name="ads_inspection_status_very_low" text="Sehr Niedrig"/>
+        <text name="ads_inspection_status_critically_low" text="Kritisch Niedrig"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Leicht Verfärbt"/>
+        <text name="ads_inspection_status_darkened" text="Verfärbt"/>
+        <text name="ads_inspection_status_contaminated" text="Verunreinigt"/>
+        <text name="ads_inspection_status_critical_condition" text="Kritisch"/>
+        <text name="ads_inspection_status_slight_moisture" text="Leichte Feuchtigkeit"/>
+        <text name="ads_inspection_status_seepage" text="Sickerung"/>
+        <text name="ads_inspection_status_active_leak" text="Aktive Leckage"/>
+        <text name="ads_inspection_status_severe_leak" text="Starke Leckage"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Leicht Verschmutzt"/>
+        <text name="ads_inspection_status_dirty" text="Verschmutzt"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Stark Verstopft"/>
+        <text name="ads_inspection_status_critically_clogged" text="Kritisch Verstopft"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="Leichte Kühlmittelspuren sind an den Verbindungen des Kühlsystems sichtbar."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Kühlmittelrückstände sind sichtbar, und der Kühlmittelstand ist unter normal."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Ein deutlicher Kühlmittelverlust ist im Bereich des Kühlsystems sichtbar."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Der Kühlmittelstand ist kritisch niedrig, und starke Kühlmittelspuren sind sichtbar."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="Das Motoröl wirkt leicht nachgedunkelt."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="Das Motoröl ist dunkler als normal."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="Das Motoröl wirkt verunreinigt."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Der Zustand des Motoröls wirkt kritisch."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="Im Bereich des Hydraulikzylinders ist ein leichter Ölfilm sichtbar."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Am Zylinder ist Hydrauliköl-Sickerung sichtbar."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Deutliche Spuren von Hydraulikflüssigkeit sind am Zylinder sichtbar."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Starke Spuren von Hydraulikflüssigkeit sind sichtbar. Der Bereich des Zylinders ist stark mit Flüssigkeit verunreinigt."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="Die Kühleroberfläche ist leicht verschmutzt."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Der Kühler ist deutlich verschmutzt."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Der Kühler ist stark mit Schmutz und Ablagerungen zugesetzt."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Der Kühler ist kritisch mit Schmutz und Ablagerungen zugesetzt."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="Der Luftansaugkanal zeigt leichte Verschmutzungen."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Der Luftansaugkanal ist deutlich verschmutzt."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Der Luftansaugkanal ist stark mit Staub und Schmutz zugesetzt."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Der Luftansaugkanal ist kritisch mit Staub und Schmutz zugesetzt."/>
     </texts>
 </l10n>

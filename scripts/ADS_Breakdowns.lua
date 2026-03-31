@@ -1023,6 +1023,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.30, aggregation = "max" },
                     { id = "ENGINE_HEAT_MODIFIER", value = 0.05, aggregation = "sum" },
                     
+                },
+                inspection = {
+                    { target = "engineOil", status = "ads_inspection_status_slightly_darkened", additional = "ads_inspection_hint_oil_pump_malfunction_stage1" },
                 }
             },
             {
@@ -1035,6 +1038,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
                     { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.5, aggregation = "max" },
                     { id = "ENGINE_HEAT_MODIFIER", value = 0.15, aggregation = "sum" },
+                },
+                inspection = {
+                    { target = "engineOil", status = "ads_inspection_status_darkened", additional = "ads_inspection_hint_oil_pump_malfunction_stage2" },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
@@ -1052,6 +1058,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_KNOCKING_NOISE_EFFECT", value = 0.8, aggregation = "max" },
                     { id = "ENGINE_HEAT_MODIFIER", value = 0.35, aggregation = "sum" },
                 },
+                inspection = {
+                    { target = "engineOil", status = "ads_inspection_status_contaminated", additional = "ads_inspection_hint_oil_pump_malfunction_stage3" },
+                },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -1064,6 +1073,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 8.0 * breakdownPriceMultipliers.OIL_PUMP_MALFUNCTION,
                 effects = {
                     { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_oil_pump_malfunction_stage4_message", reason = "BREAKDOWN", disableAi = true} },
+                },
+                inspection = {
+                    { target = "engineOil", status = "ads_inspection_status_critical_condition", additional = "ads_inspection_hint_oil_pump_malfunction_stage4" },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1593,6 +1605,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.10, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.01, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.5} }
+                },
+                inspection = {
+                    { target = "hydraulicFluid", status = "ads_inspection_status_slight_moisture", additional = "ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" },
                 }
             },
             {
@@ -1604,6 +1619,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.30, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.03, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.4}}
+                },
+                inspection = {
+                    { target = "hydraulicFluid", status = "ads_inspection_status_seepage", additional = "ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" },
                 },
                 indicators = {
                     { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
@@ -1619,6 +1637,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -0.55, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 0.05, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.2} }
                 },
+                inspection = {
+                    { target = "hydraulicFluid", status = "ads_inspection_status_active_leak", additional = "ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" },
+                },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -1632,6 +1653,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = { 
                     { id = "HYDRAULIC_SPEED_MODIFIER", value = -7.0, extraData = {message = 'ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message', disableAi = true}, aggregation = "min" },
                     { id = "HYDRAULIC_HOLD_DRIFT_EFFECT", value = 1.0, aggregation = "max", extraData = {status = 'IDLE', timer = 0, massRatio = 0.0} }
+                },
+                inspection = {
+                    { target = "hydraulicFluid", status = "ads_inspection_status_severe_leak", additional = "ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" },
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -2101,6 +2125,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 1.0 * breakdownPriceMultipliers.COOLANT_LEAK,
                 effects = {
                     { id = "RADIATOR_HEALTH_MODIFIER", value = -0.1, aggregation = "min"}
+                },
+                inspection = {
+                    { target = "coolant", status = "ads_inspection_status_slightly_low", additional = "ads_inspection_hint_coolant_leak_stage1" },
                 }
             },
             {
@@ -2111,6 +2138,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 2.0 * breakdownPriceMultipliers.COOLANT_LEAK,
                 effects = {
                     { id = "RADIATOR_HEALTH_MODIFIER", value = -0.2, aggregation = "min"}
+                },
+                inspection = {
+                    { target = "coolant", status = "ads_inspection_status_low", additional = "ads_inspection_hint_coolant_leak_stage2" },
                 },
                 indicators = {
 
@@ -2125,6 +2155,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "RADIATOR_HEALTH_MODIFIER", value = -0.4, aggregation = "min"}
                 },
+                inspection = {
+                    { target = "coolant", status = "ads_inspection_status_very_low", additional = "ads_inspection_hint_coolant_leak_stage3" },
+                },
                 indicators = {
                     { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }
                 }
@@ -2137,6 +2170,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 8.0 * breakdownPriceMultipliers.COOLANT_LEAK,
                 effects = {
                     { id = "RADIATOR_HEALTH_MODIFIER", value = -0.6, aggregation = "min"}
+                },
+                inspection = {
+                    { target = "coolant", status = "ads_inspection_status_critically_low", additional = "ads_inspection_hint_coolant_leak_stage4" },
                 },
                 indicators = {
                     { id = db.COOLANT, color = color.CRITICAL, switchOn = true, switchOff = false },

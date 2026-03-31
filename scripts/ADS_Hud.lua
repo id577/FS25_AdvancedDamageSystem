@@ -62,6 +62,18 @@ function ADS_Hud:new()
 
     self.fuelConsoText = {}
 
+    self.notificationPanel = {
+        x = 0.40,
+        y = 0.84,
+        width = 0.20,
+        padding = 0.01,
+        lineHeight = 0.016,
+        background = self.modDirectory .. "hud/ads_debugHud.dds",
+        text = nil,
+        endTime = 0,
+        isVisible = false
+    }
+
     self.activeVehicleDebugPanel = {
         x = 0.20,
         y = 0.05,
@@ -133,6 +145,8 @@ function ADS_Hud:draw()
 
     -- manager debug panel temporarily disabled
 
+    self:drawNotificationPanel()
+
     if ADS_Config.DEBUG and g_currentMission.isMasterUser and self.vehicle ~= nil and self.activeVehicleDebugPanel.isVisible then
         self:drawActiveVehicleHUD()
     end
@@ -141,6 +155,113 @@ function ADS_Hud:draw()
         self:drawDashboard()
         self:drawFuelConsumption()
     end
+end
+
+-- =====================================================================================
+--                              NOTIFICATION PANEL
+-- =====================================================================================
+
+function ADS_Hud.showNotification(text, durationMs)
+    if ADS_Main ~= nil and ADS_Main.hud ~= nil then
+        ADS_Main.hud:setNotification(text, durationMs)
+    end
+end
+
+function ADS_Hud.hideNotification()
+    if ADS_Main ~= nil and ADS_Main.hud ~= nil then
+        ADS_Main.hud:clearNotification()
+    end
+end
+
+function ADS_Hud:setNotification(text, durationMs)
+    local panel = self.notificationPanel
+    local normalizedText = tostring(text or ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+
+    if normalizedText == "" then
+        self:clearNotification()
+        return
+    end
+
+    panel.text = normalizedText
+    panel.endTime = g_time + math.max(tonumber(durationMs) or 3000, 0)
+    panel.isVisible = true
+end
+
+function ADS_Hud:clearNotification()
+    local panel = self.notificationPanel
+    panel.text = nil
+    panel.endTime = 0
+    panel.isVisible = false
+end
+
+function ADS_Hud:wrapNotificationText(text, maxWidth, textSize)
+    local words = {}
+    for word in tostring(text or ""):gmatch("%S+") do
+        table.insert(words, word)
+    end
+
+    local lines = {}
+    local currentLine = ""
+
+    for _, word in ipairs(words) do
+        local candidate = currentLine == "" and word or (currentLine .. " " .. word)
+
+        if currentLine == "" or getTextWidth(textSize, candidate) <= maxWidth then
+            currentLine = candidate
+        else
+            table.insert(lines, currentLine)
+            currentLine = word
+        end
+    end
+
+    if currentLine ~= "" then
+        table.insert(lines, currentLine)
+    end
+
+    if #lines == 0 then
+        table.insert(lines, "")
+    end
+
+    return lines
+end
+
+function ADS_Hud:drawNotificationPanel()
+    local panel = self.notificationPanel
+    if panel == nil or not panel.isVisible or panel.text == nil then
+        return
+    end
+
+    if g_time >= panel.endTime then
+        self:clearNotification()
+        return
+    end
+
+    local textSize = self.text.normalSize + 0.003
+    local maxTextWidth = panel.width - panel.padding * 2
+    local lines = self:wrapNotificationText(panel.text, maxTextWidth, textSize)
+    local dynamicHeight = panel.padding * 2 + (#lines * panel.lineHeight)
+
+    local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
+    overlay:setColor(1, 1, 1, 0.78)
+    overlay:render()
+
+    local centerX = panel.x + panel.width * 0.5
+    local currentY = panel.y + dynamicHeight - panel.padding
+
+    setTextAlignment(RenderText.ALIGN_CENTER)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
+    setTextBold(true)
+    setTextColor(1, 1, 1, 1)
+
+    for _, line in ipairs(lines) do
+        renderText(centerX, currentY, textSize, line)
+        currentY = currentY - panel.lineHeight
+    end
+
+    setTextBold(false)
+    setTextColor(1, 1, 1, 1)
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BOTTOM)
 end
 
 -- =====================================================================================

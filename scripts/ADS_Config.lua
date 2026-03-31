@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 102,
+    VER = 103,
 
     DEBUG = false,
 
@@ -455,6 +455,7 @@ ADS_Config = {
         CLOGGING_SPEED = 1.0,
         CLEANING_SPEED = 0.05,
         AIR_INTAKE_BREAKDOWN_THRESHOLD = 0.5,
+        FIELD_INSPECTION_DURATION = 6000,
     },
 
     ELECTRICAL = {
