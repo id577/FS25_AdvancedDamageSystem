@@ -518,6 +518,7 @@
         <text name="ads_field_inspection_starting" text="Avvio dell'ispezione..."/>
         <text name="ads_field_inspection_progress" text="Ispezione visiva in corso... %d%%"/>
         <text name="ads_field_inspection_cancelled" text="Ispezione annullata"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Spegni il motore prima dell'ispezione"/>
         <text name="ads_inspection_dialog_title" text="Ispezione visiva pre-turno"/>
         <text name="ads_inspection_section_fluids" text="1. Fluidi tecnici"/>
         <text name="ads_inspection_section_cooling_air" text="2. Sistema di raffreddamento e aspirazione aria"/>
@@ -569,5 +570,23 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Il condotto di aspirazione dell'aria è visibilmente sporco."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Il condotto di aspirazione dell'aria è fortemente ostruito da polvere e detriti."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Il condotto di aspirazione dell'aria è criticamente ostruito da polvere e detriti."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="Su alcuni collegamenti elettrici sono visibili lievi tracce di ossidazione."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="Sul cablaggio e sui connettori sono visibili marcate tracce di ossidazione e sporco."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Sul cablaggio e sui connettori sono visibili forti tracce di corrosione, e parti dell'isolamento appaiono danneggiate."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="Sui morsetti della batteria è visibile un leggero deposito biancastro."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="Sui morsetti della batteria è visibile un deposito biancastro."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Sui morsetti e sul corpo della batteria sono visibili marcate tracce di ossidazione e depositi."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="La batteria e i morsetti sono coperti da forti depositi, e il corpo appare sporco e usurato."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Nella zona dell'alternatore sono visibili segni di surriscaldamento e scurimento di alcuni collegamenti."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Nella zona dell'alternatore e del suo cablaggio sono visibili marcati segni di surriscaldamento e connettori scuriti."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Nella zona del turbocompressore sono visibili tracce oleose e collegamenti scuriti."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Nella zona del turbocompressore sono visibili forti tracce oleose, collegamenti scuriti e segni di fuliggine."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Nella zona della trasmissione sono visibili tracce oleose e sporco attorno ai collegamenti idraulici."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Nella zona della trasmissione sono visibili forti tracce oleose e forte sporco attorno ai collegamenti idraulici."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="Nella zona del blocco idraulico del variatore sono visibili tracce oleose e collegamenti scuriti."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="Nella zona dei collegamenti del blocco idraulico del variatore sono visibili forti tracce oleose e forte sporco."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="La tensione del cingolo appare leggermente irregolare."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Il cingolo appare allentato, con una tensione visibilmente irregolare."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Il cingolo presenta un evidente cedimento, e la tensione appare gravemente compromessa."/>
     </texts>
 </l10n>

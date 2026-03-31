@@ -511,6 +511,7 @@
         <text name="ads_field_inspection_starting" text="Inspektion wird gestartet..."/>
         <text name="ads_field_inspection_progress" text="Sichtprüfung läuft... %d%%"/>
         <text name="ads_field_inspection_cancelled" text="Inspektion abgebrochen"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Motor vor der Inspektion abstellen"/>
         <text name="ads_inspection_dialog_title" text="Sichtprüfung vor Schichtbeginn"/>
         <text name="ads_inspection_section_fluids" text="1. Technische Flüssigkeiten"/>
         <text name="ads_inspection_section_cooling_air" text="2. Kühlsystem und Luftansaugung"/>
@@ -562,5 +563,23 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Der Luftansaugkanal ist deutlich verschmutzt."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Der Luftansaugkanal ist stark mit Staub und Schmutz zugesetzt."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Der Luftansaugkanal ist kritisch mit Staub und Schmutz zugesetzt."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="An einzelnen elektrischen Verbindungen sind leichte Oxidationsspuren sichtbar."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="An Kabeln und Steckverbindern sind deutliche Oxidations- und Verschmutzungsspuren sichtbar."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="An Kabeln und Steckverbindern sind starke Korrosionsspuren sichtbar, und Teile der Isolierung wirken beschädigt."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="An den Batterieklemmen ist ein schwacher weißlicher Belag sichtbar."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="An den Batterieklemmen ist ein weißlicher Belag sichtbar."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="An Batterieklemmen und Gehäuse sind deutliche Oxidationsspuren und Ablagerungen sichtbar."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Batterie und Klemmen sind stark mit Ablagerungen bedeckt, und das Gehäuse wirkt verschmutzt und abgenutzt."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Im Bereich des Generators sind Spuren von Überhitzung und nachgedunkelte Verbindungen sichtbar."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Im Bereich des Generators und seiner Verkabelung sind deutliche Überhitzungsspuren und nachgedunkelte Steckverbindungen sichtbar."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Im Bereich des Turboladers sind ölhaltige Spuren und nachgedunkelte Verbindungen sichtbar."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Im Bereich des Turboladers sind deutliche ölhaltige Spuren, nachgedunkelte Verbindungen und Rußspuren sichtbar."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Im Bereich des Getriebes sind ölhaltige Spuren und Verschmutzungen an den hydraulischen Verbindungen sichtbar."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Im Bereich des Getriebes sind deutliche ölhaltige Spuren und starke Verschmutzungen an den hydraulischen Verbindungen sichtbar."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="Im Bereich des Hydraulikblocks des CVT sind ölhaltige Spuren und nachgedunkelte Verbindungen sichtbar."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="Im Bereich des Hydraulikblocks des CVT sind deutliche ölhaltige Spuren und starke Verschmutzungen an den Verbindungen sichtbar."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Die Kettenspannung wirkt leicht ungleichmäßig."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Die Kette wirkt gelockert, und die Spannung ist deutlich ungleichmäßig."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Die Kette hängt sichtbar durch, und die Spannung wirkt stark gestört."/>
     </texts>
 </l10n>

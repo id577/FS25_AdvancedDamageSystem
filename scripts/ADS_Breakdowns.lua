@@ -756,6 +756,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_HARD_START_MODIFIER", value = 5, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
                     { id = "ELECTRICAL_CONTACT_RESISTANCE_EFFECT", value = 0.33, extraData = { timer = 0, status = 'IDLE'}, aggregation = "min"}
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_corroded_wiring_stage2" },
+                },
                 indicators = {
                     { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
                 }
@@ -773,6 +776,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_HARD_START_MODIFIER", value = 8, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
                     { id = "ELECTRICAL_CONTACT_RESISTANCE_EFFECT", value = 0.1, extraData = { timer = 0, status = 'IDLE'}, aggregation = "min"}
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_corroded_wiring_stage3" },
+                },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -786,6 +792,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = { 
                     { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
                     { id = "ENGINE_FAILURE", value = 1.0, extraData = {starter = false, message = "ads_breakdowns_corroded_wiring_stage4_message", reason = "BREAKDOWN", disableAi = true}, aggregation = "boolean_or"} 
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_corroded_wiring_stage4" },
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -814,6 +823,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "BATTERY_HEALTH_MODIFIER", value = -0.3, aggregation = "min"},
 
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_battery_sulfation_stage1" },
                 }
             },
             {
@@ -825,6 +837,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "BATTERY_HEALTH_MODIFIER", value = -0.6, aggregation = "min"},
                     { id = "ENGINE_HARD_START_MODIFIER", value = 3, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_battery_sulfation_stage2" },
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
@@ -840,6 +855,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "BATTERY_HEALTH_MODIFIER", value = -0.9, aggregation = "min"},
                     { id = "ENGINE_HARD_START_MODIFIER", value = 6, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_battery_sulfation_stage3" },
+                },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -853,6 +871,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = { 
                     { id = "BATTERY_HEALTH_MODIFIER", value = -1.0, aggregation = "min"},
                     { id = "ENGINE_HARD_START_MODIFIER", value = 9, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max"},
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_battery_sulfation_stage4" },
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -906,6 +927,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ALTERNATOR_HEALTH_MODIFIER", value = -0.7, aggregation = "min" },
                     { id = "ELECTRICAL_CONTACT_RESISTANCE_EFFECT", value = 1.0, extraData = { timer = 0, status = 'IDLE'}, aggregation = "min"}
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_alternator_regulator_failure_stage3" },
+                },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -919,6 +943,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "ALTERNATOR_HEALTH_MODIFIER", value = -1.0, aggregation = "min" },
                     { id = "ELECTRICAL_CONTACT_RESISTANCE_EFFECT", value = 0.3, extraData = { timer = 0, status = 'IDLE'}, aggregation = "min"}
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_alternator_regulator_failure_stage4" },
                 },
                 indicators = {
                     { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -979,6 +1006,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
                     { id = "TURBO_WHISTLE_NOISE_EFFECT", value = 0.6, aggregation = "max" },
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_turbocharger_malfunction_stage3" },
+                },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -993,6 +1023,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.50, aggregation = "sum" },
                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.60, aggregation = "sum" },
                     { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" }, },
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_turbocharger_malfunction_stage4" },
                 },
                 indicators = {
                     { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false },
@@ -1337,6 +1370,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = { 
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 0.99, extraData = {timer = 0, status = "IDLE", duration = 1500, backup = 0}, aggregation = "max"}
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" },
+                },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -1349,6 +1385,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 repairPrice = 8.0 * breakdownPriceMultipliers.POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION,
                 effects = { 
                      { id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", value = 1.0, extraData = {timer = 0, status = "IDLE", duration = 0, disableAi = true}, aggregation = "max"}
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" },
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -1489,6 +1528,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.1, aggregation = "sum" },
                     { id = "CVT_MAX_RATIO_MODIFIER", value = 0.5, aggregation = "max" },
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" },
+                },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -1505,6 +1547,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                      { id = "ENGINE_TORQUE_MODIFIER", value = -0.3, aggregation = "sum" },
                      { id = "CVT_PRESSURE_DROP_CHANCE", value = 0.1, aggregation = "max", extraData = {timer = 0, duration = 300, status = 'IDLE'}},
                      { id = "ENGINE_LIMP_EFFECT", value = -0.2, aggregation = "min", extraData = {reason = "BREAKDOWN", message = "ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message", disableAi = true } },
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" },
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -2003,6 +2048,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "MAX_SPEED_MODIFIER", value = 0.06, aggregation = "max" },
 
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_track_tensioner_malfunction_stage2" },
+                },
                 indicators = {
                 }
             },
@@ -2021,6 +2069,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                     { id = "MAX_SPEED_MODIFIER", value = 0.15, aggregation = "max" },
 
                 },
+                inspection = {
+                    { additional = "ads_inspection_hint_track_tensioner_malfunction_stage3" },
+                },
                 indicators = {
                     { id = db.BRAKES, color = color.WARNING, switchOn = true, switchOff = false }
                 }
@@ -2034,6 +2085,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 effects = {
                     { id = "WHEEL_SEIZURE_GRIND_NOISE_EFFECT", value = 2.5, aggregation = "max" },
                     { id = "WHEEL_SEIZURE_EFFECT", value = 1.0, aggregation = "max", extraData = {message = "ads_breakdowns_track_tensioner_malfunction_stage4_message", disableAi = true}},
+                },
+                inspection = {
+                    { additional = "ads_inspection_hint_track_tensioner_malfunction_stage4" },
                 },
                 indicators = {
                     { id = db.BRAKES, color = color.CRITICAL, switchOn = true, switchOff = false }

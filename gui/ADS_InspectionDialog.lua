@@ -306,11 +306,13 @@ function ADS_InspectionDialog:populateCellForItemInSection(list, section, index,
     valueElement:setTextColor(unpack(getRowColor(row)))
 end
 
-function ADS_InspectionDialog:onOpen(superFunc)
+function ADS_InspectionDialog:onOpen()
+    ADS_InspectionDialog:superClass().onOpen(self)
 end
 
-function ADS_InspectionDialog:onClose(superFunc)
+function ADS_InspectionDialog:onClose()
     self.vehicle = nil
+    ADS_InspectionDialog:superClass().onClose(self)
 end
 
 function ADS_InspectionDialog:onClickBack()

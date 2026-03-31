@@ -511,6 +511,7 @@
         <text name="ads_field_inspection_starting" text="Démarrage de l'inspection..."/>
         <text name="ads_field_inspection_progress" text="Inspection visuelle en cours... %d%%"/>
         <text name="ads_field_inspection_cancelled" text="Inspection annulée"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Coupez le moteur avant l'inspection"/>
         <text name="ads_inspection_dialog_title" text="Inspection visuelle avant la prise de poste"/>
         <text name="ads_inspection_section_fluids" text="1. Fluides techniques"/>
         <text name="ads_inspection_section_cooling_air" text="2. Système de refroidissement et admission d'air"/>
@@ -562,5 +563,23 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Le conduit d'admission d'air est visiblement sale."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Le conduit d'admission d'air est fortement obstrué par la poussière et les débris."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Le conduit d'admission d'air est critiquement obstrué par la poussière et les débris."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="De légères traces d'oxydation sont visibles sur certains raccordements électriques."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="Des traces prononcées d'oxydation et de salissure sont visibles sur le câblage et les connecteurs."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="De fortes traces de corrosion sont visibles sur le câblage et les connecteurs, et certaines parties de l'isolation semblent endommagées."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="Un léger dépôt blanchâtre est visible sur les bornes de la batterie."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="Un dépôt blanchâtre est visible sur les bornes de la batterie."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Des traces prononcées d'oxydation et de dépôt sont visibles sur les bornes et le boîtier de la batterie."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="La batterie et ses bornes sont couvertes de dépôts importants, et le boîtier paraît sale et usé."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Des traces de surchauffe et un assombrissement de certains raccordements sont visibles près de l'alternateur."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Des traces prononcées de surchauffe et des connecteurs assombris sont visibles près de l'alternateur et de son câblage."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Des traces huileuses et des raccordements assombris sont visibles autour du turbocompresseur."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="De fortes traces huileuses, des raccordements assombris et des traces de suie sont visibles autour du turbocompresseur."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Des traces huileuses et des salissures sont visibles autour des raccordements hydrauliques de la transmission."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="De fortes traces huileuses et une salissure marquée sont visibles autour des raccordements hydrauliques de la transmission."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="Des traces huileuses et des raccordements assombris sont visibles autour du bloc hydraulique du variateur."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="De fortes traces huileuses et une salissure marquée sont visibles autour des raccordements du bloc hydraulique du variateur."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="La tension de la chenille paraît légèrement irrégulière."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="La chenille paraît relâchée, avec une tension visiblement irrégulière."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="La chenille présente un affaissement visible, et la tension semble fortement compromise."/>
     </texts>
 </l10n>

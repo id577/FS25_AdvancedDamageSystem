@@ -518,6 +518,7 @@
         <text name="ads_field_inspection_starting" text="Starting inspection..."/>
         <text name="ads_field_inspection_progress" text="Performing visual inspection... %d%%"/>
         <text name="ads_field_inspection_cancelled" text="Inspection cancelled"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Stop the engine before inspection"/>
         <text name="ads_inspection_dialog_title" text="Pre-Shift Visual Inspection"/>
         <text name="ads_inspection_section_fluids" text="1. Technical Fluids"/>
         <text name="ads_inspection_section_cooling_air" text="2. Cooling and Air Intake System"/>
@@ -569,6 +570,24 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="The air intake duct is noticeably dirty."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="The air intake duct is heavily clogged with dust and debris."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="The air intake duct is critically clogged with dust and debris."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="Light traces of oxidation are visible on some electrical connections."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="Pronounced oxidation and contamination are visible on the wiring and connectors."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Severe corrosion is visible on the wiring and connectors, and some insulation appears damaged."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="A faint whitish deposit is visible on the battery terminals."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="A whitish deposit is visible on the battery terminals."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Pronounced oxidation and deposits are visible on the battery terminals and casing."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="The battery and terminals are covered with heavy deposits, and the casing looks dirty and worn."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Signs of overheating and darkening are visible around the alternator and some connections."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Pronounced signs of overheating and darkened connectors are visible around the alternator and its wiring."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Oily traces and darkened connections are visible around the turbocharger area."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Heavy oily traces, darkened connections, and soot marks are visible around the turbocharger area."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Oily traces and contamination are visible around the transmission hydraulic connections."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Heavy oily traces and strong contamination are visible around the transmission hydraulic connections."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="Oily traces and darkened connections are visible around the CVT hydraulic control block."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="Heavy oily traces and strong contamination are visible around the CVT hydraulic control block connections."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="The track tension appears slightly uneven."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="The track appears loose, with noticeable uneven tension."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="The track is visibly sagging, and the tension appears severely compromised."/>
     </texts>
 </l10n>
 

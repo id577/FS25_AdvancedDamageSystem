@@ -511,6 +511,7 @@
         <text name="ads_field_inspection_starting" text="Начинаем осмотр..."/>
         <text name="ads_field_inspection_progress" text="Выполняется визуальный осмотр... %d%%"/>
         <text name="ads_field_inspection_cancelled" text="Осмотр отменен"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Заглушите двигатель перед осмотром"/>
         <text name="ads_inspection_dialog_title" text="Предсменный визуальный осмотр"/>
         <text name="ads_inspection_section_fluids" text="1. Технические жидкости"/>
         <text name="ads_inspection_section_cooling_air" text="2. Система охлаждения и забора воздуха"/>
@@ -562,5 +563,23 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Воздуховод заметно загрязнен."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Воздуховод сильно забит пылью и мусором."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Воздуховод критически забит пылью и мусором."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="На отдельных электрических соединениях заметны легкие следы окисления."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="На проводке и разъемах заметны выраженные следы окисления и загрязнения."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="На проводке и разъемах заметны сильные следы коррозии, местами изоляция выглядит поврежденной."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="На клеммах аккумулятора заметен слабый белесый налет."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="На клеммах аккумулятора заметен белесый налет."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="На клеммах и корпусе аккумулятора заметны выраженные следы окисления и налета."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Аккумулятор и клеммы покрыты сильным налетом, корпус выглядит загрязненным и изношенным."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="В районе генератора заметны следы перегрева и потемнение отдельных соединений."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="В районе генератора и его проводки заметны выраженные следы перегрева и потемнение разъемов."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="В районе турбокомпрессора заметны маслянистые следы и потемнение отдельных соединений."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="В районе турбокомпрессора заметны выраженные маслянистые следы, потемнение соединений и следы копоти."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="В районе трансмиссии заметны маслянистые следы и загрязнение вокруг гидравлических соединений."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="В районе трансмиссии заметны выраженные маслянистые следы и сильное загрязнение вокруг гидравлических соединений."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="В районе гидроблока вариатора заметны маслянистые следы и потемнение отдельных соединений."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="В районе гидроблока вариатора заметны выраженные маслянистые следы и сильное загрязнение соединений."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Натяжение гусеницы выглядит слегка неравномерным."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Гусеница выглядит ослабленной, заметно неравномерное натяжение."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Гусеница заметно провисает, натяжение выглядит сильно нарушенным."/>
     </texts>
 </l10n>

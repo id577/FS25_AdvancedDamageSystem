@@ -7788,6 +7788,13 @@ function AdvancedDamageSystem:startFieldVisualInspectionProcess()
         return false
     end
 
+    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
+        if self.isClient and g_currentMission ~= nil then
+            g_currentMission:showBlinkingWarning(g_i18n:getText("ads_field_inspection_engine_must_be_stopped"), 2200)
+        end
+        return false
+    end
+
     if self:getCurrentStatus() ~= AdvancedDamageSystem.STATUS.READY then
         return false
     end

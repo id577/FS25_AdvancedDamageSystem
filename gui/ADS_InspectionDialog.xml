@@ -17,8 +17,8 @@
             </Bitmap>
             <SmoothList profile="ads_tableList" id="technicalFluidsList" position="20px -130px" size="560px 130px">
                 <ListItem profile="ads_tableListItem" name="technicalFluidsRowTemplate" size="560px 30px">
-                    <Text profile="ads_tableRowCellLeft" position="10px 0px" size="380px 30px" name="inspectionTitle" />
-                    <Text profile="ads_tableRowCellRight" position="410px 0px" size="130px 30px" name="inspectionValue" />
+                    <Text profile="ads_tableRowCellLeft" position="10px 0px" size="260px 30px" name="inspectionTitle" />
+                    <Text profile="ads_tableRowCellRight" position="290px 0px" size="260px 30px" name="inspectionValue" />
                 </ListItem>
             </SmoothList>
 
@@ -29,8 +29,8 @@
             </Bitmap>
             <SmoothList profile="ads_tableList" id="coolingAndAirList" position="20px -310px" size="560px 100px">
                 <ListItem profile="ads_tableListItem" name="coolingAndAirRowTemplate" size="560px 30px">
-                    <Text profile="ads_tableRowCellLeft" position="10px 0px" size="380px 30px" name="inspectionTitle" />
-                    <Text profile="ads_tableRowCellRight" position="410px 0px" size="130px 30px" name="inspectionValue" />
+                    <Text profile="ads_tableRowCellLeft" position="10px 0px" size="260px 30px" name="inspectionTitle" />
+                    <Text profile="ads_tableRowCellRight" position="290px 0px" size="260px 30px" name="inspectionValue" />
                 </ListItem>
             </SmoothList>
 
@@ -41,8 +41,8 @@
             </Bitmap>
             <SmoothList profile="ads_tableList" id="lubricationList" position="20px -450px" size="560px 35px">
                 <ListItem profile="ads_tableListItem" name="lubricationRowTemplate" size="560px 30px">
-                    <Text profile="ads_tableRowCellLeft" position="10px 0px" size="380px 30px" name="inspectionTitle" />
-                    <Text profile="ads_tableRowCellRight" position="410px 0px" size="130px 30px" name="inspectionValue" />
+                    <Text profile="ads_tableRowCellLeft" position="10px 0px" size="260px 30px" name="inspectionTitle" />
+                    <Text profile="ads_tableRowCellRight" position="290px 0px" size="260px 30px" name="inspectionValue" />
                 </ListItem>
             </SmoothList>
             
@@ -61,7 +61,7 @@
 
     <GUIProfiles>
         <Profile name="ads_inspectionDialogBg" extends="fs25_dialogBg">
-            <size value="640px 720px" />
+            <size value="640px 740px" />
         </Profile>
 
         <Profile name="ads_inspectionAdditionalText" extends="fs25_dialogText">
