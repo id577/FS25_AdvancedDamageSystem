@@ -6,11 +6,16 @@
                 <Bitmap profile="fs25_menuHeaderIcon" imageSliceId="gui.icon_ingameMenu_vehicles"/>
             </Bitmap>
             <Text profile="fs25_menuHeaderTitle" id="menuHeaderTitle" text="$l10n_ads_ingame_menu_title"/>
+            <RoundCorner profile="fs25_shopMoneyBoxBg" id="moneyBoxBg"/>
+            <BoxLayout profile="fs25_shopMoneyBox" id="moneyBox">
+                <Text profile="fs25_shopBalance" id="balanceTitleElement" text="$l10n_ui_balance"/>
+                <Text profile="fs25_shopMoney" id="balanceElement"/>
+            </BoxLayout>
         </GuiElement>
 
         <GuiElement profile="ads_tableContainer">
             <GuiElement profile="fs25_statisticsHeaderBox">
-                <Button profile="ads_tableHeaderButtonLeft" position="32px 0px" size="290px 40px" text="$l10n_ads_ingame_menu_header_vehicle" onClick="onClickVehicleHeader">
+                <Button profile="ads_tableHeaderButtonLeft" position="42px 0px" size="280px 40px" text="$l10n_ads_ingame_menu_header_vehicle" onClick="onClickVehicleHeader">
                     <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="-10px 0px" id="iconVehicleAscending"/>
                     <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="-10px 0px" id="iconVehicleDescending"/>
                 </Button>
@@ -46,7 +51,7 @@
                     <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconLeasingAscending"/>
                     <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconLeasingDescending"/>
                 </Button>
-                <Button profile="ads_tableHeaderButtonRight" position="1336px 0px" size="110px 40px" text="$l10n_ads_ingame_menu_header_price" onClick="onClickPriceHeader">
+                <Button profile="ads_tableHeaderButtonRight" position="1336px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_price" onClick="onClickPriceHeader">
                     <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconPriceAscending"/>
                     <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconPriceDescending"/>
                 </Button>
@@ -55,7 +60,8 @@
 
             <SmoothList profile="ads_vehicleList" id="vehicleList">
                 <ListItem profile="ads_tableListItemAlt" id="vehicleTemplate" size="1460px 40.77px">
-                    <Text profile="ads_tableRowCellLeftAlt" position="12px 0px" size="290px 40.77px" name="vehicleNameText" textLayoutMode="scrolling"/>
+                    <ThreePartBitmap profile="ads_tableListItemGradient" name="alternating"/>
+                    <Text profile="ads_tableRowCellLeftAlt" position="22px 0px" size="280px 40.77px" name="vehicleNameText" textLayoutMode="scrolling"/>
                     <Text profile="ads_tableRowCellRightAlt" position="308px 0px" size="110px 40.77px" name="ageText"/>
                     <Text profile="ads_tableRowCellRightAlt" position="424px 0px" size="110px 40.77px" name="workingHoursText"/>
                     <Text profile="ads_tableRowCellRightAlt" position="540px 0px" size="130px 40.77px" name="conditionText"/>
@@ -64,7 +70,7 @@
                     <Text profile="ads_tableRowCellRightAlt" position="948px 0px" size="130px 40.77px" name="lastMaintenanceText" textLayoutMode="scrolling"/>
                     <Text profile="ads_tableRowCellRightAlt" position="1084px 0px" size="110px 40.77px" name="costText"/>
                     <Text profile="ads_tableRowCellRightAlt" position="1200px 0px" size="110px 40.77px" name="leasingPriceText"/>
-                    <Text profile="ads_tableRowCellRightAlt" position="1316px 0px" size="110px 40.77px" name="priceText"/>
+                    <Text profile="ads_tableRowCellRightAlt" position="1316px 0px" size="100px 40.77px" name="priceText"/>
                 </ListItem>
             </SmoothList>
 
@@ -74,10 +80,10 @@
 
             <GuiElement profile="ads_footerBox">
                 <ThreePartBitmap profile="fs25_lineSeparatorTop" position="0px -15dp"/>
-                <Text profile="ads_tableHeaderBright" position="12px 0px" size="290px 40.77px" id="totalLabel"/>
+                <Text profile="ads_tableHeaderBright" position="22px 0px" size="280px 40.77px" id="totalLabel"/>
                 <Text profile="ads_tableHeaderRightBright" position="1084px 0px" size="110px 40.77px" id="totalCost"/>
                 <Text profile="ads_tableHeaderRightBright" position="1200px 0px" size="110px 40.77px" id="totalLeasingPrice"/>
-                <Text profile="ads_tableHeaderRightBright" position="1316px 0px" size="110px 40.77px" id="totalPrice"/>
+                <Text profile="ads_tableHeaderRightBright" position="1316px 0px" size="100px 40.77px" id="totalPrice"/>
             </GuiElement>
         </GuiElement>
 
@@ -144,12 +150,18 @@
             <absoluteSizeOffset value="0px 80px"/>
         </Profile>
 
-        <Profile name="ads_tableListItemAlt" extends="baseReference" with="anchorTopStretchingX alternating">
-            <height value="32px"/>
+        <Profile name="ads_tableListItemAlt" extends="fs25_calendarListItem" with="anchorTopStretchingX alternating">
+            <height value="40.77px"/>
             <textSelectedColor value="$preset_fs25_colorMainLight"/>
             <imageColor value="$preset_fs25_colorGrey"/>
             <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
             <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+        </Profile>
+
+        <Profile name="ads_tableListItemGradient" extends="fs25_calendarListItemBg">
+            <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+            <startImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+            <endImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
         </Profile>
 
         <Profile name="ads_tableRowCellLeftAlt" extends="baseReference" with="anchorStretchingYLeft">

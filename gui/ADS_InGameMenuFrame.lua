@@ -143,6 +143,24 @@ function ADS_InGameMenuFrame:setTemplates()
     end
 end
 
+function ADS_InGameMenuFrame:updateBalanceDisplay()
+    if self.balanceElement == nil or self.balanceTitleElement == nil or self.moneyBox == nil or self.moneyBoxBg == nil then
+        return
+    end
+
+    local balanceText = g_i18n:formatMoney(math.floor(g_currentMission:getMoney()), 2, true, true)
+    self.balanceElement:setText(balanceText)
+
+    ADS_Utils.updateMoneyBoxLayout(
+        self.balanceTitleElement,
+        self.balanceElement,
+        self.moneyBox,
+        self.moneyBoxBg,
+        g_i18n:getText("ui_balance"),
+        balanceText
+    )
+end
+
 function ADS_InGameMenuFrame:initialize()
     self.backButtonInfo = {
         inputAction = InputAction.MENU_BACK
@@ -220,6 +238,7 @@ function ADS_InGameMenuFrame:initialize()
     }
 
     self:setTemplates()
+    self:updateBalanceDisplay()
     self:updateSortIcons()
     self:updateActionButtons()
     self:reloadRows()
@@ -235,6 +254,7 @@ function ADS_InGameMenuFrame:onFrameOpen()
 
     ADS_InGameMenuFrame:superClass().onFrameOpen(self)
     self.refreshTimerMs = 0
+    self:updateBalanceDisplay()
     self:reloadRows()
 end
 
@@ -435,6 +455,8 @@ function ADS_InGameMenuFrame:reloadRows()
     local totalCost = 0
     local totalLeasingPrice = 0
     local totalPrice = 0
+
+    self:updateBalanceDisplay()
 
     if ADS_Main ~= nil and ADS_Main.vehicles ~= nil then
         for _, vehicle in pairs(ADS_Main.vehicles) do
