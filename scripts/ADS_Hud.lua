@@ -792,6 +792,15 @@ function ADS_Hud:drawActiveVehicleHUD()
     local cloggingHasDust = radiatorDbg.hasDust == true or airIntakeDbg.hasDust == true
     local cloggingHasDebris = radiatorDbg.hasDebris == true or airIntakeDbg.hasDebris == true
     local cloggingWetnessFactor = tonumber(airIntakeDbg.baseWetnessFactor or radiatorDbg.baseWetnessFactor or 1) or 1
+    local factorStatsOperatingHours = 0
+    if type(spec.factorStats) == "table" then
+        for _, stats in pairs(spec.factorStats) do
+            if type(stats) == "table" and tonumber(stats.operatingHours) ~= nil then
+                factorStatsOperatingHours = tonumber(stats.operatingHours) or 0
+                break
+            end
+        end
+    end
     addLine(overviewLines, string.format(
         "condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
         asPercent(spec.conditionLevel or 0),
@@ -816,6 +825,11 @@ function ADS_Hud:drawActiveVehicleHUD()
         tostring(cloggingHasDust),
         tostring(cloggingHasDebris),
         cloggingWetnessFactor
+    ), {1, 1, 1, 1}, 0.95)
+
+    addLine(overviewLines, string.format(
+        "stats start hours: %.1f h",
+        factorStatsOperatingHours
     ), {1, 1, 1, 1}, 0.95)
 
     local engineMaxFactor = math.max(
@@ -1008,25 +1022,6 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 },
         { shortName = "lubf", statKey = "lubf", value = workprocessDbg.lubricationFactor or 0, extraInfo = string.format("lvl: %.1f%%", asPercent(lubricationLevel)) }
     })
-
-    if isSystemEnabled("workprocess") then
-        local isTurnedOn = vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() or false
-        local dischargeState = vehicle.spec_dischargeable ~= nil and vehicle.spec_dischargeable.currentDischargeState or -1
-        local harvestPercent = workprocessDbg.currentHarvestPercent or 100
-        local unloadPercent = workprocessDbg.lastUnloadPercent or 100
-        local unloadFactor = workprocessDbg.lastUnloadFactor or 1
-        local unloadOriginalFactor = workprocessDbg.lastUnloadOriginalFactor or 1
-
-        addLine(workprocessLines, string.format(
-            "proc: on %s | ds %s | yield %.1f%% | unload %.1f%% (%.3f/%.3f)",
-            tostring(isTurnedOn),
-            tostring(dischargeState),
-            harvestPercent,
-            unloadPercent,
-            unloadFactor,
-            unloadOriginalFactor
-        ), {0.92, 0.98, 1.0, 1}, 0.90)
-    end
 
     local systemSections = {}
     if isSystemEnabled("engine") then
@@ -1671,7 +1666,7 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
 
             local factorEntries = {}
             for key, value in pairs(stats) do
-                if key ~= "total" and key ~= "stress" then
+                if key ~= "total" and key ~= "stress" and key ~= "operatingHours" then
                     local numericValue = tonumber(value)
                     if numericValue ~= nil and math.abs(numericValue) > 0 then
                         table.insert(factorEntries, { key = key, value = numericValue })

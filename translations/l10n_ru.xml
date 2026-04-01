@@ -543,7 +543,8 @@
         <text name="ads_inspection_status_slightly_dirty" text="Слегка загрязнен"/>
         <text name="ads_inspection_status_dirty" text="Загрязнен"/>
         <text name="ads_inspection_status_heavily_clogged" text="Сильно забит"/>
-        <text name="ads_inspection_status_critically_clogged" text="Критически забит"/>
+    <text name="ads_inspection_status_critically_clogged" text="Критически забит"/>
+    <text name="ads_inspection_status_not_required" text="Не требуется"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="В районе соединений системы охлаждения заметны слабые следы охлаждающей жидкости."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Следы охлаждающей жидкости заметны, а уровень жидкости ниже нормы."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Потеря охлаждающей жидкости уже хорошо заметна в районе системы охлаждения."/>

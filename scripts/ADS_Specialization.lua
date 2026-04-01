@@ -182,6 +182,25 @@ local function createEmptyFactorStats(systems)
     return result
 end
 
+local function getVehicleOperatingHours(vehicle)
+    if vehicle == nil then
+        return 0
+    end
+
+    if vehicle.getOperatingTime ~= nil then
+        local operatingTime = tonumber(vehicle:getOperatingTime())
+        if operatingTime ~= nil then
+            return operatingTime / (60 * 60 * 1000)
+        end
+    end
+
+    if vehicle.getFormattedOperatingTime ~= nil then
+        return tonumber(vehicle:getFormattedOperatingTime()) or 0
+    end
+
+    return 0
+end
+
 local function flattenFactorStats(factorStats)
     local flat = {}
     if type(factorStats) ~= "table" then
@@ -227,7 +246,7 @@ local function applyFlattenedFactorStats(spec, flattenedMap)
     end
 end
 
-local function ensureFactorStats(spec)
+local function ensureFactorStats(spec, vehicle)
     if spec == nil then
         return {}
     end
@@ -244,6 +263,11 @@ local function ensureFactorStats(spec)
         local stats = spec.factorStats[systemKey]
         stats.total = tonumber(stats.total) or 0
         stats.stress = tonumber(stats.stress) or 0
+        if tonumber(stats.operatingHours) == nil then
+            stats.operatingHours = getVehicleOperatingHours(vehicle)
+        else
+            stats.operatingHours = tonumber(stats.operatingHours) or 0
+        end
     end
 
     return spec.factorStats
@@ -895,6 +919,7 @@ function AdvancedDamageSystem:onLoad(savegame)
         fuel = { name = AdvancedDamageSystem.SYSTEMS.FUEL, condition = 1.0, stress = 0.0, enabled = true }
     }
     self.spec_AdvancedDamageSystem.factorStats = createEmptyFactorStats(self.spec_AdvancedDamageSystem.systems)
+    ensureFactorStats(self.spec_AdvancedDamageSystem, self)
 
     self.spec_AdvancedDamageSystem.extraConditionWear = 0
     self.spec_AdvancedDamageSystem.extraServiceWear = 0
@@ -1467,9 +1492,9 @@ function AdvancedDamageSystem:onPostLoad(savegame)
 
             systemData.name = ADS_Utils.getSystemNameByKey(AdvancedDamageSystem.SYSTEMS, systemKey)
         end
-        ensureFactorStats(spec)
+        ensureFactorStats(spec, self)
         applyFlattenedFactorStats(spec, loadedFactorStatsFlat)
-        ensureFactorStats(spec)
+        ensureFactorStats(spec, self)
 
         local hasTotalBreakdownsOccurred = savegame.xmlFile:hasProperty(key .. "#totalBreakdownsOccurred")
         spec.totalBreakdownsOccurred = savegame.xmlFile:getValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred)
@@ -1877,7 +1902,7 @@ local function registerVehicle(vehicle)
     
             --- if first mod load or used vehicle
             if vehicle.isServer then
-                    if (vehicle:getOperatingTime() > 0 and spec.conditionLevel == spec.baseConditionLevel) or vehicle:getDamageAmount() > 0 then
+                    if (vehicle:getFormattedOperatingTime() > 0.01 and spec.conditionLevel == spec.baseConditionLevel) then
                         -- Used vehicle logic
                         spec.serviceLevel = 1 - vehicle:getDamageAmount()
                         local targetCondition = getConditionLevelFromSellPrice(vehicle)
@@ -2742,7 +2767,7 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     local newCondition = (systemData.condition or 1.0) - conditionToRemove
     systemData.condition = math.clamp(newCondition, 0.001, 1.0)
 
-    local factorStats = ensureFactorStats(spec)
+    local factorStats = ensureFactorStats(spec, self)
     local systemStats = factorStats[systemName]
     if type(systemStats) == "table" then
         systemStats.total = (tonumber(systemStats.total) or 0) + wearRate * dtMultiplier
@@ -2796,7 +2821,7 @@ function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     local stressToAdd = dmg * (ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey] or 1)
     spec.systems[systemKey].stress = math.max((spec.systems[systemKey].stress or 0) + stressToAdd, 0)
 
-    local factorStats = ensureFactorStats(spec)
+    local factorStats = ensureFactorStats(spec, self)
     local systemStats = factorStats[systemKey]
     if type(systemStats) == "table" then
         systemStats.total = (tonumber(systemStats.total) or 0) + dmg
@@ -5770,6 +5795,9 @@ function AdvancedDamageSystem:completeService()
     -- clean vehicle
     if serviceType ~= states.INSPECTION then
         self:setDirtAmount(0)
+        spec.radiatorClogging = 0
+        spec.airIntakeClogging = 0
+        spec.lubricationLevel = 1.0
     end
 
     -- repaint vehicle
@@ -9745,17 +9773,18 @@ function AdvancedDamageSystem.ConsoleCommands:resetFactorStats()
     end
 
     local spec = vehicle.spec_AdvancedDamageSystem
-    local factorStats = ensureFactorStats(spec)
+    local factorStats = ensureFactorStats(spec, vehicle)
 
     for _, systemStats in pairs(factorStats) do
         if type(systemStats) == "table" then
             for key, value in pairs(systemStats) do
-                if tonumber(value) ~= nil then
+                if key ~= "operatingHours" and tonumber(value) ~= nil then
                     systemStats[key] = 0
                 end
             end
             systemStats.total = 0
             systemStats.stress = 0
+            systemStats.operatingHours = getVehicleOperatingHours(vehicle)
         end
     end
 

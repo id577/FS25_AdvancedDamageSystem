@@ -550,7 +550,8 @@
         <text name="ads_inspection_status_slightly_dirty" text="Leggermente Sporco"/>
         <text name="ads_inspection_status_dirty" text="Sporco"/>
         <text name="ads_inspection_status_heavily_clogged" text="Fortemente Ostruito"/>
-        <text name="ads_inspection_status_critically_clogged" text="Criticamente Ostruito"/>
+    <text name="ads_inspection_status_critically_clogged" text="Criticamente Ostruito"/>
+    <text name="ads_inspection_status_not_required" text="Non richiesto"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="Leggere tracce di liquido refrigerante sono visibili vicino ai raccordi del sistema di raffreddamento."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Sono visibili residui di liquido refrigerante e il livello è inferiore al normale."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="È visibile una perdita significativa di liquido refrigerante attorno al sistema di raffreddamento."/>

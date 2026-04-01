@@ -550,7 +550,8 @@
         <text name="ads_inspection_status_slightly_dirty" text="Slightly Dirty"/>
         <text name="ads_inspection_status_dirty" text="Dirty"/>
         <text name="ads_inspection_status_heavily_clogged" text="Heavily Clogged"/>
-        <text name="ads_inspection_status_critically_clogged" text="Critically Clogged"/>
+    <text name="ads_inspection_status_critically_clogged" text="Critically Clogged"/>
+    <text name="ads_inspection_status_not_required" text="Not Required"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="Slight traces of coolant are visible near the cooling system connections."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Coolant residue is visible, and the coolant level is below normal."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Noticeable coolant loss is visible around the cooling system area."/>

@@ -543,7 +543,8 @@
         <text name="ads_inspection_status_slightly_dirty" text="Légèrement Sale"/>
         <text name="ads_inspection_status_dirty" text="Sale"/>
         <text name="ads_inspection_status_heavily_clogged" text="Fortement Encrassé"/>
-        <text name="ads_inspection_status_critically_clogged" text="Critiquement Encrassé"/>
+    <text name="ads_inspection_status_critically_clogged" text="Critiquement Encrassé"/>
+    <text name="ads_inspection_status_not_required" text="Non requis"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="De légères traces de liquide de refroidissement sont visibles près des raccords du système de refroidissement."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Des résidus de liquide de refroidissement sont visibles et le niveau est inférieur à la normale."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Une perte notable de liquide de refroidissement est visible autour du système de refroidissement."/>

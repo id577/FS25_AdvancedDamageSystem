@@ -7,6 +7,7 @@ local OK_COLOR = {0.40, 0.95, 0.40, 1.0}
 local TEXT_COLOR = {1, 1, 1, 1}
 local WARN_COLOR = {1.0, 0.77, 0.24, 1.0}
 local CRITICAL_COLOR = {1.0, 0.38, 0.38, 1.0}
+local NOT_REQUIRED_COLOR = {0.72, 0.72, 0.72, 1.0}
 
 local TARGET_TO_SECTION = {
     engineOil = "technicalFluidsData",
@@ -36,7 +37,8 @@ local STATUS_PRIORITY = {
     ads_inspection_status_critically_low = 4,
     ads_inspection_status_critical_condition = 4,
     ads_inspection_status_severe_leak = 4,
-    ads_inspection_status_critically_clogged = 4
+    ads_inspection_status_critically_clogged = 4,
+    ads_inspection_status_not_required = 0
 }
 
 local function getLocalizedText(value)
@@ -52,6 +54,10 @@ local function getLocalizedText(value)
 end
 
 local function getRowColor(row)
+    if row ~= nil and row.statusKey == "ads_inspection_status_not_required" then
+        return NOT_REQUIRED_COLOR
+    end
+
     local priority = row ~= nil and STATUS_PRIORITY[row.statusKey or ""] or 0
     if priority >= 4 then
         return CRITICAL_COLOR
@@ -165,6 +171,10 @@ local function applyCloggingInspectionFindings(dialog, additionalLines)
         return
     end
 
+    if spec.isVehicleNeedBlowOut == false then
+        return
+    end
+
     local radiatorClogging = math.clamp(tonumber(spec.radiatorClogging) or 0, 0, 1)
     if radiatorClogging > 0.15 then
         local statusKey
@@ -252,6 +262,16 @@ function ADS_InspectionDialog:updateScreen()
     self.lubricationData = {
         {titleKey = "ads_inspection_lubrication_level", title = g_i18n:getText("ads_inspection_lubrication_level"), statusKey = "ads_inspection_ok", value = g_i18n:getText("ads_inspection_ok")}
     }
+
+    local spec = self.vehicle.spec_AdvancedDamageSystem
+    if spec ~= nil and spec.isVehicleNeedBlowOut == false then
+        setRowValue(self.coolingAndAirData, "ads_inspection_radiator", "ads_inspection_status_not_required")
+        setRowValue(self.coolingAndAirData, "ads_inspection_air_duct", "ads_inspection_status_not_required")
+    end
+
+    if spec ~= nil and spec.isVehicleNeedLubricate == false then
+        setRowValue(self.lubricationData, "ads_inspection_lubrication_level", "ads_inspection_status_not_required")
+    end
 
     local additionalLines = {}
 

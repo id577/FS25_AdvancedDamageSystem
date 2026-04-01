@@ -543,7 +543,8 @@
         <text name="ads_inspection_status_slightly_dirty" text="Leicht Verschmutzt"/>
         <text name="ads_inspection_status_dirty" text="Verschmutzt"/>
         <text name="ads_inspection_status_heavily_clogged" text="Stark Verstopft"/>
-        <text name="ads_inspection_status_critically_clogged" text="Kritisch Verstopft"/>
+    <text name="ads_inspection_status_critically_clogged" text="Kritisch Verstopft"/>
+    <text name="ads_inspection_status_not_required" text="Nicht erforderlich"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="Leichte Kühlmittelspuren sind an den Verbindungen des Kühlsystems sichtbar."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Kühlmittelrückstände sind sichtbar, und der Kühlmittelstand ist unter normal."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Ein deutlicher Kühlmittelverlust ist im Bereich des Kühlsystems sichtbar."/>
