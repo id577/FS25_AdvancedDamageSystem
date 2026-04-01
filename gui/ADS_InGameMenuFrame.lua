@@ -199,7 +199,7 @@ function ADS_InGameMenuFrame:initialize()
     }
 
     self.maintenanceLogButtonInfo = {
-        inputAction = InputAction.MENU_EXTRA_1,
+        inputAction = InputAction.MENU_ACTIVATE,
         text = g_i18n:getText("ads_ws_label_maintenance_log"),
         callback = function()
             self:onShowMaintenanceLog()

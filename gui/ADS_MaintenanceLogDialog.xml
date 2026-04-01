@@ -87,7 +87,7 @@
 
         <!-- Buttons -->
         <BoxLayout profile="fs25_dialogButtonBox">
-            <Button profile="buttonMenuPrev" text="$l10n_ads_log_button_show_report" onClick="onClickShowReport" id="showReportButton"/>
+            <Button profile="buttonActivate" text="$l10n_ads_log_button_show_report" onClick="onClickShowReport" id="showReportButton"/>
             <Button profile="buttonBack" text="$l10n_button_back" onClick="onClickBack" id="backButton"/>
         </BoxLayout>
         
