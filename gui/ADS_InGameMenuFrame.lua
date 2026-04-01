@@ -59,7 +59,7 @@ local function buildVehicleRow(vehicle)
     local conditionValue, isCompleteInspection = vehicle:getLastInspectedCondition()
     local totalCost = getVehicleTotalCost(vehicle)
     local currentValue = math.min(
-        math.floor(vehicle:getSellPrice() * EconomyManager.DIRECT_SELL_MULTIPLIER),
+        math.floor(vehicle:getSellPrice()),
         vehicle:getPrice()
     )
     local isLeased = vehicle.propertyState == 3
