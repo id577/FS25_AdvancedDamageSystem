@@ -6,65 +6,98 @@
         <en>Advanced Damage System</en>
         <de>Erweitertes Schadenssystem</de>
         <fr>Système Avancé De Dégâts</fr>
-        <es>Sistema Avanzado De Daños</es>
         <it>Sistema Avanzato Di Danni</it>
-        <pl>Zaawansowany System Uszkodzeń</pl>
         <ru>Продвинутая Система Повреждений</ru>
-        <cs>Pokročilý Systém Poškození</cs>
-        <cz>Pokročilý Systém Poškození</cz>
-        <sv>Avancerat Skadesystem</sv>
     </title>
     <description>
-        <en><![CDATA[Adds realistic wear, breakdowns, inspections, maintenance, and repair workflows with logs and service reports.
+        <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
+
+The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
 
 Changelog 0.9.0.0:
 - Added multiplayer support
-- Added fuel consumption HUD display]]></en>
-        <de><![CDATA[Fügt realistische Abnutzung, Pannen, Inspektionen, Wartung und Reparaturabläufe mit Protokollen und Serviceberichten hinzu.
+- Reworked the vehicle condition model: overall condition is now built from multiple individual systems, each with its own condition and wear factors
+- Added a new stress system that accumulates stress in vehicle systems when machinery is used improperly, increasing breakdown risk
+- Added an advanced battery and alternator simulation
+- Added pre-shift vehicle inspection
+- Added new shop items: Grease Gun, Air Blower, and Jumper Cables for pre-shift service and jump-starting vehicles with a discharged battery
+- Added a fleet management table with all ADS vehicles for easier overview and control
+- Added many new breakdowns and reworked existing ones; breakdowns now have strict assignment to specific systems
+- Added a breakdown selection system that chooses failures based on which system factors were stressed or violated the most
+- Added new workshop options and reworked existing service and repair flows
+- Changed the hard engine start logic: the starter must now be held to crank the engine
+- Numerous minor balance and interface improvements]]></en>
+        <de><![CDATA[Advanced Damage System fügt Farming Simulator 25 ein tiefgehendes System für Verschleiß, Ausfälle, Diagnose, Wartung und Reparatur von Fahrzeugen hinzu. Anstelle eines einzigen allgemeinen Zustandswerts besteht jede Maschine aus mehreren einzelnen Systemen mit eigenem Zustand, eigenen Verschleißfaktoren, Stressaufbau und Ausfallrisiko. Fahrverhalten und Art der Defekte hängen von Einsatzbedingungen, Belastung, Temperatur und Wartungsqualität ab.
+
+Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
 Changelog 0.9.0.0:
 - Mehrspieler-Unterstützung hinzugefügt
-- HUD-Anzeige für Kraftstoffverbrauch hinzugefügt]]></de>
-        <fr><![CDATA[Ajoute une usure réaliste, des pannes, des inspections, de la maintenance et des processus de réparation avec journaux et rapports de service.
+- Das Zustandsmodell der Fahrzeuge wurde überarbeitet: Der Gesamtzustand basiert nun auf mehreren einzelnen Systemen mit eigenem Zustand und eigenen Verschleißfaktoren
+- Neues Stresssystem hinzugefügt: Bei falscher Nutzung sammeln die Fahrzeugsysteme Belastung an, wodurch das Ausfallrisiko steigt
+- Erweiterte Simulation von Batterie und Lichtmaschine hinzugefügt
+- Vorschicht-Inspektion für Fahrzeuge hinzugefügt
+- Neue Shop-Gegenstände hinzugefügt: Fettpresse, Luftgebläse und Starthilfekabel für Vorschicht-Service und Starthilfe bei entladener Batterie
+- Eine Flottenübersicht mit allen ADS-Fahrzeugen für eine einfachere Verwaltung hinzugefügt
+- Viele neue Pannen hinzugefügt und bestehende überarbeitet; Ausfälle sind nun klar einzelnen Systemen zugeordnet
+- Ein neues System zur Auswahl von Pannen hinzugefügt, das Defekte danach bestimmt, welche Systemfaktoren am stärksten belastet oder verletzt wurden
+- Neue Werkstattoptionen hinzugefügt und bestehende Service- und Reparaturabläufe überarbeitet
+- Die Logik des erschwerten Motorstarts geändert: Der Anlasser muss nun gehalten werden, um den Motor durchzudrehen
+- Zahlreiche kleinere Balance- und Interface-Verbesserungen]]></de>
+        <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
+
+Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
 
 Changelog 0.9.0.0:
 - Ajout du support multijoueur
-- Ajout de l'affichage HUD consommation de carburant]]></fr>
-        <es><![CDATA[Añade desgaste realista, averías, inspecciones, mantenimiento y flujos de reparación con registros e informes de servicio.
+- Refonte du modèle d'état des véhicules : l'état global repose désormais sur plusieurs systèmes distincts, chacun avec son propre état et ses propres facteurs d'usure
+- Ajout d'un nouveau système de stress : une mauvaise utilisation augmente la charge des systèmes et le risque de panne
+- Ajout d'une simulation avancée de la batterie et de l'alternateur
+- Ajout de l'inspection visuelle avant prise de poste
+- Ajout de nouveaux objets en boutique : pompe à graisse, souffleur d'air et câbles de démarrage pour l'entretien avant service et le démarrage d'un véhicule à batterie déchargée
+- Ajout d'un tableau de gestion regroupant tous les véhicules ADS pour un suivi plus pratique
+- Ajout de nombreuses nouvelles pannes et refonte des anciennes ; chaque panne est désormais strictement rattachée à un système précis
+- Ajout d'un système de sélection des pannes qui choisit les défaillances en fonction des facteurs de système les plus sollicités ou les plus perturbés
+- Ajout de nouvelles options d'atelier et refonte des anciens flux d'entretien et de réparation
+- Modification de la logique de démarrage difficile du moteur : il faut désormais maintenir le démarreur pour lancer le moteur
+- De nombreuses améliorations mineures d'équilibrage et d'interface]]></fr>
 
-Changelog 0.9.0.0:
-- Añadido soporte multijugador
-- Añadida pantalla HUD de consumo de combustible]]></es>
-        <it><![CDATA[Aggiunge usura realistica, guasti, ispezioni, manutenzione e flussi di riparazione con registri e rapporti di servizio.
+        <it><![CDATA[Advanced Damage System aggiunge a Farming Simulator 25 un sistema approfondito di usura, guasti, diagnostica, manutenzione e riparazione dei veicoli. Invece di basarsi su un unico valore generico di condizione, ogni macchina è composta da più sistemi separati con la propria condizione, i propri fattori di usura, accumulo di stress e rischio di guasto. Il comportamento del veicolo e la natura dei guasti dipendono dalle condizioni operative, dal carico, dalla temperatura e dalla qualità della manutenzione.
+
+Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine può compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrà la flotta affidabile ed eviterà problemi seri durante la stagione.
 
 Changelog 0.9.0.0:
 - Aggiunto supporto multigiocatore
-- Aggiunto display HUD consumo carburante]]></it>
-        <pl><![CDATA[Dodaje realistyczne zużycie, awarie, przeglądy, konserwację i procesy napraw z dziennikami i raportami serwisowymi.
+- Rivisto il modello delle condizioni del veicolo: la condizione generale ora dipende da più sistemi separati, ognuno con la propria condizione e i propri fattori di usura
+- Aggiunto un nuovo sistema di stress: l'uso improprio accumula stress nei sistemi del veicolo e aumenta il rischio di guasti
+- Aggiunta una simulazione avanzata di batteria e alternatore
+- Aggiunta l'ispezione pre-turno del veicolo
+- Aggiunti nuovi oggetti nel negozio: ingrassatore, soffiatore d'aria e cavi di avviamento per il servizio pre-turno e l'avviamento di veicoli con batteria scarica
+- Aggiunta una tabella di gestione con tutti i veicoli ADS per un controllo più comodo del parco mezzi
+- Aggiunti numerosi nuovi guasti e rivisti quelli esistenti; ora ogni guasto appartiene in modo preciso a un sistema specifico
+- Aggiunto un sistema di selezione dei guasti che determina le avarie in base ai fattori di sistema maggiormente stressati o compromessi
+- Aggiunte nuove opzioni d'officina e rivisti i flussi esistenti di manutenzione e riparazione
+- Modificata la logica di avviamento difficile del motore: ora il motorino di avviamento deve essere tenuto premuto per far girare il motore
+- Numerose piccole modifiche al bilanciamento e all'interfaccia]]></it>
 
-Changelog 0.9.0.0:
-- Dodano obsługę trybu wieloosobowego
-- Dodano wyświetlacz HUD zużycia paliwa]]></pl>
-        <ru><![CDATA[Добавляет реалистичный износ, поломки, осмотры, техническое обслуживание и ремонт с журналами и сервисными отчётами.
+        <ru><![CDATA[Advanced Damage System добавляет в Farming Simulator 25 глубокую систему износа, поломок, диагностики, обслуживания и ремонта техники. Вместо одного условного параметра состояния каждая машина состоит из отдельных систем, каждая из которых имеет собственный уровень состояния, факторы износа, накопление стресса и риск отказа. Поведение техники и характер поломок зависят от условий эксплуатации, нагрузки, температуры и качества обслуживания.
+
+Мод включает температурную модель ключевых систем, продвинутую симуляцию аккумулятора и генератора, реалистичную логику поломок, расширенные сценарии работы с мастерской, сервисные отчёты, журнал обслуживания и возможность проведения предсменного осмотра. В результате техника требует не только ремонта, но и грамотного планирования: обслуживание занимает время, неправильная эксплуатация повышает риск отказов, а пренебрежение состоянием машин может сорвать важные полевые работы. Ответственный фермер, который следит за техникой, вовремя обслуживает её и не работает на пределе возможностей без необходимости, сможет сохранить парк в надёжном состоянии и избежать серьёзных проблем в сезон.
 
 Changelog 0.9.0.0:
 - Добавлена поддержка мультиплеера
-- Добавлен HUD расхода топлива]]></ru>
-        <cs><![CDATA[Přidává realistické opotřebení, poruchy, inspekce, údržbu a opravy s protokoly a servisními zprávami.
-
-Changelog 0.9.0.0:
-- Přidána podpora pro více hráčů
-- Přidán HUD zobrazení spotřeby paliva]]></cs>
-        <cz><![CDATA[Přidává realistické opotřebení, poruchy, inspekce, údržbu a opravy s protokoly a servisními zprávami.
-
-Changelog 0.9.0.0:
-- Přidána podpora pro více hráčů
-- Přidán HUD zobrazení spotřeby paliva]]></cz>
-        <sv><![CDATA[Lägger till realistiskt slitage, haverier, inspektioner, underhåll och reparationsflöden med loggar och servicerapporter.
-
-Changelog 0.9.0.0:
-- Lagt till stöd för flera spelare
-- Lagt till HUD-visning av bränsleförbrukning]]></sv>
+- Полностью переработана модель состояния техники: теперь общее состояние формируется не одним параметром, а состоянием отдельных систем, каждая из которых имеет собственный уровень износа и свои факторы деградации
+- Добавлена новая система стресса: при неправильной эксплуатации техника накапливает нагрузку по системам, что повышает вероятность поломок
+- Добавлена продвинутая симуляция аккумулятора и генератора
+- Добавлена возможность проведения предсменного осмотра техники
+- В магазин добавлены новые предметы: Grease Gun, Air Blower, Jumper Cables для предсменного обслуживания и запуска техники с разряженным аккумулятором
+- В меню добавлена таблица со всей техникой Advanced Damage System для более удобного управления парком
+- Добавлено множество новых поломок, а существующие переработаны. Теперь каждая поломка имеет чёткую принадлежность к конкретной системе
+- Добавлена новая логика выбора поломок: вероятность их возникновения теперь зависит от того, какие факторы износа и нагрузки были сильнее всего нарушены в соответствующей системе
+- Добавлены новые опции мастерской, а существующие варианты обслуживания и ремонта переработаны
+- Изменена логика сложного запуска двигателя: теперь для запуска стартер необходимо удерживать, имитируя реальную прокрутку двигателя
+- Многочисленные минорные изменения в балансе и интерфейсе]]></ru>
+        
     </description>
     <storeItems>
         <storeItem xmlFilename="objects/greaseGun/greaseGun.xml"/>
