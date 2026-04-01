@@ -97,6 +97,7 @@
         <text name="ads_log_type" text="Вид работ"/>
         <text name="ads_log_description" text="Описание"/>
         <text name="ads_log_price" text="Стоимость"/>
+        <text name="ads_log_button_show_report" text="Показать отчет"/>
         <text name="ads_log_empty" text="В журнале нет записей"/>
         <text name="ads_breakdowns_severity_permanent" text="Постоянная"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Снижение мощности"/>
@@ -581,5 +582,16 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Натяжение гусеницы выглядит слегка неравномерным."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Гусеница выглядит ослабленной, заметно неравномерное натяжение."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Гусеница заметно провисает, натяжение выглядит сильно нарушенным."/>
+        <text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Техника"/>
+        <text name="ads_ingame_menu_header_age" text="Возраст"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Часы"/>
+        <text name="ads_ingame_menu_header_condition" text="Состояние"/>
+        <text name="ads_ingame_menu_header_interval" text="Интервал"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Осмотрен"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Обслужен"/>
+        <text name="ads_ingame_menu_header_cost" text="Содержание"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
+        <text name="ads_ingame_menu_header_price" text="Стоимость"/>
     </texts>
 </l10n>

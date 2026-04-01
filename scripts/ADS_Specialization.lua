@@ -8297,7 +8297,6 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
             end
         end
         repairPrice = repairPrice * (1 / spec.maintainability)
-        log_dbg(string.format("Calculated repair price: %.2f (base price: %.2f, breakdown repair price sum: %.2f, own workshop discount: %.2f, age factor: %.2f, maintainability: %.2f)", repairPrice, price, repairPrice * spec.maintainability, ownWorkshopDiscount, ageFactor, spec.maintainability))
         return repairPrice
     end
     return 0

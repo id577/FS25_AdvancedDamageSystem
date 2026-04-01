@@ -97,6 +97,7 @@
         <text name="ads_log_type" text="Arbeitsart"/>
         <text name="ads_log_description" text="Beschreibung"/>
         <text name="ads_log_price" text="Kosten"/>
+        <text name="ads_log_button_show_report" text="Bericht anzeigen"/>
         <text name="ads_log_empty" text="Protokoll ist leer"/>
         <text name="ads_breakdowns_severity_permanent" text="Dauerhaft"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Leistungsreduzierung"/>
@@ -581,5 +582,16 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Die Kettenspannung wirkt leicht ungleichmäßig."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Die Kette wirkt gelockert, und die Spannung ist deutlich ungleichmäßig."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Die Kette hängt sichtbar durch, und die Spannung wirkt stark gestört."/>
+        <text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Fahrzeug"/>
+        <text name="ads_ingame_menu_header_age" text="Alter"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Std."/>
+        <text name="ads_ingame_menu_header_condition" text="Zustand"/>
+        <text name="ads_ingame_menu_header_interval" text="Intervall"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Geprüft"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Gewartet"/>
+        <text name="ads_ingame_menu_header_cost" text="Unterhalt"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
+        <text name="ads_ingame_menu_header_price" text="Wert"/>
     </texts>
 </l10n>

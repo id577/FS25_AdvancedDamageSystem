@@ -97,6 +97,7 @@
         <text name="ads_log_type" text="Type de travail"/>
         <text name="ads_log_description" text="Description"/>
         <text name="ads_log_price" text="Coût"/>
+        <text name="ads_log_button_show_report" text="Afficher le rapport"/>
         <text name="ads_log_empty" text="Le journal est vide"/>
         <text name="ads_breakdowns_severity_permanent" text="Permanent"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Réduit la puissance"/>
@@ -581,5 +582,16 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="La tension de la chenille paraît légèrement irrégulière."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="La chenille paraît relâchée, avec une tension visiblement irrégulière."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="La chenille présente un affaissement visible, et la tension semble fortement compromise."/>
+        <text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Véhicule"/>
+        <text name="ads_ingame_menu_header_age" text="Âge"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Heures"/>
+        <text name="ads_ingame_menu_header_condition" text="État"/>
+        <text name="ads_ingame_menu_header_interval" text="Intervalle"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Inspecté"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Entretenu"/>
+        <text name="ads_ingame_menu_header_cost" text="Entretien"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
+        <text name="ads_ingame_menu_header_price" text="Valeur"/>
     </texts>
 </l10n>

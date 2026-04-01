@@ -49,7 +49,26 @@ function ADS_MaintenanceLogDialog.new(target, customMt)
     local dialog = MessageDialog.new(target, customMt or ADS_MaintenanceLogDialog_mt)
     dialog.vehicle = nil
     dialog.logDataAll = nil
+    dialog.selectedLogIndex = nil
     return dialog
+end
+
+function ADS_MaintenanceLogDialog:getSelectedLogEntry()
+    if self.logData == nil or self.selectedLogIndex == nil then
+        return nil
+    end
+
+    local entryIndex = #self.logData - self.selectedLogIndex + 1
+    return self.logData[entryIndex]
+end
+
+function ADS_MaintenanceLogDialog:updateShowReportButtonState()
+    if self.showReportButton == nil then
+        return
+    end
+
+    local entry = self:getSelectedLogEntry()
+    self.showReportButton.disabled = not (entry ~= nil and AdvancedDamageSystem.getIsLogEntryHasReport(entry))
 end
 
 function ADS_MaintenanceLogDialog:rebuildVisibleLogData()
@@ -74,6 +93,7 @@ function ADS_MaintenanceLogDialog.show(vehicle)
     
     dialog.logDataAll = vehicle.spec_AdvancedDamageSystem.maintenanceLog or {}
     dialog:rebuildVisibleLogData()
+    dialog.selectedLogIndex = #dialog.logData > 0 and 1 or nil
     
     dialog:updateScreen()
     g_gui:showDialog("ADS_MaintenanceLogDialog")
@@ -160,6 +180,17 @@ function ADS_MaintenanceLogDialog:updateScreen()
     self.logTable:setDataSource(self)
     self.logTable:setDelegate(self)
     self.logTable:reloadData()
+
+    if #self.logData > 0 then
+        if self.selectedLogIndex == nil or self.selectedLogIndex > #self.logData then
+            self.selectedLogIndex = 1
+        end
+        self.logTable:setSelectedItem(1, self.selectedLogIndex, false, false)
+    else
+        self.selectedLogIndex = nil
+    end
+
+    self:updateShowReportButtonState()
 
     local isEmpty = #self.logData == 0
     self.logTable:setVisible(not isEmpty)
@@ -304,15 +335,22 @@ end
 
 function ADS_MaintenanceLogDialog:onRowClick(row)
     if row == nil or row.indexInSection == nil then return end
-    local spec = self.vehicle.spec_AdvancedDamageSystem
-    
-    local entry = self.logData[#self.logData - row.indexInSection + 1]
+
+    self.selectedLogIndex = row.indexInSection
+    if self.logTable ~= nil then
+        self.logTable:setSelectedItem(1, row.indexInSection, false, false)
+    end
+    self:updateShowReportButtonState()
+end
+
+function ADS_MaintenanceLogDialog:onClickShowReport()
+    local entry = self:getSelectedLogEntry()
     if entry ~= nil and AdvancedDamageSystem.getIsLogEntryHasReport(entry) then
         ADS_ReportDialog.show(self.vehicle, entry)
         return
     end
+
     InfoDialog.show(g_i18n:getText("ads_ws_no_report_message"))
-    
 end
 
 function ADS_MaintenanceLogDialog:onOpen(superFunc)
@@ -323,5 +361,6 @@ function ADS_MaintenanceLogDialog:onClose(superFunc)
     self.vehicle = nil
     self.logData = nil
     self.logDataAll = nil
+    self.selectedLogIndex = nil
     g_messageCenter:unsubscribeAll(self)
 end

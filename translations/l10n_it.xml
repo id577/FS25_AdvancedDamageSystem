@@ -99,6 +99,7 @@
         <text name="ads_log_type" text="Tipo di intervento"/>
         <text name="ads_log_description" text="Descrizione"/>
         <text name="ads_log_price" text="Costo"/>
+        <text name="ads_log_button_show_report" text="Mostra rapporto"/>
         <text name="ads_log_empty" text="Il registro e vuoto"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Permanente"/>
@@ -588,5 +589,16 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="La tensione del cingolo appare leggermente irregolare."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Il cingolo appare allentato, con una tensione visibilmente irregolare."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Il cingolo presenta un evidente cedimento, e la tensione appare gravemente compromessa."/>
+        <text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Veicolo"/>
+        <text name="ads_ingame_menu_header_age" text="Età"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Ore"/>
+        <text name="ads_ingame_menu_header_condition" text="Condizione"/>
+        <text name="ads_ingame_menu_header_interval" text="Intervallo"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Ispez."/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Manut."/>
+        <text name="ads_ingame_menu_header_cost" text="Gestione"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
+        <text name="ads_ingame_menu_header_price" text="Valore"/>
     </texts>
 </l10n>

@@ -10,6 +10,7 @@ source(g_currentModDirectory .. "gui/ADS_WorkshopDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceLogDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_ReportDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_InspectionDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_InGameMenuFrame.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceTwoOptionsDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceThreeOptionsDialog.lua")
 source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
@@ -147,6 +148,9 @@ end
 -- ==========================================================
 
 function ADS_Main:onStartMission()
+    self.shopMenuPageInstalled = false
+    self.shopMenuFrame = nil
+
     ADS_WorkshopDialog.register()
     ADS_MaintenanceLogDialog.register()
     ADS_ReportDialog.register()
@@ -221,8 +225,89 @@ local function getMaintainability(storeItem)
 end
 
 -- adds spec while browsing
-g_storeManager:addSpecType("reliability", "shopListAttributeIconReliability", nil, getReliability, StoreSpecies.VEHICLE)
+    g_storeManager:addSpecType("reliability", "shopListAttributeIconReliability", nil, getReliability, StoreSpecies.VEHICLE)
 g_storeManager:addSpecType("maintainability", "shopListAttributeIconMaintainability", nil, getMaintainability, StoreSpecies.VEHICLE)
+
+function ADS_Main.addShopMenuPage(frame, pageName, uvs, predicateFunc, insertAfter)
+    local targetPosition = 0
+
+    g_shopMenu.controlIDs[pageName] = nil
+
+    for i = 1, #g_shopMenu.pagingElement.elements do
+        local child = g_shopMenu.pagingElement.elements[i]
+        if child == g_shopMenu[insertAfter] then
+            targetPosition = i + 1
+            break
+        end
+    end
+
+    if targetPosition == 0 then
+        targetPosition = #g_shopMenu.pagingElement.elements + 1
+    end
+
+    g_shopMenu[pageName] = frame
+    g_shopMenu.pagingElement:addElement(g_shopMenu[pageName])
+    g_shopMenu:exposeControlsAsFields(pageName)
+
+    for i = 1, #g_shopMenu.pagingElement.elements do
+        local child = g_shopMenu.pagingElement.elements[i]
+        if child == g_shopMenu[pageName] then
+            table.remove(g_shopMenu.pagingElement.elements, i)
+            table.insert(g_shopMenu.pagingElement.elements, targetPosition, child)
+            break
+        end
+    end
+
+    for i = 1, #g_shopMenu.pagingElement.pages do
+        local child = g_shopMenu.pagingElement.pages[i]
+        if child.element == g_shopMenu[pageName] then
+            table.remove(g_shopMenu.pagingElement.pages, i)
+            table.insert(g_shopMenu.pagingElement.pages, targetPosition, child)
+            break
+        end
+    end
+
+    g_shopMenu.pagingElement:updateAbsolutePosition()
+    g_shopMenu.pagingElement:updatePageMapping()
+    g_shopMenu:registerPage(g_shopMenu[pageName], nil, predicateFunc)
+    g_shopMenu:addPageTab(g_shopMenu[pageName], Utils.getFilename("images/menuIcon.dds", modDirectory), GuiUtils.getUVs(uvs))
+
+    for i = 1, #g_shopMenu.pageFrames do
+        local child = g_shopMenu.pageFrames[i]
+        if child == g_shopMenu[pageName] then
+            table.remove(g_shopMenu.pageFrames, i)
+            table.insert(g_shopMenu.pageFrames, targetPosition, child)
+            break
+        end
+    end
+
+    g_shopMenu:rebuildTabList()
+end
+
+function ADS_Main:tryRegisterShopMenuPage()
+    if self.shopMenuPageInstalled then
+        return true
+    end
+
+    if ADS_InGameMenuFrame == nil or g_shopMenu == nil then
+        return false
+    end
+
+    if g_shopMenu[ADS_InGameMenuFrame.PAGE_NAME] ~= nil then
+        self.shopMenuPageInstalled = true
+        return true
+    end
+
+    local frame = ADS_InGameMenuFrame.register()
+    ADS_Main.addShopMenuPage(frame, ADS_InGameMenuFrame.PAGE_NAME, {0, 0, 1024, 1024}, function()
+        return true
+    end, "pageUsedSale")
+    frame:initialize()
+
+    self.shopMenuFrame = frame
+    self.shopMenuPageInstalled = true
+    return true
+end
 
 
 -- adds spec in config screen 
@@ -349,6 +434,12 @@ end
 
 
 function ADS_Main:update(dt)
+    if g_currentMission ~= nil and g_currentMission.getIsClient ~= nil and g_currentMission:getIsClient() then
+        if not self.shopMenuPageInstalled then
+            self:tryRegisterShopMenuPage()
+        end
+    end
+
     local function updateOpenWorkshopDialog()
         local dialog = ADS_WorkshopDialog.INSTANCE
         if dialog == nil or not dialog.isDialogOpen or dialog.vehicle == nil or dialog.vehicle.spec_AdvancedDamageSystem == nil then
@@ -434,10 +525,15 @@ end
 
 function ADS_Main:loadMap()
     log_dbg("loadMap() called")
+    self.shopMenuPageInstalled = false
+    self.shopMenuFrame = nil
     ADS_Config.loadFromXMLFile()
+    self:tryRegisterShopMenuPage()
 end
 
 function ADS_Main:deleteMap()
+    self.shopMenuPageInstalled = false
+    self.shopMenuFrame = nil
     ADS_Config._loaded = nil
 end
 

@@ -99,6 +99,7 @@
         <text name="ads_log_type" text="Work Type"/>
         <text name="ads_log_description" text="Description"/>
         <text name="ads_log_price" text="Cost"/>
+        <text name="ads_log_button_show_report" text="Show Report"/>
         <text name="ads_log_empty" text="Log is empty"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Permanent"/>
@@ -588,6 +589,18 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="The track tension appears slightly uneven."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="The track appears loose, with noticeable uneven tension."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="The track is visibly sagging, and the tension appears severely compromised."/>
+        
+        <text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Vehicle"/>
+        <text name="ads_ingame_menu_header_age" text="Age"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Hours"/>
+        <text name="ads_ingame_menu_header_condition" text="Condition"/>
+        <text name="ads_ingame_menu_header_interval" text="Interval"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Inspected"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Serviced"/>
+        <text name="ads_ingame_menu_header_cost" text="Upkeep"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
+        <text name="ads_ingame_menu_header_price" text="Value"/>
     </texts>
 </l10n>
 
