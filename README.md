@@ -13,7 +13,6 @@ Forget about one-click repairs. Maintenance now takes time, resources, and prope
 >
 > *   This mod is a work in progress (WIP). Features are subject to change, and bugs are to be expected.
 > *   Use at your own risk. The author is not responsible for any potential issues with your savegame or game. It is strongly recommended to back up your saves.
-> *   Multiplayer (MP) is not currently supported. Support is planned for a future release.
 
 </td>
 <td width="35%" align="center" valign="top">
