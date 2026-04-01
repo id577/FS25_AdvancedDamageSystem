@@ -26,7 +26,7 @@ Forget about one-click repairs. Maintenance now takes time, resources, and prope
 
 A huge thank you to **Frvetz** (https://github.com/Frvetz), creator of the Realistic Damage System mod for FS22, for the permission to use ideas from his mod and for the support during the early stages of development.
 
-A huge special thanks to Squallqt (https://github.com/Squallqt) for his direct contributions to the project. He implemented multiplayer support and provided invaluable help with testing and technical advice.
+A huge special thanks to **Squallqt** (https://github.com/Squallqt) for his direct contributions to the project. He implemented multiplayer support and provided invaluable help with testing and technical advice.
 
 Also, a big thank you to **Derwen Modding** for testing the early builds.
 
