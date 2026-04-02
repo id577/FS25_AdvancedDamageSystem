@@ -289,6 +289,14 @@ function ADS_InGameMenuFrame:updateActionButtons()
         self.maintenanceLogButtonInfo.disabled = not hasVehicle
     end
 
+    self:setMenuButtonInfo({
+        self.backButtonInfo,
+        self.prevPageButtonInfo,
+        self.nextPageButtonInfo,
+        self.maintenanceLogButtonInfo,
+        self.enterVehicleButtonInfo,
+        self.sellVehicleButtonInfo
+    })
     self:setMenuButtonInfoDirty()
 end
 
@@ -684,17 +692,33 @@ function ADS_InGameMenuFrame:onSellSelectedVehicle()
         return
     end
 
+    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+    if storeItem == nil then
+        return
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
     local isLeased = vehicle.propertyState == 3
-    local label = g_i18n:getText(isLeased and "ui_youWantToReturnVehicle" or "ui_youWantToSellVehicle")
 
-    YesNoDialog.show(function(target, clickOk)
-        if not clickOk then
-            return
-        end
+    if spec ~= nil and not spec.isExcludedVehicle and isLeased then
+        ADS_SellItemDialog.show(vehicle, storeItem, self.onADSSellDialogCallback, self)
+        return
+    end
 
-        g_client:getServerConnection():sendEvent(SellVehicleEvent.new(vehicle, 1, true))
-        InfoDialog.show(g_i18n:getText(isLeased and "shop_messageReturnedVehicle" or "shop_messageSoldVehicle"))
-    end, self, label)
+    g_shopController:sell(storeItem, vehicle)
+end
+
+function ADS_InGameMenuFrame:onADSSellDialogCallback(yes)
+    if not yes then
+        return
+    end
+
+    local vehicle = self:getSelectedVehicle()
+    if vehicle == nil then
+        return
+    end
+
+    g_client:getServerConnection():sendEvent(SellVehicleEvent.new(vehicle, 1, true))
 end
 
 function ADS_InGameMenuFrame:onShowMaintenanceLog()

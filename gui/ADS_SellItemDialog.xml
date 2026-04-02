@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+
+    <GuiElement profile="ads_sellDialogBg" id="dialogElement" with="anchorMiddleCenter" position="0px -20px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="fs25_dialogTitle" id="dialogTitleElement" position="0px -30px" text="$l10n_button_return"/>
+
+            <Bitmap profile="ads_sellVehicleImage" id="vehicleImageElement"/>
+            <Text profile="ads_sellVehicleName" id="vehicleNameElement" text="Vehicle Name"/>
+
+            <GuiElement profile="ads_sellCostsContainer">
+                <SmoothList profile="ads_dialogInfoTable" id="costList" position="0px 0px" size="320px 130px">
+                    <ListItem profile="ads_dialogInfoRow" name="costRowTemplate" size="320px 26px">
+                        <Text profile="ads_dialogInfoTitle" position="16px 0px" size="164px 26px" name="costLabel" textLayoutMode="scrolling"/>
+                        <Text profile="ads_dialogInfoValue" position="190px 0px" size="114px 26px" name="costValue" textLayoutMode="scrolling"/>
+                    </ListItem>
+                </SmoothList>
+            </GuiElement>
+
+            <Text profile="ads_sellTotalText" id="totalAmountElement" text="-"/>
+        </GuiElement>
+
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonOK" text="$l10n_button_yes" onClick="onClickYes"/>
+            <Button profile="buttonBack" text="$l10n_button_no" onClick="onClickNo"/>
+        </BoxLayout>
+    </GuiElement>
+
+    <GUIProfiles>
+        <Profile name="ads_sellDialogBg" extends="fs25_dialogBg">
+            <size value="410px 610px"/>
+        </Profile>
+
+        <Profile name="ads_sellVehicleImage" extends="baseReference" with="anchorTopCenter">
+            <position value="0px 30px"/>
+            <size value="330px 330px"/>
+            <imageSliceId value="noSlice"/>
+        </Profile>
+
+        <Profile name="ads_sellVehicleName" extends="baseReference" with="anchorTopCenter">
+            <position value="0px -310px"/>
+            <size value="320px 34px"/>
+            <textSize value="18px"/>
+            <textColor value="$preset_colorWhite_50"/>
+            <textAlignment value="center"/>
+            <textVerticalAlignment value="middle"/>
+        </Profile>
+
+        <Profile name="ads_sellCostsContainer" extends="emptyPanel" with="anchorTopCenter">
+            <size value="320px 130px"/>
+            <position value="0px -360px"/>
+        </Profile>
+
+        <Profile name="ads_dialogInfoTable" extends="emptyPanel" with="anchorTopCenter">
+        </Profile>
+
+        <Profile name="ads_dialogInfoRow" extends="baseReference" with="anchorTopStretchingX alternating">
+            <height value="26px"/>
+            <imageColor value="$preset_fs25_colorGrey"/>
+            <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+        </Profile>
+
+        <Profile name="ads_dialogInfoTitle" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false"/>
+            <textSize value="14px"/>
+            <textUpperCase value="true"/>
+            <textColor value="$preset_colorWhite_50"/>
+            <textAlignment value="left"/>
+            <textVerticalAlignment value="middle"/>
+            <textDisabledColor value="$preset_colorDisabled"/>
+        </Profile>
+
+        <Profile name="ads_dialogInfoValue" extends="baseReference" with="anchorStretchingYLeft">
+            <textBold value="false"/>
+            <textSize value="14px"/>
+            <textColor value="$preset_colorWhite_50"/>
+            <textAlignment value="right"/>
+            <textVerticalAlignment value="middle"/>
+            <textDisabledColor value="$preset_colorDisabled"/>
+        </Profile>
+
+        <Profile name="ads_sellTotalText" extends="baseReference" with="anchorTopCenter">
+            <position value="0px -480px"/>
+            <size value="320px 34px"/>
+            <textBold value="false"/>
+            <textSize value="22px"/>
+            <textColor value="$preset_colorWhite_50"/>
+            <textAlignment value="center"/>
+            <textVerticalAlignment value="middle"/>
+        </Profile>
+    </GUIProfiles>
+</GUI>

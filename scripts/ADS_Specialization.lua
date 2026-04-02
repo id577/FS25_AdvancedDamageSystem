@@ -2760,12 +2760,12 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     local globalStressMultiplier = math.max(tonumber(ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER) or 1.0, 0.0)
     local dtMultiplier = ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
 
-    local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier * globalStressMultiplier
-    systemData.stress = math.max((systemData.stress or 0) + stressToAdd, 0)
-
     local conditionToRemove = wearRate * dtMultiplier
     local newCondition = (systemData.condition or 1.0) - conditionToRemove
     systemData.condition = math.clamp(newCondition, 0.001, 1.0)
+
+    local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier * globalStressMultiplier
+    systemData.stress = math.clamp((systemData.stress or 0) + stressToAdd, 0, math.max(systemData.condition, ADS_Config.CORE.CONDITION_EFFECTIVE_FLOOR))
 
     local factorStats = ensureFactorStats(spec, self)
     local systemStats = factorStats[systemName]
@@ -2819,7 +2819,8 @@ function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     local dmg = math.max(tonumber(damageAmount) or 0, 0)
     spec.systems[systemKey].condition = math.clamp((spec.systems[systemKey].condition or 1.0) - dmg, 0.001, 1.0)
     local stressToAdd = dmg * (ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey] or 1)
-    spec.systems[systemKey].stress = math.max((spec.systems[systemKey].stress or 0) + stressToAdd, 0)
+    local stressCap = math.max(spec.systems[systemKey].condition or 0, ADS_Config.CORE.CONDITION_EFFECTIVE_FLOOR or 0)
+    spec.systems[systemKey].stress = math.clamp((spec.systems[systemKey].stress or 0) + stressToAdd, 0, stressCap)
 
     local factorStats = ensureFactorStats(spec, self)
     local systemStats = factorStats[systemKey]
@@ -4166,7 +4167,7 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
             hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
 
             local random = math.random()
-            if random < failureChancePerFrame then
+            if random < failureChancePerFrame or systemStress >= effectiveCondition then
                 local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemData.name)
                 local breakdownId = self:getRandomBreakdownBySystem(systemKey)
                 if breakdownId ~= nil then

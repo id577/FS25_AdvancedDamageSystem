@@ -594,5 +594,11 @@
         <text name="ads_ingame_menu_header_cost" text="Entretien"/>
         <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
         <text name="ads_ingame_menu_header_price" text="Valeur"/>
+        <text name="ads_sell_dialog_costs_title" text="Coûts supplémentaires"/>
+        <text name="ads_sell_dialog_deposit_return" text="Retour de dépôt"/>
+        <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Entretien en retard"/>
+        <text name="ads_sell_dialog_repair_penalty" text="Réparation"/>
+        <text name="ads_sell_dialog_washing_penalty" text="Lavage"/>
+        <text name="ads_sell_dialog_total" text="Total"/>
     </texts>
 </l10n>

@@ -386,7 +386,7 @@ function ADS_Hud:drawDashboard()
         if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle or hudIndicatorId == self.indicators.oil.name or hudIndicatorId == self.indicators.transmission.name then 
             icon:setVisible(false)
         else
-            if vehicle:getLastSpeed() >= 100 then
+            if vehicle:getLastSpeed() >= 99.9 then
                 if  hudIndicatorId == self.indicators.brakes.name or 
                     hudIndicatorId == self.indicators.engine.name or
                     hudIndicatorId == self.indicators.warning.name or

@@ -594,5 +594,11 @@
         <text name="ads_ingame_menu_header_cost" text="Содержание"/>
         <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
         <text name="ads_ingame_menu_header_price" text="Стоимость"/>
+        <text name="ads_sell_dialog_costs_title" text="Дополнительные расходы"/>
+        <text name="ads_sell_dialog_deposit_return" text="Возврат депозита"/>
+        <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Просроченное ТО"/>
+        <text name="ads_sell_dialog_repair_penalty" text="Ремонт"/>
+        <text name="ads_sell_dialog_washing_penalty" text="Мойка"/>
+        <text name="ads_sell_dialog_total" text="Итого"/>
     </texts>
 </l10n>

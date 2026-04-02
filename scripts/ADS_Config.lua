@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 103,
+    VER = 104,
 
     DEBUG = false,
 
@@ -219,7 +219,7 @@ ADS_Config = {
         BASE_BREAKDOWN_PROGRESS_TIME = 1 * 3600000,
         BREAKDOWN_PROBABILITIES = {
             STRESS_THRESHOLD = 0.2,
-            MIN_MTBF = 60,
+            MIN_MTBF = 30,
             MAX_MTBF = 3200,
             DEGREE = 3.0,
             CRITICAL_MIN = 0.05,
