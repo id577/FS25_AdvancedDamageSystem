@@ -15,6 +15,7 @@ end
 
 function ADS_Leasing.preLoad(_mission)
     SellVehicleEvent.run = Utils.overwrittenFunction(SellVehicleEvent.run, ADS_Leasing.onSellVehicleEventRun)
+    ShopController.sell = Utils.overwrittenFunction(ShopController.sell, ADS_Leasing.onShopControllerSell)
 end
 
 function ADS_Leasing.init()
@@ -143,6 +144,30 @@ function ADS_Leasing.getReturnBreakdown(vehicle)
     emptyResult.rows[4].value = emptyResult.display.washing
 
     return emptyResult
+end
+
+function ADS_Leasing.onShopControllerSell(self, overwrittenFunc, storeItem, concreteItem)
+    local vehicle = concreteItem
+    local isConcreteVehicle = vehicle ~= nil and vehicle ~= ShopDisplayItem.NO_CONCRETE_ITEM
+
+    if not isConcreteVehicle or not ADS_Leasing.isSupportedVehicle(vehicle) then
+        overwrittenFunc(self, storeItem, concreteItem)
+        return
+    end
+
+    self.isSelling = true
+    self.currentSellStoreItem = storeItem
+    self.currentSellItem = concreteItem
+
+    ADS_SellItemDialog.show(vehicle, storeItem, ADS_Leasing.onShopControllerSellDialogCallback, self)
+end
+
+function ADS_Leasing.onShopControllerSellDialogCallback(self, yes)
+    if self == nil then
+        return
+    end
+
+    self:onSellCallback(yes)
 end
 
 function ADS_Leasing.onSellVehicleEventRun(self, overwrittenFunc, connection)
