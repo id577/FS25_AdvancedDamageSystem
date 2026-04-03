@@ -4082,12 +4082,36 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local currentWeather = ADS_Main.currentWeather
     local isHail = (WeatherType.HAIL ~= nil and currentWeather == WeatherType.HAIL) or (WeatherType.HALL ~= nil and currentWeather == WeatherType.HALL)
     local isWetWeather = currentWeather == WeatherType.RAIN or currentWeather == WeatherType.SNOW or isHail
-    local isHarvestingInProcess = false
-    if spec_cutter ~= nil and spec_cutter.isWorking == true then
-        isHarvestingInProcess = true
-    elseif spec_combine ~= nil then
-        isHarvestingInProcess = (spec_combine.lastArea or 0) > 0
+    
+    
+    local function isHarvesting(vehicle)
+        local cutterArea = 0
+
+        if vehicle == nil or not vehicle:getIsOnField() or vehicle:getLastSpeed() < 0.5 then
+            return false
+        end
+
+        if vehicle.getIsTurnedOn ~= nil and not vehicle:getIsTurnedOn() then
+            return false
+        end
+
+        if vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attachedImplements ~= nil then
+            for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
+                local implement = implementData.object
+
+                if implement ~= nil and implement.spec_cutter ~= nil and implement.spec_cutter.workAreaParameters ~= nil then
+                    cutterArea = math.max(cutterArea, implement.spec_cutter.workAreaParameters.lastArea or 0)
+                end
+            end
+        end
+
+        if cutterArea <= 0 and vehicle.spec_cutter ~= nil and vehicle.spec_cutter.workAreaParameters ~= nil then
+            cutterArea = vehicle.spec_cutter.workAreaParameters.lastArea or 0
+        end
+        return cutterArea > 0
     end
+    
+    local isHarvestingInProcess = isHarvesting(self)
 
     if isMotorStarted and not spec.isElectricVehicle then
         -- longHarvestFactor
@@ -7577,6 +7601,7 @@ end
 -- ==========================================================
 
 local function getIsThereDebris(vehicle)
+    local cutterArea = 0
 
     if vehicle == nil or not vehicle:getIsOnField() or vehicle:getLastSpeed() < 0.5 then
         return false
@@ -7586,15 +7611,21 @@ local function getIsThereDebris(vehicle)
         return false
     end
 
-    local spec_cutter = vehicle.spec_cutter
-    local spec_combine = vehicle.spec_combine
+    if vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attachedImplements ~= nil then
+        for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
+            local implement = implementData.object
 
-    if spec_cutter ~= nil and spec_cutter.isWorking == true then
-        return true
-    elseif spec_combine ~= nil and (spec_combine.lastArea or 0) > 0 then
-        return true
+            if implement ~= nil and implement.spec_cutter ~= nil and implement.spec_cutter.workAreaParameters ~= nil then
+                cutterArea = math.max(cutterArea, implement.spec_cutter.workAreaParameters.lastArea or 0)
+            end
+        end
     end
-    return false
+
+    if cutterArea <= 0 and vehicle.spec_cutter ~= nil and vehicle.spec_cutter.workAreaParameters ~= nil then
+        cutterArea = vehicle.spec_cutter.workAreaParameters.lastArea or 0
+    end
+
+    return cutterArea > 0
 end
 
 local function getIsThereDust(vehicle)
@@ -7680,7 +7711,7 @@ function AdvancedDamageSystem:updateRadiatorClogging(dt)
             return
         end
 
-        local dirtDuration = washableSpec.dirtDuration / 5 or 0
+        local dirtDuration = ((washableSpec.dirtDuration or 0) / 4) * (ADS_Config.CORE.BASE_SERVICE_WEAR * 10)
         local totalMultiplier = wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED
         dbg.totalMultiplier = totalMultiplier
 
@@ -7757,8 +7788,8 @@ function AdvancedDamageSystem:updateAirIntakeClogging(dt)
         if washableSpec == nil then
             return
         end
-
-        local dirtDuration = washableSpec.dirtDuration / 5
+        
+        local dirtDuration = ((washableSpec.dirtDuration or 0) / 4) * (ADS_Config.CORE.BASE_SERVICE_WEAR * 10)
         local totalMultiplier = wetnessFactor * (fieldFactor + dustFactor + debrisFactor) * C.CLOGGING_SPEED
         dbg.totalMultiplier = totalMultiplier
 
