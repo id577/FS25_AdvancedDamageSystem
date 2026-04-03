@@ -615,5 +615,6 @@
         <text name="ads_sell_dialog_repair_penalty" text="Riparazione"/>
         <text name="ads_sell_dialog_washing_penalty" text="Lavaggio"/>
         <text name="ads_sell_dialog_total" text="Totale"/>
+        <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s non e disponibile per %s nell'officina mobile a causa della bassa manutenibilita."/>
     </texts>
 </l10n>

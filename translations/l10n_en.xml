@@ -616,6 +616,7 @@
         <text name="ads_sell_dialog_repair_penalty" text="Repair"/>
         <text name="ads_sell_dialog_washing_penalty" text="Washing"/>
         <text name="ads_sell_dialog_total" text="Total"/>
+        <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s is unavailable for %s in the mobile workshop due to low maintainability."/>
     </texts>
 </l10n>
 

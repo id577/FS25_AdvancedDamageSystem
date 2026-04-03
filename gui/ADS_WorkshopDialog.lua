@@ -45,8 +45,8 @@ function ADS_WorkshopDialog.show(vehicle)
     dialog.workshopType = AdvancedDamageSystem.WORKSHOP.DEALER
     dialog.lastObservedStatus = vehicle:getCurrentStatus()
 
-    if g_workshopScreen.isMobileWorkshop then  dialog.workshopType = AdvancedDamageSystem.WORKSHOP.MOBILE end
     if g_workshopScreen.isOwnWorkshop then  dialog.workshopType = AdvancedDamageSystem.WORKSHOP.OWN end
+    if g_workshopScreen.isMobileWorkshop then  dialog.workshopType = AdvancedDamageSystem.WORKSHOP.MOBILE end
 
     dialog:updateScreen()
     g_gui:showDialog("ADS_WorkshopDialog")
@@ -187,8 +187,8 @@ function ADS_WorkshopDialog:updateScreen()
         self.overhaulButton.disabled = buttonsDisabled or not hasSystemEligibleForOverhaul
     else
         self.inscpectionButton.disabled = false or spec.currentState ~= STATUS.READY
-        self.maintenanceButton.disabled = not (g_workshopScreen.isMobileWorkshop and spec.maintainability >= 1.1) or spec.currentState ~= STATUS.READY
-        self.repairButton.disabled = not (g_workshopScreen.isMobileWorkshop and spec.maintainability >= 1.2) or spec.currentState ~= STATUS.READY
+        self.maintenanceButton.disabled = spec.currentState ~= STATUS.READY
+        self.repairButton.disabled = spec.currentState ~= STATUS.READY
         self.overhaulButton.disabled = true
     end
 

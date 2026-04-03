@@ -33,6 +33,50 @@ local function ensureTrailingColon(text)
     return normalized .. ":"
 end
 
+local function getMobileWorkshopAvailability(dialog)
+    local vehicle = dialog ~= nil and dialog.vehicle or nil
+    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    local workshopType = ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.workshopType or (spec ~= nil and spec.workshopType or nil)
+
+    if vehicle == nil or spec == nil or workshopType ~= AdvancedDamageSystem.WORKSHOP.MOBILE then
+        return true
+    end
+
+    local serviceKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.STATUS, dialog.maintenanceType)
+    local optionKey
+
+    if dialog.maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
+        optionKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.INSPECTION_TYPES, dialog.selectedOptionOne)
+    elseif dialog.maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
+        optionKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.OVERHAUL_TYPES, dialog.selectedOptionOne)
+    end
+
+    local limits = ADS_Config.WORKSHOP.MOBILE_WORKSHOP_SERVICES_BY_MAINTAINABILITY
+    local requiredMaintainability = limits ~= nil and serviceKey ~= nil and optionKey ~= nil and limits[serviceKey] ~= nil and limits[serviceKey][optionKey] or 0
+    local currentMaintainability = spec.maintainability or 0
+
+    return currentMaintainability >= requiredMaintainability
+end
+
+local function getSelectedProcedureDisplayName(dialog)
+    if dialog == nil then
+        return ""
+    end
+
+    local optionOneText = dialog.selectedOptionOne ~= nil and g_i18n:getText(dialog.selectedOptionOne) or ""
+    local typeText = dialog.maintenanceType ~= nil and g_i18n:getText(dialog.maintenanceType) or ""
+
+    if optionOneText == "" then
+        return typeText
+    end
+
+    if typeText == "" then
+        return optionOneText
+    end
+
+    return string.format("%s %s", optionOneText, typeText)
+end
+
 function ADS_MaintenanceTwoOptionsDialog.show(vehicle, maintenanceType)
     if ADS_MaintenanceTwoOptionsDialog.INSTANCE == nil then ADS_MaintenanceTwoOptionsDialog.register() end
     if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or maintenanceType == nil then return end
@@ -112,6 +156,23 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
     self.optionOneText:setText(optionOneText)
     self.optionOne:setTexts(optionOneOptions)
 
+    if self.optionOne ~= nil and self.optionOne.getState ~= nil then
+        local optionOneState = tonumber(self.optionOne:getState())
+        if optionOneState ~= nil then
+            if self.maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
+                if self.inspectionOptionValues ~= nil and self.inspectionOptionValues[optionOneState] ~= nil then
+                    self.selectedOptionOne = self.inspectionOptionValues[optionOneState]
+                end
+            elseif self.maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
+                if AdvancedDamageSystem.OVERHAUL_TYPES[optionOneState] ~= nil then
+                    self.selectedOptionOne = AdvancedDamageSystem.OVERHAUL_TYPES[optionOneState]
+                end
+            end
+        end
+    end
+
+    local isAllowedInMobileWorkshop = getMobileWorkshopAvailability(self)
+
     -- price, duration, finishtime
     local workshopType = ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.workshopType or spec.workshopType
     local priceValue = g_i18n:formatMoney(self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType))
@@ -153,6 +214,15 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
         self.optionOneDisclaimer:setText(optionOneDisclaimers[ADS_Utils.getIndexByValue(AdvancedDamageSystem.OVERHAUL_TYPES, self.selectedOptionOne)] or "")
     end
 
+    if not isAllowedInMobileWorkshop then
+        local procedureName = getSelectedProcedureDisplayName(self)
+        local vehicleName = self.vehicle.getFullName ~= nil and self.vehicle:getFullName() or g_i18n:getText("ui_vehicle")
+        self.optionOneDisclaimer:setText(string.format(g_i18n:getText("ads_mobile_workshop_low_maintainability"), procedureName, vehicleName))
+        self.optionOneDisclaimer:setTextColor(0.88, 0.18, 0.18, 1)
+    else
+        self.optionOneDisclaimer:setTextColor(1, 1, 1, 1)
+    end
+
     
 
     -- option three
@@ -162,6 +232,10 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
     else
         self.optionThreeText:setText(g_i18n:getText("ads_option_menu_perform_renew_paint"))
         self.optionThreeDisclaimer:setText(g_i18n:getText("ads_option_menu_option_three_disclaimer_overhaul_repaint"))
+    end
+
+    if self.startServiceButton ~= nil then
+        self.startServiceButton:setDisabled(not isAllowedInMobileWorkshop)
     end
 end
 
@@ -188,6 +262,10 @@ function ADS_MaintenanceTwoOptionsDialog:onClickOptionThree(state, binaryOptionE
 end
 
 function ADS_MaintenanceTwoOptionsDialog:onClickStartService()
+    if not getMobileWorkshopAvailability(self) then
+        return
+    end
+
     local vehicle = self.vehicle
     local workshopType = ADS_WorkshopDialog.INSTANCE.workshopType
     local spec = vehicle.spec_AdvancedDamageSystem

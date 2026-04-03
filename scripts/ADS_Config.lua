@@ -241,6 +241,33 @@ ADS_Config = {
             [2] = 1.2, MOBILE = 1.2,
             [3] = 0.8, OWN = 0.8,
         },
+
+        MOBILE_WORKSHOP_SERVICES_BY_MAINTAINABILITY = {
+            INSPECTION = {
+                [1] = 0.0,  STANDARD = 0.0,
+                [2] = 0.0,  VISUAL   = 0.0,
+                [3] = 99.0, COMPLETE = 99.0,
+            },
+
+            MAINTENANCE = {
+                [1] = 1.0,  STANDARD = 1.1,
+                [2] = 0.9,  MINIMAL  = 0.9,
+                [3] = 1.2,  EXTENDED = 1.2,
+                [4] = 1.4,  PREVENTIVE = 1.4,
+            },
+
+            REPAIR = {
+                [1] = 0.0,  LOW    = 0.0,
+                [2] = 1.1,  MEDIUM = 1.1,
+                [3] = 99.0, HIGH   = 99.0,
+            },
+
+            OVERHAUL = {
+                [1] = 99.0,  STANDARD = 99.0,
+                [2] = 99.0,  PARTIAL  = 99.0,
+                [3] = 99.0,  FULL     = 99.0,
+            },
+        }
     },
     -- ====================================================================================
     -- MAINTENANCE & REPAIR PARAMETERS

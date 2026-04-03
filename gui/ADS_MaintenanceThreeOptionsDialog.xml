@@ -43,7 +43,7 @@
         </GuiElement>
         <BoxLayout profile="fs25_dialogButtonBox">
             <Button profile="buttonBack" text="$l10n_button_close" onClick="onClickBack" />
-            <Button profile="buttonOK" text="$l10n_ads_option_menu_start_text" onClick="onClickStartService" />
+            <Button profile="buttonOK" id="startServiceButton" text="$l10n_ads_option_menu_start_text" onClick="onClickStartService" />
         </BoxLayout>
     </GuiElement>
 
