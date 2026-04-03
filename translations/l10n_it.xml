@@ -550,8 +550,12 @@
         <text name="ads_inspection_status_slightly_dirty" text="Leggermente Sporco"/>
         <text name="ads_inspection_status_dirty" text="Sporco"/>
         <text name="ads_inspection_status_heavily_clogged" text="Fortemente Ostruito"/>
-    <text name="ads_inspection_status_critically_clogged" text="Criticamente Ostruito"/>
-    <text name="ads_inspection_status_not_required" text="Non richiesto"/>
+        <text name="ads_inspection_status_critically_clogged" text="Criticamente Ostruito"/>
+        <text name="ads_inspection_status_slightly_dry" text="Leggermente Secco"/>
+        <text name="ads_inspection_status_dry" text="Secco"/>
+        <text name="ads_inspection_status_very_dry" text="Molto Secco"/>
+        <text name="ads_inspection_status_critically_dry" text="Criticamente Secco"/>
+        <text name="ads_inspection_status_not_required" text="Non richiesto"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="Leggere tracce di liquido refrigerante sono visibili vicino ai raccordi del sistema di raffreddamento."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Sono visibili residui di liquido refrigerante e il livello è inferiore al normale."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="È visibile una perdita significativa di liquido refrigerante attorno al sistema di raffreddamento."/>
@@ -572,6 +576,10 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Il condotto di aspirazione dell'aria è visibilmente sporco."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Il condotto di aspirazione dell'aria è fortemente ostruito da polvere e detriti."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Il condotto di aspirazione dell'aria è criticamente ostruito da polvere e detriti."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="I punti di lubrificazione appaiono leggermente secchi."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="I punti di lubrificazione appaiono secchi e insufficientemente ingrassati."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="I punti di lubrificazione sono molto secchi, con pochissimo grasso visibile."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="I punti di lubrificazione sono criticamente secchi, con quasi nessun grasso visibile."/>
         <text name="ads_inspection_hint_corroded_wiring_stage2" text="Su alcuni collegamenti elettrici sono visibili lievi tracce di ossidazione."/>
         <text name="ads_inspection_hint_corroded_wiring_stage3" text="Sul cablaggio e sui connettori sono visibili marcate tracce di ossidazione e sporco."/>
         <text name="ads_inspection_hint_corroded_wiring_stage4" text="Sul cablaggio e sui connettori sono visibili forti tracce di corrosione, e parti dell'isolamento appaiono danneggiate."/>

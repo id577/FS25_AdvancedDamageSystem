@@ -543,8 +543,12 @@
         <text name="ads_inspection_status_slightly_dirty" text="Légèrement Sale"/>
         <text name="ads_inspection_status_dirty" text="Sale"/>
         <text name="ads_inspection_status_heavily_clogged" text="Fortement Encrassé"/>
-    <text name="ads_inspection_status_critically_clogged" text="Critiquement Encrassé"/>
-    <text name="ads_inspection_status_not_required" text="Non requis"/>
+        <text name="ads_inspection_status_critically_clogged" text="Critiquement Encrassé"/>
+        <text name="ads_inspection_status_slightly_dry" text="Légèrement Sec"/>
+        <text name="ads_inspection_status_dry" text="Sec"/>
+        <text name="ads_inspection_status_very_dry" text="Très Sec"/>
+        <text name="ads_inspection_status_critically_dry" text="Critiquement Sec"/>
+        <text name="ads_inspection_status_not_required" text="Non requis"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="De légères traces de liquide de refroidissement sont visibles près des raccords du système de refroidissement."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Des résidus de liquide de refroidissement sont visibles et le niveau est inférieur à la normale."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Une perte notable de liquide de refroidissement est visible autour du système de refroidissement."/>
@@ -565,6 +569,10 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Le conduit d'admission d'air est visiblement sale."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Le conduit d'admission d'air est fortement obstrué par la poussière et les débris."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Le conduit d'admission d'air est critiquement obstrué par la poussière et les débris."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="Les points de graissage paraissent légèrement secs."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Les points de graissage paraissent secs et insuffisamment lubrifiés."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Les points de graissage sont très secs, avec très peu de graisse visible."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Les points de graissage sont critiquement secs, avec presque aucune graisse visible."/>
         <text name="ads_inspection_hint_corroded_wiring_stage2" text="De légères traces d'oxydation sont visibles sur certains raccordements électriques."/>
         <text name="ads_inspection_hint_corroded_wiring_stage3" text="Des traces prononcées d'oxydation et de salissure sont visibles sur le câblage et les connecteurs."/>
         <text name="ads_inspection_hint_corroded_wiring_stage4" text="De fortes traces de corrosion sont visibles sur le câblage et les connecteurs, et certaines parties de l'isolation semblent endommagées."/>

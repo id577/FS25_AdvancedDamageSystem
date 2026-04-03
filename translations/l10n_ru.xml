@@ -543,8 +543,12 @@
         <text name="ads_inspection_status_slightly_dirty" text="Слегка загрязнен"/>
         <text name="ads_inspection_status_dirty" text="Загрязнен"/>
         <text name="ads_inspection_status_heavily_clogged" text="Сильно забит"/>
-    <text name="ads_inspection_status_critically_clogged" text="Критически забит"/>
-    <text name="ads_inspection_status_not_required" text="Не требуется"/>
+        <text name="ads_inspection_status_critically_clogged" text="Критически забит"/>
+        <text name="ads_inspection_status_slightly_dry" text="Слегка сухо"/>
+        <text name="ads_inspection_status_dry" text="Сухо"/>
+        <text name="ads_inspection_status_very_dry" text="Очень сухо"/>
+        <text name="ads_inspection_status_critically_dry" text="Критически сухо"/>
+        <text name="ads_inspection_status_not_required" text="Не требуется"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="В районе соединений системы охлаждения заметны слабые следы охлаждающей жидкости."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Следы охлаждающей жидкости заметны, а уровень жидкости ниже нормы."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Потеря охлаждающей жидкости уже хорошо заметна в районе системы охлаждения."/>
@@ -565,6 +569,10 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Воздуховод заметно загрязнен."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Воздуховод сильно забит пылью и мусором."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Воздуховод критически забит пылью и мусором."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="Точки смазки выглядят слегка сухими."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Точки смазки выглядят сухими и недостаточно смазанными."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Точки смазки сильно пересохли, видимые следы смазки почти отсутствуют."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Точки смазки критически сухие, видимые следы смазки практически отсутствуют."/>
         <text name="ads_inspection_hint_corroded_wiring_stage2" text="На отдельных электрических соединениях заметны легкие следы окисления."/>
         <text name="ads_inspection_hint_corroded_wiring_stage3" text="На проводке и разъемах заметны выраженные следы окисления и загрязнения."/>
         <text name="ads_inspection_hint_corroded_wiring_stage4" text="На проводке и разъемах заметны сильные следы коррозии, местами изоляция выглядит поврежденной."/>

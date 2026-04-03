@@ -543,8 +543,12 @@
         <text name="ads_inspection_status_slightly_dirty" text="Leicht Verschmutzt"/>
         <text name="ads_inspection_status_dirty" text="Verschmutzt"/>
         <text name="ads_inspection_status_heavily_clogged" text="Stark Verstopft"/>
-    <text name="ads_inspection_status_critically_clogged" text="Kritisch Verstopft"/>
-    <text name="ads_inspection_status_not_required" text="Nicht erforderlich"/>
+        <text name="ads_inspection_status_critically_clogged" text="Kritisch Verstopft"/>
+        <text name="ads_inspection_status_slightly_dry" text="Leicht Trocken"/>
+        <text name="ads_inspection_status_dry" text="Trocken"/>
+        <text name="ads_inspection_status_very_dry" text="Sehr Trocken"/>
+        <text name="ads_inspection_status_critically_dry" text="Kritisch Trocken"/>
+        <text name="ads_inspection_status_not_required" text="Nicht erforderlich"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="Leichte Kühlmittelspuren sind an den Verbindungen des Kühlsystems sichtbar."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Kühlmittelrückstände sind sichtbar, und der Kühlmittelstand ist unter normal."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Ein deutlicher Kühlmittelverlust ist im Bereich des Kühlsystems sichtbar."/>
@@ -565,6 +569,10 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Der Luftansaugkanal ist deutlich verschmutzt."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Der Luftansaugkanal ist stark mit Staub und Schmutz zugesetzt."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Der Luftansaugkanal ist kritisch mit Staub und Schmutz zugesetzt."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="Die Schmierstellen wirken leicht trocken."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Die Schmierstellen wirken trocken und unzureichend geschmiert."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Die Schmierstellen sind sehr trocken, sichtbares Fett ist kaum vorhanden."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Die Schmierstellen sind kritisch trocken, sichtbares Fett ist nahezu nicht mehr vorhanden."/>
         <text name="ads_inspection_hint_corroded_wiring_stage2" text="An einzelnen elektrischen Verbindungen sind leichte Oxidationsspuren sichtbar."/>
         <text name="ads_inspection_hint_corroded_wiring_stage3" text="An Kabeln und Steckverbindern sind deutliche Oxidations- und Verschmutzungsspuren sichtbar."/>
         <text name="ads_inspection_hint_corroded_wiring_stage4" text="An Kabeln und Steckverbindern sind starke Korrosionsspuren sichtbar, und Teile der Isolierung wirken beschädigt."/>

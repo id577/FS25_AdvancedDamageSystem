@@ -310,6 +310,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#radiatorClogging", "Radiator clogging level")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#airIntakeClogging", "Air intake clogging level")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lubricationLevel", "Lubrication level")
+    schemaSavegame:register(XMLValueType.INT,    baseKey .. "#lastLubricationProcessedDay", "Last lubrication processed day")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#thermostatState", "Engine Thermostat Position")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionThermostatState", "Transmission Thermostat Position")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#lastServiceDate", "Last Service Date")
@@ -808,6 +809,7 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#radiatorClogging", math.max(spec.radiatorClogging or 0, 0))
         xmlFile:setValue(key .. "#airIntakeClogging", math.max(spec.airIntakeClogging or 0, 0))
         xmlFile:setValue(key .. "#lubricationLevel", math.clamp(spec.lubricationLevel or 1.0, 0.0, 1.0))
+        xmlFile:setValue(key .. "#lastLubricationProcessedDay", spec.lastLubricationProcessedDay or 0)
         xmlFile:setValue(key .. "#thermostatState", math.clamp(spec.thermostatState or 0.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#transmissionThermostatState", math.clamp(spec.transmissionThermostatState or 0.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower or 1)
@@ -961,6 +963,11 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.radiatorClogging = 0.0
     self.spec_AdvancedDamageSystem.airIntakeClogging = 0.0
     self.spec_AdvancedDamageSystem.lubricationLevel = 1.0
+    self.spec_AdvancedDamageSystem.lastLubricationDay = nil
+    self.spec_AdvancedDamageSystem.lastLubricationProcessedDay = g_currentMission ~= nil
+        and g_currentMission.environment ~= nil
+        and g_currentMission.environment.currentDay
+        or 6
 
     self.spec_AdvancedDamageSystem.batterySoc = 1.0
     self.spec_AdvancedDamageSystem.batteryChargeAh = nil
@@ -1395,6 +1402,10 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.radiatorClogging = math.max(savegame.xmlFile:getValue(key .. "#radiatorClogging", spec.radiatorClogging), 0)
         spec.airIntakeClogging = math.max(savegame.xmlFile:getValue(key .. "#airIntakeClogging", spec.airIntakeClogging), 0)
         spec.lubricationLevel = math.clamp(savegame.xmlFile:getValue(key .. "#lubricationLevel", spec.lubricationLevel), 0.0, 1.0)
+        spec.lastLubricationProcessedDay = savegame.xmlFile:getValue(
+            key .. "#lastLubricationProcessedDay",
+            g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.currentDay or spec.lastLubricationProcessedDay or 0
+        )
         spec.thermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#thermostatState", spec.thermostatState), 0.0, 1.0)
         spec.transmissionThermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#transmissionThermostatState", spec.transmissionThermostatState), 0.0, 1.0)
         if spec.engTermPID ~= nil then
@@ -2312,6 +2323,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:updateConditionLevel()
         -- general wear
         self:processGeneralWearBreakdown()
+        -- lubtication level
+        self:updateLubricationLevel(dt)
     end
 
     -- Raise dirty flags for changed data
@@ -4104,8 +4117,8 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         end
 
         -- lubrication
-        if isTurnedOn and spec.isVehicleNeedLubricate and spec.lubricationLevel < C.LUBRICATION_FACTOR_THRESHOLD then
-            lubricationFactor = ADS_Utils.calculateQuadraticMultiplier(spec.lubricationLevel, C.LUBRICATION_FACTOR_THRESHOLD, true, 0)
+        if isTurnedOn and spec.isVehicleNeedLubricate then
+            lubricationFactor = ADS_Utils.calculateQuadraticMultiplier(spec.lubricationLevel, 1.0, true, 0)
             lubricationFactor = lubricationFactor * (C.LUBRICATION_FACTOR_MULTIPLIER or 0)
             wearRate = wearRate + lubricationFactor
         end
@@ -7785,12 +7798,25 @@ end
 function AdvancedDamageSystem:updateLubricationLevel(dt)
     local C = ADS_Config.FIELD_CARE
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then
+    if spec == nil or not spec.isVehicleNeedLubricate then
         return
     end
 
-    if g_sleepManager.isSleeping then
-        spec.lubricationLevel = 0.0
+    local currentDay = g_currentMission.environment.currentDay
+    local prevLubricationLevel = tonumber(spec.lubricationLevel) or 0
+    if spec.lastLubricationProcessedDay == nil then
+        spec.lastLubricationProcessedDay = currentDay
+        return
+    end
+
+    if currentDay > spec.lastLubricationProcessedDay and not self:getIsMotorStarted() then
+        spec.lubricationLevel = math.max(spec.lubricationLevel - C.LUBRICATION_REDUCE_PER_DAY, 0)
+        spec.lastLubricationProcessedDay = currentDay
+        if self.isServer
+            and spec.adsDirtyFlag_state ~= nil
+            and math.abs((spec.lubricationLevel or 0) - prevLubricationLevel) > 0.0001 then
+            self:raiseDirtyFlags(spec.adsDirtyFlag_state)
+        end
     end
 end
 

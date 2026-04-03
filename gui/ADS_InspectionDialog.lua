@@ -26,18 +26,22 @@ local STATUS_PRIORITY = {
     ads_inspection_status_slightly_darkened = 1,
     ads_inspection_status_slight_moisture = 1,
     ads_inspection_status_slightly_dirty = 1,
+    ads_inspection_status_slightly_dry = 1,
     ads_inspection_status_low = 2,
     ads_inspection_status_darkened = 2,
     ads_inspection_status_seepage = 2,
     ads_inspection_status_dirty = 2,
+    ads_inspection_status_dry = 2,
     ads_inspection_status_very_low = 3,
     ads_inspection_status_contaminated = 3,
     ads_inspection_status_active_leak = 3,
     ads_inspection_status_heavily_clogged = 3,
+    ads_inspection_status_very_dry = 3,
     ads_inspection_status_critically_low = 4,
     ads_inspection_status_critical_condition = 4,
     ads_inspection_status_severe_leak = 4,
     ads_inspection_status_critically_clogged = 4,
+    ads_inspection_status_critically_dry = 4,
     ads_inspection_status_not_required = 0
 }
 
@@ -216,6 +220,35 @@ local function applyCloggingInspectionFindings(dialog, additionalLines)
     end
 end
 
+local function applyLubricationInspectionFindings(dialog, additionalLines)
+    local vehicle = dialog.vehicle
+    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    if spec == nil or spec.isVehicleNeedLubricate == false then
+        return
+    end
+
+    local lubricationLevel = math.clamp(tonumber(spec.lubricationLevel) or 0, 0, 1)
+    local statusKey = nil
+
+    if lubricationLevel <= 0.15 then
+        statusKey = "ads_inspection_status_critically_dry"
+        appendAdditionalLine(additionalLines, "ads_inspection_hint_lubrication_stage4")
+    elseif lubricationLevel <= 0.35 then
+        statusKey = "ads_inspection_status_very_dry"
+        appendAdditionalLine(additionalLines, "ads_inspection_hint_lubrication_stage3")
+    elseif lubricationLevel <= 0.60 then
+        statusKey = "ads_inspection_status_dry"
+        appendAdditionalLine(additionalLines, "ads_inspection_hint_lubrication_stage2")
+    elseif lubricationLevel <= 0.85 then
+        statusKey = "ads_inspection_status_slightly_dry"
+        appendAdditionalLine(additionalLines, "ads_inspection_hint_lubrication_stage1")
+    end
+
+    if statusKey ~= nil then
+        setRowValue(dialog.lubricationData, "ads_inspection_lubrication_level", statusKey)
+    end
+end
+
 function ADS_InspectionDialog.register()
     local dialog = ADS_InspectionDialog.new()
     g_gui:loadGui(modDirectory .. "gui/ADS_InspectionDialog.xml", "ADS_InspectionDialog", dialog)
@@ -277,6 +310,7 @@ function ADS_InspectionDialog:updateScreen()
 
     applyBreakdownInspectionFindings(self, additionalLines)
     applyCloggingInspectionFindings(self, additionalLines)
+    applyLubricationInspectionFindings(self, additionalLines)
 
     self.additionalText:setText(buildAdditionalText(additionalLines))
 

@@ -550,8 +550,12 @@
         <text name="ads_inspection_status_slightly_dirty" text="Slightly Dirty"/>
         <text name="ads_inspection_status_dirty" text="Dirty"/>
         <text name="ads_inspection_status_heavily_clogged" text="Heavily Clogged"/>
-    <text name="ads_inspection_status_critically_clogged" text="Critically Clogged"/>
-    <text name="ads_inspection_status_not_required" text="Not Required"/>
+        <text name="ads_inspection_status_critically_clogged" text="Critically Clogged"/>
+        <text name="ads_inspection_status_slightly_dry" text="Slightly Dry"/>
+        <text name="ads_inspection_status_dry" text="Dry"/>
+        <text name="ads_inspection_status_very_dry" text="Very Dry"/>
+        <text name="ads_inspection_status_critically_dry" text="Critically Dry"/>
+        <text name="ads_inspection_status_not_required" text="Not Required"/>
         <text name="ads_inspection_hint_coolant_leak_stage1" text="Slight traces of coolant are visible near the cooling system connections."/>
         <text name="ads_inspection_hint_coolant_leak_stage2" text="Coolant residue is visible, and the coolant level is below normal."/>
         <text name="ads_inspection_hint_coolant_leak_stage3" text="Noticeable coolant loss is visible around the cooling system area."/>
@@ -572,6 +576,10 @@
         <text name="ads_inspection_hint_air_intake_clogging_stage2" text="The air intake duct is noticeably dirty."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage3" text="The air intake duct is heavily clogged with dust and debris."/>
         <text name="ads_inspection_hint_air_intake_clogging_stage4" text="The air intake duct is critically clogged with dust and debris."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="Lubrication points look slightly dry."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Lubrication points look dry and insufficiently greased."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Lubrication points are very dry, with little visible grease remaining."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Lubrication points are critically dry, with almost no visible grease remaining."/>
         <text name="ads_inspection_hint_corroded_wiring_stage2" text="Light traces of oxidation are visible on some electrical connections."/>
         <text name="ads_inspection_hint_corroded_wiring_stage3" text="Pronounced oxidation and contamination are visible on the wiring and connectors."/>
         <text name="ads_inspection_hint_corroded_wiring_stage4" text="Severe corrosion is visible on the wiring and connectors, and some insulation appears damaged."/>

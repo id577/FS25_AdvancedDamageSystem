@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 104,
+    VER = 105,
 
     DEBUG = false,
 
@@ -157,8 +157,7 @@ ADS_Config = {
             LONG_HARVEST_TIMER_THRESHOLD = 0,
             LONG_HARVEST_TIMER_MAX = 3600,
             WET_CROP_FACTOR_MULTIPLIER = 10.0,
-            LUBRICATION_FACTOR_THRESHOLD = 0.5,
-            LUBRICATION_FACTOR_MULTIPLIER = 5.0
+            LUBRICATION_FACTOR_MULTIPLIER = 50.0
         },
 
         FUEL_FACTOR_DATA = {
@@ -456,6 +455,7 @@ ADS_Config = {
         CLEANING_SPEED = 0.05,
         AIR_INTAKE_BREAKDOWN_THRESHOLD = 0.5,
         FIELD_INSPECTION_DURATION = 6000,
+        LUBRICATION_REDUCE_PER_DAY = 0.2,
     },
 
     ELECTRICAL = {
