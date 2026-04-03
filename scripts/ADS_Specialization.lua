@@ -160,7 +160,6 @@ AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     coldFuelFactor = "cff",
     idleDepositFactor = "idf",
     highPressureFactor = "hpf",
-    longHarvestFactor = "lhf",
     wetCropFactor = "wcf",
     lubricationFactor = "lubf",
     instantDamageFactor = "idfg"
@@ -1163,9 +1162,7 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
-            longHarvestFactor = 0,
             wetCropFactor = 0,
-            longHarvestTimer = 0,
             currentHarvestRatio = 1.0,
             currentHarvestPercent = 100.0,
             lastUnloadOriginalFactor = 1.0,
@@ -4068,7 +4065,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workprocess.name)
     local systemData = ensureSystemData(spec, systemKey)
     local expiredServiceFactor = 0
-    local longHarvestFactor, wetCropFactor, breakdownPresenceFactor, lubricationFactor = 0, 0, 0, 0
+    local wetCropFactor, breakdownPresenceFactor, lubricationFactor = 0, 0, 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
 
@@ -4114,25 +4111,9 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local isHarvestingInProcess = isHarvesting(self)
 
     if isMotorStarted and not spec.isElectricVehicle then
-        -- longHarvestFactor
-        local longHarvestTimer = math.max(tonumber(systemData.longHarvestTimer) or 0, 0)
-        if isTurnedOn then
-            longHarvestTimer = math.min(longHarvestTimer + dt / 1000, C.LONG_HARVEST_TIMER_MAX)
-            if longHarvestTimer > C.LONG_HARVEST_TIMER_THRESHOLD then
-                longHarvestFactor = ADS_Utils.calculateQuadraticMultiplier(
-                    longHarvestTimer,
-                    C.LONG_HARVEST_TIMER_THRESHOLD,
-                    false,
-                    C.LONG_HARVEST_TIMER_MAX
-                )
-                longHarvestFactor = longHarvestFactor * C.LONG_HARVEST_FACTOR_MULTIPLIER
-                wearRate = wearRate + longHarvestFactor
-            end
-        else
-            longHarvestTimer = math.max(longHarvestTimer - 4 * dt / 1000, 0)
+        if not isTurnedOn then
             wearRate = wearRate * C.WORKPROCESSS_IDLING_MULTIPLIER
         end
-        systemData.longHarvestTimer = longHarvestTimer
 
         -- wetCrop
         if isTurnedOn and isWetWeather and isHarvestingInProcess then
@@ -4160,9 +4141,6 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
     else
-        if systemData.longHarvestTimer ~= nil and systemData.longHarvestTimer > 0 then
-                systemData.longHarvestTimer = math.max(systemData.longHarvestTimer - 4 * dt / 1000, 0)
-        end
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
         else
@@ -4172,11 +4150,9 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
 
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
-        longHarvestFactor = longHarvestFactor,
         wetCropFactor = wetCropFactor,
         lubricationFactor = lubricationFactor,
-        breakdownPresenceFactor = breakdownPresenceFactor,
-        longHarvestTimer = systemData.longHarvestTimer or 0
+        breakdownPresenceFactor = breakdownPresenceFactor
     })
 end
 

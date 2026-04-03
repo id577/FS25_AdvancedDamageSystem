@@ -884,7 +884,6 @@ function ADS_Hud:drawActiveVehicleHUD()
     ) * bcw
     local workprocessMaxFactor = math.max(
         workprocessDbg.expiredServiceFactor or 0,
-        workprocessDbg.longHarvestFactor or 0,
         workprocessDbg.wetCropFactor or 0,
         workprocessDbg.lubricationFactor or 0
     ) * bcw
@@ -1018,7 +1017,6 @@ function ADS_Hud:drawActiveVehicleHUD()
     local workprocessLines = buildSystemLines("workprocess", workprocessDbg, workprocessMaxFactor, {
         { shortName = "sf", statKey = "sf", value = workprocessDbg.expiredServiceFactor or 0 },
         { shortName = "bpf", statKey = "bpf", value = workprocessDbg.breakdownPresenceFactor or 0 },
-        { shortName = "lhf", statKey = "lhf", value = workprocessDbg.longHarvestFactor or 0, extraInfo = string.format("t: %.0fs", workprocessDbg.longHarvestTimer or 0) },
         { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 },
         { shortName = "lubf", statKey = "lubf", value = workprocessDbg.lubricationFactor or 0, extraInfo = string.format("lvl: %.1f%%", asPercent(lubricationLevel)) }
     })
