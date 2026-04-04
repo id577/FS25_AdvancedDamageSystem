@@ -91,9 +91,9 @@
                 </Bitmap>
                 
                 <SmoothList profile="ads_tableList" id="vehicleSpecTable" position="980px -75px" size="380px 510px">
-                    <ListItem profile="ads_tableListItemAlt" name="vehicleSpecRowTemplate" size="380px 40.77px" >
-                        <Text profile="ads_tableRowCellLeftAlt" position="10px 0px" size="220px 40.77px" name="reportTableVehicleSpecTitle" textLayoutMode="scrolling" />
-                        <Text profile="ads_tableRowCellRightAlt" position="235px 0px" size="135px 40.77px" name="reportTableVehicleSpecValue" />
+                    <ListItem profile="ads_tableListItem" name="vehicleSpecRowTemplate" size="380px 40.77px" >
+                        <Text profile="ads_tableRowCellLeft" position="10px 0px" size="220px 40.77px" name="reportTableVehicleSpecTitle" textLayoutMode="scrolling" />
+                        <Text profile="ads_tableRowCellRight" position="235px 0px" size="135px 40.77px" name="reportTableVehicleSpecValue" />
                     </ListItem>
                 </SmoothList>
                 
@@ -112,8 +112,8 @@
                 </Bitmap>
                 
                 <SmoothList profile="ads_tableList" id="breakdownsTable" position="20px -60px" size="650px 123px">
-                    <ListItem profile="ads_tableListItemAlt" name="reportBreakdownsRowTemplate" size="650px 30.77px" >
-                        <Text profile="ads_tableRowCellLeftAlt" position="10px 0px" size="630px 30.77px" name="reportBreakdownsRow" textLayoutMode="scrolling" />
+                    <ListItem profile="ads_tableListItem" name="reportBreakdownsRowTemplate" size="650px 30.77px" >
+                        <Text profile="ads_tableRowCellLeft" position="10px 0px" size="630px 30.77px" name="reportBreakdownsRow" textLayoutMode="scrolling" />
                     </ListItem>
                 </SmoothList>
             </GuiElement>
@@ -127,8 +127,8 @@
                 </Bitmap>
                 
                 <SmoothList profile="ads_tableList" id="recommendationsTable" position="20px -60px" size="650px 123px">
-                    <ListItem profile="ads_tableListItemAlt" name="reportRecRowTemplate" size="650px 30.77px" >
-                        <Text profile="ads_tableRowCellLeftAlt" position="10px 0px" size="630px 30.77px" name="reportRecRow" textLayoutMode="scrolling" />
+                    <ListItem profile="ads_tableListItem" name="reportRecRowTemplate" size="650px 30.77px" >
+                        <Text profile="ads_tableRowCellLeft" position="10px 0px" size="630px 30.77px" name="reportRecRow" textLayoutMode="scrolling" />
                     </ListItem>
                 </SmoothList>
             </GuiElement>

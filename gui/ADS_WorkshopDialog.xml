@@ -252,7 +252,7 @@
             <textAlignment value="right" />
             <textColor value="$preset_fs25_colorMainLight" />
             <textDisabledColor value="$preset_colorDisabled" />
-             <textSelectedColor value="$preset_fs25_colorMainDark" />
+            <textSelectedColor value="$preset_fs25_colorMainDark" />
         </Profile>
 
         <Profile name="ads_tableRowCellLeftUpper" extends="baseReference" with="anchorStretchingYLeft">

@@ -924,8 +924,8 @@ function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
     local nominalWearRate = 1 / spec.reliability / 100
 
     local assessmentConfig = {
-        ads_report_overall_assessment_condition =  {inverted = false, ideal = 0.8, high = 0.6, mid = 0.4, low = 0.2, stdVisible = true, isPercent = true},
-        ads_report_overall_assessment_service = {inverted = false, ideal = 0.9, high = 0.65, mid = 0.55, low = 0.45, stdVisible = true, isPercent = true},
+        ads_report_overall_assessment_condition =  {inverted = false, ideal = 0.99, high = 0.8, mid = 0.6, low = 0.4, stdVisible = true, isPercent = true},
+        ads_report_overall_assessment_service = {inverted = false, ideal = 0.9, high = 0.7, mid = 0.6, low = 0.5, stdVisible = true, isPercent = true},
         ads_report_overall_assessment_mtbf = {inverted = false, ideal = maxMtbf, high = diffMtbf * 0.66, mid = diffMtbf * 0.33, low = minMtbf, stdVisible = false, isPercent = false},
         ads_report_overall_assessment_rul = {inverted = false, ideal = rel, high = rel * 0.66, mid = rel * 0.33, low = minMtbf, stdVisible = false, isPercent = false},
         ads_report_overall_assessment_wear_rate = {inverted = true, ideal = nominalWearRate, high = nominalWearRate * 1.1, mid = nominalWearRate * 1.2, low = nominalWearRate * 1.3, stdVisible = false, isPercent = true},
@@ -1019,7 +1019,7 @@ function ADS_ReportDialog:populateSystemConditionCell(index, cell)
     local stressLabel = getStressLabel(stress, condition)
 
     local function getConditionColor(smooth)
-        return ADS_Utils.getValueColor(val, 80, 60, 40, 20, smooth)
+        return ADS_Utils.getValueColor(val, 95, 80, 60, 40, smooth)
     end
 
     local function getRiskColor(smooth)
