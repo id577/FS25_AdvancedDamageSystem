@@ -1,189 +1,157 @@
-<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="106">
-    <author>id577, Squallqt</author>
-    <version>0.9.1.0</version>
+<modDesc descVersion="99">
+    <author>Arrow</author>
+    <version>1.0.0.0</version>
     <title>
-        <en>Advanced Damage System</en>
-        <de>Erweitertes Schadenssystem</de>
-        <fr>Système Avancé De Dégâts</fr>
-        <it>Sistema Avanzato Di Danni</it>
-        <ru>Продвинутая Система Повреждений</ru>
+        <en>Employment</en>
+        <de>Beschäftigung</de>
+        <fr>L'Emploi</fr>
     </title>
     <description>
-        <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
+        <en>
+<![CDATA[ Many small farmers are forced to get part-time, or even full-time, jobs to support their farms during adverse economic situations. This mod allows you to get a job in order to earn some extra money while the farm work is slowing down or prices are going down.
 
-The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+Most production buildings are supported. Certain buildings on mod maps and mod placeables may not be supported. If a production is not supported, the option for employment will not be shown, otherwise an input button (Shift+Y) will be prompted when at the appropriate location, typically at the production's player icon, or when in range of the production.
 
-Changelog 0.9.1.0:
-- Reworked stress accumulation: stress can no longer exceed the current condition level of its system. When stress reaches condition, a breakdown occurs instantly
-- Returning leased ADS vehicles now applies penalties for active breakdowns and overdue maintenance. Compatible with Extended Leasing
-- Fixed: lubrication on harvesting vehicles now decays correctly instead of always staying at a normal level
-- Fixed: harvesting activity is now detected correctly for work process wear calculations and for checking the presence of large debris
-- Radiator and air intake clogging speed is now tied to the selected service interval length, allowing better adaptation to different gameplay styles
-- Removed the long harvest factor from the work process system
-- Reworked the fuel system's High Pressure Factor: it is now triggered by high fuel consumption instead of indirect engine load
-- Fixed incorrect data display in the maintenance log and inspection report
-- ADS now controls the vanilla engine temperature value
-- Fixed a bug where the battery could discharge too quickly when AI tried to start a vehicle while ENGINE_HARD_START_MODIFIER was active. As a temporary solution, AI is immune to ENGINE_HARD_START_MODIFIER
-- ADS now controls operating hour accumulation for ADS vehicles, so hours continue to accumulate even when the player leaves the engine running
+Multiplayer not supported due to how the mod works.
 
-Changelog 0.9.0.0:
-- Added multiplayer support
-- Reworked the vehicle condition model: overall condition is now built from multiple individual systems, each with its own condition and wear factors
-- Added a new stress system that accumulates stress in vehicle systems when machinery is used improperly, increasing breakdown risk
-- Added an advanced battery and alternator simulation
-- Added pre-shift vehicle inspection
-- Added new shop items: Grease Gun, Air Blower, and Jumper Cables for pre-shift service and jump-starting vehicles with a discharged battery
-- Added a fleet management table with all ADS vehicles for easier overview and control
-- Added many new breakdowns and reworked existing ones; breakdowns now have strict assignment to specific systems
-- Added a breakdown selection system that chooses failures based on which system factors were stressed or violated the most
-- Added new workshop options and reworked existing service and repair flows
-- Changed the hard engine start logic: the starter must now be held to crank the engine
-- Numerous minor balance and interface improvements]]></en>
-        <de><![CDATA[Advanced Damage System fügt Farming Simulator 25 ein tiefgehendes System für Verschleiß, Ausfälle, Diagnose, Wartung und Reparatur von Fahrzeugen hinzu. Anstelle eines einzigen allgemeinen Zustandswerts besteht jede Maschine aus mehreren einzelnen Systemen mit eigenem Zustand, eigenen Verschleißfaktoren, Stressaufbau und Ausfallrisiko. Fahrverhalten und Art der Defekte hängen von Einsatzbedingungen, Belastung, Temperatur und Wartungsqualität ab.
+Features:
 
-Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
+- Businesses:
+--- 22 unique business types, with more to be added
+--- almost every production point, factory, selling station and buying station across each map is it's own unique company
+--- each company has their characteristics which affect their salaries, and their likelihood of firing/promoting you, or giving you a raise
+--- companies will not hire you back after firing you
+--- relations with your employer can detiorate or improve based on your performance
 
-Changelog 0.9.1.0:
-- Die Stressakkumulation wurde überarbeitet: Stress kann nun den aktuellen Zustandswert des jeweiligen Systems nicht mehr überschreiten. Erreicht der Stress den Zustandswert, tritt sofort eine Panne auf
-- Bei der Rückgabe geleaster ADS-Fahrzeuge werden nun Strafkosten für aktive Defekte und überfällige Wartung berechnet. Kompatibel mit Extended Leasing
-- Behoben: Die Schmierung von Erntemaschinen nimmt jetzt korrekt ab, statt dauerhaft auf normalem Niveau zu bleiben
-- Behoben: Ernteaktivität wird nun korrekt für die Berechnung des Verschleißes im Arbeitssystem und für die Erkennung von grobem Schmutz erfasst
-- Die Verschmutzungsgeschwindigkeit von Kühler und Lufteinlass ist nun an das gewählte Wartungsintervall gekoppelt, um unterschiedliche Spielstile besser zu unterstützen
-- Der Long-Harvest-Faktor wurde aus dem Arbeitssystem entfernt
-- Der High Pressure Factor des Kraftstoffsystems wurde überarbeitet: Er wird nun durch hohen Kraftstoffverbrauch statt durch indirekte Motorlast ausgelöst
-- Fehlerhafte Datenanzeige im Wartungsprotokoll und im Inspektionsbericht wurde behoben
-- ADS steuert jetzt den Vanilla-Wert der Motortemperatur
-- Ein Fehler wurde behoben, bei dem sich die Batterie zu schnell entladen konnte, wenn die KI bei aktivem ENGINE_HARD_START_MODIFIER versuchte, ein Fahrzeug zu starten. Als vorläufige Lösung ist die KI gegen ENGINE_HARD_START_MODIFIER immun
-- ADS steuert jetzt die Erfassung der Betriebsstunden für ADS-Fahrzeuge, sodass sie weiterlaufen, auch wenn der Spieler das Fahrzeug mit laufendem Motor verlässt
+- Jobs:
+--- 35 unique jobs, with more to be added
+--- each job has its own salary, education/experience requirements, sub-promotions, and monthly working hour requirements
+--- your employer will pay you at the end of each month, based on how many hours you worked
+--- receive overtime pay for working beyond the requirements of your job
+--- climb the ladder to get vastly better paying jobs with less hours, giving you more time to focus on farming while getting more money
 
-Changelog 0.9.0.0:
-- Mehrspieler-Unterstützung hinzugefügt
-- Das Zustandsmodell der Fahrzeuge wurde überarbeitet: Der Gesamtzustand basiert nun auf mehreren einzelnen Systemen mit eigenem Zustand und eigenen Verschleißfaktoren
-- Neues Stresssystem hinzugefügt: Bei falscher Nutzung sammeln die Fahrzeugsysteme Belastung an, wodurch das Ausfallrisiko steigt
-- Erweiterte Simulation von Batterie und Lichtmaschine hinzugefügt
-- Vorschicht-Inspektion für Fahrzeuge hinzugefügt
-- Neue Shop-Gegenstände hinzugefügt: Fettpresse, Luftgebläse und Starthilfekabel für Vorschicht-Service und Starthilfe bei entladener Batterie
-- Eine Flottenübersicht mit allen ADS-Fahrzeugen für eine einfachere Verwaltung hinzugefügt
-- Viele neue Pannen hinzugefügt und bestehende überarbeitet; Ausfälle sind nun klar einzelnen Systemen zugeordnet
-- Ein neues System zur Auswahl von Pannen hinzugefügt, das Defekte danach bestimmt, welche Systemfaktoren am stärksten belastet oder verletzt wurden
-- Neue Werkstattoptionen hinzugefügt und bestehende Service- und Reparaturabläufe überarbeitet
-- Die Logik des erschwerten Motorstarts geändert: Der Anlasser muss nun gehalten werden, um den Motor durchzudrehen
-- Zahlreiche kleinere Balance- und Interface-Verbesserungen]]></de>
-        <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
+- Education:
+--- 5 education types, from high school to doctorate
+--- each education type requires you to study at home for a set amount of time
+--- once you have the studied sufficiently, you can take an exam to achieve the education level
+--- each exam is increasingly difficult for each different education level
+--- failing an exam will prevent you from re-taking the exam for 24 hours
+--- reach the next education level in order to unlock new jobs with vastly better salaries
 
-Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+- Part-Time Work:
+--- some jobs allow you to work part-time
+--- earn small amounts of money with no strings attached
+--- work however many hours you want without risk of being fired
 
-Changelog 0.9.1.0:
-- Refonte de l'accumulation de stress : le stress ne peut désormais plus dépasser le niveau de condition actuel de son système. Lorsque le stress atteint la condition, une panne survient instantanément
-- Le retour des véhicules ADS en leasing applique désormais des pénalités pour les pannes actives et l'entretien en retard. Compatible avec Extended Leasing
-- Correction : la lubrification des machines de récolte diminue désormais correctement au lieu de rester en permanence à un niveau normal
-- Correction : l'activité de récolte est maintenant détectée correctement pour les calculs d'usure du système de travail et pour la détection de gros débris
-- La vitesse d'encrassement du radiateur et de l'admission d'air est désormais liée à la durée de l'intervalle d'entretien sélectionné, pour mieux s'adapter aux différents styles de jeu
-- Suppression du facteur long harvest du système de travail
-- Refonte du High Pressure Factor du système de carburant : il se déclenche désormais en fonction d'une forte consommation de carburant plutôt que d'une charge moteur indirecte
-- Correction d'un affichage incorrect des données dans le journal d'entretien et le rapport d'inspection
-- ADS contrôle désormais la valeur vanilla de la température moteur
-- Correction d'un bug où la batterie pouvait se décharger trop rapidement lorsque l'IA tentait de démarrer un véhicule avec ENGINE_HARD_START_MODIFIER actif. Comme solution temporaire, l'IA est immunisée contre ENGINE_HARD_START_MODIFIER
-- ADS contrôle désormais l'accumulation des heures de fonctionnement pour les véhicules ADS, afin qu'elles continuent à s'accumuler même lorsque le joueur quitte un véhicule avec le moteur en marche
+- Experience:
+--- gain experience throughout the years, unlocking new jobs with better salaries and fewer hours ]]>
+        </en>
+        <de>
+<![CDATA[ Viele Kleinbauern sind gezwungen, Teilzeit- oder sogar Vollzeitjobs anzunehmen, um ihre Betriebe in wirtschaftlich schwierigen Zeiten zu unterstützen. Diese Mod ermöglicht es dir, einen Job anzunehmen, um etwas zusätzliches Geld zu verdienen, während die Arbeit auf dem Hof nachlässt oder die Preise sinken.
 
-Changelog 0.9.0.0:
-- Ajout du support multijoueur
-- Refonte du modèle d'état des véhicules : l'état global repose désormais sur plusieurs systèmes distincts, chacun avec son propre état et ses propres facteurs d'usure
-- Ajout d'un nouveau système de stress : une mauvaise utilisation augmente la charge des systèmes et le risque de panne
-- Ajout d'une simulation avancée de la batterie et de l'alternateur
-- Ajout de l'inspection visuelle avant prise de poste
-- Ajout de nouveaux objets en boutique : pompe à graisse, souffleur d'air et câbles de démarrage pour l'entretien avant service et le démarrage d'un véhicule à batterie déchargée
-- Ajout d'un tableau de gestion regroupant tous les véhicules ADS pour un suivi plus pratique
-- Ajout de nombreuses nouvelles pannes et refonte des anciennes ; chaque panne est désormais strictement rattachée à un système précis
-- Ajout d'un système de sélection des pannes qui choisit les défaillances en fonction des facteurs de système les plus sollicités ou les plus perturbés
-- Ajout de nouvelles options d'atelier et refonte des anciens flux d'entretien et de réparation
-- Modification de la logique de démarrage difficile du moteur : il faut désormais maintenir le démarreur pour lancer le moteur
-- De nombreuses améliorations mineures d'équilibrage et d'interface]]></fr>
+Multiplayer wird aufgrund der Funktionsweise des Mods nicht unterstützt.
 
-        <it><![CDATA[Advanced Damage System aggiunge a Farming Simulator 25 un sistema approfondito di usura, guasti, diagnostica, manutenzione e riparazione dei veicoli. Invece di basarsi su un unico valore generico di condizione, ogni macchina è composta da più sistemi separati con la propria condizione, i propri fattori di usura, accumulo di stress e rischio di guasto. Il comportamento del veicolo e la natura dei guasti dipendono dalle condizioni operative, dal carico, dalla temperatura e dalla qualità della manutenzione.
+Merkmale:
 
-Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine può compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrà la flotta affidabile ed eviterà problemi seri durante la stagione.
+- Unternehmen:
+--- 22 einzigartige Unternehmenstypen, weitere werden hinzugefügt
+--- fast jeder Produktionspunkt, jede Fabrik, jede Verkaufsstation und jede Einkaufsstation auf jeder Karte ist ein eigenes einzigartiges Unternehmen
+--- jedes Unternehmen hat seine eigenen Charakteristika, die sich auf die Gehälter und die Wahrscheinlichkeit auswirken, dass sie dich entlassen, befördern oder dir eine Gehaltserhöhung geben
+--- Unternehmen stellen dich nicht wieder ein, nachdem sie dich entlassen haben.
+--- die Beziehungen zu deinem Arbeitgeber können sich je nach deiner Leistung verschlechtern oder verbessern
 
-Changelog 0.9.1.0:
-- Rivisto il sistema di accumulo dello stress: lo stress non può più superare il livello di condizione attuale del proprio sistema. Quando lo stress raggiunge la condizione, il guasto si verifica immediatamente
-- La restituzione dei veicoli ADS in leasing applica ora penali per i guasti attivi e per la manutenzione scaduta. Compatibile con Extended Leasing
-- Corretto: la lubrificazione delle macchine da raccolta ora diminuisce correttamente invece di restare sempre a un livello normale
-- Corretto: l'attività di raccolta viene ora rilevata correttamente per i calcoli di usura del sistema di lavoro e per il controllo della presenza di detriti di grandi dimensioni
-- La velocità di intasamento del radiatore e della presa d'aria è ora collegata alla durata dell'intervallo di manutenzione selezionato, per adattarsi meglio ai diversi stili di gioco
-- Rimosso il fattore long harvest dal sistema di lavoro
-- Rivisto l'High Pressure Factor del sistema di alimentazione: ora si attiva in base all'elevato consumo di carburante invece che al carico motore indiretto
-- Corretta la visualizzazione errata dei dati nel registro di manutenzione e nel report di ispezione
-- ADS ora controlla il valore vanilla della temperatura motore
-- Corretto un bug per cui la batteria poteva scaricarsi troppo rapidamente quando l'IA tentava di avviare un veicolo con ENGINE_HARD_START_MODIFIER attivo. Come soluzione temporanea, l'IA è immune a ENGINE_HARD_START_MODIFIER
-- ADS ora controlla l'accumulo delle ore di funzionamento per i veicoli ADS, così le ore continuano ad accumularsi anche quando il giocatore lascia il motore acceso
+- Berufe:
+--- 35 einzigartige Jobs, weitere werden hinzugefügt
+--- jeder Job hat sein eigenes Gehalt, Anforderungen an Ausbildung/Erfahrung, Unterbeförderungen und monatliche Arbeitsstundenanforderungen
+--- dein Arbeitgeber bezahlt dich am Ende eines jeden Monats, basierend auf der Anzahl deiner Arbeitsstunden
+--- Sie erhalten eine Überstundenvergütung für Arbeiten, die über die Anforderungen Ihrer Stelle hinausgehen
+--- die Karriereleiter zu erklimmen, um weitaus besser bezahlte Jobs mit weniger Arbeitsstunden zu bekommen, so dass Sie mehr Zeit haben, sich auf die Landwirtschaft zu konzentrieren, während Sie mehr Geld bekommen
 
-Changelog 0.9.0.0:
-- Aggiunto supporto multigiocatore
-- Rivisto il modello delle condizioni del veicolo: la condizione generale ora dipende da più sistemi separati, ognuno con la propria condizione e i propri fattori di usura
-- Aggiunto un nuovo sistema di stress: l'uso improprio accumula stress nei sistemi del veicolo e aumenta il rischio di guasti
-- Aggiunta una simulazione avanzata di batteria e alternatore
-- Aggiunta l'ispezione pre-turno del veicolo
-- Aggiunti nuovi oggetti nel negozio: ingrassatore, soffiatore d'aria e cavi di avviamento per il servizio pre-turno e l'avviamento di veicoli con batteria scarica
-- Aggiunta una tabella di gestione con tutti i veicoli ADS per un controllo più comodo del parco mezzi
-- Aggiunti numerosi nuovi guasti e rivisti quelli esistenti; ora ogni guasto appartiene in modo preciso a un sistema specifico
-- Aggiunto un sistema di selezione dei guasti che determina le avarie in base ai fattori di sistema maggiormente stressati o compromessi
-- Aggiunte nuove opzioni d'officina e rivisti i flussi esistenti di manutenzione e riparazione
-- Modificata la logica di avviamento difficile del motore: ora il motorino di avviamento deve essere tenuto premuto per far girare il motore
-- Numerose piccole modifiche al bilanciamento e all'interfaccia]]></it>
+- Bildung:
+--- 5 Bildungstypen, von der Oberschule bis zum Doktorat
+--- jeder Bildungstyp erfordert, dass man zu Hause eine bestimmte Zeit lang lernt
+--- sobald man ausreichend gelernt hat, kann man eine Prüfung ablegen, um die Bildungsstufe zu erreichen
+--- jede Prüfung ist für jede Bildungsstufe zunehmend schwieriger
+--- Wenn Sie eine Prüfung nicht bestehen, können Sie die Prüfung für 24 Stunden nicht wiederholen.
+--- Erreichen Sie die nächste Ausbildungsstufe, um neue Jobs mit weitaus besseren Gehältern freizuschalten
 
-        <ru><![CDATA[Advanced Damage System добавляет в Farming Simulator 25 глубокую систему износа, поломок, диагностики, обслуживания и ремонта техники. Вместо одного условного параметра состояния каждая машина состоит из отдельных систем, каждая из которых имеет собственный уровень состояния, факторы износа, накопление стресса и риск отказа. Поведение техники и характер поломок зависят от условий эксплуатации, нагрузки, температуры и качества обслуживания.
+- Halbtagsarbeit:
+--- einige Jobs erlauben es Ihnen, in Teilzeit zu arbeiten
+--- kleine Geldbeträge zu verdienen, ohne Bedingungen zu stellen
+--- arbeiten Sie so viele Stunden, wie Sie wollen, ohne Gefahr zu laufen, gefeuert zu werden
 
-Мод включает температурную модель ключевых систем, продвинутую симуляцию аккумулятора и генератора, реалистичную логику поломок, расширенные сценарии работы с мастерской, сервисные отчёты, журнал обслуживания и возможность проведения предсменного осмотра. В результате техника требует не только ремонта, но и грамотного планирования: обслуживание занимает время, неправильная эксплуатация повышает риск отказов, а пренебрежение состоянием машин может сорвать важные полевые работы. Ответственный фермер, который следит за техникой, вовремя обслуживает её и не работает на пределе возможностей без необходимости, сможет сохранить парк в надёжном состоянии и избежать серьёзных проблем в сезон.
+- Erfahrung:
+--- im Laufe der Jahre Erfahrungen sammeln, die neue Arbeitsplätze mit besseren Gehältern und weniger Arbeitsstunden freischalten ]]>
+        </de>
+        <fr>
+<![CDATA[ De nombreux petits agriculteurs sont contraints de prendre un emploi à temps partiel, voire à temps plein, pour subvenir aux besoins de leur exploitation lorsque la situation économique est défavorable. Ce mod vous permet de trouver un emploi afin de gagner un peu plus d'argent pendant que le travail de la ferme ralentit ou que les prix baissent.
 
-Changelog 0.9.1.0:
-- Переработана система накопления стресса: стресс больше не может превышать текущий уровень состояния своей системы. Когда стресс достигает уровня состояния, поломка происходит мгновенно
-- При возврате транспорта ADS, взятого в лизинг, теперь начисляются штрафы за активные поломки и просроченное ТО. Совместимо с модом Extended Leasing
-- Исправлено: уровень смазки уборочной техники теперь корректно уменьшается, а не остаётся постоянно в норме
-- Исправлено: активность уборки урожая теперь корректно определяется для расчётов износа рабочей системы и для проверки наличия крупного мусора
-- Скорость загрязнения радиаторов и воздухозаборников теперь привязана к выбранной длительности сервисного интервала, чтобы лучше адаптироваться к разным стилям игры
-- Удалён long harvest factor из системы work process
-- Переработан High Pressure Factor в топливной системе: теперь он срабатывает от высокого расхода топлива, а не от косвенной загрузки двигателя
-- Исправлено некорректное отображение данных в журнале обслуживания и в отчёте осмотра
-- ADS теперь управляет ванильным значением температуры двигателя
-- Исправлен баг, из-за которого аккумулятор мог слишком быстро разряжаться, когда ИИ пытался завести технику при активном эффекте ENGINE_HARD_START_MODIFIER. В качестве временного решения ИИ имеет иммунитет к ENGINE_HARD_START_MODIFIER
-- ADS теперь управляет начислением моточасов для своей техники, поэтому моточасы продолжают накапливаться, даже если игрок покинул технику с работающим двигателем
+La plupart des bâtiments de production sont pris en charge. Certains bâtiments sur les cartes modifiées et les éléments modifiables peuvent ne pas être pris en charge. Si une production n'est pas prise en charge, l'option d'emploi ne s'affichera pas. Sinon, un bouton de saisie (Maj+Y) s'affichera lorsque vous vous trouverez à l'emplacement approprié, généralement au niveau de l'icône du joueur de la production, ou lorsque vous serez à portée de la production.
 
-Changelog 0.9.0.0:
-- Добавлена поддержка мультиплеера
-- Полностью переработана модель состояния техники: теперь общее состояние формируется не одним параметром, а состоянием отдельных систем, каждая из которых имеет собственный уровень износа и свои факторы деградации
-- Добавлена новая система стресса: при неправильной эксплуатации техника накапливает нагрузку по системам, что повышает вероятность поломок
-- Добавлена продвинутая симуляция аккумулятора и генератора
-- Добавлена возможность проведения предсменного осмотра техники
-- В магазин добавлены новые предметы: Grease Gun, Air Blower, Jumper Cables для предсменного обслуживания и запуска техники с разряженным аккумулятором
-- В меню добавлена таблица со всей техникой Advanced Damage System для более удобного управления парком
-- Добавлено множество новых поломок, а существующие переработаны. Теперь каждая поломка имеет чёткую принадлежность к конкретной системе
-- Добавлена новая логика выбора поломок: вероятность их возникновения теперь зависит от того, какие факторы износа и нагрузки были сильнее всего нарушены в соответствующей системе
-- Добавлены новые опции мастерской, а существующие варианты обслуживания и ремонта переработаны
-- Изменена логика сложного запуска двигателя: теперь для запуска стартер необходимо удерживать, имитируя реальную прокрутку двигателя
-- Многочисленные минорные изменения в балансе и интерфейсе]]></ru>
-        
+Le mode multijoueur n'est pas supporté en raison du fonctionnement du mod.
+
+Caractéristiques :
+
+- Entreprises :
+--- 22 types d'entreprises uniques, avec d'autres à ajouter
+--- Presque chaque point de production, usine, station de vente et station d'achat sur chaque carte est une entreprise unique.
+--- chaque entreprise a ses propres caractéristiques qui affectent leurs salaires, et leur probabilité de vous licencier/promouvoir, ou de vous donner une augmentation.
+--- les entreprises ne vous réembaucheront pas après vous avoir licencié
+--- les relations avec votre employeur peuvent se détériorer ou s'améliorer en fonction de vos performances.
+
+- Les emplois :
+--- 35 emplois uniques, et d'autres à venir
+--- chaque emploi a son propre salaire, ses exigences en matière d'éducation et d'expérience, ses sous-promotions et ses exigences en matière d'heures de travail mensuelles
+--- votre employeur vous paiera à la fin de chaque mois, en fonction du nombre d'heures travaillées
+--- recevoir une rémunération pour les heures supplémentaires effectuées au-delà des exigences de votre travail
+--- gravir les échelons pour obtenir des emplois beaucoup mieux rémunérés avec moins d'heures de travail, ce qui vous laisse plus de temps pour vous consacrer à l'agriculture tout en gagnant plus d'argent.
+
+- L'éducation :
+--- 5 types d'éducation, du lycée au doctorat
+--- chaque type d'éducation nécessite d'étudier à la maison pendant une durée déterminée
+--- Une fois que vous avez suffisamment étudié, vous pouvez passer un examen pour atteindre le niveau d'éducation.
+--- chaque examen est de plus en plus difficile pour chaque niveau d'études différent
+--- si vous échouez à un examen, vous ne pourrez pas le repasser pendant 24 heures
+--- atteindre le niveau d'éducation suivant afin de débloquer de nouveaux emplois avec des salaires bien plus élevés.
+
+- Travail à temps partiel :
+--- certains emplois vous permettent de travailler à temps partiel
+--- gagner de petites sommes d'argent sans conditions particulières
+--- travailler autant d'heures que vous le souhaitez sans risquer d'être licencié
+
+- Expérience :
+--- acquérir de l'expérience au fil des ans, débloquer de nouveaux emplois avec de meilleurs salaires et moins d'heures de travail ]]>
+        </fr>
     </description>
-    <storeItems>
-        <storeItem xmlFilename="objects/greaseGun/greaseGun.xml"/>
-        <storeItem xmlFilename="objects/airBlower/airBlower.xml"/>
-        <storeItem xmlFilename="objects/jumperCables/jumperCables.xml"/>
-    </storeItems>
-    <iconFilename>icon_ads.dds</iconFilename>
-    <multiplayer supported="true"/>
+    <iconFilename>icon_Employment.dds</iconFilename>
+    <multiplayer supported="false"/>
     <extraSourceFiles>
-        <sourceFile filename="scripts/ADS_Main.lua"/>
+        <sourceFile filename="src/RegisterSpecializations.lua"/>
+        <sourceFile filename="src/ProductionPoint.lua"/>
+        <sourceFile filename="src/EmploymentSystem.lua"/>
+        <sourceFile filename="src/PlayerInputComponent.lua"/>
+        <sourceFile filename="src/FSBaseMission.lua"/>
+        <sourceFile filename="src/FSCareerMissionInfo.lua"/>
+        <sourceFile filename="src/EmploymentDialog.lua"/>
+        <sourceFile filename="src/EducationDialog.lua"/>
+        <sourceFile filename="src/WorkHoursDialog.lua"/>
+        <sourceFile filename="src/PlaceableFarmhouse.lua"/>
+        <sourceFile filename="src/PlaceableFactory.lua"/>
+        <sourceFile filename="src/I18N.lua"/>
     </extraSourceFiles>
-    <actions>
-        <action name="ADS_FIELD_INSPECTION" axisType="HALF" displayCategory="PLAYER_INTERACTIVE"/>
-    </actions>
+
     <inputBinding>
-        <actionBinding action="ADS_FIELD_INSPECTION">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_r"/>
+        <actionBinding action="Employment">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_y"/>
+        </actionBinding>
+        <actionBinding action="Education">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_u"/>
         </actionBinding>
     </inputBinding>
-    <l10n filenamePrefix="translations/l10n"/>
-    <dependencies>
-        <dependency>FS25_Vehicle_Years</dependency>
-    </dependencies>
+    <actions>
+        <action name="Employment"/>
+        <action name="Education"/>
+    </actions>
+
+    <l10n filenamePrefix="translations/translation"/>
 </modDesc>

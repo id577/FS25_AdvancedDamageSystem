@@ -174,7 +174,8 @@ local function createEmptyFactorStats(systems)
     for systemKey, _ in pairs(systems) do
         result[systemKey] = {
             total = 0,
-            stress = 0
+            stress = 0,
+            operatingHours = -1
         }
     end
 
@@ -262,10 +263,9 @@ local function ensureFactorStats(spec, vehicle)
         local stats = spec.factorStats[systemKey]
         stats.total = tonumber(stats.total) or 0
         stats.stress = tonumber(stats.stress) or 0
-        if tonumber(stats.operatingHours) == nil then
-            stats.operatingHours = getVehicleOperatingHours(vehicle)
-        else
-            stats.operatingHours = tonumber(stats.operatingHours) or 0
+        stats.operatingHours = tonumber(stats.operatingHours)
+        if stats.operatingHours == nil then
+            stats.operatingHours = -1
         end
     end
 
@@ -1949,6 +1949,17 @@ local function registerVehicle(vehicle)
 
             --- Updating vehicle's reliability and maintainability
             spec.reliability, spec.maintainability = AdvancedDamageSystem.getBrandReliability(vehicle)
+
+            local factorStats = ensureFactorStats(spec, vehicle)
+            local currentOperatingHours = getVehicleOperatingHours(vehicle)
+            for _, systemStats in pairs(factorStats) do
+                if type(systemStats) == "table" then
+                    local operatingHours = tonumber(systemStats.operatingHours)
+                    if operatingHours == nil or operatingHours < 0 then
+                        systemStats.operatingHours = currentOperatingHours
+                    end
+                end
+            end
         end
     end
 end

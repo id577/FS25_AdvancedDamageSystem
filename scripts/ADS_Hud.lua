@@ -793,6 +793,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     local cloggingHasDebris = radiatorDbg.hasDebris == true or airIntakeDbg.hasDebris == true
     local cloggingWetnessFactor = tonumber(airIntakeDbg.baseWetnessFactor or radiatorDbg.baseWetnessFactor or 1) or 1
     local factorStatsOperatingHours = 0
+    local currentOperatingSeconds = 0
+    if vehicle.getOperatingTime ~= nil then
+        currentOperatingSeconds = math.floor((tonumber(vehicle:getOperatingTime()) or 0) / 1000)
+    end
     if type(spec.factorStats) == "table" then
         for _, stats in pairs(spec.factorStats) do
             if type(stats) == "table" and tonumber(stats.operatingHours) ~= nil then
@@ -802,7 +806,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
     end
     addLine(overviewLines, string.format(
-        "condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
+        "op.hours: %d s | condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
+        currentOperatingSeconds,
         asPercent(spec.conditionLevel or 0),
         asPercent(spec.serviceLevel or 0),
         asPercent(serviceWearRate),
