@@ -407,6 +407,7 @@ function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "addCutterArea", ADS_Breakdowns.addCutterAreaOverwrite)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDischargeNodeEmptyFactor", ADS_Breakdowns.getDischargeNodeEmptyFactorOverwrite)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getSellPrice", AdvancedDamageSystem.getSellPrice)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateMotorTemperature", AdvancedDamageSystem.updateMotorTemperature)
     
 end
 
@@ -4099,7 +4100,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         local highPressureThreshold = tonumber(C.HIGH_PRESSURE_FACTOR_THRESHOLD) or 0.8
         if currentFuelUsageRatio > highPressureThreshold then
             highPressureFactor = ADS_Utils.calculateQuadraticMultiplier(currentFuelUsageRatio, highPressureThreshold, false)
-            highPressureFactor = highPressureFactor * (C.HIGH_PRESSURE_FACTOR_MULTIPLIER or 0)
+            highPressureFactor = math.min(highPressureFactor * C.HIGH_PRESSURE_FACTOR_MULTIPLIER, C.HIGH_PRESSURE_FACTOR_MULTIPLIER)
             wearRate = wearRate + highPressureFactor
         end
 
@@ -4129,6 +4130,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         coldFuelFactor = coldFuelFactor,
         idleDepositFactor = idleDepositFactor,
         highPressureFactor = highPressureFactor,
+        currentFuelUsageRatio = currentFuelUsageRatio,
         breakdownPresenceFactor = breakdownPresenceFactor,
         idleTimer = systemData.idleTimer or 0,
         fuelLevel = fuelLevel,
@@ -7647,6 +7649,18 @@ function AdvancedDamageSystem:getSmoothedTemperature(dt)
             spec.transmissionTemperature = math.max(rawTransmissionTemperature, eviromentTemp)
         else
             spec.transmissionTemperature = math.max(currentTransmissionTemperature + alpha * (rawTransmissionTemperature - currentTransmissionTemperature), eviromentTemp)
+        end
+    end
+end
+
+function AdvancedDamageSystem.updateMotorTemperature(self, superFunc, dt)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil or spec.isExcludedVehicle then
+        return superFunc(self, dt)
+    else
+        local spec_motorized = self.spec_motorized
+        if spec_motorized ~= nil then
+            self.spec_motorized.motorTemperature.value = spec.engineTemperature or 0
         end
     end
 end

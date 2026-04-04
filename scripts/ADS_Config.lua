@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 106,
+    VER = 109,
 
     DEBUG = false,
 
@@ -74,7 +74,7 @@ ADS_Config = {
             COLD_MOTOR_MULTIPLIER = 220.0,
             OVERHEAT_MOTOR_MULTIPLIER = 500.0, 
             OVERHEAT_MOTOR_THRESHOLD = 95,
-            AIR_INTAKE_CLOGGING_MULTIPLIER = 3.0,
+            AIR_INTAKE_CLOGGING_MULTIPLIER = 2.0,
             AIR_INTAKE_CLOGGING_THRESHOLD = 0.5
         },
 
@@ -116,7 +116,7 @@ ADS_Config = {
             SERVICE_EXPIRED_MULTIPLIER = 18.0,
             HIGH_COOLING_FACTOR_MULTIPLIER = 14.0,
             HIGH_COOLING_FACTOR_THRESHOLD = 0.9,
-            OVERHEAT_FACTOR_MULTIPLIER = 450.0,
+            OVERHEAT_FACTOR_MULTIPLIER = 200.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
             COLD_SHOCK_FACTOR_MULTIPLIER = 180.0,
             COLD_SHOCK_FACTOR_THRESHOLD = 50

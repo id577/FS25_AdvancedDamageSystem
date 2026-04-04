@@ -1011,7 +1011,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "lff", statKey = "lff", value = fuelDbg.lowFuelStarvationFactor or 0, extraInfo = string.format("lvl: %.2f", asPercent(fuelDbg.fuelLevel or 0)) },
         { shortName = "cff", statKey = "cff", value = fuelDbg.coldFuelFactor or 0, extraInfo = string.format("ft: %.1f C", fuelDbg.fuelTemperature or 0) },
         { shortName = "idf", statKey = "idf", value = fuelDbg.idleDepositFactor or 0, extraInfo = string.format("t: %.0fs", fuelDbg.idleTimer or 0) },
-        { shortName = "hpf", statKey = "hpf", value = fuelDbg.highPressureFactor or 0 }
+        { shortName = "hpf", statKey = "hpf", value = fuelDbg.highPressureFactor or 0, extraInfo = string.format("r: %.3f", fuelDbg.currentFuelUsageRatio or 0) }
     })
 
     local workprocessLines = buildSystemLines("workprocess", workprocessDbg, workprocessMaxFactor, {
@@ -1569,6 +1569,10 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
         elseif debugKey == "motorLoadFactor" then
             if dbg.motorLoad ~= nil then
                 return string.format("load %.3f", tonumber(dbg.motorLoad) or 0)
+            end
+        elseif debugKey == "highPressureFactor" then
+            if dbg.currentFuelUsageRatio ~= nil then
+                return string.format("ratio %.3f", tonumber(dbg.currentFuelUsageRatio) or 0)
             end
         elseif debugKey == "airIntakeCloggingFactor" then
             if dbg.airIntakeClogging ~= nil then
