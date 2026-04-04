@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 109,
+    VER = 110,
 
     DEBUG = false,
 
@@ -164,7 +164,7 @@ ADS_Config = {
             LOW_FUEL_THRESHOLD = 0.2,
             COLD_FUEL_THRESHOLD = 20,
             COLD_FUEL_FACTOR_MULTIPLIER = 160,
-            IDLE_DEPOSIT_FACTOR_MULTIPLIER = 12.0,
+            IDLE_DEPOSIT_FACTOR_MULTIPLIER = 4.0,
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
             IDLE_DEPOSIT_FACTOR_MAX_TIMER = 600,
             HIGH_PRESSURE_FACTOR_MULTIPLIER = 20.0,
