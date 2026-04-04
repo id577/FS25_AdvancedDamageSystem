@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 105,
+    VER = 106,
 
     DEBUG = false,
 
@@ -95,6 +95,7 @@ ADS_Config = {
             COLD_TRANSMISSION_THRESHOLD = 45,
             OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 450.0,
             OVERHEAT_TRANSMISSION_THRESHOLD = 95,
+            CVT_ADDON_DAMAGE_MULTIPLIER = 1.0
         },
 
         HYDRAULICS_FACTOR_DATA = {
@@ -166,9 +167,8 @@ ADS_Config = {
             IDLE_DEPOSIT_FACTOR_MULTIPLIER = 12.0,
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
             IDLE_DEPOSIT_FACTOR_MAX_TIMER = 600,
-            HIGH_PRESSURE_FACTOR_MULTIPLIER = 14.0,
-            HIGH_PRESSURE_FACTOR_THRESHOLD = 0.9,
-            HIGH_PRESSURE_FACTOR_THRESSHOLD = 0.9
+            HIGH_PRESSURE_FACTOR_MULTIPLIER = 20.0,
+            HIGH_PRESSURE_FACTOR_THRESHOLD = 0.8,
         },
 
         STRESS_COOLDOWN = 0.65,

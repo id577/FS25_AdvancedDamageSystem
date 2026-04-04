@@ -1993,7 +1993,7 @@ local function syncDeadBatteryEffect(vehicle)
     end
 end
 
-local function syncOverheatProtection(vehicle) -- TO-DO: Rework
+local function syncOverheatProtection(vehicle)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then return end
     local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
@@ -2930,7 +2930,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     })
 end
 
--- TO-DO: heavy trailer factor
 -- transmission (pullOverload, lugging, slip, cvtCold, cvtOverheat)
 function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -2945,12 +2944,24 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local wearRate = 1.0
     local massRatio = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
+    local cvtSpec = self.spec_CVTaddon
+    local cvtAddonExists = cvtSpec ~= nil and cvtSpec.CVTcfgExists
 
     if not systemData.enabled then
         return
     end
 
-    if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+    if cvtAddonExists then
+        if spec._prevCvtAddonDamage == nil then
+            spec._prevCvtAddonDamage = cvtSpec.CVTdamage
+        end
+        if cvtSpec.CVTdamage > spec._prevCvtAddonDamage then
+            local damageDiff = cvtSpec.CVTdamage - spec._prevCvtAddonDamage
+            wearRate = wearRate + damageDiff * (C.CVT_ADDON_DAMAGE_MULTIPLIER or 1)
+        end
+
+
+    elseif  self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
@@ -3920,6 +3931,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     if systemData == nil then return end
     local lowFuelStarvationFactor, coldFuelFactor = 0, 0
     local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
+    local currentFuelUsageRatio = 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
 
@@ -3963,9 +3975,76 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         return 0, 0, 0, nil
     end
 
+    local function getFuelUsageData()
+        local motorizedSpec = self.spec_motorized
+        if motorizedSpec == nil then
+            return 0, 0
+        end
+
+        local fuelConsumer = nil
+
+        if motorizedSpec.consumersByFillTypeName ~= nil then
+            fuelConsumer = motorizedSpec.consumersByFillTypeName["DIESEL"]
+                or motorizedSpec.consumersByFillTypeName["METHANE"]
+                or motorizedSpec.consumersByFillTypeName["ELECTRICCHARGE"]
+        end
+
+        if fuelConsumer == nil and motorizedSpec.consumers ~= nil then
+            for _, consumer in pairs(motorizedSpec.consumers) do
+                if consumer ~= nil and consumer.fillType ~= nil then
+                    if consumer.fillType == FillType.DIESEL
+                    or consumer.fillType == FillType.METHANE
+                    or consumer.fillType == FillType.ELECTRICCHARGE then
+                        fuelConsumer = consumer
+                        break
+                    end
+                end
+            end
+        end
+
+        local baseFuelUsageLh = 0
+        if fuelConsumer ~= nil and fuelConsumer.usage ~= nil then
+            if fuelConsumer.permanentConsumption then
+                baseFuelUsageLh = (fuelConsumer.usage or 0) * 60 * 60 * 1000
+            else
+                baseFuelUsageLh = fuelConsumer.usage or 0
+            end
+        end
+
+        local currentFuelUsageLh = motorizedSpec.lastFuelUsage or 0
+
+        local missionInfo = g_currentMission ~= nil and g_currentMission.missionInfo or nil
+        local usageFactor = 1.5
+        if missionInfo ~= nil then
+            if missionInfo.fuelUsage == 1 then
+                usageFactor = 1.0
+            elseif missionInfo.fuelUsage == 3 then
+                usageFactor = 2.5
+            end
+        end
+
+        local damageFactor = 1.0
+        if self.getVehicleDamage ~= nil and Motorized ~= nil and Motorized.DAMAGED_USAGE_INCREASE ~= nil then
+            local vehicleDamage = self:getVehicleDamage() or 0
+            if vehicleDamage > 0 then
+                damageFactor = damageFactor * (1 + vehicleDamage * Motorized.DAMAGED_USAGE_INCREASE)
+            end
+        end
+
+        local maxFuelUsageLh = baseFuelUsageLh * usageFactor * damageFactor
+
+        return currentFuelUsageLh, maxFuelUsageLh
+    end
+
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
         fuelLevel = getFuelLevel()
+        local currentFuelUsageLh, maxFuelUsageLh = getFuelUsageData()
+        if maxFuelUsageLh > 0 then
+            currentFuelUsageRatio = currentFuelUsageLh / maxFuelUsageLh
+        else
+            currentFuelUsageRatio = 0
+        end
 
         -- low fuel
         if fuelLevel < C.LOW_FUEL_THRESHOLD then
@@ -4017,9 +4096,9 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         systemData.idleTimer = idleTimer
 
         -- high pressure factor
-        local highPressureThreshold = tonumber(C.HIGH_PRESSURE_FACTOR_THRESHOLD) or 0.95
-        if motorLoad > highPressureThreshold then
-            highPressureFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, highPressureThreshold, false)
+        local highPressureThreshold = tonumber(C.HIGH_PRESSURE_FACTOR_THRESHOLD) or 0.8
+        if currentFuelUsageRatio > highPressureThreshold then
+            highPressureFactor = ADS_Utils.calculateQuadraticMultiplier(currentFuelUsageRatio, highPressureThreshold, false)
             highPressureFactor = highPressureFactor * (C.HIGH_PRESSURE_FACTOR_MULTIPLIER or 0)
             wearRate = wearRate + highPressureFactor
         end
@@ -7663,12 +7742,12 @@ function AdvancedDamageSystem:updateRadiatorClogging(dt)
     local isOnField = self:getIsOnField()
     local hasDust = getIsThereDust(self)
     local hasDebris = getIsThereDebris(self)
-    local fieldFactor = 0.0
+    local fieldFactor = 0.5
     local dustFactor = hasDust and 1.0 or 0.0
     local debrisFactor = hasDebris and 2.0 or 0.0
 
     if washableSpec ~= nil then
-        fieldFactor = isOnField and (washableSpec.fieldMultiplier or 1.0) or 0.0
+        fieldFactor = isOnField and (washableSpec.fieldMultiplier or 1.0) or 0.5
     end
 
     dbg.fieldFactor = fieldFactor

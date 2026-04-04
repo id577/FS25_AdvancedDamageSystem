@@ -5153,6 +5153,11 @@ function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
         return
     end
 
+    if self:getIsAIActive() and not engineFailure then
+        superFunc(self, noEventSend)
+        return
+    end
+
     if engineFailure then
         if engineFailure.extraData.starter then
             if isAutomaticStartAttempt then

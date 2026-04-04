@@ -225,11 +225,9 @@ Each system has its own set of wear factors that accelerate `Condition` loss and
 
 ### Work Process
 
-- **Long Operation Factor:** Triggers whenever the machine is turned on. The effect grows with continuous operation and reaches its maximum after `7200` seconds.
-
 - **Wet Crop Factor:** Triggers when the machine is turned on, harvesting is in progress, and the weather is wet.
 
-- **Lubrication Factor:** Triggers when the machine requires lubrication and lubrication level is below `50%`. The effect becomes stronger as lubrication level drops.
+- **Lubrication Factor:** Triggers when the machine requires lubrication and lubrication level is below `100%`. The effect becomes stronger as lubrication level drops.
 
 ## 3. Breakdowns
 
