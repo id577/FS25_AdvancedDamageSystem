@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="106">
     <author>id577, Squallqt</author>
-    <version>0.9.0.0</version>
+    <version>0.9.1.0</version>
     <title>
         <en>Advanced Damage System</en>
         <de>Erweitertes Schadenssystem</de>
@@ -13,6 +13,19 @@
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
 
 The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+
+Changelog 0.9.1.0:
+- Reworked stress accumulation: stress can no longer exceed the current condition level of its system. When stress reaches condition, a breakdown occurs instantly
+- Returning leased ADS vehicles now applies penalties for active breakdowns and overdue maintenance. Compatible with Extended Leasing
+- Fixed: lubrication on harvesting vehicles now decays correctly instead of always staying at a normal level
+- Fixed: harvesting activity is now detected correctly for work process wear calculations and for checking the presence of large debris
+- Radiator and air intake clogging speed is now tied to the selected service interval length, allowing better adaptation to different gameplay styles
+- Removed the long harvest factor from the work process system
+- Reworked the fuel system's High Pressure Factor: it is now triggered by high fuel consumption instead of indirect engine load
+- Fixed incorrect data display in the maintenance log and inspection report
+- ADS now controls the vanilla engine temperature value
+- Fixed a bug where the battery could discharge too quickly when AI tried to start a vehicle while ENGINE_HARD_START_MODIFIER was active. As a temporary solution, AI is immune to ENGINE_HARD_START_MODIFIER
+- ADS now controls operating hour accumulation for ADS vehicles, so hours continue to accumulate even when the player leaves the engine running
 
 Changelog 0.9.0.0:
 - Added multiplayer support
@@ -31,6 +44,19 @@ Changelog 0.9.0.0:
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
+Changelog 0.9.1.0:
+- Die Stressakkumulation wurde überarbeitet: Stress kann nun den aktuellen Zustandswert des jeweiligen Systems nicht mehr überschreiten. Erreicht der Stress den Zustandswert, tritt sofort eine Panne auf
+- Bei der Rückgabe geleaster ADS-Fahrzeuge werden nun Strafkosten für aktive Defekte und überfällige Wartung berechnet. Kompatibel mit Extended Leasing
+- Behoben: Die Schmierung von Erntemaschinen nimmt jetzt korrekt ab, statt dauerhaft auf normalem Niveau zu bleiben
+- Behoben: Ernteaktivität wird nun korrekt für die Berechnung des Verschleißes im Arbeitssystem und für die Erkennung von grobem Schmutz erfasst
+- Die Verschmutzungsgeschwindigkeit von Kühler und Lufteinlass ist nun an das gewählte Wartungsintervall gekoppelt, um unterschiedliche Spielstile besser zu unterstützen
+- Der Long-Harvest-Faktor wurde aus dem Arbeitssystem entfernt
+- Der High Pressure Factor des Kraftstoffsystems wurde überarbeitet: Er wird nun durch hohen Kraftstoffverbrauch statt durch indirekte Motorlast ausgelöst
+- Fehlerhafte Datenanzeige im Wartungsprotokoll und im Inspektionsbericht wurde behoben
+- ADS steuert jetzt den Vanilla-Wert der Motortemperatur
+- Ein Fehler wurde behoben, bei dem sich die Batterie zu schnell entladen konnte, wenn die KI bei aktivem ENGINE_HARD_START_MODIFIER versuchte, ein Fahrzeug zu starten. Als vorläufige Lösung ist die KI gegen ENGINE_HARD_START_MODIFIER immun
+- ADS steuert jetzt die Erfassung der Betriebsstunden für ADS-Fahrzeuge, sodass sie weiterlaufen, auch wenn der Spieler das Fahrzeug mit laufendem Motor verlässt
+
 Changelog 0.9.0.0:
 - Mehrspieler-Unterstützung hinzugefügt
 - Das Zustandsmodell der Fahrzeuge wurde überarbeitet: Der Gesamtzustand basiert nun auf mehreren einzelnen Systemen mit eigenem Zustand und eigenen Verschleißfaktoren
@@ -47,6 +73,19 @@ Changelog 0.9.0.0:
         <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
 Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+
+Changelog 0.9.1.0:
+- Refonte de l'accumulation de stress : le stress ne peut désormais plus dépasser le niveau de condition actuel de son système. Lorsque le stress atteint la condition, une panne survient instantanément
+- Le retour des véhicules ADS en leasing applique désormais des pénalités pour les pannes actives et l'entretien en retard. Compatible avec Extended Leasing
+- Correction : la lubrification des machines de récolte diminue désormais correctement au lieu de rester en permanence à un niveau normal
+- Correction : l'activité de récolte est maintenant détectée correctement pour les calculs d'usure du système de travail et pour la détection de gros débris
+- La vitesse d'encrassement du radiateur et de l'admission d'air est désormais liée à la durée de l'intervalle d'entretien sélectionné, pour mieux s'adapter aux différents styles de jeu
+- Suppression du facteur long harvest du système de travail
+- Refonte du High Pressure Factor du système de carburant : il se déclenche désormais en fonction d'une forte consommation de carburant plutôt que d'une charge moteur indirecte
+- Correction d'un affichage incorrect des données dans le journal d'entretien et le rapport d'inspection
+- ADS contrôle désormais la valeur vanilla de la température moteur
+- Correction d'un bug où la batterie pouvait se décharger trop rapidement lorsque l'IA tentait de démarrer un véhicule avec ENGINE_HARD_START_MODIFIER actif. Comme solution temporaire, l'IA est immunisée contre ENGINE_HARD_START_MODIFIER
+- ADS contrôle désormais l'accumulation des heures de fonctionnement pour les véhicules ADS, afin qu'elles continuent à s'accumuler même lorsque le joueur quitte un véhicule avec le moteur en marche
 
 Changelog 0.9.0.0:
 - Ajout du support multijoueur
@@ -66,6 +105,19 @@ Changelog 0.9.0.0:
 
 Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine può compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrà la flotta affidabile ed eviterà problemi seri durante la stagione.
 
+Changelog 0.9.1.0:
+- Rivisto il sistema di accumulo dello stress: lo stress non può più superare il livello di condizione attuale del proprio sistema. Quando lo stress raggiunge la condizione, il guasto si verifica immediatamente
+- La restituzione dei veicoli ADS in leasing applica ora penali per i guasti attivi e per la manutenzione scaduta. Compatibile con Extended Leasing
+- Corretto: la lubrificazione delle macchine da raccolta ora diminuisce correttamente invece di restare sempre a un livello normale
+- Corretto: l'attività di raccolta viene ora rilevata correttamente per i calcoli di usura del sistema di lavoro e per il controllo della presenza di detriti di grandi dimensioni
+- La velocità di intasamento del radiatore e della presa d'aria è ora collegata alla durata dell'intervallo di manutenzione selezionato, per adattarsi meglio ai diversi stili di gioco
+- Rimosso il fattore long harvest dal sistema di lavoro
+- Rivisto l'High Pressure Factor del sistema di alimentazione: ora si attiva in base all'elevato consumo di carburante invece che al carico motore indiretto
+- Corretta la visualizzazione errata dei dati nel registro di manutenzione e nel report di ispezione
+- ADS ora controlla il valore vanilla della temperatura motore
+- Corretto un bug per cui la batteria poteva scaricarsi troppo rapidamente quando l'IA tentava di avviare un veicolo con ENGINE_HARD_START_MODIFIER attivo. Come soluzione temporanea, l'IA è immune a ENGINE_HARD_START_MODIFIER
+- ADS ora controlla l'accumulo delle ore di funzionamento per i veicoli ADS, così le ore continuano ad accumularsi anche quando il giocatore lascia il motore acceso
+
 Changelog 0.9.0.0:
 - Aggiunto supporto multigiocatore
 - Rivisto il modello delle condizioni del veicolo: la condizione generale ora dipende da più sistemi separati, ognuno con la propria condizione e i propri fattori di usura
@@ -83,6 +135,19 @@ Changelog 0.9.0.0:
         <ru><![CDATA[Advanced Damage System добавляет в Farming Simulator 25 глубокую систему износа, поломок, диагностики, обслуживания и ремонта техники. Вместо одного условного параметра состояния каждая машина состоит из отдельных систем, каждая из которых имеет собственный уровень состояния, факторы износа, накопление стресса и риск отказа. Поведение техники и характер поломок зависят от условий эксплуатации, нагрузки, температуры и качества обслуживания.
 
 Мод включает температурную модель ключевых систем, продвинутую симуляцию аккумулятора и генератора, реалистичную логику поломок, расширенные сценарии работы с мастерской, сервисные отчёты, журнал обслуживания и возможность проведения предсменного осмотра. В результате техника требует не только ремонта, но и грамотного планирования: обслуживание занимает время, неправильная эксплуатация повышает риск отказов, а пренебрежение состоянием машин может сорвать важные полевые работы. Ответственный фермер, который следит за техникой, вовремя обслуживает её и не работает на пределе возможностей без необходимости, сможет сохранить парк в надёжном состоянии и избежать серьёзных проблем в сезон.
+
+Changelog 0.9.1.0:
+- Переработана система накопления стресса: стресс больше не может превышать текущий уровень состояния своей системы. Когда стресс достигает уровня состояния, поломка происходит мгновенно
+- При возврате транспорта ADS, взятого в лизинг, теперь начисляются штрафы за активные поломки и просроченное ТО. Совместимо с модом Extended Leasing
+- Исправлено: уровень смазки уборочной техники теперь корректно уменьшается, а не остаётся постоянно в норме
+- Исправлено: активность уборки урожая теперь корректно определяется для расчётов износа рабочей системы и для проверки наличия крупного мусора
+- Скорость загрязнения радиаторов и воздухозаборников теперь привязана к выбранной длительности сервисного интервала, чтобы лучше адаптироваться к разным стилям игры
+- Удалён long harvest factor из системы work process
+- Переработан High Pressure Factor в топливной системе: теперь он срабатывает от высокого расхода топлива, а не от косвенной загрузки двигателя
+- Исправлено некорректное отображение данных в журнале обслуживания и в отчёте осмотра
+- ADS теперь управляет ванильным значением температуры двигателя
+- Исправлен баг, из-за которого аккумулятор мог слишком быстро разряжаться, когда ИИ пытался завести технику при активном эффекте ENGINE_HARD_START_MODIFIER. В качестве временного решения ИИ имеет иммунитет к ENGINE_HARD_START_MODIFIER
+- ADS теперь управляет начислением моточасов для своей техники, поэтому моточасы продолжают накапливаться, даже если игрок покинул технику с работающим двигателем
 
 Changelog 0.9.0.0:
 - Добавлена поддержка мультиплеера

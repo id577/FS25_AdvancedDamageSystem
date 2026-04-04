@@ -408,6 +408,8 @@ function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getDischargeNodeEmptyFactor", ADS_Breakdowns.getDischargeNodeEmptyFactorOverwrite)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getSellPrice", AdvancedDamageSystem.getSellPrice)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateMotorTemperature", AdvancedDamageSystem.updateMotorTemperature)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "setOperatingTime", AdvancedDamageSystem.setOperatingTime)
+
     
 end
 
@@ -909,6 +911,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.serviceLevel = self.spec_AdvancedDamageSystem.baseServiceLevel
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
     self.spec_AdvancedDamageSystem._prevConditionLevel = 0
+    self.spec_AdvancedDamageSystem._allowAdsOperatingTimeWrite = false
 
     self.spec_AdvancedDamageSystem.systems = {
         engine = { name = AdvancedDamageSystem.SYSTEMS.ENGINE, condition = 1.0, stress = 0.0, enabled = true },
@@ -1716,7 +1719,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec.rawEngineTemperature = spec.engineTemperature
     spec.rawTransmissionTemperature = spec.transmissionTemperature
 
-
     
     spec.isElectricVehicle = getIsElectricVehicle(self)
     spec.hydraulicsMoveAlphaCache = {}
@@ -1808,6 +1810,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec.isVehicleNeedBlowOut = getIsVehicleNeedBlowOut(self)
     resetIsMovingRecursive(self, {})
     spec._prevConditionLevel = self:getConditionLevel()
+
     self:recalculateAndApplyEffects()
 end
 
@@ -1949,8 +1952,6 @@ local function registerVehicle(vehicle)
         end
     end
 end
-
-
 
 local function syncColdEngineEffect(vehicle)
     local spec = vehicle.spec_AdvancedDamageSystem
@@ -2252,9 +2253,20 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     spec.effectsUpdateTimer = spec.effectsUpdateTimer - ADS_Config.EFFECTS_UPDATE_DELAY
 end
 
+
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
+
+    -- OP Time update for ADS vehicles
+    local motorState = self.getMotorState ~= nil and self:getMotorState() or nil
+    if motorState == MotorState.ON then
+        local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
+
+        spec._allowAdsOperatingTimeWrite = true
+        self:setOperatingTime(currentOperatingTime + (dt or 0), false)
+        spec._allowAdsOperatingTimeWrite = false
+    end
 
     -- Snapshot for dirty-flag comparison
     local prevServiceLevel = spec.serviceLevel
@@ -7557,8 +7569,8 @@ function AdvancedDamageSystem.getNewTermostatState(dt, currentTemp, targetTemp, 
     local maxOpening = 1.0
     
     if isMechanical then
-        local startOpenTemp = targetTemp - 10 
-        local fullOpenTemp = targetTemp + 3  
+        local startOpenTemp = targetTemp - 7
+        local fullOpenTemp = targetTemp + 5 
         targetPos = (currentTemp - startOpenTemp) / (fullOpenTemp - startOpenTemp)
         pidData.integral = 0
         pidData.lastError = 0
@@ -7999,6 +8011,15 @@ function AdvancedDamageSystem.updateDamageAmount(wearable, superFunc, dt)
 	else
 		return superFunc(wearable, dt)
 	end
+end
+
+function AdvancedDamageSystem.setOperatingTime(self, superFunc, operatingTime, isLoading)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec ~= nil and not spec.isExcludedVehicle and not isLoading and not spec._allowAdsOperatingTimeWrite then
+        return
+    end
+
+    superFunc(self, operatingTime, isLoading)
 end
 
 function AdvancedDamageSystem.getSellPrice(self, superFunc)
