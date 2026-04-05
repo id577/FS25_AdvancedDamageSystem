@@ -25,6 +25,7 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Si activé, l'ouvrier IA réduit la charge pour éviter la surcharge moteur ou la surchauffe."/>
         <text name="ads_debugMode_label" text="Mode débogage"/>
         <text name="ads_debugMode_tooltip" text="Active ou désactive le panneau de débogage et la journalisation de débogage étendue dans la console."/>
+        <text name="ads_mobileWorkshopRestrictions_label" text="Restrictions de l'atelier mobile"/>
         <text name="ads_serviceInterval_label" text="Intervalle d'entretien"/>
         <text name="ads_vehicleLifespan_label" text="Durée de vie du véhicule"/>
         <text name="ads_downtimeWear_label" text="Usure passive"/>
@@ -36,6 +37,7 @@
         <text name="ads_vehicleLifespan_tooltip" text="Définit la durée de vie de base du véhicule en heures, après laquelle son état atteindra 0 %. Plus l'état se rapproche de zéro, plus le véhicule devient peu fiable."/>
         <text name="ads_downtimeWear_tooltip" text="Définit la vitesse d'usure passive lorsqu'un véhicule reste à l'arrêt, en pourcentage du taux d'usure de base (Durée de vie du véhicule). Par exemple, 5 % avec la durée de vie par défaut de 100 heures signifie que chaque système perd environ 1 % d'état après environ 20 heures d'immobilisation. Remarque : l'usure passive est désactivée lorsque le véhicule est stocké sous abri."/>
         <text name="ads_generalWearEnabled_tooltip" text="Active l'usure liée à l'âge. À mesure que le véhicule s'use, chaque système subit de petites pénalités sur ses caractéristiques principales, comme la puissance moteur, la vitesse hydraulique ou l'efficacité du freinage. L'effet s'active après le premier tiers de la durée de vie, mais ne devient vraiment perceptible qu'après les deux tiers et se renforce à l'approche de la fin de vie de la machine."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="Lorsqu'elle est activée, la disponibilité des différentes interventions dans l'atelier mobile dépend de la maintenabilité du véhicule."/>
         <text name="ads_systemStressRate_tooltip" text="Détermine la vitesse à laquelle le stress s'accumule dans les systèmes sous l'effet de la surcharge, de la surchauffe, du patinage et d'autres conditions d'utilisation sévères. Le stress influe directement sur la probabilité de panne : plus un système accumule de stress, plus une panne devient probable."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajuste le comportement du modèle thermique. Des réglages plus élevés rendent le moteur et la transmission plus sensibles à la charge, à la température ambiante et à l'encrassement du radiateur, générant ainsi plus de chaleur dans les mêmes conditions."/>
         <text name="ads_thermal_none" text="Passif"/>

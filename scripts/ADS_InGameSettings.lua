@@ -107,6 +107,14 @@ function ADS_InGameSettings:onFrameOpen()
         g_i18n:getText("ads_maintenanceDuration_tooltip")
     )
 
+    -- Mobile Workshop Restrictions (Binary)
+    self.ads_mobileWorkshopRestrictions = ADS_InGameSettings:addBinaryOption(
+        self,
+        "onMobileWorkshopRestrictionsChanged",
+        g_i18n:getText("ads_mobileWorkshopRestrictions_label"),
+        g_i18n:getText("ads_mobileWorkshopRestrictions_tooltip")
+    )
+
     -- Workshop Available (Binary)
     self.ads_workshopAvailable = ADS_InGameSettings:addBinaryOption(
         self,
@@ -223,6 +231,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_generalWearEnabled:setIsChecked(ADS_Config.CORE.GENERAL_WEAR_ENABLED, false, false)
     currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL, false, false)
     currentPage.ads_workshopAvailable:setIsChecked(ADS_Config.WORKSHOP.ALWAYS_AVAILABLE, false, false)
+    currentPage.ads_mobileWorkshopRestrictions:setIsChecked(ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED, false, false)
     currentPage.ads_debugMode:setIsChecked(ADS_Config.DEBUG, false, false)
     
     setIndex(currentPage.ads_workshopOpenHour, steps.hours.values, ADS_Config.WORKSHOP.OPEN_HOUR)
@@ -251,6 +260,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_maintenancePrice:setDisabled(disableAll)
     currentPage.ads_maintenanceDuration:setDisabled(disableAll)
     currentPage.ads_workshopAvailable:setDisabled(disableAll)
+    currentPage.ads_mobileWorkshopRestrictions:setDisabled(disableAll)
     currentPage.ads_thermalSensitivity:setDisabled(disableAll)
     currentPage.ads_cloggingSpeed:setDisabled(disableAll)
     currentPage.ads_aiOverloadAndOverheatControl:setDisabled(disableAll)
@@ -313,6 +323,11 @@ function ADS_InGameSettings:onWorkshopAvailableChanged(state)
     ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
     ADS_Main:forceWorkshopUpdate()
+end
+
+function ADS_InGameSettings:onMobileWorkshopRestrictionsChanged(state)
+    ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
 function ADS_InGameSettings:onWorkshopOpenHourChanged(state)

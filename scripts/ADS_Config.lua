@@ -243,6 +243,7 @@ ADS_Config = {
             [3] = 0.8, OWN = 0.8,
         },
 
+        MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = true,
         MOBILE_WORKSHOP_SERVICES_BY_MAINTAINABILITY = {
             INSPECTION = {
                 [1] = 0.0,  STANDARD = 0.0,
@@ -675,6 +676,7 @@ function ADS_Config.saveToXMLFile()
 
     -- WORKSHOP
     setXMLBool (xmlFile, root .. ".ALWAYS_AVAILABLE",       ADS_Config.WORKSHOP.ALWAYS_AVAILABLE)
+    setXMLBool (xmlFile, root .. ".MOBILE_WORKSHOP_RESTRICTIONS_ENABLED", ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED)
     setXMLFloat(xmlFile, root .. ".OPEN_HOUR",              ADS_Config.WORKSHOP.OPEN_HOUR)
     setXMLFloat(xmlFile, root .. ".CLOSE_HOUR",             ADS_Config.WORKSHOP.CLOSE_HOUR)
 
@@ -789,6 +791,9 @@ function ADS_Config.loadFromXMLFile()
     -- WORKSHOP
     v = getXMLBool(xmlFile, root .. ".ALWAYS_AVAILABLE")
     if v ~= nil then ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = v end
+
+    v = getXMLBool(xmlFile, root .. ".MOBILE_WORKSHOP_RESTRICTIONS_ENABLED")
+    if v ~= nil then ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = v end
 
     v = getXMLFloat(xmlFile, root .. ".OPEN_HOUR")
     if v ~= nil then ADS_Config.WORKSHOP.OPEN_HOUR = v end

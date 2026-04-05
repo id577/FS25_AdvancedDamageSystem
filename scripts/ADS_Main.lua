@@ -37,7 +37,7 @@ do
     local cbs = {
         "onServiceWearChanged", "onConditionWearChanged", "onDowntimeWearChanged", "onGeneralWearEnabledChanged",
         "onSystemStressRateChanged", "onInstantInspectionChanged", "onParkVehicleChanged", "onWarrantyEnabledChanged",
-        "onMaintenancePriceChanged", "onMaintenanceDurationChanged", "onWorkshopAvailableChanged",
+        "onMaintenancePriceChanged", "onMaintenanceDurationChanged", "onWorkshopAvailableChanged", "onMobileWorkshopRestrictionsChanged",
         "onWorkshopOpenHourChanged", "onWorkshopCloseHourChanged", "onThermalSensitivityChanged",
         "onBatteryCapacityChanged", "onCloggingSpeedChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"
     }

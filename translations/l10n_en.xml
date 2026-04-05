@@ -25,6 +25,7 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="If enabled, the AI worker reduces load to prevent engine overload or overheating."/>
         <text name="ads_debugMode_label" text="Debug Mode"/>
         <text name="ads_debugMode_tooltip" text="Enables or disables debug panel and extensive debug logging in the console."/>
+        <text name="ads_mobileWorkshopRestrictions_label" text="Mobile Workshop Restrictions"/>
         <text name="ads_serviceInterval_label" text="Service Interval"/>
         <text name="ads_vehicleLifespan_label" text="Vehicle Lifespan"/>
         <text name="ads_downtimeWear_label" text="Passive Wear"/>
@@ -37,6 +38,7 @@
         <text name="ads_vehicleLifespan_tooltip" text="Sets the base vehicle lifespan in hours, after which its condition will reach 0%. The closer the condition is to zero, the more unreliable the vehicle becomes."/>
         <text name="ads_downtimeWear_tooltip" text="Sets the passive wear rate while a vehicle is idle as a percentage of the base wear rate (Vehicle Lifespan). For example, 5% with the default 100-hour lifespan means each system loses about 1% condition after roughly 20 hours of downtime. Note: passive wear is disabled while the vehicle is stored under cover."/>
         <text name="ads_generalWearEnabled_tooltip" text="Enables age-related wear. As the vehicle wears out, each system receives small penalties to its core characteristics, such as engine power, hydraulic speed, or brake efficiency. The effect becomes active after the first third of the vehicle lifespan, but only becomes noticeable after the second third and grows stronger toward the end of the machine's service life."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="When enabled, the availability of different procedures in the mobile workshop depends on the vehicle's maintainability."/>
         <text name="ads_systemStressRate_tooltip" text="Controls how quickly stress builds up in systems from overload, overheating, wheel slip, and other harsh operating conditions. Stress directly affects breakdown probability: the more stress a system accumulates, the more likely it is to fail."/>
         <text name="ads_batteryCapacity_tooltip" text="Adjusts the maximum usable battery capacity. Values close to 150 Ah are more realistic, but you may barely encounter battery discharge problems at that level."/>
         <text name="ads_thermalSensitivity_tooltip" text="Adjusts the thermal model behavior. Higher settings make the engine and transmission more sensitive to load, ambient temperature, and radiator fouling — generating more heat under the same conditions."/>

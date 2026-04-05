@@ -42,6 +42,10 @@ local function getMobileWorkshopAvailability(dialog)
         return true
     end
 
+    if not ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED then
+        return true
+    end
+
     local serviceKey = ADS_Utils.getNameByValue(AdvancedDamageSystem.STATUS, dialog.maintenanceType)
     local optionKey
 

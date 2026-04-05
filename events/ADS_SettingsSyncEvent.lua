@@ -29,6 +29,7 @@ function ADS_SettingsSyncEvent.new()
     self.globalPriceMultiplier     = ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER
     self.globalTimeMultiplier      = ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER
     self.alwaysAvailable           = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE
+    self.mobileWorkshopRestrictionsEnabled = ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED
     self.openHour                  = ADS_Config.WORKSHOP.OPEN_HOUR
     self.closeHour                 = ADS_Config.WORKSHOP.CLOSE_HOUR
     self.engineMaxHeat             = ADS_Config.THERMAL.ENGINE_MAX_HEAT
@@ -54,6 +55,7 @@ function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.globalPriceMultiplier  or 1)
     streamWriteFloat32(streamId, self.globalTimeMultiplier   or 1)
     streamWriteBool(streamId,    self.alwaysAvailable        or false)
+    streamWriteBool(streamId,    self.mobileWorkshopRestrictionsEnabled or false)
     streamWriteFloat32(streamId, self.openHour               or 8)
     streamWriteFloat32(streamId, self.closeHour              or 19)
     streamWriteFloat32(streamId, self.engineMaxHeat          or 1.05)
@@ -77,6 +79,7 @@ function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.globalPriceMultiplier     = streamReadFloat32(streamId)
     self.globalTimeMultiplier      = streamReadFloat32(streamId)
     self.alwaysAvailable           = streamReadBool(streamId)
+    self.mobileWorkshopRestrictionsEnabled = streamReadBool(streamId)
     self.openHour                  = streamReadFloat32(streamId)
     self.closeHour                 = streamReadFloat32(streamId)
     self.engineMaxHeat             = streamReadFloat32(streamId)
@@ -103,6 +106,7 @@ local function applyConfig(event)
     ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER  = event.globalPriceMultiplier
     ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER   = event.globalTimeMultiplier
     ADS_Config.WORKSHOP.ALWAYS_AVAILABLE                    = event.alwaysAvailable
+    ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = event.mobileWorkshopRestrictionsEnabled
     ADS_Config.WORKSHOP.OPEN_HOUR                           = event.openHour
     ADS_Config.WORKSHOP.CLOSE_HOUR                          = event.closeHour
     ADS_Config.THERMAL.ENGINE_MAX_HEAT                      = event.engineMaxHeat

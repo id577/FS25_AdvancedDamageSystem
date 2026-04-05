@@ -25,6 +25,7 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Se attivato, l'operaio IA riduce il carico per evitare sovraccarico o surriscaldamento del motore."/>
         <text name="ads_debugMode_label" text="Modalita debug"/>
         <text name="ads_debugMode_tooltip" text="Abilita o disabilita il pannello di debug e la registrazione estesa nella console."/>
+        <text name="ads_mobileWorkshopRestrictions_label" text="Restrizioni dell'officina mobile"/>
         <text name="ads_serviceInterval_label" text="Intervallo di manutenzione"/>
         <text name="ads_vehicleLifespan_label" text="Durata utile del veicolo"/>
         <text name="ads_downtimeWear_label" text="Usura passiva"/>
@@ -36,6 +37,7 @@
         <text name="ads_vehicleLifespan_tooltip" text="Imposta la durata utile di base del veicolo in ore, oltre la quale la sua condizione raggiungera lo 0%. Piu la condizione si avvicina allo zero, piu il veicolo diventa inaffidabile."/>
         <text name="ads_downtimeWear_tooltip" text="Imposta la velocita di usura passiva quando il veicolo resta fermo, come percentuale dell'usura di base (Durata utile del veicolo). Ad esempio, 5% con la durata utile predefinita di 100 ore significa che ogni sistema perde circa l'1% di condizione dopo circa 20 ore di inattivita. Nota: l'usura passiva viene disattivata quando il veicolo e ricoverato al coperto."/>
         <text name="ads_generalWearEnabled_tooltip" text="Abilita l'usura legata all'età. Man mano che il veicolo si usura, ogni sistema riceve piccole penalità alle proprie caratteristiche principali, come potenza del motore, velocità dell'idraulica o efficacia dei freni. L'effetto si attiva dopo il primo terzo della durata utile, ma diventa davvero percepibile solo dopo i due terzi e si intensifica verso la fine della vita operativa della macchina."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="Quando attivata, la disponibilita delle diverse procedure nell'officina mobile dipende dalla manutenibilita del veicolo."/>
         <text name="ads_systemStressRate_tooltip" text="Determina la velocita con cui lo stress si accumula nei sistemi a causa di sovraccarico, surriscaldamento, slittamento e altre condizioni operative gravose. Lo stress influisce direttamente sulla probabilita di guasto: piu stress si accumula in un sistema, piu aumenta il rischio di rottura."/>
         <text name="ads_thermalSensitivity_tooltip" text="Regola il comportamento del modello termico. Impostazioni piu elevate rendono motore e trasmissione piu sensibili al carico, alla temperatura ambiente e all'imbrattamento del radiatore, generando piu calore nelle stesse condizioni."/>
         <text name="ads_thermal_none" text="Passivo"/>
