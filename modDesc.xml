@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="106">
     <author>id577, Squallqt</author>
-    <version>0.9.1.0</version>
+    <version>0.9.1.1</version>
     <title>
         <en>Advanced Damage System</en>
         <de>Erweitertes Schadenssystem</de>
@@ -13,6 +13,12 @@
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
 
 The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+
+Changelog 0.9.1.1:
+- Increased interaction and connection distances for jumper cables
+- Implemented a filter for system wear and stress accumulation that dampens sustained high-value factors while allowing short impulses to pass through
+- Added new configuration options and expanded the adjustment ranges for existing ones
+- Rebalanced wear factor multipliers (generally reduced for better gameplay balance)
 
 Changelog 0.9.1.0:
 - Reworked stress accumulation: stress can no longer exceed the current condition level of its system. When stress reaches condition, a breakdown occurs instantly
@@ -44,6 +50,12 @@ Changelog 0.9.0.0:
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
+Changelog 0.9.1.1:
+- Interaktions- und Verbindungsdistanzen für Starthilfekabel wurden erhöht
+- Ein Filter für Systemverschleiß und Stressaufbau wurde implementiert, der anhaltend hohe Faktoren dämpft, während kurze Impulse weiterhin durchgelassen werden
+- Neue Konfigurationsoptionen wurden hinzugefügt und die Einstellbereiche bestehender Optionen erweitert
+- Multiplikatoren für Verschleißfaktoren wurden neu ausbalanciert und für ein besseres Gameplay insgesamt reduziert
+
 Changelog 0.9.1.0:
 - Die Stressakkumulation wurde überarbeitet: Stress kann nun den aktuellen Zustandswert des jeweiligen Systems nicht mehr überschreiten. Erreicht der Stress den Zustandswert, tritt sofort eine Panne auf
 - Bei der Rückgabe geleaster ADS-Fahrzeuge werden nun Strafkosten für aktive Defekte und überfällige Wartung berechnet. Kompatibel mit Extended Leasing
@@ -73,6 +85,12 @@ Changelog 0.9.0.0:
         <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
 Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+
+Changelog 0.9.1.1:
+- Augmentation des distances d'interaction et de connexion des câbles de démarrage
+- Mise en place d'un filtre pour l'usure des systèmes et l'accumulation de stress, qui atténue les facteurs élevés durables tout en laissant passer les impulsions courtes
+- Ajout de nouvelles options de configuration et extension des plages de réglage des options existantes
+- Rééquilibrage des multiplicateurs des facteurs d'usure, globalement réduits pour un meilleur équilibre de jeu
 
 Changelog 0.9.1.0:
 - Refonte de l'accumulation de stress : le stress ne peut désormais plus dépasser le niveau de condition actuel de son système. Lorsque le stress atteint la condition, une panne survient instantanément
@@ -105,6 +123,12 @@ Changelog 0.9.0.0:
 
 Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine può compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrà la flotta affidabile ed eviterà problemi seri durante la stagione.
 
+Changelog 0.9.1.1:
+- Aumentate le distanze di interazione e collegamento dei cavi di avviamento
+- Implementato un filtro per l'usura dei sistemi e l'accumulo di stress che attenua i fattori elevati prolungati lasciando però passare gli impulsi brevi
+- Aggiunte nuove opzioni di configurazione ed estesi gli intervalli di regolazione di quelle esistenti
+- Ribilanciati i moltiplicatori dei fattori di usura, generalmente ridotti per un miglior bilanciamento del gameplay
+
 Changelog 0.9.1.0:
 - Rivisto il sistema di accumulo dello stress: lo stress non può più superare il livello di condizione attuale del proprio sistema. Quando lo stress raggiunge la condizione, il guasto si verifica immediatamente
 - La restituzione dei veicoli ADS in leasing applica ora penali per i guasti attivi e per la manutenzione scaduta. Compatibile con Extended Leasing
@@ -135,6 +159,12 @@ Changelog 0.9.0.0:
         <ru><![CDATA[Advanced Damage System добавляет в Farming Simulator 25 глубокую систему износа, поломок, диагностики, обслуживания и ремонта техники. Вместо одного условного параметра состояния каждая машина состоит из отдельных систем, каждая из которых имеет собственный уровень состояния, факторы износа, накопление стресса и риск отказа. Поведение техники и характер поломок зависят от условий эксплуатации, нагрузки, температуры и качества обслуживания.
 
 Мод включает температурную модель ключевых систем, продвинутую симуляцию аккумулятора и генератора, реалистичную логику поломок, расширенные сценарии работы с мастерской, сервисные отчёты, журнал обслуживания и возможность проведения предсменного осмотра. В результате техника требует не только ремонта, но и грамотного планирования: обслуживание занимает время, неправильная эксплуатация повышает риск отказов, а пренебрежение состоянием машин может сорвать важные полевые работы. Ответственный фермер, который следит за техникой, вовремя обслуживает её и не работает на пределе возможностей без необходимости, сможет сохранить парк в надёжном состоянии и избежать серьёзных проблем в сезон.
+
+Changelog 0.9.1.1:
+- Увеличены дистанции взаимодействия и подключения для пусковых проводов
+- Реализован фильтр износа систем и накопления стресса, который приглушает длительные высокие факторы, но пропускает кратковременные импульсы
+- Добавлены новые настройки конфигурации и расширены диапазоны регулировки существующих параметров
+- Перебалансированы множители факторов износа: в целом они были снижены для более комфортного игрового баланса
 
 Changelog 0.9.1.0:
 - Переработана система накопления стресса: стресс больше не может превышать текущий уровень состояния своей системы. Когда стресс достигает уровня состояния, поломка происходит мгновенно
