@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 110,
+    VER = 113,
 
     DEBUG = false,
 
@@ -50,6 +50,9 @@ ADS_Config = {
             workProcess=0.10,
             fuel=0.08
         },
+
+        PERSISTENT_WEAR_RATE_LIMIT = 10.0,
+        IMPULSE_WEAR_RATE_LIMIT = 500.0,
 
         SYSTEM_STRESS_GLOBAL_MULTIPLIER = 1.0,
         SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS = {
@@ -480,6 +483,8 @@ ADS_Config = {
         AIR_INTAKE_BREAKDOWN_THRESHOLD = 0.5,
         FIELD_INSPECTION_DURATION = 6000,
         LUBRICATION_REDUCE_PER_DAY = 0.2,
+        RAYCAST_DISTANCE = 2.0,
+        JUMPER_CABLES_MAX_CONNECTION_DISTANCE = 12.0,
     },
 
     ELECTRICAL = {
@@ -677,6 +682,8 @@ function ADS_Config.saveToXMLFile()
 
     -- FIELD CARE
     setXMLFloat(xmlFile, root .. ".CLOGGING_SPEED",         ADS_Config.FIELD_CARE.CLOGGING_SPEED)
+    setXMLFloat(xmlFile, root .. ".RAYCAST_DISTANCE",        ADS_Config.FIELD_CARE.RAYCAST_DISTANCE)
+    setXMLFloat(xmlFile, root .. ".JUMPER_CABLES_MAX_CONNECTION_DISTANCE", ADS_Config.FIELD_CARE.JUMPER_CABLES_MAX_CONNECTION_DISTANCE)
 
     -- DEBUG
     setXMLBool (xmlFile, root .. ".DEBUG_MODE",             ADS_Config.DEBUG)
@@ -745,7 +752,6 @@ function ADS_Config.loadFromXMLFile()
     v = getXMLFloat(xmlFile, root .. ".BASE_SYSTEMS_WEAR")
     if v ~= nil then ADS_Config.CORE.BASE_SYSTEMS_WEAR = v end
 
-
     v = getXMLFloat(xmlFile, root .. ".SYSTEM_STRESS_GLOBAL_MULTIPLIER")
     if v ~= nil then ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = v end
 
@@ -791,6 +797,17 @@ function ADS_Config.loadFromXMLFile()
     -- FIELD CARE
     v = getXMLFloat(xmlFile, root .. ".CLOGGING_SPEED")
     if v ~= nil then ADS_Config.FIELD_CARE.CLOGGING_SPEED = v end
+
+    v = getXMLFloat(xmlFile, root .. ".RAYCAST_DISTANCE")
+    if v ~= nil then
+        ADS_Config.FIELD_CARE.RAYCAST_DISTANCE = v
+    else
+        v = getXMLFloat(xmlFile, root .. ".JUMPER_CABLES_RAYCAST_DISTANCE")
+        if v ~= nil then ADS_Config.FIELD_CARE.RAYCAST_DISTANCE = v end
+    end
+
+    v = getXMLFloat(xmlFile, root .. ".JUMPER_CABLES_MAX_CONNECTION_DISTANCE")
+    if v ~= nil then ADS_Config.FIELD_CARE.JUMPER_CABLES_MAX_CONNECTION_DISTANCE = v end
 
     -- DEBUG
     v = getXMLBool(xmlFile, root .. ".DEBUG_MODE")

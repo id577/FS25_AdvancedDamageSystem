@@ -8,7 +8,7 @@ local adsInspectionHoldTriggered = false
 
 local adsActiveInspectionVehicle = nil
 local adsInspectionProgressPercent = -1
-local adsInspectionMaxDistance = 4.0
+local adsInspectionMaxDistance = 6.0
 
 
 local function adsResetInspectionHoldState()

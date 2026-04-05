@@ -2789,22 +2789,33 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     wearRate = tonumber(wearRate) or baseWearRate
     wearRate = wearRate * (1 + spec.extraConditionWear) / reliability
 
+    --- filter
+    if systemData.persistentWearRateState == nil then
+        systemData.persistentWearRateState = 0
+    end
+    local tau = 700.0
+    local alpha = 1 - math.exp(-dt / tau)
+    local impulseWearRate = math.min(math.max(wearRate - systemData.persistentWearRateState, 0), ADS_Config.CORE.IMPULSE_WEAR_RATE_LIMIT)
+    systemData.persistentWearRateState = systemData.persistentWearRateState + (wearRate - systemData.persistentWearRateState) * alpha
+    local persistentWearRateLimited =  ADS_Config.CORE.PERSISTENT_WEAR_RATE_LIMIT * (1 - math.exp(-systemData.persistentWearRateState / ADS_Config.CORE.PERSISTENT_WEAR_RATE_LIMIT))
+    local effectiveWearRate = persistentWearRateLimited + impulseWearRate
+
     local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
     local systemStressMultiplier = stressMultipliers[systemName] or 1.0
     local globalStressMultiplier = math.max(tonumber(ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER) or 1.0, 0.0)
     local dtMultiplier = ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
 
-    local conditionToRemove = wearRate * dtMultiplier
+    local conditionToRemove = effectiveWearRate * dtMultiplier
     local newCondition = (systemData.condition or 1.0) - conditionToRemove
     systemData.condition = math.clamp(newCondition, 0.001, 1.0)
 
-    local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier * globalStressMultiplier
+    local stressToAdd = math.max(effectiveWearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier * globalStressMultiplier
     systemData.stress = math.clamp((systemData.stress or 0) + stressToAdd, 0, math.max(systemData.condition, ADS_Config.CORE.CONDITION_EFFECTIVE_FLOOR))
 
     local factorStats = ensureFactorStats(spec, self)
     local systemStats = factorStats[systemName]
     if type(systemStats) == "table" then
-        systemStats.total = (tonumber(systemStats.total) or 0) + wearRate * dtMultiplier
+        systemStats.total = (tonumber(systemStats.total) or 0) + effectiveWearRate * dtMultiplier
         systemStats.stress = (tonumber(systemStats.stress) or 0) + stressToAdd
 
         if type(debugFactors) == "table" then
@@ -2830,7 +2841,8 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
         local dbg = spec.debugData[systemName]
         dbg.condition = systemData.condition
         dbg.stress = systemData.stress
-        dbg.totalWearRate = wearRate
+        dbg.totalWearRate = effectiveWearRate
+        dbg.instantStressRate = dt > 0 and (stressToAdd * (60 * 60 * 1000) / dt) or 0
 
         if debugFactors ~= nil then
             for key, value in pairs(debugFactors) do
@@ -7274,7 +7286,10 @@ function AdvancedDamageSystem.isValidPowerPair(vehicleA, vehicleB)
     local dy = by - ay
     local dz = bz - az
     
-    if MathUtil.vector3Length(dx, dy, dz) > 5.0 then
+    local fieldCare = ADS_Config ~= nil and ADS_Config.FIELD_CARE or nil
+    local maxConnectionDistance = (fieldCare ~= nil and fieldCare.JUMPER_CABLES_MAX_CONNECTION_DISTANCE) or 12.0
+
+    if MathUtil.vector3Length(dx, dy, dz) > maxConnectionDistance then
         return false, 'TOO_FAR'
     end
     

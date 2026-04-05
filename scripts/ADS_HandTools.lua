@@ -1,7 +1,11 @@
 adsHandTools = {}
 
 local specName = "spec_" .. g_currentModName .. ".adsHandTools"
-local RAYCAST_DISTANCE = 1.5
+
+local function getRaycastDistance()
+    local fieldCare = ADS_Config ~= nil and ADS_Config.FIELD_CARE or nil
+    return (fieldCare ~= nil and fieldCare.RAYCAST_DISTANCE) or 1.5
+end
 
 -- ==========================================================
 --                          HELPERS
@@ -72,7 +76,7 @@ local function getRaycastVehicle(handTool, maxDistance)
     local x, y, z = getWorldTranslation(spec.raycastNode)
     local dx, dy, dz = localDirectionToWorld(spec.raycastNode, 0, 0, -1)
 
-    raycastAll(x, y, z, dx, dy, dz, maxDistance or RAYCAST_DISTANCE, "handToolRaycastCallback", handTool, nil, false, true)
+    raycastAll(x, y, z, dx, dy, dz, maxDistance or getRaycastDistance(), "handToolRaycastCallback", handTool, nil, false, true)
 
     return spec.raycastVehicle
 end
@@ -547,7 +551,7 @@ function adsHandTools:tryUseGreaseGunServer(targetVehicle, connection)
 
     local vehicle = normalizeConnectedVehicle(targetVehicle)
     if vehicle == nil then
-        vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
+        vehicle = getRaycastVehicle(self, getRaycastDistance())
     end
 
     if vehicle == nil then
@@ -771,7 +775,7 @@ function adsHandTools:onActionCallback(actionName, inputValue)
         end
     end
 
-    local vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
+    local vehicle = getRaycastVehicle(self, getRaycastDistance())
 
     --- greaseGun
     if vehicle ~= nil and spec.toolKind == "greaseGun" then
@@ -911,7 +915,7 @@ function adsHandTools:onUpdate(dt)
     if spec.toolKind == "airBlower" and self.isServer and not self.isClient then
         vehicle = normalizeConnectedVehicle(spec.serverTargetVehicle)
     else
-        vehicle = getRaycastVehicle(self, RAYCAST_DISTANCE)
+        vehicle = getRaycastVehicle(self, getRaycastDistance())
     end
 
     if vehicle == nil then

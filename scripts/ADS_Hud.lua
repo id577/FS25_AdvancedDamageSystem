@@ -929,8 +929,9 @@ function ADS_Hud:drawActiveVehicleHUD()
             asPercent((dbg.totalWearRate or 0) * bcw)
         ), getConditionFactorColor(maxFactor), 0.84)
         addLine(lines, string.format(
-            "S: %.2f (%.2f)",
+            "S: %.2f (+%.2f) t: %.2f",
             asPercent(getSystemStress(systemKey)),
+            asPercent(dbg.instantStressRate or 0),
             asPercent(getAccumulatedStat(systemKey, "stress"))
         ), {1, 1, 1, 1}, 0.84)
 
