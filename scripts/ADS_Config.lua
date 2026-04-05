@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 114,
+    VER = 115,
 
     DEBUG = false,
 
@@ -56,98 +56,98 @@ ADS_Config = {
 
         SYSTEM_STRESS_GLOBAL_MULTIPLIER = 1.0,
         SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS = {
-            engine=12.0, 
-            transmission=12.0, 
-            hydraulics=12.0, 
-            cooling=12.0, 
-            electrical=12.0, 
-            chassis=12.0, 
-            workProcess=24.0, 
-            fuel=12.0
+            engine=10.0, 
+            transmission=10.0, 
+            hydraulics=10.0, 
+            cooling=10.0, 
+            electrical=10.0, 
+            chassis=10.0, 
+            workProcess=20.0, 
+            fuel=10.0
         },
 
         ENGINE_FACTOR_DATA = {
             MOTOR_IDLING_MULTIPLIER = 0.5,
-            SERVICE_EXPIRED_MULTIPLIER = 32.0,
+            SERVICE_EXPIRED_MULTIPLIER = 16.0,
             MOTOR_IDLING_THRESHOLD = 0.3,
-            MOTOR_OVERLOADED_MULTIPLIER = 12.0, 
+            MOTOR_OVERLOADED_MULTIPLIER = 8.0, 
             MOTOR_OVERLOADED_THRESHOLD = 0.90,
             COLD_MOTOR_RPM_THRESHOLD = 0.5,
             COLD_MOTOR_TEMP_THRESHOLD = 50,         
-            COLD_MOTOR_MULTIPLIER = 220.0,
-            OVERHEAT_MOTOR_MULTIPLIER = 500.0, 
+            COLD_MOTOR_MULTIPLIER = 180.0,
+            OVERHEAT_MOTOR_MULTIPLIER = 360.0, 
             OVERHEAT_MOTOR_THRESHOLD = 95,
-            AIR_INTAKE_CLOGGING_MULTIPLIER = 2.0,
+            AIR_INTAKE_CLOGGING_MULTIPLIER = 1.0,
             AIR_INTAKE_CLOGGING_THRESHOLD = 0.5
         },
 
         TRANSMISSION_FACTOR_DATA = {
             TRANSMISSION_IDLING_MULTIPLIER = 0.2,
-            SERVICE_EXPIRED_MULTIPLIER = 18.0,
-            PULL_OVERLOAD_MULTIPLIER = 14.0,    
+            SERVICE_EXPIRED_MULTIPLIER = 9.0,
+            PULL_OVERLOAD_MULTIPLIER = 8.0,    
             PULL_OVERLOAD_THRESHOLD = 0.82,
             PULL_OVERLOAD_TIMER_THRESHOLD = 30,
-            LUGGING_MULTIPLIER = 50.0,       
+            LUGGING_MULTIPLIER = 32.0,       
             LUGGING_RPM_THRESHOLD = 0.8,
             LUGGING_MOTORLOAD_THRESHOLD = 0.80,
-            WHEEL_SLIP_MULTIPLIER = 80.0,        
+            WHEEL_SLIP_MULTIPLIER = 60.0,        
             WHEEL_SLIP_THRESHOLD = 0.1,
-            HEAVY_TRAILER_MULTIPLIER = 20.0,
+            HEAVY_TRAILER_MULTIPLIER = 12.0,
             HEAVY_TRAILER_THRESHOLD = 2.2,
             COLD_TRANSMISSION_MULTIPLIER = 180.0,
             COLD_TRANSMISSION_THRESHOLD = 45,
-            OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 450.0,
+            OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 360.0,
             OVERHEAT_TRANSMISSION_THRESHOLD = 95,
             CVT_ADDON_DAMAGE_MULTIPLIER = 1.0
         },
 
         HYDRAULICS_FACTOR_DATA = {
             HYDRAULICS_IDLING_MULTIPLIER = 0.2,
-            SERVICE_EXPIRED_MULTIPLIER = 12.0,
-            HEAVY_LIFT_FACTOR_MULTIPLIER = 30.0,
+            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            HEAVY_LIFT_FACTOR_MULTIPLIER = 18.0,
             HEAVY_LIFT_FACTOR_THRESHOLD = 0.3,
-            OPERATING_FACTOR_MULTIPLIER = 8.0,
+            OPERATING_FACTOR_MULTIPLIER = 4.0,
             COLD_OIL_MULTIPLIER = 180.0,
             COLD_OIL_THRESHOLD = 30,
             PTO_OPERATING_FACTOR = 0.0,
-            PTO_SHARP_ANGLE_FACTOR_MULTIPLIER = 120.0,
+            PTO_SHARP_ANGLE_FACTOR_MULTIPLIER = 80.0,
             PTO_SHARP_ANGLE_FACTOR_THRESHOLD = 20.0
         },
 
         COOLING_FACTOR_DATA = {
             COOLING_IDLING_MULTIPLIER = 0.2,
-            SERVICE_EXPIRED_MULTIPLIER = 18.0,
-            HIGH_COOLING_FACTOR_MULTIPLIER = 14.0,
+            SERVICE_EXPIRED_MULTIPLIER = 9.0,
+            HIGH_COOLING_FACTOR_MULTIPLIER = 8.0,
             HIGH_COOLING_FACTOR_THRESHOLD = 0.9,
-            OVERHEAT_FACTOR_MULTIPLIER = 200.0,
+            OVERHEAT_FACTOR_MULTIPLIER = 120.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
-            COLD_SHOCK_FACTOR_MULTIPLIER = 180.0,
+            COLD_SHOCK_FACTOR_MULTIPLIER = 120.0,
             COLD_SHOCK_FACTOR_THRESHOLD = 50
         },
 
         ELECTRICAL_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 8.0,
-            CRANKING_STRESS_MULTIPLIER = 30.0,
+            SERVICE_EXPIRED_MULTIPLIER = 4.0,
+            CRANKING_STRESS_MULTIPLIER = 12.0,
             RAIN_FACTOR_MULTIPLIER = 1.5,
             SNOW_FACTOR_MULTIPLIER = 1.0,
-            HALL_FACTOR_MULTIPLIER = 2.5,
-            OVERHEAT_FACTOR_MULTIPLIER = 350.0,
+            HALL_FACTOR_MULTIPLIER = 2.0,
+            OVERHEAT_FACTOR_MULTIPLIER = 360.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
-            LIGHTS_FACTOR_MULTIPLIER = 0.6
+            LIGHTS_FACTOR_MULTIPLIER = 0.4
         },
 
         CHASSIS_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 18.0,
+            SERVICE_EXPIRED_MULTIPLIER = 9.0,
             CHASSIS_IDLING_MULTIPLIER = 0.2,
-            VIB_FACTOR_THRESHOLD = 0.06,
+            VIB_FACTOR_THRESHOLD = 0.08,
             VIB_FACTOR_MAX_SIGNAL = 0.36,
-            VIB_FACTOR_MULTIPLIER = 50.0,
+            VIB_FACTOR_MULTIPLIER = 48.0,
             VIB_FIELD_MULTIPLIER = 2.0,
-            STEER_LOAD_FACTOR_MULTIPLIER = 50.0,
-            STEER_LOAD_SPEED_THRESHOLD = 4.0,
+            STEER_LOAD_FACTOR_MULTIPLIER = 32.0,
+            STEER_LOAD_SPEED_THRESHOLD = 3.0,
             STEER_LOAD_STEER_THRESHOLD = 0.2,
             STEER_LOAD_CHANGE_THRESHOLD = 0.08,
-            BRAKE_MASS_FACTOR_MULTIPLIER = 80.0,
+            BRAKE_MASS_FACTOR_MULTIPLIER = 48.0,
             BRAKE_MASS_RATIO_THRESHOLD = 1.0,
             BRAKE_MASS_RATIO_MAX = 5.0,
             BRAKE_MASS_SPEED_THRESHOLD = 2.0,
@@ -155,22 +155,22 @@ ADS_Config = {
         },
 
         WORKPROCESS_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            SERVICE_EXPIRED_MULTIPLIER = 3.0,
             WORKPROCESSS_IDLING_MULTIPLIER = 0.2,
-            WET_CROP_FACTOR_MULTIPLIER = 10.0,
-            LUBRICATION_FACTOR_MULTIPLIER = 50.0
+            WET_CROP_FACTOR_MULTIPLIER = 4.0,
+            LUBRICATION_FACTOR_MULTIPLIER = 32.0
         },
 
         FUEL_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 8.0,
-            LOW_FUEL_FACTOR_MULTIPLIER = 30.0,
+            SERVICE_EXPIRED_MULTIPLIER = 4.0,
+            LOW_FUEL_FACTOR_MULTIPLIER = 18.0,
             LOW_FUEL_THRESHOLD = 0.2,
             COLD_FUEL_THRESHOLD = 20,
-            COLD_FUEL_FACTOR_MULTIPLIER = 160,
-            IDLE_DEPOSIT_FACTOR_MULTIPLIER = 4.0,
+            COLD_FUEL_FACTOR_MULTIPLIER = 120,
+            IDLE_DEPOSIT_FACTOR_MULTIPLIER = 2.0,
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
             IDLE_DEPOSIT_FACTOR_MAX_TIMER = 600,
-            HIGH_PRESSURE_FACTOR_MULTIPLIER = 20.0,
+            HIGH_PRESSURE_FACTOR_MULTIPLIER = 12.0,
             HIGH_PRESSURE_FACTOR_THRESHOLD = 0.8,
         },
 
