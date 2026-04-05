@@ -9,6 +9,12 @@ local function formatPercentPrecise(val) return string.format("%.1f%%", val * 10
 local function formatMultiplier(val) return string.format("%.1fx", val) end
 local function formatHour(val) return string.format("%02d:00", val) end
 local function formatFloat2(val) return string.format("%.2f", val) end
+local function formatAh(val)
+    local text = string.format("%.2f", val)
+    text = text:gsub("(%..-)0+$", "%1")
+    text = text:gsub("%.$", "")
+    return text .. " Ah"
+end
 
 function ADS_InGameSettings:onFrameOpen()
     if self.ads_initSettingsMenuDone then
@@ -33,6 +39,22 @@ function ADS_InGameSettings:onFrameOpen()
         ADS_InGameSettings.steps.conditionWear.texts,
         g_i18n:getText("ads_vehicleLifespan_label"),
         g_i18n:getText("ads_vehicleLifespan_tooltip")
+    )
+
+    -- Passive Wear During Downtime
+    self.ads_downtimeWear = ADS_InGameSettings:addMultiTextOption(
+        self, "onDowntimeWearChanged",
+        ADS_InGameSettings.steps.downtimeWear.texts,
+        g_i18n:getText("ads_downtimeWear_label"),
+        g_i18n:getText("ads_downtimeWear_tooltip")
+    )
+
+    -- General Wear (Binary)
+    self.ads_generalWearEnabled = ADS_InGameSettings:addBinaryOption(
+        self,
+        "onGeneralWearEnabledChanged",
+        g_i18n:getText("ads_generalWearEnabled_label"),
+        g_i18n:getText("ads_generalWearEnabled_tooltip")
     )
 
     -- System Stress Rate
@@ -119,6 +141,14 @@ function ADS_InGameSettings:onFrameOpen()
         g_i18n:getText("ads_thermalSensitivity_tooltip")
     )
 
+    -- Battery Capacity
+    self.ads_batteryCapacity = ADS_InGameSettings:addMultiTextOption(
+        self, "onBatteryCapacityChanged",
+        ADS_InGameSettings.steps.batteryCapacity.texts,
+        g_i18n:getText("ads_batteryCapacity_label"),
+        g_i18n:getText("ads_batteryCapacity_tooltip")
+    )
+
     -- Clogging Speed
     self.ads_cloggingSpeed = ADS_InGameSettings:addMultiTextOption(
         self,
@@ -163,18 +193,25 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     local steps = ADS_InGameSettings.steps
 
     local function setIndex(element, valueList, targetValue)
+        local bestIndex = 1
+        local bestDiff = math.huge
+
         for i, v in ipairs(valueList) do
-            if math.abs(v - targetValue) < 0.0001 then
-                element:setState(i)
-                return
+            local diff = math.abs((tonumber(v) or 0) - (tonumber(targetValue) or 0))
+            if diff < bestDiff then
+                bestDiff = diff
+                bestIndex = i
             end
         end
-        element:setState(1)
+
+        element:setState(bestIndex)
     end
 
     setIndex(currentPage.ads_systemStressRate, steps.systemStressRate.values, ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER)
-    setIndex(currentPage.ads_serviceWear,       steps.serviceWear.values,    ADS_Config.CORE.BASE_SERVICE_WEAR)
-    setIndex(currentPage.ads_conditionWear,     steps.conditionWear.values,  ADS_Config.CORE.BASE_SYSTEMS_WEAR)
+    setIndex(currentPage.ads_batteryCapacity,  steps.batteryCapacity.values,  ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR)
+    setIndex(currentPage.ads_serviceWear,      steps.serviceWear.values,      ADS_Config.CORE.BASE_SERVICE_WEAR)
+    setIndex(currentPage.ads_conditionWear,    steps.conditionWear.values,    ADS_Config.CORE.BASE_SYSTEMS_WEAR)
+    setIndex(currentPage.ads_downtimeWear,     steps.downtimeWear.values,     ADS_Config.CORE.DOWNTIME_MULTIPLIER)
     setIndex(currentPage.ads_maintenancePrice,    steps.maintPrice.values,    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER * 100)
     setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER * 100)
     setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, ADS_Config.THERMAL.ENGINE_MAX_HEAT)
@@ -183,6 +220,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_instantInspection:setIsChecked(ADS_Config.MAINTENANCE.INSTANT_INSPECTION, false, false)
     currentPage.ads_parkVehicle:setIsChecked(ADS_Config.MAINTENANCE.PARK_VEHICLE, false, false)
     currentPage.ads_warrantyEnabled:setIsChecked(ADS_Config.MAINTENANCE.WARRANTY_ENABLED, false, false)
+    currentPage.ads_generalWearEnabled:setIsChecked(ADS_Config.CORE.GENERAL_WEAR_ENABLED, false, false)
     currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL, false, false)
     currentPage.ads_workshopAvailable:setIsChecked(ADS_Config.WORKSHOP.ALWAYS_AVAILABLE, false, false)
     currentPage.ads_debugMode:setIsChecked(ADS_Config.DEBUG, false, false)
@@ -202,8 +240,11 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
 
     currentPage.ads_serviceWear:setDisabled(disableAll)
     currentPage.ads_conditionWear:setDisabled(disableAll)
+    currentPage.ads_downtimeWear:setDisabled(disableAll)
+    currentPage.ads_generalWearEnabled:setDisabled(disableAll)
 
     currentPage.ads_systemStressRate:setDisabled(disableAll)
+    currentPage.ads_batteryCapacity:setDisabled(disableAll)
     currentPage.ads_instantInspection:setDisabled(disableAll)
     currentPage.ads_parkVehicle:setDisabled(disableAll)
     currentPage.ads_warrantyEnabled:setDisabled(disableAll)
@@ -230,6 +271,16 @@ end
 
 function ADS_InGameSettings:onConditionWearChanged(state)
     ADS_Config.CORE.BASE_SYSTEMS_WEAR = ADS_InGameSettings.steps.conditionWear.values[state]
+    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+end
+
+function ADS_InGameSettings:onDowntimeWearChanged(state)
+    ADS_Config.CORE.DOWNTIME_MULTIPLIER = ADS_InGameSettings.steps.downtimeWear.values[state]
+    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+end
+
+function ADS_InGameSettings:onGeneralWearEnabledChanged(state)
+    ADS_Config.CORE.GENERAL_WEAR_ENABLED = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
@@ -305,6 +356,11 @@ end
 
 function ADS_InGameSettings:onSystemStressRateChanged(state)
     ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = ADS_InGameSettings.steps.systemStressRate.values[state]
+    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+end
+
+function ADS_InGameSettings:onBatteryCapacityChanged(state)
+    ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR = ADS_InGameSettings.steps.batteryCapacity.values[state]
     ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
 end
 
@@ -432,16 +488,22 @@ function ADS_InGameSettings:generateAllSteps()
     end
 
     -- Service Interval
-    self.steps.serviceWear = createSteps(2.0, 37, 0.5, function(v)
-        return string.format("%.1f h", v)
-    end)
     do
         local data = { values = {}, texts = {} }
-        for i = 0, 36 do
-            local hours = 2.0 + i * 0.5
-            table.insert(data.values, 0.5 / hours)
-            table.insert(data.texts, string.format("%.1f h", hours))
+
+        local function addHourRange(startHour, endHour, stepHour)
+            local hours = startHour
+            while hours <= endHour + 0.0001 do
+                table.insert(data.values, 0.5 / hours)
+                table.insert(data.texts, string.format("%.1f h", hours))
+                hours = hours + stepHour
+            end
         end
+
+        addHourRange(1.0, 20.0, 1.0)
+        addHourRange(22.0, 50.0, 2.0)
+        addHourRange(55.0, 100.0, 5.0)
+
         self.steps.serviceWear = data
     end
 
@@ -449,18 +511,56 @@ function ADS_InGameSettings:generateAllSteps()
     -- 0.001 = 1000h, 0.030 = ~33h
     do
         local data = { values = {}, texts = {} }
-        for i = 0, 36 do
-            local hours = 40 + i * 10
-            table.insert(data.values, 1.0 / hours)  -- конвертируем в wear
-            table.insert(data.texts, string.format("%d h", hours))
+
+        local function addHourRange(startHour, endHour, stepHour)
+            local hours = startHour
+            while hours <= endHour + 0.0001 do
+                table.insert(data.values, 1.0 / hours)
+                table.insert(data.texts, string.format("%d h", hours))
+                hours = hours + stepHour
+            end
         end
+
+        addHourRange(40, 200, 10)
+        addHourRange(220, 500, 20)
+        addHourRange(550, 1000, 50)
+
         self.steps.conditionWear = data
+    end
+
+    -- Downtime Wear: Off, then 1% to 10%
+    do
+        local data = { values = {0.0}, texts = {g_i18n:getText("ads_option_off")} }
+        for percent = 1, 10 do
+            local value = percent / 100
+            table.insert(data.values, value)
+            table.insert(data.texts, string.format("%d%%", percent))
+        end
+        self.steps.downtimeWear = data
     end
 
     -- System Stress Rate: 10% to 300%
     self.steps.systemStressRate = createSteps(0.1, 30, 0.1, function(v)
         return string.format("%.0f%%", v * 100)
     end)
+
+    -- Battery Capacity in Ah (stored as usable capacity factor)
+    do
+        local nominalCapacity = tonumber(ADS_Config.ELECTRICAL.BATTERY_NOMINAL_CAPACITY) or 150
+        local data = { values = {}, texts = {} }
+        local factors = {0.025, 0.05, 0.075, 0.1}
+
+        for factor = 0.2, 1.0, 0.1 do
+            table.insert(factors, factor)
+        end
+
+        for _, factor in ipairs(factors) do
+            table.insert(data.values, factor)
+            table.insert(data.texts, formatAh(nominalCapacity * factor))
+        end
+
+        self.steps.batteryCapacity = data
+    end
 
     -- Maint Price: 10% to 300%
     self.steps.maintPrice = createSteps(10, 30, 10, function(v)

@@ -11,7 +11,7 @@
         <text name="ads_engineMaxHeat_label" text="Calore max motore"/>
         <text name="ads_engineMaxHeat_tooltip" text="Il tasso base di calore generato dal motore al carico massimo. Valori piu alti fanno riscaldare il motore piu rapidamente."/>
         <text name="ads_cloggingSpeed_label" text="Velocita di intasamento"/>
-        <text name="ads_cloggingSpeed_tooltip" text="Regola la velocita con cui radiatore e presa d'aria si intasano lavorando in polvere, pula e residui colturali. Valori piu alti accelerano l'accumulo di intasamento."/>
+        <text name="ads_cloggingSpeed_tooltip" text="Regola la velocita con cui radiatore e presa d'aria si intasano durante il lavoro in polvere, pula e residui colturali. Valori piu alti accelerano l'accumulo di intasamento. Al 100%, la velocita di intasamento corrisponde a circa un terzo dell'intervallo di manutenzione."/>
         <text name="ads_ws_header_title" text="Officina"/>
         <text name="ads_workshopAvailable_label" text="Officina aperta 24/7"/>
         <text name="ads_workshopAvailable_tooltip" text="Abilita o disabilita il funzionamento continuo dell'officina."/>
@@ -27,11 +27,16 @@
         <text name="ads_debugMode_tooltip" text="Abilita o disabilita il pannello di debug e la registrazione estesa nella console."/>
         <text name="ads_serviceInterval_label" text="Intervallo di manutenzione"/>
         <text name="ads_vehicleLifespan_label" text="Durata utile del veicolo"/>
+        <text name="ads_downtimeWear_label" text="Usura passiva"/>
+        <text name="ads_generalWearEnabled_label" text="Usura legata all'età"/>
         <text name="ads_systemStressRate_label" text="Velocita accumulo stress di sistema"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilita termica"/>
-        <text name="ads_serviceInterval_tooltip" text="Imposta l'intervallo di manutenzione di base oltre il quale e richiesta la manutenzione. L'intervallo reale varia in base alla marca del veicolo, all'eta e alla qualita delle manutenzioni precedenti."/>
-        <text name="ads_vehicleLifespan_tooltip" text="Imposta la durata utile di base del veicolo, oltre la quale la sua condizione raggiungera lo 0%. Piu la condizione si avvicina allo zero, piu il veicolo diventa inaffidabile."/>
-        <text name="ads_systemStressRate_tooltip" text="Controlla la velocita con cui lo stress di sistema si accumula a causa di sovraccarico, calore, slittamento e altre condizioni operative gravose. Valori piu alti portano i sistemi al livello critico piu rapidamente."/>
+        <text name="ads_option_off" text="Off"/>
+        <text name="ads_serviceInterval_tooltip" text="Imposta l'intervallo di manutenzione di base in ore, oltre il quale e richiesta la manutenzione. L'intervallo reale dipende dalla marca del veicolo, dalla sua eta e dalla qualita delle manutenzioni precedenti."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Imposta la durata utile di base del veicolo in ore, oltre la quale la sua condizione raggiungera lo 0%. Piu la condizione si avvicina allo zero, piu il veicolo diventa inaffidabile."/>
+        <text name="ads_downtimeWear_tooltip" text="Imposta la velocita di usura passiva quando il veicolo resta fermo, come percentuale dell'usura di base (Durata utile del veicolo). Ad esempio, 5% con la durata utile predefinita di 100 ore significa che ogni sistema perde circa l'1% di condizione dopo circa 20 ore di inattivita. Nota: l'usura passiva viene disattivata quando il veicolo e ricoverato al coperto."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Abilita l'usura legata all'età. Man mano che il veicolo si usura, ogni sistema riceve piccole penalità alle proprie caratteristiche principali, come potenza del motore, velocità dell'idraulica o efficacia dei freni. L'effetto si attiva dopo il primo terzo della durata utile, ma diventa davvero percepibile solo dopo i due terzi e si intensifica verso la fine della vita operativa della macchina."/>
+        <text name="ads_systemStressRate_tooltip" text="Determina la velocita con cui lo stress si accumula nei sistemi a causa di sovraccarico, surriscaldamento, slittamento e altre condizioni operative gravose. Lo stress influisce direttamente sulla probabilita di guasto: piu stress si accumula in un sistema, piu aumenta il rischio di rottura."/>
         <text name="ads_thermalSensitivity_tooltip" text="Regola il comportamento del modello termico. Impostazioni piu elevate rendono motore e trasmissione piu sensibili al carico, alla temperatura ambiente e all'imbrattamento del radiatore, generando piu calore nelle stesse condizioni."/>
         <text name="ads_thermal_none" text="Passivo"/>
         <text name="ads_thermal_mild" text="Leggero"/>

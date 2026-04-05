@@ -19,6 +19,8 @@ function ADS_SettingsSyncEvent.new()
 
     self.baseServiceWear           = ADS_Config.CORE.BASE_SERVICE_WEAR
     self.baseSystemsWear           = ADS_Config.CORE.BASE_SYSTEMS_WEAR
+    self.downtimeMultiplier        = ADS_Config.CORE.DOWNTIME_MULTIPLIER
+    self.generalWearEnabled        = ADS_Config.CORE.GENERAL_WEAR_ENABLED
     self.systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER
     self.aiOverloadControl         = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL
     self.instantInspection         = ADS_Config.MAINTENANCE.INSTANT_INSPECTION
@@ -31,7 +33,8 @@ function ADS_SettingsSyncEvent.new()
     self.closeHour                 = ADS_Config.WORKSHOP.CLOSE_HOUR
     self.engineMaxHeat             = ADS_Config.THERMAL.ENGINE_MAX_HEAT
     self.transMaxHeat              = ADS_Config.THERMAL.TRANS_MAX_HEAT
-    self.cloggingSpeed            = ADS_Config.FIELD_CARE.CLOGGING_SPEED
+    self.batteryUsableCapacityFactor = ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR
+    self.cloggingSpeed             = ADS_Config.FIELD_CARE.CLOGGING_SPEED
     self.debugMode                 = ADS_Config.DEBUG
 
     return self
@@ -41,6 +44,8 @@ end
 function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.baseServiceWear       or 0)
     streamWriteFloat32(streamId, self.baseSystemsWear       or 0)
+    streamWriteFloat32(streamId, self.downtimeMultiplier    or 0)
+    streamWriteBool(streamId,    self.generalWearEnabled    or false)
     streamWriteFloat32(streamId, self.systemStressGlobalMultiplier or 1.0)
     streamWriteBool(streamId,    self.aiOverloadControl      or false)
     streamWriteBool(streamId,    self.instantInspection      or false)
@@ -53,7 +58,8 @@ function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.closeHour              or 19)
     streamWriteFloat32(streamId, self.engineMaxHeat          or 1.05)
     streamWriteFloat32(streamId, self.transMaxHeat           or 1.05)
-    streamWriteFloat32(streamId, self.cloggingSpeed         or 1.0)
+    streamWriteFloat32(streamId, self.batteryUsableCapacityFactor or 0.1)
+    streamWriteFloat32(streamId, self.cloggingSpeed          or 1.0)
     streamWriteBool(streamId,    self.debugMode              or false)
 end
 
@@ -61,6 +67,8 @@ end
 function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.baseServiceWear           = streamReadFloat32(streamId)
     self.baseSystemsWear           = streamReadFloat32(streamId)
+    self.downtimeMultiplier        = streamReadFloat32(streamId)
+    self.generalWearEnabled        = streamReadBool(streamId)
     self.systemStressGlobalMultiplier = streamReadFloat32(streamId)
     self.aiOverloadControl         = streamReadBool(streamId)
     self.instantInspection         = streamReadBool(streamId)
@@ -73,7 +81,8 @@ function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.closeHour                 = streamReadFloat32(streamId)
     self.engineMaxHeat             = streamReadFloat32(streamId)
     self.transMaxHeat              = streamReadFloat32(streamId)
-    self.cloggingSpeed            = streamReadFloat32(streamId)
+    self.batteryUsableCapacityFactor = streamReadFloat32(streamId)
+    self.cloggingSpeed             = streamReadFloat32(streamId)
     self.debugMode                 = streamReadBool(streamId)
 
     self:run(connection)
@@ -84,6 +93,8 @@ end
 local function applyConfig(event)
     ADS_Config.CORE.BASE_SERVICE_WEAR                      = event.baseServiceWear
     ADS_Config.CORE.BASE_SYSTEMS_WEAR                      = event.baseSystemsWear
+    ADS_Config.CORE.DOWNTIME_MULTIPLIER                    = event.downtimeMultiplier
+    ADS_Config.CORE.GENERAL_WEAR_ENABLED                   = event.generalWearEnabled
     ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER        = event.systemStressGlobalMultiplier
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL       = event.aiOverloadControl
     ADS_Config.MAINTENANCE.INSTANT_INSPECTION               = event.instantInspection
@@ -96,6 +107,7 @@ local function applyConfig(event)
     ADS_Config.WORKSHOP.CLOSE_HOUR                          = event.closeHour
     ADS_Config.THERMAL.ENGINE_MAX_HEAT                      = event.engineMaxHeat
     ADS_Config.THERMAL.TRANS_MAX_HEAT                       = event.transMaxHeat
+    ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR    = event.batteryUsableCapacityFactor
     ADS_Config.FIELD_CARE.CLOGGING_SPEED                    = event.cloggingSpeed
     ADS_Config.DEBUG                                        = event.debugMode
 

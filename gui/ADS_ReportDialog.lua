@@ -572,7 +572,7 @@ function ADS_ReportDialog:updateScreen()
 -- ==========================================================
 
     local activeEffects = self.lastReport.conditionData.activeEffects or {}
-    local nominalBatteryCapacityAh = ADS_Config.ELECTRICAL.BATTART_NOMINAL_CAPACITY or 0
+    local nominalBatteryCapacityAh = ADS_Config.ELECTRICAL.BATTERY_NOMINAL_CAPACITY or 0
     local batterySoc = clampUnitRatio(self.lastReport.conditionData.batterySoc or 1)
     local batteryHealth = clampUnitRatio(1.0 + (getEffectValue(activeEffects, "BATTERY_HEALTH_MODIFIER") or 0))
     local alternatorHealth = clampUnitRatio(1.0 + (getEffectValue(activeEffects, "ALTERNATOR_HEALTH_MODIFIER") or 0))

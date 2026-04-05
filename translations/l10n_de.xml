@@ -11,7 +11,7 @@
         <text name="ads_engineMaxHeat_label" text="Max. Motorhitze"/>
         <text name="ads_engineMaxHeat_tooltip" text="Die Basiswärmeerzeugung des Motors bei maximaler Last. Höhere Werte lassen den Motor schneller aufheizen."/>
         <text name="ads_cloggingSpeed_label" text="Verschmutzungstempo"/>
-        <text name="ads_cloggingSpeed_tooltip" text="Regelt, wie schnell sich Kühler und Lufteinlass bei Arbeit in Staub, Spreu und Ernteresten zusetzen. Höhere Werte lassen Verschmutzungen schneller ansteigen."/>
+        <text name="ads_cloggingSpeed_tooltip" text="Regelt, wie schnell sich Kühler und Lufteinlass bei der Arbeit in Staub, Spreu und Ernteresten zusetzen. Höhere Werte beschleunigen die Verschmutzung. Bei 100 % entspricht die Verschmutzungsgeschwindigkeit ungefähr einem Drittel des Wartungsintervalls."/>
         <text name="ads_ws_header_title" text="Werkstatt"/>
         <text name="ads_workshopAvailable_label" text="Werkstatt 24/7 geöffnet"/>
         <text name="ads_workshopAvailable_tooltip" text="Aktiviert oder deaktiviert den 24/7-Betrieb der Werkstatt."/>
@@ -27,11 +27,16 @@
         <text name="ads_debugMode_tooltip" text="Aktiviert oder deaktiviert das Debug-Panel und die umfangreiche Debug-Protokollierung in der Konsole."/>
         <text name="ads_serviceInterval_label" text="Wartungsintervall"/>
         <text name="ads_vehicleLifespan_label" text="Fahrzeuglebensdauer"/>
+        <text name="ads_downtimeWear_label" text="Passiver Verschleiß"/>
+        <text name="ads_generalWearEnabled_label" text="Altersbedingter Verschleiß"/>
         <text name="ads_systemStressRate_label" text="Systemstress-Aufbau"/>
         <text name="ads_thermalSensitivity_label" text="Thermische Empfindlichkeit"/>
-        <text name="ads_serviceInterval_tooltip" text="Legt das Basis-Wartungsintervall fest, nach dem eine Wartung erforderlich ist. Das tatsächliche Intervall variiert je nach Fahrzeugmarke, Alter und Qualität früherer Wartungen."/>
-        <text name="ads_vehicleLifespan_tooltip" text="Legt die grundlegende Fahrzeuglebensdauer fest, nach der der Zustand 0 % erreicht. Je näher der Zustand an null liegt, desto unzuverlässiger wird das Fahrzeug."/>
-        <text name="ads_systemStressRate_tooltip" text="Bestimmt, wie schnell sich Systemstress durch Uberlastung, Hitze, Schlupf und andere schadliche Betriebsbedingungen aufbaut. Hohere Werte bringen Systeme schneller in den kritischen Bereich."/>
+        <text name="ads_option_off" text="Aus"/>
+        <text name="ads_serviceInterval_tooltip" text="Legt das grundlegende Wartungsintervall in Stunden fest, nach dem eine Wartung erforderlich ist. Das tatsächliche Intervall hängt von der Fahrzeugmarke, dem Alter und der Qualität früherer Wartungen ab."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Legt die grundlegende Fahrzeuglebensdauer in Stunden fest, nach der der Zustand 0 % erreicht. Je näher der Zustand an null liegt, desto unzuverlässiger wird das Fahrzeug."/>
+        <text name="ads_downtimeWear_tooltip" text="Legt die Geschwindigkeit des passiven Verschleißes im Stillstand als Prozentsatz des Grundverschleißes fest (Fahrzeuglebensdauer). Beispiel: 5 % bei der Standard-Lebensdauer von 100 Stunden bedeuten, dass jedes System nach etwa 20 Stunden Stillstand rund 1 % Zustand verliert. Hinweis: Wird das Fahrzeug unter Dach gelagert, ist passiver Verschleiß deaktiviert."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Aktiviert altersbedingten Verschleiß. Mit zunehmendem Verschleiß erhält jedes System kleine Abzüge auf seine wichtigsten Eigenschaften, etwa Motorleistung, Hydraulikgeschwindigkeit oder Bremswirkung. Der Effekt wird nach dem ersten Drittel der Lebensdauer aktiv, macht sich jedoch erst nach zwei Dritteln deutlich bemerkbar und verstärkt sich zum Ende der Lebensdauer der Maschine hin."/>
+        <text name="ads_systemStressRate_tooltip" text="Bestimmt, wie schnell sich Stress in den Systemen durch Überlastung, Überhitzung, Schlupf und andere harte Betriebsbedingungen aufbaut. Stress beeinflusst die Wahrscheinlichkeit von Ausfällen direkt: Je mehr Stress sich in einem System ansammelt, desto wahrscheinlicher ist eine Panne."/>
         <text name="ads_thermalSensitivity_tooltip" text="Passt das Verhalten des thermischen Modells an. Höhere Einstellungen machen Motor und Getriebe empfindlicher gegenüber Last, Umgebungstemperatur und Kühlerverschmutzung und erzeugen unter gleichen Bedingungen mehr Wärme."/>
         <text name="ads_thermal_none" text="Passiv"/>
         <text name="ads_thermal_mild" text="Leicht"/>

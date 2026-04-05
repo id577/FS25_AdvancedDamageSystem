@@ -975,7 +975,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.batterySoc = 1.0
     self.spec_AdvancedDamageSystem.batteryChargeAh = nil
     self.spec_AdvancedDamageSystem.batteryHealth = 1.0
-    self.spec_AdvancedDamageSystem.batteryCapacityAh = ADS_Config.ELECTRICAL.BATTART_NOMINAL_CAPACITY
+    self.spec_AdvancedDamageSystem.batteryCapacityAh = ADS_Config.ELECTRICAL.BATTERY_NOMINAL_CAPACITY
     self.spec_AdvancedDamageSystem.batteryTempC = 0
     self.spec_AdvancedDamageSystem.batteryOpenCircuitVoltageV = 12.7
     self.spec_AdvancedDamageSystem.rawBatteryTerminalVoltageV = 12.7
@@ -5042,6 +5042,14 @@ function AdvancedDamageSystem:processGeneralWearBreakdown()
     end
 
     local generalWearId = "GENERAL_WEAR"
+
+    if not ADS_Config.CORE.GENERAL_WEAR_ENABLED then
+        if self:hasBreakdown(generalWearId) then
+            self:removeBreakdown(generalWearId)
+        end
+        return
+    end
+
     local isGeneralWearShouldBe = false
     local needToRecalculate = math.abs(self:getConditionLevel() - spec._prevConditionLevel) > ADS_Config.CORE.BASE_SYSTEMS_WEAR / 5
     

@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 113,
+    VER = 114,
 
     DEBUG = false,
 
@@ -209,6 +209,7 @@ ADS_Config = {
             EMERGENCY_ENGINE_TEMP = 105.0,
             EMERGENCY_TRANS_TEMP = 105.0
         },
+        GENERAL_WEAR_ENABLED = true,
         GENERAL_WEAR_EARLY_STAGE_THRESHOLD = 0.66,
         GENERAL_WEAR_LATE_STAGE_THRESHOLD = 0.33,
 
@@ -488,7 +489,7 @@ ADS_Config = {
     },
 
     ELECTRICAL = {
-        BATTART_NOMINAL_CAPACITY = 150,
+        BATTERY_NOMINAL_CAPACITY = 150,
         BATTERY_USABLE_CAPACITY_FACTOR = 0.1,
         AMBIENT_DEFAULT_C = 15,
         BATTERY_THERMAL_TAU_S = 600,
@@ -660,7 +661,9 @@ function ADS_Config.saveToXMLFile()
     -- CORE
     setXMLFloat(xmlFile, root .. ".BASE_SERVICE_WEAR",      ADS_Config.CORE.BASE_SERVICE_WEAR)
     setXMLFloat(xmlFile, root .. ".BASE_SYSTEMS_WEAR",      ADS_Config.CORE.BASE_SYSTEMS_WEAR)
+    setXMLFloat(xmlFile, root .. ".DOWNTIME_MULTIPLIER",    ADS_Config.CORE.DOWNTIME_MULTIPLIER)
     setXMLFloat(xmlFile, root .. ".SYSTEM_STRESS_GLOBAL_MULTIPLIER", ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER)
+    setXMLBool (xmlFile, root .. ".GENERAL_WEAR_ENABLED",   ADS_Config.CORE.GENERAL_WEAR_ENABLED)
     setXMLBool (xmlFile, root .. ".AI_OVERLOAD_CONTROL",    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL)
 
     -- MAINTENANCE
@@ -679,6 +682,9 @@ function ADS_Config.saveToXMLFile()
     setXMLFloat(xmlFile, root .. ".ENGINE_MAX_HEAT",        ADS_Config.THERMAL.ENGINE_MAX_HEAT)
     setXMLFloat(xmlFile, root .. ".TRANS_MAX_HEAT",         ADS_Config.THERMAL.TRANS_MAX_HEAT)
     setXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE",     ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
+
+    -- ELECTRICAL
+    setXMLFloat(xmlFile, root .. ".BATTERY_USABLE_CAPACITY_FACTOR", ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR)
 
     -- FIELD CARE
     setXMLFloat(xmlFile, root .. ".CLOGGING_SPEED",         ADS_Config.FIELD_CARE.CLOGGING_SPEED)
@@ -752,8 +758,14 @@ function ADS_Config.loadFromXMLFile()
     v = getXMLFloat(xmlFile, root .. ".BASE_SYSTEMS_WEAR")
     if v ~= nil then ADS_Config.CORE.BASE_SYSTEMS_WEAR = v end
 
+    v = getXMLFloat(xmlFile, root .. ".DOWNTIME_MULTIPLIER")
+    if v ~= nil then ADS_Config.CORE.DOWNTIME_MULTIPLIER = v end
+
     v = getXMLFloat(xmlFile, root .. ".SYSTEM_STRESS_GLOBAL_MULTIPLIER")
     if v ~= nil then ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = v end
+
+    v = getXMLBool(xmlFile, root .. ".GENERAL_WEAR_ENABLED")
+    if v ~= nil then ADS_Config.CORE.GENERAL_WEAR_ENABLED = v end
 
     v = getXMLBool(xmlFile, root .. ".AI_OVERLOAD_CONTROL")
     if v ~= nil then ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = v end
@@ -793,6 +805,10 @@ function ADS_Config.loadFromXMLFile()
 
     v = getXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE")
     if v ~= nil then ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = v end
+
+    -- ELECTRICAL
+    v = getXMLFloat(xmlFile, root .. ".BATTERY_USABLE_CAPACITY_FACTOR")
+    if v ~= nil then ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR = v end
 
     -- FIELD CARE
     v = getXMLFloat(xmlFile, root .. ".CLOGGING_SPEED")

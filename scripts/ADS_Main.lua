@@ -35,11 +35,11 @@ source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
 -- re-broadcast to all other clients via ADS_SettingsSyncEvent).
 do
     local cbs = {
-        "onServiceWearChanged", "onConditionWearChanged",
+        "onServiceWearChanged", "onConditionWearChanged", "onDowntimeWearChanged", "onGeneralWearEnabledChanged",
         "onSystemStressRateChanged", "onInstantInspectionChanged", "onParkVehicleChanged", "onWarrantyEnabledChanged",
         "onMaintenancePriceChanged", "onMaintenanceDurationChanged", "onWorkshopAvailableChanged",
         "onWorkshopOpenHourChanged", "onWorkshopCloseHourChanged", "onThermalSensitivityChanged",
-        "onCloggingSpeedChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"
+        "onBatteryCapacityChanged", "onCloggingSpeedChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"
     }
     for _, name in ipairs(cbs) do
         local orig = ADS_InGameSettings[name]

@@ -11,7 +11,7 @@
         <text name="ads_engineMaxHeat_label" text="Chaleur max. moteur"/>
         <text name="ads_engineMaxHeat_tooltip" text="Le taux de base de chaleur générée par le moteur à charge maximale. Des valeurs plus élevées feront chauffer le moteur plus rapidement."/>
         <text name="ads_cloggingSpeed_label" text="Vitesse d'encrassement"/>
-        <text name="ads_cloggingSpeed_tooltip" text="Règle la vitesse à laquelle le radiateur et l'admission d'air s'encrassent lors du travail dans la poussière, la menue paille et les résidus de culture. Des valeurs plus élevées accélèrent l'encrassement."/>
+        <text name="ads_cloggingSpeed_tooltip" text="Règle la vitesse à laquelle le radiateur et l'admission d'air s'encrassent lors du travail dans la poussière, la menue paille et les résidus de culture. Des valeurs plus élevées accélèrent l'encrassement. À 100 %, la vitesse d'encrassement correspond à environ un tiers de l'intervalle d'entretien."/>
         <text name="ads_ws_header_title" text="Atelier"/>
         <text name="ads_workshopAvailable_label" text="Atelier ouvert 24/7"/>
         <text name="ads_workshopAvailable_tooltip" text="Active ou désactive l'ouverture de l'atelier 24h/24 et 7j/7."/>
@@ -27,11 +27,16 @@
         <text name="ads_debugMode_tooltip" text="Active ou désactive le panneau de débogage et la journalisation de débogage étendue dans la console."/>
         <text name="ads_serviceInterval_label" text="Intervalle d'entretien"/>
         <text name="ads_vehicleLifespan_label" text="Durée de vie du véhicule"/>
+        <text name="ads_downtimeWear_label" text="Usure passive"/>
+        <text name="ads_generalWearEnabled_label" text="Usure liée à l'âge"/>
         <text name="ads_systemStressRate_label" text="Vitesse d'accumulation du stress"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilité thermique"/>
-        <text name="ads_serviceInterval_tooltip" text="Définit l'intervalle de maintenance de base après lequel un entretien est requis. L'intervalle réel varie selon la marque, l'âge du véhicule et la qualité des entretiens précédents."/>
-        <text name="ads_vehicleLifespan_tooltip" text="Définit la durée de vie de base du véhicule, après laquelle son état atteindra 0 %. Plus l'état approche de zéro, plus le véhicule devient peu fiable."/>
-        <text name="ads_systemStressRate_tooltip" text="Definit la vitesse d'accumulation du stress des systemes sous l'effet de la surcharge, de la chaleur, du patinage et d'autres conditions d'utilisation severes. Des valeurs plus elevees amenent plus vite les systemes a un niveau critique."/>
+        <text name="ads_option_off" text="Arrêt"/>
+        <text name="ads_serviceInterval_tooltip" text="Définit l'intervalle d'entretien de base en heures, au-delà duquel un entretien est requis. L'intervalle réel dépend de la marque du véhicule, de son âge et de la qualité des entretiens précédents."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Définit la durée de vie de base du véhicule en heures, après laquelle son état atteindra 0 %. Plus l'état se rapproche de zéro, plus le véhicule devient peu fiable."/>
+        <text name="ads_downtimeWear_tooltip" text="Définit la vitesse d'usure passive lorsqu'un véhicule reste à l'arrêt, en pourcentage du taux d'usure de base (Durée de vie du véhicule). Par exemple, 5 % avec la durée de vie par défaut de 100 heures signifie que chaque système perd environ 1 % d'état après environ 20 heures d'immobilisation. Remarque : l'usure passive est désactivée lorsque le véhicule est stocké sous abri."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Active l'usure liée à l'âge. À mesure que le véhicule s'use, chaque système subit de petites pénalités sur ses caractéristiques principales, comme la puissance moteur, la vitesse hydraulique ou l'efficacité du freinage. L'effet s'active après le premier tiers de la durée de vie, mais ne devient vraiment perceptible qu'après les deux tiers et se renforce à l'approche de la fin de vie de la machine."/>
+        <text name="ads_systemStressRate_tooltip" text="Détermine la vitesse à laquelle le stress s'accumule dans les systèmes sous l'effet de la surcharge, de la surchauffe, du patinage et d'autres conditions d'utilisation sévères. Le stress influe directement sur la probabilité de panne : plus un système accumule de stress, plus une panne devient probable."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajuste le comportement du modèle thermique. Des réglages plus élevés rendent le moteur et la transmission plus sensibles à la charge, à la température ambiante et à l'encrassement du radiateur, générant ainsi plus de chaleur dans les mêmes conditions."/>
         <text name="ads_thermal_none" text="Passif"/>
         <text name="ads_thermal_mild" text="Modérée"/>
