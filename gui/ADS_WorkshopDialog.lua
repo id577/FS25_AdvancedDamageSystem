@@ -95,8 +95,8 @@ function ADS_WorkshopDialog:updateScreen()
     self.operatingHoursValue:setText(string.format("%s %s", vehicle:getFormattedOperatingTime(), g_i18n:getText("ads_ws_hours_unit")))
     
     self.lastServiceValue:setText(ADS_Utils.formatTimeAgo(vehicle:getLastMaintenanceDate()))
-    self.maintainabilityValue:setText(string.format("%.1f%%", (spec.maintainability or 0) * 100))
-    self.maintainabilityValue:setTextColor(ADS_Utils.getValueColor(spec.maintainability, 1.2, 1.1, 1.1, 0.9, false))
+    self.maintainabilityValue:setText(ADS_Utils.formatMaintainability(spec.maintainability))
+    self.maintainabilityValue:setTextColor(ADS_Utils.getValueColor(spec.maintainability, 1.2, 1.1, 1.0, 0.9, false))
 
     local monthsSinceInspectionText = ADS_Utils.formatTimeAgo(self.vehicle:getLastInspectionDate())
     local serviceText = ADS_Utils.formatService(self.vehicle:getLastInspectedService())

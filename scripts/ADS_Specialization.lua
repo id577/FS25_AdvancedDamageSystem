@@ -8311,7 +8311,7 @@ function AdvancedDamageSystem:getHoursSinceLastMaintenance()
     for i = #spec.maintenanceLog, 1, -1 do
         local entry = spec.maintenanceLog[i]
         if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
-            return self:getFormattedOperatingTime() - (entry.conditionData.operatingHours or 0)
+            return math.max(self:getFormattedOperatingTime() - (entry.conditionData.operatingHours or 0), 0)
         end
     end
     return 0

@@ -30,6 +30,15 @@ source(g_currentModDirectory .. "events/ADS_StartButtonEvent.lua")
 source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
 
+function ADS_Main.loadGuiProfiles()
+    if ADS_Main.guiProfilesLoaded or g_gui == nil then
+        return
+    end
+
+    g_gui:loadProfiles(modDirectory .. "gui/guiProfiles.xml")
+    ADS_Main.guiProfilesLoaded = true
+end
+
 -- Network hook: wrap every settings callback so changes made by an admin
 -- client are automatically replicated to the dedicated server (and then
 -- re-broadcast to all other clients via ADS_SettingsSyncEvent).
@@ -150,6 +159,7 @@ end
 -- ==========================================================
 
 function ADS_Main:onStartMission()
+    ADS_Main.loadGuiProfiles()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
 
@@ -528,6 +538,7 @@ end
 
 function ADS_Main:loadMap()
     log_dbg("loadMap() called")
+    ADS_Main.loadGuiProfiles()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
     ADS_Config.loadFromXMLFile()
@@ -537,6 +548,7 @@ end
 function ADS_Main:deleteMap()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
+    ADS_Main.guiProfilesLoaded = nil
     ADS_Config._loaded = nil
 end
 

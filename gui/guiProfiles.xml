@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUIProfiles>
+    <!-- Shared presets -->
+    <Presets>
+        <Preset name="colorWhite" value="1 1 1 1"/>
+        <Preset name="colorListHeaderBackground" value="0 0 0 0.35"/>
+        <Preset name="colorBalanceGreen" value="0.659 0.847 0.286 1"/>
+    </Presets>
+
+    <!-- Shared dialog backgrounds and blockers -->
+    <Profile name="ads_dialogScreenBlocker" extends="baseReference" with="anchorStretchingYStretchingX pivotTopCenter">
+        <size value="100% 100%"/>
+        <color value="$preset_fs25_colorMainDark"/>
+        <cornerSize value="0"/>
+    </Profile>
+    <Profile name="ads_dialogBg" extends="fs25_dialogBg">
+        <width value="1440px"/>
+        <height value="900px"/>
+    </Profile>
+    <Profile name="ads_dialogBgSmall" extends="fs25_dialogBg">
+        <size value="600px 550px"/>
+    </Profile>
+    <Profile name="ads_dialogBgLarge" extends="fs25_dialogBg">
+        <size value="600px 670px"/>
+    </Profile>
+    <Profile name="ads_inspectionDialogBg" extends="fs25_dialogBg">
+        <size value="640px 740px"/>
+    </Profile>
+    <Profile name="ads_sellDialogBg" extends="fs25_dialogBg">
+        <size value="410px 610px"/>
+    </Profile>
+
+    <!-- Shared text and separators -->
+    <Profile name="ads_textSeporator" extends="baseReference" with="anchorBottomCenter">
+        <size value="950px 1dp"/>
+        <absoluteSizeOffset value="0px 0px"/>
+        <imageColor value="$preset_fs25_colorGreyLight_50"/>
+        <startImageSize value="30px 0px"/>
+        <startImageSliceId value="gui.list_divider"/>
+        <endImageSize value="0px 0px"/>
+        <endImageInvertX value="true"/>
+        <endImageSliceId value="gui.list_divider"/>
+    </Profile>
+    <Profile name="ads_headerBoldText" extends="fs25_textDefault" with="anchorStretchingYLeft">
+        <textSize value="24px"/>
+        <textBold value="true"/>
+        <textUpperCase value="true"/>
+        <textOffset value="0px 0px"/>
+        <textColor value="$preset_colorWhite_50"/>
+    </Profile>
+    <Profile name="ads_textBold" extends="fs25_textDefault">
+        <textBold value="true"/>
+    </Profile>
+    <Profile name="ads_textHeaderGrey" extends="fs25_textDefault">
+        <textBold value="true"/>
+        <textSize value="20px"/>
+        <textColor value="$preset_colorDisabled"/>
+        <textAlignment value="center"/>
+    </Profile>
+    <Profile name="ads_dialogText" extends="fs25_dialogText" with="anchorTopLeft"/>
+    <Profile name="ads_greenText" extends="ads_dialogText">
+        <textSize value="14px"/>
+        <textColor value="$preset_fs25_colorGreen"/>
+    </Profile>
+    <Profile name="ads_disclaimerText" extends="ads_dialogText">
+        <textSize value="12px"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+    </Profile>
+    <Profile name="ads_inspectionAdditionalText" extends="fs25_dialogText">
+        <textSize value="14px"/>
+        <textAlignment value="left"/>
+        <textVerticalAlignment value="top"/>
+        <textColor value="$preset_colorWhite_50"/>
+    </Profile>
+
+    <!-- Shared workshop, report and log tables -->
+    <Profile name="ads_tableHeaderLeft" extends="baseReference">
+        <imageColor value="0 0 0 0"/>
+        <textFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <textHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <textSize value="16px"/>
+        <textBold value="true"/>
+        <textUpperCase value="true"/>
+        <textColor value="$preset_colorWhite_50"/>
+        <textAlignment value="left"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_tableList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft"/>
+    <Profile name="ads_tableListItem" extends="baseReference" with="anchorTopStretchingX alternating">
+        <height value="32px"/>
+        <textSelectedColor value="$preset_fs25_colorMainLight"/>
+        <imageColor value="$preset_fs25_colorGrey"/>
+        <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+    </Profile>
+    <Profile name="ads_tableListItemAlt" extends="baseReference" with="anchorTopStretchingX alternating">
+        <height value="32px"/>
+        <textSelectedColor value="$preset_fs25_colorMainLight"/>
+        <imageColor value="$preset_fs25_colorGrey"/>
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+    </Profile>
+    <Profile name="ads_tableRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="16px"/>
+        <textAlignment value="left"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_tableRowCellRight" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="16px"/>
+        <textAlignment value="right"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_tableRowCellLeftAlt" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="16px"/>
+        <textAlignment value="left"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+    </Profile>
+    <Profile name="ads_tableRowCellRightAlt" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="16px"/>
+        <textAlignment value="right"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+    </Profile>
+    <Profile name="ads_tableRowCellLeftUpper" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="16px"/>
+        <textUpperCase value="true"/>
+        <textAlignment value="left"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_tableRowCellButton" extends="emptyPanel" with="anchorStretchingYLeft">
+        <size value="90px 32px"/>
+        <focusOnHighlight value="true"/>
+        <textResizeWidth value="200px"/>
+        <textSize value="16px"/>
+        <iconColor value="$preset_fs25_colorMainDark"/>
+        <iconFocusedColor value="$preset_colorTransparent"/>
+        <iconTextOffset value="30px 0px"/>
+        <iconHighlightedColor value="$preset_colorTransparent"/>
+        <textBold value="true"/>
+        <textUpperCase value="true"/>
+        <textAlignment value="center"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textFocusedColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_containerFrame" extends="baseReference" with="anchorTopStretchingX">
+        <size value="100% 100%"/>
+        <imageSliceId value="gui.savegame_middle"/>
+        <imageSelectedSliceId value="gui.savegame_selected_middle"/>
+        <imageHighlightedSliceId value="gui.savegame_hover_middle"/>
+        <startImageSize value="20px 0"/>
+        <startImageSliceId value="gui.savegame_left"/>
+        <startImageSelectedSliceId value="gui.savegame_selected_left"/>
+        <startImageHighlightedSliceId value="gui.savegame_hover_left"/>
+        <endImageSize value="20px 0"/>
+        <endImageSliceId value="gui.savegame_right"/>
+        <endImageSelectedSliceId value="gui.savegame_selected_right"/>
+        <endImageHighlightedSliceId value="gui.savegame_hover_right"/>
+    </Profile>
+    <Profile name="ads_infoButton" extends="emptyPanel" with="anchorMiddleRight">
+        <size value="80px 32px"/>
+        <position value="-10px 0px"/>
+        <focusOnHighlight value="true"/>
+        <textResizeWidth value="200px"/>
+        <textSize value="16px"/>
+        <iconColor value="$preset_colorTransparent"/>
+        <iconFocusedColor value="$preset_colorTransparent"/>
+        <iconTextOffset value="0px -1px"/>
+        <iconHighlightedColor value="$preset_colorTransparent"/>
+        <textBold value="true"/>
+        <textUpperCase value="true"/>
+        <textAlignment value="center"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+
+    <!-- Shared compact info tables -->
+    <Profile name="ads_dialogSeparator" extends="baseReference" with="anchorTopCenter">
+        <size value="500px 1dp"/>
+        <absoluteSizeOffset value="0px 0px"/>
+        <imageColor value="$preset_fs25_colorGreyLight_50"/>
+        <startImageSize value="30px 0px"/>
+        <startImageSliceId value="gui.list_divider"/>
+        <endImageSize value="0px 0px"/>
+        <endImageInvertX value="true"/>
+        <endImageSliceId value="gui.list_divider"/>
+    </Profile>
+    <Profile name="ads_dialogInfoTable" extends="emptyPanel" with="anchorTopCenter"/>
+    <Profile name="ads_dialogInfoRow" extends="baseReference" with="anchorTopStretchingX alternating">
+        <height value="26px"/>
+        <imageColor value="$preset_fs25_colorGrey"/>
+        <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+    </Profile>
+    <Profile name="ads_dialogInfoTitle" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="14px"/>
+        <textUpperCase value="true"/>
+        <textColor value="$preset_colorWhite_50"/>
+        <textAlignment value="left"/>
+        <textVerticalAlignment value="middle"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_dialogInfoValue" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="14px"/>
+        <textColor value="$preset_colorWhite_50"/>
+        <textAlignment value="right"/>
+        <textVerticalAlignment value="middle"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+
+    <!-- Workshop specific -->
+    <Profile name="ads_vehicleInfoContainer" extends="emptyPanel" with="anchorTopCenter">
+        <size value="1410px 350px"/>
+        <position value="0px 0px"/>
+    </Profile>
+    <Profile name="ads_breakdownTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="1410px 470px"/>
+        <position value="0px -300px"/>
+    </Profile>
+    <Profile name="ads_statusBarContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="1410px 80px"/>
+        <position value="0px -730px"/>
+    </Profile>
+    <Profile name="ads_vehicleImage" extends="baseReference" with="anchorMiddleLeft">
+        <position value="40px 60px"/>
+        <size value="300px 300px"/>
+        <imageSliceId value="noSlice"/>
+    </Profile>
+    <Profile name="shopListAttributeIconReliability" extends="shopListAttributeIconLifeTime">
+        <imageSliceId value="ads_DashboardHud.reliability"/>
+    </Profile>
+    <Profile name="shopConfigAttributeIconReliability" extends="shopConfigAttributeIconCapacity">
+        <imageSliceId value="ads_DashboardHud.reliability"/>
+    </Profile>
+    <Profile name="shopListAttributeIconMaintainability" extends="shopListAttributeIconLifeTime">
+        <imageSliceId value="ads_DashboardHud.maintainability"/>
+    </Profile>
+    <Profile name="shopConfigAttributeIconMaintainability" extends="shopConfigAttributeIconCapacity">
+        <imageSliceId value="ads_DashboardHud.maintainability"/>
+    </Profile>
+    <Profile name="ads_multiTextOption" extends="fs25_multiTextOption" with="anchorTopCenter"/>
+
+    <!-- Maintenance log specific -->
+    <Profile name="ads_logInfoContainer" extends="emptyPanel" with="anchorTopCenter">
+        <size value="1410px 200px"/>
+        <position value="0px -10px"/>
+    </Profile>
+    <Profile name="ads_logTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="1410px 700px"/>
+        <position value="0px -160px"/>
+    </Profile>
+
+    <!-- Report specific -->
+    <Profile name="ads_reportStatsContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="1410px 470px"/>
+        <position value="0px -170px"/>
+    </Profile>
+    <Profile name="ads_reportBreakdownsContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="710px 230px"/>
+        <position value="-350px -590px"/>
+    </Profile>
+    <Profile name="ads_reportRecContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="710px 230px"/>
+        <position value="350px -590px"/>
+    </Profile>
+
+    <!-- Sell dialog specific -->
+    <Profile name="ads_sellVehicleImage" extends="baseReference" with="anchorTopCenter">
+        <position value="0px 30px"/>
+        <size value="330px 330px"/>
+        <imageSliceId value="noSlice"/>
+    </Profile>
+    <Profile name="ads_sellVehicleName" extends="baseReference" with="anchorTopCenter">
+        <position value="0px -310px"/>
+        <size value="320px 34px"/>
+        <textSize value="18px"/>
+        <textColor value="$preset_colorWhite_50"/>
+        <textAlignment value="center"/>
+        <textVerticalAlignment value="middle"/>
+    </Profile>
+    <Profile name="ads_sellCostsContainer" extends="emptyPanel" with="anchorTopCenter">
+        <size value="320px 130px"/>
+        <position value="0px -360px"/>
+    </Profile>
+    <Profile name="ads_sellTotalText" extends="baseReference" with="anchorTopCenter">
+        <position value="0px -480px"/>
+        <size value="320px 34px"/>
+        <textBold value="false"/>
+        <textSize value="22px"/>
+        <textColor value="$preset_colorWhite_50"/>
+        <textAlignment value="center"/>
+        <textVerticalAlignment value="middle"/>
+    </Profile>
+
+    <!-- In-game fleet menu specific -->
+    <Profile name="ads_menuTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="1510px 630px"/>
+        <position value="-30px 0px"/>
+    </Profile>
+    <Profile name="ads_menuHeaderButtonLeft" extends="baseReference">
+        <imageColor value="0 0 0 0"/>
+        <textFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <textHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <textSize value="15px"/>
+        <textBold value="true"/>
+        <textUpperCase value="true"/>
+        <textColor value="$preset_colorWhite_50"/>
+        <textAlignment value="center"/>
+        <textVerticalAlignment value="middle"/>
+        <textMaxNumLines value="2"/>
+        <textLineHeightScale value="0.95"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_menuHeaderButtonRight" extends="ads_menuHeaderButtonLeft">
+        <textAutoWidth value="false"/>
+        <textAlignment value="right"/>
+    </Profile>
+    <Profile name="ads_menuHeaderBright" extends="ads_menuHeaderButtonLeft">
+        <textColor value="$preset_colorWhite"/>
+    </Profile>
+    <Profile name="ads_menuHeaderRightBright" extends="ads_menuHeaderButtonRight">
+        <textColor value="$preset_colorWhite"/>
+    </Profile>
+    <Profile name="ads_menuVehicleList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
+        <position value="0px -48px"/>
+        <absoluteSizeOffset value="0px 80px"/>
+    </Profile>
+    <Profile name="ads_menuListSliderBox" extends="fs25_listSliderBox" with="anchorTopStretchingX pivotTopRight">
+        <position value="28px -48px"/>
+        <absoluteSizeOffset value="0px 80px"/>
+    </Profile>
+    <Profile name="ads_menuTableListItemAlt" extends="fs25_calendarListItem" with="anchorTopStretchingX alternating">
+        <height value="40.77px"/>
+        <textSelectedColor value="$preset_fs25_colorMainLight"/>
+        <imageColor value="$preset_fs25_colorGrey"/>
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+    </Profile>
+    <Profile name="ads_menuTableListItemGradient" extends="fs25_calendarListItemBg">
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
+    <Profile name="ads_menuTableRowCellLeftAlt" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="15px"/>
+        <textAlignment value="left"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+    </Profile>
+    <Profile name="ads_menuTableRowCellRightAlt" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="15px"/>
+        <textAlignment value="right"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+    </Profile>
+    <Profile name="ads_menuFooterBox" extends="baseReference" with="anchorBottomStretchingX">
+        <size value="100% 50px"/>
+    </Profile>
+    <Profile name="ads_menuDetailBox" extends="fs25_shopItemsDetailsContainer" with="anchorTopStretchingX">
+        <size value="1510px 180px"/>
+        <position value="-30px -640px"/>
+    </Profile>
+</GUIProfiles>
