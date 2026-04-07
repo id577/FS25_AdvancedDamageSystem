@@ -4,6 +4,7 @@
     <version>0.9.1.1</version>
     <title>
         <en>Advanced Damage System</en>
+		<pl>Zaawansowany system obrażeń</pl>
         <de>Erweitertes Schadenssystem</de>
         <fr>Système Avancé De Dégâts</fr>
         <it>Sistema Avanzato Di Danni</it>
@@ -46,6 +47,44 @@ Changelog 0.9.0.0:
 - Added new workshop options and reworked existing service and repair flows
 - Changed the hard engine start logic: the starter must now be held to crank the engine
 - Numerous minor balance and interface improvements]]></en>
+
+         <pl><![CDATA[Advanced Damage System dodaje do gry Farming Simulator 25 rozbudowany system zużycia pojazdów, awarii, diagnostyki, konserwacji i napraw. Zamiast polegać na jednej, ogólnej wartości stanu, każda maszyna jest zbudowana wokół wielu indywidualnych systemów, posiadających własny stan, czynniki zużycia, akumulację naprężeń i ryzyko awarii. Zachowanie pojazdu i charakter usterek zależą od warunków eksploatacji, obciążenia, temperatury i jakości serwisu.
+
+Modyfikacja zawiera model temperatury kluczowych systemów, zaawansowaną symulację akumulatora i alternatora, realistyczną logikę awarii, rozszerzone przepływy pracy w warsztacie, raporty serwisowe, historię konserwacji oraz inspekcje przedrozruchowe. W rezultacie zarządzanie pojazdami staje się strategiczną częścią rozgrywki: serwis zajmuje czas, złe użytkowanie zwiększa ryzyko awarii, a zaniedbanie stanu maszyny może zakłócić krytyczne prace polowe. Odpowiedzialny rolnik, który dba o sprzęt, serwisuje go na czas i unika niepotrzebnego nadużywania, utrzyma flotę w niezawodnym stanie i uniknie poważnych problemów w trakcie sezonu.
+
+Changelog 0.9.1.1:
+- Zwiększono odległości interakcji i połączenia dla kabli rozruchowych
+- Zaimplementowano filtr dla zużycia systemów i akumulacji naprężeń, który tłumi długotrwałe wysokie wartości, jednocześnie pozwalając na przejście krótkich impulsów
+- Dodano nowe opcje konfiguracji i rozszerzono zakresy regulacji dla istniejących
+- Zbalansowano mnożniki czynnika zużycia (ogólnie zmniejszone dla lepszego balansu rozgrywki)
+
+Changelog 0.9.1.0:
+- Przeprojektowano akumulację naprężeń: naprężenia nie mogą już przekraczać aktualnego poziomu stanu swojego systemu. Gdy naprężenie osiągnie stan, awaria następuje natychmiast
+- Zwrot wynajętych pojazdów ADS nakłada kary za aktywne awarie i przeterminowaną konserwację. Kompatybilne z Extended Leasing
+- Naprawiono: smarowanie w pojazdach żniwnych teraz prawidłowo się zużywa, zamiast zawsze pozostawać na normalnym poziomie
+- Naprawiono: aktywność żniwna jest teraz prawidłowo wykrywana do obliczeń zużycia procesu roboczego i do sprawdzania obecności dużych zanieczyszczeń
+- Prędkość zatykania chłodnicy i wlotu powietrza jest teraz powiązana z wybraną długością interwału serwisowego, co pozwala na lepsze dostosowanie do różnych stylów gry
+- Usunięto długi czynnik żniwny z systemu procesu roboczego
+- Przeprojektowano czynnik wysokiego ciśnienia w układzie paliwowym: jest on teraz wyzwalany przez wysokie zużycie paliwa zamiast pośredniego obciążenia silnika
+- Naprawiono nieprawidłowe wyświetlanie danych w dzienniku konserwacji i raporcie z inspekcji
+- ADS steruje teraz wartością temperatury silnika z gry podstawowej
+- Naprawiono błąd, w którym akumulator mógł się zbyt szybko rozładować, gdy SI próbowała uruchomić pojazd, podczas gdy aktywny był ENGINE_HARD_START_MODIFIER. Jako tymczasowe rozwiązanie, SI jest odporna na ENGINE_HARD_START_MODIFIER
+- ADS steruje teraz akumulacją godzin pracy dla pojazdów ADS, więc godziny nadal się naliczają, nawet gdy gracz pozostawia silnik włączony
+
+Changelog 0.9.0.0:
+- Dodano wsparcie dla trybu wieloosobowego
+- Przeprojektowano model stanu pojazdu: ogólny stan jest teraz budowany z wielu indywidualnych systemów, każdy z własnym stanem i czynnikami zużycia
+- Dodano nowy system naprężeń, który akumuluje naprężenia w systemach pojazdu podczas niewłaściwego użytkowania maszyn, zwiększając ryzyko awarii
+- Dodano zaawansowaną symulację akumulatora i alternatora
+- Dodano inspekcję pojazdu przed rozruchem
+- Dodano nowe przedmioty w warsztacie: Pistolet do smarowania, Dmuchawa powietrza i Kable rozruchowe do serwisu przedrozruchowego i uruchamiania pojazdów z rozładowanym akumulatorem
+- Dodano tabelę zarządzania flotą ze wszystkimi pojazdami ADS dla łatwiejszego przeglądu i kontroli
+- Dodano wiele nowych awarii i przeprojektowano istniejące; awarie są teraz ściśle przypisane do konkretnych systemów
+- Dodano system wyboru awarii, który wybiera usterki w oparciu o to, które czynniki systemowe były najbardziej obciążone lub naruszone
+- Dodano nowe opcje warsztatowe i przeprojektowano istniejące przepływy serwisu i napraw
+- Zmieniono logikę trudnego rozruchu silnika: rozrusznik musi być teraz przytrzymany, aby uruchomić silnik
+- Liczne drobne ulepszenia balansu i interfejsu]]></pl>
+
         <de><![CDATA[Advanced Damage System fügt Farming Simulator 25 ein tiefgehendes System für Verschleiß, Ausfälle, Diagnose, Wartung und Reparatur von Fahrzeugen hinzu. Anstelle eines einzigen allgemeinen Zustandswerts besteht jede Maschine aus mehreren einzelnen Systemen mit eigenem Zustand, eigenen Verschleißfaktoren, Stressaufbau und Ausfallrisiko. Fahrverhalten und Art der Defekte hängen von Einsatzbedingungen, Belastung, Temperatur und Wartungsqualität ab.
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
