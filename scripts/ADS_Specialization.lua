@@ -1926,9 +1926,9 @@ local function initializeVehicleConditionFromVanillaPrice(vehicle, resetBreakdow
 
         if vehicle:getOperatingTime() > 0 then
             local operatingHours = tonumber(vehicle:getFormattedOperatingTime()) or 0
-            local chance = operatingHours / 100
+            local lifespanRatio = ADS_Config.CORE.DEFAULT_SYSTEM_WEAR / ADS_Config.CORE.BASE_SYSTEMS_WEAR
+            local chance = operatingHours / (100 * lifespanRatio)
             chance = math.clamp(chance * ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MUL, 0, ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MAX)
-
             if math.random() < chance then
                 vehicle:addBreakdown(vehicle:getRandomBreakdown())
             end
@@ -4575,7 +4575,8 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stageOrOptions)
 
     local resumeTimer = math.max(tonumber(options.resumeTimer) or 0, 0)
     if not currentIsActive and resumeTimer <= 0 then
-        resumeTimer = ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * (math.random() + 0.5)
+        local serviceScale = ADS_Config.CORE.DEFAULT_SERVICE_WEAR / ADS_Config.CORE.BASE_SERVICE_WEAR
+        resumeTimer = ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * serviceScale * (math.random() + 0.5)
     end
 
     spec.activeBreakdowns[breakdownId] = {
@@ -4768,7 +4769,8 @@ function AdvancedDamageSystem:processBreakdowns(dt)
                         breakdown.progressTimer = breakdown.progressTimer or 0
                         breakdown.progressTimer = breakdown.progressTimer + dt
                         
-                        local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier
+                        local serviceScale = C.DEFAULT_SERVICE_WEAR / C.BASE_SERVICE_WEAR
+                        local stageDuration = C.BASE_BREAKDOWN_PROGRESS_TIME * stageData.progressMultiplier * serviceScale
 
                         if breakdown.progressTimer >= stageDuration then
                             local maxStages = #registryEntry.stages
@@ -5765,7 +5767,8 @@ function AdvancedDamageSystem:processService(dt)
         
                     if optionOne == AdvancedDamageSystem.REPAIR_TYPES.LOW then
                         local random = math.random()
-                        self:suspendBreakdown(breakdownId, ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * (random + 0.5))
+                        local serviceScale = ADS_Config.CORE.DEFAULT_SERVICE_WEAR / ADS_Config.CORE.BASE_SERVICE_WEAR
+                        self:suspendBreakdown(breakdownId, ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * serviceScale* (random + 0.5))
                     else
                         local stage = self:getActiveBreakdowns()[breakdownId].stage
                         self:removeBreakdown(breakdownId)
@@ -5778,12 +5781,13 @@ function AdvancedDamageSystem:processService(dt)
                         if optionTwo ~= AdvancedDamageSystem.PART_TYPES.PREMIUM then
                             local defectChance = C.PARTS_BREAKDOWN_CHANCES[optionTwoKey]
                             if math.random() < defectChance then
+                                local serviceScale = ADS_Config.CORE.DEFAULT_SERVICE_WEAR / ADS_Config.CORE.BASE_SERVICE_WEAR
                                 self:addBreakdown(breakdownId, {
                                     stage = stage,
                                     isVisible = false,
                                     isSelectedForRepair = true,
                                     isActive = false,
-                                    resumeTimer =  ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * (math.random() + 0.5),
+                                    resumeTimer =  ADS_Config.CORE.REPEAT_BREAKDOWN_TIME * serviceScale * (math.random() + 0.5),
                                     progressTimer = 0,
                                     source = AdvancedDamageSystem.BREAKDOWN_SOURCES.POOR_PARTS
                                 })
@@ -8453,7 +8457,8 @@ function AdvancedDamageSystem:isWarrantyRepairCovered(repairType, partType)
     local operatingHours = self.getFormattedOperatingTime ~= nil and tonumber(self:getFormattedOperatingTime()) or 0
     local ageMonths = tonumber(self.age) or 0
 
-    if operatingHours >= (C.WARRANTY_MAX_OPERATING_HOURS or 20) or ageMonths >= (C.WARRANTY_MAX_AGE_MONTHS or 12) then
+    local lifespanScale = ADS_Config.CORE.DEFAULT_SYSTEM_WEAR / ADS_Config.CORE.BASE_SYSTEMS_WEAR
+    if operatingHours >= ((C.WARRANTY_MAX_OPERATING_HOURS * lifespanScale) or 20) or ageMonths >= (C.WARRANTY_MAX_AGE_MONTHS or 12) then
         return false
     end
 

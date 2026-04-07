@@ -518,6 +518,7 @@ function ADS_InGameSettings:generateAllSteps()
         addHourRange(1.0, 20.0, 1.0)
         addHourRange(22.0, 50.0, 2.0)
         addHourRange(55.0, 100.0, 5.0)
+        addHourRange(200.0, 1000.0, 100.0)
 
         self.steps.serviceWear = data
     end
@@ -539,6 +540,8 @@ function ADS_InGameSettings:generateAllSteps()
         addHourRange(40, 200, 10)
         addHourRange(220, 500, 20)
         addHourRange(550, 1000, 50)
+        addHourRange(2000, 10000, 1000)
+        addHourRange(20000, 50000, 10000)
 
         self.steps.conditionWear = data
     end
@@ -554,10 +557,19 @@ function ADS_InGameSettings:generateAllSteps()
         self.steps.downtimeWear = data
     end
 
-    -- System Stress Rate: 10% to 300%
-    self.steps.systemStressRate = createSteps(0.1, 30, 0.1, function(v)
-        return string.format("%.0f%%", v * 100)
-    end)
+    -- System Stress Rate: 10% to 300%, then 350% to 1000% by 50%
+    do
+        local data = createSteps(0.1, 30, 0.1, function(v)
+            return string.format("%.0f%%", v * 100)
+        end)
+
+        for percent = 350, 1000, 50 do
+            table.insert(data.values, percent / 100)
+            table.insert(data.texts, string.format("%d%%", percent))
+        end
+
+        self.steps.systemStressRate = data
+    end
 
     -- Battery Capacity in Ah (stored as usable capacity factor)
     do

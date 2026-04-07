@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 115,
+    VER = 116,
 
     DEBUG = false,
 
@@ -29,8 +29,11 @@ ADS_Config = {
     -- This section controls the fundamental mechanics of wear, tear, and breakdowns.
     -- ====================================================================================
     CORE = {
+        DEFAULT_SERVICE_WEAR = 0.1,
+        DEFAULT_SYSTEM_WEAR = 0.01,
         BASE_SERVICE_WEAR = 0.1,
         BASE_SYSTEMS_WEAR = 0.01,
+
         DOWNTIME_MULTIPLIER = 0.05,
         UNDER_ROOF_DOWNTIME_MULTIPLIER = 0.0,
         RAIN_FACTOR = 1.1,
@@ -353,7 +356,7 @@ ADS_Config = {
             [3] = 0.33, AFTERMARKET = 0.33,
             [4] = 0.0,  PREMIUM     = 0.0,
         },
-        PARTS_BREAKDOWN_TIME = 18000000,
+
 
         PARTS_PRICE_MULTIPLIERS = {
             [1] = 1.0,  OEM         = 1.0,
