@@ -1900,6 +1900,44 @@ local function getConditionLevelFromSellPrice(vehicle)
     return targetCondition
 end
 
+local function initializeVehicleConditionFromVanillaPrice(vehicle, resetBreakdowns)
+    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    if vehicle == nil or spec == nil or spec.isExcludedVehicle then
+        return false
+    end
+
+    spec.serviceLevel = 1 - vehicle:getDamageAmount()
+
+    local targetCondition = getConditionLevelFromSellPrice(vehicle)
+    for _, systemData in pairs(spec.systems or {}) do
+        if type(systemData) == "table" then
+            local random = math.random() * 0.2 + 0.9
+            systemData.condition = math.clamp(targetCondition * random, 0.2, 1.0)
+            systemData.stress = 0
+            systemData.persistentWearRateState = 0
+        end
+    end
+
+    vehicle:updateConditionLevel()
+    vehicle:setDamageAmount(0.0, true)
+
+    if resetBreakdowns then
+        vehicle:removeBreakdown()
+
+        if vehicle:getOperatingTime() > 0 then
+            local operatingHours = tonumber(vehicle:getFormattedOperatingTime()) or 0
+            local chance = operatingHours / 100
+            chance = math.clamp(chance * ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MUL, 0, ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MAX)
+
+            if math.random() < chance then
+                vehicle:addBreakdown(vehicle:getRandomBreakdown())
+            end
+        end
+    end
+
+    return true, targetCondition
+end
+
 local function registerVehicle(vehicle)
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[vehicle.uniqueId] == nil then
         if (vehicle.propertyState == 2 or vehicle.propertyState == 3 or vehicle.propertyState == 4) and vehicle.ownerFarmId ~= 0 and vehicle.ownerFarmId < 10 then
@@ -1916,23 +1954,7 @@ local function registerVehicle(vehicle)
             if vehicle.isServer then
                     if (vehicle:getFormattedOperatingTime() > 0.01 and spec.conditionLevel == spec.baseConditionLevel) then
                         -- Used vehicle logic
-                        spec.serviceLevel = 1 - vehicle:getDamageAmount()
-                        local targetCondition = getConditionLevelFromSellPrice(vehicle)
-                        for _, systemData in pairs(spec.systems) do
-                            local random = math.random() * 0.2 + 0.9
-                            systemData.condition = math.clamp(targetCondition * random, 0.2, 1.0)
-                        end
-                        vehicle:setDamageAmount(0.0, true)
-                        --- breakdown presence chance
-                        if vehicle:getOperatingTime() > 0 then
-                            local operatingHours = tonumber(vehicle:getFormattedOperatingTime()) or 0
-                            local chance = operatingHours / 100
-                            chance = math.clamp(chance * ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MUL, 0, ADS_Config.CORE.USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MAX)
-
-                            if math.random() < chance then
-                                vehicle:addBreakdown(vehicle:getRandomBreakdown())
-                            end
-                        end
+                        initializeVehicleConditionFromVanillaPrice(vehicle, true)
                     end
 
                     --- if first mod load and vehicle has no maintenance log, add initial entry with current condition and service levels
@@ -8187,7 +8209,6 @@ function AdvancedDamageSystem.getIsLogEntryHasReport(entry)
     return (entry.type ~= AdvancedDamageSystem.STATUS.REPAIR 
     and entry.optionOne ~= AdvancedDamageSystem.INSPECTION_TYPES.VISUAL 
     and entry.optionOne ~= "NONE" 
-    and isVisible
     and isCompleted
     and not isLegacyEntry)
 end
@@ -8310,8 +8331,12 @@ function AdvancedDamageSystem:getHoursSinceLastMaintenance()
 
     for i = #spec.maintenanceLog, 1, -1 do
         local entry = spec.maintenanceLog[i]
-        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE or entry.id == 1 then
+        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE then
             return math.max(self:getFormattedOperatingTime() - (entry.conditionData.operatingHours or 0), 0)
+        elseif entry.id == 1 then
+            local serviceLevelAtStart = entry.conditionData.service or 0
+            local calculatedHoursForMaintenance = entry.conditionData.operatingHours - (spec.baseServiceLevel - serviceLevelAtStart) / (ADS_Config.CORE.BASE_SERVICE_WEAR / spec.reliability)
+            return math.max(self:getFormattedOperatingTime() - calculatedHoursForMaintenance, 0)
         end
     end
     return 0
@@ -8884,6 +8909,53 @@ local function syncConsoleCloggingState(vehicle, spec, parent, key)
     return true
 end
 
+local function printSpecValueRecursive(prefix, value, visited, depth)
+    visited = visited or {}
+    depth = depth or 0
+
+    if type(value) ~= "table" then
+        print(string.format("%s = %s", prefix, tostring(value)))
+        return
+    end
+
+    if visited[value] then
+        print(string.format("%s = <recursive>", prefix))
+        return
+    end
+
+    visited[value] = true
+    print(string.format("%s = {", prefix))
+
+    local keys = {}
+    for key, _ in pairs(value) do
+        table.insert(keys, key)
+    end
+
+    table.sort(keys, function(a, b)
+        if type(a) == type(b) then
+            if type(a) == "number" or type(a) == "string" then
+                return a < b
+            end
+        end
+        return tostring(a) < tostring(b)
+    end)
+
+    local indent = string.rep("  ", depth + 1)
+    for _, key in ipairs(keys) do
+        local childPrefix = string.format("%s[%s]", prefix, tostring(key))
+        local childValue = value[key]
+        if type(childValue) == "table" then
+            print(string.format("%s[%s] = {", indent, tostring(key)))
+            printSpecValueRecursive(indent .. "  ", childValue, visited, depth + 1)
+            print(string.format("%s}", indent))
+        else
+            print(string.format("%s[%s] = %s", indent, tostring(key), tostring(childValue)))
+        end
+    end
+
+    print(string.format("%s}", string.rep("  ", depth)))
+end
+
 function AdvancedDamageSystem.ConsoleCommands:setConfigVar(rawArgs, rawValue)
     if not g_currentMission:getIsServer() then
         ADS_ConsoleCommandEvent.sendToServer("setConfigVar", rawArgs, rawValue, nil)
@@ -8978,6 +9050,50 @@ function AdvancedDamageSystem.ConsoleCommands:setSpecVar(rawArgs, rawValue)
             tonumber(vehicle.getDirtAmount ~= nil and vehicle:getDirtAmount() or 0) or 0,
             tonumber(spec.radiatorClogging) or 0,
             tonumber(spec.airIntakeClogging) or 0
+        ))
+    end
+end
+
+function AdvancedDamageSystem.ConsoleCommands:printSpecVar(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("printSpecVar", rawArgs, nil, vehicle) end
+        return
+    end
+
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then return end
+
+    local args = parseArguments(rawArgs)
+    local path = args and args[1] or nil
+    if path == nil then
+        print("ADS Error: Usage: ads_printSpecVar <path>")
+        print("Example: ads_printSpecVar systems.engine")
+        return
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local parent, key, _, err = resolvePathParent(spec, path)
+    if parent == nil then
+        print(string.format("ADS Error: Invalid ADS spec path '%s': %s", path, tostring(err)))
+        return
+    end
+
+    local value = parent[key]
+    if value == nil then
+        print(string.format("ADS: spec_AdvancedDamageSystem.%s = nil", path))
+        return
+    end
+
+    if type(value) == "table" then
+        print(string.format("ADS: spec_AdvancedDamageSystem.%s on '%s':", path, vehicle:getFullName()))
+        printSpecValueRecursive("spec_AdvancedDamageSystem." .. path, value, {}, 0)
+    else
+        print(string.format(
+            "ADS: spec_AdvancedDamageSystem.%s on '%s' = %s",
+            path,
+            vehicle:getFullName(),
+            tostring(value)
         ))
     end
 end
@@ -9457,6 +9573,30 @@ function AdvancedDamageSystem.ConsoleCommands:resetVehicle()
     end
 
     print(string.format("ADS: Fully reset state for '%s'.", vehicle:getFullName()))
+end
+
+function AdvancedDamageSystem.ConsoleCommands:reinitializeVehicle()
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("reinitializeVehicle", nil, nil, vehicle) end
+        return
+    end
+
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then return end
+
+    local ok, targetCondition = initializeVehicleConditionFromVanillaPrice(vehicle, true)
+    if not ok then
+        print(string.format("ADS Error: Failed to reinitialize '%s'.", vehicle:getFullName()))
+        return
+    end
+
+    print(string.format(
+        "ADS: Reinitialized '%s' from vanilla resale price. Target condition: %.3f, final overall condition: %.3f.",
+        vehicle:getFullName(),
+        targetCondition or 0,
+        vehicle.spec_AdvancedDamageSystem.conditionLevel or 0
+    ))
 end
 
 function AdvancedDamageSystem.ConsoleCommands:startMaintance(rawArgs, rawArgTwo)
@@ -10023,6 +10163,7 @@ addConsoleCommand("ads_setSystemStress", "Sets system stress. Usage: ads_setSyst
 addConsoleCommand("ads_setSystemStressMultiplier", "Sets stress accumulation multiplier. Usage: ads_setSystemStressMultiplier [>=0.0] [system]", "setSystemStressMultiplier", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setService", "Sets vehicle service. Usage: ads_setService [0.0-1.0]", "setService", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_resetVehicle", "Resets vehicle state.", "resetVehicle", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_reinitializeVehicle", "Reinitializes vehicle from vanilla resale price logic.", "reinitializeVehicle", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_startService", "Starts service. Usage: ads_startService <type> [count]", "startMaintance", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_finishService", "Instantly finishes current service.", "finishMaintance", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_getServiceState", "Prints current service/workshop state variables.", "getServiceState", AdvancedDamageSystem.ConsoleCommands)
@@ -10035,6 +10176,7 @@ addConsoleCommand("ads_toggleHudDebugView", "Switch debug HUD view. Usage: ads_t
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_printSpecVar", "Prints ADS specialization variable on current vehicle. Usage: ads_printSpecVar <path>", "printSpecVar", AdvancedDamageSystem.ConsoleCommands)
 
 
 
