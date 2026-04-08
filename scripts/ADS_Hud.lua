@@ -57,7 +57,7 @@ function ADS_Hud:new()
     self.motorLoadText = {}
     self.batteryVoltageText = {}
     self.tsTempText = {
-        year = 2000
+        year = 1950
     }
 
     self.fuelConsoText = {}
@@ -133,6 +133,20 @@ function ADS_Hud:getVehicleTypeCategoryLabel(vehicle)
     return string.format("%s/%s", vehicleTypeName, categoryName)
 end
 
+local function hasCVTTransmission(vehicle)
+    local motor = vehicle:getMotor()
+    return motor ~= nil and motor.minForwardGearRatio ~= nil
+end
+
+local function hasCVTAddon(vehicle)
+    local spec_CVTaddon = vehicle.spec_CVTaddon
+    local cvtAddonConfig = spec_CVTaddon ~= nil and (tonumber(spec_CVTaddon.CVTconfig) or 0) or 0
+    local hasActiveCVTAddon = spec_CVTaddon ~= nil
+        and spec_CVTaddon.CVTcfgExists
+        and cvtAddonConfig ~= 0
+        and cvtAddonConfig ~= 8
+    return hasActiveCVTAddon
+end
 
 -- =====================================================================================
 --                              DRAW
@@ -360,6 +374,18 @@ function ADS_Hud:drawDashboard()
                 end
             end
 
+            -- CVT Addon
+            if hasCVTAddon(vehicle) then
+                local spec_CVTaddon = vehicle.spec_CVTaddon
+
+                if hudIndicatorId == self.indicators.warning.name and targetColor == colors.DEFAULT and (spec_CVTaddon.forDBL_warndamage == 1 or spec_CVTaddon.forDBL_warnheat == 1 or spec_CVTaddon.forDBL_highpressure == 1) then
+                    targetColor = colors.WARNING
+                end
+                if hudIndicatorId == self.indicators.warning.name and targetColor == colors.WARNING and (spec_CVTaddon.forDBL_critdamage == 1 or spec_CVTaddon.forDBL_critheat == 1) then
+                    targetColor = colors.CRITICAL
+                end
+            end
+
             if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature < 50 then targetColor = colors.COOL
             elseif hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature > 99 and spec.engineTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.coolant.name and spec.engineTemperature > 110 then targetColor = colors.CRITICAL end
@@ -413,7 +439,7 @@ function ADS_Hud:drawDashboard()
     end
 
     local tempText = ""
-    if transTemp > -90 and spec.year >= self.tsTempText.year then
+    if hasCVTTransmission(vehicle) or hasCVTAddon(vehicle) then
         tempText = string.format("%.0f%s | %.0f%s" , engineTemp, tempSign, transTemp, tempSign)
     else
         tempText = string.format("%.1f%s", engineTemp, tempSign)
@@ -1068,7 +1094,9 @@ function ADS_Hud:drawActiveVehicleHUD()
         spec.debugData.engineTemp.convectionCooling
     ), getTempColor(spec.engineTemperature), 0.95)
 
-    local vehicleHasCVT = motor.minForwardGearRatio ~= nil and spec.year >= self.tsTempText.year and not spec.isElectricVehicle
+    local hasActiveCVTAddon = hasCVTAddon(vehicle)
+    local vehicleHasCVT = hasCVTTransmission(vehicle)
+
     local showTransmissionSection = vehicleHasCVT and spec.transmissionTemperature > -30
     local transmissionTempLines = {}
     if showTransmissionSection then
@@ -1101,6 +1129,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local maxRpm = math.max(motor.maxRpm or 1, 1)
     local rpmLoad = lastRpm / maxRpm
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
+    local spec_CVTaddon = vehicle.spec_CVTaddon
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
         "hp: %d/%d | ml/rpm: %.3f/%.3f | g: %d>%d(%d,%.2f) | fuel: %.2fl/h | d/dr: %.3f/%.3f" ,
@@ -1117,6 +1146,18 @@ function ADS_Hud:drawActiveVehicleHUD()
         vehicle:getDirtAmount()
 
     ), {1, 1, 1, 1}, 0.95)
+
+    if hasActiveCVTAddon then
+        addLine(drivetrainLines, string.format(
+            "CA: damage: %.6f%% | wd: %s, cd: %s | wh: %s, ch: %s | hp: %s",
+            tonumber(spec_CVTaddon.CVTdamage) or 0,
+            tostring(spec_CVTaddon.forDBL_warndamage == 1),
+            tostring(spec_CVTaddon.forDBL_critdamage == 1),
+            tostring(spec_CVTaddon.forDBL_warnheat == 1),
+            tostring(spec_CVTaddon.forDBL_critheat == 1),
+            tostring(spec_CVTaddon.forDBL_highpressure == 1)
+        ), {1, 0.92, 0.78, 1}, 0.95)
+    end
 
     local batteryLines = {}
     local soc = spec.batterySoc or batteryDbg.soc or 0

@@ -165,6 +165,20 @@ AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     instantDamageFactor = "idfg"
 }
 
+-- ==========================================================
+--                          HELPER FUNCTIONS
+-- ==========================================================
+
+local function log_dbg(...)
+    if ADS_Config and ADS_Config.DEBUG then
+        local args = {...}
+        for i = 1, #args do
+            args[i] = tostring(args[i])
+        end
+        print("[ADS_SPEC] " .. table.concat(args, " "))
+    end
+end
+
 local function createEmptyFactorStats(systems)
     local result = {}
     if type(systems) ~= "table" then
@@ -272,15 +286,69 @@ local function ensureFactorStats(spec, vehicle)
     return spec.factorStats
 end
 
-local function log_dbg(...)
-    if ADS_Config and ADS_Config.DEBUG then
-        local args = {...}
-        for i = 1, #args do
-            args[i] = tostring(args[i])
-        end
-        print("[ADS_SPEC] " .. table.concat(args, " "))
-    end
+local function hasCVTTransmission(vehicle)
+    local motor = vehicle:getMotor()
+    return motor ~= nil and motor.minForwardGearRatio ~= nil
 end
+
+local function hasCVTAddon(vehicle)
+    local spec_CVTaddon = vehicle.spec_CVTaddon
+    local cvtAddonConfig = spec_CVTaddon ~= nil and (tonumber(spec_CVTaddon.CVTconfig) or 0) or 0
+    local hasActiveCVTAddon = spec_CVTaddon ~= nil
+        and spec_CVTaddon.CVTcfgExists
+        and cvtAddonConfig ~= 0
+        and cvtAddonConfig ~= 8
+    return hasActiveCVTAddon
+end
+
+local function getIsElectricVehicle(vehicle)
+    if vehicle.spec_motorized and vehicle.spec_motorized.consumers then
+        for _, consumer in pairs(vehicle.spec_motorized.consumers) do
+            if consumer.fillType == FillType.ELECTRICCHARGE then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function getIsExcludedFromADS(vehicle)
+    local vehicleName = vehicle:getFullName()
+    if getIsElectricVehicle(vehicle) or
+            vehicleName == 'Lizard Old Bike' or
+            vehicleName == 'Lizard Mountain Bike' or
+            vehicleName == 'Lizard Motorized Bike' then
+        return true
+    end
+    return false
+end
+
+local function getIsVehicleNeedLubticate(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return false
+    end
+
+    local workProcessSystem = spec.systems ~= nil and spec.systems.workprocess or nil
+    if type(workProcessSystem) ~= "table" then
+        return false
+    end
+
+    return workProcessSystem.enabled ~= false
+end
+
+local function getIsVehicleNeedBlowOut(vehicle)
+    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+    local categoryName = storeItem ~= nil and storeItem.categoryName or ""
+    local vtype = vehicle.type ~= nil and vehicle.type.name or ""
+
+    if categoryName == "TRUCKS" or vtype == "car" or vtype == "carFillable" or vtype == "motorbike" then
+        return false
+    end
+
+    return true
+end
+
 
 -- ==========================================================
 --                          REGISTRATION
@@ -508,6 +576,7 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
     if spec == nil or spec.isExcludedVehicle then return end
 
     -- [Group 1] Core state
+    streamWriteFloat32(streamId, self:getOperatingTime() or self.operatingTime or 0)
     streamWriteFloat32(streamId, spec.serviceLevel or 1.0)
     streamWriteFloat32(streamId, spec.conditionLevel or 1.0)
     streamWriteString(streamId, spec.currentState or "")
@@ -561,13 +630,13 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
         streamWriteString(streamId, ADS_Utils.serializeMaintenanceLogEntry(entry))
     end
 end
-
 --- Full state sync on a joining client (client-side).
 function AdvancedDamageSystem:onReadStream(streamId, connection)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil or spec.isExcludedVehicle then return end
 
     -- [Group 1] Core state
+    self:setOperatingTime(streamReadFloat32(streamId), true)
     spec.serviceLevel = streamReadFloat32(streamId)
     spec.conditionLevel = streamReadFloat32(streamId)
     spec.currentState = streamReadString(streamId)
@@ -590,10 +659,8 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
     local syncRawTransTemp = streamReadFloat32(streamId)
     spec.rawEngineTemperature = syncRawEngTemp
     spec.rawTransmissionTemperature = syncRawTransTemp
-    -- Keep these fields in sync for compatibility with existing debug/tools.
     spec._netTargetEngineTemp = syncRawEngTemp
     spec._netTargetTransmissionTemp = syncRawTransTemp
-    -- Initialize smoothed values from raw on full sync.
     spec.engineTemperature = syncRawEngTemp
     spec.transmissionTemperature = syncRawTransTemp
     spec.batterySoc = streamReadFloat32(streamId)
@@ -651,11 +718,9 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
         end
     end
 
-    -- Rebuild derived state from initial sync data
     self:recalculateAndApplyEffects()
     self:recalculateAndApplyIndicators()
 end
-
 --- Differential update sync (server -> client, 4 dirty-flag groups).
 function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMask)
     local spec = self.spec_AdvancedDamageSystem
@@ -664,6 +729,7 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
     if not connection:getIsServer() then
         -- [1] State + Thermal(raw) + Service options + Fuel consumption
         if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_state) ~= 0) then
+            streamWriteFloat32(streamId, self:getOperatingTime() or self.operatingTime or 0)
             streamWriteFloat32(streamId, spec.serviceLevel or 1.0)
             streamWriteString(streamId, spec.currentState or "")
             streamWriteString(streamId, spec.plannedState or "")
@@ -704,10 +770,8 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
             streamWriteFloat32(streamId, spec.pendingProgressTotalTime or 0)
             streamWriteFloat32(streamId, spec.pendingProgressElapsedTime or 0)
         end
-        -- [5] Log entries are now synced via ADS_LogEntrySyncEvent (broadcast).
     end
 end
-
 --- Differential update sync (client reads from server).
 function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection)
     local spec = self.spec_AdvancedDamageSystem
@@ -716,6 +780,7 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
     if connection:getIsServer() then
         -- [1] State + Thermal(raw) + Service options + Fuel consumption
         if streamReadBool(streamId) then
+            self:setOperatingTime(streamReadFloat32(streamId), true)
             spec.serviceLevel = streamReadFloat32(streamId)
             spec.currentState = streamReadString(streamId)
             spec.plannedState = streamReadString(streamId)
@@ -724,7 +789,6 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             local syncRawTransTemp = streamReadFloat32(streamId)
             spec.rawEngineTemperature = syncRawEngTemp
             spec.rawTransmissionTemperature = syncRawTransTemp
-            -- Keep compatibility with previous tooling.
             spec._netTargetEngineTemp = syncRawEngTemp
             spec._netTargetTransmissionTemp = syncRawTransTemp
             spec.batterySoc = streamReadFloat32(streamId)
@@ -740,7 +804,7 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             if spec.engTermPID ~= nil then
                 spec.engTermPID.mechPos = spec.thermostatState
             end
-            spec._fuelUsageRaw = streamReadFloat32(streamId)  -- raw lastFuelUsage, buffered client-side
+            spec._fuelUsageRaw = streamReadFloat32(streamId)
             spec._netMotorLoad = streamReadFloat32(streamId)
             spec.serviceOptionOne = streamReadString(streamId)
             spec.serviceOptionTwo = streamReadString(streamId)
@@ -778,10 +842,8 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             spec.pendingProgressTotalTime = streamReadFloat32(streamId)
             spec.pendingProgressElapsedTime = streamReadFloat32(streamId)
         end
-        -- [5] Log entries are now synced via ADS_LogEntrySyncEvent (broadcast).
     end
 end
-
 -- ============================================================
 --                       SAVE & LOAD
 -- ============================================================
@@ -1318,53 +1380,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     log_dbg("onPostLoad called for vehicle:", self:getFullName())
     local spec = self.spec_AdvancedDamageSystem
 
-    local function getIsElectricVehicle(vehicle)
-        if vehicle.spec_motorized and vehicle.spec_motorized.consumers then
-            for _, consumer in pairs(vehicle.spec_motorized.consumers) do
-                if consumer.fillType == FillType.ELECTRICCHARGE then
-                    return true
-                end
-            end
-        end
-        return false
-    end
-
-    local function getIsExcludedFromADS(vehicle)
-        local vehicleName = vehicle:getFullName()
-        if  getIsElectricVehicle(vehicle) or
-            vehicleName == 'Lizard Old Bike' or
-            vehicleName == 'Lizard Mountain Bike' or
-            vehicleName == 'Lizard Motorized Bike' then
-                return true
-        end
-    end
-
-    local function getIsVehicleNeedLubticate(vehicle)
-        local spec = vehicle.spec_AdvancedDamageSystem
-        if spec == nil then
-            return false
-        end
-
-        local workProcessSystem = spec.systems ~= nil and spec.systems.workprocess or nil
-        if type(workProcessSystem) ~= "table" then
-            return false
-        end
-
-        return workProcessSystem.enabled ~= false
-    end
-
-    local function getIsVehicleNeedBlowOut(vehicle)
-        local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-        local categoryName = storeItem ~= nil and storeItem.categoryName or ""
-        local vtype = vehicle.type ~= nil and vehicle.type.name or ""
-
-        if categoryName == "TRUCKS" or vtype == "car" or vtype == "carFillable" or vtype == "motorbike" then
-            return false
-        end
-
-        return true
-    end
-
     spec.isExcludedVehicle = getIsExcludedFromADS(self)
     if spec.isExcludedVehicle then return end
 
@@ -1719,7 +1734,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec.rawEngineTemperature = spec.engineTemperature
     spec.rawTransmissionTemperature = spec.transmissionTemperature
 
-    
     spec.isElectricVehicle = getIsElectricVehicle(self)
     spec.hydraulicsMoveAlphaCache = {}
 
@@ -1803,7 +1817,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
             end
         end
     end
-
 
     enableOrDisableSystems(self)
     spec.isVehicleNeedLubricate = getIsVehicleNeedLubticate(self)
@@ -2031,8 +2044,8 @@ end
 local function syncOverheatProtection(vehicle)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then return end
-    local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
-    local rawTransmissionTemp = spec.rawTransmissionTemperature or spec.transmissionTemperature or -99
+    local rawEngineTemp =  spec.rawEngineTemperature or spec.engineTemperature or -99 
+    local rawTransmissionTemp = not hasCVTAddon(vehicle) and (spec.rawTransmissionTemperature or spec.transmissionTemperature or -99) or -99
 
     if vehicle.isServer and spec.year >= 2000 then
         local overheatProtectionId = 'OVERHEAT_PROTECTION'
@@ -2291,6 +2304,9 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
 
+    local prevOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
+
+
     -- OP Time update for ADS vehicles
     local motorState = self.getMotorState ~= nil and self:getMotorState() or nil
     if motorState == MotorState.ON then
@@ -2377,6 +2393,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         or spec.currentState ~= prevCurrentState
         or spec.plannedState ~= prevPlannedState
         or math.abs((spec.maintenanceTimer or 0) - (prevMaintenanceTimer or 0)) > 0.5
+        or math.abs(((self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0) - (prevOperatingTime or 0))) > 1
         or math.abs((spec.rawEngineTemperature or 0) - (prevRawEngineTemp or 0)) > 0.25
         or math.abs((spec.rawTransmissionTemperature or 0) - (prevRawTransTemp or 0)) > 0.25
         or math.abs((spec.batterySoc or 0) - (prevBatterySoc or 0)) > 0.0025
@@ -2895,7 +2912,6 @@ function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     if type(systemStats) == "table" then
         systemStats.total = (tonumber(systemStats.total) or 0) + dmg
         systemStats.stress = (tonumber(systemStats.stress) or 0) + stressToAdd
-        systemStats.idfg = (tonumber(systemStats.idfg) or 0) + dmg
     end
 end
 
@@ -2996,30 +3012,18 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local C = ADS_Config.CORE.TRANSMISSION_FACTOR_DATA
     local systemData = spec.systems.transmission
     systemData.pullOverloadTimer = tonumber(systemData.pullOverloadTimer) or 0
-    local vehicleHaveCVT = (spec_motorized.motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+    local vehicleHaveCVT = hasCVTTransmission(self)
     local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor, wheelSlipIntensity, coldTransFactor, hotTransFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0, 0, 0, 0
     local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
     local massRatio = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
-    local cvtSpec = self.spec_CVTaddon
-    local cvtAddonExists = cvtSpec ~= nil and cvtSpec.CVTcfgExists
 
     if not systemData.enabled then
         return
     end
 
-    if cvtAddonExists then
-        if spec._prevCvtAddonDamage == nil then
-            spec._prevCvtAddonDamage = cvtSpec.CVTdamage
-        end
-        if cvtSpec.CVTdamage > spec._prevCvtAddonDamage then
-            local damageDiff = cvtSpec.CVTdamage - spec._prevCvtAddonDamage
-            wearRate = wearRate + damageDiff * (C.CVT_ADDON_DAMAGE_MULTIPLIER or 1)
-        end
-
-
-    elseif  self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+    if  self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
@@ -7405,7 +7409,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     if not motor then return end
 
     local spec = self.spec_AdvancedDamageSystem
-    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+    local vehicleHaveCVT = hasCVTTransmission(self)
     
     local isMotorStarted = self:getIsMotorStarted()
     local motorLoad = math.max(self:getMotorLoadPercentage(), 0.0)
@@ -7433,9 +7437,12 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     end
     
     if vehicleHaveCVT then
-        self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
+        if hasCVTAddon(self) then
+            spec.rawTransmissionTemperature = self.spec_motorized.motorTemperature.value
+        else 
+            self:updateTransmissionThermalModel(dt, spec, isMotorStarted, motorLoad, motorRpm, speed, speedCooling, eviromentTemp, dirt)
+        end
     else
-        spec.transmissionTemperature = -99
         spec.rawTransmissionTemperature = -99
     end
 end
@@ -7703,7 +7710,7 @@ function AdvancedDamageSystem:getSmoothedTemperature(dt)
     local alpha = dt / (C.TAU + dt)
     local eviromentTemp = g_currentMission.environment.weather.forecast:getCurrentWeather().temperature or 0
     local motor = self:getMotor()
-    local vehicleHaveCVT = (motor.minForwardGearRatio ~= nil and spec.year >= 2000 and not spec.isElectricVehicle)
+    local vehicleHaveCVT = hasCVTTransmission(self)
     local snapThreshold = 5.0
 
     local rawEngineTemperature = spec.rawEngineTemperature or eviromentTemp
@@ -7727,7 +7734,7 @@ end
 
 function AdvancedDamageSystem.updateMotorTemperature(self, superFunc, dt)
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil or spec.isExcludedVehicle then
+    if spec == nil or spec.isExcludedVehicle or hasCVTAddon(self) then
         return superFunc(self, dt)
     else
         local spec_motorized = self.spec_motorized
