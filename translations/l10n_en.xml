@@ -134,6 +134,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift hydraulic pump"/>
         <text name="ads_breakdowns_part_cvt_chain" text="CVT chain"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT hydraulic control valve"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulic pump"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulic cylinder"/>
         <text name="ads_breakdowns_part_pto_clutch" text="PTO clutch"/>
@@ -236,6 +237,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Moderate CVT hydraulic control valve malfunction. Hydraulic pressure instability is frequent, engine torque is reduced, transmission temperature is increased, and the available ratio range is further limited."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Severe CVT hydraulic control valve malfunction. Hydraulic pressure drops are pronounced, engine torque is heavily reduced, transmission overheating is likely, and ratio range limitation is significant."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Critical CVT hydraulic control valve failure. Pressure control is no longer stable, the ratio range is severely restricted, transmission heating is excessive, and the powertrain operates in emergency mode."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Early signs of a CVT transmission malfunction have been detected. Inspection and repair are required."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="The CVT transmission malfunction is getting worse. Continued operation may lead to emergency mode."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Critical CVT transmission damage. The transmission is in emergency mode and the maximum vehicle speed is reduced."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Complete CVT transmission failure. Further operation is impossible until the transmission is repaired."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT transmission failure"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="CVT hydraulic control failure"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Engine thermostat is beginning to fail. The engine takes longer to reach optimal temperature or runs slightly hot."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Thermostat response is poor. Engine temperature regulation is unstable, increasing wear."/>

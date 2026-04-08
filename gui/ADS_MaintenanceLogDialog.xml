@@ -68,7 +68,7 @@
                 </Bitmap>
                 
                 <SmoothList profile="ads_tableList" id="logTable" position="50px -85px" size="1290px 510px">
-                    <ListItem profile="ads_tableListItem" name="logRowTemplate" size="1290px 40.77px" onClick="onRowClick">
+                    <ListItem profile="ads_tableListItemSelected" name="logRowTemplate" size="1290px 40.77px" onClick="onRowClick">
                         <Text profile="ads_tableRowCellLeft" position="20px 0px" size="100px 40.77px" name="logDate" />
                         <Text profile="ads_tableRowCellLeft" position="120px 0px" size="160px 40.77px" name="logHours" />
                         <Text profile="ads_tableRowCellLeftUpper" position="280px 0px" size="180px 40.77px" name="logType" />

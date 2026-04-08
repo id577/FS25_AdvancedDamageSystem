@@ -99,6 +99,9 @@
         <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
         <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
     </Profile>
+    <Profile name="ads_tableListItemSelected" extends="ads_tableListItem">
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
     <Profile name="ads_tableRowCellLeft" extends="baseReference" with="anchorStretchingYLeft">
         <textBold value="false"/>
         <textSize value="16px"/>

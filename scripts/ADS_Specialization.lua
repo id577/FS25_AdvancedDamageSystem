@@ -2230,6 +2230,41 @@ local function syncFuelConsumption(vehicle)
     end
 end
 
+local function syncCVTaddonBreakdown(vehicle)
+    if not hasCVTAddon(vehicle) then return end
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil or not vehicle.isServer then return end
+
+    local breakdownId = 'CVT_ADDON_MALFUNCTION'
+    local spec_CVTaddon = vehicle.spec_CVTaddon
+    if spec_CVTaddon ~= nil then
+        local shouldHaveBreakdown = spec_CVTaddon.CVTdamage > 60.0
+        local shouldBeStage = 1
+        if spec_CVTaddon.CVTdamage > 90.0 then
+            shouldBeStage = 4
+        elseif spec_CVTaddon.CVTdamage > 80.0 then
+            shouldBeStage = 3
+        elseif spec_CVTaddon.CVTdamage > 70.0 then
+            shouldBeStage = 2
+        end
+
+        if shouldHaveBreakdown and not vehicle:hasBreakdown(breakdownId) then
+            vehicle:addBreakdown(breakdownId, shouldBeStage)
+        elseif not shouldHaveBreakdown and vehicle:hasBreakdown(breakdownId) then
+            vehicle:removeBreakdown(breakdownId)
+        elseif shouldHaveBreakdown and vehicle:hasBreakdown(breakdownId) then
+            local currentStage = vehicle:getActiveBreakdowns()[breakdownId].stage
+            if currentStage ~= shouldBeStage then
+                vehicle:changeBreakdownStage(breakdownId, shouldBeStage)
+            end
+        end
+    else
+        if vehicle:hasBreakdown(breakdownId) then
+            vehicle:removeBreakdown(breakdownId)
+        end
+    end
+end
+
 
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
@@ -2272,6 +2307,9 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
     syncOverheatProtection(self)
+
+    --- CVT addon breakdown sync
+    syncCVTaddonBreakdown(self)
     
     --- Messages
     syncMessages(self)
@@ -3023,7 +3061,54 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         return
     end
 
-    if  self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
+    if hasCVTAddon(self) and self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
+        local spec_CVTaddon = self.spec_CVTaddon
+
+        if self.spec_RealisticDamageSystem == nil then
+            self.spec_RealisticDamageSystem = {}
+        end
+
+        local currentCVTdamage = math.clamp(tonumber(spec_CVTaddon.CVTdamage) or 0, 0, 100)
+        local prevCVTdamage = math.clamp(tonumber(spec._prevCVTdamage) or currentCVTdamage, 0, 100)
+        local prevStress = math.max(tonumber(spec._prevStress) or 0, 0)
+
+        local cvtDamageDelta = math.max(currentCVTdamage - prevCVTdamage, 0)
+        local normalizedCVTdamage = currentCVTdamage / 100
+        local normalizedDelta = cvtDamageDelta / 100
+
+        local systemStressMultiplier = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey] or 1.0
+        local globalStressMultiplier = math.max(tonumber(ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER) or 1.0, 0.001)
+        local divisor = math.max(systemStressMultiplier * globalStressMultiplier, 0.001)
+
+        local currentCondition = math.clamp(tonumber(systemData.condition) or 1.0, 0.001, 1.0)
+        local conditionToRemove = normalizedDelta / divisor
+        local newCondition = math.clamp(currentCondition - conditionToRemove, 0.001, 1.0)
+
+        local currentStress = systemData.stress or 0
+        local newStress = math.clamp(currentStress + normalizedDelta, 0, newCondition)
+        local previousStress = math.clamp(tonumber(systemData.stress) or 0, 0, math.max(currentCondition, 0.001))
+
+        systemData.condition = newCondition
+        systemData.stress = newStress
+
+        spec_CVTaddon.CVTdamage = newStress / math.max(newCondition, 0.001) * 100
+        spec._prevCVTdamage = spec_CVTaddon.CVTdamage
+        spec._prevStress = newStress
+
+        local factorStats = ensureFactorStats(spec, self)
+        local systemStats = factorStats[systemKey]
+        if type(systemStats) == "table" then
+            systemStats.total = (tonumber(systemStats.total) or 0) + conditionToRemove
+            systemStats.stress = (tonumber(systemStats.stress) or 0) + math.max(newStress - previousStress, 0)
+        end
+
+        local motorLoad = self:getMotorLoadPercentage()
+        local speed = self:getLastSpeed()
+        if motorLoad < ADS_Config.CORE.ENGINE_FACTOR_DATA.MOTOR_IDLING_THRESHOLD and speed < 0.003 then
+            wearRate = wearRate * C.TRANSMISSION_IDLING_MULTIPLIER
+        end
+
+    elseif self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
@@ -3181,6 +3266,11 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         wearRate = wearRate * expiredServiceMultiplier
         expiredServiceFactor = wearRate - wearRateWithoutService
     else
+        if hasCVTAddon(self) then
+            local spec_CVTaddon = self.spec_CVTaddon
+            spec_CVTaddon.CVTdamage = systemData.stress / math.max(systemData.condition, 0.001) * 100
+        end
+
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
         else
@@ -4310,56 +4400,60 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
     local conditionEffectiveFloor = ADS_Config.CORE.CONDITION_EFFECTIVE_FLOOR or 0.15
 
     for systemName, systemData in pairs(spec.systems) do
-        local systemCondition = math.max(systemData.condition or 1.0, 0.001)
-        local effectiveCondition = math.max(systemCondition, conditionEffectiveFloor)
-        local systemStress = math.max(systemData.stress or 0.0, 0.0)
-        local stressThreshold = probabilityData.STRESS_THRESHOLD
-        local hourlyProb = 0.0
+        if systemData.name == AdvancedDamageSystem.SYSTEMS.TRANSMISSION and hasCVTAddon(self) then
+            -- skip transmission breakdowns if CVT addon is present
+        else
+            local systemCondition = math.max(systemData.condition or 1.0, 0.001)
+            local effectiveCondition = math.max(systemCondition, conditionEffectiveFloor)
+            local systemStress = math.max(systemData.stress or 0.0, 0.0)
+            local stressThreshold = probabilityData.STRESS_THRESHOLD
+            local hourlyProb = 0.0
 
-        if systemStress / effectiveCondition >= stressThreshold then
-            local stressOverload = math.max(effectiveCondition - systemStress, 0.001)
-            local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(stressOverload, probabilityData, dt)
-            hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
+            local stressRatio = math.max(systemStress / effectiveCondition, 0.0)
+            if stressRatio >= stressThreshold then
+                local failureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(stressRatio, probabilityData, dt)
+                hourlyProb = 1 - (1 - failureChancePerFrame) ^ (3600000 / dt)
 
-            local random = math.random()
-            if random < failureChancePerFrame or systemStress >= effectiveCondition then
-                local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemData.name)
-                local breakdownId = self:getRandomBreakdownBySystem(systemKey)
-                if breakdownId ~= nil then
-                    local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
-                    if registryEntry ~= nil and registryEntry.stages ~= nil and #registryEntry.stages > 0 then
-                        local criticalOutcomeChance = ADS_Utils.getCriticalFailureChance(systemCondition)
-                        if math.random() < criticalOutcomeChance then
-                            self:addBreakdown(breakdownId, #registryEntry.stages)
-                        else
-                            local stage = 1
-                            if systemCondition <= ADS_Config.CORE.GENERAL_WEAR_LATE_STAGE_THRESHOLD then
-                                stage = 3
-                            elseif systemCondition <= ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD then
-                                stage = 2
+                local random = math.random()
+                if random < failureChancePerFrame or systemStress >= effectiveCondition then
+                    local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemData.name)
+                    local breakdownId = self:getRandomBreakdownBySystem(systemKey)
+                    if breakdownId ~= nil then
+                        local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+                        if registryEntry ~= nil and registryEntry.stages ~= nil and #registryEntry.stages > 0 then
+                            local criticalOutcomeChance = ADS_Utils.getCriticalFailureChance(systemCondition)
+                            if math.random() < criticalOutcomeChance then
+                                self:addBreakdown(breakdownId, #registryEntry.stages)
+                            else
+                                local stage = 1
+                                if systemCondition <= ADS_Config.CORE.GENERAL_WEAR_LATE_STAGE_THRESHOLD then
+                                    stage = 3
+                                elseif systemCondition <= ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD then
+                                    stage = 2
+                                end
+                                self:addBreakdown(breakdownId, stage)
                             end
-                            self:addBreakdown(breakdownId, stage)
-                        end
 
-                        systemData.stress = systemStress * ADS_Config.CORE.STRESS_COOLDOWN
-                        systemStress = math.max(systemData.stress or 0.0, 0.0)
+                            systemData.stress = systemStress * ADS_Config.CORE.STRESS_COOLDOWN
+                            systemStress = math.max(systemData.stress or 0.0, 0.0)
 
-                        if systemStress / effectiveCondition >= stressThreshold then
-                            local cooledStressOverload = math.max(effectiveCondition - systemStress, 0.001)
-                            local cooledFailureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(cooledStressOverload, probabilityData, dt)
-                            hourlyProb = 1 - (1 - cooledFailureChancePerFrame) ^ (3600000 / dt)
-                        else
-                            hourlyProb = 0.0
+                            local cooledStressRatio = math.max(systemStress / effectiveCondition, 0.0)
+                            if cooledStressRatio >= stressThreshold then
+                                local cooledFailureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(cooledStressRatio, probabilityData, dt)
+                                hourlyProb = 1 - (1 - cooledFailureChancePerFrame) ^ (3600000 / dt)
+                            else
+                                hourlyProb = 0.0
+                            end
                         end
                     end
                 end
             end
-        end
 
-        if ADS_Config.DEBUG and spec.debugData[systemName] ~= nil then
-            local criticalChance = math.clamp((1 - systemCondition) ^ probabilityData.CRITICAL_DEGREE, probabilityData.CRITICAL_MIN, probabilityData.CRITICAL_MAX)
-            spec.debugData[systemName].breakdownProbability = hourlyProb
-            spec.debugData[systemName].critBreakdownProbability = criticalChance
+            if ADS_Config.DEBUG and spec.debugData[systemName] ~= nil then
+                local criticalChance = math.clamp((1 - systemCondition) ^ probabilityData.CRITICAL_DEGREE, probabilityData.CRITICAL_MIN, probabilityData.CRITICAL_MAX)
+                spec.debugData[systemName].breakdownProbability = hourlyProb
+                spec.debugData[systemName].critBreakdownProbability = criticalChance
+            end
         end
     end
 end
@@ -4873,7 +4967,7 @@ local function buildGeneralWearBreakdown(vehicle)
                 local isCvt = motor.minForwardGearRatio ~= nil
 
                 --- early stage
-                if isManual then
+                if isManual and hasCVTAddon(vehicle) then
                     effect = {
                         id = "TRANSMISSION_SLIP_EFFECT", 
                         value = function ()
@@ -4887,7 +4981,7 @@ local function buildGeneralWearBreakdown(vehicle)
                     }
                     if effect ~= nil then table.insert(effects, effect) end
 
-                elseif isPowerShift then
+                elseif isPowerShift and hasCVTAddon(vehicle) then
                     effect = { 
                         id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", 
                         value = function ()
@@ -4901,7 +4995,7 @@ local function buildGeneralWearBreakdown(vehicle)
                     }
                     if effect ~= nil then table.insert(effects, effect) end
 
-                elseif isCvt then
+                elseif isCvt and not hasCVTAddon(vehicle) then
                     effect = { 
                         id = "CVT_MAX_RATIO_MODIFIER", 
                         value = function ()
@@ -5969,8 +6063,16 @@ function AdvancedDamageSystem:completeService()
     end
 
     -- repaint vehicle
-    if serviceType == states.OVERHAUL and optionThree == true then
+    if serviceType == states.OVERHAUL or optionThree == true then
         self:repaintVehicle(true)
+    end
+
+    -- cvt addon repair
+    if serviceType == states.REPAIR or serviceType == states.OVERHAUL and pendingSelectedBreakdowns.CVT_ADDON_MALFUNCTION ~= nil then
+        local systemData = spec.systems.transmission
+        if systemData.stress > 0.25 then
+            spec.systems.transmission.stress = 0.25
+        end
     end
 
     local maintenanceCompletedText = self:getFullName() .. ": " .. g_i18n:getText(serviceType) .. " " .. g_i18n:getText("ads_spec_maintenance_complete_notification")
@@ -8431,18 +8533,19 @@ function AdvancedDamageSystem.getBrandReliability(vehicle, storeItem)
 end
 
 function AdvancedDamageSystem.calculateBreakdownProbability(level, p, dt)
-    local wear = 1 - math.max(0, math.min(1, level))
+    local threshold = math.clamp(tonumber(ADS_Config.CORE.BREAKDOWN_PROBABILITIES.STRESS_THRESHOLD) or 1.0, 0.0, 0.999)
+    local clampedLevel = math.max(tonumber(level) or 0, 0.0)
+    local normalizedLevel = math.clamp((clampedLevel - threshold) / math.max(1 - threshold, 0.001), 0.0, 1.0)
 
-    local calculatedMtbf = p.MAX_MTBF + (p.MIN_MTBF - p.MAX_MTBF) * wear ^ (math.max(p.DEGREE - p.DEGREE * wear, 0.1))
+    local calculatedMtbf = p.MAX_MTBF + (p.MIN_MTBF - p.MAX_MTBF) * normalizedLevel ^ (math.max(p.DEGREE - p.DEGREE * normalizedLevel, 0.1))
     local mtbfInMinutes = math.max(calculatedMtbf, p.MIN_MTBF)
     local mtbfInMillis = mtbfInMinutes * 60 * 1000
 
     if mtbfInMillis <= 0 then
         return 1.0
     end
-    local probability = 1 - math.exp(-dt / mtbfInMillis)
 
-    return probability
+    return 1 - math.exp(-dt / mtbfInMillis)
 end
 
 function AdvancedDamageSystem:isWarrantyRepairCovered(repairType, partType)

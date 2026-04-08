@@ -195,6 +195,10 @@ function ADS_WorkshopDialog:updateScreen()
     local isUnderService = spec.currentState ~= STATUS.READY
     self.cancelServiceButton:setVisible(isUnderService)
     self.cancelServiceButton.disabled = not isUnderService
+    self.inscpectionButton:setVisible(not isUnderService)
+    self.maintenanceButton:setVisible(not isUnderService)
+    self.repairButton:setVisible(not isUnderService)
+    self.overhaulButton:setVisible(not isUnderService)
 
     local inspectionPrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.INSPECTION, AdvancedDamageSystem.INSPECTION_TYPES.STANDARD, "NONE", false, self.workshopType)
     local maintenancePrice = self.vehicle:getServicePrice(AdvancedDamageSystem.STATUS.MAINTENANCE, AdvancedDamageSystem.MAINTENANCE_TYPES.STANDARD, AdvancedDamageSystem.PART_TYPES.OEM, false, self.workshopType)

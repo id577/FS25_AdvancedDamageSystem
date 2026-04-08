@@ -129,6 +129,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Pompe hydraulique Powershift"/>
         <text name="ads_breakdowns_part_cvt_chain" text="Chaîne de CVT"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Distributeur hydraulique de CVT"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Pompe hydraulique"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Vérin hydraulique"/>
         <text name="ads_breakdowns_part_pto_clutch" text="Embrayage de PDF"/>
@@ -231,6 +232,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Dysfonctionnement modéré du distributeur hydraulique. Le débit est instable, la réponse hydraulique est ralentie et l'efficacité diminue nettement."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Dysfonctionnement sévère du distributeur hydraulique. Le débit est très irrégulier, les commandes répondent mal et la puissance hydraulique disponible chute fortement."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Défaillance critique du distributeur hydraulique. Le flux hydraulique ne peut plus être correctement contrôlé et le fonctionnement devient impossible."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Les premiers signes d un dysfonctionnement de la transmission CVT ont ete detectes. Un diagnostic et une reparation sont necessaires."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Le dysfonctionnement de la transmission CVT s aggrave. Une utilisation prolongee peut entrainer le passage en mode d urgence."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Endommagement critique de la transmission CVT. La transmission est en mode d urgence et la vitesse maximale du vehicule est reduite."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Defaillance complete de la transmission CVT. Toute utilisation ulterieure est impossible jusqu a la reparation."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Transmission CVT hors service"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Défaillance du distributeur hydraulique"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Le thermostat du moteur commence à présenter des défaillances. Le moteur met plus de temps à atteindre sa température optimale ou fonctionne à une température légèrement élevée."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="La réponse du thermostat est médiocre. La régulation de la température du moteur est instable, ce qui augmente l'usure."/>

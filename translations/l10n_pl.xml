@@ -134,6 +134,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Pompa hydrauliczna skrzyni powershift"/>
         <text name="ads_breakdowns_part_cvt_chain" text="Łańcuch bezstopniowej skrzyni CVT"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Zawór hydrauliczny skrzyni CVT"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Pompa hydrauliczna"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Siłownik hydrauliczny"/>
         <text name="ads_breakdowns_part_pto_clutch" text="Sprzęgło wałka WOM"/>
@@ -236,6 +237,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Umiarkowana niesprawność zaworu hydraulicznego CVT. Niestabilne ciśnienie, mniejszy moment i zawężony zakres przełożeń."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Silna awaria zaworu sterującego CVT. Duże wahania ciśnienia, znaczny spadek momentu, przegrzewanie skrzyni i ograniczony zakres przełożeń."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Krytyczna niesprawność zaworu hydraulicznego CVT. Utrata stabilnej kontroli ciśnienia, poważne ograniczenie przełożeń i tryb awaryjny napędu."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Wykryto pierwsze oznaki usterki przekladni CVT. Wymagana jest diagnostyka i naprawa."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Usterka przekladni CVT postepuje. Dalsza eksploatacja moze doprowadzic do przejscia w tryb awaryjny."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Krytyczne uszkodzenie przekladni CVT. Skrzynia pracuje w trybie awaryjnym, a maksymalna predkosc pojazdu jest ograniczona."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Calkowita awaria przekladni CVT. Dalsza eksploatacja jest niemozliwa do czasu naprawy."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Awaria przekladni CVT"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Usterka sterowania hydraulicznego CVT"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Zużywający się termostat silnika. Wydłużony czas nagrzewania lub delikatne przegrzewanie."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Niesprawna praca termostatu. Niestabilna kontrola temperatury silnika i zwiększone zużycie."/>

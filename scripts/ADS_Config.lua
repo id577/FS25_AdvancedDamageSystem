@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 116,
+    VER = 118,
 
     DEBUG = false,
 
@@ -177,7 +177,7 @@ ADS_Config = {
             HIGH_PRESSURE_FACTOR_THRESHOLD = 0.8,
         },
 
-        STRESS_COOLDOWN = 0.65,
+        STRESS_COOLDOWN = 0.5,
         CONDITION_EFFECTIVE_FLOOR = 0.10,
         REPEAT_BREAKDOWN_TIME = 1.3 * 3600000,
         USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MUL = 0.33,
@@ -221,9 +221,9 @@ ADS_Config = {
 
         BASE_BREAKDOWN_PROGRESS_TIME = 1 * 3600000,
         BREAKDOWN_PROBABILITIES = {
-            STRESS_THRESHOLD = 0.2,
+            STRESS_THRESHOLD = 0.5,
             MIN_MTBF = 30,
-            MAX_MTBF = 3200,
+            MAX_MTBF = 5200,
             DEGREE = 3.0,
             CRITICAL_MIN = 0.05,
             CRITICAL_MAX = 0.33,

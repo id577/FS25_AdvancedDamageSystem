@@ -129,6 +129,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift-Hydraulikpumpe"/>
         <text name="ads_breakdowns_part_cvt_chain" text="CVT-Kette"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT-Hydraulikregelventil"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulikpumpe"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulikzylinder"/>
         <text name="ads_breakdowns_part_pto_clutch" text="Zapfwellenkupplung"/>
@@ -231,6 +232,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Mäßige Fehlfunktion des Hydraulikregelventils. Der Durchfluss ist instabil, die Hydraulik reagiert verzögert und die Effizienz sinkt deutlich."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Schwere Fehlfunktion des Hydraulikregelventils. Der Durchfluss ist stark ungleichmäßig, die Steuerung reagiert schlecht und die verfügbare Hydraulikleistung sinkt deutlich."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Kritischer Ausfall des Hydraulikregelventils. Der Hydraulikfluss kann nicht mehr korrekt geregelt werden und ein normaler Betrieb ist unmöglich."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Erste Anzeichen einer Stoerung des CVT-Getriebes wurden erkannt. Eine Diagnose und Reparatur ist erforderlich."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Die Stoerung des CVT-Getriebes schreitet fort. Weiterer Betrieb kann zum Notlauf fuehren."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Kritische Beschaedigung des CVT-Getriebes. Das Getriebe arbeitet im Notlauf und die maximale Fahrgeschwindigkeit ist reduziert."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Vollstaendiger Ausfall des CVT-Getriebes. Ein weiterer Betrieb ist bis zur Reparatur nicht moeglich."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT-Getriebe ausgefallen"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Ausfall des Hydraulikregelventils"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Motorthermostat beginnt auszufallen. Der Motor braucht länger, um die optimale Temperatur zu erreichen, oder läuft etwas zu heiß."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Schlechte Reaktion des Thermostats. Die Motortemperaturregelung ist instabil, was den Verschleiß erhöht."/>

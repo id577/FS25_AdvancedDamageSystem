@@ -132,6 +132,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Pompa idraulica Powershift"/>
         <text name="ads_breakdowns_part_cvt_chain" text="Catena CVT"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Valvola di comando idraulica CVT"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Pompa idraulica"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Cilindro idraulico"/>
         <text name="ads_breakdowns_part_pto_clutch" text="Frizione PDF"/>
@@ -234,6 +235,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Malfunzionamento moderato della valvola di comando idraulica CVT. L'instabilita della pressione e frequente, la coppia motore diminuisce, la temperatura della trasmissione aumenta e il campo rapporti disponibile si riduce ulteriormente."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Grave malfunzionamento della valvola di comando idraulica CVT. I cali di pressione sono marcati, la coppia motore e fortemente ridotta, il surriscaldamento della trasmissione e probabile e la limitazione del campo rapporti e significativa."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Guasto critico della valvola di comando idraulica CVT. Il controllo della pressione non e piu stabile, il campo rapporti e severamente limitato, il riscaldamento della trasmissione e eccessivo e la catena cinematica lavora in modalita emergenza."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Sono stati rilevati i primi segni di un malfunzionamento della trasmissione CVT. Sono necessari controllo e riparazione."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Il malfunzionamento della trasmissione CVT sta peggiorando. Continuare a usare il veicolo puo portare alla modalita di emergenza."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Danno critico alla trasmissione CVT. La trasmissione e in modalita di emergenza e la velocita massima del veicolo e ridotta."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Guasto completo della trasmissione CVT. Un ulteriore utilizzo e impossibile fino alla riparazione."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Trasmissione CVT guasta"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Guasto comando idraulico CVT"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Il termostato motore inizia a guastarsi. Il motore impiega piu tempo a raggiungere la temperatura ottimale oppure lavora leggermente piu caldo del normale."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="La risposta del termostato e insufficiente. La regolazione della temperatura motore e instabile e l'usura aumenta."/>
