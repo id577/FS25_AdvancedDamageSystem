@@ -6068,7 +6068,7 @@ function AdvancedDamageSystem:completeService()
     end
 
     -- cvt addon repair
-    if serviceType == states.REPAIR or serviceType == states.OVERHAUL and pendingSelectedBreakdowns.CVT_ADDON_MALFUNCTION ~= nil then
+    if serviceType == states.REPAIR or serviceType == states.OVERHAUL and spec.pendingSelectedBreakdowns.CVT_ADDON_MALFUNCTION ~= nil then
         local systemData = spec.systems.transmission
         if systemData.stress > 0.25 then
             spec.systems.transmission.stress = 0.25
