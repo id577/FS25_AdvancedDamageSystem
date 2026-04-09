@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="106">
     <author>id577, Squallqt</author>
-    <version>0.9.1.1</version>
+    <version>0.9.1.2</version>
     <title>
         <en>Advanced Damage System</en>
+        <es>Sistema Avanzado De Daños</es>
 		<pl>Zaawansowany system obrażeń</pl>
         <de>Erweitertes Schadenssystem</de>
         <fr>Système Avancé De Dégâts</fr>
@@ -14,6 +15,15 @@
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
 
 The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+
+Changelog 0.9.1.2:
+- Added compatibility with CVT Addon
+- Expanded the in-game adjustment ranges for service interval and vehicle lifespan settings
+- Scaled breakdown progression and other time-based mechanics to match custom service intervals and extended vehicle lifespans
+- Fixed operating hours synchronization in multiplayer
+- Fixed service interval progress calculation during initial vehicle initialization
+- Added Polish and Spanish translations
+- Minor UI fixes
 
 Changelog 0.9.1.1:
 - Increased interaction and connection distances for jumper cables
@@ -48,9 +58,64 @@ Changelog 0.9.0.0:
 - Changed the hard engine start logic: the starter must now be held to crank the engine
 - Numerous minor balance and interface improvements]]></en>
 
+        <es><![CDATA[Advanced Damage System añade a Farming Simulator 25 un sistema profundo de desgaste, averías, diagnóstico, mantenimiento y reparación de vehículos. En lugar de depender de un único valor genérico de estado, cada máquina se compone de varios sistemas individuales con su propia condición, factores de desgaste, acumulación de estrés y riesgo de fallo. El comportamiento del vehículo y la naturaleza de las averías dependen de las condiciones de trabajo, la carga, la temperatura y la calidad del mantenimiento.
+
+El mod incluye un modelo térmico para los sistemas principales, una simulación avanzada de batería y alternador, una lógica de averías realista, flujos de trabajo ampliados en el taller, informes de servicio, historial de mantenimiento e inspecciones previas al turno. Como resultado, la gestión de los vehículos se convierte en una parte estratégica de la jugabilidad: el mantenimiento lleva tiempo, el uso incorrecto aumenta el riesgo de fallos y descuidar el estado de la maquinaria puede interrumpir trabajos de campo importantes. Un agricultor responsable que cuide su equipo, lo mantenga a tiempo y evite abusos innecesarios mantendrá una flota fiable y evitará problemas graves durante la temporada.
+
+Changelog 0.9.1.2:
+- Añadida compatibilidad con CVT Addon
+- Ampliados los rangos de ajuste del intervalo de servicio y de la vida útil del vehículo en la configuración
+- Ajustada la progresión de averías y otras mecánicas basadas en el tiempo para adaptarse a intervalos de servicio personalizados y a vidas útiles extendidas
+- Corregida la sincronización de las horas de funcionamiento en multijugador
+- Corregido el cálculo del progreso del intervalo de servicio durante la inicialización del vehículo
+- Añadidos los idiomas polaco y español
+- Pequeñas correcciones de interfaz
+
+Changelog 0.9.1.1:
+- Aumentadas las distancias de interacción y conexión de los cables de arranque
+- Implementado un filtro para el desgaste de los sistemas y la acumulación de estrés, que atenúa los factores elevados sostenidos mientras permite el paso de impulsos breves
+- Añadidas nuevas opciones de configuración y ampliados los rangos de ajuste de las ya existentes
+- Reequilibrados los multiplicadores de los factores de desgaste, generalmente reducidos para un mejor equilibrio de la jugabilidad
+
+Changelog 0.9.1.0:
+- Se ha rediseñado la acumulación de estrés: el estrés ya no puede superar el nivel de condición actual de su sistema. Cuando el estrés alcanza la condición, se produce una avería al instante
+- La devolución de vehículos ADS en leasing ahora aplica penalizaciones por averías activas y mantenimiento atrasado. Compatible con Extended Leasing
+- Corregido: la lubricación de las máquinas de cosecha ahora se degrada correctamente en lugar de permanecer siempre en un nivel normal
+- Corregido: la actividad de cosecha ahora se detecta correctamente para los cálculos de desgaste del sistema de trabajo y para comprobar la presencia de residuos grandes
+- La velocidad de obstrucción del radiador y de la admisión de aire ahora está vinculada a la duración del intervalo de servicio seleccionado, lo que permite una mejor adaptación a diferentes estilos de juego
+- Se eliminó el factor de cosecha prolongada del sistema de proceso de trabajo
+- Se ha rediseñado el factor de alta presión del sistema de combustible: ahora se activa por alto consumo de combustible en lugar de por carga indirecta del motor
+- Corregida la visualización incorrecta de datos en el registro de mantenimiento y en el informe de inspección
+- ADS ahora controla el valor vanilla de la temperatura del motor
+- Corregido un error por el que la batería podía descargarse demasiado rápido cuando la IA intentaba arrancar un vehículo con ENGINE_HARD_START_MODIFIER activo. Como solución temporal, la IA es inmune a ENGINE_HARD_START_MODIFIER
+- ADS ahora controla la acumulación de horas de funcionamiento de los vehículos ADS, por lo que las horas siguen acumulándose incluso cuando el jugador deja el motor en marcha
+
+Changelog 0.9.0.0:
+- Añadido soporte multijugador
+- Rediseñado el modelo de condición del vehículo: la condición general ahora se compone de varios sistemas individuales, cada uno con su propia condición y factores de desgaste
+- Añadido un nuevo sistema de estrés que acumula estrés en los sistemas del vehículo cuando la maquinaria se utiliza de forma incorrecta, aumentando el riesgo de avería
+- Añadida una simulación avanzada de batería y alternador
+- Añadida la inspección del vehículo antes del turno
+- Añadidos nuevos objetos de tienda: pistola de engrase, soplador de aire y cables de arranque para el servicio previo al turno y el arranque de vehículos con la batería descargada
+- Añadida una tabla de gestión de flota con todos los vehículos ADS para facilitar la supervisión y el control
+- Añadidas muchas averías nuevas y revisadas las existentes; las averías ahora están asignadas estrictamente a sistemas concretos
+- Añadido un sistema de selección de averías que elige los fallos según qué factores del sistema hayan sido más estresados o vulnerados
+- Añadidas nuevas opciones de taller y revisados los flujos de mantenimiento y reparación existentes
+- Cambiada la lógica de arranque difícil del motor: ahora es necesario mantener pulsado el arranque para hacer girar el motor
+- Numerosas mejoras menores de equilibrio e interfaz]]></es>
+
          <pl><![CDATA[Advanced Damage System dodaje do gry Farming Simulator 25 rozbudowany system zużycia pojazdów, awarii, diagnostyki, konserwacji i napraw. Zamiast polegać na jednej, ogólnej wartości stanu, każda maszyna jest zbudowana wokół wielu indywidualnych systemów, posiadających własny stan, czynniki zużycia, akumulację naprężeń i ryzyko awarii. Zachowanie pojazdu i charakter usterek zależą od warunków eksploatacji, obciążenia, temperatury i jakości serwisu.
 
 Modyfikacja zawiera model temperatury kluczowych systemów, zaawansowaną symulację akumulatora i alternatora, realistyczną logikę awarii, rozszerzone przepływy pracy w warsztacie, raporty serwisowe, historię konserwacji oraz inspekcje przedrozruchowe. W rezultacie zarządzanie pojazdami staje się strategiczną częścią rozgrywki: serwis zajmuje czas, złe użytkowanie zwiększa ryzyko awarii, a zaniedbanie stanu maszyny może zakłócić krytyczne prace polowe. Odpowiedzialny rolnik, który dba o sprzęt, serwisuje go na czas i unika niepotrzebnego nadużywania, utrzyma flotę w niezawodnym stanie i uniknie poważnych problemów w trakcie sezonu.
+
+Changelog 0.9.1.2:
+- Dodano kompatybilność z CVT Addon
+- Rozszerzono zakresy regulacji interwału serwisowego i żywotności pojazdu w ustawieniach
+- Dostosowano progresję awarii i inne mechaniki zależne od czasu do niestandardowych interwałów serwisowych i wydłużonej żywotności pojazdu
+- Naprawiono synchronizację godzin pracy w trybie wieloosobowym
+- Naprawiono obliczanie postępu interwału serwisowego podczas inicjalizacji pojazdu
+- Dodano tłumaczenia polskie i hiszpańskie
+- Drobne poprawki interfejsu
 
 Changelog 0.9.1.1:
 - Zwiększono odległości interakcji i połączenia dla kabli rozruchowych
@@ -89,6 +154,15 @@ Changelog 0.9.0.0:
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
+Changelog 0.9.1.2:
+- Kompatibilität mit CVT Addon hinzugefügt
+- Die Einstellbereiche für Serviceintervall und Fahrzeuglebensdauer im Spiel wurden erweitert
+- Die Progression von Pannen und anderen zeitbasierten Mechaniken wurde an benutzerdefinierte Serviceintervalle und verlängerte Fahrzeuglebensdauer angepasst
+- Die Synchronisierung der Betriebsstunden im Mehrspielermodus wurde behoben
+- Die Berechnung des Fortschritts des Serviceintervalls bei der Fahrzeuginitialisierung wurde behoben
+- Polnische und spanische Übersetzungen hinzugefügt
+- Kleinere UI-Verbesserungen
+
 Changelog 0.9.1.1:
 - Interaktions- und Verbindungsdistanzen für Starthilfekabel wurden erhöht
 - Ein Filter für Systemverschleiß und Stressaufbau wurde implementiert, der anhaltend hohe Faktoren dämpft, während kurze Impulse weiterhin durchgelassen werden
@@ -124,6 +198,15 @@ Changelog 0.9.0.0:
         <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
 Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+
+Changelog 0.9.1.2:
+- Ajout de la compatibilité avec CVT Addon
+- Extension des plages de réglage de l'intervalle d'entretien et de la durée de vie des véhicules dans les paramètres
+- Ajustement de la progression des pannes et des autres mécaniques basées sur le temps aux intervalles d'entretien personnalisés et aux durées de vie prolongées des véhicules
+- Correction de la synchronisation des heures de fonctionnement en multijoueur
+- Correction du calcul de la progression de l'intervalle d'entretien lors de l'initialisation du véhicule
+- Ajout des traductions polonaise et espagnole
+- Corrections mineures de l'interface
 
 Changelog 0.9.1.1:
 - Augmentation des distances d'interaction et de connexion des câbles de démarrage
@@ -162,6 +245,15 @@ Changelog 0.9.0.0:
 
 Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine può compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrà la flotta affidabile ed eviterà problemi seri durante la stagione.
 
+Changelog 0.9.1.2:
+- Aggiunta la compatibilità con CVT Addon
+- Estesi gli intervalli di regolazione dell'intervallo di manutenzione e della vita utile del veicolo nelle impostazioni
+- Adattata la progressione dei guasti e delle altre meccaniche basate sul tempo agli intervalli di manutenzione personalizzati e alla maggiore vita utile dei veicoli
+- Corretta la sincronizzazione delle ore di funzionamento in multigiocatore
+- Corretto il calcolo del progresso dell'intervallo di manutenzione durante l'inizializzazione del veicolo
+- Aggiunte le traduzioni polacca e spagnola
+- Piccole correzioni all'interfaccia
+
 Changelog 0.9.1.1:
 - Aumentate le distanze di interazione e collegamento dei cavi di avviamento
 - Implementato un filtro per l'usura dei sistemi e l'accumulo di stress che attenua i fattori elevati prolungati lasciando però passare gli impulsi brevi
@@ -198,6 +290,15 @@ Changelog 0.9.0.0:
         <ru><![CDATA[Advanced Damage System добавляет в Farming Simulator 25 глубокую систему износа, поломок, диагностики, обслуживания и ремонта техники. Вместо одного условного параметра состояния каждая машина состоит из отдельных систем, каждая из которых имеет собственный уровень состояния, факторы износа, накопление стресса и риск отказа. Поведение техники и характер поломок зависят от условий эксплуатации, нагрузки, температуры и качества обслуживания.
 
 Мод включает температурную модель ключевых систем, продвинутую симуляцию аккумулятора и генератора, реалистичную логику поломок, расширенные сценарии работы с мастерской, сервисные отчёты, журнал обслуживания и возможность проведения предсменного осмотра. В результате техника требует не только ремонта, но и грамотного планирования: обслуживание занимает время, неправильная эксплуатация повышает риск отказов, а пренебрежение состоянием машин может сорвать важные полевые работы. Ответственный фермер, который следит за техникой, вовремя обслуживает её и не работает на пределе возможностей без необходимости, сможет сохранить парк в надёжном состоянии и избежать серьёзных проблем в сезон.
+
+Changelog 0.9.1.2:
+- Добавлена совместимость с CVT Addon
+- Расширены диапазоны регулировки сервисного интервала и ресурса техники в настройках
+- Скорректирована прогрессия поломок и других механик, завязанных на время, под пользовательские значения сервисного интервала и ресурса техники
+- Исправлена синхронизация моточасов в мультиплеере
+- Исправлен расчёт прогресса сервисного интервала при инициализации техники
+- Добавлены польский и испанский переводы
+- Небольшие исправления интерфейса
 
 Changelog 0.9.1.1:
 - Увеличены дистанции взаимодействия и подключения для пусковых проводов

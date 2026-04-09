@@ -386,7 +386,12 @@ function ADS_Hud:drawDashboard()
                 end
             end
 
-            if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature < 50 then targetColor = colors.COOL
+            local isNotHeated = 
+            (spec.engineTemperature < ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD) or 
+            (hasCVTTransmission(vehicle) and not hasCVTAddon(vehicle) and spec.transmissionTemperature < ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.COLD_TRANSMISSION_THRESHOLD) or
+            (hasCVTAddon(vehicle) and spec.transmissionTemperature < 55)
+
+            if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and isNotHeated then targetColor = colors.COOL
             elseif hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature > 99 and spec.engineTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.coolant.name and spec.engineTemperature > 110 then targetColor = colors.CRITICAL end
 
