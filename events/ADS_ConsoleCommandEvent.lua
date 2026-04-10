@@ -120,14 +120,29 @@ function ADS_ConsoleCommandEvent:run(connection)
         if spec.adsDirtyFlag_state ~= nil then
             self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_state)
         end
-        if spec.adsDirtyFlag_systems ~= nil then
-            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_systems)
+        if spec.adsDirtyFlag_serviceContext ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_serviceContext)
         end
-        if spec.adsDirtyFlag_breakdown ~= nil then
-            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_breakdown)
+        if spec.adsDirtyFlag_telemetry ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_telemetry)
         end
-        if spec.adsDirtyFlag_service ~= nil then
-            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_service)
+        if spec.adsDirtyFlag_thermal ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_thermal)
+        end
+        if spec.adsDirtyFlag_electrical ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_electrical)
+        end
+        if spec.adsDirtyFlag_fieldcare ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_fieldcare)
+        end
+        if spec.adsDirtyFlag_wear ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_wear)
+        end
+        if spec.adsDirtyFlag_breakdowns ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_breakdowns)
+        end
+        if spec.adsDirtyFlag_serviceProgress ~= nil then
+            self.vehicle:raiseDirtyFlags(spec.adsDirtyFlag_serviceProgress)
         end
     end
 

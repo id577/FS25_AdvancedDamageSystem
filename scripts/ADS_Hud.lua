@@ -148,6 +148,54 @@ local function hasCVTAddon(vehicle)
     return hasActiveCVTAddon
 end
 
+local function collectActiveDraftStats(rootVehicle, result, visited)
+    result = result or {
+        maxForce = 0,
+        effectiveForceCap = 0,
+        count = 0
+    }
+    visited = visited or {}
+
+    if rootVehicle == nil or visited[rootVehicle] then
+        return result
+    end
+
+    visited[rootVehicle] = true
+
+    local attachedImplements = rootVehicle.getAttachedImplements ~= nil and rootVehicle:getAttachedImplements() or nil
+    if attachedImplements ~= nil then
+        for _, implement in pairs(attachedImplements) do
+            local object = implement.object
+            if object ~= nil and not visited[object] then
+                local powerConsumer = object.spec_powerConsumer
+                if powerConsumer ~= nil then
+                    local maxForce = tonumber(powerConsumer.maxForce) or 0
+                    local multiplier = object.getPowerMultiplier ~= nil and (tonumber(object:getPowerMultiplier()) or 0) or 1
+                    local speed = math.abs(tonumber(object.lastSpeedReal) or 0)
+                    local movingDirection = tonumber(object.movingDirection) or 0
+                    local forceDir = tonumber(powerConsumer.forceDir) or 0
+
+                    local isActiveDraft = maxForce > 0
+                        and multiplier > 0.001
+                        and powerConsumer.forceNode ~= nil
+                        and movingDirection == forceDir
+                        and speed > 0.0001
+
+                    if isActiveDraft then
+                        result.maxForce = result.maxForce + maxForce
+                        result.effectiveForceCap = result.effectiveForceCap + maxForce * multiplier
+                        result.count = result.count + 1
+                    end
+                end
+
+                collectActiveDraftStats(object, result, visited)
+            end
+        end
+    end
+
+    return result
+end
+
 -- =====================================================================================
 --                              DRAW
 -- =====================================================================================
@@ -1086,8 +1134,9 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
-        "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h/c: %.3f/%.3f | r/s/c: %.3f/%.3f/%.3f",
+        "T: %.1fC (raw: %.1fC) | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h/c: %.3f/%.3f | r/s/c: %.3f/%.3f/%.3f",
         spec.engineTemperature,
+        spec.rawEngineTemperature or spec.engineTemperature or -99,
         spec.thermostatState,
         spec.debugData.engineTemp.kp,
         spec.debugData.engineTemp.stiction,
@@ -1106,8 +1155,9 @@ function ADS_Hud:drawActiveVehicleHUD()
     local transmissionTempLines = {}
     if showTransmissionSection then
         addLine(transmissionTempLines, string.format(
-            "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a/p/ws: %.2f/%.2f/%.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f) | cvt: a/l=%d/%d eh=%.3f",
+            "T: %.1fC (raw: %.1fC) | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a/p/ws: %.2f/%.2f/%.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f) | cvt: a/l=%d/%d eh=%.3f",
             spec.transmissionTemperature,
+            spec.rawTransmissionTemperature or spec.transmissionTemperature or -99,
             spec.transmissionThermostatState,
             spec.debugData.transmissionTemp.kp or 0,
             spec.debugData.transmissionTemp.stiction or 0,
@@ -1135,9 +1185,11 @@ function ADS_Hud:drawActiveVehicleHUD()
     local rpmLoad = lastRpm / maxRpm
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
     local spec_CVTaddon = vehicle.spec_CVTaddon
+    local draftStats = collectActiveDraftStats(vehicle)
+    local draftMultiplier = draftStats.maxForce > 0 and (draftStats.effectiveForceCap / draftStats.maxForce) or 0
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
-        "hp: %d/%d | ml/rpm: %.3f/%.3f | g: %d>%d(%d,%.2f) | fuel: %.2fl/h | d/dr: %.3f/%.3f" ,
+        "hp: %d/%d | ml/rpm: %.3f/%.3f | g: %d>%d(%d,%.2f) | fuel: %.2fl/h | d/dr: %.3f/%.3f | maxForce: %.2f, multiplier: %.2f, effectiveForceCap: %.2f" ,
         motorPower / 735.5,
         peakPowerHp,
         vehicle:getMotorLoadPercentage(),
@@ -1148,7 +1200,10 @@ function ADS_Hud:drawActiveVehicleHUD()
         motor:getGearRatio() or 0,
         vehicle.spec_motorized.lastFuelUsage or 0,
         vehicle:getDamageAmount(),
-        vehicle:getDirtAmount()
+        vehicle:getDirtAmount(),
+        draftStats.maxForce,
+        draftMultiplier,
+        draftStats.effectiveForceCap
 
     ), {1, 1, 1, 1}, 0.95)
 
@@ -1944,12 +1999,21 @@ SpeedMeterDisplay.draw = function(self, ...)
     if selectedTool ~= nil then
         useCustomValue = true
         if selectedTool.getServiceLevel ~= nil then
-            local cs = vehicle.spec_AdvancedDamageSystem.lastInspectedConditionState
-            if cs == AdvancedDamageSystem.STATES.UNKNOWN or cs == AdvancedDamageSystem.STATES.EXCELLENT then customDamageAmount = 0.0
-            elseif cs == AdvancedDamageSystem.STATES.GOOD then customDamageAmount = 0.25
-            elseif cs == AdvancedDamageSystem.STATES.NORMAL then customDamageAmount = 0.5
-            elseif cs == AdvancedDamageSystem.STATES.BAD then customDamageAmount = 0.75
-            else customDamageAmount = 1.0 end
+            local condition, isCompleteInspection = vehicle:getLastInspectedCondition()
+            condition = math.clamp(condition or 0, 0, 1)
+            if isCompleteInspection then
+                customDamageAmount = 1 - condition
+            elseif condition > 0.8 then
+                customDamageAmount = 0.0
+            elseif condition > 0.6 then
+                customDamageAmount = 0.25
+            elseif condition > 0.4 then
+                customDamageAmount = 0.5
+            elseif condition > 0.2 then
+                customDamageAmount = 0.75
+            else
+                customDamageAmount = 1.0
+            end
         else
             customDamageAmount = selectedTool:getDamageAmount()
         end

@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 118,
+    VER = 119,
 
     DEBUG = false,
 
@@ -134,7 +134,7 @@ ADS_Config = {
             RAIN_FACTOR_MULTIPLIER = 1.5,
             SNOW_FACTOR_MULTIPLIER = 1.0,
             HALL_FACTOR_MULTIPLIER = 2.0,
-            OVERHEAT_FACTOR_MULTIPLIER = 360.0,
+            OVERHEAT_FACTOR_MULTIPLIER = 120.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
             LIGHTS_FACTOR_MULTIPLIER = 0.4
         },
@@ -168,7 +168,7 @@ ADS_Config = {
             SERVICE_EXPIRED_MULTIPLIER = 4.0,
             LOW_FUEL_FACTOR_MULTIPLIER = 18.0,
             LOW_FUEL_THRESHOLD = 0.2,
-            COLD_FUEL_THRESHOLD = 20,
+            COLD_FUEL_THRESHOLD = 20.0,
             COLD_FUEL_FACTOR_MULTIPLIER = 120,
             IDLE_DEPOSIT_FACTOR_MULTIPLIER = 2.0,
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
