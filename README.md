@@ -30,6 +30,25 @@ A huge special thanks to **Squallqt** (https://github.com/Squallqt) for his dire
 
 Also, a big thank you to **Derwen Modding** for testing the early builds.
 
+# Quick Start
+
+If you do not want to read the full guide at the bottom of this page but still want to play with ADS without constant breakdowns and unnecessary frustration, just follow these three rules:
+
+1. **Always follow the service interval.**  
+   By default, the recommended interval is about `5 operating hours` on average. You can check it:
+   - in the workshop,
+   - in the vehicle info panel when looking at the machine,
+   - in the ADS fleet management menu opened with the `P` key.  
+   
+   Once the interval is reached, perform the `Maintenance` procedure in the workshop.
+
+2. **Inspect and prepare your machines every day.**  
+   Perform a daily inspection (hold `R` key) and basic pre-shift maintenance. Clean the vehicle with the `Air Blower` and lubricate machines that require it with the `Grease Gun`. These simple routine actions greatly reduce the risk of avoidable failures.
+
+3. **Do not abuse your equipment.**  
+   Avoid overloading, overheating, using implements that are too heavy or too demanding for the machine, excessive wheel slip in mud, hard work on a cold engine, and high-speed driving over rough terrain.  
+   As a general rule: if something would be harmful to the machine in real life, it is harmful in ADS too.
+
 # Key Features
 - **Complete Replacement of the Vanilla Damage System:** Every vehicle in the game is now divided into multiple individual systems: engine, transmission, hydraulics, cooling system, fuel system, working systems, electrical system, and chassis. Each system tracks how the machine is actually being used. For example, chassis wear increases faster if you drive quickly over rough terrain. The harsher the operating conditions, the faster wear builds up and the more often breakdowns occur.
 - **Regular Maintenance Becomes Essential:** Scheduled service is now required to prevent accelerated wear and avoid costly failures.
@@ -86,26 +105,6 @@ For testing and debugging, ADS includes console commands. Most commands require 
 
 The Advanced Damage System (ADS) mod completely replaces the standard damage system, offering a deep and detailed simulation of wear, breakdowns, and technical service.
 This guide will help you understand all aspects of the mod.
-
-## Quick Start
-
-If you do not want to read the full guide but still want to play with ADS without constant breakdowns and unnecessary frustration, just follow these three rules:
-
-1. **Always follow the service interval.**  
-   By default, the recommended interval is about `5 operating hours` on average. You can check it:
-   - in the workshop,
-   - in the vehicle info panel when looking at the machine,
-   - in the ADS fleet management menu opened with the `P` key.  
-   
-   Once the interval is reached, perform the `Maintenance` procedure in the workshop.
-
-2. **Inspect and prepare your machines every day.**  
-   Perform a daily inspection (hold `R` key) and basic pre-shift maintenance. Clean the vehicle with the `Air Blower` and lubricate machines that require it with the `Grease Gun`. These simple routine actions greatly reduce the risk of avoidable failures.
-
-3. **Do not abuse your equipment.**  
-   Avoid overloading, overheating, using implements that are too heavy or too demanding for the machine, excessive wheel slip in mud, hard work on a cold engine, and high-speed driving over rough terrain.  
-   As a general rule: if something would be harmful to the machine in real life, it is harmful in ADS too.
-
 
 ## 1. Core Mechanics: Condition, Stress and Service
 
