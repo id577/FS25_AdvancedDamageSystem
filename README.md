@@ -548,7 +548,43 @@ Beyond money, all workshop procedures require time. The duration of a service or
  
  This adds a new layer of strategy: you now need to plan when to take your vehicles in for service. An urgent repair on a combine during the harvest season might extend into the next day, leading to downtime and financial loss.
 
-## 5. Reliability and Maintainability
+## 5. Pre-Shift Inspection and Maintenance
+
+ADS encourages you to spend a little time with your machines at the beginning of each working day. A quick pre-shift inspection and a few routine maintenance actions can help you detect problems early and avoid expensive breakdowns later in the field.
+
+#### Pre-Shift Inspection
+
+You can start a pre-shift inspection by holding the `R` key near the vehicle you want to inspect.
+
+- **What it does:** This quick routine check allows you to assess the level of technical fluids, the condition of radiator and air intake contamination, and potentially reveal active breakdowns that can realistically be identified through a visual inspection.
+
+- **Why it matters:** Low fluid levels may indicate an active fault. Dirt buildup in the radiator or air intake can lead to overheating and reduced engine performance. Some breakdowns can be spotted before they become serious if you make inspection part of your daily routine.
+
+- **When to use:** Ideally before the start of each working day, especially before heavy field work, harvesting, or transport under load. The procedure takes very little time and can be performed anywhere.
+
+#### Blowing Out the Cooling System
+
+You can buy an `Air Blower` in the shop and use it to clean the radiator and air intake.
+
+- **What it does:** Removes accumulated dust and debris from the cooling system and engine air supply.
+
+- **Why it matters:** A clean radiator reduces the risk of overheating, and a clean air intake helps the engine breathe properly under load. Just a few seconds of cleaning at the start of the day can prevent unnecessary wear and performance loss.
+
+- **When to use:** Regularly, especially during dusty field work, harvesting, and hot weather.
+
+#### Lubrication
+
+Complex machines with many moving parts, especially harvesters, require regular lubrication.
+
+You can buy a `Grease Gun` in the shop and use it to lubricate the vehicle before work.
+
+- **What it does:** Restores lubrication for machines that require it as part of their daily preparation.
+
+- **Why it matters:** Poor lubrication increases wear and can eventually lead to lubrication-related failures. This is particularly important for high-complexity harvesting machines that operate under sustained load for long periods.
+
+- **When to use:** Before a working day or before demanding seasonal operations. Properly lubricating a combine before harvest is one of the easiest ways to avoid an inconvenient breakdown in the middle of the field.
+
+## 6. Reliability and Maintainability
 
 Each brand of vehicle in the game now has two parameters based on its real-world reputation:
 
@@ -568,7 +604,7 @@ Examples: Premium European and American brands are generally more reliable than 
 
 Examples: Simple, older vehicles are often more maintainable than modern machines packed with electronics.
 
-## 6. Thermal Dynamics
+## 7. Thermal Dynamics
 The mod simulates full engine heating/cooling behavior with thermostat operation. Temperature is not just visual data: it directly affects wear and failure risk.
 
 #### Engine Thermal Model
@@ -605,7 +641,7 @@ CVT vehicles use a dedicated transmission thermal model. Unlike the engine model
 
 In practice, low-speed high-stress work and jerky driving can overheat CVT components even when engine temperature is still acceptable.
 
-## 7. Alternator & Battery
+## 8. Alternator & Battery
 
 ADS simulates the vehicle electrical system as a real working model rather than a simple on/off mechanic. The mod tracks battery charge, alternator output, onboard electrical loads, battery temperature, internal resistance, and voltage behavior under charging and discharge.
 
