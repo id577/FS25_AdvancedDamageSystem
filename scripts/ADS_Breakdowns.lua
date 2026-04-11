@@ -1437,7 +1437,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
                 repairPrice = 1.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = {
-                    { id = "CVT_SLIP_EFFECT", value = 0.2, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                    { id = "CVT_SLIP_EFFECT", value = 0.1, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" }  
                 }
             },
@@ -1448,7 +1448,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
                 repairPrice = 2.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = {
-                     { id = "CVT_SLIP_EFFECT", value = 0.4, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                     { id = "CVT_SLIP_EFFECT", value = 0.2, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.1, aggregation = "sum" }
                 },
@@ -1463,7 +1463,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
                 repairPrice = 4.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = { 
-                     { id = "CVT_SLIP_EFFECT", value = 0.6, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                     { id = "CVT_SLIP_EFFECT", value = 0.5, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.15, aggregation = "sum" }
                 },
@@ -3730,7 +3730,7 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
             local modifier = tonumber(slipEffect.value) or 0
 
             if modifier >= 1 then
-                return minRatio * 10, maxRatio * 10
+                return minRatio * 100, maxRatio * 100
             end
 
             local speedFactor = math.min(self.vehicle:getLastSpeed() / (self:getMaximumForwardSpeed() * 3.6), 1.0)
@@ -3758,6 +3758,10 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
         local isSliping = false
         if cvtSlipEffect ~= nil and cvtSlipEffect.value ~= nil and self.minForwardGearRatio ~= nil then
             local modifier = tonumber(cvtSlipEffect.value) or 0
+
+            if modifier >= 1 then
+                return minRatio * 100, maxRatio * 100
+            end
 
             cvtSlipEffect.extraData = cvtSlipEffect.extraData or {}
             local nowMs = (g_currentMission and g_currentMission.time) or 0

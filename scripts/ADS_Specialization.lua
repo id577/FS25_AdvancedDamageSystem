@@ -2682,6 +2682,14 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
 end
 
 -- ==========================================================
+--                      VEHICLE STATE
+-- ==========================================================
+
+function AdvancedDamageSystem:captureVehicleStateSnaphot(dt)
+
+end
+
+-- ==========================================================
 --                        AI WORKER
 -- ==========================================================
 
@@ -3327,7 +3335,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         if motorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
             systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
             pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
-            pullOverloadFactor = pullOverloadFactor * C.PULL_OVERLOAD_MULTIPLIER
+            pullOverloadFactor = pullOverloadFactor * motorLoad * C.PULL_OVERLOAD_MULTIPLIER
             wearRate = wearRate + pullOverloadFactor
         else
             systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, 0)
@@ -7783,8 +7791,6 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
             cooling = convectionCooling
         end
     end
-    
-   
 
     spec.rawEngineTemperature = spec.rawEngineTemperature + (heat - cooling) * (dt / 1000) * C.TEMPERATURE_CHANGE_SPEED
     spec.rawEngineTemperature = math.max(spec.rawEngineTemperature, eviromentTemp)

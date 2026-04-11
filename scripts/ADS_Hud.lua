@@ -480,7 +480,7 @@ function ADS_Hud:drawDashboard()
         end
 
     local engineTemp, transTemp, systemVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.systemVoltageV
-    local motorLoad = spec._smoothedMotorLoad or 0
+    local motorLoad = math.min(spec._smoothedMotorLoad or 0, 1)
 
     local tempSign = "°C"
     local voltageSing = "V"
