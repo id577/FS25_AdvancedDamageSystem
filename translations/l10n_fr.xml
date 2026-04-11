@@ -31,6 +31,7 @@
         <text name="ads_downtimeWear_label" text="Usure passive"/>
         <text name="ads_generalWearEnabled_label" text="Usure liée à l'âge"/>
         <text name="ads_systemStressRate_label" text="Vitesse d'accumulation du stress"/>
+        <text name="ads_batteryCapacity_label" text="Capacité de la batterie"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilité thermique"/>
         <text name="ads_option_off" text="Arrêt"/>
         <text name="ads_serviceInterval_tooltip" text="Définit l'intervalle d'entretien de base en heures, au-delà duquel un entretien est requis. L'intervalle réel dépend de la marque du véhicule, de son âge et de la qualité des entretiens précédents."/>
@@ -39,6 +40,7 @@
         <text name="ads_generalWearEnabled_tooltip" text="Active l'usure liée à l'âge. À mesure que le véhicule s'use, chaque système subit de petites pénalités sur ses caractéristiques principales, comme la puissance moteur, la vitesse hydraulique ou l'efficacité du freinage. L'effet s'active après le premier tiers de la durée de vie, mais ne devient vraiment perceptible qu'après les deux tiers et se renforce à l'approche de la fin de vie de la machine."/>
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Lorsqu'elle est activée, la disponibilité des différentes interventions dans l'atelier mobile dépend de la maintenabilité du véhicule."/>
         <text name="ads_systemStressRate_tooltip" text="Détermine la vitesse à laquelle le stress s'accumule dans les systèmes sous l'effet de la surcharge, de la surchauffe, du patinage et d'autres conditions d'utilisation sévères. Le stress influe directement sur la probabilité de panne : plus un système accumule de stress, plus une panne devient probable."/>
+        <text name="ads_batteryCapacity_tooltip" text="Ajuste la capacité maximale réellement utilisable de la batterie. Des valeurs proches de 150 Ah sont plus réalistes, mais à ce niveau vous rencontrerez à peine des problèmes de décharge de batterie."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajuste le comportement du modèle thermique. Des réglages plus élevés rendent le moteur et la transmission plus sensibles à la charge, à la température ambiante et à l'encrassement du radiateur, générant ainsi plus de chaleur dans les mêmes conditions."/>
         <text name="ads_thermal_none" text="Passif"/>
         <text name="ads_thermal_mild" text="Modérée"/>
@@ -346,7 +348,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="annulé"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s problème(s) détecté(s)"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Aucun problème détecté"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s effectué"/>
+        <text name="ads_spec_next_planned_service_notification" text="Intervention planifiée lancée : %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Le %s planifié a été annulé faute de fonds suffisants"/>
         <text name="ads_spec_workshop_dealer" text="Concessionnaire"/>
         <text name="ads_spec_workshop_own" text="Privé"/>

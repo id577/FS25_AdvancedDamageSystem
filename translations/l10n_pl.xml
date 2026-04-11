@@ -352,7 +352,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="Anulowane."/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s Awaria(s) Zidentyfikowano"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Nie wykryto żadnych problemów."/>
-        <text name="ads_spec_next_planned_service_notification" text="%s Wykonano"/>
+        <text name="ads_spec_next_planned_service_notification" text="Zaplanowana procedura rozpoczęta: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Zaplanowane %s odwołano z powodu braku wystarczających funduszy."/>
         <text name="ads_spec_workshop_dealer" text="Autoryzowany dealer"/>
         <text name="ads_spec_workshop_own" text="Będący własnością"/>

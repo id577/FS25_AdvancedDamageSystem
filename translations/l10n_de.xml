@@ -31,6 +31,7 @@
         <text name="ads_downtimeWear_label" text="Passiver Verschleiß"/>
         <text name="ads_generalWearEnabled_label" text="Altersbedingter Verschleiß"/>
         <text name="ads_systemStressRate_label" text="Systemstress-Aufbau"/>
+        <text name="ads_batteryCapacity_label" text="Batteriekapazität"/>
         <text name="ads_thermalSensitivity_label" text="Thermische Empfindlichkeit"/>
         <text name="ads_option_off" text="Aus"/>
         <text name="ads_serviceInterval_tooltip" text="Legt das grundlegende Wartungsintervall in Stunden fest, nach dem eine Wartung erforderlich ist. Das tatsächliche Intervall hängt von der Fahrzeugmarke, dem Alter und der Qualität früherer Wartungen ab."/>
@@ -39,6 +40,7 @@
         <text name="ads_generalWearEnabled_tooltip" text="Aktiviert altersbedingten Verschleiß. Mit zunehmendem Verschleiß erhält jedes System kleine Abzüge auf seine wichtigsten Eigenschaften, etwa Motorleistung, Hydraulikgeschwindigkeit oder Bremswirkung. Der Effekt wird nach dem ersten Drittel der Lebensdauer aktiv, macht sich jedoch erst nach zwei Dritteln deutlich bemerkbar und verstärkt sich zum Ende der Lebensdauer der Maschine hin."/>
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Wenn aktiviert, hängt die Verfügbarkeit verschiedener Arbeiten in der mobilen Werkstatt von der Wartungsfreundlichkeit des Fahrzeugs ab."/>
         <text name="ads_systemStressRate_tooltip" text="Bestimmt, wie schnell sich Stress in den Systemen durch Überlastung, Überhitzung, Schlupf und andere harte Betriebsbedingungen aufbaut. Stress beeinflusst die Wahrscheinlichkeit von Ausfällen direkt: Je mehr Stress sich in einem System ansammelt, desto wahrscheinlicher ist eine Panne."/>
+        <text name="ads_batteryCapacity_tooltip" text="Passt die maximal nutzbare Batteriekapazität an. Werte nahe 150 Ah sind realistischer, allerdings treten bei diesem Niveau Entladeprobleme der Batterie kaum noch auf."/>
         <text name="ads_thermalSensitivity_tooltip" text="Passt das Verhalten des thermischen Modells an. Höhere Einstellungen machen Motor und Getriebe empfindlicher gegenüber Last, Umgebungstemperatur und Kühlerverschmutzung und erzeugen unter gleichen Bedingungen mehr Wärme."/>
         <text name="ads_thermal_none" text="Passiv"/>
         <text name="ads_thermal_mild" text="Leicht"/>
@@ -346,7 +348,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="abgesagt"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s Problem(e) erkannt"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Keine Probleme erkannt"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s durchgeführt"/>
+        <text name="ads_spec_next_planned_service_notification" text="Geplante Maßnahme gestartet: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Geplanter Termin %s wegen unzureichender Mittel abgesagt"/>
         <text name="ads_spec_workshop_dealer" text="Händler"/>
         <text name="ads_spec_workshop_own" text="Eigene"/>

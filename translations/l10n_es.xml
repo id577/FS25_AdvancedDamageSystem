@@ -352,7 +352,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="cancelado"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s problema(s) detectado(s)"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="No se detectaron problemas"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s realizado"/>
+        <text name="ads_spec_next_planned_service_notification" text="Procedimiento programado iniciado: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="%s programado cancelado por fondos insuficientes"/>
         <text name="ads_spec_workshop_dealer" text="Concesionario"/>
         <text name="ads_spec_workshop_own" text="Propio"/>

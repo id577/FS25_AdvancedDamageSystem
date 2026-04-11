@@ -31,6 +31,7 @@
         <text name="ads_downtimeWear_label" text="Usura passiva"/>
         <text name="ads_generalWearEnabled_label" text="Usura legata all'età"/>
         <text name="ads_systemStressRate_label" text="Velocita accumulo stress di sistema"/>
+        <text name="ads_batteryCapacity_label" text="Capacità della batteria"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilita termica"/>
         <text name="ads_option_off" text="Off"/>
         <text name="ads_serviceInterval_tooltip" text="Imposta l'intervallo di manutenzione di base in ore, oltre il quale e richiesta la manutenzione. L'intervallo reale dipende dalla marca del veicolo, dalla sua eta e dalla qualita delle manutenzioni precedenti."/>
@@ -39,6 +40,7 @@
         <text name="ads_generalWearEnabled_tooltip" text="Abilita l'usura legata all'età. Man mano che il veicolo si usura, ogni sistema riceve piccole penalità alle proprie caratteristiche principali, come potenza del motore, velocità dell'idraulica o efficacia dei freni. L'effetto si attiva dopo il primo terzo della durata utile, ma diventa davvero percepibile solo dopo i due terzi e si intensifica verso la fine della vita operativa della macchina."/>
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Quando attivata, la disponibilita delle diverse procedure nell'officina mobile dipende dalla manutenibilita del veicolo."/>
         <text name="ads_systemStressRate_tooltip" text="Determina la velocita con cui lo stress si accumula nei sistemi a causa di sovraccarico, surriscaldamento, slittamento e altre condizioni operative gravose. Lo stress influisce direttamente sulla probabilita di guasto: piu stress si accumula in un sistema, piu aumenta il rischio di rottura."/>
+        <text name="ads_batteryCapacity_tooltip" text="Regola la capacità massima effettivamente utilizzabile della batteria. Valori vicini a 150 Ah sono più realistici, ma a quel livello difficilmente incontrerai problemi di scarica della batteria."/>
         <text name="ads_thermalSensitivity_tooltip" text="Regola il comportamento del modello termico. Impostazioni piu elevate rendono motore e trasmissione piu sensibili al carico, alla temperatura ambiente e all'imbrattamento del radiatore, generando piu calore nelle stesse condizioni."/>
         <text name="ads_thermal_none" text="Passivo"/>
         <text name="ads_thermal_mild" text="Leggero"/>
@@ -350,7 +352,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="annullata"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s problema/i rilevato/i"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Nessun problema rilevato"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s eseguito"/>
+        <text name="ads_spec_next_planned_service_notification" text="Procedura pianificata avviata: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="%s pianificato annullato per fondi insufficienti"/>
         <text name="ads_spec_workshop_dealer" text="Concessionario"/>
         <text name="ads_spec_workshop_own" text="Propria"/>

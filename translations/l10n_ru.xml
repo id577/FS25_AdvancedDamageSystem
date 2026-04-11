@@ -348,7 +348,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="отменено"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="Обнаружено неисправностей: %s"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Неисправности не обнаружены"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s выполнено"/>
+        <text name="ads_spec_next_planned_service_notification" text="Запланированная процедура начата: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Запланированное %s отменено из-за недостатка средств"/>
         <text name="ads_spec_workshop_dealer" text="Дилер"/>
         <text name="ads_spec_workshop_own" text="Собственный"/>
