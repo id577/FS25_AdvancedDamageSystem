@@ -172,7 +172,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
     local age = math.max(1, (currentMonth + (currentYear - 1) * 12) - (pMonth + (pYear - 1) * 12))
     
     local costPerMonth = totalCost / age
-    local avgBreakdownInterval = totalBreakdowns > 0 and ((self.vehicle:getFormattedOperatingTime() - (purchaseHours or 0)) / totalBreakdowns) or 0
+    local avgBreakdownInterval = totalBreakdowns > 0 and math.max(((self.vehicle:getFormattedOperatingTime() - (purchaseHours or 0)) / totalBreakdowns), 0) or 0
     local averageMaintenanceInterval = 0
 
     self.costPerMonthValue:setText(g_i18n:formatMoney(costPerMonth, 0, true, true) .. " / " .. g_i18n:getText("ads_ws_age_unit"))
@@ -203,7 +203,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
                 end
             end
         end
-        averageMaintenanceInterval = sumMaintenanceInterval / maintenanceCount
+        averageMaintenanceInterval = math.max(sumMaintenanceInterval / maintenanceCount, 0)
         self.averageMaintenanceIntervalValue:setText(string.format("%.1f", averageMaintenanceInterval) .. " " .. g_i18n:getText("ads_spec_hour_s"))
     end
 
