@@ -96,10 +96,11 @@ If you do not want to read the full guide but still want to play with ADS withou
    - in the workshop,
    - in the vehicle info panel when looking at the machine,
    - in the ADS fleet management menu opened with the `P` key.  
+   
    Once the interval is reached, perform the `Maintenance` procedure in the workshop.
 
 2. **Inspect and prepare your machines every day.**  
-   Perform a daily inspection and basic pre-shift maintenance. Clean the vehicle with the `Air Blower` and lubricate machines that require it with the `Grease Gun`. These simple routine actions greatly reduce the risk of avoidable failures.
+   Perform a daily inspection (hold `R` key) and basic pre-shift maintenance. Clean the vehicle with the `Air Blower` and lubricate machines that require it with the `Grease Gun`. These simple routine actions greatly reduce the risk of avoidable failures.
 
 3. **Do not abuse your equipment.**  
    Avoid overloading, overheating, using implements that are too heavy or too demanding for the machine, excessive wheel slip in mud, hard work on a cold engine, and high-speed driving over rough terrain.  
