@@ -39,6 +39,36 @@ local function isLogEntryVisible(entry)
     return value ~= false
 end
 
+local function getResolvedBreakdownsCount(logEntries)
+    if type(logEntries) ~= "table" then
+        return 0
+    end
+
+    local total = 0
+    local S = AdvancedDamageSystem.STATUS
+
+    for _, entry in ipairs(logEntries) do
+        if entry ~= nil and entry.isCompleted ~= false then
+            local entryType = entry.type
+
+            if entryType == S.REPAIR or entryType == S.OVERHAUL then
+                local conditionData = entry.conditionData
+                local selectedBreakdowns = conditionData ~= nil and conditionData.selectedBreakdowns or nil
+
+                if type(selectedBreakdowns) == "table" then
+                    for _, breakdownId in ipairs(selectedBreakdowns) do
+                        if breakdownId ~= nil and breakdownId ~= "GENERAL_WEAR" then
+                            total = total + 1
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return total
+end
+
 function ADS_MaintenanceLogDialog.register()
     local dialog = ADS_MaintenanceLogDialog.new()
     g_gui:loadGui(modDirectory .. "gui/ADS_MaintenanceLogDialog.xml", "ADS_MaintenanceLogDialog", dialog)
@@ -120,7 +150,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
     self.vehicleNameValue:setText(g_i18n:getText('ads_log_title') .. " " .. self.vehicle:getFullName())
 
     local totalCost = 0
-    local totalBreakdowns = spec.totalBreakdownsOccurred or 0
+    local totalBreakdowns = getResolvedBreakdownsCount(self.logDataAll)
     local purchaseDate = {}
     local purchaseHours = 0
 

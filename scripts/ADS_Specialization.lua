@@ -547,11 +547,9 @@ local function markBreakdownsDirty(vehicle, spec)
     end
 
     local serializedBreakdowns = ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {})
-    if spec._lastSyncBreakdowns_serialized ~= serializedBreakdowns or
-       spec._lastSyncBreakdowns_totalOccurred ~= spec.totalBreakdownsOccurred then
+    if spec._lastSyncBreakdowns_serialized ~= serializedBreakdowns then
             vehicle:raiseDirtyFlags(spec.adsDirtyFlag_breakdowns)
             spec._lastSyncBreakdowns_serialized = serializedBreakdowns
-            spec._lastSyncBreakdowns_totalOccurred = spec.totalBreakdownsOccurred
             return true
     end
 
@@ -633,8 +631,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingRepairSystemStressStart", "Pending repair per-system stress start values")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingRepairSystemStressTarget", "Pending repair per-system stress target values")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#pendingRepairSystemStressStartRatio", "Pending repair per-system stress start ratios")
-    schemaSavegame:register(XMLValueType.INT,    baseKey .. "#totalBreakdownsOccurred", "Total Breakdowns Occurred")
-    
+
     local logKey = baseKey .. ".maintenanceLog.entry(?)"
     schemaSavegame:register(XMLValueType.INT,    logKey .. "#id", "Entry ID")
     schemaSavegame:register(XMLValueType.STRING, logKey .. "#type", "Maintenance Type")
@@ -835,7 +832,6 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
 
     -- [Group 8] Breakdowns
     streamWriteString(streamId, ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {}))
-    streamWriteUInt16(streamId, spec.totalBreakdownsOccurred or 0)
 
     -- [Group 9] Service progress
     streamWriteInt32(streamId, spec.pendingProgressStepIndex or 0)
@@ -924,7 +920,6 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
 
     -- [Group 8] Breakdowns
     spec.activeBreakdowns = ADS_Utils.deserializeBreakdowns(streamReadString(streamId))
-    spec.totalBreakdownsOccurred = streamReadUInt16(streamId)
 
     -- [Group 9] Service progress
     spec.pendingProgressStepIndex = streamReadInt32(streamId)
@@ -1005,7 +1000,6 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
         -- [8] Breakdowns
         if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_breakdowns) ~= 0) then
             streamWriteString(streamId, ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {}))
-            streamWriteUInt16(streamId, spec.totalBreakdownsOccurred or 0)
         end
 
         -- [9] Service progress
@@ -1099,7 +1093,6 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
         -- [8] Breakdowns
         if streamReadBool(streamId) then
             spec.activeBreakdowns = ADS_Utils.deserializeBreakdowns(streamReadString(streamId))
-            spec.totalBreakdownsOccurred = streamReadUInt16(streamId)
             self:recalculateAndApplyEffects()
             self:recalculateAndApplyIndicators()
         end
@@ -1166,7 +1159,6 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#pendingRepairSystemStressStart", ADS_Utils.serializeNumericMap(spec.pendingRepairSystemStressStart))
         xmlFile:setValue(key .. "#pendingRepairSystemStressTarget", ADS_Utils.serializeNumericMap(spec.pendingRepairSystemStressTarget))
         xmlFile:setValue(key .. "#pendingRepairSystemStressStartRatio", ADS_Utils.serializeNumericMap(spec.pendingRepairSystemStressStartRatio))
-        xmlFile:setValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred or 0)
 
         if spec.maintenanceLog and #spec.maintenanceLog > 0 then
             for i, entry in ipairs(spec.maintenanceLog) do
@@ -1604,7 +1596,6 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.pendingRepairSystemStressStart = {}
     self.spec_AdvancedDamageSystem.pendingRepairSystemStressTarget = {}
     self.spec_AdvancedDamageSystem.pendingRepairSystemStressStartRatio = {}
-    self.spec_AdvancedDamageSystem.totalBreakdownsOccurred = 0
     self.spec_AdvancedDamageSystem.hydraulicsMoveAlphaCache = {}
     self.spec_AdvancedDamageSystem.chassisVibState = {
         prevSuspension = {},
@@ -1620,7 +1611,7 @@ function AdvancedDamageSystem:onLoad(savegame)
         self.spec_AdvancedDamageSystem.adsDirtyFlag_electrical = self:getNextDirtyFlag()        -- [5] batterySoc, batteryChargeAh, batteryTerminalVoltageV, systemVoltageV
         self.spec_AdvancedDamageSystem.adsDirtyFlag_fieldcare = self:getNextDirtyFlag()         -- [6] radiatorClogging, airIntakeClogging, lubricationLevel
         self.spec_AdvancedDamageSystem.adsDirtyFlag_wear = self:getNextDirtyFlag()              -- [7] serviceLevel, conditionLevel, systems[...].condition, systems[...].stress
-        self.spec_AdvancedDamageSystem.adsDirtyFlag_breakdowns = self:getNextDirtyFlag()        -- [8] activeBreakdowns, totalBreakdownsOccurred
+        self.spec_AdvancedDamageSystem.adsDirtyFlag_breakdowns = self:getNextDirtyFlag()        -- [8] activeBreakdowns
         self.spec_AdvancedDamageSystem.adsDirtyFlag_serviceProgress = self:getNextDirtyFlag()   -- [9] pendingProgressElapsedTime, pendingProgressTotalTime, pendingProgressStepIndex
     end
 end
@@ -1765,9 +1756,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         applyFlattenedFactorStats(spec, loadedFactorStatsFlat)
         ensureFactorStats(spec, self)
 
-        local hasTotalBreakdownsOccurred = savegame.xmlFile:hasProperty(key .. "#totalBreakdownsOccurred")
-        spec.totalBreakdownsOccurred = savegame.xmlFile:getValue(key .. "#totalBreakdownsOccurred", spec.totalBreakdownsOccurred)
-
         -- Load Maintenance Log
         spec.maintenanceLog = {}
         local i = 0
@@ -1870,24 +1858,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
             i = i + 1
         end
 
-        if not hasTotalBreakdownsOccurred then
-            -- COMPAT(0.8.5.0): bootstrap totalBreakdownsOccurred for legacy saves lacking this field.
-            -- Remove this bootstrap after legacy save migration window is over.
-            local bootstrapOccurred = 0
-            for _, entry in ipairs(spec.maintenanceLog) do
-                if entry.type == AdvancedDamageSystem.STATUS.REPAIR then
-                    local selectedBreakdowns = entry.conditionData and entry.conditionData.selectedBreakdowns or {}
-                    for _, breakdownId in ipairs(selectedBreakdowns) do
-                        local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
-                        if breakdownDef ~= nil and breakdownDef.isSelectable == true then
-                            bootstrapOccurred = bootstrapOccurred + 1
-                        end
-                    end
-                end
-            end
-            spec.totalBreakdownsOccurred = math.max(spec.totalBreakdownsOccurred or 0, bootstrapOccurred)
-        end
-
         -- Fill defaults
         if spec.serviceLevel == nil then spec.serviceLevel = spec.baseServiceLevel end
         if spec.conditionLevel == nil then spec.conditionLevel = spec.baseConditionLevel end
@@ -1910,7 +1880,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         if spec.pendingRepairSystemStressStart == nil then spec.pendingRepairSystemStressStart = {} end
         if spec.pendingRepairSystemStressTarget == nil then spec.pendingRepairSystemStressTarget = {} end
         if spec.pendingRepairSystemStressStartRatio == nil then spec.pendingRepairSystemStressStartRatio = {} end
-        if spec.totalBreakdownsOccurred == nil then spec.totalBreakdownsOccurred = 0 end
         if spec.aiWorkerPid == nil then
             spec.aiWorkerPid = {
                 integral = 0,
@@ -2102,7 +2071,6 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec._lastSyncWear_systemsHash = computeSystemSyncHash(self)
     --- [8] breakdowns
     spec._lastSyncBreakdowns_serialized = ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {})
-    spec._lastSyncBreakdowns_totalOccurred = spec.totalBreakdownsOccurred
     --- [9] service
     spec._lastSyncServiceProgress_elapsed = spec.pendingProgressElapsedTime
     spec._lastSyncServiceProgress_step = spec.pendingProgressStepIndex
@@ -4873,10 +4841,6 @@ function AdvancedDamageSystem:addBreakdown(breakdownId, stageOrOptions)
         return
     end
 
-    if registryEntry.isSelectable == true then
-        spec.totalBreakdownsOccurred = (spec.totalBreakdownsOccurred or 0) + 1
-    end
-
     local currentIsActive = false
     if options.isActive == nil then
         currentIsActive = true
@@ -6527,7 +6491,6 @@ end
 
 local getBatteryChargeAcceptance
 
-
 local function evaluateAlternatorRpmCurve(curveData, rpmNorm)
     rpmNorm = math.clamp(rpmNorm or 0, 0, 1)
     if type(curveData) ~= "table" then
@@ -7595,7 +7558,6 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
     dbg.rIntHealthFactor = healthRintMult
     dbg.termIsCranking = isCranking and 1 or 0
 end
-
 
 function AdvancedDamageSystem.isValidPowerPair(vehicleA, vehicleB)
     if vehicleA == nil or vehicleB == nil or vehicleA == vehicleB then
@@ -9125,7 +9087,6 @@ local function parseConsoleValue(rawValue)
     return rawValue, true
 end
 
-
 local function resolvePathParent(rootTable, fullPath)
     if type(rootTable) ~= "table" then
         return nil, nil, nil, "Root is not a table."
@@ -10095,7 +10056,7 @@ function AdvancedDamageSystem.ConsoleCommands:getServiceState()
         tostring(spec.pendingMaintenanceServiceStart), tostring(spec.pendingMaintenanceServiceTarget), pendingOverhaulSystemsCount))
     print(string.format("Levels: service=%.4f condition=%.4f", spec.serviceLevel or 0, spec.conditionLevel or 0))
     print(string.format("Queues: selected=%d inspection=%d repair=%d", #(spec.pendingSelectedBreakdowns or {}), #(spec.pendingInspectionQueue or {}), #(spec.pendingRepairQueue or {})))
-    print(string.format("Breakdowns: active=%d selectedForRepair=%d totalOccurred=%d", activeBreakdownsCount, selectedForRepairCount, spec.totalBreakdownsOccurred or 0))
+    print(string.format("Breakdowns: active=%d selectedForRepair=%d", activeBreakdownsCount, selectedForRepairCount))
 
     if #(spec.pendingSelectedBreakdowns or {}) > 0 then
         print("pendingSelectedBreakdowns: " .. table.concat(spec.pendingSelectedBreakdowns, ", "))
