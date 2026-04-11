@@ -148,7 +148,7 @@ function ADS_MaintenanceThreeOptionsDialog.show(vehicle, maintenanceType)
     if dialog.maintenanceType == AdvancedDamageSystem.STATUS.MAINTENANCE then
         dialog.selectedOptionOne = AdvancedDamageSystem.MAINTENANCE_TYPES[1]
     elseif dialog.maintenanceType == AdvancedDamageSystem.STATUS.REPAIR then
-        dialog.selectedOptionOne = AdvancedDamageSystem.REPAIR_TYPES[1]
+        dialog.selectedOptionOne = AdvancedDamageSystem.REPAIR_TYPES.MEDIUM
     elseif dialog.maintenanceType == AdvancedDamageSystem.STATUS.OVERHAUL then
         dialog.selectedOptionOne = AdvancedDamageSystem.OVERHAUL_TYPES[1]
     end
@@ -208,12 +208,12 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
             end
         end
 
-        if isHaveBreakdownToBeQuickFixed then
-            table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.LOW)
-        end
         if isHaveBreakdownToBeReplaced then
             table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.MEDIUM)
             table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.HIGH)
+        end
+        if isHaveBreakdownToBeQuickFixed then
+            table.insert(optionOneValues, AdvancedDamageSystem.REPAIR_TYPES.LOW)
         end
 
     else
