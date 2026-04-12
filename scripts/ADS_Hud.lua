@@ -1039,7 +1039,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local engineLines = buildSystemLines("engine", engineDbg, engineMaxFactor, {
         { shortName = "sf", statKey = "sf", value = engineDbg.expiredServiceFactor or 0 },
         { shortName = "bpf", statKey = "bpf", value = engineDbg.breakdownPresenceFactor or 0 },
-        { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0 },
+        { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0, extraInfo = string.format("eff/ml: %.2f", engineDbg.effectiveMotorLoadRatio or 1.0) },
         { shortName = "aicf", statKey = "aicf", value = engineDbg.airIntakeCloggingFactor or 0 },
         { shortName = "cmf", statKey = "cmf", value = engineDbg.coldMotorFactor or 0 },
         { shortName = "hmf", statKey = "hmf", value = engineDbg.hotMotorFactor or 0 }

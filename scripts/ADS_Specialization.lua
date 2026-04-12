@@ -3291,6 +3291,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
     local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, breakdownPresenceFactor, airIntakeCloggingFactor = 0, 0, 0, 0, 0, 0
+    local effectiveMotorLoadRatio = 1.0
     local expiredServiceMultiplier = 1.0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
@@ -3307,11 +3308,33 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
+        local speed = self:getLastSpeed()
 
         -- overload factor
-        if motorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
-            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(motorLoad, C.MOTOR_OVERLOADED_THRESHOLD, false)
-            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0)
+        local isWorking = false
+        if speed > 0.5 and self.getIsOnField ~= nil and self:getIsOnField() and self.getAttachedImplements ~= nil then
+            for _, implement in pairs(self:getAttachedImplements()) do
+                local object = implement.object
+                if object ~= nil and object.getIsLowered ~= nil and object:getIsLowered() then
+                    isWorking = true
+                    break
+                end
+            end
+        end
+
+        local loadCompensation = 0
+        if isWorking then
+            local speedLimit = tonumber(self.getSpeedLimit ~= nil and self:getSpeedLimit(true) or 0) or 0
+            if speedLimit > 0 then
+                loadCompensation = 1 - speed / speedLimit
+            end
+        end
+
+        local effectiveMotorLoad = motorLoad + loadCompensation
+        effectiveMotorLoadRatio = motorLoad > 0 and (effectiveMotorLoad / motorLoad) or 1.0
+        if effectiveMotorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
+            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(effectiveMotorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
+            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0) * math.max(effectiveMotorLoad, 1.0)
             wearRate = wearRate + motorLoadFactor
         end
 
@@ -3365,6 +3388,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
 
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         motorLoadFactor = motorLoadFactor,
+        effectiveMotorLoadRatio = effectiveMotorLoadRatio,
         airIntakeCloggingFactor = airIntakeCloggingFactor,
         expiredServiceFactor = expiredServiceFactor,
         coldMotorFactor = coldMotorFactor,
@@ -3451,10 +3475,31 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         massRatio = selfMass > 0 and math.max(totalMass / selfMass, 0) or 1.0
 
         -- pull overload
-        if motorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
+        local isWorking = false
+        if self.getIsOnField ~= nil and self:getIsOnField() and self.getAttachedImplements ~= nil then
+            for _, implement in pairs(self:getAttachedImplements()) do
+                local object = implement.object
+                if object ~= nil and object.getIsLowered ~= nil and object:getIsLowered() then
+                    isWorking = true
+                    break
+                end
+            end
+        end
+
+        local loadCompensation = 0
+        if isWorking then
+            local speedLimit = tonumber(self.getSpeedLimit ~= nil and self:getSpeedLimit(true) or 0) or 0
+            if speedLimit > 0 then
+                loadCompensation = 1 - speed / speedLimit
+            end
+        end
+
+        local effectiveMotorLoad = motorLoad + loadCompensation
+
+        if effectiveMotorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
             systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
             pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
-            pullOverloadFactor = pullOverloadFactor * motorLoad * C.PULL_OVERLOAD_MULTIPLIER
+            pullOverloadFactor = pullOverloadFactor * effectiveMotorLoad * C.PULL_OVERLOAD_MULTIPLIER
             wearRate = wearRate + pullOverloadFactor
         else
             systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, 0)
