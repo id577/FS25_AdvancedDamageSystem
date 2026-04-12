@@ -746,6 +746,7 @@ function AdvancedDamageSystem.registerEventListeners(vehicleType)
     SpecializationUtil.registerEventListener(vehicleType, "onLoad", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onPostLoad", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onDelete", AdvancedDamageSystem)
+    SpecializationUtil.registerEventListener(vehicleType, "onLeaveVehicle", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onUpdate", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onWriteStream", AdvancedDamageSystem)
     SpecializationUtil.registerEventListener(vehicleType, "onReadStream", AdvancedDamageSystem)
@@ -2172,6 +2173,16 @@ function AdvancedDamageSystem:onDelete()
     end
 end
 
+function AdvancedDamageSystem:onLeaveVehicle(wasEntered)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    spec.lastMessage = ""
+    spec.messageTimer = 0
+end
+
 function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveForInputIgnoreSelection)
     if not self.isClient then
         return
@@ -2483,9 +2494,29 @@ local function syncAirIntakeCloggingEffect(vehicle)
     end
 end
 
+local function syncDisableAiWorkers(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil or not vehicle.isServer or not vehicle:getIsAIActive() then
+        return
+    end
+
+    if spec.activeEffects ~= nil and next(spec.activeEffects) ~= nil then
+        for _, effectData in pairs(spec.activeEffects) do
+            if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.disableAi then
+                vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new())
+                return
+            end
+        end
+    end
+end
+
 local function syncMessages(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then return end
+
+    if ADS_Config.CORE ~= nil and ADS_Config.CORE.ENABLE_WARNING_MESSAGES == false then
+        return
+    end
 
     local repeatDelayMs = 180000
 
@@ -2538,15 +2569,12 @@ local function syncMessages(vehicle, dt)
         end
     end
 
-    --- Messages from breakdowns and disable AI
+    --- Messages from breakdowns
     if spec.activeEffects ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
             if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
                 if candidateMessage == nil and isActiveForInput and not isUnderService then
                     candidateMessage = effectData.extraData.message
-                end
-                if vehicle.isServer and vehicle:getIsAIActive() and effectData.extraData.disableAi then 
-                    vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) 
                 end
             end
         end
@@ -2684,6 +2712,9 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     
     --- Messages
     syncMessages(self, spec.effectsUpdateTimer)
+
+    --- Disable AI workers for critical effects
+    syncDisableAiWorkers(self)
     
     --- just in case, reset damage amount to 0 if it's not
     if self.isServer and self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end

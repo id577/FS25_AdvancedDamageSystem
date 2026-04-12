@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Si está activado, el trabajador IA reduce la carga para evitar sobrecarga o sobrecalentamiento del motor."/>
         <text name="ads_debugMode_label" text="Modo depuración"/>
         <text name="ads_debugMode_tooltip" text="Activa o desactiva el panel de depuración y el registro extenso en la consola."/>
+        <text name="ads_warningMessages_label" text="Mensajes de advertencia"/>
+        <text name="ads_warningMessages_tooltip" text="Activa o desactiva advertencias de juego como motor frío o sobrecalentamiento."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Restricciones del taller móvil"/>
         <text name="ads_serviceInterval_label" text="Intervalo de servicio"/>
         <text name="ads_vehicleLifespan_label" text="Vida útil del vehículo"/>

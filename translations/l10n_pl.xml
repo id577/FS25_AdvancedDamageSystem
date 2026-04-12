@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Jeśli włączone, pracownik AI zmniejsza obciążenie, aby zapobiec przeciążeniu silnika lub przegrzaniu."/>
         <text name="ads_debugMode_label" text="Tryb debugowania"/>
         <text name="ads_debugMode_tooltip" text="Włącz lub wyłącz panel debugowania oraz rozbudowane logowanie debugowania w konsoli."/>
+        <text name="ads_warningMessages_label" text="Komunikaty ostrzegawcze"/>
+        <text name="ads_warningMessages_tooltip" text="Włącza lub wyłącza ostrzeżenia w grze, takie jak zimny silnik lub przegrzanie."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Ograniczenia mobilnego warsztatu"/>
         <text name="ads_serviceInterval_label" text="Interwał serwisowy"/>
         <text name="ads_vehicleLifespan_label" text="Okres eksploatacji pojazdu"/>

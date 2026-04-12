@@ -30,6 +30,7 @@ local function buildPendingConfigFromAdsConfig()
         baseSystemsWear = ADS_Config.CORE.BASE_SYSTEMS_WEAR,
         downtimeMultiplier = ADS_Config.CORE.DOWNTIME_MULTIPLIER,
         generalWearEnabled = ADS_Config.CORE.GENERAL_WEAR_ENABLED,
+        enableWarningMessages = ADS_Config.CORE.ENABLE_WARNING_MESSAGES,
         systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER,
         aiOverloadControl = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL,
 
@@ -283,6 +284,14 @@ function ADS_InGameSettings:onFrameOpen()
         g_i18n:getText("ads_aiOverloadAndOverheatControl_tooltip")
     )
 
+    -- Warning Messages (Binary)
+    self.ads_warningMessages = ADS_InGameSettings:addBinaryOption(
+        self,
+        "onWarningMessagesChanged",
+        g_i18n:getText("ads_warningMessages_label"),
+        g_i18n:getText("ads_warningMessages_tooltip")
+    )
+
     -- DEbug Mode (Binary)
     self.ads_debugMode = ADS_InGameSettings:addBinaryOption(
         self,
@@ -341,6 +350,7 @@ function ADS_InGameSettings:onFrameClose()
     ADS_Config.CORE.BASE_SYSTEMS_WEAR = pending.baseSystemsWear
     ADS_Config.CORE.DOWNTIME_MULTIPLIER = pending.downtimeMultiplier
     ADS_Config.CORE.GENERAL_WEAR_ENABLED = pending.generalWearEnabled
+    ADS_Config.CORE.ENABLE_WARNING_MESSAGES = pending.enableWarningMessages
     ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = pending.systemStressGlobalMultiplier
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = pending.aiOverloadControl
 
@@ -430,6 +440,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_parkVehicle:setIsChecked(pending.parkVehicle, false, false)
     currentPage.ads_warrantyEnabled:setIsChecked(pending.warrantyEnabled, false, false)
     currentPage.ads_generalWearEnabled:setIsChecked(pending.generalWearEnabled, false, false)
+    currentPage.ads_warningMessages:setIsChecked(pending.enableWarningMessages, false, false)
     currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(pending.aiOverloadControl, false, false)
     currentPage.ads_workshopAvailable:setIsChecked(pending.alwaysAvailable, false, false)
     currentPage.ads_mobileWorkshopRestrictions:setIsChecked(pending.mobileWorkshopRestrictionsEnabled, false, false)
@@ -465,6 +476,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_thermalSensitivity:setDisabled(disableAll)
     currentPage.ads_cloggingSpeed:setDisabled(disableAll)
     currentPage.ads_aiOverloadAndOverheatControl:setDisabled(disableAll)
+    currentPage.ads_warningMessages:setDisabled(disableAll)
     currentPage.ads_debugMode:setDisabled(disableAll)
 
     -- Workshop hour controls: disabled if non-server OR always-available is on.
@@ -612,6 +624,12 @@ end
 
 function ADS_InGameSettings:onAiOverloadAndOverheatControlChanged(state)
     getPendingConfig().aiOverloadControl = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onWarningMessagesChanged(state)
+    getPendingConfig().enableWarningMessages = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings.ads_hasPendingSettingsChange = true
     refreshCurrentSettingsPage()
 end

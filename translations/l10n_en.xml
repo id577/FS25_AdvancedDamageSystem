@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="If enabled, the AI worker reduces load to prevent engine overload or overheating."/>
         <text name="ads_debugMode_label" text="Debug Mode"/>
         <text name="ads_debugMode_tooltip" text="Enables or disables debug panel and extensive debug logging in the console."/>
+        <text name="ads_warningMessages_label" text="Warning Messages"/>
+        <text name="ads_warningMessages_tooltip" text="Enables or disables gameplay warning messages such as cold engine and overheating alerts."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Mobile Workshop Restrictions"/>
         <text name="ads_serviceInterval_label" text="Service Interval"/>
         <text name="ads_vehicleLifespan_label" text="Vehicle Lifespan"/>

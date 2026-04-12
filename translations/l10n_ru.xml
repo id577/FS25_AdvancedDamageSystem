@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Если включено, ИИ-работник будет снижать нагрузку, чтобы не допустить перегрузки двигателя или перегрева."/>
         <text name="ads_debugMode_label" text="Режим отладки"/>
         <text name="ads_debugMode_tooltip" text="Включает или отключает панель отладки и расширенное ведение журнала отладки в консоли."/>
+        <text name="ads_warningMessages_label" text="Предупреждающие сообщения"/>
+        <text name="ads_warningMessages_tooltip" text="Включает или отключает игровые предупреждения, например о холодном двигателе и перегреве."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Ограничения мобильной мастерской"/>
         <text name="ads_serviceInterval_label" text="Интервал ТО"/>
         <text name="ads_vehicleLifespan_label" text="Ресурс техники"/>

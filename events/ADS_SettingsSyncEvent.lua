@@ -21,6 +21,7 @@ function ADS_SettingsSyncEvent.new()
     self.baseSystemsWear           = ADS_Config.CORE.BASE_SYSTEMS_WEAR
     self.downtimeMultiplier        = ADS_Config.CORE.DOWNTIME_MULTIPLIER
     self.generalWearEnabled        = ADS_Config.CORE.GENERAL_WEAR_ENABLED
+    self.enableWarningMessages     = ADS_Config.CORE.ENABLE_WARNING_MESSAGES
     self.systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER
     self.aiOverloadControl         = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL
     self.instantInspection         = ADS_Config.MAINTENANCE.INSTANT_INSPECTION
@@ -47,6 +48,7 @@ function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.baseSystemsWear       or 0)
     streamWriteFloat32(streamId, self.downtimeMultiplier    or 0)
     streamWriteBool(streamId,    self.generalWearEnabled    or false)
+    streamWriteBool(streamId,    self.enableWarningMessages or false)
     streamWriteFloat32(streamId, self.systemStressGlobalMultiplier or 1.0)
     streamWriteBool(streamId,    self.aiOverloadControl      or false)
     streamWriteBool(streamId,    self.instantInspection      or false)
@@ -71,6 +73,7 @@ function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.baseSystemsWear           = streamReadFloat32(streamId)
     self.downtimeMultiplier        = streamReadFloat32(streamId)
     self.generalWearEnabled        = streamReadBool(streamId)
+    self.enableWarningMessages     = streamReadBool(streamId)
     self.systemStressGlobalMultiplier = streamReadFloat32(streamId)
     self.aiOverloadControl         = streamReadBool(streamId)
     self.instantInspection         = streamReadBool(streamId)
@@ -104,6 +107,7 @@ local function applyConfig(event)
     ADS_Config.CORE.BASE_SYSTEMS_WEAR                      = event.baseSystemsWear
     ADS_Config.CORE.DOWNTIME_MULTIPLIER                    = event.downtimeMultiplier
     ADS_Config.CORE.GENERAL_WEAR_ENABLED                   = event.generalWearEnabled
+    ADS_Config.CORE.ENABLE_WARNING_MESSAGES                = event.enableWarningMessages
     ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER        = event.systemStressGlobalMultiplier
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL       = event.aiOverloadControl
     ADS_Config.MAINTENANCE.INSTANT_INSPECTION               = event.instantInspection

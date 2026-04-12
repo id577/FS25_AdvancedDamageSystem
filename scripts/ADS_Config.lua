@@ -184,6 +184,7 @@ ADS_Config = {
         USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MAX = 0.66,
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 15,
+        ENABLE_WARNING_MESSAGES = true,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
         AI_WORKER_PID = {
             MIN_SPEED = 3.0,
@@ -668,6 +669,7 @@ function ADS_Config.saveToXMLFile()
     setXMLFloat(xmlFile, root .. ".DOWNTIME_MULTIPLIER",    ADS_Config.CORE.DOWNTIME_MULTIPLIER)
     setXMLFloat(xmlFile, root .. ".SYSTEM_STRESS_GLOBAL_MULTIPLIER", ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER)
     setXMLBool (xmlFile, root .. ".GENERAL_WEAR_ENABLED",   ADS_Config.CORE.GENERAL_WEAR_ENABLED)
+    setXMLBool (xmlFile, root .. ".ENABLE_WARNING_MESSAGES", ADS_Config.CORE.ENABLE_WARNING_MESSAGES)
     setXMLBool (xmlFile, root .. ".AI_OVERLOAD_CONTROL",    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL)
 
     -- MAINTENANCE
@@ -771,6 +773,9 @@ function ADS_Config.loadFromXMLFile()
 
     v = getXMLBool(xmlFile, root .. ".GENERAL_WEAR_ENABLED")
     if v ~= nil then ADS_Config.CORE.GENERAL_WEAR_ENABLED = v end
+
+    v = getXMLBool(xmlFile, root .. ".ENABLE_WARNING_MESSAGES")
+    if v ~= nil then ADS_Config.CORE.ENABLE_WARNING_MESSAGES = v end
 
     v = getXMLBool(xmlFile, root .. ".AI_OVERLOAD_CONTROL")
     if v ~= nil then ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = v end

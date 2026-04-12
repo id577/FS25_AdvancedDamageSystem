@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Der KI-Helfer reduziert die Motorlast bei drohender Überlastung oder Überhitzung."/>
         <text name="ads_debugMode_label" text="Debug-Modus"/>
         <text name="ads_debugMode_tooltip" text="Aktiviert oder deaktiviert das Debug-Panel und die umfangreiche Debug-Protokollierung in der Konsole."/>
+        <text name="ads_warningMessages_label" text="Warnmeldungen"/>
+        <text name="ads_warningMessages_tooltip" text="Aktiviert oder deaktiviert Warnmeldungen wie kalter Motor oder Überhitzung."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Einschränkungen der mobilen Werkstatt"/>
         <text name="ads_serviceInterval_label" text="Wartungsintervall"/>
         <text name="ads_vehicleLifespan_label" text="Fahrzeuglebensdauer"/>

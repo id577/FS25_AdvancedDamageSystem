@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Si activé, l'ouvrier IA réduit la charge pour éviter la surcharge moteur ou la surchauffe."/>
         <text name="ads_debugMode_label" text="Mode débogage"/>
         <text name="ads_debugMode_tooltip" text="Active ou désactive le panneau de débogage et la journalisation de débogage étendue dans la console."/>
+        <text name="ads_warningMessages_label" text="Messages d'avertissement"/>
+        <text name="ads_warningMessages_tooltip" text="Active ou désactive les avertissements de jeu comme moteur froid ou surchauffe."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Restrictions de l'atelier mobile"/>
         <text name="ads_serviceInterval_label" text="Intervalle d'entretien"/>
         <text name="ads_vehicleLifespan_label" text="Durée de vie du véhicule"/>
