@@ -15,7 +15,7 @@ function ADS_Hud:new()
         engine = {
             name = 'engine',
             icon = g_overlayManager:createOverlay("ads_DashboardHud.engine", 0, 0, 0, 0),
-            year = 2000
+            year = 1990
         },
         transmission = {
             name = 'transmission',
@@ -53,6 +53,19 @@ function ADS_Hud:new()
             year = 1950
         }
     }
+
+    self.indicatorRuntime = {}
+    self.indicatorSoundConfig = {
+        engine =        { cooldownMs = 1800, sampleName = "warning" },
+        transmission =  { cooldownMs = 1800, sampleName = "warning" },
+        brakes =        { cooldownMs = 1800, sampleName = "warning" },
+        battery =       { cooldownMs = 1800, sampleName = "warning" },
+        coolant =       { cooldownMs = 1800, sampleName = "warning" },
+        warning =       { cooldownMs = 1400, sampleName = "warning" },
+        service =       { cooldownMs = 2500, sampleName = "warning" },
+        oil =           { cooldownMs = 1800, sampleName = "warning" }
+    }
+
     self.engineTempText = {}
     self.motorLoadText = {}
     self.batteryVoltageText = {}
@@ -112,7 +125,170 @@ function ADS_Hud:setVisible(isVisible)
 end
 
 function ADS_Hud:setVehicle(vehicle)
+    if self.vehicle ~= vehicle then
+        self.indicatorRuntime = {}
+    end
+
     self.vehicle = vehicle
+end
+
+function ADS_Hud:getIndicatorRuntimeState(indicatorId)
+    if self.indicatorRuntime == nil then
+        self.indicatorRuntime = {}
+    end
+
+    if self.indicatorRuntime[indicatorId] == nil then
+        self.indicatorRuntime[indicatorId] = {
+            isLit = false,
+            soundPlayedForCurrentActivation = false,
+            lastSoundTime = 0,
+            severity = 0,
+            lastSoundSeverity = 0,
+            blinkStartTime = 0,
+            blinkActive = false
+        }
+    end
+
+    return self.indicatorRuntime[indicatorId]
+end
+
+function ADS_Hud:startIndicatorBlink(indicatorId)
+    local runtimeState = self:getIndicatorRuntimeState(indicatorId)
+    local vehicle = self.vehicle
+    if vehicle == nil or vehicle.getMotorState == nil or vehicle:getMotorState() ~= 4 then
+        runtimeState.blinkActive = false
+        runtimeState.blinkStartTime = 0
+        return
+    end
+
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+
+    runtimeState.blinkActive = true
+    runtimeState.blinkStartTime = now
+end
+
+function ADS_Hud:applyIndicatorBlink(indicatorId, targetColor)
+    local runtimeState = self:getIndicatorRuntimeState(indicatorId)
+    local colors = ADS_Breakdowns ~= nil and ADS_Breakdowns.COLORS or nil
+    local vehicle = self.vehicle
+    if runtimeState == nil or colors == nil or runtimeState.blinkActive ~= true then
+        return targetColor
+    end
+
+    if vehicle == nil or vehicle.getMotorState == nil or vehicle:getMotorState() ~= 4 then
+        runtimeState.blinkActive = false
+        runtimeState.blinkStartTime = 0
+        return targetColor
+    end
+
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+    local blinkIntervalMs = 600
+    local totalPhases = 4
+    local elapsed = math.max(now - (runtimeState.blinkStartTime or 0), 0)
+    local phaseIndex = math.floor(elapsed / blinkIntervalMs)
+
+    if phaseIndex >= totalPhases then
+        runtimeState.blinkActive = false
+        return targetColor
+    end
+
+    if phaseIndex % 2 == 1 then
+        return colors.DEFAULT
+    end
+
+    return targetColor
+end
+
+function ADS_Hud:tryPlayIndicatorActivationSound(indicatorId, runtimeState, severity)
+    local vehicle = self.vehicle
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+        return false
+    end
+
+    local config = self.indicatorSoundConfig ~= nil and self.indicatorSoundConfig[indicatorId] or nil
+    if config == nil then
+        return false
+    end
+
+    if vehicle.getMotorState == nil or vehicle:getMotorState() ~= 4 then
+        return false
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local samples = spec.samples
+    if samples == nil then
+        return false
+    end
+
+    local sampleName = config.sampleName
+    local sample = sampleName ~= nil and samples[sampleName] or nil
+    if sample == nil then
+        return false
+    end
+
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+    local cooldownMs = math.max(tonumber(config.cooldownMs) or 0, 0)
+    local elapsed = now - (runtimeState.lastSoundTime or 0)
+
+    if runtimeState.soundPlayedForCurrentActivation and severity <= (runtimeState.lastSoundSeverity or 0) then
+        return false
+    end
+
+    if elapsed < cooldownMs then
+        return false
+    end
+
+    g_soundManager:playSample(sample)
+    runtimeState.lastSoundTime = now
+    runtimeState.soundPlayedForCurrentActivation = true
+    runtimeState.lastSoundSeverity = severity or 0
+    return true
+end
+
+function ADS_Hud:syncIndicatorActivation(indicatorId, shouldLight, targetColor)
+    local runtimeState = self:getIndicatorRuntimeState(indicatorId)
+    local colors = ADS_Breakdowns ~= nil and ADS_Breakdowns.COLORS or nil
+    local severity = 0
+
+    if shouldLight and colors ~= nil then
+        if targetColor == colors.CRITICAL then
+            severity = 2
+        elseif targetColor == colors.WARNING then
+            severity = 1
+        end
+    end
+
+    local wasLit = runtimeState.isLit == true
+    local previousSeverity = runtimeState.severity or 0
+    local turnedOn = shouldLight and not wasLit
+    local turnedOff = not shouldLight and wasLit
+    local escalatedToCritical = shouldLight and previousSeverity == 1 and severity == 2
+
+    if turnedOn then
+        runtimeState.isLit = true
+        runtimeState.severity = severity
+        if severity > 0 then
+            self:startIndicatorBlink(indicatorId)
+        end
+        self:tryPlayIndicatorActivationSound(indicatorId, runtimeState, severity)
+    elseif escalatedToCritical then
+        runtimeState.isLit = true
+        runtimeState.severity = severity
+        if severity > 0 then
+            self:startIndicatorBlink(indicatorId)
+        end
+        self:tryPlayIndicatorActivationSound(indicatorId, runtimeState, severity)
+    elseif turnedOff then
+        runtimeState.isLit = false
+        runtimeState.severity = 0
+        runtimeState.soundPlayedForCurrentActivation = false
+        runtimeState.lastSoundSeverity = 0
+        runtimeState.blinkActive = false
+        runtimeState.blinkStartTime = 0
+    else
+        runtimeState.isLit = shouldLight
+        runtimeState.severity = severity
+    end
 end
 
 function ADS_Hud:getVehicleTypeCategoryLabel(vehicle)
@@ -395,17 +571,12 @@ function ADS_Hud:drawDashboard()
     local posX = speedBgX + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetX
     local posY = speedBgY + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetY
 
-
     for hudIndicatorId, hudIndicatorData in pairs(self.indicators) do
         local icon = hudIndicatorData.icon
         local targetColor = colors.DEFAULT 
+        local isIndicatorVisible = true
         
-
-        if vehicle:getIsMotorStarted() or vehicle:getMotorState() == 2 then
-            local motorStartedDelta = g_currentMission.environment.mission.time - vehicle:getMotorStartTime()
-            if motorStartedDelta < 500 and spec.year >= 1990 then targetColor = colors.WARNING end
-            if motorStartedDelta < 1000 and motorStartedDelta > 500 and spec.year >= 2005 then targetColor = colors.CRITICAL end
-
+        if vehicle:getMotorState() ~= 1 then
             local activeData = activeIndicators[hudIndicatorId]
             if activeData then
                 local isActive = activeData.isActive
@@ -442,15 +613,14 @@ function ADS_Hud:drawDashboard()
             if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and isNotHeated then targetColor = colors.COOL
             elseif hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature > 99 and spec.engineTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.coolant.name and spec.engineTemperature > 110 then targetColor = colors.CRITICAL end
-
-            if hudIndicatorId == self.indicators.transmission.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
-            elseif hudIndicatorId == self.indicators.transmission.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
+            if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
+            elseif hudIndicatorId == self.indicators.coolant.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
 
             local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 0) / (self.vehicle:getMaintenanceInterval() or 5)
             if hudIndicatorId == self.indicators.service.name and serviceInterval > 1.0 then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
 
-            if vehicle:getMotorState() == 2 then
+            if vehicle:getMotorState() == 2 or vehicle:getMotorState() == 3 then
                 targetColor = colors.WARNING
             end
         else
@@ -459,25 +629,36 @@ function ADS_Hud:drawDashboard()
                 activeData.isActive = false
             end
         end
-
-        icon:setColor(unpack(targetColor))
         icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
-        if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle or hudIndicatorId == self.indicators.oil.name or hudIndicatorId == self.indicators.transmission.name then 
-            icon:setVisible(false)
+        if (hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle)
+            or hudIndicatorId == self.indicators.oil.name
+            or hudIndicatorId == self.indicators.transmission.name then
+            isIndicatorVisible = false
         else
             if vehicle:getLastSpeed() >= 99.9 then
                 if  hudIndicatorId == self.indicators.brakes.name or 
                     hudIndicatorId == self.indicators.engine.name or
                     hudIndicatorId == self.indicators.warning.name or
                     hudIndicatorId == self.indicators.battery.name then
-                        icon:setVisible(false)
+                        isIndicatorVisible = false
+                else
+                    isIndicatorVisible = hudIndicatorData.year < spec.year
                 end
             else
-                icon:setVisible(hudIndicatorData.year < spec.year)
+                isIndicatorVisible = hudIndicatorData.year < spec.year
             end
         end
+
+        icon:setVisible(isIndicatorVisible)
+
+        local isAudibleIndicator = targetColor ~= colors.DEFAULT and targetColor ~= colors.COOL
+        local shouldActivateIndicator = isIndicatorVisible and isAudibleIndicator
+        self:syncIndicatorActivation(hudIndicatorId, shouldActivateIndicator, targetColor)
+
+        local displayColor = self:applyIndicatorBlink(hudIndicatorId, targetColor)
+        icon:setColor(unpack(displayColor))
         icon:render()
-        end
+    end
 
     local engineTemp, transTemp, systemVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.systemVoltageV
     local motorLoad = math.min(spec._smoothedMotorLoad or 0, 1)
@@ -1008,10 +1189,11 @@ function ADS_Hud:drawActiveVehicleHUD()
             asPercent((dbg.totalWearRate or 0) * bcw)
         ), getConditionFactorColor(maxFactor), 0.84)
         addLine(lines, string.format(
-            "S: %.2f (+%.2f) t: %.2f",
+            "S: %.2f (+%.2f) t: %.2f | a: %.2f",
             asPercent(getSystemStress(systemKey)),
             asPercent(dbg.instantStressRate or 0),
-            asPercent(getAccumulatedStat(systemKey, "stress"))
+            asPercent(getAccumulatedStat(systemKey, "stress")),
+            asPercent(dbg._avgStress or 0)
         ), {1, 1, 1, 1}, 0.84)
 
         addLine(lines, string.format(

@@ -189,6 +189,8 @@ local function createEmptyFactorStats(systems)
         result[systemKey] = {
             total = 0,
             stress = 0,
+            _prevStress = 0,
+            _avgStress = 0,
             operatingHours = -1
         }
     end
@@ -277,6 +279,8 @@ local function ensureFactorStats(spec, vehicle)
         local stats = spec.factorStats[systemKey]
         stats.total = tonumber(stats.total) or 0
         stats.stress = tonumber(stats.stress) or 0
+        stats._prevStress = tonumber(stats._prevStress) or 0
+        stats._avgStress = tonumber(stats._avgStress) or 0
         stats.operatingHours = tonumber(stats.operatingHours)
         if stats.operatingHours == nil then
             stats.operatingHours = -1
@@ -1997,6 +2001,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.samples.starterCranking = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "starterCranking", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.starterCrankingEnd = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "starterCrankingEnd", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.alarm = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "alarm", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
+        spec.samples.warning = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "warning", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.transmissionShiftFailed1 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed1", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.transmissionShiftFailed2 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed2", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
         spec.samples.transmissionShiftFailed3 = soundManager:loadSampleFromXML(xmlSoundFile, "sounds", "transmissionShiftFailed3", modDir, root, 1, AudioGroup.VEHICLE, i3d, self)
@@ -2665,6 +2670,104 @@ local function syncCVTaddonBreakdown(vehicle)
     end
 end
 
+local function syncOverloadWarning(vehicle, dt)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil or not vehicle.isServer then return end
+    local period = 30000
+    local avgStressWarningThreshold = 0.25
+    local avgStressCriticalThreshold = 0.5
+    local sampleDurationMs = math.max(tonumber(dt) or 0, 1)
+    local isMotorStarted = vehicle.getIsMotorStarted ~= nil and vehicle:getIsMotorStarted()
+
+    local factorStats = ensureFactorStats(spec, vehicle)
+    local shouldStage = 0
+    for systemName, systemData in pairs(factorStats) do
+        if type(systemData) == "table" then
+            local currentStress = tonumber(systemData.stress) or 0
+
+            if not isMotorStarted then
+                systemData._prevStress = currentStress
+                systemData._avgStress = 0
+                systemData._avgStressSamples = {}
+
+                if ADS_Config.DEBUG and spec.debugData ~= nil and spec.debugData[systemName] ~= nil then
+                    spec.debugData[systemName]._avgStress = 0
+                end
+            else
+            local previousStress = tonumber(systemData._prevStress)
+            if previousStress == nil then
+                previousStress = currentStress
+            end
+
+            local deltaStress = math.max(currentStress - previousStress, 0)
+            local sampleRatePerHour = deltaStress * (60 * 60 * 1000) / sampleDurationMs
+            systemData._prevStress = currentStress
+
+            if type(systemData._avgStressSamples) ~= "table" then
+                systemData._avgStressSamples = {}
+            end
+
+            local samples = systemData._avgStressSamples
+            table.insert(samples, {
+                durationMs = sampleDurationMs,
+                ratePerHour = sampleRatePerHour
+            })
+
+            local totalSamplesDurationMs = 0
+            local weightedSum = 0
+            for _, sample in ipairs(samples) do
+                local durationMs = math.max(tonumber(sample.durationMs) or 0, 0)
+                local ratePerHour = tonumber(sample.ratePerHour) or 0
+                totalSamplesDurationMs = totalSamplesDurationMs + durationMs
+                weightedSum = weightedSum + ratePerHour * durationMs
+            end
+
+            while #samples > 0 and totalSamplesDurationMs > period do
+                local oldest = samples[1]
+                local oldestDurationMs = math.max(tonumber(oldest.durationMs) or 0, 0)
+                local overflowMs = totalSamplesDurationMs - period
+
+                if oldestDurationMs <= overflowMs then
+                    totalSamplesDurationMs = totalSamplesDurationMs - oldestDurationMs
+                    weightedSum = weightedSum - (tonumber(oldest.ratePerHour) or 0) * oldestDurationMs
+                    table.remove(samples, 1)
+                else
+                    oldest.durationMs = oldestDurationMs - overflowMs
+                    totalSamplesDurationMs = totalSamplesDurationMs - overflowMs
+                    weightedSum = weightedSum - (tonumber(oldest.ratePerHour) or 0) * overflowMs
+                end
+            end
+
+            systemData._avgStress = math.max(weightedSum / period, 0)
+
+            if ADS_Config.DEBUG and spec.debugData ~= nil and spec.debugData[systemName] ~= nil then
+                spec.debugData[systemName]._avgStress = systemData._avgStress
+            end
+
+            if systemData._avgStress > avgStressCriticalThreshold then
+                shouldStage = 2
+            elseif systemData._avgStress > avgStressWarningThreshold and shouldStage == 0 then
+                shouldStage = 1
+            end
+            end
+        end
+    end
+
+    local breakdownId = "STRESS_OVERLOAD"
+    local activeBreakdowns = spec.activeBreakdowns or {}
+    local currentBreakdown = activeBreakdowns[breakdownId]
+
+    if shouldStage > 0 then
+        if currentBreakdown == nil then
+            vehicle:addBreakdown(breakdownId, shouldStage)
+        elseif currentBreakdown.stage ~= shouldStage then
+            vehicle:changeBreakdownStage(breakdownId, shouldStage)
+        end
+    elseif currentBreakdown ~= nil then
+        vehicle:removeBreakdown(breakdownId)
+    end
+end
+
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
@@ -2784,6 +2887,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:processGeneralWearBreakdown()
         -- lubtication level
         self:updateLubricationLevel(dt)
+        --- Overload warnings / rolling avg stress
+        syncOverloadWarning(self, dt)
     end
 
     -- Raise dirty flags for changed data
@@ -10676,6 +10781,7 @@ addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDa
 addConsoleCommand("ads_setConfigVar", "Sets ADS_Config variable. Usage: ads_setConfigVar <path> <value>", "setConfigVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setSpecVar", "Sets ADS specialization variable on current vehicle. Usage: ads_setSpecVar <path> <value>", "setSpecVar", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_printSpecVar", "Prints ADS specialization variable on current vehicle. Usage: ads_printSpecVar <path>", "printSpecVar", AdvancedDamageSystem.ConsoleCommands)
+
 
 
 

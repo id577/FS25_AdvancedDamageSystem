@@ -479,6 +479,44 @@ ADS_Breakdowns.BreakdownRegistry = {
         }
     },
 
+    STRESS_OVERLOAD = {
+        part = parts.VEHICLE,
+        isSelectable = false,
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+        }
+    },
+
     MAINTENANCE_WITH_POOR_QUALITY_CONSUMABLES = {
         isSelectable = false,
         part = parts.CONSUMABLES,
