@@ -509,7 +509,9 @@ ADS_Breakdowns.BreakdownRegistry = {
                 detectionChance = 0.0,
                 progressMultiplier = 0.0,
                 repairPrice = 0.0,
-                effects = {},
+                effects = {
+                    { id = "EMPTY_EFFECT", value = 1.0, aggregation = "boolean_or",  extraData = {message = "ads_breakdowns_overload_breakdown_stage2_message", reason = "BREAKDOWN", disableAi = true}}
+                },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
                 }
@@ -5482,7 +5484,6 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
 
 -- ==========================================================
 -- LIGHTS_FLICKER_CHANCE
-
 ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
     getEffectName = function()
         return "LIGHTS_FLICKER_CHANCE" 
@@ -5533,8 +5534,18 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
     end
 }
 
--- ==========================================================
+-- =========================================================
+-- EMPTY_EFFECT
+ADS_Breakdowns.EffectApplicators.EMPTY_EFFECT = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying EMPTY_EFFECT effect")
+    end,
+    remove = function(vehicle, handler)
+        log_dbg("Removing EMPTY_EFFECT effect.")
+    end
+}
 
+-- ==========================================================
 function ADS_Breakdowns.getCanMotorRun(self, superFunc)
     local spec = self.spec_AdvancedDamageSystem
     if (spec and spec.activeEffects.ENGINE_FAILURE) then

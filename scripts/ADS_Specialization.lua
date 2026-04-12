@@ -2674,8 +2674,8 @@ local function syncOverloadWarning(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil or not vehicle.isServer then return end
     local period = 30000
-    local avgStressWarningThreshold = 0.25
-    local avgStressCriticalThreshold = 0.5
+    local avgStressWarningThreshold = ADS_Config.CORE.AVG_STRESS_WARNING_THRESHOLD
+    local avgStressCriticalThreshold = ADS_Config.CORE.AVG_STRESS_CRITICAL_THRESHOLD
     local sampleDurationMs = math.max(tonumber(dt) or 0, 1)
     local isMotorStarted = vehicle.getIsMotorStarted ~= nil and vehicle:getIsMotorStarted()
 
@@ -2744,10 +2744,13 @@ local function syncOverloadWarning(vehicle, dt)
                 spec.debugData[systemName]._avgStress = systemData._avgStress
             end
 
-            if systemData._avgStress > avgStressCriticalThreshold then
-                shouldStage = 2
-            elseif systemData._avgStress > avgStressWarningThreshold and shouldStage == 0 then
-                shouldStage = 1
+            local affectsOverloadBreakdown = tostring(systemName) ~= "chassis"
+            if affectsOverloadBreakdown then
+                if systemData._avgStress > avgStressCriticalThreshold then
+                    shouldStage = 2
+                elseif systemData._avgStress > avgStressWarningThreshold and shouldStage == 0 then
+                    shouldStage = 1
+                end
             end
             end
         end

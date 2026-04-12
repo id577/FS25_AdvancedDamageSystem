@@ -636,6 +636,7 @@
         <text name="ads_sell_dialog_washing_penalty" text="Washing"/>
         <text name="ads_sell_dialog_total" text="Total"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s is unavailable for %s in the mobile workshop due to low maintainability."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Critical overload! Reduce the load on the vehicle immediately."/>
     </texts>
 </l10n>
 

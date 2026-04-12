@@ -628,5 +628,6 @@
         <text name="ads_sell_dialog_washing_penalty" text="Lavage"/>
         <text name="ads_sell_dialog_total" text="Total"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s est indisponible pour %s dans l'atelier mobile en raison d'une faible maintenabilite."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Surcharge critique ! Reduisez immediatement la charge sur la machine."/>
     </texts>
 </l10n>

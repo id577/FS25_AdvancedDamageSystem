@@ -628,5 +628,6 @@
         <text name="ads_sell_dialog_washing_penalty" text="Reinigung"/>
         <text name="ads_sell_dialog_total" text="Gesamt"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s ist fuer %s in der mobilen Werkstatt wegen geringer Wartungsfreundlichkeit nicht verfuegbar."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kritische Ueberlastung! Verringern Sie sofort die Belastung der Maschine."/>
     </texts>
 </l10n>

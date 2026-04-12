@@ -628,5 +628,6 @@
         <text name="ads_sell_dialog_washing_penalty" text="Мойка"/>
         <text name="ads_sell_dialog_total" text="Итого"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s недоступно для %s в мобильной мастерской из-за низкой ремонтопригодности."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Критическая перегрузка! Немедленно снизьте нагрузку на технику."/>
     </texts>
 </l10n>
