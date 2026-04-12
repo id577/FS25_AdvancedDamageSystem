@@ -2586,7 +2586,7 @@ local function syncMessages(vehicle, dt)
     end
 
     if candidateMessage ~= nil and (spec.messageTimer == 0 or spec.lastMessage ~= candidateMessage) then
-        g_currentMission:showBlinkingWarning(g_i18n:getText(candidateMessage), 2800)
+        g_currentMission:showBlinkingWarning(g_i18n:getText(candidateMessage), 3600)
         spec.lastMessage = candidateMessage
         spec.messageTimer = repeatDelayMs
     end
@@ -2708,10 +2708,12 @@ local function syncOverloadWarning(vehicle, dt)
             end
 
             local samples = systemData._avgStressSamples
-            table.insert(samples, {
-                durationMs = sampleDurationMs,
-                ratePerHour = sampleRatePerHour
-            })
+            if sampleRatePerHour > 0 or #samples > 0 then
+                table.insert(samples, {
+                    durationMs = sampleDurationMs,
+                    ratePerHour = sampleRatePerHour
+                })
+            end
 
             local totalSamplesDurationMs = 0
             local weightedSum = 0
@@ -2738,7 +2740,13 @@ local function syncOverloadWarning(vehicle, dt)
                 end
             end
 
-            systemData._avgStress = math.max(weightedSum / period, 0)
+            if weightedSum <= 0 or totalSamplesDurationMs <= 0 then
+                systemData._avgStress = 0
+                systemData._avgStressSamples = {}
+                samples = systemData._avgStressSamples
+            else
+                systemData._avgStress = math.max(weightedSum / period, 0)
+            end
 
             if ADS_Config.DEBUG and spec.debugData ~= nil and spec.debugData[systemName] ~= nil then
                 spec.debugData[systemName]._avgStress = systemData._avgStress
@@ -3433,12 +3441,18 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         local loadCompensation = 0
         if isWorking then
             local speedLimit = tonumber(self.getSpeedLimit ~= nil and self:getSpeedLimit(true) or 0) or 0
+            if self:getCruiseControlState() ~= 0 then
+                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
+            end
+            local speedLimit = speedLimit - 0.5
             if speedLimit > 0 then
-                loadCompensation = 1 - speed / speedLimit
+                local rawCompensation = math.clamp(1 - speed / speedLimit, 0, 1)
+                local speedWeight = math.clamp(speedLimit / 12, 0.2, 1.0)
+                loadCompensation = rawCompensation * speedWeight
             end
         end
 
-        local effectiveMotorLoad = motorLoad + loadCompensation
+        local effectiveMotorLoad = math.min(motorLoad + loadCompensation, 1.5)
         effectiveMotorLoadRatio = motorLoad > 0 and (effectiveMotorLoad / motorLoad) or 1.0
         if effectiveMotorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
             motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(effectiveMotorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
@@ -3597,12 +3611,18 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         local loadCompensation = 0
         if isWorking then
             local speedLimit = tonumber(self.getSpeedLimit ~= nil and self:getSpeedLimit(true) or 0) or 0
+            if self:getCruiseControlState() ~= 0 then
+                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
+            end
+            local speedLimit = speedLimit - 0.5
             if speedLimit > 0 then
-                loadCompensation = 1 - speed / speedLimit
+                local rawCompensation = math.clamp(1 - speed / speedLimit, 0, 1)
+                local speedWeight = math.clamp(speedLimit / 12, 0.2, 1.0)
+                loadCompensation = rawCompensation * speedWeight
             end
         end
 
-        local effectiveMotorLoad = motorLoad + loadCompensation
+        local effectiveMotorLoad = math.min(motorLoad + loadCompensation, 1.5)
 
         if effectiveMotorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
             systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
