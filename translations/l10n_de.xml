@@ -327,6 +327,8 @@
         <text name="ads_breakdowns_gear_disengage_message" text="Gang ausgelegt"/>
         <text name="ads_breakdown_at_progress_message" text="in Arbeit"/>
         <text name="ads_spec_cold_engine_message" text="Motor ist kalt! Hohe Drehzahlen verursachen Verschleiß!"/>
+        <text name="ads_spec_overheat_engine_message" text="Warnung! Motor überhitzt."/>
+        <text name="ads_spec_overheat_transmission_message" text="Warnung! Getriebe überhitzt."/>
         <text name="ads_spec_this_month" text="Diesen Monat"/>
         <text name="ads_spec_months_ago" text="Monaten"/>
         <text name="ads_spec_never" text="Nie"/>

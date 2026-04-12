@@ -327,6 +327,8 @@
         <text name="ads_breakdowns_gear_disengage_message" text="Передача выключена"/>
         <text name="ads_breakdown_at_progress_message" text="в процессе"/>
         <text name="ads_spec_cold_engine_message" text="Двигатель холодный! Высокие обороты вызывают износ!"/>
+        <text name="ads_spec_overheat_engine_message" text="Внимание! Перегрев двигателя."/>
+        <text name="ads_spec_overheat_transmission_message" text="Внимание! Перегрев трансмиссии."/>
         <text name="ads_spec_this_month" text="В этом месяце"/>
         <text name="ads_spec_months_ago" text="мес. назад"/>
         <text name="ads_spec_never" text="Никогда"/>

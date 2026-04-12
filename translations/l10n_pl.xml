@@ -331,6 +331,8 @@
         <text name="ads_breakdown_at_progress_message" text="W trakcie realizacji."/>
 
         <text name="ads_spec_cold_engine_message" text="Silnik jest zimny! Wysokie obroty powodują zużycie!"/>
+        <text name="ads_spec_overheat_engine_message" text="Uwaga! Przegrzanie silnika."/>
+        <text name="ads_spec_overheat_transmission_message" text="Uwaga! Przegrzanie skrzyni biegów."/>
         <text name="ads_spec_this_month" text="W tym miesiącu."/>
         <text name="ads_spec_months_ago" text="Kilka miesięcy temu."/>
         <text name="ads_spec_never" text="Nigdy."/>

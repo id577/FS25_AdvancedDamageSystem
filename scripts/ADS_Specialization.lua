@@ -2483,33 +2483,79 @@ local function syncAirIntakeCloggingEffect(vehicle)
     end
 end
 
-local function syncMessages(vehicle)
+local function syncMessages(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then return end
 
-    --- Cold engine message (guard: temperature must be initialized, i.e. > -90)
-    if vehicle:getIsMotorStarted() and spec.engineTemperature > -90 and spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD and vehicle:getIsActiveForInput(true) and not vehicle:getIsAIActive() and not spec.isElectricVehicle then
+    local repeatDelayMs = 180000
+
+    if spec.messageTimer == nil then
+        spec.messageTimer = 0
+    end
+
+    if spec.lastMessage == nil then
+        spec.lastMessage = ""
+    end
+
+    if spec.messageTimer > 0 then
+        spec.messageTimer = math.max(spec.messageTimer - dt, 0)
+    end
+
+    local candidateMessage = nil
+    local isActiveForInput = vehicle:getIsActiveForInput(true)
+    local isAiActive = vehicle:getIsAIActive()
+    local isUnderService = vehicle:isUnderService()
+    local isMotorStarted = vehicle:getIsMotorStarted()
+
+    if isMotorStarted and isActiveForInput and not isAiActive and not spec.isElectricVehicle then
         local spec_motorized = vehicle.spec_motorized
-        local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
-        local maxRpm = spec_motorized.motor.maxRpm
-        local rpmLoad = lastRpm / maxRpm
-        if rpmLoad > 0.75 then
-            g_currentMission:showBlinkingWarning(g_i18n:getText('ads_spec_cold_engine_message'), 2800)
+        local motor = spec_motorized ~= nil and spec_motorized.motor or nil
+        if motor ~= nil then
+            local lastRpm = tonumber(motor:getLastModulatedMotorRpm()) or 0
+            local maxRpm = math.max(tonumber(motor.maxRpm) or 0, 0.0001)
+            local rpmLoad = lastRpm / maxRpm
+            local motorLoad = 0
+
+            if vehicle.getMotorLoad ~= nil then
+                motorLoad = tonumber(vehicle:getMotorLoad()) or 0
+            elseif vehicle.getMotorLoadPercentage ~= nil then
+                motorLoad = tonumber(vehicle:getMotorLoadPercentage()) or 0
+            end
+
+            if spec.engineTemperature > -90 then
+                if spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD and rpmLoad > 0.5 then
+                    candidateMessage = 'ads_spec_cold_engine_message'
+                elseif spec.engineTemperature >= ADS_Config.CORE.ENGINE_FACTOR_DATA.OVERHEAT_MOTOR_THRESHOLD + 5 and motorLoad > 0.3 then
+                    candidateMessage = 'ads_spec_overheat_engine_message'
+                end
+            end
+
+            if candidateMessage == nil and spec.transmissionTemperature > -90 then
+                if spec.transmissionTemperature >= ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.OVERHEAT_TRANSMISSION_THRESHOLD + 5 and rpmLoad > 0.5 then
+                    candidateMessage = 'ads_spec_overheat_transmission_message'
+                end
+            end
         end
     end
 
-    --- Messages from breakdowns and stop AI
-    if spec.activeFunctions ~= nil and next(spec.activeEffects) ~= nil then
+    --- Messages from breakdowns and disable AI
+    if spec.activeEffects ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
             if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.message ~= nil then
-                if vehicle:getIsActiveForInput(true) and not vehicle:isUnderService() then
-                    g_currentMission:showBlinkingWarning(g_i18n:getText(effectData.extraData.message), 200)
+                if candidateMessage == nil and isActiveForInput and not isUnderService then
+                    candidateMessage = effectData.extraData.message
                 end
                 if vehicle.isServer and vehicle:getIsAIActive() and effectData.extraData.disableAi then 
                     vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new()) 
                 end
             end
         end
+    end
+
+    if candidateMessage ~= nil and (spec.messageTimer == 0 or spec.lastMessage ~= candidateMessage) then
+        g_currentMission:showBlinkingWarning(g_i18n:getText(candidateMessage), 2800)
+        spec.lastMessage = candidateMessage
+        spec.messageTimer = repeatDelayMs
     end
 end
 
@@ -2637,7 +2683,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     syncCVTaddonBreakdown(self)
     
     --- Messages
-    syncMessages(self)
+    syncMessages(self, spec.effectsUpdateTimer)
     
     --- just in case, reset damage amount to 0 if it's not
     if self.isServer and self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
@@ -3495,7 +3541,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             -- cold CVT factor
             if (spec.transmissionTemperature or -99) < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
                 coldTransFactor = ADS_Utils.calculateQuadraticMultiplier(spec.transmissionTemperature, C.COLD_TRANSMISSION_THRESHOLD, true)
-                local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
+                local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.5, false)
                 coldTransFactor = coldTransFactor * C.COLD_TRANSMISSION_MULTIPLIER * motorLoadInf
                 coldTransFactor = math.min(coldTransFactor, C.COLD_TRANSMISSION_MULTIPLIER or coldTransFactor)
                 wearRate = wearRate + coldTransFactor
@@ -3504,7 +3550,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             elseif (spec.transmissionTemperature or -99) > C.OVERHEAT_TRANSMISSION_THRESHOLD and motorLoad > 0.3 and not spec.isElectricVehicle then
                 local transTemp = spec.transmissionTemperature
                 hotTransFactor = ADS_Utils.calculateQuadraticMultiplier(transTemp, C.OVERHEAT_TRANSMISSION_THRESHOLD, false, 120)
-                local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.75, false)
+                local motorLoadInf = ADS_Utils.calculateQuadraticMultiplier(rpmLoad, 0.5, false)
                 hotTransFactor = hotTransFactor * C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER * motorLoadInf
                 hotTransFactor = math.min(hotTransFactor, C.OVERHEAT_TRANSMISSION_MAX_MULTIPLIER or hotTransFactor)
                 wearRate = wearRate + hotTransFactor
@@ -7903,7 +7949,10 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     convectionCooling = C.CONVECTION_FACTOR * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
 
     if isMotorStarted then
-        if (self:getAccelerationAxis() > 0 or self:getCruiseControlAxis() > 0) then
+        local accelerationAxis = self.getAccelerationAxis ~= nil and (tonumber(self:getAccelerationAxis()) or 0) or 0
+        local cruiseControlAxis = self.getCruiseControlAxis ~= nil and (tonumber(self:getCruiseControlAxis()) or 0) or 0
+
+        if accelerationAxis > 0 or cruiseControlAxis > 0 then
             accFactor = math.max(5 * motorRpm * math.clamp(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0, 1.0), 1.0)
 
             if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then

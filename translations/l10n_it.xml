@@ -331,6 +331,8 @@
         <text name="ads_breakdown_at_progress_message" text="in corso"/>
 
         <text name="ads_spec_cold_engine_message" text="Motore freddo! I giri elevati causano usura!"/>
+        <text name="ads_spec_overheat_engine_message" text="Attenzione! Surriscaldamento del motore."/>
+        <text name="ads_spec_overheat_transmission_message" text="Attenzione! Surriscaldamento della trasmissione."/>
         <text name="ads_spec_this_month" text="Questo mese"/>
         <text name="ads_spec_months_ago" text="mesi fa"/>
         <text name="ads_spec_never" text="Mai"/>
