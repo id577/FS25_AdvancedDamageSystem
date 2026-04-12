@@ -574,6 +574,80 @@ local function markServiceProgressDirty(vehicle, spec)
     return false
 end
 
+function AdvancedDamageSystem.raiseServiceLifecycleDirtyFlags(vehicle)
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+        return false
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local raised = false
+
+    if markStateDirty(vehicle, spec) then
+        raised = true
+    end
+    if markServiceContextDirty(vehicle, spec) then
+        raised = true
+    end
+    if markWearDirty(vehicle, spec) then
+        raised = true
+    end
+    if markBreakdownsDirty(vehicle, spec) then
+        raised = true
+    end
+    if markServiceProgressDirty(vehicle, spec) then
+        raised = true
+    end
+
+    return raised
+end
+
+function AdvancedDamageSystem.forceFinishService(vehicle)
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil or not vehicle.isServer then
+        return false
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec.currentState == AdvancedDamageSystem.STATUS.READY then
+        return false
+    end
+
+    local remainingMs = math.max(spec.maintenanceTimer or 0, 0)
+    local missionInfo = g_currentMission and g_currentMission.missionInfo or nil
+    local timeScale = (missionInfo and missionInfo.timeScale) or 1
+    if timeScale <= 0 then
+        timeScale = 1
+    end
+
+    local forceDt = math.max(math.ceil(remainingMs / timeScale) + 1, 1)
+
+    local previousWorkshopOpen = nil
+    if ADS_Main ~= nil then
+        previousWorkshopOpen = ADS_Main.isWorkshopOpen
+        ADS_Main.isWorkshopOpen = true
+    end
+
+    local ok, err = pcall(function()
+        vehicle:processService(forceDt)
+    end)
+
+    if ADS_Main ~= nil and previousWorkshopOpen ~= nil then
+        ADS_Main.isWorkshopOpen = previousWorkshopOpen
+    end
+
+    if not ok then
+        log_dbg(string.format("Failed to force-finish service for '%s': %s", vehicle:getFullName(), tostring(err)))
+        return false
+    end
+
+    if spec.currentState ~= AdvancedDamageSystem.STATUS.READY then
+        spec.pendingProgressElapsedTime = spec.pendingProgressTotalTime or 0
+        spec.maintenanceTimer = 0
+        vehicle:completeService()
+    end
+
+    return true
+end
+
 -- ==========================================================
 --                          REGISTRATION
 -- ==========================================================
@@ -7390,6 +7464,33 @@ local function solveExternalPowerConnection(consumerCtx, donorCtx, dtS)
     }
 
     return consumerCtx, donorCtx, finalCompositeCtx
+end
+
+function AdvancedDamageSystem.rescaleBatteryChargeFromSoc(vehicle)
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+        return
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local tempC = tonumber(spec.batteryTempC) or 25
+    local capF = 1.0
+
+    if tempC < 25 then
+        capF = math.clamp(1.0 - (25 - tempC) * 0.004, 0.55, 1.0)
+    end
+
+    local nominalCapacityAh = math.max(tonumber(spec.batteryCapacityAh) or 0, 1)
+    local batteryHealth = math.max(tonumber(spec.batteryHealth) or 0, 0.0001)
+
+    local usableCapacityAh = math.max(
+        nominalCapacityAh * capF * ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR,
+        0.01
+    )
+
+    local effectiveCapacityAh = math.max(usableCapacityAh * batteryHealth, 0.01)
+    local soc = math.clamp(tonumber(spec.batterySoc) or 1.0, 0, 1)
+
+    spec.batteryChargeAh = math.clamp(soc * effectiveCapacityAh, 0, effectiveCapacityAh)
 end
 
 function AdvancedDamageSystem:updateBatteryChargingModel(dt)

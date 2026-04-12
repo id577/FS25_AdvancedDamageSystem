@@ -94,6 +94,12 @@ end
 
 -- Apply received values to ADS_Config.
 local function applyConfig(event)
+    local oldBatteryCapacityFactor = ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR
+    local oldConfig = {
+        parkVehicle = ADS_Config.MAINTENANCE.PARK_VEHICLE,
+        instantInspection = ADS_Config.MAINTENANCE.INSTANT_INSPECTION
+    }
+
     ADS_Config.CORE.BASE_SERVICE_WEAR                      = event.baseServiceWear
     ADS_Config.CORE.BASE_SYSTEMS_WEAR                      = event.baseSystemsWear
     ADS_Config.CORE.DOWNTIME_MULTIPLIER                    = event.downtimeMultiplier
@@ -114,6 +120,27 @@ local function applyConfig(event)
     ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR    = event.batteryUsableCapacityFactor
     ADS_Config.FIELD_CARE.CLOGGING_SPEED                    = event.cloggingSpeed
     ADS_Config.DEBUG                                        = event.debugMode
+
+    local newConfig = {
+        parkVehicle = event.parkVehicle,
+        instantInspection = event.instantInspection
+    }
+
+    ADS_InGameSettings.applyPendingConfigSideEffects(oldConfig, newConfig)
+
+    if math.abs((oldBatteryCapacityFactor or 0) - (event.batteryUsableCapacityFactor or 0)) > 0.0001
+        and ADS_Main ~= nil and ADS_Main.vehicles ~= nil then
+        for _, vehicle in pairs(ADS_Main.vehicles) do
+            if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
+                AdvancedDamageSystem.rescaleBatteryChargeFromSoc(vehicle)
+
+                local spec = vehicle.spec_AdvancedDamageSystem
+                if vehicle.isServer and spec.adsDirtyFlag_electrical ~= nil then
+                    vehicle:raiseDirtyFlags(spec.adsDirtyFlag_electrical)
+                end
+            end
+        end
+    end
 
     ADS_Main:forceWorkshopUpdate()
 end

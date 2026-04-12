@@ -16,7 +16,116 @@ local function formatAh(val)
     return text .. " Ah"
 end
 
+local function valuesDiffer(a, b)
+    if type(a) == "number" or type(b) == "number" then
+        return math.abs((tonumber(a) or 0) - (tonumber(b) or 0)) > 0.0001
+    end
+
+    return a ~= b
+end
+
+local function buildPendingConfigFromAdsConfig()
+    return {
+        baseServiceWear = ADS_Config.CORE.BASE_SERVICE_WEAR,
+        baseSystemsWear = ADS_Config.CORE.BASE_SYSTEMS_WEAR,
+        downtimeMultiplier = ADS_Config.CORE.DOWNTIME_MULTIPLIER,
+        generalWearEnabled = ADS_Config.CORE.GENERAL_WEAR_ENABLED,
+        systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER,
+        aiOverloadControl = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL,
+
+        instantInspection = ADS_Config.MAINTENANCE.INSTANT_INSPECTION,
+        parkVehicle = ADS_Config.MAINTENANCE.PARK_VEHICLE,
+        warrantyEnabled = ADS_Config.MAINTENANCE.WARRANTY_ENABLED,
+        globalPriceMultiplier = ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER,
+        globalTimeMultiplier = ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER,
+
+        alwaysAvailable = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE,
+        mobileWorkshopRestrictionsEnabled = ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED,
+        openHour = ADS_Config.WORKSHOP.OPEN_HOUR,
+        closeHour = ADS_Config.WORKSHOP.CLOSE_HOUR,
+
+        engineMaxHeat = ADS_Config.THERMAL.ENGINE_MAX_HEAT,
+        transMaxHeat = ADS_Config.THERMAL.TRANS_MAX_HEAT,
+
+        batteryUsableCapacityFactor = ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR,
+
+        cloggingSpeed = ADS_Config.FIELD_CARE.CLOGGING_SPEED,
+
+        debugMode = ADS_Config.DEBUG
+    }
+end
+
+local function getPendingConfig()
+    if ADS_InGameSettings.pendingConfig == nil then
+        ADS_InGameSettings.pendingConfig = buildPendingConfigFromAdsConfig()
+    end
+
+    return ADS_InGameSettings.pendingConfig
+end
+
+local function getCurrentSettingsPage()
+    return g_gui ~= nil
+        and g_gui.currentGui ~= nil
+        and g_gui.currentGui.target ~= nil
+        and g_gui.currentGui.target.currentPage
+        or nil
+end
+
+local function refreshCurrentSettingsPage()
+    local currentPage = getCurrentSettingsPage()
+    if currentPage ~= nil then
+        ADS_InGameSettings:updateADSSettings(currentPage)
+    end
+end
+
+function ADS_InGameSettings.applyPendingConfigSideEffects(oldConfig, newConfig)
+    if g_currentMission == nil or not g_currentMission:getIsServer() then
+        return
+    end
+
+    if oldConfig == nil or newConfig == nil or ADS_Main == nil or ADS_Main.vehicles == nil then
+        return
+    end
+
+    local parkVehicleChanged = valuesDiffer(oldConfig.parkVehicle, newConfig.parkVehicle)
+    local instantInspectionEnabled = (oldConfig.instantInspection ~= true and newConfig.instantInspection == true)
+
+    if not parkVehicleChanged and not instantInspectionEnabled then
+        return
+    end
+
+    local states = AdvancedDamageSystem.STATUS
+
+    for _, vehicle in pairs(ADS_Main.vehicles) do
+        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
+            local spec = vehicle.spec_AdvancedDamageSystem
+            local currentState = spec.currentState
+
+            if parkVehicleChanged
+                and currentState ~= states.READY
+                and currentState ~= states.BROKEN
+                and vehicle.spec_enterable ~= nil
+                and vehicle.spec_enterable.setIsTabbable ~= nil then
+                vehicle.spec_enterable:setIsTabbable(not newConfig.parkVehicle)
+            end
+
+            if instantInspectionEnabled and currentState == states.INSPECTION then
+                if AdvancedDamageSystem.forceFinishService(vehicle) then
+                    AdvancedDamageSystem.raiseServiceLifecycleDirtyFlags(vehicle)
+                end
+            end
+        end
+    end
+end
+
 function ADS_InGameSettings:onFrameOpen()
+    ADS_InGameSettings.pendingConfig = buildPendingConfigFromAdsConfig()
+    ADS_InGameSettings.ads_hasPendingSettingsChange = false
+
+    if self.ads_initSettingsMenuDone then
+        ADS_InGameSettings:updateADSSettings(self)
+        return
+    end
     if self.ads_initSettingsMenuDone then
         return
     end
@@ -191,6 +300,97 @@ function ADS_InGameSettings:onFrameOpen()
     ADS_InGameSettings:updateADSSettings(self)
 end
 
+function ADS_InGameSettings:onFrameClose()
+    if not ADS_InGameSettings.ads_hasPendingSettingsChange then
+        ADS_InGameSettings.pendingConfig = nil
+        return
+    end
+
+    local pending = ADS_InGameSettings.pendingConfig
+    local current = buildPendingConfigFromAdsConfig()
+
+    ADS_InGameSettings.pendingConfig = nil
+    ADS_InGameSettings.ads_hasPendingSettingsChange = false
+
+    if pending == nil then
+        return
+    end
+
+    local anyChanged = false
+    for key, oldValue in pairs(current) do
+        if valuesDiffer(pending[key], oldValue) then
+            anyChanged = true
+            break
+        end
+    end
+
+    if not anyChanged then
+        return
+    end
+
+    ADS_InGameSettings.applyPendingConfigSideEffects(current, pending)
+
+    local batteryFactorChanged = valuesDiffer(pending.batteryUsableCapacityFactor, current.batteryUsableCapacityFactor)
+    local workshopChanged =
+        valuesDiffer(pending.alwaysAvailable, current.alwaysAvailable) or
+        valuesDiffer(pending.mobileWorkshopRestrictionsEnabled, current.mobileWorkshopRestrictionsEnabled) or
+        valuesDiffer(pending.openHour, current.openHour) or
+        valuesDiffer(pending.closeHour, current.closeHour)
+
+    ADS_Config.CORE.BASE_SERVICE_WEAR = pending.baseServiceWear
+    ADS_Config.CORE.BASE_SYSTEMS_WEAR = pending.baseSystemsWear
+    ADS_Config.CORE.DOWNTIME_MULTIPLIER = pending.downtimeMultiplier
+    ADS_Config.CORE.GENERAL_WEAR_ENABLED = pending.generalWearEnabled
+    ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = pending.systemStressGlobalMultiplier
+    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = pending.aiOverloadControl
+
+    ADS_Config.MAINTENANCE.INSTANT_INSPECTION = pending.instantInspection
+    ADS_Config.MAINTENANCE.PARK_VEHICLE = pending.parkVehicle
+    ADS_Config.MAINTENANCE.WARRANTY_ENABLED = pending.warrantyEnabled
+    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER = pending.globalPriceMultiplier
+    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER = pending.globalTimeMultiplier
+
+    ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = pending.alwaysAvailable
+    ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = pending.mobileWorkshopRestrictionsEnabled
+    ADS_Config.WORKSHOP.OPEN_HOUR = pending.openHour
+    ADS_Config.WORKSHOP.CLOSE_HOUR = pending.closeHour
+
+    ADS_Config.THERMAL.ENGINE_MAX_HEAT = pending.engineMaxHeat
+    ADS_Config.THERMAL.TRANS_MAX_HEAT = pending.transMaxHeat
+
+    ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR = pending.batteryUsableCapacityFactor
+
+    ADS_Config.FIELD_CARE.CLOGGING_SPEED = pending.cloggingSpeed
+
+    ADS_Config.DEBUG = pending.debugMode
+
+    if batteryFactorChanged and ADS_Main ~= nil and ADS_Main.vehicles ~= nil then
+        for _, vehicle in pairs(ADS_Main.vehicles) do
+            if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
+                AdvancedDamageSystem.rescaleBatteryChargeFromSoc(vehicle)
+
+                local spec = vehicle.spec_AdvancedDamageSystem
+                if vehicle.isServer and spec.adsDirtyFlag_electrical ~= nil then
+                    vehicle:raiseDirtyFlags(spec.adsDirtyFlag_electrical)
+                end
+            end
+        end
+    end
+
+    if workshopChanged and ADS_Main ~= nil and ADS_Main.forceWorkshopUpdate ~= nil then
+        ADS_Main:forceWorkshopUpdate()
+    end
+
+    if g_currentMission ~= nil then
+        if g_currentMission:getIsServer() and g_server ~= nil then
+            g_server:broadcastEvent(ADS_SettingsSyncEvent.new())
+        elseif g_client ~= nil then
+            ADS_SettingsSyncEvent.send()
+        end
+    end
+end
+
+
 function ADS_InGameSettings:updateGameSettings()
     ADS_InGameSettings:updateADSSettings(self)
 end
@@ -199,6 +399,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     if not currentPage.ads_initSettingsMenuDone then return end
 
     local steps = ADS_InGameSettings.steps
+    local pending = ADS_InGameSettings.pendingConfig or buildPendingConfigFromAdsConfig()
 
     local function setIndex(element, valueList, targetValue)
         local bestIndex = 1
@@ -215,29 +416,29 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
         element:setState(bestIndex)
     end
 
-    setIndex(currentPage.ads_systemStressRate, steps.systemStressRate.values, ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER)
-    setIndex(currentPage.ads_batteryCapacity,  steps.batteryCapacity.values,  ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR)
-    setIndex(currentPage.ads_serviceWear,      steps.serviceWear.values,      ADS_Config.CORE.BASE_SERVICE_WEAR)
-    setIndex(currentPage.ads_conditionWear,    steps.conditionWear.values,    ADS_Config.CORE.BASE_SYSTEMS_WEAR)
-    setIndex(currentPage.ads_downtimeWear,     steps.downtimeWear.values,     ADS_Config.CORE.DOWNTIME_MULTIPLIER)
-    setIndex(currentPage.ads_maintenancePrice,    steps.maintPrice.values,    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER * 100)
-    setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER * 100)
-    setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, ADS_Config.THERMAL.ENGINE_MAX_HEAT)
-    setIndex(currentPage.ads_cloggingSpeed,    steps.cloggingSpeed.values,  ADS_Config.FIELD_CARE.CLOGGING_SPEED)
+    setIndex(currentPage.ads_systemStressRate, steps.systemStressRate.values, pending.systemStressGlobalMultiplier)
+    setIndex(currentPage.ads_batteryCapacity, steps.batteryCapacity.values, pending.batteryUsableCapacityFactor)
+    setIndex(currentPage.ads_serviceWear, steps.serviceWear.values, pending.baseServiceWear)
+    setIndex(currentPage.ads_conditionWear, steps.conditionWear.values, pending.baseSystemsWear)
+    setIndex(currentPage.ads_downtimeWear, steps.downtimeWear.values, pending.downtimeMultiplier)
+    setIndex(currentPage.ads_maintenancePrice, steps.maintPrice.values, pending.globalPriceMultiplier * 100)
+    setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, pending.globalTimeMultiplier * 100)
+    setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, pending.engineMaxHeat)
+    setIndex(currentPage.ads_cloggingSpeed, steps.cloggingSpeed.values, pending.cloggingSpeed)
     
-    currentPage.ads_instantInspection:setIsChecked(ADS_Config.MAINTENANCE.INSTANT_INSPECTION, false, false)
-    currentPage.ads_parkVehicle:setIsChecked(ADS_Config.MAINTENANCE.PARK_VEHICLE, false, false)
-    currentPage.ads_warrantyEnabled:setIsChecked(ADS_Config.MAINTENANCE.WARRANTY_ENABLED, false, false)
-    currentPage.ads_generalWearEnabled:setIsChecked(ADS_Config.CORE.GENERAL_WEAR_ENABLED, false, false)
-    currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL, false, false)
-    currentPage.ads_workshopAvailable:setIsChecked(ADS_Config.WORKSHOP.ALWAYS_AVAILABLE, false, false)
-    currentPage.ads_mobileWorkshopRestrictions:setIsChecked(ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED, false, false)
-    currentPage.ads_debugMode:setIsChecked(ADS_Config.DEBUG, false, false)
+    currentPage.ads_instantInspection:setIsChecked(pending.instantInspection, false, false)
+    currentPage.ads_parkVehicle:setIsChecked(pending.parkVehicle, false, false)
+    currentPage.ads_warrantyEnabled:setIsChecked(pending.warrantyEnabled, false, false)
+    currentPage.ads_generalWearEnabled:setIsChecked(pending.generalWearEnabled, false, false)
+    currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(pending.aiOverloadControl, false, false)
+    currentPage.ads_workshopAvailable:setIsChecked(pending.alwaysAvailable, false, false)
+    currentPage.ads_mobileWorkshopRestrictions:setIsChecked(pending.mobileWorkshopRestrictionsEnabled, false, false)
+    currentPage.ads_debugMode:setIsChecked(pending.debugMode, false, false)
     
-    setIndex(currentPage.ads_workshopOpenHour, steps.hours.values, ADS_Config.WORKSHOP.OPEN_HOUR)
-    setIndex(currentPage.ads_workshopCloseHour, steps.hours.values, ADS_Config.WORKSHOP.CLOSE_HOUR)
+    setIndex(currentPage.ads_workshopOpenHour, steps.hours.values, pending.openHour)
+    setIndex(currentPage.ads_workshopCloseHour, steps.hours.values, pending.closeHour)
 
-    local isAlwaysAvailable = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE
+    local isAlwaysAvailable = pending.alwaysAvailable
     currentPage.ads_workshopOpenHour:setDisabled(isAlwaysAvailable)
     currentPage.ads_workshopCloseHour:setDisabled(isAlwaysAvailable)
 
@@ -275,64 +476,75 @@ end
 
 -- --- Callback Handlers --- --
 function ADS_InGameSettings:onServiceWearChanged(state)
-    ADS_Config.CORE.BASE_SERVICE_WEAR = ADS_InGameSettings.steps.serviceWear.values[state]
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().baseServiceWear = ADS_InGameSettings.steps.serviceWear.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onConditionWearChanged(state)
-    ADS_Config.CORE.BASE_SYSTEMS_WEAR = ADS_InGameSettings.steps.conditionWear.values[state]
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().baseSystemsWear = ADS_InGameSettings.steps.conditionWear.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onDowntimeWearChanged(state)
-    ADS_Config.CORE.DOWNTIME_MULTIPLIER = ADS_InGameSettings.steps.downtimeWear.values[state]
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().downtimeMultiplier = ADS_InGameSettings.steps.downtimeWear.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onGeneralWearEnabledChanged(state)
-    ADS_Config.CORE.GENERAL_WEAR_ENABLED = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().generalWearEnabled = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onInstantInspectionChanged(state)
-    ADS_Config.MAINTENANCE.INSTANT_INSPECTION = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().instantInspection = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onParkVehicleChanged(state)
-    ADS_Config.MAINTENANCE.PARK_VEHICLE = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().parkVehicle = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onWarrantyEnabledChanged(state)
-    ADS_Config.MAINTENANCE.WARRANTY_ENABLED = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().warrantyEnabled = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onMaintenancePriceChanged(state)
-    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER = ADS_InGameSettings.steps.maintPrice.values[state] / 100
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().globalPriceMultiplier = ADS_InGameSettings.steps.maintPrice.values[state] / 100
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onMaintenanceDurationChanged(state)
-    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER = ADS_InGameSettings.steps.maintDuration.values[state] / 100
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().globalTimeMultiplier = ADS_InGameSettings.steps.maintDuration.values[state] / 100
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onWorkshopAvailableChanged(state)
-    ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
-    ADS_Main:forceWorkshopUpdate()
+    getPendingConfig().alwaysAvailable = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onMobileWorkshopRestrictionsChanged(state)
-    ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().mobileWorkshopRestrictionsEnabled = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onWorkshopOpenHourChanged(state)
+    local pending = getPendingConfig()
     local newOpen = ADS_InGameSettings.steps.hours.values[state]
-    local currentClose = ADS_Config.WORKSHOP.CLOSE_HOUR
+    local currentClose = pending.closeHour
 
     -- Logic for avoiding overlap
     if newOpen >= currentClose then
@@ -341,17 +553,18 @@ function ADS_InGameSettings:onWorkshopOpenHourChanged(state)
             currentClose = 23
             newOpen = 22
         end
-        ADS_Config.WORKSHOP.CLOSE_HOUR = currentClose
+        pending.closeHour = currentClose
     end
 
-    ADS_Config.WORKSHOP.OPEN_HOUR = newOpen
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
-    ADS_Main:forceWorkshopUpdate()
+    pending.openHour = newOpen
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onWorkshopCloseHourChanged(state)
+    local pending = getPendingConfig()
     local newClose = ADS_InGameSettings.steps.hours.values[state]
-    local currentOpen = ADS_Config.WORKSHOP.OPEN_HOUR
+    local currentOpen = pending.openHour
 
     -- Logic for avoiding overlap
     if currentOpen >= newClose then
@@ -360,45 +573,53 @@ function ADS_InGameSettings:onWorkshopCloseHourChanged(state)
             currentOpen = 0
             newClose = 1
         end
-        ADS_Config.WORKSHOP.OPEN_HOUR = currentOpen
+        pending.openHour = currentOpen
     end
 
-    ADS_Config.WORKSHOP.CLOSE_HOUR = newClose
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
-    ADS_Main:forceWorkshopUpdate()
+    pending.closeHour = newClose
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 
 function ADS_InGameSettings:onSystemStressRateChanged(state)
-    ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = ADS_InGameSettings.steps.systemStressRate.values[state]
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().systemStressGlobalMultiplier = ADS_InGameSettings.steps.systemStressRate.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onBatteryCapacityChanged(state)
-    ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR = ADS_InGameSettings.steps.batteryCapacity.values[state]
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().batteryUsableCapacityFactor = ADS_InGameSettings.steps.batteryCapacity.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
+
 
 function ADS_InGameSettings:onThermalSensitivityChanged(state)
     local val = ADS_InGameSettings.steps.thermalSensitivity.values[state]
-    ADS_Config.THERMAL.ENGINE_MAX_HEAT = val
-    ADS_Config.THERMAL.TRANS_MAX_HEAT  = val
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    local pending = getPendingConfig()
+    pending.engineMaxHeat = val
+    pending.transMaxHeat = val
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onCloggingSpeedChanged(state)
-    ADS_Config.FIELD_CARE.CLOGGING_SPEED = ADS_InGameSettings.steps.cloggingSpeed.values[state]
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().cloggingSpeed = ADS_InGameSettings.steps.cloggingSpeed.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onAiOverloadAndOverheatControlChanged(state)
-    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage)
+    getPendingConfig().aiOverloadControl = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 function ADS_InGameSettings:onDebugModeChanged(state)
-    ADS_Config.DEBUG = (state == BinaryOptionElement.STATE_RIGHT)
-    ADS_InGameSettings:updateADSSettings(g_gui.currentGui.target.currentPage) 
+    getPendingConfig().debugMode = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
 end
 
 
@@ -629,6 +850,8 @@ end
 function ADS_InGameSettings.init()
     InGameMenuSettingsFrame.updateGameSettings = Utils.appendedFunction(InGameMenuSettingsFrame.updateGameSettings, ADS_InGameSettings.updateGameSettings)
     InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuSettingsFrame.onFrameOpen, ADS_InGameSettings.onFrameOpen)
+    InGameMenuSettingsFrame.onFrameClose = Utils.appendedFunction(InGameMenuSettingsFrame.onFrameClose, ADS_InGameSettings.onFrameClose)
 end
+
 
 ADS_InGameSettings.init()

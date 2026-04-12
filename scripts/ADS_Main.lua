@@ -55,13 +55,6 @@ do
         if orig ~= nil then
             ADS_InGameSettings[name] = function(self, ...)
                 orig(self, ...)
-                if g_currentMission ~= nil then
-                    if g_currentMission:getIsServer() and g_server ~= nil then
-                        g_server:broadcastEvent(ADS_SettingsSyncEvent.new())
-                    elseif g_client ~= nil then
-                        ADS_SettingsSyncEvent.send()
-                    end
-                end
             end
         end
     end
