@@ -89,7 +89,7 @@ function ADS_Hud:new()
 
     self.activeVehicleDebugPanel = {
         x = 0.20,
-        y = 0.05,
+        y = 0.0269,
         width = 0.60,
         padding = 0.01,
         lineHeight = 0.012,
@@ -1066,8 +1066,9 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
     end
     addLine(overviewLines, string.format(
-        "op.hours: %d s | condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
+        "op.sec: %ds | start.op.h: %.1fh | condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
         currentOperatingSeconds,
+        factorStatsOperatingHours,
         asPercent(spec.conditionLevel or 0),
         asPercent(spec.serviceLevel or 0),
         asPercent(serviceWearRate),
@@ -1090,11 +1091,6 @@ function ADS_Hud:drawActiveVehicleHUD()
         tostring(cloggingHasDust),
         tostring(cloggingHasDebris),
         cloggingWetnessFactor
-    ), {1, 1, 1, 1}, 0.95)
-
-    addLine(overviewLines, string.format(
-        "stats start hours: %.1f h",
-        factorStatsOperatingHours
     ), {1, 1, 1, 1}, 0.95)
 
     local engineMaxFactor = math.max(
@@ -1180,6 +1176,32 @@ function ADS_Hud:drawActiveVehicleHUD()
         return string.format("%s: %.2f | %.2f | %.2f%s", shortName, currentPct, sumPct, stressPct, extraText)
     end
 
+    local function getAverageTireGroundFrictionCoeff()
+        local specWheels = vehicle.spec_wheels
+        if specWheels == nil or specWheels.wheels == nil then
+            return 0
+        end
+
+        local sum = 0
+        local count = 0
+        for _, wheel in ipairs(specWheels.wheels) do
+            local physics = wheel ~= nil and wheel.physics or nil
+            local coeff = physics ~= nil and tonumber(physics.tireGroundFrictionCoeff) or nil
+            if coeff ~= nil and coeff > 0 then
+                sum = sum + coeff
+                count = count + 1
+            end
+        end
+
+        if count == 0 then
+            return 0
+        end
+
+        return sum / count
+    end
+
+    local avgTireGroundFrictionCoeff = getAverageTireGroundFrictionCoeff()
+
     local function buildSystemLines(systemKey, dbg, maxFactor, factorEntries)
         local lines = {}
         local systemStressMultiplier = tonumber(ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey]) or 1
@@ -1201,10 +1223,6 @@ function ADS_Hud:drawActiveVehicleHUD()
             asPercent(dbg.breakdownProbability or 0),
             asPercent(dbg.critBreakdownProbability or 0)
         ), {1, 0.82, 0.82, 1}, 0.80)
-
-        if #factorEntries > 0 then
-            addLine(lines, "", {1, 1, 1, 1}, 0.80)
-        end
 
         for _, entry in ipairs(factorEntries) do
             addLine(
@@ -1233,7 +1251,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("t: %.1fs", transmissionDbg.pullOverloadTimer or 0) },
         { shortName = "htf", statKey = "htf", value = transmissionDbg.heavyTrailerFactor or 0, extraInfo = string.format("mr: %.2f", transmissionDbg.heavyTrailerMassRatio or 0) },
         { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
-        { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("wsi: %.2f", asPercent(transmissionDbg.wheelSlipIntensity or 0)) },
+        { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("s: %.1f c: %.2f", asPercent(transmissionDbg.wheelSlipIntensity or 0), avgTireGroundFrictionCoeff) },
         { shortName = "ctf", statKey = "ctf", value = (transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0 },
         { shortName = "hotf", statKey = "hotf", value = transmissionDbg.hotTransFactor or 0 }
     })
@@ -1337,7 +1355,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local transmissionTempLines = {}
     if showTransmissionSection then
         addLine(transmissionTempLines, string.format(
-            "T: %.1fC (raw: %.1fC) | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a/p/ws: %.2f/%.2f/%.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f) | cvt: a/l=%d/%d eh=%.3f",
+            "T: %.1fC (raw: %.1fC) | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a/ws: %.2f/%.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f) | cvt: a/l=%d/%d eh=%.3f",
             spec.transmissionTemperature,
             spec.rawTransmissionTemperature or spec.transmissionTemperature or -99,
             spec.transmissionThermostatState,
@@ -1348,7 +1366,6 @@ function ADS_Hud:drawActiveVehicleHUD()
             spec.debugData.transmissionTemp.loadFactor or 0,
             spec.debugData.transmissionTemp.slipFactor or 0,
             spec.debugData.transmissionTemp.accFactor or 0,
-            spec.debugData.transmissionTemp.pullFactor or 0,
             spec.debugData.transmissionTemp.wheelSlipFactor or 0,
             spec.debugData.transmissionTemp.totalCooling or 0,
             spec.debugData.transmissionTemp.radiatorCooling or 0,
@@ -1360,33 +1377,34 @@ function ADS_Hud:drawActiveVehicleHUD()
         ), getTempColor(spec.transmissionTemperature), 0.95)
     end
 
-    local motorPower = motor:getMotorRotSpeed() * (motor:getMotorAvailableTorque() - motor:getMotorExternalTorque()) * 1000
+    local availableTorque = motor:getMotorAvailableTorque() or 0
+    local appliedTorque = motor:getMotorAppliedTorque() or 0
+    local engineTorqueLoad = availableTorque > 0 and (appliedTorque / math.max(availableTorque, 0.0001)) or 0
+    spec._smoothedEngineTorqueLoad = spec._smoothedEngineTorqueLoad or engineTorqueLoad
+    spec._smoothedEngineTorqueLoad = spec._smoothedEngineTorqueLoad + (engineTorqueLoad - spec._smoothedEngineTorqueLoad) * 0.12
+    local motorPower = motor:getMotorRotSpeed() * (availableTorque - motor:getMotorExternalTorque()) * 1000
     local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
     local lastRpm = motor:getLastModulatedMotorRpm()
     local maxRpm = math.max(motor.maxRpm or 1, 1)
     local rpmLoad = lastRpm / maxRpm
+    local motorLoad = vehicle:getMotorLoadPercentage() or 0
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
     local spec_CVTaddon = vehicle.spec_CVTaddon
     local draftStats = collectActiveDraftStats(vehicle)
-    local draftMultiplier = draftStats.maxForce > 0 and (draftStats.effectiveForceCap / draftStats.maxForce) or 0
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
-        "hp: %d/%d | ml/rpm: %.3f/%.3f | g: %d>%d(%d,%.2f) | fuel: %.2fl/h | d/dr: %.3f/%.3f | maxForce: %.2f, multiplier: %.2f, effectiveForceCap: %.2f" ,
+        "hp: %d/%d | ml/etl/rpm: %.3f/%.3f/%.3f | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f",
         motorPower / 735.5,
         peakPowerHp,
-        vehicle:getMotorLoadPercentage(),
+        motorLoad,
+        spec._smoothedEngineTorqueLoad,
         rpmLoad,
         motor.gear or 0,
         targetGear,
         motor.activeGearGroupIndex or 0,
         motor:getGearRatio() or 0,
-        vehicle.spec_motorized.lastFuelUsage or 0,
-        vehicle:getDamageAmount(),
-        vehicle:getDirtAmount(),
         draftStats.maxForce,
-        draftMultiplier,
         draftStats.effectiveForceCap
-
     ), {1, 1, 1, 1}, 0.95)
 
     if hasActiveCVTAddon then
@@ -1414,14 +1432,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     local chargeAh = batteryDbg.chargeAh or spec.batteryChargeAh or 0
 
     addLine(batteryLines, string.format(
-        "Voltage: sys %.2fV | term: %.2fV | ocv: %.1fV",
+        "Voltage: sys %.2fV | term: %.2fV | ocv: %.1fV - Battery: %.1fA | %.2f Ah (%.1f%%) | Temp %.1fC -> %.1fC | acc %.3f | rint %.5f",
         systemV,
         termV,
-        ocvV
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "Battery: %.1fA | %.2f Ah (%.1f%%) | Temp %.1fC -> %.1fC | acc %.3f | rint %.5f",
+        ocvV,
         iNet,
         chargeAh,
         asPercent(soc),
@@ -1432,14 +1446,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {0.9, 1.0, 0.9, 1}, 0.95)
 
     addLine(batteryLines, string.format(
-        "Alternator: %.1fA (raw: %.1fA | k %.2f)",
+        "Alternator: %.1fA (raw: %.1fA | k %.2f) - Loads: %.1fA (base: %.1fA | lights: %.1fA | cabFan: %.1fA | winHeat: %.1fA | pulse: %.1fA | crank: %.1fA)",
         iAlt,
         batteryDbg.iAltRaw or iAlt,
-        batteryDbg.altFactor or 0
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "Loads: %.1fA (base: %.1fA | lights: %.1fA | cabFan: %.1fA | winHeat: %.1fA | pulse: %.1fA | crank: %.1fA)",
+        batteryDbg.altFactor or 0,
         iLoads,
         batteryDbg.baseLoadA or 0,
         batteryDbg.lightsLoadA or 0,
@@ -1649,8 +1659,9 @@ function ADS_Hud:drawActiveVehicleHUD()
     for _, section in ipairs(allLinearSections) do
         totalSectionHeight = totalSectionHeight + (math.max(#section.lines, 1) * activeLineHeight)
     end
-    totalSectionHeight = totalSectionHeight + (math.max(#allLinearSections - 1, 0) * sectionGap)
-    totalSectionHeight = totalSectionHeight + sectionGap + totalSystemHeight
+    if #systemSections > 0 then
+        totalSectionHeight = totalSectionHeight + sectionGap + totalSystemHeight + sectionGap
+    end
 
     local dynamicHeight = (panel.padding * 2) + activeHeaderSize + totalSectionHeight + 0.02
     if panel.background ~= nil then
@@ -1707,9 +1718,9 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     drawSection(overviewSection)
-    currentY = currentY - sectionGap
 
     if #systemSections > 0 then
+        currentY = currentY - sectionGap
         local gridStartX = textStartX
         local gridAvailableWidth = panel.width - panel.padding * 2
         local cardWidth = (gridAvailableWidth - (systemColumns - 1) * systemGapX) / systemColumns
@@ -1745,10 +1756,10 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
 
         currentY = currentY - totalSystemHeight
+        currentY = currentY - sectionGap
     end
 
-    for index, section in ipairs(sections) do
-        currentY = currentY - sectionGap
+    for _, section in ipairs(sections) do
         drawSection(section)
     end
 

@@ -2775,6 +2775,7 @@ local function syncOverloadWarning(vehicle, dt)
             vehicle:changeBreakdownStage(breakdownId, shouldStage)
         end
     elseif currentBreakdown ~= nil then
+        
         vehicle:removeBreakdown(breakdownId)
     end
 end
@@ -2866,6 +2867,51 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:setOperatingTime(currentOperatingTime + (dt or 0), false)
         spec._allowAdsOperatingTimeWrite = false
     end
+
+    -- TEMP DEBUG: torque ratio filter investigation
+    if self.getIsControlled ~= nil and self:getIsControlled() then
+        local motor = self.getMotor ~= nil and self:getMotor() or nil
+        local appliedTorque = motor ~= nil and motor.getMotorAppliedTorque ~= nil and (tonumber(motor:getMotorAppliedTorque()) or 0) or 0
+        local availableTorque = motor ~= nil and motor.getMotorAvailableTorque ~= nil and (tonumber(motor:getMotorAvailableTorque()) or 0) or 0
+        local engineTorqueLoad = availableTorque > 0 and (appliedTorque / math.max(availableTorque, 0.0001)) or 0
+        local torqueRatioClamped = math.clamp(engineTorqueLoad, 0, 1.2)
+        spec._tempTorqueFilterWindowMs = (spec._tempTorqueFilterWindowMs or 0) + (dt or 0)
+        spec._tempTorqueFilterSamples = (spec._tempTorqueFilterSamples or 0) + 1
+        spec._tempTorqueFilterSum = (spec._tempTorqueFilterSum or 0) + torqueRatioClamped
+        spec._tempTorqueFilterPowSum = (spec._tempTorqueFilterPowSum or 0) + math.pow(torqueRatioClamped, 8)
+
+        if spec._tempTorqueFilterWindowMs >= 1000 then
+            local motorLoad = self.getMotorLoadPercentage ~= nil and (tonumber(self:getMotorLoadPercentage()) or 0) or 0
+            local samples = math.max(spec._tempTorqueFilterSamples, 1)
+            local averageTorqueRatio = spec._tempTorqueFilterSum / samples
+            local highWeightedTorqueRatio = math.pow(spec._tempTorqueFilterPowSum / samples, 0.083)
+
+            spec._tempTorqueFilterSmoothed = spec._tempTorqueFilterSmoothed or highWeightedTorqueRatio
+            spec._tempTorqueFilterSmoothed = spec._tempTorqueFilterSmoothed + (highWeightedTorqueRatio - spec._tempTorqueFilterSmoothed) * 0.35
+
+            print(string.format(
+                "[ADS_TEMP_TORQUE] %s | motorLoad: %.3f | eTL: %.3f | avgTL: %.3f | hiTL: %.3f | hiTLS: %.3f",
+                tostring(self:getFullName() or self.configFileName or self.uniqueId),
+                motorLoad,
+                torqueRatioClamped,
+                averageTorqueRatio,
+                highWeightedTorqueRatio,
+                spec._tempTorqueFilterSmoothed
+            ))
+
+            spec._tempTorqueFilterWindowMs = 0
+            spec._tempTorqueFilterSamples = 0
+            spec._tempTorqueFilterSum = 0
+            spec._tempTorqueFilterPowSum = 0
+        end
+    else
+        spec._tempTorqueFilterWindowMs = 0
+        spec._tempTorqueFilterSamples = 0
+        spec._tempTorqueFilterSum = 0
+        spec._tempTorqueFilterPowSum = 0
+        spec._tempTorqueFilterSmoothed = nil
+    end
+    -- END TEMP DEBUG
 
     self:updateThermalSystems(dt)
     self:updateBatteryChargingModel(dt)
@@ -3407,7 +3453,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
     local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, breakdownPresenceFactor, airIntakeCloggingFactor = 0, 0, 0, 0, 0, 0
-    local effectiveMotorLoadRatio = 1.0
     local expiredServiceMultiplier = 1.0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
@@ -3427,36 +3472,9 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         local speed = self:getLastSpeed()
 
         -- overload factor
-        local isWorking = false
-        if speed > 0.5 and self.getIsOnField ~= nil and self:getIsOnField() and self.getAttachedImplements ~= nil then
-            for _, implement in pairs(self:getAttachedImplements()) do
-                local object = implement.object
-                if object ~= nil and object.getIsLowered ~= nil and object:getIsLowered() then
-                    isWorking = true
-                    break
-                end
-            end
-        end
-
-        local loadCompensation = 0
-        if isWorking then
-            local speedLimit = tonumber(self.getSpeedLimit ~= nil and self:getSpeedLimit(true) or 0) or 0
-            if self:getCruiseControlState() ~= 0 then
-                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
-            end
-            local speedLimit = speedLimit - 0.5
-            if speedLimit > 0 then
-                local rawCompensation = math.clamp(1 - speed / speedLimit, 0, 1)
-                local speedWeight = math.clamp(speedLimit / 12, 0.2, 1.0)
-                loadCompensation = rawCompensation * speedWeight
-            end
-        end
-
-        local effectiveMotorLoad = math.min(motorLoad + loadCompensation, 1.5)
-        effectiveMotorLoadRatio = motorLoad > 0 and (effectiveMotorLoad / motorLoad) or 1.0
-        if effectiveMotorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
-            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(effectiveMotorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
-            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0) * math.max(effectiveMotorLoad, 1.0)
+        if motorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
+            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(motorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
+            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0) * math.max(motorLoad, 1.0)
             wearRate = wearRate + motorLoadFactor
         end
 
@@ -3597,37 +3615,10 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         massRatio = selfMass > 0 and math.max(totalMass / selfMass, 0) or 1.0
 
         -- pull overload
-        local isWorking = false
-        if self.getIsOnField ~= nil and self:getIsOnField() and self.getAttachedImplements ~= nil then
-            for _, implement in pairs(self:getAttachedImplements()) do
-                local object = implement.object
-                if object ~= nil and object.getIsLowered ~= nil and object:getIsLowered() then
-                    isWorking = true
-                    break
-                end
-            end
-        end
-
-        local loadCompensation = 0
-        if isWorking then
-            local speedLimit = tonumber(self.getSpeedLimit ~= nil and self:getSpeedLimit(true) or 0) or 0
-            if self:getCruiseControlState() ~= 0 then
-                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
-            end
-            local speedLimit = speedLimit - 0.5
-            if speedLimit > 0 then
-                local rawCompensation = math.clamp(1 - speed / speedLimit, 0, 1)
-                local speedWeight = math.clamp(speedLimit / 12, 0.2, 1.0)
-                loadCompensation = rawCompensation * speedWeight
-            end
-        end
-
-        local effectiveMotorLoad = math.min(motorLoad + loadCompensation, 1.5)
-
-        if effectiveMotorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
+        if motorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
             systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
             pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
-            pullOverloadFactor = pullOverloadFactor * effectiveMotorLoad * C.PULL_OVERLOAD_MULTIPLIER
+            pullOverloadFactor = pullOverloadFactor * motorLoad * C.PULL_OVERLOAD_MULTIPLIER
             wearRate = wearRate + pullOverloadFactor
         else
             systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, 0)
@@ -3651,74 +3642,29 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             wearRate = wearRate + heavyTrailerFactor
         end
 
-        -- wheel slip (0 = no slip, 1 = max slip)
+        -- wheel slip factor
         if spec_wheels ~= nil and spec_wheels.wheels ~= nil then
-            local sum = 0.0
-            local cnt = 0
-            local bodySpeed = math.abs(self.lastSpeedReal or 0)
-            local minBodySpeed = 0.00002
-            local speedKmh = math.abs(speed or 0)
-            local clamp = (MathUtil ~= nil and MathUtil.clamp) or math.clamp or function(value, minValue, maxValue)
-                if value < minValue then return minValue end
-                if value > maxValue then return maxValue end
-                return value
-            end
+            local slipValues = {}
 
             for _, wheel in ipairs(spec_wheels.wheels) do
                 local physicsWheel = wheel.physics
-                local runtimeWheel = physicsWheel or wheel
-
-                local node = runtimeWheel.node or wheel.node
-                local wheelShape = runtimeWheel.wheelShape or wheel.wheelShape
-                local hasShapeCreated = runtimeWheel.wheelShapeCreated == true or wheel.wheelShapeCreated == true
-                local hasShape = wheelShape ~= nil and wheelShape ~= 0
-                local netInfo = runtimeWheel.netInfo or wheel.netInfo
-                local hasNetInfo = netInfo ~= nil
-                local radius = tonumber(runtimeWheel.radius or runtimeWheel.radiusOriginal or wheel.radius or wheel.radiusOriginal) or 0
-                local xDriveSpeed = (hasNetInfo and netInfo.xDriveSpeed ~= nil) and netInfo.xDriveSpeed or 0
-
-                local hasKinematic = hasNetInfo and radius > 0
-                local hasPhysical = hasShapeCreated and hasShape and node ~= nil and node ~= 0
-
-                if hasKinematic or hasPhysical then
-                    local ratio = 0
-                    local kinematicSlip = 0
-                    local physicalSlip = 0
-                    local loadGate = clamp((motorLoad - 0.45) / 0.45, 0, 1)
-
-                    if hasKinematic then
-                        local wheelSpeed = math.abs(MathUtil.rpmToMps(xDriveSpeed / (2 * math.pi) * 60, radius)) -- m/ms
-                        ratio = wheelSpeed / math.max(bodySpeed, minBodySpeed)
-                        kinematicSlip = clamp((ratio - 1.15) / 1.35, 0, 1)
-                    end
-
-                    if hasPhysical then
-                        local rawLongSlip, rawLatSlip = getWheelShapeSlip(node, wheelShape)
-                        local longSlip = math.abs(tonumber(rawLongSlip) or 0)
-                        local latSlip = math.abs(tonumber(rawLatSlip) or 0)
-                        local physicalRaw = longSlip + latSlip * 0.15
-                        physicalSlip = clamp((physicalRaw - 0.33) / 0.67, 0, 1)
-                    end
-
-                    local baseSlip = 0
-                    if speedKmh < 1.0 then
-                        baseSlip = math.max(kinematicSlip, physicalSlip * 0.25)
-                    else
-                        baseSlip = 0.8 * kinematicSlip + 0.2 * physicalSlip
-                    end
-
-                    local wheelSlip = clamp(baseSlip * loadGate, 0, 1)
-                    if speedKmh < 0.5 and motorLoad < 0.25 then
-                        wheelSlip = 0
-                    end
-
-                    sum = sum + wheelSlip
-                    cnt = cnt + 1
+                if physicsWheel ~= nil and physicsWheel.netInfo ~= nil then
+                    local vanillaSlip = math.max(tonumber(physicsWheel.netInfo.slip) or 0, 0)
+                    table.insert(slipValues, vanillaSlip)
                 end
             end
 
-            if cnt > 0 then
-                wheelSlipIntensity = sum / cnt
+            table.sort(slipValues, function(a, b)
+                return a > b
+            end)
+
+            local topCount = math.min(#slipValues, 2)
+            if topCount > 0 then
+                local topSlipSum = 0
+                for i = 1, topCount do
+                    topSlipSum = topSlipSum + slipValues[i]
+                end
+                wheelSlipIntensity = topSlipSum / topCount
             end
         end
 
@@ -3726,9 +3672,34 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             wheelSlipIntensity = 0
         end
 
+        local function getAverageTireGroundFrictionCoeff()
+            local specWheels = self.spec_wheels
+            if specWheels == nil or specWheels.wheels == nil then
+                return 0
+            end
+
+            local sum = 0
+            local count = 0
+            for _, wheel in ipairs(specWheels.wheels) do
+                local physics = wheel ~= nil and wheel.physics or nil
+                local coeff = physics ~= nil and tonumber(physics.tireGroundFrictionCoeff) or nil
+                if coeff ~= nil and coeff > 0 then
+                    sum = sum + coeff
+                    count = count + 1
+                end
+            end
+
+            if count == 0 then
+                return 0
+            end
+
+            return sum / count
+        end
+
         if wheelSlipIntensity > C.WHEEL_SLIP_THRESHOLD then
+            local groundFrictionCoef = getAverageTireGroundFrictionCoeff()
             wheelSlipFactor = ADS_Utils.calculateQuadraticMultiplier(wheelSlipIntensity, C.WHEEL_SLIP_THRESHOLD, false)
-            wheelSlipFactor = wheelSlipFactor * (C.WHEEL_SLIP_MULTIPLIER or 0)
+            wheelSlipFactor = wheelSlipFactor * (C.WHEEL_SLIP_MULTIPLIER or 0) * (groundFrictionCoef ^ 2)
             wearRate = wearRate + wheelSlipFactor
         end
 
@@ -8141,11 +8112,9 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     local dbg = spec.debugData.transmissionTemp
 
     local loadFactor = motorLoad - motor.motorExternalTorque / motor.peakMotorTorque
-    local pullFactor = 1.0
     local slipFactor = 1.0
     local wheelSlipFactor = 1.0
     local accFactor = 1.0
-    local speedLimit = math.huge
     local cvtSlipActive = false
     local cvtSlipLocked = false
     
@@ -8158,27 +8127,6 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
 
         if accelerationAxis > 0 or cruiseControlAxis > 0 then
             accFactor = math.max(5 * motorRpm * math.clamp(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0, 1.0), 1.0)
-
-            if self.spec_attacherJoints and self.spec_attacherJoints.attachedImplements and next(self.spec_attacherJoints.attachedImplements) ~= nil then
-                for _, implementData in pairs(self.spec_attacherJoints.attachedImplements) do
-                    if implementData.object ~= nil then
-                        local implement = implementData.object
-                        local currentSpeedLimit = implement.speedLimit
-                        if currentSpeedLimit ~= nil and implement:getIsLowered() then
-                            if currentSpeedLimit < speedLimit then
-                                speedLimit = currentSpeedLimit
-                            end
-                        end
-                    end
-                end
-            end
-        end
-
-        if speedLimit ~= math.huge then 
-            if self:getCruiseControlState() ~= 0 then
-                speedLimit = math.min(self:getCruiseControlSpeed(), speedLimit)
-            end
-            pullFactor = pullFactor + (1 - math.clamp((speed / speedLimit), 0.0, 1.0)) / 2
         end
 
         -- slip effect from breakdown
@@ -8199,7 +8147,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         end
         
         local maxHeat = C.TRANS_MAX_HEAT + spec.extraTransmissionHeat
-        heat = C.TRANS_MIN_HEAT + (maxHeat - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor * wheelSlipFactor * pullFactor 
+        heat = C.TRANS_MIN_HEAT + (maxHeat - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor * wheelSlipFactor
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
@@ -8238,10 +8186,8 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         dbg.convectionCooling = convectionCooling
         dbg.loadFactor = loadFactor
         dbg.slipFactor = slipFactor
-        dbg.pullFactor = pullFactor
         dbg.wheelSlipFactor = wheelSlipFactor
         dbg.accFactor = accFactor
-        dbg.speedLimit = speedLimit ~= math.huge and speedLimit or 0
         dbg.cvtSlipActive = cvtSlipActive and 1 or 0
         dbg.cvtSlipLocked = cvtSlipLocked and 1 or 0
         dbg.extraTransmissionHeat = spec.extraTransmissionHeat or 0
