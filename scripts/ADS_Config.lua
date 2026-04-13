@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 121,
+    VER = 122,
 
     DEBUG = false,
 
@@ -56,8 +56,8 @@ ADS_Config = {
 
         PERSISTENT_WEAR_RATE_LIMIT = 10.0,
         IMPULSE_WEAR_RATE_LIMIT = 500.0,
-        AVG_STRESS_WARNING_THRESHOLD = 0.3,
-        AVG_STRESS_CRITICAL_THRESHOLD = 0.5,
+        AVG_STRESS_WARNING_THRESHOLD = 0.2,
+        AVG_STRESS_CRITICAL_THRESHOLD = 0.4,
 
         SYSTEM_STRESS_GLOBAL_MULTIPLIER = 1.0,
         SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS = {

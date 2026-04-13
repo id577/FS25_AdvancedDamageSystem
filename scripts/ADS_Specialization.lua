@@ -2673,7 +2673,7 @@ end
 local function syncOverloadWarning(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil or not vehicle.isServer then return end
-    local period = 30000
+    local period = 40000
     local avgStressWarningThreshold = ADS_Config.CORE.AVG_STRESS_WARNING_THRESHOLD
     local avgStressCriticalThreshold = ADS_Config.CORE.AVG_STRESS_CRITICAL_THRESHOLD
     local sampleDurationMs = math.max(tonumber(dt) or 0, 1)
@@ -2775,7 +2775,6 @@ local function syncOverloadWarning(vehicle, dt)
             vehicle:changeBreakdownStage(breakdownId, shouldStage)
         end
     elseif currentBreakdown ~= nil then
-        
         vehicle:removeBreakdown(breakdownId)
     end
 end
@@ -2867,51 +2866,6 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:setOperatingTime(currentOperatingTime + (dt or 0), false)
         spec._allowAdsOperatingTimeWrite = false
     end
-
-    -- TEMP DEBUG: torque ratio filter investigation
-    if self.getIsControlled ~= nil and self:getIsControlled() then
-        local motor = self.getMotor ~= nil and self:getMotor() or nil
-        local appliedTorque = motor ~= nil and motor.getMotorAppliedTorque ~= nil and (tonumber(motor:getMotorAppliedTorque()) or 0) or 0
-        local availableTorque = motor ~= nil and motor.getMotorAvailableTorque ~= nil and (tonumber(motor:getMotorAvailableTorque()) or 0) or 0
-        local engineTorqueLoad = availableTorque > 0 and (appliedTorque / math.max(availableTorque, 0.0001)) or 0
-        local torqueRatioClamped = math.clamp(engineTorqueLoad, 0, 1.2)
-        spec._tempTorqueFilterWindowMs = (spec._tempTorqueFilterWindowMs or 0) + (dt or 0)
-        spec._tempTorqueFilterSamples = (spec._tempTorqueFilterSamples or 0) + 1
-        spec._tempTorqueFilterSum = (spec._tempTorqueFilterSum or 0) + torqueRatioClamped
-        spec._tempTorqueFilterPowSum = (spec._tempTorqueFilterPowSum or 0) + math.pow(torqueRatioClamped, 8)
-
-        if spec._tempTorqueFilterWindowMs >= 1000 then
-            local motorLoad = self.getMotorLoadPercentage ~= nil and (tonumber(self:getMotorLoadPercentage()) or 0) or 0
-            local samples = math.max(spec._tempTorqueFilterSamples, 1)
-            local averageTorqueRatio = spec._tempTorqueFilterSum / samples
-            local highWeightedTorqueRatio = math.pow(spec._tempTorqueFilterPowSum / samples, 0.083)
-
-            spec._tempTorqueFilterSmoothed = spec._tempTorqueFilterSmoothed or highWeightedTorqueRatio
-            spec._tempTorqueFilterSmoothed = spec._tempTorqueFilterSmoothed + (highWeightedTorqueRatio - spec._tempTorqueFilterSmoothed) * 0.35
-
-            print(string.format(
-                "[ADS_TEMP_TORQUE] %s | motorLoad: %.3f | eTL: %.3f | avgTL: %.3f | hiTL: %.3f | hiTLS: %.3f",
-                tostring(self:getFullName() or self.configFileName or self.uniqueId),
-                motorLoad,
-                torqueRatioClamped,
-                averageTorqueRatio,
-                highWeightedTorqueRatio,
-                spec._tempTorqueFilterSmoothed
-            ))
-
-            spec._tempTorqueFilterWindowMs = 0
-            spec._tempTorqueFilterSamples = 0
-            spec._tempTorqueFilterSum = 0
-            spec._tempTorqueFilterPowSum = 0
-        end
-    else
-        spec._tempTorqueFilterWindowMs = 0
-        spec._tempTorqueFilterSamples = 0
-        spec._tempTorqueFilterSum = 0
-        spec._tempTorqueFilterPowSum = 0
-        spec._tempTorqueFilterSmoothed = nil
-    end
-    -- END TEMP DEBUG
 
     self:updateThermalSystems(dt)
     self:updateBatteryChargingModel(dt)
