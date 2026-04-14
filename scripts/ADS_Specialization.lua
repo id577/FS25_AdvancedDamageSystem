@@ -1433,6 +1433,11 @@ function AdvancedDamageSystem:onLoad(savegame)
             isValidConnection = false,
             distance = 0
         },
+        drivetrain = {
+            rawMotorLoad = 0,
+            avgMotorLoadWindow = 0,
+            avgMotorLoadOscillationWindow = 0
+        },
 
         engine = {
             condition = 0,
@@ -2783,6 +2788,67 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
 
+    -- ==========================================================
+    --          TEMP DEBUG: RAW MOTOR LOAD OSCILLATION WINDOW
+    -- ==========================================================
+    if ADS_Config.DEBUG and self.getIsControlled ~= nil and self:getIsControlled() then
+        local specMotorized = self.spec_motorized
+        local motor = specMotorized ~= nil and specMotorized.motor or nil
+
+        if motor ~= nil then
+            local rawMotorLoad = tonumber(motor.rawLoadPercentage) or 0
+            local smoothedMotorLoad = tonumber(self.getMotorLoadPercentage ~= nil and self:getMotorLoadPercentage() or 0) or 0
+            local windowDurationMs = 500
+
+            if spec._tempRawMotorLoadSamples == nil then
+                spec._tempRawMotorLoadSamples = {}
+            end
+
+            local samples = spec._tempRawMotorLoadSamples
+
+            for i = #samples, 1, -1 do
+                local sample = samples[i]
+                sample.ageMs = (tonumber(sample.ageMs) or 0) + (tonumber(dt) or 0)
+
+                if sample.ageMs > windowDurationMs then
+                    table.remove(samples, i)
+                end
+            end
+
+            table.insert(samples, {
+                ageMs = 0,
+                value = rawMotorLoad
+            })
+
+            local count = #samples
+            local oscillationDipSum = 0
+            local oscillationDipCount = 0
+
+            for i = 1, count do
+                local rawSample = tonumber(samples[i].value) or 0
+                local dip = math.max(smoothedMotorLoad - rawSample, 0)
+
+                if dip > 0 then
+                    oscillationDipSum = oscillationDipSum + dip
+                    oscillationDipCount = oscillationDipCount + 1
+                end
+            end
+
+            local avgMotorLoadWindow = smoothedMotorLoad
+            local avgMotorLoadOscillationWindow = oscillationDipCount > 0 and ((oscillationDipSum / oscillationDipCount) * 2) or 0
+            avgMotorLoadOscillationWindow = avgMotorLoadOscillationWindow * math.min((smoothedMotorLoad + 0.15)^3, 1.2)
+
+            spec._tempAvgMotorLoadWindow = avgMotorLoadWindow
+            spec._tempAvgMotorLoadOscillationWindow = avgMotorLoadOscillationWindow
+
+            if spec.debugData ~= nil and spec.debugData.drivetrain ~= nil then
+                spec.debugData.drivetrain.rawMotorLoad = rawMotorLoad
+                spec.debugData.drivetrain.avgMotorLoadWindow = avgMotorLoadWindow
+                spec.debugData.drivetrain.avgMotorLoadOscillationWindow = avgMotorLoadOscillationWindow
+            end
+        end
+    end
+
     spec.effectsUpdateTimer = spec.effectsUpdateTimer + dt
 
     -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
@@ -2856,6 +2922,15 @@ end
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
+
+    if ADS_Config.DEBUG and spec.debugData ~= nil and spec.debugData.drivetrain ~= nil and self.getIsControlled ~= nil and self:getIsControlled() then
+        print(string.format(
+            "[ADS_DRIVETRAIN_DEBUG] motorLoad/avgOsc/sum: %.3f / %.3f / %.3f",
+            tonumber(self.getMotorLoadPercentage ~= nil and self:getMotorLoadPercentage() or 0) or 0,
+            tonumber(spec._tempAvgMotorLoadOscillationWindow) or 0,
+            (tonumber(self.getMotorLoadPercentage ~= nil and self:getMotorLoadPercentage() or 0) or 0) + (tonumber(spec._tempAvgMotorLoadOscillationWindow) or 0)
+        ))
+    end
 
     -- OP Time update for ADS vehicles
     local motorState = self.getMotorState ~= nil and self:getMotorState() or nil
