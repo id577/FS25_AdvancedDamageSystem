@@ -402,7 +402,7 @@ local function updateDynamicMotorLoad(vehicle)
             local motor = vehicle:getMotor()
             local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
             local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
-            dynamicMotorLoad = math.min(motorLoad + math.min(avgAbsDiffAcc / 4, 0.1) * ((spec.activeDraftEffectiveForceCap / peakPowerHp) / 0.15) ^ 2, 1.15)
+            dynamicMotorLoad = math.min(motorLoad + math.min(avgAbsDiffAcc / 3, 0.3) * ((spec.activeDraftEffectiveForceCap / peakPowerHp) / 0.15) ^ 2, 1.15)
         end
     end
 
