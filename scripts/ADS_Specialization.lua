@@ -8093,7 +8093,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
 
     if isMotorStarted then
         local engineMaxHeat = C.ENGINE_MAX_HEAT + spec.extraEngineHeat
-        heat = C.ENGINE_MIN_HEAT + motorLoad * (engineMaxHeat - C.ENGINE_MIN_HEAT)
+        heat = C.ENGINE_MIN_HEAT + math.min(motorLoad, 1.0) * (engineMaxHeat - C.ENGINE_MIN_HEAT)
         
         local brokenFanModifier = 1.0
         if spec.fanClutchHealth < 1.0 then
