@@ -3461,33 +3461,22 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     wearRate = tonumber(wearRate) or baseWearRate
     wearRate = wearRate * (1 + spec.extraConditionWear) / reliability
 
-    --- filter
-    if systemData.persistentWearRateState == nil then
-        systemData.persistentWearRateState = 0
-    end
-    local tau = 700.0
-    local alpha = 1 - math.exp(-dt / tau)
-    local impulseWearRate = math.min(math.max(wearRate - systemData.persistentWearRateState, 0), ADS_Config.CORE.IMPULSE_WEAR_RATE_LIMIT)
-    systemData.persistentWearRateState = systemData.persistentWearRateState + (wearRate - systemData.persistentWearRateState) * alpha
-    local persistentWearRateLimited =  ADS_Config.CORE.PERSISTENT_WEAR_RATE_LIMIT * (1 - math.exp(-systemData.persistentWearRateState / ADS_Config.CORE.PERSISTENT_WEAR_RATE_LIMIT))
-    local effectiveWearRate = persistentWearRateLimited + impulseWearRate
-
     local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
     local systemStressMultiplier = stressMultipliers[systemName] or 1.0
     local globalStressMultiplier = math.max(tonumber(ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER) or 1.0, 0.0)
     local dtMultiplier = ADS_Config.CORE.BASE_SYSTEMS_WEAR / (60 * 60 * 1000) * dt
 
-    local conditionToRemove = effectiveWearRate * dtMultiplier
+    local conditionToRemove = wearRate * dtMultiplier
     local newCondition = (systemData.condition or 1.0) - conditionToRemove
     systemData.condition = math.clamp(newCondition, 0.001, 1.0)
 
-    local stressToAdd = math.max(effectiveWearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier * globalStressMultiplier
-    systemData.stress = math.clamp((systemData.stress or 0) + stressToAdd, 0, math.max(systemData.condition, ADS_Config.CORE.CONDITION_EFFECTIVE_FLOOR))
+    local stressToAdd = math.max(wearRate - baseWearRate, 0) * dtMultiplier * systemStressMultiplier * globalStressMultiplier
+    systemData.stress = math.max((systemData.stress or 0) + stressToAdd, 0)
 
     local factorStats = ensureFactorStats(spec, self)
     local systemStats = factorStats[systemName]
     if type(systemStats) == "table" then
-        systemStats.total = (tonumber(systemStats.total) or 0) + effectiveWearRate * dtMultiplier
+        systemStats.total = (tonumber(systemStats.total) or 0) + wearRate * dtMultiplier
         systemStats.stress = (tonumber(systemStats.stress) or 0) + stressToAdd
 
         if type(debugFactors) == "table" then
@@ -3513,7 +3502,7 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
         local dbg = spec.debugData[systemName]
         dbg.condition = systemData.condition
         dbg.stress = systemData.stress
-        dbg.totalWearRate = effectiveWearRate
+        dbg.totalWearRate = wearRate
         dbg.instantStressRate = dt > 0 and (stressToAdd * (60 * 60 * 1000) / dt) or 0
 
         if debugFactors ~= nil then
@@ -3721,10 +3710,15 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         if dynamicMotorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
             systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
             pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
-            pullOverloadFactor = pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER
+            pullOverloadFactor = math.clamp(pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER, 0, C.PULL_OVERLOAD_MULTIPLIER)
             wearRate = wearRate + pullOverloadFactor
         else
-            systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, 0)
+            if systemData.pullOverloadTimer > 0 then
+                systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, 0)
+                pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
+                pullOverloadFactor = math.clamp(pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER, 0, C.PULL_OVERLOAD_MULTIPLIER)
+                wearRate = wearRate + pullOverloadFactor 
+            end
         end
 
         -- lugging factor
