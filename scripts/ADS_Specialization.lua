@@ -376,7 +376,7 @@ local function computeSystemSyncHash(vehicle)
     return systemHash
 end
 
-local function getDynamicMotorLoad(vehicle)
+local function updateDynamicMotorLoad(vehicle)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
         return 0
@@ -2863,6 +2863,8 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     if spec.isExcludedVehicle then return end
 
     updateAvgAbsDiffAccWindow(spec, self:getMotor(), dt)
+    updateDynamicMotorLoad(self)
+
     spec.effectsUpdateTimer = spec.effectsUpdateTimer + dt
 
     -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
@@ -3500,7 +3502,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
-        local dynamicMotorLoad = getDynamicMotorLoad(self)
+        local dynamicMotorLoad = spec.dynamicMotorLoad
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
@@ -3641,7 +3643,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
 
     elseif self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
-        local dynamicMotorLoad = getDynamicMotorLoad(self)
+        local dynamicMotorLoad = spec.dynamicMotorLoad
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
@@ -8046,7 +8048,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     local vehicleHaveCVT = hasCVTTransmission(self)
     
     local isMotorStarted = self:getIsMotorStarted()
-    local motorLoad = getDynamicMotorLoad(self) or math.max(self:getMotorLoadPercentage(), 0.0)
+    local motorLoad = spec.dynamicMotorLoad or math.max(self:getMotorLoadPercentage(), 0.0)
     local motorRpm = self:getMotorRpmPercentage()
     local speed = self:getLastSpeed()
     local dirt = spec.radiatorClogging
