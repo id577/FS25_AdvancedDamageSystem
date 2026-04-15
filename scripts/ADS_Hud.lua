@@ -324,54 +324,6 @@ local function hasCVTAddon(vehicle)
     return hasActiveCVTAddon
 end
 
-local function collectActiveDraftStats(rootVehicle, result, visited)
-    result = result or {
-        maxForce = 0,
-        effectiveForceCap = 0,
-        count = 0
-    }
-    visited = visited or {}
-
-    if rootVehicle == nil or visited[rootVehicle] then
-        return result
-    end
-
-    visited[rootVehicle] = true
-
-    local attachedImplements = rootVehicle.getAttachedImplements ~= nil and rootVehicle:getAttachedImplements() or nil
-    if attachedImplements ~= nil then
-        for _, implement in pairs(attachedImplements) do
-            local object = implement.object
-            if object ~= nil and not visited[object] then
-                local powerConsumer = object.spec_powerConsumer
-                if powerConsumer ~= nil then
-                    local maxForce = tonumber(powerConsumer.maxForce) or 0
-                    local multiplier = object.getPowerMultiplier ~= nil and (tonumber(object:getPowerMultiplier()) or 0) or 1
-                    local speed = math.abs(tonumber(object.lastSpeedReal) or 0)
-                    local movingDirection = tonumber(object.movingDirection) or 0
-                    local forceDir = tonumber(powerConsumer.forceDir) or 0
-
-                    local isActiveDraft = maxForce > 0
-                        and multiplier > 0.001
-                        and powerConsumer.forceNode ~= nil
-                        and movingDirection == forceDir
-                        and speed > 0.0001
-
-                    if isActiveDraft then
-                        result.maxForce = result.maxForce + maxForce
-                        result.effectiveForceCap = result.effectiveForceCap + maxForce * multiplier
-                        result.count = result.count + 1
-                    end
-                end
-
-                collectActiveDraftStats(object, result, visited)
-            end
-        end
-    end
-
-    return result
-end
-
 -- =====================================================================================
 --                              DRAW
 -- =====================================================================================
@@ -1389,7 +1341,8 @@ function ADS_Hud:drawActiveVehicleHUD()
     local dynamicLoadDeltaPct = motorLoad > 0 and ((dynamicMotorLoad - motorLoad) / motorLoad) * 100 or 0
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
     local spec_CVTaddon = vehicle.spec_CVTaddon
-    local draftStats = collectActiveDraftStats(vehicle)
+    local draftMaxForce = tonumber(spec.activeDraftMaxForce) or 0
+    local draftEffectiveForceCap = tonumber(spec.activeDraftEffectiveForceCap) or 0
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
         "hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f",
@@ -1404,8 +1357,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         targetGear,
         motor.activeGearGroupIndex or 0,
         motor:getGearRatio() or 0,
-        draftStats.maxForce,
-        draftStats.effectiveForceCap
+        draftMaxForce,
+        draftEffectiveForceCap
     ), {1, 1, 1, 1}, 0.95)
 
     if hasActiveCVTAddon then

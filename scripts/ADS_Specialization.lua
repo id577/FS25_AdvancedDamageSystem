@@ -399,13 +399,75 @@ local function updateDynamicMotorLoad(vehicle)
         end
 
         if isWorking then
+            local motor = vehicle:getMotor()
+            local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
             local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
-            dynamicMotorLoad = math.min(motorLoad + (avgAbsDiffAcc / 2) * (motorLoad / 0.85), 1.25)
+            dynamicMotorLoad = math.min(motorLoad + math.min(avgAbsDiffAcc / 4, 0.1) * ((spec.activeDraftEffectiveForceCap / peakPowerHp) / 0.15) ^ 2, 1.15)
         end
     end
 
     spec.dynamicMotorLoad = dynamicMotorLoad or motorLoad
     return dynamicMotorLoad or motorLoad
+end
+
+local function updateActiveDraftStats(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    local result = {
+        maxForce = 0,
+        effectiveForceCap = 0,
+        count = 0
+    }
+    local visited = {}
+
+    local function collectDraftStats(rootVehicle)
+        if rootVehicle == nil or visited[rootVehicle] then
+            return
+        end
+
+        visited[rootVehicle] = true
+
+        local attachedImplements = rootVehicle.getAttachedImplements ~= nil and rootVehicle:getAttachedImplements() or nil
+        if attachedImplements == nil then
+            return
+        end
+
+        for _, implement in pairs(attachedImplements) do
+            local object = implement ~= nil and implement.object or nil
+            if object ~= nil and not visited[object] then
+                local powerConsumer = object.spec_powerConsumer
+                if powerConsumer ~= nil then
+                    local maxForce = tonumber(powerConsumer.maxForce) or 0
+                    local multiplier = object.getPowerMultiplier ~= nil and (tonumber(object:getPowerMultiplier()) or 0) or 1
+                    local speed = math.abs(tonumber(object.lastSpeedReal) or 0)
+                    local movingDirection = tonumber(object.movingDirection) or 0
+                    local forceDir = tonumber(powerConsumer.forceDir) or 0
+
+                    local isActiveDraft = maxForce > 0
+                        and multiplier > 0.001
+                        and powerConsumer.forceNode ~= nil
+                        and movingDirection == forceDir
+                        and speed > 0.0001
+
+                    if isActiveDraft then
+                        result.maxForce = result.maxForce + maxForce
+                        result.effectiveForceCap = result.effectiveForceCap + maxForce * multiplier
+                        result.count = result.count + 1
+                    end
+                end
+
+                collectDraftStats(object)
+            end
+        end
+    end
+
+    collectDraftStats(vehicle)
+
+    spec.activeDraftMaxForce = result.maxForce
+    spec.activeDraftEffectiveForceCap = result.effectiveForceCap
 end
 
 -- ==========================================================
@@ -1681,6 +1743,8 @@ function AdvancedDamageSystem:onLoad(savegame)
         }
     }
     self.spec_AdvancedDamageSystem.dynamicMotorLoad = 0
+    self.spec_AdvancedDamageSystem.activeDraftMaxForce = 0
+    self.spec_AdvancedDamageSystem.activeDraftEffectiveForceCap = 0
     self.spec_AdvancedDamageSystem.isUnderRoof = true
     self.spec_AdvancedDamageSystem.effectsUpdateTimer = ADS_Config.EFFECTS_UPDATE_DELAY
     self.spec_AdvancedDamageSystem.metaUpdateTimer = math.random() * ADS_Config.META_UPDATE_DELAY
@@ -2949,6 +3013,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         spec._allowAdsOperatingTimeWrite = false
     end
 
+    updateActiveDraftStats(self)
     self:updateThermalSystems(dt)
     self:updateBatteryChargingModel(dt)
 
