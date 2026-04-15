@@ -1343,9 +1343,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     local spec_CVTaddon = vehicle.spec_CVTaddon
     local draftMaxForce = tonumber(spec.activeDraftMaxForce) or 0
     local draftEffectiveForceCap = tonumber(spec.activeDraftEffectiveForceCap) or 0
+    local effectiveCapPerHp = peakPowerHp > 0 and (draftEffectiveForceCap / peakPowerHp) or 0
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
-        "hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f",
+        "hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f | e/h: %.2f",
         motorPower / 735.5,
         peakPowerHp,
         math.max(motorLoad * 100, 0),
@@ -1358,7 +1359,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         motor.activeGearGroupIndex or 0,
         motor:getGearRatio() or 0,
         draftMaxForce,
-        draftEffectiveForceCap
+        draftEffectiveForceCap,
+        effectiveCapPerHp
     ), {1, 1, 1, 1}, 0.95)
 
     if hasActiveCVTAddon then
