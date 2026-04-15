@@ -376,6 +376,38 @@ local function computeSystemSyncHash(vehicle)
     return systemHash
 end
 
+local function getDynamicMotorLoad(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return 0
+    end
+
+    local motorLoad = vehicle:getMotorLoadPercentage()
+    local dynamicMotorLoad = motorLoad
+
+    if vehicle:getIsOnField() then
+        local isWorking = false
+        if vehicle.spec_attacherJoints and vehicle.spec_attacherJoints.attachedImplements and next(vehicle.spec_attacherJoints.attachedImplements) ~= nil then
+            for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
+                if implementData.object ~= nil then
+                    local implement = implementData.object
+                    if implement:getIsLowered() then
+                        isWorking = true
+                    end
+                end
+            end
+        end
+
+        if isWorking then
+            local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
+            dynamicMotorLoad = math.min(motorLoad + (avgAbsDiffAcc / 2) * (motorLoad / 0.85), 1.25)
+        end
+    end
+
+    spec.dynamicMotorLoad = dynamicMotorLoad or motorLoad
+    return dynamicMotorLoad or motorLoad
+end
+
 -- ==========================================================
 --                         DIRTY FLAGS HELPERS
 -- ==========================================================
@@ -1434,9 +1466,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             distance = 0
         },
         drivetrain = {
-            rawMotorLoad = 0,
-            avgMotorLoadWindow = 0,
-            avgMotorLoadOscillationWindow = 0
         },
 
         engine = {
@@ -1651,7 +1680,7 @@ function AdvancedDamageSystem:onLoad(savegame)
             transStress = 0
         }
     }
-
+    self.spec_AdvancedDamageSystem.dynamicMotorLoad = 0
     self.spec_AdvancedDamageSystem.isUnderRoof = true
     self.spec_AdvancedDamageSystem.effectsUpdateTimer = ADS_Config.EFFECTS_UPDATE_DELAY
     self.spec_AdvancedDamageSystem.metaUpdateTimer = math.random() * ADS_Config.META_UPDATE_DELAY
@@ -2784,71 +2813,56 @@ local function syncOverloadWarning(vehicle, dt)
     end
 end
 
+local function updateAvgAbsDiffAccWindow(spec, motor, dt)
+    if spec == nil or motor == nil then
+        if spec ~= nil then
+            spec.avgAbsDiffAcc = 0
+        end
+        return 0
+    end
+
+    local windowDurationMs = 500
+    local diffAcc = math.abs(tonumber(motor.differentialRotAccelerationSmoothed) or 0)
+
+    if spec._avgAbsDiffAccSamples == nil then
+        spec._avgAbsDiffAccSamples = {}
+    end
+
+    local samples = spec._avgAbsDiffAccSamples
+
+    for i = #samples, 1, -1 do
+        local sample = samples[i]
+        sample.ageMs = (tonumber(sample.ageMs) or 0) + (tonumber(dt) or 0)
+
+        if sample.ageMs > windowDurationMs then
+            table.remove(samples, i)
+        end
+    end
+
+    table.insert(samples, {
+        ageMs = 0,
+        value = diffAcc
+    })
+
+    if #samples == 0 then
+        spec.avgAbsDiffAcc = 0
+        return 0
+    end
+
+    local sum = 0
+    for i = 1, #samples do
+        sum = sum + (tonumber(samples[i].value) or 0)
+    end
+
+    local avg = sum / #samples
+    spec.avgAbsDiffAcc = avg
+end
+
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
 
-    -- ==========================================================
-    --          TEMP DEBUG: RAW MOTOR LOAD OSCILLATION WINDOW
-    -- ==========================================================
-    if ADS_Config.DEBUG and self.getIsControlled ~= nil and self:getIsControlled() then
-        local specMotorized = self.spec_motorized
-        local motor = specMotorized ~= nil and specMotorized.motor or nil
-
-        if motor ~= nil then
-            local rawMotorLoad = tonumber(motor.rawLoadPercentage) or 0
-            local smoothedMotorLoad = tonumber(self.getMotorLoadPercentage ~= nil and self:getMotorLoadPercentage() or 0) or 0
-            local windowDurationMs = 500
-
-            if spec._tempRawMotorLoadSamples == nil then
-                spec._tempRawMotorLoadSamples = {}
-            end
-
-            local samples = spec._tempRawMotorLoadSamples
-
-            for i = #samples, 1, -1 do
-                local sample = samples[i]
-                sample.ageMs = (tonumber(sample.ageMs) or 0) + (tonumber(dt) or 0)
-
-                if sample.ageMs > windowDurationMs then
-                    table.remove(samples, i)
-                end
-            end
-
-            table.insert(samples, {
-                ageMs = 0,
-                value = rawMotorLoad
-            })
-
-            local count = #samples
-            local oscillationDipSum = 0
-            local oscillationDipCount = 0
-
-            for i = 1, count do
-                local rawSample = tonumber(samples[i].value) or 0
-                local dip = math.max(smoothedMotorLoad - rawSample, 0)
-
-                if dip > 0 then
-                    oscillationDipSum = oscillationDipSum + dip
-                    oscillationDipCount = oscillationDipCount + 1
-                end
-            end
-
-            local avgMotorLoadWindow = smoothedMotorLoad
-            local avgMotorLoadOscillationWindow = oscillationDipCount > 0 and ((oscillationDipSum / oscillationDipCount) * 2) or 0
-            avgMotorLoadOscillationWindow = avgMotorLoadOscillationWindow * math.min((smoothedMotorLoad + 0.15)^3, 1.2)
-
-            spec._tempAvgMotorLoadWindow = avgMotorLoadWindow
-            spec._tempAvgMotorLoadOscillationWindow = avgMotorLoadOscillationWindow
-
-            if spec.debugData ~= nil and spec.debugData.drivetrain ~= nil then
-                spec.debugData.drivetrain.rawMotorLoad = rawMotorLoad
-                spec.debugData.drivetrain.avgMotorLoadWindow = avgMotorLoadWindow
-                spec.debugData.drivetrain.avgMotorLoadOscillationWindow = avgMotorLoadOscillationWindow
-            end
-        end
-    end
-
+    updateAvgAbsDiffAccWindow(spec, self:getMotor(), dt)
     spec.effectsUpdateTimer = spec.effectsUpdateTimer + dt
 
     -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
@@ -2922,15 +2936,6 @@ end
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
-
-    if ADS_Config.DEBUG and spec.debugData ~= nil and spec.debugData.drivetrain ~= nil and self.getIsControlled ~= nil and self:getIsControlled() then
-        print(string.format(
-            "[ADS_DRIVETRAIN_DEBUG] motorLoad/avgOsc/sum: %.3f / %.3f / %.3f",
-            tonumber(self.getMotorLoadPercentage ~= nil and self:getMotorLoadPercentage() or 0) or 0,
-            tonumber(spec._tempAvgMotorLoadOscillationWindow) or 0,
-            (tonumber(self.getMotorLoadPercentage ~= nil and self:getMotorLoadPercentage() or 0) or 0) + (tonumber(spec._tempAvgMotorLoadOscillationWindow) or 0)
-        ))
-    end
 
     -- OP Time update for ADS vehicles
     local motorState = self.getMotorState ~= nil and self:getMotorState() or nil
@@ -3495,15 +3500,16 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
+        local dynamicMotorLoad = getDynamicMotorLoad(self)
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
         local speed = self:getLastSpeed()
 
         -- overload factor
-        if motorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
-            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(motorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
-            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0) * math.max(motorLoad, 1.0)
+        if dynamicMotorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
+            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(dynamicMotorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
+            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0) * math.max(dynamicMotorLoad, 1.0)
             wearRate = wearRate + motorLoadFactor
         end
 
@@ -3635,6 +3641,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
 
     elseif self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
+        local dynamicMotorLoad = getDynamicMotorLoad(self)
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
@@ -3644,10 +3651,10 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         massRatio = selfMass > 0 and math.max(totalMass / selfMass, 0) or 1.0
 
         -- pull overload
-        if motorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
+        if dynamicMotorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
             systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
             pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
-            pullOverloadFactor = pullOverloadFactor * motorLoad * C.PULL_OVERLOAD_MULTIPLIER
+            pullOverloadFactor = pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER
             wearRate = wearRate + pullOverloadFactor
         else
             systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, 0)
@@ -8039,7 +8046,7 @@ function AdvancedDamageSystem:updateThermalSystems(dt)
     local vehicleHaveCVT = hasCVTTransmission(self)
     
     local isMotorStarted = self:getIsMotorStarted()
-    local motorLoad = math.max(self:getMotorLoadPercentage(), 0.0)
+    local motorLoad = getDynamicMotorLoad(self) or math.max(self:getMotorLoadPercentage(), 0.0)
     local motorRpm = self:getMotorRpmPercentage()
     local speed = self:getLastSpeed()
     local dirt = spec.radiatorClogging
@@ -9360,8 +9367,110 @@ local function parseArguments(argString, ...)
             appendToken(extraArg)
         end
 
-        return args
+    return args
+end
+
+local function recalculateMotorPowerFromTorqueCurve(motor)
+    if motor == nil or motor.torqueCurve == nil or motor.torqueCurve.keyframes == nil then
+        return false
     end
+
+    motor.peakMotorTorque = motor.torqueCurve:getMaximum()
+    motor.peakMotorPower = 0
+    motor.peakMotorPowerRotSpeed = 0
+
+    local numKeyFrames = #motor.torqueCurve.keyframes
+    if numKeyFrames >= 2 then
+        for i = 2, numKeyFrames do
+            local v0 = motor.torqueCurve.keyframes[i - 1]
+            local v1 = motor.torqueCurve.keyframes[i]
+            local torque0 = motor.torqueCurve:getFromKeyframes(v0, v0, i - 1, i - 1, 0)
+            local torque1 = motor.torqueCurve:getFromKeyframes(v1, v1, i, i, 0)
+            local rpm
+            local torque
+
+            if math.abs(torque0 - torque1) > 0.0001 then
+                rpm = (v1.time * torque0 - v0.time * torque1) / (2.0 * (torque0 - torque1))
+                rpm = math.min(math.max(rpm, v0.time), v1.time)
+                torque = motor.torqueCurve:getFromKeyframes(v0, v1, i - 1, i, (v1.time - rpm) / (v1.time - v0.time))
+            else
+                rpm = v0.time
+                torque = torque0
+            end
+
+            local power = torque * rpm
+            if power > motor.peakMotorPower then
+                motor.peakMotorPower = power
+                motor.peakMotorPowerRotSpeed = rpm
+            end
+        end
+
+        motor.peakMotorPower = motor.peakMotorPower * math.pi / 30
+        motor.peakMotorPowerRotSpeed = motor.peakMotorPowerRotSpeed * math.pi / 30
+    elseif numKeyFrames == 1 then
+        local v = motor.torqueCurve.keyframes[1]
+        local rotSpeed = v.time * math.pi / 30
+        local torque = motor.torqueCurve:getFromKeyframes(v, v, 1, 1, 0)
+        motor.peakMotorPower = rotSpeed * torque
+        motor.peakMotorPowerRotSpeed = rotSpeed
+    end
+
+    return true
+end
+
+local function refreshAttachedImplementSourceMotorPeakPower(rootVehicle)
+    if rootVehicle == nil or rootVehicle.getAttachedImplements == nil then
+        return
+    end
+
+    local rootMotor = rootVehicle.getMotor ~= nil and rootVehicle:getMotor() or nil
+    local rootPeakMotorPower = rootMotor ~= nil and rootMotor.peakMotorPower or math.huge
+
+    for _, implement in pairs(rootVehicle:getAttachedImplements()) do
+        local object = implement ~= nil and implement.object or nil
+        if object ~= nil then
+            if object.spec_powerConsumer ~= nil then
+                object.spec_powerConsumer.sourceMotorPeakPower = rootPeakMotorPower
+            end
+            refreshAttachedImplementSourceMotorPeakPower(object)
+        end
+    end
+end
+
+local function getAttachedPlowLikeImplement(vehicle)
+    if vehicle == nil then
+        return nil
+    end
+
+    local selectedImplement = vehicle.getSelectedImplement ~= nil and vehicle:getSelectedImplement() or nil
+    local selectedObject = selectedImplement ~= nil and selectedImplement.object or nil
+    if selectedObject ~= nil and selectedObject.spec_powerConsumer ~= nil then
+        return selectedObject
+    end
+
+    local attachedImplements = vehicle.getAttachedImplements ~= nil and vehicle:getAttachedImplements() or nil
+    if attachedImplements == nil then
+        return nil
+    end
+
+    for _, implement in pairs(attachedImplements) do
+        local object = implement ~= nil and implement.object or nil
+        if object ~= nil then
+            if object.spec_plow ~= nil and object.spec_powerConsumer ~= nil then
+                return object
+            end
+        end
+    end
+
+    for _, implement in pairs(attachedImplements) do
+        local object = implement ~= nil and implement.object or nil
+        if object ~= nil and object.spec_powerConsumer ~= nil then
+            return object
+        end
+    end
+
+    return nil
+end
 
     if argString == nil or type(argString) ~= 'string' or argString == '' then
         return {}
@@ -10685,6 +10794,212 @@ function AdvancedDamageSystem.ConsoleCommands:setFuelLevel(rawArgs)
     ))
 end
 
+function AdvancedDamageSystem.ConsoleCommands:setHorsePower(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setHorsePower", rawArgs, nil, vehicle) end
+        return
+    end
+
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then
+        return
+    end
+
+    local args = parseArguments(rawArgs)
+    if not args or not args[1] then
+        print("ADS Error: Usage: ads_setHorsePower <hp>")
+        return
+    end
+
+    local targetHp = tonumber(args[1])
+    if targetHp == nil or targetHp <= 0 then
+        print("ADS Error: Horsepower must be a positive number.")
+        return
+    end
+
+    local motor = vehicle.getMotor ~= nil and vehicle:getMotor() or nil
+    if motor == nil or motor.torqueCurve == nil or motor.torqueCurve.keyframes == nil then
+        print(string.format("ADS Error: Vehicle '%s' has no editable motor torque curve.", vehicle:getFullName()))
+        return
+    end
+
+    local currentPeakKw = tonumber(motor.peakMotorPower) or 0
+    if currentPeakKw <= 0 then
+        print(string.format("ADS Error: Vehicle '%s' has invalid peak motor power.", vehicle:getFullName()))
+        return
+    end
+
+    local targetPeakKw = targetHp / 1.36
+    local scale = targetPeakKw / currentPeakKw
+    local scaledKeys = 0
+
+    for _, keyframe in ipairs(motor.torqueCurve.keyframes) do
+        if type(keyframe) == "table" then
+            if keyframe[1] ~= nil then
+                keyframe[1] = keyframe[1] * scale
+                scaledKeys = scaledKeys + 1
+            elseif keyframe.value ~= nil then
+                keyframe.value = keyframe.value * scale
+                scaledKeys = scaledKeys + 1
+            end
+        end
+    end
+
+    if scaledKeys == 0 then
+        print(string.format("ADS Error: Failed to scale torque curve for '%s'.", vehicle:getFullName()))
+        return
+    end
+
+    motor.peakMotorTorque = motor.torqueCurve:getMaximum()
+    motor.peakMotorPower = 0
+    motor.peakMotorPowerRotSpeed = 0
+
+    local numKeyFrames = #motor.torqueCurve.keyframes
+    if numKeyFrames >= 2 then
+        for i = 2, numKeyFrames do
+            local v0 = motor.torqueCurve.keyframes[i - 1]
+            local v1 = motor.torqueCurve.keyframes[i]
+            local torque0 = motor.torqueCurve:getFromKeyframes(v0, v0, i - 1, i - 1, 0)
+            local torque1 = motor.torqueCurve:getFromKeyframes(v1, v1, i, i, 0)
+            local rpm
+            local torque
+
+            if math.abs(torque0 - torque1) > 0.0001 then
+                rpm = (v1.time * torque0 - v0.time * torque1) / (2.0 * (torque0 - torque1))
+                rpm = math.min(math.max(rpm, v0.time), v1.time)
+                torque = motor.torqueCurve:getFromKeyframes(v0, v1, i - 1, i, (v1.time - rpm) / (v1.time - v0.time))
+            else
+                rpm = v0.time
+                torque = torque0
+            end
+
+            local power = torque * rpm
+            if power > motor.peakMotorPower then
+                motor.peakMotorPower = power
+                motor.peakMotorPowerRotSpeed = rpm
+            end
+        end
+
+        motor.peakMotorPower = motor.peakMotorPower * math.pi / 30
+        motor.peakMotorPowerRotSpeed = motor.peakMotorPowerRotSpeed * math.pi / 30
+    elseif numKeyFrames == 1 then
+        local v = motor.torqueCurve.keyframes[1]
+        local rotSpeed = v.time * math.pi / 30
+        local torque = motor.torqueCurve:getFromKeyframes(v, v, 1, 1, 0)
+        motor.peakMotorPower = rotSpeed * torque
+        motor.peakMotorPowerRotSpeed = rotSpeed
+    end
+
+    if vehicle.updateMotorProperties ~= nil then
+        vehicle:updateMotorProperties()
+    end
+
+    local function refreshAttachedPeakPower(rootVehicle)
+        if rootVehicle == nil or rootVehicle.getAttachedImplements == nil then
+            return
+        end
+
+        local rootPeakMotorPower = rootVehicle.getMotor ~= nil and rootVehicle:getMotor().peakMotorPower or math.huge
+        for _, implement in pairs(rootVehicle:getAttachedImplements()) do
+            local object = implement ~= nil and implement.object or nil
+            if object ~= nil then
+                if object.spec_powerConsumer ~= nil then
+                    object.spec_powerConsumer.sourceMotorPeakPower = rootPeakMotorPower
+                end
+                refreshAttachedPeakPower(object)
+            end
+        end
+    end
+
+    refreshAttachedPeakPower(vehicle)
+
+    local specMotorized = vehicle.spec_motorized
+    if specMotorized ~= nil and specMotorized.motorizedNode ~= nil and I3DUtil ~= nil and I3DUtil.wakeUpObject ~= nil then
+        I3DUtil.wakeUpObject(specMotorized.motorizedNode)
+    end
+
+    print(string.format(
+        "ADS: Set horsepower for '%s' to %.1f hp (was %.1f hp).",
+        vehicle:getFullName(),
+        (tonumber(motor.peakMotorPower) or 0) * 1.36,
+        currentPeakKw * 1.36
+    ))
+end
+
+function AdvancedDamageSystem.ConsoleCommands:setPlowMaxForce(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setPlowMaxForce", rawArgs, nil, vehicle) end
+        return
+    end
+
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then
+        return
+    end
+
+    local args = parseArguments(rawArgs)
+    if not args or not args[1] then
+        print("ADS Error: Usage: ads_setPlowMaxForce <kN>")
+        return
+    end
+
+    local targetMaxForce = tonumber(args[1])
+    if targetMaxForce == nil or targetMaxForce < 0 then
+        print("ADS Error: Max force must be a number >= 0.")
+        return
+    end
+
+    local implement = nil
+    if vehicle.getSelectedImplement ~= nil then
+        local selectedImplement = vehicle:getSelectedImplement()
+        local selectedObject = selectedImplement ~= nil and selectedImplement.object or nil
+        if selectedObject ~= nil and selectedObject.spec_powerConsumer ~= nil then
+            implement = selectedObject
+        end
+    end
+
+    if implement == nil and vehicle.getAttachedImplements ~= nil then
+        for _, attachedImplement in pairs(vehicle:getAttachedImplements()) do
+            local object = attachedImplement ~= nil and attachedImplement.object or nil
+            if object ~= nil and object.spec_plow ~= nil and object.spec_powerConsumer ~= nil then
+                implement = object
+                break
+            end
+        end
+    end
+
+    if implement == nil and vehicle.getAttachedImplements ~= nil then
+        for _, attachedImplement in pairs(vehicle:getAttachedImplements()) do
+            local object = attachedImplement ~= nil and attachedImplement.object or nil
+            if object ~= nil and object.spec_powerConsumer ~= nil then
+                implement = object
+                break
+            end
+        end
+    end
+
+    if implement == nil or implement.spec_powerConsumer == nil then
+        print(string.format("ADS Error: No attached plow/implement with powerConsumer found for '%s'.", vehicle:getFullName()))
+        return
+    end
+
+    local specPowerConsumer = implement.spec_powerConsumer
+    local previousMaxForce = tonumber(specPowerConsumer.maxForce) or 0
+    specPowerConsumer.maxForce = targetMaxForce
+    if specPowerConsumer.maxForceOrig ~= nil then
+        specPowerConsumer.maxForceOrig = targetMaxForce
+    end
+
+    print(string.format(
+        "ADS: Set maxForce for '%s' to %.2f kN (was %.2f kN).",
+        implement.getFullName ~= nil and implement:getFullName() or tostring(implement.configFileName or "implement"),
+        specPowerConsumer.maxForce,
+        previousMaxForce
+    ))
+end
+
 function AdvancedDamageSystem.ConsoleCommands:resetFactorStats()
     if not g_currentMission:getIsServer() then
         local vehicle = self:getTargetVehicle()
@@ -10773,6 +11088,8 @@ addConsoleCommand("ads_showServiceLog", "Shows service log. Usage: ads_showServi
 addConsoleCommand("ads_getDebugVehicleInfo", "Vehicle debug info", "getDebugVehicleInfo", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_setDirtAmount [0.0-1.0]", "setDirtAmount", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setFuelLevel", "Sets vehicle fuel level. Usage: ads_setFuelLevel [0.0-1.0 or 0..100]", "setFuelLevel", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setHorsePower", "Sets horsepower on current vehicle. Usage: ads_setHorsePower [hp]", "setHorsePower", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setPlowMaxForce", "Sets maxForce on selected/attached plow. Usage: ads_setPlowMaxForce [kN]", "setPlowMaxForce", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_resetFactorStats", "Resets accumulated factor stats for current vehicle.", "resetFactorStats", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_toggleHudDebugView", "Switch debug HUD view. Usage: ads_toggleHudDebugView [default|stats|toggle]", "toggleHudDebugView", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_debug", "Enbales/disabled ADS debug", "debug", AdvancedDamageSystem.ConsoleCommands)

@@ -481,11 +481,6 @@ function ADS_Telemetry:collectDrivetrainInfo(vehicle)
     end
 
     local availableTorque = tonumber(motor.getMotorAvailableTorque ~= nil and motor:getMotorAvailableTorque() or 0) or 0
-    local appliedTorque = tonumber(motor.getMotorAppliedTorque ~= nil and motor:getMotorAppliedTorque() or 0) or 0
-    local engineTorqueLoad = availableTorque > 0 and (appliedTorque / math.max(availableTorque, 0.0001)) or 0
-    spec._smoothedEngineTorqueLoad = spec._smoothedEngineTorqueLoad or engineTorqueLoad
-    spec._smoothedEngineTorqueLoad = spec._smoothedEngineTorqueLoad + (engineTorqueLoad - spec._smoothedEngineTorqueLoad) * 0.12
-
     local motorPowerW = (tonumber(motor.getMotorRotSpeed ~= nil and motor:getMotorRotSpeed() or 0) or 0)
         * ((availableTorque - (tonumber(motor.getMotorExternalTorque ~= nil and motor:getMotorExternalTorque() or 0) or 0)) * 1000)
     local motorPowerHp = motorPowerW / 735.5
@@ -494,6 +489,31 @@ function ADS_Telemetry:collectDrivetrainInfo(vehicle)
     local maxRpm = math.max(tonumber(motor.maxRpm) or 1, 1)
     local rpmLoad = lastRpm / maxRpm
     local motorLoad = tonumber(vehicle.getMotorLoadPercentage ~= nil and vehicle:getMotorLoadPercentage() or 0) or 0
+    local dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or motorLoad
+    local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
+    local acceleratorPedal = tonumber(motor.lastAcceleratorPedal or 0) or 0
+    local currentSpeedKmh = tonumber(vehicle.getLastSpeed ~= nil and vehicle:getLastSpeed() or 0) or 0
+    local currentSpeedLimitKmh = tonumber(vehicle.getSpeedLimit ~= nil and vehicle:getSpeedLimit(true) or 0) or 0
+    if currentSpeedLimitKmh == math.huge or currentSpeedLimitKmh < 0 then
+        currentSpeedLimitKmh = 0
+    end
+    if currentSpeedLimitKmh <= 0 and vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attachedImplements ~= nil then
+        local implementSpeedLimit = math.huge
+        for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
+            local implement = implementData ~= nil and implementData.object or nil
+            local limit = implement ~= nil and tonumber(implement.speedLimit) or nil
+            local isLowered = implement ~= nil and implement.getIsLowered ~= nil and implement:getIsLowered() or false
+            if limit ~= nil and limit > 0 and isLowered then
+                implementSpeedLimit = math.min(implementSpeedLimit, limit)
+            end
+        end
+        if implementSpeedLimit < math.huge then
+            currentSpeedLimitKmh = implementSpeedLimit
+        end
+    end
+    if currentSpeedLimitKmh <= 0 then
+        currentSpeedLimitKmh = (tonumber(motor.getMaximumForwardSpeed ~= nil and motor:getMaximumForwardSpeed() or 0) or 0) * 3.6
+    end
     local targetGear = (tonumber(motor.targetGear) or 0) * (tonumber(motor.currentDirection) or 1)
     local draftStats = collectActiveDraftStats(vehicle)
     local spec_CVTaddon = vehicle.spec_CVTaddon
@@ -502,8 +522,12 @@ function ADS_Telemetry:collectDrivetrainInfo(vehicle)
         motorPowerHp = motorPowerHp,
         peakPowerHp = peakPowerHp,
         motorLoad = motorLoad,
-        engineTorqueLoad = tonumber(spec._smoothedEngineTorqueLoad or 0) or 0,
+        dynamicMotorLoad = dynamicMotorLoad,
+        avgAbsDiffAcc = avgAbsDiffAcc,
+        acceleratorPedal = acceleratorPedal,
         rpmLoad = rpmLoad,
+        currentSpeedKmh = currentSpeedKmh,
+        currentSpeedLimitKmh = currentSpeedLimitKmh,
         currentGear = tonumber(motor.gear) or 0,
         targetGear = targetGear,
         activeGearGroupIndex = tonumber(motor.activeGearGroupIndex) or 0,

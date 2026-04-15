@@ -1378,27 +1378,28 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     local availableTorque = motor:getMotorAvailableTorque() or 0
-    local appliedTorque = motor:getMotorAppliedTorque() or 0
-    local engineTorqueLoad = availableTorque > 0 and (appliedTorque / math.max(availableTorque, 0.0001)) or 0
-    spec._smoothedEngineTorqueLoad = spec._smoothedEngineTorqueLoad or engineTorqueLoad
-    spec._smoothedEngineTorqueLoad = spec._smoothedEngineTorqueLoad + (engineTorqueLoad - spec._smoothedEngineTorqueLoad) * 0.12
     local motorPower = motor:getMotorRotSpeed() * (availableTorque - motor:getMotorExternalTorque()) * 1000
     local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
     local lastRpm = motor:getLastModulatedMotorRpm()
     local maxRpm = math.max(motor.maxRpm or 1, 1)
     local rpmLoad = lastRpm / maxRpm
     local motorLoad = vehicle:getMotorLoadPercentage() or 0
+    local dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or motorLoad
+    local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
+    local dynamicLoadDeltaPct = motorLoad > 0 and ((dynamicMotorLoad - motorLoad) / motorLoad) * 100 or 0
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
     local spec_CVTaddon = vehicle.spec_CVTaddon
     local draftStats = collectActiveDraftStats(vehicle)
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
-        "hp: %d/%d | ml/etl/rpm: %.3f/%.3f/%.3f | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f",
+        "hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f",
         motorPower / 735.5,
         peakPowerHp,
-        motorLoad,
-        spec._smoothedEngineTorqueLoad,
-        rpmLoad,
+        math.max(motorLoad * 100, 0),
+        math.max(dynamicMotorLoad * 100, 0),
+        dynamicLoadDeltaPct,
+        avgAbsDiffAcc,
+        math.max(rpmLoad * 100, 0),
         motor.gear or 0,
         targetGear,
         motor.activeGearGroupIndex or 0,
