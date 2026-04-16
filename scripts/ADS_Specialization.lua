@@ -2995,8 +2995,8 @@ local function updateActiveDraftStats(vehicle)  -- calculates the current active
 
     collectDraftStats(vehicle)
 
-    spec.activeDraftmaxForce = result.maxForce 
-    spec.activeDrafteffectiveForceCap = result.effectiveForceCap
+    spec.activeDraftMaxForce = result.maxForce 
+    spec.activeDraftEffectiveForceCap = result.effectiveForceCap
 end
 
 local function updateDynamicMotorLoad(vehicle) -- adjusts motor load with driveline vibration under active field work
@@ -3252,15 +3252,27 @@ local function getDefaultNode(vehicle)
     return nil
 end
 
-local function hasActivePtoInChain(rootVehicle)
+local function updateImplementChainState(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return 0
+    end
+
+    spec.liftedMass = 0
+    spec.operatingMass = 0
+    spec.isImplementLifted = false
+    spec.isImplementOperating = false
+    spec.isImplementLowered = false
+
+    local nextMoveAlphaCache = {}
+    local implements = {}
     local visited = {}
+    local maxConnectedPtoAngleDeg = 0
+    local hasConnectedPto = false
+    local isPtoActive = false
+    local maxCutterArea = 0
 
-    local function scan(vehicleObj)
-        if vehicleObj == nil or visited[vehicleObj] then
-            return false
-        end
-        visited[vehicleObj] = true
-
+    local function updatePtoActivityState(vehicleObj)
         local ptoActive = vehicleObj.getIsPowerTakeOffActive ~= nil and vehicleObj:getIsPowerTakeOffActive() or false
         local ptoConsuming = vehicleObj.getDoConsumePtoPower ~= nil and vehicleObj:getDoConsumePtoPower() or false
         local ptoRpm = vehicleObj.getPtoRpm ~= nil and (tonumber(vehicleObj:getPtoRpm()) or 0) or 0
@@ -3274,151 +3286,96 @@ local function hasActivePtoInChain(rootVehicle)
         end
 
         if ptoActive or ptoConsuming or ptoRpm > 10 or ptoTorque > 0.001 then
-            return true
+            isPtoActive = true
         end
+    end
 
-        if vehicleObj.getAttachedImplements ~= nil then
-            local attachedImplements = vehicleObj:getAttachedImplements() or {}
-            for _, implement in pairs(attachedImplements) do
-                if implement ~= nil and implement.object ~= nil and scan(implement.object) then
-                    return true
+    local function updateConnectedPtoState(parentObj, childObj, jointDescIndex)
+        local hasLinkPto = false
+
+        if parentObj ~= nil and parentObj.getOutputPowerTakeOffsByJointDescIndex ~= nil and jointDescIndex ~= nil then
+            local outputs = parentObj:getOutputPowerTakeOffsByJointDescIndex(jointDescIndex) or {}
+            for _, output in ipairs(outputs) do
+                if output ~= nil and output.connectedInput ~= nil then
+                    hasLinkPto = true
+                    hasConnectedPto = true
                 end
             end
         end
 
-        return false
+        if hasLinkPto and Utils ~= nil and Utils.getYRotationBetweenNodes ~= nil then
+            local parentNode = getDefaultNode(parentObj)
+            local childNode = getDefaultNode(childObj)
+            if parentNode ~= nil and childNode ~= nil then
+                local yRot = Utils.getYRotationBetweenNodes(parentNode, childNode) or 0
+                local horizontalAngleDeg = math.deg(math.abs(yRot))
+                maxConnectedPtoAngleDeg = math.max(maxConnectedPtoAngleDeg, horizontalAngleDeg)
+            end
+        end
     end
 
-    return scan(rootVehicle)
-end
-
-local function getMaxConnectedPtoAngleDeg(rootVehicle)
-    local spec = rootVehicle.spec_AdvancedDamageSystem
-    if spec == nil then
-        return 0
-    end
-
-    local maxAngleDeg = 0
-    local hasConnectedPto = false
-    local visited = {}
-
-    local function scan(vehicleObj)
+    local function collectImplementState(vehicleObj, parentObj, jointDesc, jointDescIndex, isHead)
         if vehicleObj == nil or visited[vehicleObj] then
             return
         end
+
         visited[vehicleObj] = true
+        updatePtoActivityState(vehicleObj)
 
-        if vehicleObj.getAttachedImplements == nil then
-            return
+        local isMoving = false
+        if isHead then
+            if vehicleObj.spec_attacherJoints ~= nil and vehicleObj.spec_attacherJoints.attacherJoints ~= nil then
+                for index, headJointDesc in pairs(vehicleObj.spec_attacherJoints.attacherJoints) do
+                    isMoving = isMoving or getMoveState(vehicleObj, "__head:" .. tostring(index), headJointDesc, nextMoveAlphaCache)
+                end
+            end
+        else
+            local moveKey = string.format("%s:%s", tostring(vehicleObj), tostring(jointDescIndex or -1))
+            isMoving = getMoveState(parentObj, moveKey, jointDesc, nextMoveAlphaCache)
+            updateConnectedPtoState(parentObj, vehicleObj, jointDescIndex)
         end
 
-        local attachedImplements = vehicleObj:getAttachedImplements() or {}
-        for _, implement in pairs(attachedImplements) do
-            if implement ~= nil and implement.object ~= nil then
-                local childObj = implement.object
-                local linkAngleDeg = 0
-                local hasLinkPto = false
+        local isFoldMoving, isPlowRotationMoving, isCylinderedMoving = getToolMotionFlags(vehicleObj)
+        local isLowered = false
 
-                if vehicleObj.getOutputPowerTakeOffsByJointDescIndex ~= nil and implement.jointDescIndex ~= nil then
-                    local outputs = vehicleObj:getOutputPowerTakeOffsByJointDescIndex(implement.jointDescIndex) or {}
-                    for _, output in ipairs(outputs) do
-                        if output ~= nil and output.connectedInput ~= nil then
-                            hasLinkPto = true
-                            hasConnectedPto = true
-                        end
+        if vehicleObj.getIsLowered ~= nil then
+            isLowered = vehicleObj:getIsLowered(false)
+        elseif jointDesc ~= nil then
+            isLowered = jointDesc.moveDown == true
+        end
+
+        if vehicleObj.spec_cutter ~= nil and vehicleObj.spec_cutter.workAreaParameters ~= nil then
+            maxCutterArea = math.max(maxCutterArea, tonumber(vehicleObj.spec_cutter.workAreaParameters.lastArea) or 0)
+        end
+
+        table.insert(implements, {
+            mass = vehicleObj.getTotalMass ~= nil and (vehicleObj:getTotalMass(true) or 0) or 0,
+            jointTypeId = isHead and 0 or (jointDesc ~= nil and jointDesc.jointType or nil),
+            isLowered = isLowered,
+            supportWheelCount = getSupportWheelCount(vehicleObj),
+            isMoving = isMoving,
+            isFoldMoving = isFoldMoving,
+            isPlowRotationMoving = isPlowRotationMoving,
+            isCylinderedMoving = isCylinderedMoving,
+            isHead = isHead == true
+        })
+
+        local attachedImplements = vehicleObj.getAttachedImplements ~= nil and vehicleObj:getAttachedImplements() or nil
+        if attachedImplements ~= nil then
+            for _, implementData in pairs(attachedImplements) do
+                local childObj = implementData ~= nil and implementData.object or nil
+                if childObj ~= nil then
+                    local childJointDesc = nil
+                    if vehicleObj.spec_attacherJoints ~= nil and vehicleObj.spec_attacherJoints.attacherJoints ~= nil then
+                        childJointDesc = vehicleObj.spec_attacherJoints.attacherJoints[implementData.jointDescIndex]
                     end
+                    collectImplementState(childObj, vehicleObj, childJointDesc, implementData.jointDescIndex, false)
                 end
-
-                if hasLinkPto and Utils ~= nil and Utils.getYRotationBetweenNodes ~= nil then
-                    local parentNode = getDefaultNode(vehicleObj)
-                    local childNode = getDefaultNode(childObj)
-                    if parentNode ~= nil and childNode ~= nil then
-                        local yRot = Utils.getYRotationBetweenNodes(parentNode, childNode) or 0
-                        local horizontalAngleDeg = math.deg(math.abs(yRot))
-                        linkAngleDeg = math.max(linkAngleDeg, horizontalAngleDeg)
-                    end
-                end
-
-                maxAngleDeg = math.max(maxAngleDeg, linkAngleDeg)
-                scan(childObj)
             end
         end
     end
 
-    scan(rootVehicle)
-
-    spec.maxConnectedPtoAngleDeg = maxAngleDeg 
-    spec.hasConnectedPto = hasConnectedPto
-end
-
-local function updateImplementsState(vehicle)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then
-        return 0
-    end
-
-    spec.liftedMass = 0
-    spec.operatingMass = 0
-    spec.isImplementLifted = false
-    spec.isImplementOperating = false
-    spec.isImplementLowered = false
-
-    local nextMoveAlphaCache = {}
-    local headIsMoving = false
-    local implements = {}
-
-    if vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attacherJoints ~= nil then
-        for index, jointDesc in pairs(vehicle.spec_attacherJoints.attacherJoints) do
-            headIsMoving = headIsMoving or getMoveState(vehicle, '__head:' .. tostring(index), jointDesc, nextMoveAlphaCache)
-        end
-    end
-    local headIsFoldMoving, headIsPlowRotationMoving, headIsCylinderedMoving = getToolMotionFlags(vehicle)
-
-    table.insert(implements, {
-        mass = vehicle.getTotalMass ~= nil and (vehicle:getTotalMass(true) or 0) or 0,
-        jointTypeId = 0,
-        isLowered = vehicle.getIsLowered ~= nil and vehicle:getIsLowered(false) or false,
-        supportWheelCount = getSupportWheelCount(vehicle),
-        isMoving = headIsMoving,
-        isFoldMoving = headIsFoldMoving,
-        isPlowRotationMoving = headIsPlowRotationMoving,
-        isCylinderedMoving = headIsCylinderedMoving,
-        isHead = true
-    })
-
-    if vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attachedImplements ~= nil then
-        for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
-            local object = implementData.object
-            if object ~= nil then
-                local jointDesc = nil
-                if vehicle.spec_attacherJoints.attacherJoints ~= nil then
-                    jointDesc = vehicle.spec_attacherJoints.attacherJoints[implementData.jointDescIndex]
-                end
-
-                local isLowered = false
-                if object.getIsLowered ~= nil then
-                    isLowered = object:getIsLowered(false)
-                elseif jointDesc ~= nil then
-                    isLowered = jointDesc.moveDown == true
-                end
-
-                local isFoldMoving, isPlowRotationMoving, isCylinderedMoving = getToolMotionFlags(object)
-                local moveKey = string.format('%s:%s', tostring(object), tostring(implementData.jointDescIndex or -1))
-
-                table.insert(implements, {
-                    mass = object.getTotalMass ~= nil and (object:getTotalMass(true) or 0) or 0,
-                    jointTypeId = jointDesc ~= nil and jointDesc.jointType or nil,
-                    isLowered = isLowered,
-                    supportWheelCount = getSupportWheelCount(object),
-                    isMoving = getMoveState(vehicle, moveKey, jointDesc, nextMoveAlphaCache),
-                    isFoldMoving = isFoldMoving,
-                    isPlowRotationMoving = isPlowRotationMoving,
-                    isCylinderedMoving = isCylinderedMoving,
-                    isHead = false
-                })
-            end
-        end
-    end
+    collectImplementState(vehicle, nil, nil, nil, true)
     
     for _, impl in ipairs(implements) do
         if impl.isLowered then
@@ -3434,10 +3391,16 @@ local function updateImplementsState(vehicle)
         end
     end
 
-    getMaxConnectedPtoAngleDeg(vehicle)
+    local isOnField = vehicle.getIsOnField ~= nil and vehicle:getIsOnField() or false
+    local lastSpeed = vehicle.getLastSpeed ~= nil and vehicle:getLastSpeed() or 0
+    local isTurnedOn = vehicle.getIsTurnedOn == nil or vehicle:getIsTurnedOn()
+
     spec.hydraulicsMoveAlphaCache = nextMoveAlphaCache
-    spec.isPtoActive = hasActivePtoInChain(vehicle)
+    spec.maxConnectedPtoAngleDeg = maxConnectedPtoAngleDeg
+    spec.hasConnectedPto = hasConnectedPto
+    spec.isPtoActive = isPtoActive
     spec.implements = implements
+    spec.isHarvesting = maxCutterArea > 0 and isOnField and lastSpeed >= 0.5 and isTurnedOn
 end
 
 --- chassis
@@ -3795,44 +3758,6 @@ local function updateFuelState(vehicle, dt)
     end
 end
 
-local function updateWorkprocessState(vehicle)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then
-        return
-    end
-
-    local cutterArea = 0
-
-    if vehicle == nil
-        or vehicle.getIsOnField == nil
-        or not vehicle:getIsOnField()
-        or (vehicle.getLastSpeed ~= nil and vehicle:getLastSpeed() or 0) < 0.5 then
-        spec.isHarvesting = false
-        return
-    end
-
-    if vehicle.getIsTurnedOn ~= nil and not vehicle:getIsTurnedOn() then
-        spec.isHarvesting = false
-        return
-    end
-
-    if vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attachedImplements ~= nil then
-        for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
-            local implement = implementData.object
-
-            if implement ~= nil and implement.spec_cutter ~= nil and implement.spec_cutter.workAreaParameters ~= nil then
-                cutterArea = math.max(cutterArea, implement.spec_cutter.workAreaParameters.lastArea or 0)
-            end
-        end
-    end
-
-    if cutterArea <= 0 and vehicle.spec_cutter ~= nil and vehicle.spec_cutter.workAreaParameters ~= nil then
-        cutterArea = vehicle.spec_cutter.workAreaParameters.lastArea or 0
-    end
-
-    spec.isHarvesting = cutterArea > 0
-end
-
 --- update state
 function AdvancedDamageSystem:updateVehicleStateSnapshot(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -3880,12 +3805,10 @@ function AdvancedDamageSystem:updateVehicleStateSnapshot(dt)
         updateActiveDraftStats(self)
         --- average tire friction coefficient
         updateAverageTireGroundFrictionCoeff(self)
-        --- implemets state
-        updateImplementsState(self)
+        --- implement chain state
+        updateImplementChainState(self)
         --- fuel state
         updateFuelState(self, spec.updateVehicleStateTimerThree)
-        --- workprocess state
-        updateWorkprocessState(self)
         --- is vehicle under roof
         spec.isUnderRoof = self:isUnderRoof()
 

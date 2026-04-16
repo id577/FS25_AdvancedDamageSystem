@@ -159,54 +159,6 @@ local function hasCVTAddon(vehicle)
         and cvtAddonConfig ~= 8
 end
 
-local function collectActiveDraftStats(rootVehicle, result, visited)
-    result = result or {
-        maxForce = 0,
-        effectiveForceCap = 0,
-        count = 0
-    }
-    visited = visited or {}
-
-    if rootVehicle == nil or visited[rootVehicle] then
-        return result
-    end
-
-    visited[rootVehicle] = true
-
-    local attachedImplements = rootVehicle.getAttachedImplements ~= nil and rootVehicle:getAttachedImplements() or nil
-    if attachedImplements ~= nil then
-        for _, implement in pairs(attachedImplements) do
-            local object = implement.object
-            if object ~= nil and not visited[object] then
-                local powerConsumer = object.spec_powerConsumer
-                if powerConsumer ~= nil then
-                    local maxForce = tonumber(powerConsumer.maxForce) or 0
-                    local multiplier = object.getPowerMultiplier ~= nil and (tonumber(object:getPowerMultiplier()) or 0) or 1
-                    local speed = math.abs(tonumber(object.lastSpeedReal) or 0)
-                    local movingDirection = tonumber(object.movingDirection) or 0
-                    local forceDir = tonumber(powerConsumer.forceDir) or 0
-
-                    local isActiveDraft = maxForce > 0
-                        and multiplier > 0.001
-                        and powerConsumer.forceNode ~= nil
-                        and movingDirection == forceDir
-                        and speed > 0.0001
-
-                    if isActiveDraft then
-                        result.maxForce = result.maxForce + maxForce
-                        result.effectiveForceCap = result.effectiveForceCap + maxForce * multiplier
-                        result.count = result.count + 1
-                    end
-                end
-
-                collectActiveDraftStats(object, result, visited)
-            end
-        end
-    end
-
-    return result
-end
-
 local function splitConsoleArgs(text)
     local args = {}
     for token in tostring(text or ""):gmatch("%S+") do
@@ -491,7 +443,6 @@ function ADS_Telemetry:collectDrivetrainInfo(vehicle)
         currentSpeedLimitKmh = (tonumber(motor.getMaximumForwardSpeed ~= nil and motor:getMaximumForwardSpeed() or 0) or 0) * 3.6
     end
     local targetGear = (tonumber(motor.targetGear) or 0) * (tonumber(motor.currentDirection) or 1)
-    local draftStats = collectActiveDraftStats(vehicle)
     local spec_CVTaddon = vehicle.spec_CVTaddon
 
     return {
@@ -508,8 +459,8 @@ function ADS_Telemetry:collectDrivetrainInfo(vehicle)
         targetGear = targetGear,
         activeGearGroupIndex = tonumber(motor.activeGearGroupIndex) or 0,
         gearRatio = tonumber(motor.getGearRatio ~= nil and motor:getGearRatio() or 0) or 0,
-        draftMaxForce = tonumber(draftStats.maxForce or 0) or 0,
-        draftEffectiveForceCap = tonumber(draftStats.effectiveForceCap or 0) or 0,
+        draftMaxForce = tonumber(spec.activeDraftMaxForce) or 0,
+        draftEffectiveForceCap = tonumber(spec.activeDraftEffectiveForceCap) or 0,
         cvtAddon = hasCVTAddon(vehicle) and {
             damage = tonumber(spec_CVTaddon.CVTdamage) or 0,
             warnDamage = spec_CVTaddon.forDBL_warndamage == 1,
