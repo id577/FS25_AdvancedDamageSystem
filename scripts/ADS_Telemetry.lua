@@ -159,30 +159,6 @@ local function hasCVTAddon(vehicle)
         and cvtAddonConfig ~= 8
 end
 
-local function getAverageTireGroundFrictionCoeff(vehicle)
-    local specWheels = vehicle ~= nil and vehicle.spec_wheels or nil
-    if specWheels == nil or specWheels.wheels == nil then
-        return 0
-    end
-
-    local sum = 0
-    local count = 0
-    for _, wheel in ipairs(specWheels.wheels) do
-        local physics = wheel ~= nil and wheel.physics or nil
-        local coeff = physics ~= nil and tonumber(physics.tireGroundFrictionCoeff) or nil
-        if coeff ~= nil and coeff > 0 then
-            sum = sum + coeff
-            count = count + 1
-        end
-    end
-
-    if count == 0 then
-        return 0
-    end
-
-    return sum / count
-end
-
 local function collectActiveDraftStats(rootVehicle, result, visited)
     result = result or {
         maxForce = 0,
@@ -430,8 +406,8 @@ function ADS_Telemetry:collectTransmissionSystemInfo(vehicle)
         heavyTrailerMassRatio = tonumber(transmissionDbg.heavyTrailerMassRatio or 0) or 0,
         luggingFactor = tonumber(transmissionDbg.luggingFactor or 0) or 0,
         wheelSlipFactor = tonumber(transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0) or 0,
-        wheelSlipIntensity = tonumber(transmissionDbg.wheelSlipIntensity or 0) or 0,
-        avgTireGroundFrictionCoeff = tonumber(getAverageTireGroundFrictionCoeff(vehicle) or 0) or 0,
+        wheelSlipIntensity = tonumber(spec.wheelSlipIntensity or 0) or 0,
+        avgTireGroundFrictionCoeff = tonumber(spec.avgTireGroundFrictionCoeff or 0) or 0,
         coldTransFactor = tonumber((transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0) or 0,
         hotTransFactor = tonumber(transmissionDbg.hotTransFactor or 0) or 0
     }

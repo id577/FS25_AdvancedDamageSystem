@@ -1128,31 +1128,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         return string.format("%s: %.2f | %.2f | %.2f%s", shortName, currentPct, sumPct, stressPct, extraText)
     end
 
-    local function getAverageTireGroundFrictionCoeff()
-        local specWheels = vehicle.spec_wheels
-        if specWheels == nil or specWheels.wheels == nil then
-            return 0
-        end
-
-        local sum = 0
-        local count = 0
-        for _, wheel in ipairs(specWheels.wheels) do
-            local physics = wheel ~= nil and wheel.physics or nil
-            local coeff = physics ~= nil and tonumber(physics.tireGroundFrictionCoeff) or nil
-            if coeff ~= nil and coeff > 0 then
-                sum = sum + coeff
-                count = count + 1
-            end
-        end
-
-        if count == 0 then
-            return 0
-        end
-
-        return sum / count
-    end
-
-    local avgTireGroundFrictionCoeff = getAverageTireGroundFrictionCoeff()
+    local avgTireGroundFrictionCoeff = tonumber(spec.avgTireGroundFrictionCoeff or 0) or 0
 
     local function buildSystemLines(systemKey, dbg, maxFactor, factorEntries)
         local lines = {}
@@ -1203,7 +1179,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("t: %.1fs", transmissionDbg.pullOverloadTimer or 0) },
         { shortName = "htf", statKey = "htf", value = transmissionDbg.heavyTrailerFactor or 0, extraInfo = string.format("mr: %.2f", transmissionDbg.heavyTrailerMassRatio or 0) },
         { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
-        { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("s: %.1f c: %.2f", asPercent(transmissionDbg.wheelSlipIntensity or 0), avgTireGroundFrictionCoeff) },
+        { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("s: %.1f c: %.2f", asPercent(spec.wheelSlipIntensity or 0), avgTireGroundFrictionCoeff) },
         { shortName = "ctf", statKey = "ctf", value = (transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0 },
         { shortName = "hotf", statKey = "hotf", value = transmissionDbg.hotTransFactor or 0 }
     })
