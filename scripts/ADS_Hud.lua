@@ -1176,7 +1176,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local transmissionLines = buildSystemLines("transmission", transmissionDbg, transmissionMaxFactor, {
         { shortName = "sf", statKey = "sf", value = transmissionDbg.expiredServiceFactor or 0 },
         { shortName = "bpf", statKey = "bpf", value = transmissionDbg.breakdownPresenceFactor or 0 },
-        { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("t: %.1fs", transmissionDbg.pullOverloadTimer or 0) },
+        { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("%.1f->%.1f", transmissionDbg.pullOverloadTimer or 0, transmissionDbg.pullOverloadTimerMin or 0) },
         { shortName = "htf", statKey = "htf", value = transmissionDbg.heavyTrailerFactor or 0, extraInfo = string.format("mr: %.2f", transmissionDbg.heavyTrailerMassRatio or 0) },
         { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
         { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("s: %.1f c: %.2f", asPercent(spec.wheelSlipIntensity or 0), avgTireGroundFrictionCoeff) },

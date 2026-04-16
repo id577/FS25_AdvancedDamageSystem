@@ -4445,20 +4445,25 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         massRatio = selfMass > 0 and math.max(totalMass / selfMass, 0) or 1.0
 
         -- pull overload
-        if dynamicMotorLoad > C.PULL_OVERLOAD_THRESHOLD and speed > 0.5 then
-            systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, C.PULL_OVERLOAD_TIMER_THRESHOLD)
+        local pullOverloadTargetTimer = 0
+        if dynamicMotorLoad > C.PULL_OVERLOAD_THRESHOLD then
+            pullOverloadTargetTimer = C.PULL_OVERLOAD_TIMER_THRESHOLD
+                + math.max((dynamicMotorLoad - C.PULL_OVERLOAD_THRESHOLD) * 100, 0)
+        end
+
+        systemData.pullOverloadTimerMax = pullOverloadTargetTimer
+        systemData.pullOverloadTimerMin = dynamicMotorLoad < C.PULL_OVERLOAD_THRESHOLD and 0 or pullOverloadTargetTimer
+
+        if systemData.pullOverloadTimer < pullOverloadTargetTimer then
+            systemData.pullOverloadTimer = math.min(systemData.pullOverloadTimer + dt / 1000, pullOverloadTargetTimer)
+        elseif systemData.pullOverloadTimer > pullOverloadTargetTimer then
+            systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, pullOverloadTargetTimer)
+        end
+
+        if speed > 0.5 and systemData.pullOverloadTimer > 0 then
             pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
-            pullOverloadFactor = math.clamp(pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER, 0, C.PULL_OVERLOAD_MULTIPLIER)
+            pullOverloadFactor = math.clamp(pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER, 0, C.PULL_OVERLOAD_MULTIPLIER * 5)
             wearRate = wearRate + pullOverloadFactor
-        else
-            if systemData.pullOverloadTimer > 0 then
-                systemData.pullOverloadTimer = math.max(systemData.pullOverloadTimer - dt / 1000, 0)
-                if speed > 0.5 then
-                    pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
-                    pullOverloadFactor = math.clamp(pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER, 0, C.PULL_OVERLOAD_MULTIPLIER)
-                    wearRate = wearRate + pullOverloadFactor
-                end
-            end
         end
  
         -- lugging factor
@@ -4540,6 +4545,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         expiredServiceFactor = expiredServiceFactor,
         pullOverloadFactor = pullOverloadFactor,
         pullOverloadTimer = systemData.pullOverloadTimer,
+        pullOverloadTimerMin = systemData.pullOverloadTimerMin,
+        pullOverloadTimerMax = systemData.pullOverloadTimerMax,
         heavyTrailerFactor = heavyTrailerFactor,
         heavyTrailerMassRatio = massRatio,
         luggingFactor = luggingFactor,
