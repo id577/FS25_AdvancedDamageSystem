@@ -4461,7 +4461,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         end
 
         if speed > 0.5 and systemData.pullOverloadTimer > 0 then
-            pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_THRESHOLD)
+            pullOverloadFactor = ADS_Utils.calculateQuadraticMultiplier(systemData.pullOverloadTimer, 0, false, C.PULL_OVERLOAD_TIMER_MAX_EFFECT)
             pullOverloadFactor = math.clamp(pullOverloadFactor * dynamicMotorLoad * C.PULL_OVERLOAD_MULTIPLIER, 0, C.PULL_OVERLOAD_MULTIPLIER * 5)
             wearRate = wearRate + pullOverloadFactor
         end
