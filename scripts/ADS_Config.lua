@@ -16,7 +16,11 @@ ADS_Config = {
     -- WARNING: It is strongly recommended to keep this value low (e.g., under 200ms).
     -- High values can cause visual glitches (like lights staying off for too long)
     -- or make gameplay effects feel unresponsive and delayed.
-    EFFECTS_UPDATE_DELAY = 100, -- (100ms = 10 times per second)
+    ON_UPDATE_DELAY = 100, -- (100ms = 10 times per second)
+
+    UPDATE_VEHICLE_STATE_DELAY_ONE = 50,
+    UPDATE_VEHICLE_STATE_DELAY_TWO = 200,
+    UPDATE_VEHICLE_STATE_DELAY_THREE = 500,
     
     -- How often the main simulation logic (wear, temperature, etc.) updates, in milliseconds.
     -- This handles the slow-burning processes. A higher value is better for performance

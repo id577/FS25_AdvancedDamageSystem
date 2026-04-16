@@ -613,7 +613,7 @@ function ADS_Hud:drawDashboard()
     end
 
     local engineTemp, transTemp, systemVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.systemVoltageV
-    local motorLoad = math.min(spec._smoothedMotorLoad or 0, 1)
+    local motorLoad = math.min(spec.dynamicMotorLoad or spec._smoothedMotorLoad or 0, 1)
 
     local tempSign = "°C"
     local voltageSing = "V"
@@ -1230,7 +1230,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "bpf", statKey = "bpf", value = electricalDbg.breakdownPresenceFactor or 0 },
         { shortName = "wef", statKey = "wef", value = electricalDbg.weatherExposureFactor or 0 },
         { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
-        { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s", tostring(spec.systems ~= nil and spec.systems.electrical ~= nil and spec.systems.electrical.isCranking == true)) },
+        { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s", tostring(spec.isCranking ~= nil and spec.isCranking == true)) },
         { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 }
     })
 

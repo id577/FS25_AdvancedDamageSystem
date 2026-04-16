@@ -376,100 +376,6 @@ local function computeSystemSyncHash(vehicle)
     return systemHash
 end
 
-local function updateDynamicMotorLoad(vehicle)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then
-        return 0
-    end
-
-    local motorLoad = vehicle:getMotorLoadPercentage()
-    local dynamicMotorLoad = motorLoad
-
-    if vehicle:getIsOnField() then
-        local isWorking = false
-        if vehicle.spec_attacherJoints and vehicle.spec_attacherJoints.attachedImplements and next(vehicle.spec_attacherJoints.attachedImplements) ~= nil then
-            for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
-                if implementData.object ~= nil then
-                    local implement = implementData.object
-                    if implement:getIsLowered() then
-                        isWorking = true
-                    end
-                end
-            end
-        end
-
-        if isWorking then
-            local motor = vehicle:getMotor()
-            local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
-            local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
-            dynamicMotorLoad = math.min(motorLoad + math.min(avgAbsDiffAcc / 3, 0.15) * ((spec.activeDraftEffectiveForceCap / peakPowerHp) / 0.15) ^ 2, 1.15)
-        end
-    end
-
-    spec.dynamicMotorLoad = dynamicMotorLoad or motorLoad
-    return dynamicMotorLoad or motorLoad
-end
-
-local function updateActiveDraftStats(vehicle)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then
-        return
-    end
-
-    local result = {
-        maxForce = 0,
-        effectiveForceCap = 0,
-        count = 0
-    }
-    local visited = {}
-
-    local function collectDraftStats(rootVehicle)
-        if rootVehicle == nil or visited[rootVehicle] then
-            return
-        end
-
-        visited[rootVehicle] = true
-
-        local attachedImplements = rootVehicle.getAttachedImplements ~= nil and rootVehicle:getAttachedImplements() or nil
-        if attachedImplements == nil then
-            return
-        end
-
-        for _, implement in pairs(attachedImplements) do
-            local object = implement ~= nil and implement.object or nil
-            if object ~= nil and not visited[object] then
-                local powerConsumer = object.spec_powerConsumer
-                if powerConsumer ~= nil then
-                    local maxForce = tonumber(powerConsumer.maxForce) or 0
-                    local multiplier = object.getPowerMultiplier ~= nil and (tonumber(object:getPowerMultiplier()) or 0) or 1
-                    local speed = math.abs(tonumber(object.lastSpeedReal) or 0)
-                    local movingDirection = tonumber(object.movingDirection) or 0
-                    local forceDir = tonumber(powerConsumer.forceDir) or 0
-
-                    local isActiveDraft = maxForce > 0
-                        and multiplier > 0.001
-                        and powerConsumer.forceNode ~= nil
-                        and movingDirection == forceDir
-                        and speed > 0.0001
-
-                    if isActiveDraft then
-                        result.maxForce = result.maxForce + maxForce
-                        result.effectiveForceCap = result.effectiveForceCap + maxForce * multiplier
-                        result.count = result.count + 1
-                    end
-                end
-
-                collectDraftStats(object)
-            end
-        end
-    end
-
-    collectDraftStats(vehicle)
-
-    spec.activeDraftMaxForce = result.maxForce
-    spec.activeDraftEffectiveForceCap = result.effectiveForceCap
-end
-
 -- ==========================================================
 --                         DIRTY FLAGS HELPERS
 -- ==========================================================
@@ -750,7 +656,6 @@ end
 --                          REGISTRATION
 -- ==========================================================
 
-
 function AdvancedDamageSystem.initSpecialization()
     log_dbg("initSpecialization called.")
     local schema = Vehicle.xmlSchema
@@ -875,7 +780,8 @@ end
 function AdvancedDamageSystem.registerFunctions(vehicleType)
     log_dbg("registerFunctions called for vehicleType:", vehicleType.name)
     SpecializationUtil.registerFunction(vehicleType, "adsUpdate", AdvancedDamageSystem.adsUpdate)
-
+    SpecializationUtil.registerFunction(vehicleType, "updateVehicleStateSnapshot", AdvancedDamageSystem.updateVehicleStateSnapshot)
+    
     SpecializationUtil.registerFunction(vehicleType, "recalculateAndApplyEffects", AdvancedDamageSystem.recalculateAndApplyEffects)
     SpecializationUtil.registerFunction(vehicleType, "recalculateAndApplyIndicators", AdvancedDamageSystem.recalculateAndApplyIndicators)
     
@@ -1745,8 +1651,13 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.dynamicMotorLoad = 0
     self.spec_AdvancedDamageSystem.activeDraftMaxForce = 0
     self.spec_AdvancedDamageSystem.activeDraftEffectiveForceCap = 0
+    self.spec_AdvancedDamageSystem.isCranking = false
+
     self.spec_AdvancedDamageSystem.isUnderRoof = true
-    self.spec_AdvancedDamageSystem.effectsUpdateTimer = ADS_Config.EFFECTS_UPDATE_DELAY
+    self.spec_AdvancedDamageSystem.onUpdateTimer = ADS_Config.ON_UPDATE_DELAY
+    self.spec_AdvancedDamageSystem.updateVehicleStateTimerOne = ADS_Config.UPDATE_VEHICLE_STATE_DELAY_ONE
+    self.spec_AdvancedDamageSystem.updateVehicleStateTimerTwo = ADS_Config.UPDATE_VEHICLE_STATE_DELAY_TWO
+    self.spec_AdvancedDamageSystem.updateVehicleStateTimerThree = ADS_Config.UPDATE_VEHICLE_STATE_DELAY_THREE
     self.spec_AdvancedDamageSystem.metaUpdateTimer = math.random() * ADS_Config.META_UPDATE_DELAY
     self.spec_AdvancedDamageSystem.maintenanceTimer = 0
     self.spec_AdvancedDamageSystem.currentState = AdvancedDamageSystem.STATUS.READY
@@ -2276,6 +2187,10 @@ function AdvancedDamageSystem:onDelete()
     end
 end
 
+-- ==========================================================
+--                        EVENTS
+-- ==========================================================
+
 function AdvancedDamageSystem:onLeaveVehicle(wasEntered)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then
@@ -2464,7 +2379,7 @@ local function syncDeadBatteryEffect(vehicle)
         if (vehicle:getIsMotorStarted() and spec.alternatorHealth < 0.01) or not vehicle:getIsMotorStarted() then
             if not vehicle:hasBreakdown(breakdownId) and spec.externalPowerConnection == nil then
                 vehicle:addBreakdown(breakdownId)
-                if spec.systems.electrical.isCranking then
+                if spec.isCranking ~= nil and spec.isCranking then
                     local engineHardStartEffect = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_HARD_START_MODIFIER or nil
                     local engineFailedEffect = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_FAILURE or nil
                     if engineHardStartEffect ~= nil and engineHardStartEffect.extraData ~= nil and engineHardStartEffect.extraData.status ~= nil then
@@ -2525,7 +2440,7 @@ local function syncOverheatProtection(vehicle)
         if vehicle.isServer then
             local engineFailedEffect = spec.activeEffects.ENGINE_FAILURE
             if rawEngineTemp > 125 and not engineFailedEffect then
-                if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.effectsUpdateTimer, 3) then
+                if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.onUpdateTimer, 3) then
                     vehicle:addBreakdown('ENGINE_JAM')
                 end
             end
@@ -2542,7 +2457,7 @@ local function syncVoltageSagEffect(vehicle, dt)
     end
 
     local motorState = vehicle:getMotorState()
-    local isCranking = spec.systems.electrical.isCranking ~= nil and spec.systems.electrical.isCranking
+    local isCranking = spec.isCranking ~= nil and spec.isCranking
     local breakdownId = 'VOLTAGE_SAG'
     local systemVoltageV = spec.rawSystemVoltageV or spec.systemVoltageV or 0
     local isVoltageSagging = (motorState == 1 and systemVoltageV < 12.0 and not isCranking) or (motorState == 4 and systemVoltageV < 13.0)
@@ -2687,25 +2602,6 @@ local function syncMessages(vehicle, dt)
         g_currentMission:showBlinkingWarning(g_i18n:getText(candidateMessage), 3600)
         spec.lastMessage = candidateMessage
         spec.messageTimer = repeatDelayMs
-    end
-end
-
-local function getSmoothedMotorLoad(vehicle, dt)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then return end
-
-    if vehicle:getIsMotorStarted() then
-        local rawLoad
-        if vehicle.isServer then
-            rawLoad = math.max(vehicle:getMotorLoadPercentage() or 0, 0)
-        else
-            rawLoad = math.max(spec._netMotorLoad or 0, 0)
-        end
-        local loadTau = 300
-        local loadAlpha = math.min(dt / (loadTau + dt), 1)
-        spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
-    else
-        spec._smoothedMotorLoad = 0
     end
 end
 
@@ -2877,86 +2773,26 @@ local function syncOverloadWarning(vehicle, dt)
     end
 end
 
-local function updateAvgAbsDiffAccWindow(spec, motor, dt)
-    if spec == nil or motor == nil then
-        if spec ~= nil then
-            spec.avgAbsDiffAcc = 0
-        end
-        return 0
-    end
-
-    local windowDurationMs = 500
-    local diffAcc = math.abs(tonumber(motor.differentialRotAccelerationSmoothed) or 0)
-
-    if spec._avgAbsDiffAccSamples == nil then
-        spec._avgAbsDiffAccSamples = {}
-    end
-
-    local samples = spec._avgAbsDiffAccSamples
-
-    for i = #samples, 1, -1 do
-        local sample = samples[i]
-        sample.ageMs = (tonumber(sample.ageMs) or 0) + (tonumber(dt) or 0)
-
-        if sample.ageMs > windowDurationMs then
-            table.remove(samples, i)
-        end
-    end
-
-    table.insert(samples, {
-        ageMs = 0,
-        value = diffAcc
-    })
-
-    if #samples == 0 then
-        spec.avgAbsDiffAcc = 0
-        return 0
-    end
-
-    local sum = 0
-    for i = 1, #samples do
-        sum = sum + (tonumber(samples[i].value) or 0)
-    end
-
-    local avg = sum / #samples
-    spec.avgAbsDiffAcc = avg
-end
-
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
 
-    updateAvgAbsDiffAccWindow(spec, self:getMotor(), dt)
-    updateDynamicMotorLoad(self)
+    self:updateVehicleStateSnapshot(dt)
 
-    spec.effectsUpdateTimer = spec.effectsUpdateTimer + dt
+    spec.onUpdateTimer = spec.onUpdateTimer + dt
 
-    -- Smooth motor load for HUD display (EMA filter, TAU ~300ms).
-    -- On a dedicated client, Giants' getMotorLoadPercentage() is derived from
-    -- a 7-bit quantized rawLoadPercentage sent in Motorized's update stream,
-    -- resulting in non-deterministic idle values between restarts.
-    -- We sync the server's authoritative value (float32) in dirty flag [1]
-    -- and use it as the EMA input on the client for a stable, consistent reading.
-    getSmoothedMotorLoad(self, spec.effectsUpdateTimer)
-
-    --- Fuel consumption
-    syncFuelConsumption(self)
-
-    if spec.effectsUpdateTimer < ADS_Config.EFFECTS_UPDATE_DELAY then
+    if spec.onUpdateTimer < ADS_Config.ON_UPDATE_DELAY then
         return
     end
 
     --- Registration in ADS_Main.vehicles and first load checks.
     registerVehicle(self)
-    
-    --- Temperature smoothing
-    self:getSmoothedTemperature(spec.effectsUpdateTimer)
 
     --- Checking for cold engine effect
     syncColdEngineEffect(self)
 
     --- Checking for dead alternator or dead battery
-    syncVoltageSagEffect(self, spec.effectsUpdateTimer)
+    syncVoltageSagEffect(self, spec.onUpdateTimer)
 
     --- Checking for airintake clogging
     syncAirIntakeCloggingEffect(self)
@@ -2971,7 +2807,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     syncCVTaddonBreakdown(self)
     
     --- Messages
-    syncMessages(self, spec.effectsUpdateTimer)
+    syncMessages(self, spec.onUpdateTimer)
 
     --- Disable AI workers for critical effects
     syncDisableAiWorkers(self)
@@ -2981,22 +2817,22 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     
     --- AI worker overload, temp control
     if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL then
-        self:updateAiWorkerCruiseControl(spec.effectsUpdateTimer)
+        self:updateAiWorkerCruiseControl(spec.onUpdateTimer)
     end
 
     --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
     if self.isServer and ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
-        self:updateThermalSystems(spec.effectsUpdateTimer)
+        self:updateThermalSystems(spec.onUpdateTimer)
     end
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeFunctions) ~= nil then
         for _ , func in pairs(spec.activeFunctions) do
-            func(self, spec.effectsUpdateTimer)
+            func(self, spec.onUpdateTimer)
         end
     end
 
-    spec.effectsUpdateTimer = spec.effectsUpdateTimer - ADS_Config.EFFECTS_UPDATE_DELAY
+    spec.onUpdateTimer = spec.onUpdateTimer - ADS_Config.ON_UPDATE_DELAY
 end
 
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
@@ -3013,7 +2849,6 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         spec._allowAdsOperatingTimeWrite = false
     end
 
-    updateActiveDraftStats(self)
     self:updateThermalSystems(dt)
     self:updateBatteryChargingModel(dt)
 
@@ -3025,7 +2860,6 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
             self:updateAirIntakeClogging(dt)
             self:processBreakdowns(dt)
             self:tryTriggerBreakdown(dt)
-            spec.isUnderRoof = self:isUnderRoof()
         end
 
         -- service
@@ -3067,8 +2901,219 @@ end
 --                      VEHICLE STATE
 -- ==========================================================
 
-function AdvancedDamageSystem:captureVehicleStateSnaphot(dt)
+local function updateActiveDraftStats(vehicle)  -- calculates the current active draft demand from attached implements
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
 
+    local result = {
+        maxForce = 0,
+        effectiveForceCap = 0,
+        count = 0
+    }
+    local visited = {}
+
+    local function collectDraftStats(rootVehicle)
+        if rootVehicle == nil or visited[rootVehicle] then
+            return
+        end
+
+        visited[rootVehicle] = true
+
+        local attachedImplements = rootVehicle.getAttachedImplements ~= nil and rootVehicle:getAttachedImplements() or nil
+        if attachedImplements == nil then
+            return
+        end
+
+        for _, implement in pairs(attachedImplements) do
+            local object = implement ~= nil and implement.object or nil
+            if object ~= nil and not visited[object] then
+                local powerConsumer = object.spec_powerConsumer
+                if powerConsumer ~= nil then
+                    local maxForce = tonumber(powerConsumer.maxForce) or 0
+                    local multiplier = object.getPowerMultiplier ~= nil and (tonumber(object:getPowerMultiplier()) or 0) or 1
+                    local speed = math.abs(tonumber(object.lastSpeedReal) or 0)
+                    local movingDirection = tonumber(object.movingDirection) or 0
+                    local forceDir = tonumber(powerConsumer.forceDir) or 0
+
+                    local isActiveDraft = maxForce > 0
+                        and multiplier > 0.001
+                        and powerConsumer.forceNode ~= nil
+                        and movingDirection == forceDir
+                        and speed > 0.0001
+
+                    if isActiveDraft then
+                        result.maxForce = result.maxForce + maxForce
+                        result.effectiveForceCap = result.effectiveForceCap + maxForce * multiplier
+                        result.count = result.count + 1
+                    end
+                end
+
+                collectDraftStats(object)
+            end
+        end
+    end
+
+    collectDraftStats(vehicle)
+
+    return result.maxForce, result.effectiveForceCap
+end
+
+local function updateDynamicMotorLoad(vehicle) -- adjusts motor load with driveline vibration under active field work
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return 0
+    end
+
+    local motorLoad = vehicle:getMotorLoadPercentage()
+    local dynamicMotorLoad = motorLoad
+
+    if vehicle:getIsOnField() then
+        local isWorking = false
+        if vehicle.spec_attacherJoints and vehicle.spec_attacherJoints.attachedImplements and next(vehicle.spec_attacherJoints.attachedImplements) ~= nil then
+            for _, implementData in pairs(vehicle.spec_attacherJoints.attachedImplements) do
+                if implementData.object ~= nil then
+                    local implement = implementData.object
+                    if implement:getIsLowered() then
+                        isWorking = true
+                    end
+                end
+            end
+        end
+
+        if isWorking then
+            local motor = vehicle:getMotor()
+            local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
+            local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
+            dynamicMotorLoad = math.min(motorLoad + math.min(avgAbsDiffAcc / 3, 0.15) * ((spec.activeDraftEffectiveForceCap / peakPowerHp) / 0.15) ^ 2, 1.15)
+        end
+    end
+
+    return dynamicMotorLoad or motorLoad
+end
+
+local function updateAvgAbsDiffAccWindow(spec, motor, dt) -- Tracks the rolling average absolute differential acceleration over the last 500 ms
+    if spec == nil or motor == nil then
+        if spec ~= nil then
+            spec.avgAbsDiffAcc = 0
+        end
+        return 0
+    end
+
+    local windowDurationMs = 500
+    local diffAcc = math.abs(tonumber(motor.differentialRotAccelerationSmoothed) or 0)
+
+    if spec._avgAbsDiffAccSamples == nil then
+        spec._avgAbsDiffAccSamples = {}
+    end
+
+    local samples = spec._avgAbsDiffAccSamples
+
+    for i = #samples, 1, -1 do
+        local sample = samples[i]
+        sample.ageMs = (tonumber(sample.ageMs) or 0) + (tonumber(dt) or 0)
+
+        if sample.ageMs > windowDurationMs then
+            table.remove(samples, i)
+        end
+    end
+
+    table.insert(samples, {
+        ageMs = 0,
+        value = diffAcc
+    })
+
+    if #samples == 0 then
+        spec.avgAbsDiffAcc = 0
+        return 0
+    end
+
+    local sum = 0
+    for i = 1, #samples do
+        sum = sum + (tonumber(samples[i].value) or 0)
+    end
+
+    local avg = sum / #samples
+    return avg
+end
+
+local function updateStarterState(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then
+        return
+    end
+
+    local engineHardStartEffect = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_HARD_START_MODIFIER or nil
+    local engineFailedEffect = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_FAILURE or nil
+
+    local isCranking = vehicle:getMotorState() == 3 or 
+        (engineHardStartEffect ~= nil and engineHardStartEffect.extraData ~= nil and engineHardStartEffect.extraData.status ~= nil and (engineHardStartEffect.extraData.status == "CRANKING" or engineHardStartEffect.extraData.status == "PASSED")) or 
+        (engineFailedEffect ~= nil and engineFailedEffect.extraData ~= nil and engineFailedEffect.extraData.status ~= nil and engineFailedEffect.extraData.status == "CRANKING")
+
+    return isCranking
+end
+
+local function getSmoothedMotorLoad(vehicle, dt)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    if vehicle:getIsMotorStarted() then
+        local rawLoad
+        if vehicle.isServer then
+            rawLoad = math.max(vehicle:getMotorLoadPercentage() or 0, 0)
+        else
+            rawLoad = math.max(spec._netMotorLoad or 0, 0)
+        end
+        local loadTau = 300
+        local loadAlpha = math.min(dt / (loadTau + dt), 1)
+        spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
+    else
+        spec._smoothedMotorLoad = 0
+    end
+end
+
+function AdvancedDamageSystem:updateVehicleStateSnapshot(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil or spec.isExcludedVehicle then return end
+
+    spec.updateVehicleStateTimerOne = spec.updateVehicleStateTimerOne + dt
+    spec.updateVehicleStateTimerTwo = spec.updateVehicleStateTimerTwo + dt
+    spec.updateVehicleStateTimerThree = spec.updateVehicleStateTimerThree + dt
+
+    --- GROUP 1 ---
+    if spec.updateVehicleStateTimerOne >= ADS_Config.UPDATE_VEHICLE_STATE_DELAY_ONE then
+        --- avgAbsDiffAcc for dynamic motorLoad calculations
+        spec.avgAbsDiffAcc = updateAvgAbsDiffAccWindow(spec, self:getMotor(), spec.updateVehicleStateTimerOne)
+        --- dynamic motorLoad
+        spec.dynamicMotorLoad = updateDynamicMotorLoad(self)
+        --- smoothedMotorLoad
+        getSmoothedMotorLoad(self, spec.updateVehicleStateTimerOne)
+        --- Temperature smoothing
+        self:getSmoothedTemperature(spec.updateVehicleStateTimerOne)
+        --- Fuel consumption
+        syncFuelConsumption(self)
+
+        spec.updateVehicleStateTimerOne = spec.updateVehicleStateTimerOne - ADS_Config.UPDATE_VEHICLE_STATE_DELAY_ONE
+    end
+
+    --- GROUP 2 ---
+    if spec.updateVehicleStateTimerTwo >= ADS_Config.UPDATE_VEHICLE_STATE_DELAY_TWO then
+        --- isCranking
+        spec.isCranking = updateStarterState(self)
+        
+        spec.updateVehicleStateTimerTwo = spec.updateVehicleStateTimerTwo - ADS_Config.UPDATE_VEHICLE_STATE_DELAY_TWO
+    end
+    
+    --- GROUP 3 ---
+    if spec.updateVehicleStateTimerThree >= ADS_Config.UPDATE_VEHICLE_STATE_DELAY_THREE then
+        --- max friction force
+        spec.activeDraftMaxForce, spec.activeDraftEffectiveForceCap = updateActiveDraftStats(self)
+        --- is vehicle under roof
+        spec.isUnderRoof = self:isUnderRoof()
+
+        spec.updateVehicleStateTimerThree = spec.updateVehicleStateTimerThree - ADS_Config.UPDATE_VEHICLE_STATE_DELAY_THREE
+    end
 end
 
 -- ==========================================================
@@ -3162,7 +3207,7 @@ function AdvancedDamageSystem:updateAiWorkerCruiseControl(dt)
     end
 
     local state = spec.aiWorkerPid
-    local dtMs = math.max(dt or ADS_Config.EFFECTS_UPDATE_DELAY, 1)
+    local dtMs = math.max(dt or ADS_Config.ON_UPDATE_DELAY, 1)
     local dtSeconds = math.max(dtMs / 1000, 0.05)
 
     local function normalizeToUnit(value, startValue, fullValue)
@@ -3286,8 +3331,8 @@ function AdvancedDamageSystem:updateAiWorkerCruiseControl(dt)
     end
 end
 
--- ==========================================================
---                      CORE FUNCTIONS
+-- =========================================================
+--                   CORE WEAR FUNCTIONS
 -- =========================================================
 
 local function resolveSystemKey(spec, systemName)
@@ -3387,7 +3432,6 @@ local function getBreakdownsStageSum(vehicle, system)
     return sumOfStages
 end
 
--- service
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
     local wearRate = ADS_Config.CORE.BASE_SERVICE_WEAR
@@ -3420,7 +3464,6 @@ function AdvancedDamageSystem:updateServiceLevel(dt)
     end
 end
 
--- condition
 function AdvancedDamageSystem:updateConditionLevel()
     local spec = self.spec_AdvancedDamageSystem
     local weightedCondition = 0
@@ -3446,7 +3489,6 @@ function AdvancedDamageSystem:updateConditionLevel()
     spec.conditionLevel = math.clamp(condition, 0.001, 1.0)
 end
 
--- system condition and stress
 function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wearRate, debugFactors)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then
@@ -3513,7 +3555,6 @@ function AdvancedDamageSystem:updateSystemConditionAndStress(dt, systemName, wea
     end
 end
 
--- damage
 function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
@@ -3537,7 +3578,7 @@ function AdvancedDamageSystem:applyInstantDamageToSystem(system, damageAmount)
     end
 end
 
--- engine (overload, cold, overheat)
+-- systems
 function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
@@ -3549,10 +3590,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.engine.name)
     local systemData = spec.systems.engine
 
-    if not systemData.enabled then
-        systemData.isCranking = false
-        return
-    end
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() and not spec.isElectricVehicle then
         local motorLoad = self:getMotorLoadPercentage()
@@ -3560,7 +3597,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         local lastRpm = spec_motorized.motor:getLastModulatedMotorRpm()
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
-        local speed = self:getLastSpeed()
 
         -- overload factor
         if dynamicMotorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
@@ -3619,7 +3655,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
 
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         motorLoadFactor = motorLoadFactor,
-        effectiveMotorLoadRatio = effectiveMotorLoadRatio,
+        dynamicMotorLoad = spec.dynamicMotorLoad,
         airIntakeCloggingFactor = airIntakeCloggingFactor,
         expiredServiceFactor = expiredServiceFactor,
         coldMotorFactor = coldMotorFactor,
@@ -3629,7 +3665,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     })
 end
 
--- transmission (pullOverload, lugging, slip, cvtCold, cvtOverheat)
 function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
@@ -3720,12 +3755,12 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
                 wearRate = wearRate + pullOverloadFactor 
             end
         end
-
+ 
         -- lugging factor
-        if motorLoad > C.LUGGING_MOTORLOAD_THRESHOLD and rpmLoad < C.LUGGING_RPM_THRESHOLD and speed > 0.5 then
+        if dynamicMotorLoad > C.LUGGING_MOTORLOAD_THRESHOLD and rpmLoad < C.LUGGING_RPM_THRESHOLD and speed > 0.5 then
             local minDiff = math.max(C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD, 0)
             local maxDiff = 1 - (1 - C.LUGGING_MOTORLOAD_THRESHOLD) + (1 - C.LUGGING_RPM_THRESHOLD)
-            local currentDiff = math.clamp(motorLoad - rpmLoad, 0.0, 1.0)
+            local currentDiff = math.clamp(dynamicMotorLoad - rpmLoad, 0.0, 1.0)
             luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false, maxDiff)
             luggingFactor = luggingFactor * C.LUGGING_MULTIPLIER
             wearRate = wearRate + luggingFactor
@@ -3867,7 +3902,6 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     })
 end
 
--- hydraulics (heavyLift, operation, coldOperation, ptoOperation, ptoSharpAngle)
 function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.hydraulics.name)
@@ -4212,7 +4246,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     })
 end
 
--- cooling (highCooling, overheat, coldShock)
 function AdvancedDamageSystem:updateCoolingSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
@@ -4293,7 +4326,6 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     })
 end
 
--- electrical (weather, cranking, lights, overheat)
 function AdvancedDamageSystem:updateElectricalSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
@@ -4339,20 +4371,10 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         wearRate = wearRate + weatherExposureFactor
     end
 
-    -- cranking stress damage while starter is engaged
-    local engineHardStartEffect = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_HARD_START_MODIFIER or nil
-    local engineFailedEffect = spec.activeEffects ~= nil and spec.activeEffects.ENGINE_FAILURE or nil
-    local isCranking = self:getMotorState() == 3 or 
-        (engineHardStartEffect ~= nil and engineHardStartEffect.extraData ~= nil and engineHardStartEffect.extraData.status ~= nil and (engineHardStartEffect.extraData.status == "CRANKING" or engineHardStartEffect.extraData.status == "PASSED")) or 
-        (engineFailedEffect ~= nil and engineFailedEffect.extraData ~= nil and engineFailedEffect.extraData.status ~= nil and engineFailedEffect.extraData.status == "CRANKING")
-
-    if not spec.isElectricVehicle and isCranking then
-        systemData.isCranking = true
+    if not spec.isElectricVehicle and spec.isCranking then
         crankingStressFactor = C.CRANKING_STRESS_MULTIPLIER
         wearRate = wearRate + crankingStressFactor
-    else
-        systemData.isCranking = false
-    end    
+    end
 
     if self:getIsMotorStarted() and not spec.isElectricVehicle then
         -- service factor
@@ -4394,7 +4416,6 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     })
 end
 
--- chassis (vibration, steering load, braking under mass)
 function AdvancedDamageSystem:updateChassisSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.chassis.name)
@@ -4648,7 +4669,6 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     })
 end
 
--- fuel (lowFuel, coldFuel, idle deposit, highPressure)
 function AdvancedDamageSystem:updateFuelSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.fuel.name)
@@ -4862,7 +4882,6 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     })
 end
 
--- workprocess (longHarves, wetCrop)
 function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_combine = self.spec_combine
@@ -4961,7 +4980,267 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     })
 end
 
----------------------- breakdowns ----------------------
+-- ==========================================================
+--                       BREAKDOWNS
+-- ==========================================================
+
+local function buildGeneralWearBreakdown(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if not spec then
+        return
+    end
+
+    local generalWearBreakdown = {
+        system = 'vehicle',
+        isSelectable = false,
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_permanent",
+                description = "ads_breakdowns_general_wear_stage1_description",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {}
+            }
+        }
+    }
+
+    local effects = generalWearBreakdown.stages[1].effects
+    local systems = AdvancedDamageSystem.SYSTEMS
+
+    for _, systemData in pairs(spec.systems) do
+        local systemName = systemData.name
+        local systemCondition = vehicle:getSystemConditionLevel(systemName)
+        local effect = nil
+        local isLateStage = systemCondition <= ADS_Config.CORE.GENERAL_WEAR_LATE_STAGE_THRESHOLD
+        
+        if systemData.enabled and systemCondition <= ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD  then
+            
+            --- ENGINE
+            if systemName == systems.ENGINE then
+
+                --- early stage
+                effect = {
+                    id = "ENGINE_TORQUE_MODIFIER",
+                    value = function() 
+                        local baseEffect = -0.30
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,
+                    aggregation = "sum"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+            --- TRANSMISSION
+            elseif systemName == systems.TRANSMISSION then
+                local motor = vehicle:getMotor()
+                if not motor then return false end
+                
+                local isManual = motor.minForwardGearRatio == nil
+                local isPowerShift = motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
+                local isCvt = motor.minForwardGearRatio ~= nil
+
+                --- early stage
+                if isManual and hasCVTAddon(vehicle) then
+                    effect = {
+                        id = "TRANSMISSION_SLIP_EFFECT", 
+                        value = function ()
+                            local baseEffect = 0.30
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return baseEffect * multiplier
+                        end, 
+                        extraData = {accumulatedMod = 0.0}, 
+                        aggregation = "max"
+                    }
+                    if effect ~= nil then table.insert(effects, effect) end
+
+                elseif isPowerShift and hasCVTAddon(vehicle) then
+                    effect = { 
+                        id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", 
+                        value = function ()
+                            local baseEffect = 0.30
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return baseEffect * multiplier
+                        end,
+                        extraData = {timer = 0, status = "IDLE", duration = 1000, backup = 0}, 
+                        aggregation = "max"
+                    }
+                    if effect ~= nil then table.insert(effects, effect) end
+
+                elseif isCvt and not hasCVTAddon(vehicle) then
+                    effect = { 
+                        id = "CVT_MAX_RATIO_MODIFIER", 
+                        value = function ()
+                            local baseEffect = 0.30
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return baseEffect * multiplier
+                        end,
+                        aggregation = "max" 
+                    }
+                    if effect ~= nil then table.insert(effects, effect) end
+                end
+
+            --- HYDRAULIC
+            elseif systemName == systems.HYDRAULICS then
+                effect = {
+                    id = "HYDRAULIC_SPEED_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.30
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,
+                    aggregation = "min"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+            
+            --- FUEL
+            elseif systemName == systems.FUEL then
+
+                --- ealry stage
+                effect = {
+                    id = "FUEL_CONSUMPTION_MODIFIER", 
+                    value = function ()
+                        local baseEffect = 0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end, 
+                    aggregation = "sum" 
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+            --- CHASSIS
+            elseif systemName == systems.CHASSIS then
+                
+                --- early stage
+                effect = {
+                    id = "BRAKE_FORCE_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,  
+                    aggregation = "min",  
+                    extraData = {timer = 0, soundPlayed = false}
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+                --- late stage
+                effect = {
+                    id = "STEERING_SENSITIVITY_MODIFIER", 
+                    value = function ()
+                        local baseEffect = 0.30
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,   
+                    aggregation = "max" 
+                }
+                if isLateStage and effect ~= nil then table.insert(effects, effect) end
+
+            --- COOLING
+            elseif systemName == systems.COOLING then
+                
+                --- early stage
+                effect = {
+                    id = "RADIATOR_HEALTH_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.20
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,  
+                    aggregation = "min",  
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+            --- ELECTRICAL
+            elseif systemName == systems.ELECTRICAL then
+
+                --- early stage
+                effect = {
+                    id = "ALTERNATOR_HEALTH_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,   
+                    aggregation = "min"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+                effect = {
+                    id = "BATTERY_HEALTH_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.60
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,  
+                    aggregation = "min"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+
+                --- late stage
+                effect = {
+                        id = "ENGINE_HARD_START_MODIFIER",
+                        value = function ()
+                        local baseEffect = 6
+                            local condition = systemCondition
+                            local multiplier = (1 - condition) ^ 3
+                            return math.max(baseEffect * multiplier, 2)
+                        end,  
+                        aggregation = "max",
+                        extraData = {timer = 0, status = 'IDLE'}
+                }
+                if isLateStage and effect ~= nil and effect.value() >= 2 then table.insert(effects, effect) end
+
+            --- WORKPORCESS
+            elseif systemName == systems.WORKPROCESS then
+
+                --- early stage
+                effect = {
+                    id = "YIELD_REDUCTION_MODIFIER", 
+                    value = function ()
+                        local baseEffect = -0.20
+                        local condition = systemCondition
+                        local multiplier = (1 - condition) ^ 3
+                        return baseEffect * multiplier
+                    end,
+                    aggregation = "sum"
+                }
+                if effect ~= nil then table.insert(effects, effect) end
+            end 
+        end
+    end
+
+    return generalWearBreakdown
+end
+
+local function getBreakdownDefinition(vehicle, breakdownId)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec ~= nil and spec.dynamicBreakdowns ~= nil and spec.dynamicBreakdowns[breakdownId] ~= nil then
+        return spec.dynamicBreakdowns[breakdownId]
+    end
+    return ADS_Breakdowns.BreakdownRegistry[breakdownId]
+end
 
 function AdvancedDamageSystem:tryTriggerBreakdown(dt)
     local spec = self.spec_AdvancedDamageSystem
@@ -5464,264 +5743,6 @@ function AdvancedDamageSystem:processBreakdowns(dt)
     end
 end
 
-local function buildGeneralWearBreakdown(vehicle)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if not spec then
-        return
-    end
-
-    local generalWearBreakdown = {
-        system = 'vehicle',
-        isSelectable = false,
-        isApplicable = function(vehicle)
-            return true
-        end,
-        probability = function(vehicle)
-            return 0.0
-        end,
-        isCanProgress = function(vehicle)
-            return false
-        end,
-        stages = {
-            {
-                severity = "ads_breakdowns_severity_permanent",
-                description = "ads_breakdowns_general_wear_stage1_description",
-                detectionChance = 0.0,
-                progressMultiplier = 0.0,
-                repairPrice = 0.0,
-                effects = {},
-                indicators = {}
-            }
-        }
-    }
-
-    local effects = generalWearBreakdown.stages[1].effects
-    local systems = AdvancedDamageSystem.SYSTEMS
-
-    for _, systemData in pairs(spec.systems) do
-        local systemName = systemData.name
-        local systemCondition = vehicle:getSystemConditionLevel(systemName)
-        local effect = nil
-        local isLateStage = systemCondition <= ADS_Config.CORE.GENERAL_WEAR_LATE_STAGE_THRESHOLD
-        
-        if systemData.enabled and systemCondition <= ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD  then
-            
-            --- ENGINE
-            if systemName == systems.ENGINE then
-
-                --- early stage
-                effect = {
-                    id = "ENGINE_TORQUE_MODIFIER",
-                    value = function() 
-                        local baseEffect = -0.30
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,
-                    aggregation = "sum"
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-
-            --- TRANSMISSION
-            elseif systemName == systems.TRANSMISSION then
-                local motor = vehicle:getMotor()
-                if not motor then return false end
-                
-                local isManual = motor.minForwardGearRatio == nil
-                local isPowerShift = motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
-                local isCvt = motor.minForwardGearRatio ~= nil
-
-                --- early stage
-                if isManual and hasCVTAddon(vehicle) then
-                    effect = {
-                        id = "TRANSMISSION_SLIP_EFFECT", 
-                        value = function ()
-                            local baseEffect = 0.30
-                            local condition = systemCondition
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end, 
-                        extraData = {accumulatedMod = 0.0}, 
-                        aggregation = "max"
-                    }
-                    if effect ~= nil then table.insert(effects, effect) end
-
-                elseif isPowerShift and hasCVTAddon(vehicle) then
-                    effect = { 
-                        id = "POWERSHIFT_ENGAGEMENT_LAG_AND_HARSH_EFFECT", 
-                        value = function ()
-                            local baseEffect = 0.30
-                            local condition = systemCondition
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end,
-                        extraData = {timer = 0, status = "IDLE", duration = 1000, backup = 0}, 
-                        aggregation = "max"
-                    }
-                    if effect ~= nil then table.insert(effects, effect) end
-
-                elseif isCvt and not hasCVTAddon(vehicle) then
-                    effect = { 
-                        id = "CVT_MAX_RATIO_MODIFIER", 
-                        value = function ()
-                            local baseEffect = 0.30
-                            local condition = systemCondition
-                            local multiplier = (1 - condition) ^ 3
-                            return baseEffect * multiplier
-                        end,
-                        aggregation = "max" 
-                    }
-                    if effect ~= nil then table.insert(effects, effect) end
-                end
-
-            --- HYDRAULIC
-            elseif systemName == systems.HYDRAULICS then
-                effect = {
-                    id = "HYDRAULIC_SPEED_MODIFIER", 
-                    value = function ()
-                        local baseEffect = -0.30
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,
-                    aggregation = "min"
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-            
-            --- FUEL
-            elseif systemName == systems.FUEL then
-
-                --- ealry stage
-                effect = {
-                    id = "FUEL_CONSUMPTION_MODIFIER", 
-                    value = function ()
-                        local baseEffect = 0.60
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end, 
-                    aggregation = "sum" 
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-
-            --- CHASSIS
-            elseif systemName == systems.CHASSIS then
-                
-                --- early stage
-                effect = {
-                    id = "BRAKE_FORCE_MODIFIER", 
-                    value = function ()
-                        local baseEffect = -0.60
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,  
-                    aggregation = "min",  
-                    extraData = {timer = 0, soundPlayed = false}
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-
-                --- late stage
-                effect = {
-                    id = "STEERING_SENSITIVITY_MODIFIER", 
-                    value = function ()
-                        local baseEffect = 0.30
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,   
-                    aggregation = "max" 
-                }
-                if isLateStage and effect ~= nil then table.insert(effects, effect) end
-
-            --- COOLING
-            elseif systemName == systems.COOLING then
-                
-                --- early stage
-                effect = {
-                    id = "RADIATOR_HEALTH_MODIFIER", 
-                    value = function ()
-                        local baseEffect = -0.20
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,  
-                    aggregation = "min",  
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-
-            --- ELECTRICAL
-            elseif systemName == systems.ELECTRICAL then
-
-                --- early stage
-                effect = {
-                    id = "ALTERNATOR_HEALTH_MODIFIER", 
-                    value = function ()
-                        local baseEffect = -0.60
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,   
-                    aggregation = "min"
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-
-                effect = {
-                    id = "BATTERY_HEALTH_MODIFIER", 
-                    value = function ()
-                        local baseEffect = -0.60
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,  
-                    aggregation = "min"
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-
-                --- late stage
-                effect = {
-                        id = "ENGINE_HARD_START_MODIFIER",
-                        value = function ()
-                        local baseEffect = 6
-                            local condition = systemCondition
-                            local multiplier = (1 - condition) ^ 3
-                            return math.max(baseEffect * multiplier, 2)
-                        end,  
-                        aggregation = "max",
-                        extraData = {timer = 0, status = 'IDLE'}
-                }
-                if isLateStage and effect ~= nil and effect.value() >= 2 then table.insert(effects, effect) end
-
-            --- WORKPORCESS
-            elseif systemName == systems.WORKPROCESS then
-
-                --- early stage
-                effect = {
-                    id = "YIELD_REDUCTION_MODIFIER", 
-                    value = function ()
-                        local baseEffect = -0.20
-                        local condition = systemCondition
-                        local multiplier = (1 - condition) ^ 3
-                        return baseEffect * multiplier
-                    end,
-                    aggregation = "sum"
-                }
-                if effect ~= nil then table.insert(effects, effect) end
-            end 
-        end
-    end
-
-    return generalWearBreakdown
-end
-
-local function getBreakdownDefinition(vehicle, breakdownId)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec ~= nil and spec.dynamicBreakdowns ~= nil and spec.dynamicBreakdowns[breakdownId] ~= nil then
-        return spec.dynamicBreakdowns[breakdownId]
-    end
-    return ADS_Breakdowns.BreakdownRegistry[breakdownId]
-end
-
 function AdvancedDamageSystem:processGeneralWearBreakdown()
     local spec = self.spec_AdvancedDamageSystem
     if not spec or not self.isServer then
@@ -5996,7 +6017,9 @@ function AdvancedDamageSystem:recalculateAndApplyIndicators()
     end
 end
 
---------------------- maintenance --------------------------------
+-- ==========================================================
+--                       MAINTENANCE    
+-- ==========================================================
 
 local function isBreakdownSelectedForPlayerRepair(breakdownId, breakdown, optionOne)
     local breakdownDef = ADS_Breakdowns.BreakdownRegistry[breakdownId]
@@ -7048,7 +7071,7 @@ local function calculateCurrentLoadAmps(vehicle, isMotorStarted, envTemp)
 
     -- starterCranking
     local crankingA = 0
-    if spec.systems.electrical ~= nil and spec.systems.electrical.isCranking ~= nil and spec.systems.electrical.isCranking then
+    if spec.isCranking ~= nil and spec.isCranking then
         crankingA = ADS_Config.ELECTRICAL.BATTERY_CRANK_CURRENT_A * (0.8 + math.random() * 0.4)
     end
 
@@ -7703,8 +7726,8 @@ local function solveExternalPowerConnection(consumerCtx, donorCtx, dtS)
     local finalCompositeCtx = buildCompositeBatteryContext(consumerCtx, donorCtx)
     local networkMotorStarted = consumerCtx.isMotorStarted or donorCtx.isMotorStarted
     local networkIsCranking =
-        (consumerCtx.spec.systems.electrical ~= nil and consumerCtx.spec.systems.electrical.isCranking == true)
-        or (donorCtx.spec.systems.electrical ~= nil and donorCtx.spec.systems.electrical.isCranking == true)
+        (consumerCtx.spec.isCranking ~= nil and consumerCtx.spec.isCranking == true)
+        or (donorCtx.spec.isCranking ~= nil and donorCtx.spec.isCranking == true)
 
     local batteryTerminalV, loadDropV, chargeRiseV, iDischargeA, iChargeA =
         getBatteryTerminalVoltage(finalCompositeCtx.ocvV, totalAltA, totalLoadsA, networkIsCranking, finalCompositeCtx.rIntOhm)
@@ -7941,9 +7964,7 @@ function AdvancedDamageSystem:updateBatteryChargingModel(dt)
     local healthRintMult = 1 + (1 - health) * (maxHealthRintMult - 1)
     local rIntOhm = rRef * (ctx.rintF or 1) * healthRintMult
 
-    local isCranking = spec.systems.electrical ~= nil
-        and spec.systems.electrical.isCranking ~= nil
-        and spec.systems.electrical.isCranking
+    local isCranking = spec.isCranking ~= nil and spec.isCranking
 
     local batteryTerminalV, loadDropV, chargeRiseV, iDischargeA, iChargeA =
         getBatteryTerminalVoltage(ctx.ocvV, ctx.iAltAvail, ctx.iLoads, isCranking, rIntOhm)
