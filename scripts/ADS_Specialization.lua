@@ -2798,7 +2798,6 @@ local function syncOverloadWarning(vehicle, dt)
             end
         end
     end
-    print(maxAvgStress)
     local breakdownId = "STRESS_OVERLOAD"
     local activeBreakdowns = spec.activeBreakdowns or {}
     local currentBreakdown = activeBreakdowns[breakdownId]
@@ -4491,9 +4490,11 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         end
 
         --- heavy trailer factor
-        if massRatio > C.HEAVY_TRAILER_THRESHOLD and speed > 0.5 then
-            heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(massRatio, C.HEAVY_TRAILER_THRESHOLD, false, 5.0)
-            heavyTrailerFactor = math.max(heavyTrailerFactor * C.HEAVY_TRAILER_MULTIPLIER * motorLoad, 0)
+        if massRatio > C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD and motorLoad > C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD and speed > 0.5 then
+            heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(massRatio, C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD, false, 5.0)
+            local loadRange = math.max(1.0 - C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD, 0.001)
+            local loadRatio = math.clamp((motorLoad - C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD) / loadRange, 0, 1.0)
+            heavyTrailerFactor = math.max(heavyTrailerFactor * C.HEAVY_TRAILER_MULTIPLIER * loadRatio, 0)
             heavyTrailerFactor = math.min(heavyTrailerFactor, C.HEAVY_TRAILER_MULTIPLIER or heavyTrailerFactor)
             wearRate = wearRate + heavyTrailerFactor
         end
@@ -8328,7 +8329,8 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
 
     if isMotorStarted then
         local engineMaxHeat = C.ENGINE_MAX_HEAT + spec.extraEngineHeat
-        heat = C.ENGINE_MIN_HEAT + math.min(motorLoad, 1.0) * (engineMaxHeat - C.ENGINE_MIN_HEAT)
+        local warmBoost = math.max(((C.WARMING_BOOST_THRESHOLD - spec.rawEngineTemperature) / (C.WARMING_BOOST_THRESHOLD / 2)) * C.WARMING_BOOST_POWER, 1.0)
+        heat = (C.ENGINE_MIN_HEAT + math.min(motorLoad, 1.0) * (engineMaxHeat - C.ENGINE_MIN_HEAT)) * warmBoost
         
         local brokenFanModifier = 1.0
         if spec.fanClutchHealth < 1.0 then
@@ -8420,7 +8422,8 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         end
         
         local maxHeat = C.TRANS_MAX_HEAT + spec.extraTransmissionHeat
-        heat = C.TRANS_MIN_HEAT + (maxHeat - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor * wheelSlipFactor
+        local warmBoost = math.max(((C.WARMING_BOOST_THRESHOLD - spec.rawTransmissionTemperature) / (C.WARMING_BOOST_THRESHOLD / 2)) * C.WARMING_BOOST_POWER, 1.0)
+        heat = C.TRANS_MIN_HEAT + (maxHeat - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor * wheelSlipFactor * warmBoost
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 3))
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)

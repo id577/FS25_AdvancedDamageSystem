@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 126,
+    VER = 127,
 
     DEBUG = false,
 
@@ -106,7 +106,8 @@ ADS_Config = {
             WHEEL_SLIP_MULTIPLIER = 12.0,        
             WHEEL_SLIP_THRESHOLD = 0.05,
             HEAVY_TRAILER_MULTIPLIER = 2.0,
-            HEAVY_TRAILER_THRESHOLD = 2.2,
+            HEAVY_TRAILER_MASS_RATIO_THRESHOLD = 2.2,
+            HEAVY_TRAILER_MOTORLOAD_THRESHOLD = 0.7,
             COLD_TRANSMISSION_MULTIPLIER = 120.0,
             COLD_TRANSMISSION_THRESHOLD = 45,
             OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 240.0,
@@ -408,7 +409,7 @@ ADS_Config = {
 
         -- A global multiplier for how quickly temperatures change (both heating and cooling).
         -- Higher value means more volatile temperatures.
-        TEMPERATURE_CHANGE_SPEED = 1.8,
+        TEMPERATURE_CHANGE_SPEED = 1.4,
 
         -- The vehicle speed (kph) at which cooling from airflow starts to take effect.
         SPEED_COOLING_MIN_SPEED = 15,
@@ -476,6 +477,8 @@ ADS_Config = {
 
         COOLING_SLOWDOWN_THRESHOLD = 90,
         COOLING_SLOWDOWN_POWER = 12,
+        WARMING_BOOST_THRESHOLD = 50,
+        WARMING_BOOST_POWER = 2.0,
 
         THERMOSTAT_TYPE_YEAR_DIVIDER = 2000,
         MECHANIC_THERMOSTAT_MIN_YEAR = 1950,
