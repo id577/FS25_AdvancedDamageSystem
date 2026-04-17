@@ -97,6 +97,14 @@ function ADS_Hud:new()
         isVisible = false
     }
 
+    self.activeVehicleDebugCache = {
+        refreshIntervalMs = 100,
+        lastUpdateTime = -math.huge,
+        vehicle = nil,
+        background = nil,
+        commands = nil
+    }
+
     self.managerDebugPanel = {
         x = 0.766,
         y = 0.70,
@@ -127,6 +135,10 @@ end
 function ADS_Hud:setVehicle(vehicle)
     if self.vehicle ~= vehicle then
         self.indicatorRuntime = {}
+        self.activeVehicleDebugCache.lastUpdateTime = -math.huge
+        self.activeVehicleDebugCache.vehicle = nil
+        self.activeVehicleDebugCache.background = nil
+        self.activeVehicleDebugCache.commands = nil
     end
 
     self.vehicle = vehicle
@@ -727,6 +739,47 @@ end
 --                              DEBAG HUD ACTIVE
 -- =====================================================================================
 
+function ADS_Hud:renderActiveVehicleDebugCache(cache)
+    if cache == nil then
+        return
+    end
+
+    local background = cache.background
+    if background ~= nil and background.path ~= nil then
+        local overlay = Overlay.new(background.path, background.x, background.y, background.width, background.height)
+        local color = background.color or {1, 1, 1, 0.7}
+        overlay:setColor(color[1], color[2], color[3], color[4] or 1)
+        overlay:render()
+    end
+
+    local commands = cache.commands
+    if commands == nil or #commands == 0 then
+        return
+    end
+
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
+
+    local lastBold = nil
+    for _, command in ipairs(commands) do
+        local isBold = command.bold == true
+        if lastBold ~= isBold then
+            setTextBold(isBold)
+            lastBold = isBold
+        end
+
+        local color = command.color or {1, 1, 1, 1}
+        setTextColor(color[1], color[2], color[3], color[4] or 1)
+        renderText(command.x, command.y, command.size, command.text or "")
+    end
+
+    if lastBold then
+        setTextBold(false)
+    end
+
+    setTextColor(1, 1, 1, 1)
+end
+
 
 function ADS_Hud:drawActiveVehicleHUD()
     local vehicle = self.vehicle
@@ -739,6 +792,13 @@ function ADS_Hud:drawActiveVehicleHUD()
         return
     end
 
+    local cache = self.activeVehicleDebugCache
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+    if cache.vehicle == vehicle and cache.commands ~= nil and (now - (cache.lastUpdateTime or 0)) < (cache.refreshIntervalMs or 100) then
+        self:renderActiveVehicleDebugCache(cache)
+        return
+    end
+
     local panel = self.activeVehicleDebugPanel
     local textSettings = self.text
     local fontStep = 0.001
@@ -746,6 +806,18 @@ function ADS_Hud:drawActiveVehicleHUD()
     local activeNormalSize = textSettings.normalSize + fontStep
     local activeLineHeight = panel.lineHeight + fontStep
     local sectionGap = activeLineHeight * 0.65
+    local queuedCommands = {}
+
+    local function queueText(x, y, size, text, color, isBold)
+        table.insert(queuedCommands, {
+            x = x,
+            y = y,
+            size = size,
+            text = text,
+            color = color or {1, 1, 1, 1},
+            bold = isBold == true
+        })
+    end
 
     local function addLine(target, text, color, sizeScale)
         table.insert(target, {
@@ -1314,6 +1386,9 @@ function ADS_Hud:drawActiveVehicleHUD()
     local rpmLoad = lastRpm / maxRpm
     local motorLoad = vehicle:getMotorLoadPercentage() or 0
     local dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or motorLoad
+    local avgDynamicMotorLoad = tonumber(spec.avgDynamicMotorLoad) or 0
+    local currentSpeed = tonumber(vehicle:getLastSpeed()) or 0
+    local avgSpeed = tonumber(spec.avgSpeed) or 0
     local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
     local dynamicLoadDeltaPct = motorLoad > 0 and ((dynamicMotorLoad - motorLoad) / motorLoad) * 100 or 0
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
@@ -1323,13 +1398,16 @@ function ADS_Hud:drawActiveVehicleHUD()
     local effectiveCapPerHp = peakPowerHp > 0 and (draftEffectiveForceCap / peakPowerHp) or 0
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
-        "hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f | e/h: %.2f",
+        "sp: %.1f (avg: %.1f) | hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f (avg: %.2f%%)) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f | e/h: %.2f",
+        currentSpeed,
+        avgSpeed,
         motorPower / 735.5,
         peakPowerHp,
         math.max(motorLoad * 100, 0),
         math.max(dynamicMotorLoad * 100, 0),
         dynamicLoadDeltaPct,
         avgAbsDiffAcc,
+        math.max(avgDynamicMotorLoad * 100, 0),
         math.max(rpmLoad * 100, 0),
         motor.gear or 0,
         targetGear,
@@ -1597,32 +1675,21 @@ function ADS_Hud:drawActiveVehicleHUD()
     end
 
     local dynamicHeight = (panel.padding * 2) + activeHeaderSize + totalSectionHeight + 0.02
-    if panel.background ~= nil then
-        local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
-        overlay:setColor(1, 1, 1, 0.7)
-        overlay:render()
-    end
 
     local textStartX = panel.x + panel.padding
     local currentY = panel.y + dynamicHeight - panel.padding
 
-    setTextAlignment(RenderText.ALIGN_LEFT)
-    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
-    setTextBold(true)
-    setTextColor(1, 1, 1, 1)
     local vehicleTypeCategory = self:getVehicleTypeCategoryLabel(vehicle)
     local headerText = string.format("%s %s | Type/Category: %s", vehicle:getFullName(), tostring(spec.year), vehicleTypeCategory)
-    renderText(textStartX, currentY, activeHeaderSize, headerText)
-    setTextBold(false)
+    queueText(textStartX, currentY, activeHeaderSize, headerText, {1, 1, 1, 1}, true)
     currentY = currentY - activeHeaderSize - activeLineHeight
 
     local function drawSection(section)
         local sectionLines = section.lines or {}
         local showTitle = section.showTitle ~= false
         if #sectionLines == 0 then
-            setTextColor(1, 1, 1, 1)
             if showTitle then
-                renderText(textStartX, currentY, activeNormalSize, section.title .. ":")
+                queueText(textStartX, currentY, activeNormalSize, section.title .. ":", {1, 1, 1, 1}, false)
             end
             currentY = currentY - activeLineHeight
             return
@@ -1631,12 +1698,11 @@ function ADS_Hud:drawActiveVehicleHUD()
         local firstLine = sectionLines[1]
         local firstColor = firstLine.color or {1, 1, 1, 1}
         local firstSize = activeNormalSize * (firstLine.sizeScale or 1.0)
-        setTextColor(firstColor[1], firstColor[2], firstColor[3], firstColor[4] or 1)
         local firstText = firstLine.text or ""
         if showTitle then
             firstText = section.title .. ": " .. firstText
         end
-        renderText(textStartX, currentY, firstSize, firstText)
+        queueText(textStartX, currentY, firstSize, firstText, firstColor, false)
         currentY = currentY - activeLineHeight
 
         for index = 2, #sectionLines do
@@ -1644,8 +1710,7 @@ function ADS_Hud:drawActiveVehicleHUD()
             local lineText = line.text or ""
             local lineColor = line.color or {1, 1, 1, 1}
             local lineSize = activeNormalSize * (line.sizeScale or 1.0)
-            setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
-            renderText(textStartX, currentY, lineSize, lineText)
+            queueText(textStartX, currentY, lineSize, lineText, lineColor, false)
             currentY = currentY - activeLineHeight
         end
     end
@@ -1667,16 +1732,14 @@ function ADS_Hud:drawActiveVehicleHUD()
                 if section ~= nil then
                     local cardX = gridStartX + (col - 1) * (cardWidth + systemGapX)
                     local cardY = rowY
-                    setTextColor(1, 1, 1, 1)
-                    renderText(cardX, cardY, activeNormalSize, section.title .. ":")
+                    queueText(cardX, cardY, activeNormalSize, section.title .. ":", {1, 1, 1, 1}, false)
 
                     local cardLineY = cardY - activeLineHeight
                     for _, line in ipairs(section.lines) do
                         local lineText = line.text or ""
                         local lineColor = line.color or {1, 1, 1, 1}
                         local lineSize = activeNormalSize * (line.sizeScale or 1.0)
-                        setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
-                        renderText(cardX + 0.003, cardLineY, lineSize, lineText)
+                        queueText(cardX + 0.003, cardLineY, lineSize, lineText, lineColor, false)
                         cardLineY = cardLineY - activeLineHeight
                     end
                 end
@@ -1696,7 +1759,19 @@ function ADS_Hud:drawActiveVehicleHUD()
         drawSection(section)
     end
 
-    setTextColor(1, 1, 1, 1)
+    cache.lastUpdateTime = now
+    cache.vehicle = vehicle
+    cache.background = panel.background ~= nil and {
+        path = panel.background,
+        x = panel.x,
+        y = panel.y,
+        width = panel.width,
+        height = dynamicHeight,
+        color = {1, 1, 1, 0.7}
+    } or nil
+    cache.commands = queuedCommands
+
+    self:renderActiveVehicleDebugCache(cache)
 end
 
 function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSize, activeNormalSize, activeLineHeight, sectionGap)

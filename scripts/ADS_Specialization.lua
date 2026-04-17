@@ -1650,6 +1650,8 @@ function AdvancedDamageSystem:onLoad(savegame)
 
     self.spec_AdvancedDamageSystem.isUnderRoof = true
     self.spec_AdvancedDamageSystem.dynamicMotorLoad = 0
+    self.spec_AdvancedDamageSystem.avgDynamicMotorLoad = 0
+    self.spec_AdvancedDamageSystem.avgSpeed = 0
     self.spec_AdvancedDamageSystem.activeDraftMaxForce = 0
     self.spec_AdvancedDamageSystem.activeDraftEffectiveForceCap = 0
     self.spec_AdvancedDamageSystem.isCranking = false
@@ -3008,7 +3010,119 @@ local function updateActiveDraftStats(vehicle)  -- calculates the current active
     spec.activeDraftEffectiveForceCap = result.effectiveForceCap
 end
 
-local function updateDynamicMotorLoad(vehicle) -- adjusts motor load with driveline vibration under active field work
+local function updateAvgDynamicMotorLoadWindow(spec, dynamicMotorLoad, dt)
+    if spec == nil then
+        return 0
+    end
+
+    if not ADS_Config.DEBUG then
+        spec._avgDynamicMotorLoadSamples = nil
+        spec.avgDynamicMotorLoad = 0
+        return 0
+    end
+
+    local durationMs = math.max(tonumber(dt) or 0, 1)
+    local value = math.max(tonumber(dynamicMotorLoad) or 0, 0)
+    local periodMs = 10000
+
+    if type(spec._avgDynamicMotorLoadSamples) ~= "table" then
+        spec._avgDynamicMotorLoadSamples = {}
+    end
+
+    local samples = spec._avgDynamicMotorLoadSamples
+    table.insert(samples, {
+        durationMs = durationMs,
+        value = value
+    })
+
+    local totalDurationMs = 0
+    local weightedSum = 0
+    for _, sample in ipairs(samples) do
+        local sampleDurationMs = math.max(tonumber(sample.durationMs) or 0, 0)
+        local sampleValue = math.max(tonumber(sample.value) or 0, 0)
+        totalDurationMs = totalDurationMs + sampleDurationMs
+        weightedSum = weightedSum + sampleValue * sampleDurationMs
+    end
+
+    while #samples > 0 and totalDurationMs > periodMs do
+        local oldest = samples[1]
+        local oldestDurationMs = math.max(tonumber(oldest.durationMs) or 0, 0)
+        local overflowMs = totalDurationMs - periodMs
+
+        if oldestDurationMs <= overflowMs then
+            totalDurationMs = totalDurationMs - oldestDurationMs
+            weightedSum = weightedSum - (math.max(tonumber(oldest.value) or 0, 0) * oldestDurationMs)
+            table.remove(samples, 1)
+        else
+            oldest.durationMs = oldestDurationMs - overflowMs
+            totalDurationMs = totalDurationMs - overflowMs
+            weightedSum = weightedSum - (math.max(tonumber(oldest.value) or 0, 0) * overflowMs)
+        end
+    end
+
+    local avgValue = totalDurationMs > 0 and math.max(weightedSum / totalDurationMs, 0) or 0
+    spec.avgDynamicMotorLoad = avgValue
+
+    return avgValue
+end
+
+local function updateAvgSpeedWindow(spec, speed, dt)
+    if spec == nil then
+        return 0
+    end
+
+    if not ADS_Config.DEBUG then
+        spec._avgSpeedSamples = nil
+        spec.avgSpeed = 0
+        return 0
+    end
+
+    local durationMs = math.max(tonumber(dt) or 0, 1)
+    local value = math.max(tonumber(speed) or 0, 0)
+    local periodMs = 10000
+
+    if type(spec._avgSpeedSamples) ~= "table" then
+        spec._avgSpeedSamples = {}
+    end
+
+    local samples = spec._avgSpeedSamples
+    table.insert(samples, {
+        durationMs = durationMs,
+        value = value
+    })
+
+    local totalDurationMs = 0
+    local weightedSum = 0
+    for _, sample in ipairs(samples) do
+        local sampleDurationMs = math.max(tonumber(sample.durationMs) or 0, 0)
+        local sampleValue = math.max(tonumber(sample.value) or 0, 0)
+        totalDurationMs = totalDurationMs + sampleDurationMs
+        weightedSum = weightedSum + sampleValue * sampleDurationMs
+    end
+
+    while #samples > 0 and totalDurationMs > periodMs do
+        local oldest = samples[1]
+        local oldestDurationMs = math.max(tonumber(oldest.durationMs) or 0, 0)
+        local overflowMs = totalDurationMs - periodMs
+
+        if oldestDurationMs <= overflowMs then
+            totalDurationMs = totalDurationMs - oldestDurationMs
+            weightedSum = weightedSum - (math.max(tonumber(oldest.value) or 0, 0) * oldestDurationMs)
+            table.remove(samples, 1)
+        else
+            oldest.durationMs = oldestDurationMs - overflowMs
+            totalDurationMs = totalDurationMs - overflowMs
+            weightedSum = weightedSum - (math.max(tonumber(oldest.value) or 0, 0) * overflowMs)
+        end
+    end
+
+    local avgValue = totalDurationMs > 0 and math.max(weightedSum / totalDurationMs, 0) or 0
+    spec.avgSpeed = avgValue
+
+    return avgValue
+end
+
+local function updateDynamicMotorLoad(vehicle, dt) -- adjusts motor load with driveline vibration under active field work
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
         return 0
@@ -3039,6 +3153,9 @@ local function updateDynamicMotorLoad(vehicle) -- adjusts motor load with drivel
     end
 
     spec.dynamicMotorLoad = dynamicMotorLoad or motorLoad
+
+    updateAvgDynamicMotorLoadWindow(spec, spec.dynamicMotorLoad or motorLoad, dt)
+    updateAvgSpeedWindow(spec, vehicle:getLastSpeed(), dt)
 end
 
 local function updateAvgAbsDiffAccWindow(spec, motor, dt) -- Tracks the rolling average absolute differential acceleration over the last 500 ms
@@ -3781,7 +3898,7 @@ function AdvancedDamageSystem:updateVehicleStateSnapshot(dt)
         --- avgAbsDiffAcc for dynamic motorLoad calculations
         updateAvgAbsDiffAccWindow(spec, self:getMotor(), spec.updateVehicleStateTimerOne)
         --- dynamic motorLoad
-        updateDynamicMotorLoad(self)
+        updateDynamicMotorLoad(self, spec.updateVehicleStateTimerOne)
         --- smoothedMotorLoad
         getSmoothedMotorLoad(self, spec.updateVehicleStateTimerOne)
         --- Temperature smoothing
