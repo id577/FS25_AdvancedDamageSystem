@@ -4433,8 +4433,8 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
 
         -- overload factor
         if dynamicMotorLoad > C.MOTOR_OVERLOADED_THRESHOLD then
-            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(dynamicMotorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
-            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0) * math.max(dynamicMotorLoad, 1.0)
+            motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(dynamicMotorLoad, C.MOTOR_OVERLOADED_THRESHOLD, false, C.MOTOR_OVERLOADED_MAX_EFFECT)
+            motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0)
             wearRate = wearRate + motorLoadFactor
         end
 
