@@ -4286,7 +4286,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
-    local motorLoadFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, breakdownPresenceFactor, airIntakeCloggingFactor = 0, 0, 0, 0, 0, 0
+    local motorLoadFactor, luggingFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, breakdownPresenceFactor, airIntakeCloggingFactor = 0, 0, 0, 0, 0, 0, 0
     local expiredServiceMultiplier = 1.0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
@@ -4309,6 +4309,16 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             motorLoadFactor = ADS_Utils.calculateQuadraticMultiplier(math.min(dynamicMotorLoad, 1.0), C.MOTOR_OVERLOADED_THRESHOLD, false)
             motorLoadFactor = motorLoadFactor * (C.MOTOR_OVERLOADED_MULTIPLIER or 0) * math.max(dynamicMotorLoad, 1.0)
             wearRate = wearRate + motorLoadFactor
+        end
+
+        -- lugging factor
+        if dynamicMotorLoad > C.LUGGING_MOTORLOAD_THRESHOLD and rpmLoad < C.LUGGING_RPM_THRESHOLD and self:getLastSpeed() > 0.5 then
+            local maxDiff = 0.6
+            local minDiff = math.clamp(C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD, 0, maxDiff)
+            local currentDiff = math.clamp(dynamicMotorLoad - rpmLoad, 0.0, 1.0)
+            luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false, maxDiff)
+            luggingFactor = luggingFactor * (C.LUGGING_MULTIPLIER or 0)
+            wearRate = wearRate + luggingFactor
         end
 
         -- airintake cloagging factor
@@ -4361,6 +4371,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
 
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         motorLoadFactor = motorLoadFactor,
+        luggingFactor = luggingFactor,
         dynamicMotorLoad = spec.dynamicMotorLoad,
         airIntakeCloggingFactor = airIntakeCloggingFactor,
         expiredServiceFactor = expiredServiceFactor,
@@ -4471,8 +4482,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
  
         -- lugging factor
         if dynamicMotorLoad > C.LUGGING_MOTORLOAD_THRESHOLD and rpmLoad < C.LUGGING_RPM_THRESHOLD and speed > 0.5 then
-            local minDiff = math.max(C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD, 0)
-            local maxDiff = 1 - (1 - C.LUGGING_MOTORLOAD_THRESHOLD) + (1 - C.LUGGING_RPM_THRESHOLD)
+            local maxDiff = 0.6
+            local minDiff = math.clamp(C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD, 0, maxDiff)
             local currentDiff = math.clamp(dynamicMotorLoad - rpmLoad, 0.0, 1.0)
             luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false, maxDiff)
             luggingFactor = luggingFactor * C.LUGGING_MULTIPLIER
