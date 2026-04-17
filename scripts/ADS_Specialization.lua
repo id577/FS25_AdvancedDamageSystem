@@ -4467,9 +4467,14 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
 
         -- pull overload
         local pullOverloadTargetTimer = 0
-        if dynamicMotorLoad > C.PULL_OVERLOAD_THRESHOLD then
-            pullOverloadTargetTimer = C.PULL_OVERLOAD_TIMER_THRESHOLD
-                + math.max((dynamicMotorLoad - C.PULL_OVERLOAD_THRESHOLD) * 100, 0)
+        if dynamicMotorLoad >= C.PULL_OVERLOAD_THRESHOLD then
+            local timerMax = tonumber(C.PULL_OVERLOAD_TIMER_MAX_EFFECT) or 90
+            local timerMid = tonumber(C.PULL_OVERLOAD_TIMER_THRESHOLD) or 60
+            local timerMin = math.max(timerMid - (timerMax - timerMid), 0)
+            local loadMaxForTimer = 1.15
+            local loadRange = math.max(loadMaxForTimer - C.PULL_OVERLOAD_THRESHOLD, 0.001)
+            local loadRatio = math.clamp((dynamicMotorLoad - C.PULL_OVERLOAD_THRESHOLD) / loadRange, 0.0, 1.0)
+            pullOverloadTargetTimer = timerMin + (timerMax - timerMin) * loadRatio
         end
 
         systemData.pullOverloadTimerMax = pullOverloadTargetTimer
