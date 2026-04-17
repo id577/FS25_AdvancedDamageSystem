@@ -2610,7 +2610,7 @@ local function syncMessages(vehicle, dt)
             end
 
             if spec.engineTemperature > -90 then
-                if spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD and rpmLoad > 0.5 then
+                if spec.engineTemperature <= ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD and rpmLoad > 0.75 then
                     candidateMessage = 'ads_spec_cold_engine_message'
                 elseif spec.engineTemperature >= ADS_Config.CORE.ENGINE_FACTOR_DATA.OVERHEAT_MOTOR_THRESHOLD + 5 and motorLoad > 0.3 then
                     candidateMessage = 'ads_spec_overheat_engine_message'
@@ -2618,7 +2618,7 @@ local function syncMessages(vehicle, dt)
             end
 
             if candidateMessage == nil and spec.transmissionTemperature > -90 then
-                if spec.transmissionTemperature >= ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.OVERHEAT_TRANSMISSION_THRESHOLD + 5 and rpmLoad > 0.5 then
+                if spec.transmissionTemperature >= ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.OVERHEAT_TRANSMISSION_THRESHOLD + 5 and rpmLoad > 0.75 then
                     candidateMessage = 'ads_spec_overheat_transmission_message'
                 end
             end
@@ -2714,6 +2714,7 @@ local function syncOverloadWarning(vehicle, dt)
 
     local factorStats = ensureFactorStats(spec, vehicle)
     local shouldStage = 0
+    local maxAvgStress = 0
     for systemName, systemData in pairs(factorStats) do
         if type(systemData) == "table" then
             local currentStress = tonumber(systemData.stress) or 0
@@ -2779,6 +2780,7 @@ local function syncOverloadWarning(vehicle, dt)
                 samples = systemData._avgStressSamples
             else
                 systemData._avgStress = math.max(weightedSum / period, 0)
+                if systemData._avgStress > maxAvgStress then maxAvgStress = systemData._avgStress end
             end
 
             if ADS_Config.DEBUG and spec.debugData ~= nil and spec.debugData[systemName] ~= nil then
@@ -2796,7 +2798,7 @@ local function syncOverloadWarning(vehicle, dt)
             end
         end
     end
-
+    print(maxAvgStress)
     local breakdownId = "STRESS_OVERLOAD"
     local activeBreakdowns = spec.activeBreakdowns or {}
     local currentBreakdown = activeBreakdowns[breakdownId]
@@ -2804,10 +2806,10 @@ local function syncOverloadWarning(vehicle, dt)
     if shouldStage > 0 then
         if currentBreakdown == nil then
             vehicle:addBreakdown(breakdownId, shouldStage)
-        elseif currentBreakdown.stage ~= shouldStage then
+        elseif currentBreakdown.stage < shouldStage then
             vehicle:changeBreakdownStage(breakdownId, shouldStage)
         end
-    elseif currentBreakdown ~= nil then
+    elseif currentBreakdown ~= nil and maxAvgStress < avgStressWarningThreshold * 0.5 then
         vehicle:removeBreakdown(breakdownId)
     end
 end
@@ -8325,11 +8327,11 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
                 brokenFanModifier = 1 - math.min(speedK * (1 - spec.fanClutchHealth), 0.5)
             end
         end
-        local dirtRadiatorMaxCooling = (C.ENGINE_RADIATOR_MAX_COOLING * spec.radiatorHealth) * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4)) * brokenFanModifier
+        local dirtRadiatorMaxCooling = (C.ENGINE_RADIATOR_MAX_COOLING * spec.radiatorHealth) * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 3)) * brokenFanModifier
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.thermostatState, C.ENGINE_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling + convectionCooling) * (1 + speedCooling)
     else
-        if (spec.engineTemperature or -99) < C.COOLING_SLOWDOWN_THRESHOLD then
+        if (spec.engineTemperature or -99) < C.PID_TARGET_TEMP then
             cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
         else
             cooling = convectionCooling
@@ -8371,7 +8373,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
     
     local dbg = spec.debugData.transmissionTemp
 
-    local loadFactor = motorLoad - motor.motorExternalTorque / motor.peakMotorTorque
+    local loadFactor = math.clamp(motorLoad - motor.motorExternalTorque / motor.peakMotorTorque, C.TRANS_MIN_HEAT, 1.1)
     local slipFactor = 1.0
     local wheelSlipFactor = 1.0
     local accFactor = 1.0
@@ -8386,7 +8388,7 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         local cruiseControlAxis = self.getCruiseControlAxis ~= nil and (tonumber(self:getCruiseControlAxis()) or 0) or 0
 
         if accelerationAxis > 0 or cruiseControlAxis > 0 then
-            accFactor = math.max(5 * motorRpm * math.clamp(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0, 1.0), 1.0)
+            accFactor = math.clamp(5 * motorRpm * math.clamp(motor.motorRotAccelerationSmoothed / motor.motorRotationAccelerationLimit, 0.0, 1.0), 1.0, 2.0)
         end
 
         -- slip effect from breakdown
@@ -8403,17 +8405,17 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
 
         -- wheel slip
         if spec.wheelSlipIntensity ~= nil and spec.wheelSlipIntensity > 0.05 then
-            wheelSlipFactor = wheelSlipFactor + (spec.wheelSlipIntensity or 0)
+            wheelSlipFactor = math.min(wheelSlipFactor + ((spec.wheelSlipIntensity or 0) / 2) * (spec.avgTireGroundFrictionCoeff ^ 2), 1.4)
         end
         
         local maxHeat = C.TRANS_MAX_HEAT + spec.extraTransmissionHeat
         heat = C.TRANS_MIN_HEAT + (maxHeat - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor * wheelSlipFactor
-        local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 4))
+        local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 3))
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)
     else
-        if (spec.engineTemperature or -99) < C.COOLING_SLOWDOWN_THRESHOLD then
+        if (spec.engineTemperature or -99) < C.TRANS_PID_TARGET_TEMP then
             cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
         else
             cooling = convectionCooling
