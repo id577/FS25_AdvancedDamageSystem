@@ -2713,11 +2713,18 @@ local function syncOverloadWarning(vehicle, dt)
     local isMotorStarted = vehicle.getIsMotorStarted ~= nil and vehicle:getIsMotorStarted()
 
     local factorStats = ensureFactorStats(spec, vehicle)
+    local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
+    local globalStressMultiplier = math.max(tonumber(ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER) or 1.0, 0.0)
     local shouldStage = 0
     local maxAvgStress = 0
     for systemName, systemData in pairs(factorStats) do
         if type(systemData) == "table" then
-            local currentStress = tonumber(systemData.stress) or 0
+            local systemStressMultiplier = tonumber(stressMultipliers[systemName]) or 1.0
+            local excludedStress = (
+                (tonumber(systemData.sf) or 0) +
+                (tonumber(systemData.bpf) or 0)
+            ) * systemStressMultiplier * globalStressMultiplier
+            local currentStress = math.max((tonumber(systemData.stress) or 0) - excludedStress, 0)
 
             if not isMotorStarted then
                 systemData._prevStress = currentStress
@@ -4087,17 +4094,22 @@ local function ensureSystemData(spec, systemName)
     return systemData
 end
 
-local function getExpiredServiceMultiplier(serviceLevel, serviceMultiplier)
+local function getExpiredServiceFactor(serviceLevel, serviceMultiplier)
     if serviceLevel == nil then
-        return 1.0
+        return 0.0
     end
 
     if serviceLevel < ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD then
-        local severity = ADS_Utils.calculateQuadraticMultiplier(serviceLevel, ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD, true)
-        return 1.0 + severity * (serviceMultiplier or 0)
+        local severity = math.clamp(
+            (ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD - serviceLevel) / ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD,
+            0.0,
+            1.0
+        )
+        local serviceExpireWear = severity * (serviceMultiplier or 0)
+        return serviceExpireWear
     end
 
-    return 1.0
+    return 0.0
 end
 
 local function getBreakdownsStageSum(vehicle, system)
@@ -4286,7 +4298,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
     local motorLoadFactor, luggingFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, breakdownPresenceFactor, airIntakeCloggingFactor = 0, 0, 0, 0, 0, 0, 0
-    local expiredServiceMultiplier = 1.0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.engine.name)
@@ -4356,10 +4367,8 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             wearRate = wearRate + breakdownPresenceFactor
         end
 
-        expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
+        expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        wearRate = wearRate + expiredServiceFactor
     else
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -4390,7 +4399,6 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     systemData.pullOverloadTimer = tonumber(systemData.pullOverloadTimer) or 0
     local vehicleHaveCVT = hasCVTTransmission(self)
     local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor,  coldTransFactor, hotTransFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0, 0, 0
-    local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
     local massRatio = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
@@ -4539,10 +4547,9 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             wearRate = wearRate * C.TRANSMISSION_IDLING_MULTIPLIER
         end
 
-        expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER or ADS_Config.CORE.ENGINE_FACTOR_DATA.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
+        -- service
+        expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER or ADS_Config.CORE.ENGINE_FACTOR_DATA.SERVICE_EXPIRED_MULTIPLIER)
+        wearRate = wearRate + expiredServiceFactor
     else
         if hasCVTAddon(self) then
             local spec_CVTaddon = self.spec_CVTaddon
@@ -4581,7 +4588,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
     local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
     local ptoSharpAngleDeg = tonumber(spec.maxConnectedPtoAngleDeg or 0) or 0
-    local expiredServiceMultiplier = 1.0
     local wearRate = 1.0
     local vehicleMass = self.getTotalMass ~= nil and (self:getTotalMass(true) or 0) or 0
     local heavyLiftMassRatio, operatingMassRatio = 0, 0
@@ -4655,10 +4661,8 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         end
 
         -- service factor
-        expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
+        expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        wearRate = wearRate + expiredServiceFactor
 
     else
         if spec.isUnderRoof then 
@@ -4740,10 +4744,8 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         end
 
         -- service factor
-        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
+        expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        wearRate = wearRate + expiredServiceFactor
     else
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -4813,10 +4815,8 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
 
     if self:getIsMotorStarted() and not spec.isElectricVehicle then
         -- service factor
-        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
+        expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        wearRate = wearRate + expiredServiceFactor
 
         -- overheating engine compartment
         if (spec.engineTemperature or -99) > C.OVERHEAT_FACTOR_THRESHOLD then
@@ -4939,10 +4939,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
 
         -- service
         if not spec.isElectricVehicle then
-            local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-            local wearRateWithoutService = wearRate
-            wearRate = wearRate * expiredServiceMultiplier
-            expiredServiceFactor = wearRate - wearRateWithoutService
+            expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+            wearRate = wearRate + expiredServiceFactor
         end
     else
         if spec.isUnderRoof then 
@@ -5044,10 +5042,8 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         end
 
         -- service
-        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
+        expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        wearRate = wearRate + expiredServiceFactor
     else
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -5117,10 +5113,8 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         end  
 
         -- service
-        local expiredServiceMultiplier = getExpiredServiceMultiplier(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
-        local wearRateWithoutService = wearRate
-        wearRate = wearRate * expiredServiceMultiplier
-        expiredServiceFactor = wearRate - wearRateWithoutService
+        expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
+        wearRate = wearRate + expiredServiceFactor
     else
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -9132,7 +9126,11 @@ function AdvancedDamageSystem:getHoursSinceLastMaintenance()
 
     for i = #spec.maintenanceLog, 1, -1 do
         local entry = spec.maintenanceLog[i]
-        if entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE then
+        local isMaintenance = entry.type == AdvancedDamageSystem.STATUS.MAINTENANCE
+        local isFullOverhaul = entry.type == AdvancedDamageSystem.STATUS.OVERHAUL
+            and entry.optionOne ~= AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL
+
+        if isMaintenance or isFullOverhaul then
             return math.max(self:getFormattedOperatingTime() - (entry.conditionData.operatingHours or 0), 0)
         elseif entry.id == 1 then
             local serviceLevelAtStart = entry.conditionData.service or 0
