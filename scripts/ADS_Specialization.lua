@@ -2822,6 +2822,25 @@ local function syncOverloadWarning(vehicle, dt)
     end
 end
 
+local function getSmoothedMotorLoad(vehicle, dt)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil then return end
+
+    if vehicle:getIsMotorStarted() then
+        local rawLoad
+        if vehicle.isServer then
+            rawLoad = math.max(vehicle:getMotorLoadPercentage() or 0, 0)
+        else
+            rawLoad = math.max(spec._netMotorLoad or 0, 0)
+        end
+        local loadTau = 300
+        local loadAlpha = math.min(dt / (loadTau + dt), 1)
+        spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
+    else
+        spec._smoothedMotorLoad = 0
+    end
+end
+
 function AdvancedDamageSystem:onUpdate(dt, ...)
     local spec = self.spec_AdvancedDamageSystem
     if spec.isExcludedVehicle then return end
@@ -2836,6 +2855,15 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     --- Registration in ADS_Main.vehicles and first load checks.
     registerVehicle(self)
+
+    --- Temperature smoothing
+    self:getSmoothedTemperature(spec.onUpdateTimer)
+
+    --- Fuel consumption
+    syncFuelConsumption(self)
+
+    --- smoothedMotorLoad
+    getSmoothedMotorLoad(self, spec.onUpdateTimer)
 
     --- Checking for cold engine effect
     syncColdEngineEffect(self)
@@ -3219,24 +3247,6 @@ local function updateStarterState(vehicle)
     spec.isCranking = isCranking
 end
 
-local function getSmoothedMotorLoad(vehicle, dt)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then return end
-
-    if vehicle:getIsMotorStarted() then
-        local rawLoad
-        if vehicle.isServer then
-            rawLoad = math.max(vehicle:getMotorLoadPercentage() or 0, 0)
-        else
-            rawLoad = math.max(spec._netMotorLoad or 0, 0)
-        end
-        local loadTau = 300
-        local loadAlpha = math.min(dt / (loadTau + dt), 1)
-        spec._smoothedMotorLoad = (spec._smoothedMotorLoad or 0) + loadAlpha * (rawLoad - (spec._smoothedMotorLoad or 0))
-    else
-        spec._smoothedMotorLoad = 0
-    end
-end
 
 --- transmission
 local function updateWheelSlip(vehicle)
@@ -3899,12 +3909,6 @@ function AdvancedDamageSystem:updateVehicleStateSnapshot(dt)
         updateAvgAbsDiffAccWindow(spec, self:getMotor(), spec.updateVehicleStateTimerOne)
         --- dynamic motorLoad
         updateDynamicMotorLoad(self, spec.updateVehicleStateTimerOne)
-        --- smoothedMotorLoad
-        getSmoothedMotorLoad(self, spec.updateVehicleStateTimerOne)
-        --- Temperature smoothing
-        self:getSmoothedTemperature(spec.updateVehicleStateTimerOne)
-        --- Fuel consumption
-        syncFuelConsumption(self)
 
         spec.updateVehicleStateTimerOne = spec.updateVehicleStateTimerOne - ADS_Config.UPDATE_VEHICLE_STATE_DELAY_ONE
     end
