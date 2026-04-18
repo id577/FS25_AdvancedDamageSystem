@@ -4410,7 +4410,8 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             local minDiff = math.clamp(C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD, 0, maxDiff)
             local currentDiff = math.clamp(dynamicMotorLoad - rpmLoad, 0.0, 1.0)
             luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false, maxDiff)
-            luggingFactor = luggingFactor * (C.LUGGING_MULTIPLIER or 0)
+            local aiMultiplier = self:getIsAIActive() and 0.5 or 1.0
+            luggingFactor = luggingFactor * (C.LUGGING_MULTIPLIER or 0) * aiMultiplier
             wearRate = wearRate + luggingFactor
         end
 
@@ -4570,7 +4571,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             local minDiff = math.clamp(C.LUGGING_MOTORLOAD_THRESHOLD - C.LUGGING_RPM_THRESHOLD, 0, maxDiff)
             local currentDiff = math.clamp(dynamicMotorLoad - rpmLoad, 0.0, 1.0)
             luggingFactor = ADS_Utils.calculateQuadraticMultiplier(currentDiff, minDiff, false, maxDiff)
-            luggingFactor = luggingFactor * C.LUGGING_MULTIPLIER
+            local aiMultiplier = self:getIsAIActive() and 0.5 or 1.0
+            luggingFactor = luggingFactor * C.LUGGING_MULTIPLIER * aiMultiplier
             wearRate = wearRate + luggingFactor
         end
 
