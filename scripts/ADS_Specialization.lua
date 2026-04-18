@@ -3698,14 +3698,22 @@ local function updateChassisBrakingState(vehicle)
 
     brakeState.pedal = 0
     brakeState.massRatio = 0
+    brakeState.hpMassRatio = 1000
     brakeState.isBraking = false
     brakeState.isBrakingByAxis = false
+
+    local totalMass = tonumber(vehicle.getTotalMass ~= nil and vehicle:getTotalMass() or 0) or 0
+    local selfMass = tonumber(vehicle.getTotalMass ~= nil and vehicle:getTotalMass(true) or 0) or 0
+    local trailerMass = math.max(totalMass - selfMass, 0.01)
+    brakeState.hpMassRatio = math.max((vehicle:getMotor().peakMotorPower or 0) * 1.36, 0.001) / trailerMass
 
     local drivable = vehicle.spec_drivable
     if drivable == nil or vehicle.spec_wheels == nil then
         return
     end
 
+    -- This is the effective brake pedal after the game has already processed
+    -- updateVehiclePhysics / wheel physics, so brake breakdown modifiers are reflected here.
     local brakePedalRaw = tonumber(vehicle.spec_wheels.brakePedal) or 0
     local axisForward = tonumber(drivable.axisForward or drivable.axisForwardSend or (drivable.lastInputValues and drivable.lastInputValues.axisForward) or 0) or 0
     local movingDirection = tonumber(vehicle.movingDirection) or 0
@@ -4221,40 +4229,6 @@ local function getExpiredServiceFactor(serviceLevel, serviceMultiplier)
     return 0.0
 end
 
-local function getBreakdownsStageSum(vehicle, system)
-    local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then return 0 end
-
-    local activeBreakdowns = vehicle:getActiveBreakdowns()
-    if activeBreakdowns == nil or next(activeBreakdowns) == nil then
-        return 0
-    end
-
-    local breadownsRegistry = ADS_Breakdowns.BreakdownRegistry
-    local targetSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, system)
-    if targetSystemKey == nil or targetSystemKey == "" then
-        targetSystemKey = type(system) == "string" and string.lower(system) or ""
-    end
-
-    if targetSystemKey == "" then
-        return 0
-    end
-
-    local sumOfStages = 0
-
-    for breakdownId, breakdownData in pairs(activeBreakdowns) do
-        local registryBreakdown = breadownsRegistry[breakdownId]
-        if registryBreakdown ~= nil then
-            local breakdownSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, registryBreakdown.system)
-            if breakdownSystemKey == targetSystemKey and breakdownData.isActive ~= false then
-                sumOfStages = sumOfStages + (tonumber(breakdownData.stage) or 0)
-            end
-        end
-    end
-
-    return sumOfStages
-end
-
 function AdvancedDamageSystem:updateServiceLevel(dt)
     local spec = self.spec_AdvancedDamageSystem
     local wearRate = ADS_Config.CORE.BASE_SERVICE_WEAR
@@ -4501,7 +4475,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local vehicleHaveCVT = hasCVTTransmission(self)
     local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor,  coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0, 0
     local wearRate = 1.0
-    local hpMassRatio = 1.0
+    local hpMassRatio = spec.chassisBrakeState.hpMassRatio or 100
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
     
     if not systemData.enabled then
@@ -4562,10 +4536,6 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         local maxRpm = spec_motorized.motor.maxRpm
         local rpmLoad = lastRpm / maxRpm
         local speed = self:getLastSpeed()
-        local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
-        local selfMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
-        local trailerMass = math.max(totalMass - selfMass, 0.001)
-        hpMassRatio = math.max((self:getMotor().peakMotorPower or 0) * 1.36, 0.001) / trailerMass
         
         -- pull overload
         local pullOverloadTargetTimer = 0
@@ -4604,7 +4574,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             wearRate = wearRate + luggingFactor
         end
 
-        --- heavy trailer factor
+        -- heavy trailer factor
         if hpMassRatio < C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD and motorLoad > C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD and speed > 0.5 then
             heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(hpMassRatio, C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD, true, 5.0)
             local loadRange = math.max(1.0 - C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD, 0.001)
@@ -4947,7 +4917,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local steerChangeFactor = 0
     local steerGroundContact = tonumber(steerState.groundContact or 0) or 0
     local brakeMassFactor = 0
-    local brakeMassRatio = tonumber(brakeState.massRatio or 0) or 0
+    local hpBrakeMassRatio = tonumber(brakeState.hpMassRatio or 0) or 0
     local brakePedal = tonumber(brakeState.pedal or 0) or 0
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
     local wearRate = 1.0
@@ -4990,11 +4960,10 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
 
             -- braking under mass
             if brakeState.isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
-                local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 1.0
-                local ratioMax = math.max(tonumber(C.BRAKE_MASS_RATIO_MAX) or 1.5, ratioThreshold + 0.01)
-                if brakeMassRatio > ratioThreshold then
-                    local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(brakeMassRatio, ratioThreshold, false, ratioMax)
-                    local brakeInputFactor = math.max(brakePedal, brakeState.isBrakingByAxis and 1 or 0)
+                local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 12.0
+                if hpBrakeMassRatio < ratioThreshold then
+                    local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(hpBrakeMassRatio, ratioThreshold, true, 5.0)
+                    local brakeInputFactor = brakePedal
                     brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
                     brakeMassFactor = math.min(brakeMassFactor, tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or brakeMassFactor)
                     wearRate = wearRate + brakeMassFactor
@@ -5036,7 +5005,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         steerChangeFactor = steerChangeFactor,
         steerGroundContact = steerGroundContact,
         brakeMassFactor = brakeMassFactor,
-        brakeMassRatio = brakeMassRatio,
+        brakeMassRatio = hpBrakeMassRatio,
         brakePedal = brakePedal
     })
 end
