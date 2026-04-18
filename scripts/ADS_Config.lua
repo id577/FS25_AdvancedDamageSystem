@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 127,
+    VER = 128,
 
     DEBUG = false,
 
@@ -101,13 +101,13 @@ ADS_Config = {
             PULL_OVERLOAD_THRESHOLD = 0.85,
             PULL_OVERLOAD_TIMER_THRESHOLD = 60,
             PULL_OVERLOAD_TIMER_MAX_EFFECT = 90,
-            LUGGING_MULTIPLIER = 12.0,       
+            LUGGING_MULTIPLIER = 12.0,
             LUGGING_RPM_THRESHOLD = 0.6,
             LUGGING_MOTORLOAD_THRESHOLD = 0.80,
             WHEEL_SLIP_MULTIPLIER = 12.0,        
             WHEEL_SLIP_THRESHOLD = 0.05,
-            HEAVY_TRAILER_MULTIPLIER = 2.0,
-            HEAVY_TRAILER_MASS_RATIO_THRESHOLD = 2.2,
+            HEAVY_TRAILER_MULTIPLIER = 3.0,
+            HEAVY_TRAILER_MASS_RATIO_THRESHOLD = 12,
             HEAVY_TRAILER_MOTORLOAD_THRESHOLD = 0.7,
             COLD_TRANSMISSION_MULTIPLIER = 120.0,
             COLD_TRANSMISSION_THRESHOLD = 45,

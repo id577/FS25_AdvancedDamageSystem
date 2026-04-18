@@ -13,7 +13,17 @@ function ADS_Utils.calculateQuadraticMultiplier(level, threshold, lessIsWorse, c
         return 0.0
     end
     if lessIsWorse then
-        local normalizedValue = (threshold - level) / threshold
+        local lowerBound = tonumber(customMax)
+        local denominator = threshold
+
+        if lowerBound ~= nil and lowerBound < threshold then
+            denominator = math.max(threshold - lowerBound, 0.0001)
+            level = math.max(level, lowerBound)
+        else
+            denominator = math.max(threshold, 0.0001)
+        end
+
+        local normalizedValue = (threshold - level) / denominator
         return normalizedValue * normalizedValue
     else
         local normalizedValue = (level - threshold) / ((customMax or 1) - threshold)

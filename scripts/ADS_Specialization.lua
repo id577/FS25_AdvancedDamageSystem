@@ -4521,9 +4521,9 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local vehicleHaveCVT = hasCVTTransmission(self)
     local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor,  coldTransFactor, hotTransFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0, 0, 0
     local wearRate = 1.0
-    local massRatio = 1.0
+    local hpMassRatio = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
-
+    
     if not systemData.enabled then
         return
     end
@@ -4584,8 +4584,9 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         local speed = self:getLastSpeed()
         local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
         local selfMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
-        massRatio = selfMass > 0 and math.max(totalMass / selfMass, 0) or 1.0
-
+        local trailerMass = math.max(totalMass - selfMass, 0)
+        
+        hpMassRatio =math.max((self:getMotor().peakMotorPower or 0) * 1.36, 0.001) / trailerMass
         -- pull overload
         local pullOverloadTargetTimer = 0
         if dynamicMotorLoad >= C.PULL_OVERLOAD_THRESHOLD then
@@ -4624,8 +4625,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         end
 
         --- heavy trailer factor
-        if massRatio > C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD and motorLoad > C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD and speed > 0.5 then
-            heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(massRatio, C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD, false, 5.0)
+        if hpMassRatio < C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD and motorLoad > C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD and speed > 0.5 then
+            heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(hpMassRatio, C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD, true, 5.0)
             local loadRange = math.max(1.0 - C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD, 0.001)
             local loadRatio = math.clamp((motorLoad - C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD) / loadRange, 0, 1.0)
             heavyTrailerFactor = math.max(heavyTrailerFactor * C.HEAVY_TRAILER_MULTIPLIER * loadRatio, 0)
@@ -4696,7 +4697,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         pullOverloadTimerMin = systemData.pullOverloadTimerMin,
         pullOverloadTimerMax = systemData.pullOverloadTimerMax,
         heavyTrailerFactor = heavyTrailerFactor,
-        heavyTrailerMassRatio = massRatio,
+        heavyTrailerMassRatio = hpMassRatio,
         luggingFactor = luggingFactor,
         wheelSlipFactor = wheelSlipFactor,
         coldTransFactor = coldTransFactor,
