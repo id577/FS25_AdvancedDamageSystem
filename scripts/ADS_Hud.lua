@@ -1258,7 +1258,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local hydraulicsLines = buildSystemLines("hydraulics", hydraulicsDbg, hydraulicsMaxFactor, {
         { shortName = "sf", statKey = "sf", value = hydraulicsDbg.expiredServiceFactor or 0 },
         { shortName = "hlf", statKey = "hlf", value = hydraulicsDbg.heavyLiftFactor or 0, extraInfo = string.format("mr: %.2f", asPercent(hydraulicsDbg.heavyLiftMassRatio or 0)) },
-        { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0 },
+        { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0, extraInfo = string.format("om: %.2f t: %ds", hydraulicsDbg.operatingMassRatio or 0, math.floor(((hydraulicsDbg.operatingTimer or 0) / 1000) + 0.0001)) },
         { shortName = "cof", statKey = "cof", value = hydraulicsDbg.coldOilFactor or 0 },
         { shortName = "saf", statKey = "saf", value = hydraulicsDbg.sharpAngleFactor or 0, extraInfo = string.format("%.1f deg", hydraulicsDbg.ptoSharpAngleDeg or 0) }
     })

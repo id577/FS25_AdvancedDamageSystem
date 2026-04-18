@@ -3522,7 +3522,8 @@ local function updateImplementChainState(vehicle)
         end
         if (impl.isMoving and impl.jointTypeId ~= 0) or impl.isFoldMoving or impl.isPlowRotationMoving or (impl.isCylinderedMoving and not impl.isHead) then
             spec.isImplementOperating  = true
-            if not impl.isHead then spec.operatingMass = spec.operatingMass + (impl.mass or 0) end
+            local impMass = impl.supportWheelCount == 0 and impl.mass or impl.mass / 2
+            if not impl.isHead then spec.operatingMass = spec.operatingMass + (impMass or 0) end
         end
     end
 
@@ -4673,6 +4674,8 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local wearRate = 1.0
     local vehicleMass = self.getTotalMass ~= nil and (self:getTotalMass(true) or 0) or 0
     local heavyLiftMassRatio, operatingMassRatio = 0, 0
+    
+    systemData.operatingTimer = tonumber(systemData.operatingTimer) or 0
 
     if not systemData.enabled then
         return
@@ -4680,17 +4683,15 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
         if spec.isImplementLifted or spec.isImplementOperating or spec.isPtoActive then
-            
             -- operating and cold oil
             if spec.isImplementOperating then
+                systemData.operatingTimer = math.min(systemData.operatingTimer + dt, 30000)
                 operatingMassRatio = vehicleMass > 0 and (spec.operatingMass / vehicleMass) or 0
-                if operatingMassRatio == 0 then
-                    operatingMassRatio = 0.3
+                if operatingMassRatio > C.OPERATING_FACTOR_THRESHOLD then
+                    operatingFactor = ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, C.OPERATING_FACTOR_THRESHOLD, false)
+                    operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0) * math.max(systemData.operatingTimer / 5000, 1)
+                    wearRate = wearRate + operatingFactor
                 end
-                operatingFactor = ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false)
-                operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0)
-                operatingFactor = math.min(operatingFactor, C.OPERATING_FACTOR_MULTIPLIER or operatingFactor)
-                wearRate = wearRate + operatingFactor
                 -- cold oil
                 if (spec.engineTemperature or -99) < C.COLD_OIL_THRESHOLD then
                     coldOilFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_OIL_THRESHOLD, true)
@@ -4749,11 +4750,17 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         end
     end
 
+    if not spec.isImplementOperating then
+        systemData.operatingTimer = math.max(systemData.operatingTimer - dt / 3, 0)
+    end
+
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         heavyLiftFactor = heavyLiftFactor,
         heavyLiftMassRatio = heavyLiftMassRatio,
         operatingFactor = operatingFactor,
+        operatingMassRatio = operatingMassRatio,
+        operatingTimer = systemData.operatingTimer or 0,
         coldOilFactor = coldOilFactor,
         ptoOperatingFactor = ptoOperatingFactor,
         sharpAngleFactor = sharpAngleFactor,
