@@ -4564,9 +4564,9 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         local speed = self:getLastSpeed()
         local totalMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass() or 0) or 0
         local selfMass = tonumber(self.getTotalMass ~= nil and self:getTotalMass(true) or 0) or 0
-        local trailerMass = math.max(totalMass - selfMass, 0)
+        local trailerMass = math.max(totalMass - selfMass, 0.001)
+        hpMassRatio = math.max((self:getMotor().peakMotorPower or 0) * 1.36, 0.001) / trailerMass
         
-        hpMassRatio =math.max((self:getMotor().peakMotorPower or 0) * 1.36, 0.001) / trailerMass
         -- pull overload
         local pullOverloadTargetTimer = 0
         if dynamicMotorLoad >= C.PULL_OVERLOAD_THRESHOLD then
