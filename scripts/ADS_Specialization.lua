@@ -452,14 +452,17 @@ local function markTelemetryDirty(vehicle, spec)
 
     local operatingTime = getSyncOperatingTime(vehicle)
     local motorLoad = getSyncMotorLoad(vehicle)
+    local dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or 0
 
     if syncFloatChanged(spec._lastSyncTelemetry_operatingTime, operatingTime, 1.0) or
        syncFloatChanged(spec._lastSyncTelemetry_fuelUsageRaw, spec._fuelUsageRaw, 0.3) or
-       syncFloatChanged(spec._lastSyncTelemetry_motorLoad, motorLoad, 0.01) then
+       syncFloatChanged(spec._lastSyncTelemetry_motorLoad, motorLoad, 0.01) or
+       syncFloatChanged(spec._lastSyncTelemetry_dynamicMotorLoad, dynamicMotorLoad, 0.01) then
             vehicle:raiseDirtyFlags(spec.adsDirtyFlag_telemetry)
             spec._lastSyncTelemetry_operatingTime = operatingTime
             spec._lastSyncTelemetry_fuelUsageRaw = spec._fuelUsageRaw
             spec._lastSyncTelemetry_motorLoad = motorLoad
+            spec._lastSyncTelemetry_dynamicMotorLoad = dynamicMotorLoad
             return true
     end
 
@@ -885,6 +888,7 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
     streamWriteFloat32(streamId, getSyncOperatingTime(self))
     streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
     streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
+    streamWriteFloat32(streamId, spec.dynamicMotorLoad or 0)
 
     -- [Group 4] Thermal
     streamWriteFloat32(streamId, spec.rawEngineTemperature or -99)
@@ -949,6 +953,8 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
     spec._fuelUsageRaw = syncFuelRaw
     spec.fuelUsage = syncFuelRaw
     spec._netMotorLoad = streamReadFloat32(streamId)
+    spec._netDynamicMotorLoad = streamReadFloat32(streamId)
+    spec.dynamicMotorLoad = spec._netDynamicMotorLoad
     if not self.isServer and self.spec_motorized ~= nil then
         self.spec_motorized.lastFuelUsage = syncFuelRaw
     end
@@ -1043,6 +1049,7 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
             streamWriteFloat32(streamId, getSyncOperatingTime(self))
             streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
             streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
+            streamWriteFloat32(streamId, spec.dynamicMotorLoad or 0)
         end
 
         -- [4] Thermal
@@ -1117,6 +1124,8 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
             self:setOperatingTime(streamReadFloat32(streamId), true)
             spec._fuelUsageRaw = streamReadFloat32(streamId)
             spec._netMotorLoad = streamReadFloat32(streamId)
+            spec._netDynamicMotorLoad = streamReadFloat32(streamId)
+            spec.dynamicMotorLoad = spec._netDynamicMotorLoad
         end
 
         -- [4] Thermal
@@ -1381,6 +1390,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem._netTargetEngineTemp = nil
     self.spec_AdvancedDamageSystem._smoothedMotorLoad = 0
     self.spec_AdvancedDamageSystem._netMotorLoad = 0
+    self.spec_AdvancedDamageSystem._netDynamicMotorLoad = 0
     self.spec_AdvancedDamageSystem.radiatorHealth = 1.0
     self.spec_AdvancedDamageSystem.fanClutchHealth = 1.0
     self.spec_AdvancedDamageSystem.thermostatState = 0.0
@@ -1725,7 +1735,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     if self.isServer then
         self.spec_AdvancedDamageSystem.adsDirtyFlag_state = self:getNextDirtyFlag()             -- [1] currentState, plannedState, maintenanceTimer
         self.spec_AdvancedDamageSystem.adsDirtyFlag_serviceContext = self:getNextDirtyFlag()    -- [2] serviceOptionOne, serviceOptionTwo, serviceOptionThree, workshopType
-        self.spec_AdvancedDamageSystem.adsDirtyFlag_telemetry = self:getNextDirtyFlag()         -- [3] operatingTime, _fuelUsageRaw, _netMotorLoad -- [5] telemetry
+        self.spec_AdvancedDamageSystem.adsDirtyFlag_telemetry = self:getNextDirtyFlag()         -- [3] operatingTime, _fuelUsageRaw, _netMotorLoad, dynamicMotorLoad -- [5] telemetry
         self.spec_AdvancedDamageSystem.adsDirtyFlag_thermal = self:getNextDirtyFlag()           -- [4] rawEngineTemperature, rawTransmissionTemperature, thermostatState, transmissionThermostatState
         self.spec_AdvancedDamageSystem.adsDirtyFlag_electrical = self:getNextDirtyFlag()        -- [5] batterySoc, batteryChargeAh, batteryTerminalVoltageV, systemVoltageV
         self.spec_AdvancedDamageSystem.adsDirtyFlag_fieldcare = self:getNextDirtyFlag()         -- [6] radiatorClogging, airIntakeClogging, lubricationLevel
@@ -2171,6 +2181,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec._lastSyncTelemetry_operatingTime = getSyncOperatingTime(self)
     spec._lastSyncTelemetry_fuelUsageRaw = spec._fuelUsageRaw
     spec._lastSyncTelemetry_motorLoad  = getSyncMotorLoad(self)
+    spec._lastSyncTelemetry_dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or 0
     --- [4] thermal
     spec._lastSyncThermal_rawEngineTemperature = spec.rawEngineTemperature
     spec._lastSyncThermal_rawTransmissionTemperature = spec.rawTransmissionTemperature
@@ -4669,6 +4680,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
         if spec.isImplementLifted or spec.isImplementOperating or spec.isPtoActive then
+            
             -- operating and cold oil
             if spec.isImplementOperating then
                 operatingMassRatio = vehicleMass > 0 and (spec.operatingMass / vehicleMass) or 0
@@ -4679,6 +4691,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0)
                 operatingFactor = math.min(operatingFactor, C.OPERATING_FACTOR_MULTIPLIER or operatingFactor)
                 wearRate = wearRate + operatingFactor
+                -- cold oil
                 if (spec.engineTemperature or -99) < C.COLD_OIL_THRESHOLD then
                     coldOilFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_OIL_THRESHOLD, true)
                     coldOilFactor = coldOilFactor * (C.COLD_OIL_MULTIPLIER or 0) * (1 + ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false))
