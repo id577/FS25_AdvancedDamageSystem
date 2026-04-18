@@ -1282,7 +1282,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "sf", statKey = "sf", value = chassisDbg.expiredServiceFactor or 0 },
         { shortName = "vf", statKey = "vf", value = chassisDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(chassisDbg.vibRaw or 0), asPercent(chassisDbg.vibSignal or 0)) },
         { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("d: %.2f", asPercent(chassisDbg.steerDeltaRate or 0)) },
-        { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("mr: %.2f", chassisDbg.brakeMassRatio or 0) }
+        { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("hp/m: %.1f", chassisDbg.brakeMassRatio or 0) }
     })
 
     local fuelLines = buildSystemLines("fuel", fuelDbg, fuelMaxFactor, {

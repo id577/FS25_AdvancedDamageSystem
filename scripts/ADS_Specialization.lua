@@ -4689,7 +4689,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 operatingMassRatio = vehicleMass > 0 and (spec.operatingMass / vehicleMass) or 0
                 if operatingMassRatio > C.OPERATING_FACTOR_THRESHOLD then
                     operatingFactor = ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, C.OPERATING_FACTOR_THRESHOLD, false)
-                    operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0) * math.max(systemData.operatingTimer / 5000, 1)
+                    operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0) * math.max(systemData.operatingTimer / 10000, 1)
                     wearRate = wearRate + operatingFactor
                 end
                 -- cold oil
