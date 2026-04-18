@@ -1238,7 +1238,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local engineLines = buildSystemLines("engine", engineDbg, engineMaxFactor, {
         { shortName = "sf", statKey = "sf", value = engineDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = engineDbg.breakdownPresenceFactor or 0 },
         { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0, extraInfo = string.format("eff/ml: %.2f", engineDbg.effectiveMotorLoadRatio or 1.0) },
         { shortName = "lf", statKey = "lf", value = engineDbg.luggingFactor or 0 },
         { shortName = "aicf", statKey = "aicf", value = engineDbg.airIntakeCloggingFactor or 0 },
@@ -1248,7 +1247,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local transmissionLines = buildSystemLines("transmission", transmissionDbg, transmissionMaxFactor, {
         { shortName = "sf", statKey = "sf", value = transmissionDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = transmissionDbg.breakdownPresenceFactor or 0 },
         { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("%.1f->%.1f", transmissionDbg.pullOverloadTimer or 0, transmissionDbg.pullOverloadTimerMin or 0) },
         { shortName = "htf", statKey = "htf", value = transmissionDbg.heavyTrailerFactor or 0, extraInfo = string.format("hp/m: %.1f", transmissionDbg.heavyTrailerMassRatio or 0) },
         { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
@@ -1259,7 +1257,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local hydraulicsLines = buildSystemLines("hydraulics", hydraulicsDbg, hydraulicsMaxFactor, {
         { shortName = "sf", statKey = "sf", value = hydraulicsDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = hydraulicsDbg.breakdownPresenceFactor or 0 },
         { shortName = "hlf", statKey = "hlf", value = hydraulicsDbg.heavyLiftFactor or 0, extraInfo = string.format("mr: %.2f", asPercent(hydraulicsDbg.heavyLiftMassRatio or 0)) },
         { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0 },
         { shortName = "cof", statKey = "cof", value = hydraulicsDbg.coldOilFactor or 0 },
@@ -1268,7 +1265,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local coolingLines = buildSystemLines("cooling", coolingDbg, coolingMaxFactor, {
         { shortName = "sf", statKey = "sf", value = coolingDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = coolingDbg.breakdownPresenceFactor or 0 },
         { shortName = "hcf", statKey = "hcf", value = coolingDbg.highCoolingFactor or 0, extraInfo = string.format("ts: %.1f", asPercent(spec.thermostatState or 0)) },
         { shortName = "ohf", statKey = "ohf", value = coolingDbg.overheatFactor or 0 },
         { shortName = "csf", statKey = "csf", value = coolingDbg.coldShockFactor or 0 }
@@ -1276,7 +1272,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local electricalLines = buildSystemLines("electrical", electricalDbg, electricalMaxFactor, {
         { shortName = "sf", statKey = "sf", value = electricalDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = electricalDbg.breakdownPresenceFactor or 0 },
         { shortName = "wef", statKey = "wef", value = electricalDbg.weatherExposureFactor or 0 },
         { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
         { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s", tostring(spec.isCranking ~= nil and spec.isCranking == true)) },
@@ -1285,7 +1280,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local chassisLines = buildSystemLines("chassis", chassisDbg, chassisMaxFactor, {
         { shortName = "sf", statKey = "sf", value = chassisDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = chassisDbg.breakdownPresenceFactor or 0 },
         { shortName = "vf", statKey = "vf", value = chassisDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(chassisDbg.vibRaw or 0), asPercent(chassisDbg.vibSignal or 0)) },
         { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("d: %.2f", asPercent(chassisDbg.steerDeltaRate or 0)) },
         { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("mr: %.2f", chassisDbg.brakeMassRatio or 0) }
@@ -1293,7 +1287,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local fuelLines = buildSystemLines("fuel", fuelDbg, fuelMaxFactor, {
         { shortName = "sf", statKey = "sf", value = fuelDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = fuelDbg.breakdownPresenceFactor or 0 },
         { shortName = "lff", statKey = "lff", value = fuelDbg.lowFuelStarvationFactor or 0, extraInfo = string.format("lvl: %.2f", asPercent(fuelDbg.fuelLevel or 0)) },
         { shortName = "cff", statKey = "cff", value = fuelDbg.coldFuelFactor or 0, extraInfo = string.format("ft: %.1f C", fuelDbg.fuelTemperature or 0) },
         { shortName = "idf", statKey = "idf", value = fuelDbg.idleDepositFactor or 0, extraInfo = string.format("t: %.0fs", fuelDbg.idleTimer or 0) },
@@ -1302,7 +1295,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local workprocessLines = buildSystemLines("workprocess", workprocessDbg, workprocessMaxFactor, {
         { shortName = "sf", statKey = "sf", value = workprocessDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = workprocessDbg.breakdownPresenceFactor or 0 },
         { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 },
         { shortName = "lubf", statKey = "lubf", value = workprocessDbg.lubricationFactor or 0, extraInfo = string.format("lvl: %.1f%%", asPercent(lubricationLevel)) }
     })

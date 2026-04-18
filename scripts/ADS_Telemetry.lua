@@ -351,7 +351,6 @@ function ADS_Telemetry:collectTransmissionSystemInfo(vehicle)
         breakdownProbability = tonumber(transmissionDbg.breakdownProbability or 0) or 0,
         critBreakdownProbability = tonumber(transmissionDbg.critBreakdownProbability or 0) or 0,
         expiredServiceFactor = tonumber(transmissionDbg.expiredServiceFactor or 0) or 0,
-        breakdownPresenceFactor = tonumber(transmissionDbg.breakdownPresenceFactor or 0) or 0,
         pullOverloadFactor = tonumber(transmissionDbg.pullOverloadFactor or 0) or 0,
         pullOverloadTimer = tonumber(transmissionDbg.pullOverloadTimer or 0) or 0,
         heavyTrailerFactor = tonumber(transmissionDbg.heavyTrailerFactor or 0) or 0,

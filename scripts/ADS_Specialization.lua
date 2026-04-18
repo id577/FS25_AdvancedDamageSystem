@@ -121,7 +121,6 @@ AdvancedDamageSystem.modDirectory = g_currentModDirectory
 
 AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     expiredServiceFactor = "sf",
-    breakdownPresenceFactor = "bpf",
     -- engine
     motorLoadFactor = "mlf",
     airIntakeCloggingFactor = "aicf",
@@ -1441,7 +1440,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0, 
             expiredServiceFactor = 0,
-            breakdownInSystemFactor = 0, 
             motorLoadFactor = 0, 
             coldMotorFactor = 0, 
             hotMotorFactor = 0,
@@ -1454,7 +1452,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0, 
             expiredServiceFactor = 0,
-            breakdownInSystemFactor = 0,
             pullOverloadFactor = 0,
             heavyTrailerFactor = 0,
             heavyTrailerMassRatio = 0,
@@ -1479,7 +1476,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             ptoOperatingFactor = 0,
             sharpAngleFactor = 0,
             ptoSharpAngleDeg = 0,
-            breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
         },
@@ -1492,7 +1488,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             highCoolingFactor = 0,
             overheatFactor = 0,
             coldShockFactor = 0,
-            breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
         },
@@ -1505,7 +1500,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             lightsFactor = 0,
             crankingStressFactor = 0,
             overheatFactor = 0,
-            breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
         },
@@ -1535,7 +1529,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             brakePedal = 0,
             parkingBrakeFactor = 0,
             parkingBrakeActive = 0,
-            breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
         },
@@ -1551,7 +1544,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             lastUnloadOriginalFactor = 1.0,
             lastUnloadFactor = 1.0,
             lastUnloadPercent = 100.0,
-            breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
         },
@@ -1568,7 +1560,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             idleTimer = 0,
             fuelLevel = 0,
             fuelTemperature = 0,
-            breakdownInSystemFactor = 0, 
             breakdownProbability = 0,
             critBreakdownProbability = 0
         },
@@ -2722,10 +2713,7 @@ local function syncOverloadWarning(vehicle, dt)
     for systemName, systemData in pairs(factorStats) do
         if type(systemData) == "table" then
             local systemStressMultiplier = tonumber(stressMultipliers[systemName]) or 1.0
-            local excludedStress = (
-                (tonumber(systemData.sf) or 0) +
-                (tonumber(systemData.bpf) or 0)
-            ) * systemStressMultiplier * globalStressMultiplier
+            local excludedStress = (tonumber(systemData.sf) or 0) * systemStressMultiplier * globalStressMultiplier
             local currentStress = math.max((tonumber(systemData.stress) or 0) - excludedStress, 0)
 
             if not isMotorStarted then
@@ -4418,7 +4406,7 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
     local spec = self.spec_AdvancedDamageSystem
     local spec_motorized = self.spec_motorized
     local C = ADS_Config.CORE.ENGINE_FACTOR_DATA
-    local motorLoadFactor, luggingFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, breakdownPresenceFactor, airIntakeCloggingFactor = 0, 0, 0, 0, 0, 0, 0
+    local motorLoadFactor, luggingFactor, expiredServiceFactor, coldMotorFactor, hotMotorFactor, airIntakeCloggingFactor = 0, 0, 0, 0, 0, 0
     local baseWearRate = 1.0
     local wearRate = baseWearRate
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.engine.name)
@@ -4481,13 +4469,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
             wearRate = wearRate * C.MOTOR_IDLING_MULTIPLIER
         end
 
-        -- breakdown presence factor
-        if self:hasSystemBreakdowns(systemKey) then
-            local stagesSum = getBreakdownsStageSum(self, systemKey)
-            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-            wearRate = wearRate + breakdownPresenceFactor
-        end
-
         expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         wearRate = wearRate + expiredServiceFactor
     else
@@ -4506,7 +4487,6 @@ function AdvancedDamageSystem:updateEngineSystem(dt)
         expiredServiceFactor = expiredServiceFactor,
         coldMotorFactor = coldMotorFactor,
         hotMotorFactor = hotMotorFactor,
-        breakdownPresenceFactor = breakdownPresenceFactor,
         airIntakeClogging = spec.airIntakeClogging
     })
 end
@@ -4519,7 +4499,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local systemData = spec.systems.transmission
     systemData.pullOverloadTimer = tonumber(systemData.pullOverloadTimer) or 0
     local vehicleHaveCVT = hasCVTTransmission(self)
-    local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor,  coldTransFactor, hotTransFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0, 0, 0
+    local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor,  coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0, 0
     local wearRate = 1.0
     local hpMassRatio = 1.0
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
@@ -4642,13 +4622,6 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             wearRate = wearRate + wheelSlipFactor
         end
 
-        -- breakdown presence factor
-        if self:hasSystemBreakdowns(systemKey) then
-            local stagesSum = getBreakdownsStageSum(self, systemKey)
-            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-            wearRate = wearRate + breakdownPresenceFactor
-        end
-
         if vehicleHaveCVT then
             -- cold CVT factor
             if (spec.transmissionTemperature or -99) < C.COLD_TRANSMISSION_THRESHOLD and rpmLoad > 0.75 and not spec.isElectricVehicle and not self:getIsAIActive() then
@@ -4702,8 +4675,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         wheelSlipFactor = wheelSlipFactor,
         coldTransFactor = coldTransFactor,
         coldMotorFactor = coldTransFactor,
-        hotTransFactor = hotTransFactor,
-        breakdownPresenceFactor = breakdownPresenceFactor
+        hotTransFactor = hotTransFactor
     })
 end
 
@@ -4713,7 +4685,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local systemData = spec.systems.hydraulics
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
-    local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
+    local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor = 0, 0, 0, 0, 0
     local ptoSharpAngleDeg = tonumber(spec.maxConnectedPtoAngleDeg or 0) or 0
     local wearRate = 1.0
     local vehicleMass = self.getTotalMass ~= nil and (self:getTotalMass(true) or 0) or 0
@@ -4780,13 +4752,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
             wearRate = wearRate * C.HYDRAULICS_IDLING_MULTIPLIER
         end
 
-        -- breakdown presence factor
-        if self:hasSystemBreakdowns(systemKey) then
-            local stagesSum = getBreakdownsStageSum(self, systemKey)
-            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-            wearRate = wearRate + breakdownPresenceFactor
-        end
-
         -- service factor
         expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         wearRate = wearRate + expiredServiceFactor
@@ -4806,7 +4771,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         operatingFactor = operatingFactor,
         coldOilFactor = coldOilFactor,
         ptoOperatingFactor = ptoOperatingFactor,
-        breakdownPresenceFactor = breakdownPresenceFactor,
         sharpAngleFactor = sharpAngleFactor,
         ptoSharpAngleDeg = ptoSharpAngleDeg
     })
@@ -4819,7 +4783,7 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
     local systemData = spec.systems.cooling
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.COOLING_FACTOR_DATA
-    local highCoolingFactor, overheatFactor, coldShockFactor, breakdownPresenceFactor = 0, 0, 0, 0
+    local highCoolingFactor, overheatFactor, coldShockFactor = 0, 0, 0
     local wearRate = 1.0
 
     if not systemData.enabled then
@@ -4858,13 +4822,6 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
             wearRate = wearRate + coldShockFactor
         end
 
-        -- breakdown presence factor
-        if self:hasSystemBreakdowns(systemKey) then
-            local stagesSum = getBreakdownsStageSum(self, systemKey)
-            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-            wearRate = wearRate + breakdownPresenceFactor
-        end
-
         -- idling
         if spec.thermostatState == 0 and overheatFactor == 0 and coldShockFactor == 0 then
             wearRate = wearRate * C.COOLING_IDLING_MULTIPLIER
@@ -4885,8 +4842,7 @@ function AdvancedDamageSystem:updateCoolingSystem(dt)
         expiredServiceFactor = expiredServiceFactor,
         highCoolingFactor = highCoolingFactor,
         overheatFactor = overheatFactor,
-        coldShockFactor = coldShockFactor,
-        breakdownPresenceFactor = breakdownPresenceFactor
+        coldShockFactor = coldShockFactor
     })
 end
 
@@ -4895,7 +4851,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
     local systemData = spec.systems.electrical
     if systemData == nil then return end
-    local expiredServiceFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
+    local expiredServiceFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor = 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
@@ -4953,13 +4909,6 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
             wearRate = wearRate + overheatFactor
         end
 
-        -- breakdown presence factor
-        if self:hasSystemBreakdowns(systemKey) then
-            local stagesSum = getBreakdownsStageSum(self, systemKey)
-            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-            wearRate = wearRate + breakdownPresenceFactor
-        end
-
     elseif lightsFactor == 0 and crankingStressFactor == 0 then 
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -4973,8 +4922,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         crankingStressFactor = crankingStressFactor,
         weatherExposureFactor = weatherExposureFactor,
         lightsFactor = lightsFactor,
-        overheatFactor = overheatFactor,
-        breakdownPresenceFactor = breakdownPresenceFactor
+        overheatFactor = overheatFactor
     })
 end
 
@@ -5001,7 +4949,6 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local brakeMassFactor = 0
     local brakeMassRatio = tonumber(brakeState.massRatio or 0) or 0
     local brakePedal = tonumber(brakeState.pedal or 0) or 0
-    local breakdownPresenceFactor = 0
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
     local wearRate = 1.0
 
@@ -5054,12 +5001,6 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
                 end
             end
 
-            -- breakdown presence factor
-            if self:hasSystemBreakdowns(systemKey) then
-                local stagesSum = getBreakdownsStageSum(self, systemKey)
-                breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-                wearRate = wearRate + breakdownPresenceFactor
-            end
         else
             wearRate = wearRate * C.CHASSIS_IDLING_MULTIPLIER    
         end
@@ -5096,8 +5037,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         steerGroundContact = steerGroundContact,
         brakeMassFactor = brakeMassFactor,
         brakeMassRatio = brakeMassRatio,
-        brakePedal = brakePedal,
-        breakdownPresenceFactor = breakdownPresenceFactor
+        brakePedal = brakePedal
     })
 end
 
@@ -5107,7 +5047,7 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
     local systemData = spec.systems.fuel
     if systemData == nil then return end
     local lowFuelStarvationFactor, coldFuelFactor = 0, 0
-    local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor, breakdownPresenceFactor = 0, 0, 0, 0, 0, 0
+    local expiredServiceFactor, fuelLevel, fuelTemperature, idleDepositFactor, highPressureFactor = 0, 0, 0, 0, 0
     local currentFuelUsageRatio = 0
     local C = ADS_Config.CORE.FUEL_FACTOR_DATA
     local wearRate = 1.0
@@ -5161,13 +5101,6 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
             wearRate = wearRate + highPressureFactor
         end
 
-        -- breakdown presence factor
-        if self:hasSystemBreakdowns(systemKey) then
-            local stagesSum = getBreakdownsStageSum(self, systemKey)
-            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-            wearRate = wearRate + breakdownPresenceFactor
-        end
-
         -- service
         expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         wearRate = wearRate + expiredServiceFactor
@@ -5186,7 +5119,6 @@ function AdvancedDamageSystem:updateFuelSystem(dt)
         idleDepositFactor = idleDepositFactor,
         highPressureFactor = highPressureFactor,
         currentFuelUsageRatio = currentFuelUsageRatio,
-        breakdownPresenceFactor = breakdownPresenceFactor,
         idleTimer = tonumber(fuelState.idleTimer or 0) or 0,
         fuelLevel = fuelLevel,
         fuelTemperature = fuelTemperature
@@ -5198,7 +5130,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.workprocess.name)
     local systemData = ensureSystemData(spec, systemKey)
     local expiredServiceFactor = 0
-    local wetCropFactor, breakdownPresenceFactor, lubricationFactor = 0, 0, 0
+    local wetCropFactor, lubricationFactor = 0, 0
     local C = ADS_Config.CORE.WORKPROCESS_FACTOR_DATA
     local wearRate = 1.0
 
@@ -5232,13 +5164,6 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
             wearRate = wearRate + lubricationFactor
         end
 
-        -- breakdown presence factor
-        if self:hasSystemBreakdowns(systemKey) then
-            local stagesSum = getBreakdownsStageSum(self, systemKey)
-            breakdownPresenceFactor = stagesSum * (ADS_Config.CORE.BREAKDOWN_PRESENCE_FACTOR or 0)
-            wearRate = wearRate + breakdownPresenceFactor
-        end  
-
         -- service
         expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
         wearRate = wearRate + expiredServiceFactor
@@ -5253,8 +5178,7 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         wetCropFactor = wetCropFactor,
-        lubricationFactor = lubricationFactor,
-        breakdownPresenceFactor = breakdownPresenceFactor
+        lubricationFactor = lubricationFactor
     })
 end
 
