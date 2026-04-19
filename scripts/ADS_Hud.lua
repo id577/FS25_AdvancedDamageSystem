@@ -1273,7 +1273,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "sf", statKey = "sf", value = electricalDbg.expiredServiceFactor or 0 },
         { shortName = "wef", statKey = "wef", value = electricalDbg.weatherExposureFactor or 0 },
         { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
-        { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s", tostring(spec.isCranking ~= nil and spec.isCranking == true)) },
+        { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s, t: %ds", tostring(spec.isCranking ~= nil and spec.isCranking == true), math.floor(((electricalDbg.crankingTimer or 0) / 1000) + 0.0001)) },
         { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 }
     })
 

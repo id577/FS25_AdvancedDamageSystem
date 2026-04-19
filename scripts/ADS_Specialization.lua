@@ -3424,25 +3424,48 @@ local function updateImplementChainState(vehicle)
     end
 
     local function updateConnectedPtoState(parentObj, childObj, jointDescIndex)
-        local hasLinkPto = false
-
         if parentObj ~= nil and parentObj.getOutputPowerTakeOffsByJointDescIndex ~= nil and jointDescIndex ~= nil then
             local outputs = parentObj:getOutputPowerTakeOffsByJointDescIndex(jointDescIndex) or {}
             for _, output in ipairs(outputs) do
                 if output ~= nil and output.connectedInput ~= nil then
-                    hasLinkPto = true
                     hasConnectedPto = true
-                end
-            end
-        end
 
-        if hasLinkPto and Utils ~= nil and Utils.getYRotationBetweenNodes ~= nil then
-            local parentNode = getDefaultNode(parentObj)
-            local childNode = getDefaultNode(childObj)
-            if parentNode ~= nil and childNode ~= nil then
-                local yRot = Utils.getYRotationBetweenNodes(parentNode, childNode) or 0
-                local horizontalAngleDeg = math.deg(math.abs(yRot))
-                maxConnectedPtoAngleDeg = math.max(maxConnectedPtoAngleDeg, horizontalAngleDeg)
+                    local inputPto = output.connectedInput
+                    local outputNode = output.outputNode
+                    local inputNode = inputPto ~= nil and inputPto.inputNode or nil
+
+                    if outputNode ~= nil and inputNode ~= nil then
+                        local outDirX, outDirY, outDirZ = localDirectionToWorld(outputNode, 0, 0, 1)
+                        local inDirX, inDirY, inDirZ = localDirectionToWorld(inputNode, 0, 0, 1)
+                        local angleDeg = nil
+
+                        outDirX, outDirY, outDirZ = MathUtil.vector3Normalize(outDirX, outDirY, outDirZ)
+                        inDirX, inDirY, inDirZ = MathUtil.vector3Normalize(inDirX, inDirY, inDirZ)
+
+                        local outLen = MathUtil.vector3Length(outDirX, outDirY, outDirZ)
+                        local inLen = MathUtil.vector3Length(inDirX, inDirY, inDirZ)
+                        if outLen > 0.0001 and inLen > 0.0001 then
+                            local cosine = MathUtil.dotProduct(outDirX, outDirY, outDirZ, inDirX, inDirY, inDirZ)
+                            angleDeg = math.deg(math.acos(math.clamp(cosine, -1.0, 1.0)))
+                        end
+
+                        if angleDeg == nil then
+                            local x1, y1, z1 = getWorldTranslation(outputNode)
+                            local x2, y2, z2 = getWorldTranslation(inputNode)
+                            local dx, dy, dz = x1 - x2, y1 - y2, z1 - z2
+                            local length = MathUtil.vector3Length(dx, dy, dz)
+                            if length > 0.0001 then
+                                local length2D = MathUtil.vector2Length(dx, dz)
+                                local cosine = math.clamp(length2D / length, -1.0, 1.0)
+                                angleDeg = math.deg(math.acos(cosine))
+                            end
+                        end
+
+                        if angleDeg ~= nil then
+                            maxConnectedPtoAngleDeg = math.max(maxConnectedPtoAngleDeg, angleDeg)
+                        end
+                    end
+                end
             end
         end
     end
@@ -4727,7 +4750,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 end
             end
 
-
         else
             --idling
             wearRate = wearRate * C.HYDRAULICS_IDLING_MULTIPLIER
@@ -4877,9 +4899,15 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         wearRate = wearRate + weatherExposureFactor
     end
 
+    systemData.crankingTimer = systemData.crankingTimer or 0
     if not spec.isElectricVehicle and spec.isCranking then
-        crankingStressFactor = C.CRANKING_STRESS_MULTIPLIER
-        wearRate = wearRate + crankingStressFactor
+        systemData.crankingTimer = systemData.crankingTimer + dt
+        if systemData.crankingTimer > 3500 then
+            crankingStressFactor = C.CRANKING_STRESS_MULTIPLIER
+            wearRate = wearRate + crankingStressFactor
+        end
+    else
+        systemData.crankingTimer = systemData.crankingTimer - dt / 10
     end
 
     if self:getIsMotorStarted() and not spec.isElectricVehicle then
@@ -4906,6 +4934,7 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         crankingStressFactor = crankingStressFactor,
+        crankingTimer = systemData.crankingTimer or 0,
         weatherExposureFactor = weatherExposureFactor,
         lightsFactor = lightsFactor,
         overheatFactor = overheatFactor
@@ -4944,11 +4973,16 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
 
     local speed = tonumber(self.getLastSpeed ~= nil and self:getLastSpeed() or 0) or 0
 
+    systemData.speedTimer = systemData.speedTimer or 0
+    systemData.vibTimer = systemData.vibTimer or 0
+    systemData.steerTimer = systemData.steerTimer or 0
+
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
         if speed > 0.003 then
             -- vibration
             local vibThreshold = tonumber(C.VIB_FACTOR_THRESHOLD) or 0.12
             if (tonumber(vibState.smoothed or 0) or 0) > vibThreshold then
+                systemData.vibTimer = systemData.vibTimer + dt
                 local vibMaxSignal = tonumber(C.VIB_FACTOR_MAX_SIGNAL) or 0.22
                 local vibMaxForCurve = math.max(vibMaxSignal, vibThreshold + 0.001)
                 local vibMultiplier = (tonumber(C.VIB_FACTOR_MULTIPLIER) or 4.0) * vibFieldMultiplier
@@ -4962,6 +4996,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
             -- steering load at standstill / low speed
             local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
             if steerSpeedThreshold > 0 and steerState.isLowSpeedActive and steerGroundContact > 0 then
+                systemData.steerTimer = systemData.steerTimer + dt
+
                 steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
                 steerAngleFactor = ADS_Utils.calculateQuadraticMultiplier(steerInputAbs, tonumber(C.STEER_LOAD_STEER_THRESHOLD) or 0.2, false, 1.0)
                 steerChangeFactor = ADS_Utils.calculateQuadraticMultiplier(steerDeltaRate, tonumber(C.STEER_LOAD_CHANGE_THRESHOLD) or 0.08, false, 1.0)
@@ -5002,6 +5038,11 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
             wearRate = wearRate * ADS_Config.CORE.DOWNTIME_MULTIPLIER 
         end
     end
+
+
+    if speed > 0.1 then systemData.speedTimer = systemData.speedTimer + dt end
+
+    --if self:getIsOperating() then print(string.format('vib: %.1f | steer: %.1f | total: %.1f', systemData.vibTimer, systemData.steerTimer, systemData.speedTimer)) end
 
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
@@ -5144,8 +5185,8 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
 
         -- lubrication
         if isTurnedOn and spec.isVehicleNeedLubricate then
-            lubricationFactor = ADS_Utils.calculateQuadraticMultiplier(spec.lubricationLevel, 1.0, true, 0)
-            lubricationFactor = lubricationFactor * (C.LUBRICATION_FACTOR_MULTIPLIER or 0)
+            local missedDays = (1 - spec.lubricationLevel) / ADS_Config.FIELD_CARE.LUBRICATION_REDUCE_PER_DAY
+            lubricationFactor = (C.LUBRICATION_FACTOR_MULTIPLIER or 0) * missedDays
             wearRate = wearRate + lubricationFactor
         end
 
