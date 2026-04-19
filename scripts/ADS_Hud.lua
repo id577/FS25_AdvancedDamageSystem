@@ -1609,7 +1609,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local implementLines = {}
     addLine(implementLines, "", {1, 1, 1, 1}, 0.95)
     addLine(implementLines, string.format(
-        "Implements: low: %s | op: %s | lift: %s | opM: %.1f | liftM: %.1f | pto: %s | ptoA: %s | harv: %s",
+        "Implements: lowered: %s | operating: %s | lifted: %s | operatingMass: %.1f | liftedMass: %.1f | connectedPto: %s | ptoActive: %s | harvesting: %s",
         tostring(spec.isImplementLowered == true),
         tostring(spec.isImplementOperating == true),
         tostring(spec.isImplementLifted == true),
@@ -1622,7 +1622,7 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     for index, impl in ipairs(spec.implements or {}) do
         addLine(implementLines, string.format(
-            "#%d %s | m: %.1f | jt: %s | low: %s | sw: %d | mv: %s | fm: %s | prm: %s | cm: %s | head: %s",
+            "#%d %s | mass: %.1f | jointType: %s | lowered: %s | supportWheels: %d | moving: %s | foldMoving: %s | plowRotating: %s | cylinderMoving: %s | head: %s",
             index,
             tostring(impl.name or "implement"),
             tonumber(impl.mass or 0) or 0,

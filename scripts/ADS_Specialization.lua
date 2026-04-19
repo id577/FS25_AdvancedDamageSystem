@@ -3336,7 +3336,7 @@ end
 local function getMoveState(vehicle, moveKey, jointDesc, nextMoveAlphaCache)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then
-        return 0
+        return false
     end
     local moveAlpha = jointDesc ~= nil and (jointDesc.moveAlpha or 0) or 0
     local prevMoveAlphaCache = spec.hydraulicsMoveAlphaCache or {}
@@ -3464,7 +3464,7 @@ local function updateImplementChainState(vehicle)
             end
         else
             local moveKey = string.format("%s:%s", tostring(vehicleObj), tostring(jointDescIndex or -1))
-            isMoving = getMoveState(parentObj, moveKey, jointDesc, nextMoveAlphaCache)
+            isMoving = getMoveState(vehicle, moveKey, jointDesc, nextMoveAlphaCache)
             updateConnectedPtoState(parentObj, vehicleObj, jointDescIndex)
         end
 
@@ -4688,11 +4688,11 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 operatingMassRatio = vehicleMass > 0 and (spec.operatingMass / vehicleMass) or 0
                 if operatingMassRatio > C.OPERATING_FACTOR_THRESHOLD then
                     operatingFactor = ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, C.OPERATING_FACTOR_THRESHOLD, false)
-                    operatingFactor = operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0) * math.max(systemData.operatingTimer / 10000, 1)
+                    operatingFactor = math.min(operatingFactor * (C.OPERATING_FACTOR_MULTIPLIER or 0), C.OPERATING_FACTOR_MULTIPLIER) * math.max(systemData.operatingTimer / 10000, 1)
                     wearRate = wearRate + operatingFactor
                 end
                 -- cold oil
-                if (spec.engineTemperature or -99) < C.COLD_OIL_THRESHOLD then
+                if (spec.engineTemperature or 0) < C.COLD_OIL_THRESHOLD then
                     coldOilFactor = ADS_Utils.calculateQuadraticMultiplier(spec.engineTemperature, C.COLD_OIL_THRESHOLD, true)
                     coldOilFactor = coldOilFactor * (C.COLD_OIL_MULTIPLIER or 0) * (1 + ADS_Utils.calculateQuadraticMultiplier(operatingMassRatio, 0, false))
                     coldOilFactor = math.min(coldOilFactor, (C.COLD_OIL_MULTIPLIER or 0) * 2)
