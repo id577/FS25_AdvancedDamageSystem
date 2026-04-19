@@ -6844,9 +6844,24 @@ function AdvancedDamageSystem:completeService()
         spec.lubricationLevel = 1.0
     end
 
+    local function resetVehicleRepaintWear(vehicle)
+        if vehicle == nil or vehicle.spec_wearable == nil then
+            return
+        end
+
+        local specWearable = vehicle.spec_wearable
+        if specWearable.wearableNodes == nil then
+            return
+        end
+
+        for _, nodeData in ipairs(specWearable.wearableNodes) do
+            vehicle:setNodeWearAmount(nodeData, 0, true)
+        end
+    end
+
     -- repaint vehicle
-    if serviceType == states.OVERHAUL or optionThree == true then
-        self:repaintVehicle(true)
+    if serviceType == states.OVERHAUL and optionThree == true then
+        resetVehicleRepaintWear(self)
     end
 
     -- cvt addon repair
