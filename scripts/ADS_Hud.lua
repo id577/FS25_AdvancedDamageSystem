@@ -1138,7 +1138,6 @@ function ADS_Hud:drawActiveVehicleHUD()
         hydraulicsDbg.heavyLiftFactor or 0,
         hydraulicsDbg.operatingFactor or 0,
         hydraulicsDbg.coldOilFactor or 0,
-        hydraulicsDbg.ptoOperatingFactor or 0,
         hydraulicsDbg.sharpAngleFactor or 0
     ) * bcw
     local coolingMaxFactor = math.max(
@@ -1607,6 +1606,36 @@ function ADS_Hud:drawActiveVehicleHUD()
     local sections = {
         {title = "Engine Temp", lines = engineTempLines}
     }
+    local implementLines = {}
+    addLine(implementLines, "", {1, 1, 1, 1}, 0.95)
+    addLine(implementLines, string.format(
+        "Implements: low: %s | op: %s | lift: %s | opM: %.1f | liftM: %.1f | pto: %s | ptoA: %s | harv: %s",
+        tostring(spec.isImplementLowered == true),
+        tostring(spec.isImplementOperating == true),
+        tostring(spec.isImplementLifted == true),
+        tonumber(spec.operatingMass or 0) or 0,
+        tonumber(spec.liftedMass or 0) or 0,
+        tostring(spec.hasConnectedPto == true),
+        tostring(spec.isPtoActive == true),
+        tostring(spec.isHarvesting == true)
+    ), {1, 1, 1, 1}, 0.95)
+
+    for index, impl in ipairs(spec.implements or {}) do
+        addLine(implementLines, string.format(
+            "#%d %s | m: %.1f | jt: %s | low: %s | sw: %d | mv: %s | fm: %s | prm: %s | cm: %s | head: %s",
+            index,
+            tostring(impl.name or "implement"),
+            tonumber(impl.mass or 0) or 0,
+            tostring(impl.jointTypeId),
+            tostring(impl.isLowered == true),
+            tonumber(impl.supportWheelCount or 0) or 0,
+            tostring(impl.isMoving == true),
+            tostring(impl.isFoldMoving == true),
+            tostring(impl.isPlowRotationMoving == true),
+            tostring(impl.isCylinderedMoving == true),
+            tostring(impl.isHead == true)
+        ), {0.92, 0.96, 1.0, 1}, 0.90)
+    end
 
     if showTransmissionSection then
         table.insert(sections, {title = "CVT Temp", lines = transmissionTempLines})
@@ -1627,6 +1656,8 @@ function ADS_Hud:drawActiveVehicleHUD()
     if #aiCruiseLines > 0 then
         table.insert(sections, {title = "AI Cruise Control", lines = aiCruiseLines})
     end
+
+    table.insert(sections, {title = "Implements", lines = implementLines, showTitle = false})
 
     local systemColumns = math.min(8, math.max(#systemSections, 1))
     local systemGapX = 0.00012

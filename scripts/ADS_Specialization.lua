@@ -137,7 +137,6 @@ AdvancedDamageSystem.FACTOR_STATS_ALIASES = {
     heavyLiftFactor = "hlf",
     operatingFactor = "of",
     coldOilFactor = "cof",
-    ptoOperatingFactor = "ptof",
     sharpAngleFactor = "saf",
     -- cooling
     highCoolingFactor = "hcf",
@@ -1483,7 +1482,6 @@ function AdvancedDamageSystem:onLoad(savegame)
             heavyLiftMassRatio = 0,
             operatingFactor = 0,
             coldOilFactor = 0,
-            ptoOperatingFactor = 0,
             sharpAngleFactor = 0,
             ptoSharpAngleDeg = 0,
             breakdownProbability = 0,
@@ -3484,6 +3482,7 @@ local function updateImplementChainState(vehicle)
         end
 
         table.insert(implements, {
+            name = vehicleObj.getFullName ~= nil and vehicleObj:getFullName() or tostring(vehicleObj.configFileName or vehicleObj.customEnvironment or "implement"),
             mass = vehicleObj.getTotalMass ~= nil and (vehicleObj:getTotalMass(true) or 0) or 0,
             jointTypeId = isHead and 0 or (jointDesc ~= nil and jointDesc.jointType or nil),
             isLowered = isLowered,
@@ -4669,7 +4668,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local systemData = spec.systems.hydraulics
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
-    local heavyLiftFactor, operatingFactor, coldOilFactor, ptoOperatingFactor, sharpAngleFactor = 0, 0, 0, 0, 0
+    local heavyLiftFactor, operatingFactor, coldOilFactor, sharpAngleFactor = 0, 0, 0, 0
     local ptoSharpAngleDeg = tonumber(spec.maxConnectedPtoAngleDeg or 0) or 0
     local wearRate = 1.0
     local vehicleMass = self.getTotalMass ~= nil and (self:getTotalMass(true) or 0) or 0
@@ -4710,11 +4709,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 wearRate = wearRate + heavyLiftFactor
             end
 
-            -- pto operating
             if spec.isPtoActive then
-                ptoOperatingFactor = C.PTO_OPERATING_FACTOR or 0
-                wearRate = wearRate + ptoOperatingFactor
-                
                 -- pto sharp angle factor
                 local ptoAngleDeg = tonumber(spec.maxConnectedPtoAngleDeg or 0) or 0
                 local hasConnectedPto = spec.hasConnectedPto == true
@@ -4762,7 +4757,6 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         operatingMassRatio = operatingMassRatio,
         operatingTimer = systemData.operatingTimer or 0,
         coldOilFactor = coldOilFactor,
-        ptoOperatingFactor = ptoOperatingFactor,
         sharpAngleFactor = sharpAngleFactor,
         ptoSharpAngleDeg = ptoSharpAngleDeg
     })
