@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 129,
+    VER = 130,
 
     DEBUG = false,
 
@@ -25,7 +25,7 @@ ADS_Config = {
     -- How often the main simulation logic (wear, temperature, etc.) updates, in milliseconds.
     -- This handles the slow-burning processes. A higher value is better for performance
     -- as these calculations do not need to run every frame.
-    CORE_UPDATE_DELAY = 500,
+    CORE_UPDATE_DELAY = 250,
     META_UPDATE_DELAY = 30000,
 
     -- ====================================================================================
@@ -123,7 +123,11 @@ ADS_Config = {
             COLD_OIL_MULTIPLIER = 80.0,
             COLD_OIL_THRESHOLD = 30,
             PTO_SHARP_ANGLE_FACTOR_MULTIPLIER = 20.0,
-            PTO_SHARP_ANGLE_FACTOR_THRESHOLD = 30.0
+            PTO_SHARP_ANGLE_FACTOR_THRESHOLD = 30.0,
+            VIB_FACTOR_THRESHOLD = 0.08,
+            VIB_FACTOR_MAX_SIGNAL = 0.36,
+            VIB_FACTOR_MULTIPLIER = 48.0,
+            VIB_FIELD_MULTIPLIER = 2.0
         },
 
         COOLING_FACTOR_DATA = {
@@ -145,7 +149,11 @@ ADS_Config = {
             HALL_FACTOR_MULTIPLIER = 1.2,
             OVERHEAT_FACTOR_MULTIPLIER = 60.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
-            LIGHTS_FACTOR_MULTIPLIER = 0.4
+            LIGHTS_FACTOR_MULTIPLIER = 0.2,
+            VIB_FACTOR_THRESHOLD = 0.08,
+            VIB_FACTOR_MAX_SIGNAL = 0.36,
+            VIB_FACTOR_MULTIPLIER = 48.0,
+            VIB_FIELD_MULTIPLIER = 2.0
         },
 
         CHASSIS_FACTOR_DATA = {
@@ -156,9 +164,7 @@ ADS_Config = {
             VIB_FACTOR_MULTIPLIER = 48.0,
             VIB_FIELD_MULTIPLIER = 2.0,
             STEER_LOAD_FACTOR_MULTIPLIER = 16.0,
-            STEER_LOAD_SPEED_THRESHOLD = 3.0,
-            STEER_LOAD_STEER_THRESHOLD = 0.2,
-            STEER_LOAD_CHANGE_THRESHOLD = 0.08,
+            STEER_LOAD_SPEED_THRESHOLD = 4.0,
             BRAKE_MASS_FACTOR_MULTIPLIER = 48.0,
             BRAKE_MASS_RATIO_THRESHOLD = 12.0,
             BRAKE_MASS_SPEED_THRESHOLD = 2.0,
@@ -181,7 +187,7 @@ ADS_Config = {
             IDLE_DEPOSIT_FACTOR_MULTIPLIER = 1.0,
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
             IDLE_DEPOSIT_FACTOR_MAX_TIMER = 360,
-            HIGH_PRESSURE_FACTOR_MULTIPLIER = 12.0,
+            HIGH_PRESSURE_FACTOR_MULTIPLIER = 2.0,
             HIGH_PRESSURE_FACTOR_THRESHOLD = 0.8,
         },
 

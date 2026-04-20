@@ -1137,6 +1137,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         hydraulicsDbg.expiredServiceFactor or 0,
         hydraulicsDbg.heavyLiftFactor or 0,
         hydraulicsDbg.operatingFactor or 0,
+        hydraulicsDbg.vibFactor or 0,
         hydraulicsDbg.coldOilFactor or 0,
         hydraulicsDbg.sharpAngleFactor or 0
     ) * bcw
@@ -1151,7 +1152,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         electricalDbg.weatherExposureFactor or 0,
         electricalDbg.lightsFactor or 0,
         electricalDbg.crankingStressFactor or 0,
-        electricalDbg.overheatFactor or 0
+        electricalDbg.overheatFactor or 0,
+        electricalDbg.vibFactor or 0
     ) * bcw
     local chassisMaxFactor = math.max(
         chassisDbg.expiredServiceFactor or 0,
@@ -1258,6 +1260,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "sf", statKey = "sf", value = hydraulicsDbg.expiredServiceFactor or 0 },
         { shortName = "hlf", statKey = "hlf", value = hydraulicsDbg.heavyLiftFactor or 0, extraInfo = string.format("mr: %.2f", asPercent(hydraulicsDbg.heavyLiftMassRatio or 0)) },
         { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0, extraInfo = string.format("om: %.2f t: %ds", hydraulicsDbg.operatingMassRatio or 0, math.floor(((hydraulicsDbg.operatingTimer or 0) / 1000) + 0.0001)) },
+        { shortName = "vf", statKey = "vf", value = hydraulicsDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(hydraulicsDbg.vibRaw or 0), asPercent(hydraulicsDbg.vibSignal or 0)) },
         { shortName = "cof", statKey = "cof", value = hydraulicsDbg.coldOilFactor or 0 },
         { shortName = "saf", statKey = "saf", value = hydraulicsDbg.sharpAngleFactor or 0, extraInfo = string.format("%.1f deg", hydraulicsDbg.ptoSharpAngleDeg or 0) }
     })
@@ -1274,13 +1277,14 @@ function ADS_Hud:drawActiveVehicleHUD()
         { shortName = "wef", statKey = "wef", value = electricalDbg.weatherExposureFactor or 0 },
         { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
         { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s, t: %ds", tostring(spec.isCranking ~= nil and spec.isCranking == true), math.floor(((electricalDbg.crankingTimer or 0) / 1000) + 0.0001)) },
-        { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 }
+        { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 },
+        { shortName = "vf", statKey = "vf", value = electricalDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(electricalDbg.vibRaw or 0), asPercent(electricalDbg.vibSignal or 0)) }
     })
 
     local chassisLines = buildSystemLines("chassis", chassisDbg, chassisMaxFactor, {
         { shortName = "sf", statKey = "sf", value = chassisDbg.expiredServiceFactor or 0 },
         { shortName = "vf", statKey = "vf", value = chassisDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(chassisDbg.vibRaw or 0), asPercent(chassisDbg.vibSignal or 0)) },
-        { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("d: %.2f", asPercent(chassisDbg.steerDeltaRate or 0)) },
+        { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("lowSp: %.2f m: %s", tonumber(chassisDbg.steerLowSpeedFactor or 0) or 0, tostring(chassisDbg.steerMoving == true)) },
         { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("hp/m: %.1f", chassisDbg.brakeMassRatio or 0) }
     })
 
@@ -1866,11 +1870,11 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
             end
         elseif debugKey == "steerLoadFactor" then
             local parts = {}
-            if dbg.steerInputAbs ~= nil then
-                table.insert(parts, string.format("steer %.3f", tonumber(dbg.steerInputAbs) or 0))
-            end
             if dbg.steerLowSpeedFactor ~= nil then
                 table.insert(parts, string.format("lowSp %.3f", tonumber(dbg.steerLowSpeedFactor) or 0))
+            end
+            if dbg.steerMoving ~= nil then
+                table.insert(parts, string.format("moving %s", tostring(dbg.steerMoving == true)))
             end
             if #parts > 0 then
                 return table.concat(parts, " | ")

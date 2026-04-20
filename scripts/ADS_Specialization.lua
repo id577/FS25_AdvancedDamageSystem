@@ -1484,6 +1484,10 @@ function AdvancedDamageSystem:onLoad(savegame)
             heavyLiftFactor = 0,
             heavyLiftMassRatio = 0,
             operatingFactor = 0,
+            vibFactor = 0,
+            vibSignal = 0,
+            vibRaw = 0,
+            vibFieldMultiplier = 1,
             coldOilFactor = 0,
             sharpAngleFactor = 0,
             ptoSharpAngleDeg = 0,
@@ -1508,6 +1512,10 @@ function AdvancedDamageSystem:onLoad(savegame)
             stress = 0,
             totalWearRate = 0,
             expiredServiceFactor = 0,
+            vibFactor = 0,
+            vibSignal = 0,
+            vibRaw = 0,
+            vibFieldMultiplier = 1,
             lightsFactor = 0,
             crankingStressFactor = 0,
             overheatFactor = 0,
@@ -1529,12 +1537,9 @@ function AdvancedDamageSystem:onLoad(savegame)
             vibAvgDensityType = 0,
             vibFieldMultiplier = 1,
             steerLoadFactor = 0,
-            steerInputAbs = 0,
-            steerDeltaRate = 0,
             steerLowSpeedFactor = 0,
-            steerAngleFactor = 0,
-            steerChangeFactor = 0,
             steerGroundContact = 0,
+            steerMoving = false,
             brakeMassFactor = 0,
             brakeMassRatio = 0,
             brakePedal = 0,
@@ -2794,7 +2799,7 @@ local function syncOverloadWarning(vehicle, dt)
         engine = { "mlf", "hmf", "lf" },
         transmission = { "pof", "htf", "lf", "wsf", "hotf" }
     }
-    
+
     local shouldStage = 0
     local maxAvgStress = 0
     for systemName, systemData in pairs(factorStats) do
@@ -3753,30 +3758,32 @@ local function updateChassisSteeringState(vehicle, dt)
     local steerState = spec.chassisSteerState
     if steerState == nil then
         steerState = {
-            prevSteerAbs = nil,
-            inputAbs = 0,
-            deltaRate = 0,
+            prevPosition = nil,
+            position = 0,
             groundContact = 0,
-            isLowSpeedActive = false
+            isLowSpeedActive = false,
+            isMoving = false
         }
         spec.chassisSteerState = steerState
     end
 
     local speed = tonumber(vehicle.getLastSpeed ~= nil and vehicle:getLastSpeed() or 0) or 0
     local steerSpeedThreshold = tonumber(ADS_Config.CORE.CHASSIS_FACTOR_DATA.STEER_LOAD_SPEED_THRESHOLD) or 4.0
+    local steeringPosition = 0
 
-    local steeringDirectionAbs = 0
     if vehicle.spec_wheels ~= nil and vehicle.spec_wheels.rotatedTime ~= nil then
-        steeringDirectionAbs = math.abs(tonumber(vehicle.spec_wheels.rotatedTime) or 0)
+        steeringPosition = tonumber(vehicle.spec_wheels.rotatedTime) or 0
     elseif vehicle.getSteeringDirection ~= nil then
-        steeringDirectionAbs = math.abs(tonumber(vehicle:getSteeringDirection()) or 0)
+        steeringPosition = tonumber(vehicle:getSteeringDirection()) or 0
     end
 
-    local steerInputAbs = math.clamp(steeringDirectionAbs, 0, 1)
-    local prevSteerAbs = tonumber(steerState.prevSteerAbs) or steerInputAbs
-    local dtSafe = math.max(tonumber(dt) or 0, 1)
-    local steerDeltaRate = math.clamp(math.abs(steerInputAbs - prevSteerAbs) * 1000 / dtSafe, 0, 1)
-    steerState.prevSteerAbs = steerInputAbs
+    local prevSteeringPosition = tonumber(steerState.prevPosition)
+    local steerMoving = false
+    if prevSteeringPosition ~= nil then
+        steerMoving = math.abs(steeringPosition - prevSteeringPosition) > 0.0005
+    end
+    steerState.prevPosition = steeringPosition
+    steerState.position = steeringPosition
 
     local steerGroundContact = 0
     if vehicle.spec_wheels ~= nil and vehicle.spec_wheels.wheels ~= nil then
@@ -3795,10 +3802,9 @@ local function updateChassisSteeringState(vehicle, dt)
         end
     end
 
-    steerState.inputAbs = steerInputAbs
-    steerState.deltaRate = steerDeltaRate
     steerState.groundContact = steerGroundContact
     steerState.isLowSpeedActive = steerSpeedThreshold > 0 and speed <= steerSpeedThreshold
+    steerState.isMoving = steerMoving
 end
 
 local function updateChassisBrakingState(vehicle)
@@ -4779,8 +4785,12 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
     local systemData = spec.systems.hydraulics
     local expiredServiceFactor = 0
     local C = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA
-    local heavyLiftFactor, operatingFactor, coldOilFactor, sharpAngleFactor = 0, 0, 0, 0
+    local heavyLiftFactor, operatingFactor, coldOilFactor, sharpAngleFactor, vibFactor = 0, 0, 0, 0, 0
     local ptoSharpAngleDeg = tonumber(spec.maxConnectedPtoAngleDeg or 0) or 0
+    local vibState = spec.chassisVibState or {}
+    local vibSignal = tonumber(vibState.signal or 0) or 0
+    local vibRaw = tonumber(vibState.raw or 0) or 0
+    local vibFieldMultiplier = tonumber(vibState.fieldMultiplier or 1) or 1
     local wearRate = 1.0
     local vehicleMass = self.getTotalMass ~= nil and (self:getTotalMass(true) or 0) or 0
     local heavyLiftMassRatio, operatingMassRatio = 0, 0
@@ -4818,6 +4828,25 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                 heavyLiftFactor = heavyLiftFactor * (C.HEAVY_LIFT_FACTOR_MULTIPLIER or 0)
                 heavyLiftFactor = math.min(heavyLiftFactor, C.HEAVY_LIFT_FACTOR_MULTIPLIER or heavyLiftFactor)
                 wearRate = wearRate + heavyLiftFactor
+            end
+
+            -- vibration factor
+            local vibThreshold = tonumber(C.VIB_FACTOR_THRESHOLD) or 0.12
+            if spec.isImplementLifted and (tonumber(vibState.smoothed or 0) or 0) > vibThreshold then
+                local vibMaxSignal = tonumber(C.VIB_FACTOR_MAX_SIGNAL) or 0.22
+                local vibMaxForCurve = math.max(vibMaxSignal, vibThreshold + 0.001)
+                local liftRatioPivot = tonumber(C.HEAVY_LIFT_FACTOR_THRESHOLD) or 0.6
+                local liftRatioInfluence = 1.0
+                if heavyLiftMassRatio > liftRatioPivot then
+                    liftRatioInfluence = 1.0 + ADS_Utils.calculateQuadraticMultiplier(heavyLiftMassRatio, liftRatioPivot, false, 1.0)
+                elseif heavyLiftMassRatio < liftRatioPivot then
+                    liftRatioInfluence = 1.0 - 0.5 * ADS_Utils.calculateQuadraticMultiplier(heavyLiftMassRatio, liftRatioPivot, true, 0.0)
+                end
+                local vibMultiplier = (tonumber(C.VIB_FACTOR_MULTIPLIER) or 4.0) * vibFieldMultiplier * liftRatioInfluence
+                vibFactor = ADS_Utils.calculateQuadraticMultiplier(tonumber(vibState.smoothed or 0) or 0, vibThreshold, false, vibMaxForCurve)
+                vibFactor = vibFactor * vibMultiplier
+                vibFactor = math.min(vibFactor, vibMultiplier)
+                wearRate = wearRate + vibFactor
             end
 
             if spec.isPtoActive then
@@ -4866,6 +4895,10 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
         operatingFactor = operatingFactor,
         operatingMassRatio = operatingMassRatio,
         operatingTimer = systemData.operatingTimer or 0,
+        vibFactor = vibFactor,
+        vibSignal = vibSignal,
+        vibRaw = vibRaw,
+        vibFieldMultiplier = vibFieldMultiplier,
         coldOilFactor = coldOilFactor,
         sharpAngleFactor = sharpAngleFactor,
         ptoSharpAngleDeg = ptoSharpAngleDeg
@@ -4947,7 +4980,11 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.electrical.name)
     local systemData = spec.systems.electrical
     if systemData == nil then return end
-    local expiredServiceFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor = 0, 0, 0, 0, 0
+    local vibState = spec.chassisVibState or {}
+    local vibSignal = tonumber(vibState.signal or 0) or 0
+    local vibRaw = tonumber(vibState.raw or 0) or 0
+    local vibFieldMultiplier = tonumber(vibState.fieldMultiplier or 1) or 1
+    local expiredServiceFactor, weatherExposureFactor, lightsFactor, overheatFactor, crankingStressFactor, vibFactor = 0, 0, 0, 0, 0, 0
     local C = ADS_Config.CORE.ELECTRICAL_FACTOR_DATA
     local wearRate = 1.0
 
@@ -5011,6 +5048,18 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
             wearRate = wearRate + overheatFactor
         end
 
+        -- vibration factor
+        local vibThreshold = tonumber(C.VIB_FACTOR_THRESHOLD) or 0.12
+        if (tonumber(vibState.smoothed or 0) or 0) > vibThreshold then
+            local vibMaxSignal = tonumber(C.VIB_FACTOR_MAX_SIGNAL) or 0.22
+            local vibMaxForCurve = math.max(vibMaxSignal, vibThreshold + 0.001)
+            local vibMultiplier = (tonumber(C.VIB_FACTOR_MULTIPLIER) or 4.0) * vibFieldMultiplier
+            vibFactor = ADS_Utils.calculateQuadraticMultiplier(tonumber(vibState.smoothed or 0) or 0, vibThreshold, false, vibMaxForCurve)
+            vibFactor = vibFactor * vibMultiplier
+            vibFactor = math.min(vibFactor, vibMultiplier)
+            wearRate = wearRate + vibFactor
+        end
+
     elseif lightsFactor == 0 and crankingStressFactor == 0 then 
         if spec.isUnderRoof then 
             wearRate = wearRate * ADS_Config.CORE.UNDER_ROOF_DOWNTIME_MULTIPLIER 
@@ -5025,7 +5074,11 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         crankingTimer = systemData.crankingTimer or 0,
         weatherExposureFactor = weatherExposureFactor,
         lightsFactor = lightsFactor,
-        overheatFactor = overheatFactor
+        overheatFactor = overheatFactor,
+        vibFactor = vibFactor,
+        vibSignal = vibSignal,
+        vibRaw = vibRaw,
+        vibFieldMultiplier = vibFieldMultiplier
     })
 end
 
@@ -5043,12 +5096,9 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local vibSpeedFactor = tonumber(vibState.speedFactor or 0) or 0
     local vibAvgDensityType = tonumber(vibState.avgDensityType or 0) or 0
     local vibFieldMultiplier = tonumber(vibState.fieldMultiplier or 1) or 1
-    local steerInputAbs = tonumber(steerState.inputAbs or 0) or 0
-    local steerDeltaRate = tonumber(steerState.deltaRate or 0) or 0
     local steerLowSpeedFactor = 0
-    local steerAngleFactor = 0
-    local steerChangeFactor = 0
     local steerGroundContact = tonumber(steerState.groundContact or 0) or 0
+    local steerMoving = steerState.isMoving == true
     local brakeMassFactor = 0
     local hpBrakeMassRatio = tonumber(brakeState.hpMassRatio or 0) or 0
     local brakePedal = tonumber(brakeState.pedal or 0) or 0
@@ -5061,41 +5111,19 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
 
     local speed = tonumber(self.getLastSpeed ~= nil and self:getLastSpeed() or 0) or 0
 
-    systemData.speedTimer = systemData.speedTimer or 0
-    systemData.vibTimer = systemData.vibTimer or 0
-    systemData.steerTimer = systemData.steerTimer or 0
 
     if self.getIsMotorStarted ~= nil and self:getIsMotorStarted() then
         if speed > 0.003 then
             -- vibration
             local vibThreshold = tonumber(C.VIB_FACTOR_THRESHOLD) or 0.12
             if (tonumber(vibState.smoothed or 0) or 0) > vibThreshold then
-                systemData.vibTimer = systemData.vibTimer + dt
                 local vibMaxSignal = tonumber(C.VIB_FACTOR_MAX_SIGNAL) or 0.22
                 local vibMaxForCurve = math.max(vibMaxSignal, vibThreshold + 0.001)
                 local vibMultiplier = (tonumber(C.VIB_FACTOR_MULTIPLIER) or 4.0) * vibFieldMultiplier
-
                 vibFactor = ADS_Utils.calculateQuadraticMultiplier(tonumber(vibState.smoothed or 0) or 0, vibThreshold, false, vibMaxForCurve)
                 vibFactor = vibFactor * vibMultiplier
                 vibFactor = math.min(vibFactor, vibMultiplier)
                 wearRate = wearRate + vibFactor
-            end
-
-            -- steering load at standstill / low speed
-            local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
-            if steerSpeedThreshold > 0 and steerState.isLowSpeedActive and steerGroundContact > 0 then
-                systemData.steerTimer = systemData.steerTimer + dt
-
-                steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
-                steerAngleFactor = ADS_Utils.calculateQuadraticMultiplier(steerInputAbs, tonumber(C.STEER_LOAD_STEER_THRESHOLD) or 0.2, false, 1.0)
-                steerChangeFactor = ADS_Utils.calculateQuadraticMultiplier(steerDeltaRate, tonumber(C.STEER_LOAD_CHANGE_THRESHOLD) or 0.08, false, 1.0)
-
-                if steerChangeFactor > 0 and steerLowSpeedFactor > 0 then
-                    local steerSignal = (0.35 + 0.65 * steerAngleFactor) * steerChangeFactor * steerLowSpeedFactor
-                    local aiMultiplier = self:getIsAIActive() and 0.25 or 1.0
-                    steerLoadFactor = steerSignal * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0) * aiMultiplier
-                    wearRate = wearRate + steerLoadFactor
-                end
             end
 
             -- braking under mass
@@ -5114,6 +5142,16 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
             wearRate = wearRate * C.CHASSIS_IDLING_MULTIPLIER    
         end
 
+        -- steering load at standstill / low speed
+        local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
+        if steerSpeedThreshold > 0 and steerState.isLowSpeedActive and steerGroundContact > 0 and steerMoving then
+            steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
+            if steerLowSpeedFactor > 0 then
+                steerLoadFactor = steerLowSpeedFactor * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
+                wearRate = wearRate + steerLoadFactor
+            end
+        end
+
         -- service
         if not spec.isElectricVehicle then
             expiredServiceFactor = getExpiredServiceFactor(spec.serviceLevel, C.SERVICE_EXPIRED_MULTIPLIER)
@@ -5127,11 +5165,6 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         end
     end
 
-
-    if speed > 0.1 then systemData.speedTimer = systemData.speedTimer + dt end
-
-    --if self:getIsOperating() then print(string.format('vib: %.1f | steer: %.1f | total: %.1f', systemData.vibTimer, systemData.steerTimer, systemData.speedTimer)) end
-
     self:updateSystemConditionAndStress(dt, systemKey, wearRate, {
         expiredServiceFactor = expiredServiceFactor,
         vibFactor = vibFactor,
@@ -5143,12 +5176,9 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         vibAvgDensityType = vibAvgDensityType,
         vibFieldMultiplier = vibFieldMultiplier,
         steerLoadFactor = steerLoadFactor,
-        steerInputAbs = steerInputAbs,
-        steerDeltaRate = steerDeltaRate,
         steerLowSpeedFactor = steerLowSpeedFactor,
-        steerAngleFactor = steerAngleFactor,
-        steerChangeFactor = steerChangeFactor,
         steerGroundContact = steerGroundContact,
+        steerMoving = steerMoving,
         brakeMassFactor = brakeMassFactor,
         brakeMassRatio = hpBrakeMassRatio,
         brakePedal = brakePedal
