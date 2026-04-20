@@ -3588,6 +3588,15 @@ function ADS_Breakdowns.updateConsumers(vehicle, dt, accInput)
 	local rpmFactor = idleFactor + rpmPercentage * (1 - idleFactor)
 	local loadFactor = math.max(spec.smoothedLoadPercentage * rpmPercentage, 0)
 	local motorFactor = 0.5 * (0.2 * rpmFactor + 1.8 * loadFactor)
+    local timeScale = 1
+
+    if g_modIsLoaded ~= nil and g_modIsLoaded["FS25_ingameTimeOperatingHours"] then
+        local missionInfo = g_currentMission ~= nil and g_currentMission.missionInfo or nil
+        timeScale = (missionInfo and missionInfo.timeScale) or 1
+        if timeScale <= 0 then
+            timeScale = 1
+        end
+    end
 
     local fuelUsageFactors = {
         [1] = 1.0,
@@ -3613,7 +3622,7 @@ function ADS_Breakdowns.updateConsumers(vehicle, dt, accInput)
 
 	for _, consumer in pairs(spec.consumers) do
 		if consumer.permanentConsumption and consumer.usage > 0 then
-			local used = usageFactor * motorFactor * consumer.usage * dt
+			local used = usageFactor * motorFactor * consumer.usage * dt * timeScale
 
 			if used ~= 0 then
 				consumer.fillLevelToChange = consumer.fillLevelToChange + used
@@ -3642,10 +3651,15 @@ function ADS_Breakdowns.updateConsumers(vehicle, dt, accInput)
 					end
 				end
 
+				local usage = used / dt * 1000 * 60 * 60
+                if timeScale ~= 0 then
+                    usage = usage / timeScale
+                end
+
 				if consumer.fillType == FillType.DIESEL or consumer.fillType == FillType.ELECTRICCHARGE or consumer.fillType == FillType.METHANE then
-					spec.lastFuelUsage = used / dt * 1000 * 60 * 60
+					spec.lastFuelUsage = usage
 				elseif consumer.fillType == FillType.DEF then
-					spec.lastDefUsage = used / dt * 1000 * 60 * 60
+					spec.lastDefUsage = usage
 				end
 			end
 		end

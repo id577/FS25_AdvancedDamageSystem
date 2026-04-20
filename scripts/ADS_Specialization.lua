@@ -3011,8 +3011,15 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
     if motorState == MotorState.ON then
         local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
 
+        local operatingDt = dt or 0
+        if g_modIsLoaded ~= nil and g_modIsLoaded["FS25_ingameTimeOperatingHours"] then
+            local missionInfo = g_currentMission ~= nil and g_currentMission.missionInfo or nil
+            local timeScale = (missionInfo and missionInfo.timeScale) or 1
+            operatingDt = dt * timeScale
+        end
+
         spec._allowAdsOperatingTimeWrite = true
-        self:setOperatingTime(currentOperatingTime + (dt or 0), false)
+        self:setOperatingTime(currentOperatingTime + operatingDt, false)
         spec._allowAdsOperatingTimeWrite = false
     end
 
