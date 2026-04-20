@@ -58,17 +58,4 @@
             <Button profile="buttonBack" text="$l10n_button_close" onClick="onClickBack" />
         </BoxLayout>
     </GuiElement>
-
-    <GUIProfiles>
-        <Profile name="ads_inspectionDialogBg" extends="fs25_dialogBg">
-            <size value="640px 740px" />
-        </Profile>
-
-        <Profile name="ads_inspectionAdditionalText" extends="fs25_dialogText">
-            <textSize value="14px" />
-            <textAlignment value="left" />
-            <textVerticalAlignment value="top" />
-            <textColor value="$preset_colorWhite_50" />
-        </Profile>
-    </GUIProfiles>
 </GUI>

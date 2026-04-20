@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 115,
+    VER = 130,
 
     DEBUG = false,
 
@@ -16,12 +16,16 @@ ADS_Config = {
     -- WARNING: It is strongly recommended to keep this value low (e.g., under 200ms).
     -- High values can cause visual glitches (like lights staying off for too long)
     -- or make gameplay effects feel unresponsive and delayed.
-    EFFECTS_UPDATE_DELAY = 100, -- (100ms = 10 times per second)
+    ON_UPDATE_DELAY = 100, -- (100ms = 10 times per second)
+
+    UPDATE_VEHICLE_STATE_DELAY_ONE = 50,
+    UPDATE_VEHICLE_STATE_DELAY_TWO = 200,
+    UPDATE_VEHICLE_STATE_DELAY_THREE = 500,
     
     -- How often the main simulation logic (wear, temperature, etc.) updates, in milliseconds.
     -- This handles the slow-burning processes. A higher value is better for performance
     -- as these calculations do not need to run every frame.
-    CORE_UPDATE_DELAY = 500,
+    CORE_UPDATE_DELAY = 250,
     META_UPDATE_DELAY = 30000,
 
     -- ====================================================================================
@@ -29,15 +33,16 @@ ADS_Config = {
     -- This section controls the fundamental mechanics of wear, tear, and breakdowns.
     -- ====================================================================================
     CORE = {
+        DEFAULT_SERVICE_WEAR = 0.1,
+        DEFAULT_SYSTEM_WEAR = 0.01,
         BASE_SERVICE_WEAR = 0.1,
         BASE_SYSTEMS_WEAR = 0.01,
+
         DOWNTIME_MULTIPLIER = 0.05,
         UNDER_ROOF_DOWNTIME_MULTIPLIER = 0.0,
         RAIN_FACTOR = 1.1,
         HALL_FACTOR = 1.3,
         SNOW_FACTOR = 1.1,
-        BREAKDOWN_PRESENCE_FACTOR = 1.0,
-
         SERVICE_EXPIRED_THRESHOLD = 0.5,
 
         SYSTEM_WEIGHTS = {
@@ -53,6 +58,8 @@ ADS_Config = {
 
         PERSISTENT_WEAR_RATE_LIMIT = 10.0,
         IMPULSE_WEAR_RATE_LIMIT = 500.0,
+        AVG_STRESS_WARNING_THRESHOLD = 0.2,
+        AVG_STRESS_CRITICAL_THRESHOLD = 0.4,
 
         SYSTEM_STRESS_GLOBAL_MULTIPLIER = 1.0,
         SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS = {
@@ -62,125 +69,136 @@ ADS_Config = {
             cooling=10.0, 
             electrical=10.0, 
             chassis=10.0, 
-            workProcess=20.0, 
+            workProcess=10.0, 
             fuel=10.0
         },
 
         ENGINE_FACTOR_DATA = {
             MOTOR_IDLING_MULTIPLIER = 0.5,
-            SERVICE_EXPIRED_MULTIPLIER = 16.0,
+            SERVICE_EXPIRED_MULTIPLIER = 8.0,
             MOTOR_IDLING_THRESHOLD = 0.3,
-            MOTOR_OVERLOADED_MULTIPLIER = 8.0, 
-            MOTOR_OVERLOADED_THRESHOLD = 0.90,
+            MOTOR_OVERLOADED_MULTIPLIER = 2.0, 
+            MOTOR_OVERLOADED_THRESHOLD = 0.85,
+            MOTOR_OVERLOADED_MAX_EFFECT = 1.05,
+            LUGGING_MULTIPLIER = 4.0,       
+            LUGGING_RPM_THRESHOLD = 0.6,
+            LUGGING_MOTORLOAD_THRESHOLD = 0.80,
             COLD_MOTOR_RPM_THRESHOLD = 0.5,
             COLD_MOTOR_TEMP_THRESHOLD = 50,         
-            COLD_MOTOR_MULTIPLIER = 180.0,
-            OVERHEAT_MOTOR_MULTIPLIER = 360.0, 
+            COLD_MOTOR_MULTIPLIER = 80.0,
+            OVERHEAT_MOTOR_MULTIPLIER = 120.0, 
             OVERHEAT_MOTOR_THRESHOLD = 95,
             AIR_INTAKE_CLOGGING_MULTIPLIER = 1.0,
             AIR_INTAKE_CLOGGING_THRESHOLD = 0.5
         },
 
         TRANSMISSION_FACTOR_DATA = {
-            TRANSMISSION_IDLING_MULTIPLIER = 0.2,
-            SERVICE_EXPIRED_MULTIPLIER = 9.0,
-            PULL_OVERLOAD_MULTIPLIER = 8.0,    
-            PULL_OVERLOAD_THRESHOLD = 0.82,
-            PULL_OVERLOAD_TIMER_THRESHOLD = 30,
-            LUGGING_MULTIPLIER = 32.0,       
-            LUGGING_RPM_THRESHOLD = 0.8,
+            TRANSMISSION_IDLING_MULTIPLIER = 0.5,
+            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            PULL_OVERLOAD_MULTIPLIER = 2.0,    
+            PULL_OVERLOAD_THRESHOLD = 0.85,
+            PULL_OVERLOAD_TIMER_THRESHOLD = 60,
+            PULL_OVERLOAD_TIMER_MAX_EFFECT = 90,
+            LUGGING_MULTIPLIER = 12.0,
+            LUGGING_RPM_THRESHOLD = 0.6,
             LUGGING_MOTORLOAD_THRESHOLD = 0.80,
-            WHEEL_SLIP_MULTIPLIER = 60.0,        
-            WHEEL_SLIP_THRESHOLD = 0.1,
-            HEAVY_TRAILER_MULTIPLIER = 12.0,
-            HEAVY_TRAILER_THRESHOLD = 2.2,
-            COLD_TRANSMISSION_MULTIPLIER = 180.0,
+            WHEEL_SLIP_MULTIPLIER = 12.0,        
+            WHEEL_SLIP_THRESHOLD = 0.05,
+            HEAVY_TRAILER_MULTIPLIER = 3.0,
+            HEAVY_TRAILER_MASS_RATIO_THRESHOLD = 12,
+            HEAVY_TRAILER_MOTORLOAD_THRESHOLD = 0.7,
+            COLD_TRANSMISSION_MULTIPLIER = 80.0,
             COLD_TRANSMISSION_THRESHOLD = 45,
-            OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 360.0,
+            OVERHEAT_TRANSMISSION_MAX_MULTIPLIER = 120.0,
             OVERHEAT_TRANSMISSION_THRESHOLD = 95,
-            CVT_ADDON_DAMAGE_MULTIPLIER = 1.0
         },
 
         HYDRAULICS_FACTOR_DATA = {
-            HYDRAULICS_IDLING_MULTIPLIER = 0.2,
-            SERVICE_EXPIRED_MULTIPLIER = 6.0,
-            HEAVY_LIFT_FACTOR_MULTIPLIER = 18.0,
-            HEAVY_LIFT_FACTOR_THRESHOLD = 0.3,
-            OPERATING_FACTOR_MULTIPLIER = 4.0,
-            COLD_OIL_MULTIPLIER = 180.0,
+            HYDRAULICS_IDLING_MULTIPLIER = 0.5,
+            SERVICE_EXPIRED_MULTIPLIER = 4.0,
+            HEAVY_LIFT_FACTOR_MULTIPLIER = 1.0,
+            HEAVY_LIFT_FACTOR_THRESHOLD = 0.6,
+            OPERATING_FACTOR_MULTIPLIER = 6.0,
+            OPERATING_FACTOR_THRESHOLD = 0.3,
+            COLD_OIL_MULTIPLIER = 80.0,
             COLD_OIL_THRESHOLD = 30,
-            PTO_OPERATING_FACTOR = 0.0,
-            PTO_SHARP_ANGLE_FACTOR_MULTIPLIER = 80.0,
-            PTO_SHARP_ANGLE_FACTOR_THRESHOLD = 20.0
+            PTO_SHARP_ANGLE_FACTOR_MULTIPLIER = 20.0,
+            PTO_SHARP_ANGLE_FACTOR_THRESHOLD = 30.0,
+            VIB_FACTOR_THRESHOLD = 0.08,
+            VIB_FACTOR_MAX_SIGNAL = 0.36,
+            VIB_FACTOR_MULTIPLIER = 48.0,
+            VIB_FIELD_MULTIPLIER = 2.0
         },
 
         COOLING_FACTOR_DATA = {
-            COOLING_IDLING_MULTIPLIER = 0.2,
-            SERVICE_EXPIRED_MULTIPLIER = 9.0,
-            HIGH_COOLING_FACTOR_MULTIPLIER = 8.0,
-            HIGH_COOLING_FACTOR_THRESHOLD = 0.9,
-            OVERHEAT_FACTOR_MULTIPLIER = 120.0,
+            COOLING_IDLING_MULTIPLIER = 0.5,
+            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            HIGH_COOLING_FACTOR_MULTIPLIER = 2.0,
+            HIGH_COOLING_FACTOR_THRESHOLD = 0.85,
+            OVERHEAT_FACTOR_MULTIPLIER = 60.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
-            COLD_SHOCK_FACTOR_MULTIPLIER = 120.0,
+            COLD_SHOCK_FACTOR_MULTIPLIER = 40.0,
             COLD_SHOCK_FACTOR_THRESHOLD = 50
         },
 
         ELECTRICAL_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 4.0,
-            CRANKING_STRESS_MULTIPLIER = 12.0,
-            RAIN_FACTOR_MULTIPLIER = 1.5,
-            SNOW_FACTOR_MULTIPLIER = 1.0,
-            HALL_FACTOR_MULTIPLIER = 2.0,
-            OVERHEAT_FACTOR_MULTIPLIER = 360.0,
+            SERVICE_EXPIRED_MULTIPLIER = 2.0,
+            CRANKING_STRESS_MULTIPLIER = 6.0,
+            RAIN_FACTOR_MULTIPLIER = 1.0,
+            SNOW_FACTOR_MULTIPLIER = 0.8,
+            HALL_FACTOR_MULTIPLIER = 1.2,
+            OVERHEAT_FACTOR_MULTIPLIER = 60.0,
             OVERHEAT_FACTOR_THRESHOLD = 95,
-            LIGHTS_FACTOR_MULTIPLIER = 0.4
+            LIGHTS_FACTOR_MULTIPLIER = 0.2,
+            VIB_FACTOR_THRESHOLD = 0.08,
+            VIB_FACTOR_MAX_SIGNAL = 0.36,
+            VIB_FACTOR_MULTIPLIER = 48.0,
+            VIB_FIELD_MULTIPLIER = 2.0
         },
 
         CHASSIS_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 9.0,
-            CHASSIS_IDLING_MULTIPLIER = 0.2,
+            SERVICE_EXPIRED_MULTIPLIER = 6.0,
+            CHASSIS_IDLING_MULTIPLIER = 0.5,
             VIB_FACTOR_THRESHOLD = 0.08,
             VIB_FACTOR_MAX_SIGNAL = 0.36,
             VIB_FACTOR_MULTIPLIER = 48.0,
             VIB_FIELD_MULTIPLIER = 2.0,
-            STEER_LOAD_FACTOR_MULTIPLIER = 32.0,
-            STEER_LOAD_SPEED_THRESHOLD = 3.0,
-            STEER_LOAD_STEER_THRESHOLD = 0.2,
-            STEER_LOAD_CHANGE_THRESHOLD = 0.08,
+            STEER_LOAD_FACTOR_MULTIPLIER = 16.0,
+            STEER_LOAD_SPEED_THRESHOLD = 4.0,
             BRAKE_MASS_FACTOR_MULTIPLIER = 48.0,
-            BRAKE_MASS_RATIO_THRESHOLD = 1.0,
-            BRAKE_MASS_RATIO_MAX = 5.0,
+            BRAKE_MASS_RATIO_THRESHOLD = 12.0,
             BRAKE_MASS_SPEED_THRESHOLD = 2.0,
             BRAKE_PEDAL_THRESHOLD = 0.15,
         },
 
         WORKPROCESS_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 3.0,
-            WORKPROCESSS_IDLING_MULTIPLIER = 0.2,
-            WET_CROP_FACTOR_MULTIPLIER = 4.0,
-            LUBRICATION_FACTOR_MULTIPLIER = 32.0
+            SERVICE_EXPIRED_MULTIPLIER = 2.0,
+            WORKPROCESSS_IDLING_MULTIPLIER = 0.5,
+            WET_CROP_FACTOR_MULTIPLIER = 1.0,
+            LUBRICATION_FACTOR_MULTIPLIER = 1.0
         },
 
         FUEL_FACTOR_DATA = {
-            SERVICE_EXPIRED_MULTIPLIER = 4.0,
-            LOW_FUEL_FACTOR_MULTIPLIER = 18.0,
-            LOW_FUEL_THRESHOLD = 0.2,
-            COLD_FUEL_THRESHOLD = 20,
-            COLD_FUEL_FACTOR_MULTIPLIER = 120,
-            IDLE_DEPOSIT_FACTOR_MULTIPLIER = 2.0,
+            SERVICE_EXPIRED_MULTIPLIER = 2.0,
+            LOW_FUEL_FACTOR_MULTIPLIER = 4.0,
+            LOW_FUEL_THRESHOLD = 0.20,
+            COLD_FUEL_THRESHOLD = 20.0,
+            COLD_FUEL_FACTOR_MULTIPLIER = 60,
+            IDLE_DEPOSIT_FACTOR_MULTIPLIER = 1.0,
             IDLE_DEPOSIT_FACTOR_TIMER_THRESHOLD = 60,
-            IDLE_DEPOSIT_FACTOR_MAX_TIMER = 600,
-            HIGH_PRESSURE_FACTOR_MULTIPLIER = 12.0,
+            IDLE_DEPOSIT_FACTOR_MAX_TIMER = 360,
+            HIGH_PRESSURE_FACTOR_MULTIPLIER = 2.0,
             HIGH_PRESSURE_FACTOR_THRESHOLD = 0.8,
         },
 
-        STRESS_COOLDOWN = 0.65,
+        STRESS_COOLDOWN = 0.5,
         CONDITION_EFFECTIVE_FLOOR = 0.10,
         REPEAT_BREAKDOWN_TIME = 1.3 * 3600000,
-        USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MUL = 0.5,
+        USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MUL = 0.33,
         USED_VEHICLE_BREAKDOWN_PRESENCE_CHANGE_MAX = 0.66,
 
         CONCURRENT_BREAKDOWN_LIMIT_PER_VEHICLE = 15,
+        ENABLE_WARNING_MESSAGES = true,
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
         AI_WORKER_PID = {
             MIN_SPEED = 3.0,
@@ -218,9 +236,9 @@ ADS_Config = {
 
         BASE_BREAKDOWN_PROGRESS_TIME = 1 * 3600000,
         BREAKDOWN_PROBABILITIES = {
-            STRESS_THRESHOLD = 0.2,
+            STRESS_THRESHOLD = 0.5,
             MIN_MTBF = 30,
-            MAX_MTBF = 3200,
+            MAX_MTBF = 5200,
             DEGREE = 3.0,
             CRITICAL_MIN = 0.05,
             CRITICAL_MAX = 0.33,
@@ -353,7 +371,7 @@ ADS_Config = {
             [3] = 0.33, AFTERMARKET = 0.33,
             [4] = 0.0,  PREMIUM     = 0.0,
         },
-        PARTS_BREAKDOWN_TIME = 18000000,
+
 
         PARTS_PRICE_MULTIPLIERS = {
             [1] = 1.0,  OEM         = 1.0,
@@ -395,7 +413,7 @@ ADS_Config = {
 
         -- A global multiplier for how quickly temperatures change (both heating and cooling).
         -- Higher value means more volatile temperatures.
-        TEMPERATURE_CHANGE_SPEED = 1.8,
+        TEMPERATURE_CHANGE_SPEED = 1.4,
 
         -- The vehicle speed (kph) at which cooling from airflow starts to take effect.
         SPEED_COOLING_MIN_SPEED = 15,
@@ -462,7 +480,9 @@ ADS_Config = {
         PID_MAX_INTEGRAL = 200,
 
         COOLING_SLOWDOWN_THRESHOLD = 90,
-        COOLING_SLOWDOWN_POWER = 8,
+        COOLING_SLOWDOWN_POWER = 12,
+        WARMING_BOOST_THRESHOLD = 50,
+        WARMING_BOOST_POWER = 2.0,
 
         THERMOSTAT_TYPE_YEAR_DIVIDER = 2000,
         MECHANIC_THERMOSTAT_MIN_YEAR = 1950,
@@ -665,6 +685,7 @@ function ADS_Config.saveToXMLFile()
     setXMLFloat(xmlFile, root .. ".DOWNTIME_MULTIPLIER",    ADS_Config.CORE.DOWNTIME_MULTIPLIER)
     setXMLFloat(xmlFile, root .. ".SYSTEM_STRESS_GLOBAL_MULTIPLIER", ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER)
     setXMLBool (xmlFile, root .. ".GENERAL_WEAR_ENABLED",   ADS_Config.CORE.GENERAL_WEAR_ENABLED)
+    setXMLBool (xmlFile, root .. ".ENABLE_WARNING_MESSAGES", ADS_Config.CORE.ENABLE_WARNING_MESSAGES)
     setXMLBool (xmlFile, root .. ".AI_OVERLOAD_CONTROL",    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL)
 
     -- MAINTENANCE
@@ -768,6 +789,9 @@ function ADS_Config.loadFromXMLFile()
 
     v = getXMLBool(xmlFile, root .. ".GENERAL_WEAR_ENABLED")
     if v ~= nil then ADS_Config.CORE.GENERAL_WEAR_ENABLED = v end
+
+    v = getXMLBool(xmlFile, root .. ".ENABLE_WARNING_MESSAGES")
+    if v ~= nil then ADS_Config.CORE.ENABLE_WARNING_MESSAGES = v end
 
     v = getXMLBool(xmlFile, root .. ".AI_OVERLOAD_CONTROL")
     if v ~= nil then ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = v end

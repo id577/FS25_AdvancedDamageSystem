@@ -51,6 +51,16 @@ local function getIsElectricVehicle(vehicle)
     end
 end
 
+local function hasCVTAddon(vehicle)
+    local spec_CVTaddon = vehicle.spec_CVTaddon
+    local cvtAddonConfig = spec_CVTaddon ~= nil and (tonumber(spec_CVTaddon.CVTconfig) or 0) or 0
+    local hasActiveCVTAddon = spec_CVTaddon ~= nil
+        and spec_CVTaddon.CVTcfgExists
+        and cvtAddonConfig ~= 0
+        and cvtAddonConfig ~= 8
+    return hasActiveCVTAddon
+end
+
 local function hasPtoCapability(vehicle)
     if vehicle == nil then
         return false
@@ -111,6 +121,7 @@ ADS_Breakdowns.PARTS = {
     POWERSHIFT_HYDRAULIC_PUMP = "ads_breakdowns_part_powershift_hydraulic_pump",
     CVT_CHAIN = "ads_breakdowns_part_cvt_chain",
     CVT_HYDRAULIC_CONTROL_VALVE = "ads_breakdowns_part_cvt_hydraulic_control_valve",
+    CVT = "ads_breakdowns_part_cvt",
     HYDRAULIC_PUMP = "ads_breakdowns_part_hydraulic_pump",
     HYDRAULIC_CYLINDER = "ads_breakdowns_part_hydraulic_cylinder",
     PTO_CLUTCH = "ads_breakdowns_part_pto_clutch",
@@ -144,6 +155,7 @@ local breakdownPriceMultipliers = {
     POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = 2.40,
     CVT_CHAIN_WEAR = 2.60,
     CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = 2.80,
+    CVT_ADDON_MALFUNCTION = 3.0,
     HYDRAULIC_PUMP_MALFUNCTION = 0.90,
     HYDRAULIC_CYLINDER_INTERNAL_LEAK = 1.0,
     PTO_CLUTCH_SLIP = 1.25,
@@ -175,6 +187,7 @@ local breakdownProgressMultipliers = {
     POWERSHIFT_HYDRAULIC_PUMP_MALFUNCTION = 1.1,
     CVT_CHAIN_WEAR = 1.2,
     CVT_HYDRAULIC_CONTROL_VALVE_MALFUNCTION = 1.1,
+    CVT_ADDON_MALFUNCTION = 1.4,
     HYDRAULIC_PUMP_MALFUNCTION = 1.1,
     HYDRAULIC_CYLINDER_INTERNAL_LEAK = 0.6,
     PTO_CLUTCH_SLIP = 0.75,
@@ -463,6 +476,46 @@ ADS_Breakdowns.BreakdownRegistry = {
                 indicators = {
                 }
             }
+        }
+    },
+
+    STRESS_OVERLOAD = {
+        part = parts.VEHICLE,
+        isSelectable = false,
+        isApplicable = function(vehicle)
+            return true
+        end,
+        probability = function(vehicle)
+            return 0.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            {
+                severity = "ads_breakdowns_severity_minor",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {},
+                indicators = {
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            {
+                severity = "ads_breakdowns_severity_critical",
+                description = "",
+                detectionChance = 0.0,
+                progressMultiplier = 0.0,
+                repairPrice = 0.0,
+                effects = {
+                    { id = "EMPTY_EFFECT", value = 1.0, aggregation = "boolean_or",  extraData = {message = "ads_breakdowns_overload_breakdown_stage2_message", reason = "BREAKDOWN", disableAi = true}}
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
         }
     },
 
@@ -1197,6 +1250,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         system = systems.TRANSMISSION,
         part = parts.CLUTCH,
         isApplicable = function(vehicle)
+            if hasCVTAddon(vehicle) then return false end
             local motor = vehicle:getMotor()
             if not motor then return false end
             return motor.minForwardGearRatio == nil
@@ -1265,6 +1319,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         system = systems.TRANSMISSION,
         part = parts.SYNCHRONIZER,
         isApplicable = function(vehicle)
+            if hasCVTAddon(vehicle) then return false end
             local motor = vehicle:getMotor()
             if not motor then return false end
             return motor.minForwardGearRatio == nil and motor.gearType ~= VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
@@ -1327,6 +1382,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         system = systems.TRANSMISSION,
         part = parts.POWERSHIFT_HYDRAULIC_PUMP,
         isApplicable = function(vehicle)
+            if hasCVTAddon(vehicle) then return false end
             local motor = vehicle:getMotor()
             if not motor then return false end
             return motor.gearType == VehicleMotor.TRANSMISSION_TYPE.POWERSHIFT
@@ -1401,6 +1457,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         system = systems.TRANSMISSION,
         part = parts.CVT_CHAIN,
         isApplicable = function(vehicle)
+            if hasCVTAddon(vehicle) then return false end
             local motor = vehicle:getMotor()
             if not motor then return false end
             if motor.minForwardGearRatio == nil then return false end
@@ -1420,7 +1477,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 2.0 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
                 repairPrice = 1.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = {
-                    { id = "CVT_SLIP_EFFECT", value = 0.2, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                    { id = "CVT_SLIP_EFFECT", value = 0.1, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                     { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.05, aggregation = "sum" }  
                 }
             },
@@ -1431,7 +1488,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 1.0 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
                 repairPrice = 2.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = {
-                     { id = "CVT_SLIP_EFFECT", value = 0.4, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                     { id = "CVT_SLIP_EFFECT", value = 0.2, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.1, aggregation = "sum" }
                 },
@@ -1446,7 +1503,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.5 * breakdownProgressMultipliers.CVT_CHAIN_WEAR,
                 repairPrice = 4.0 * breakdownPriceMultipliers.CVT_CHAIN_WEAR,
                 effects = { 
-                     { id = "CVT_SLIP_EFFECT", value = 0.6, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
+                     { id = "CVT_SLIP_EFFECT", value = 0.5, extraData = {accumulatedMod = 0.0}, aggregation = "max" },
                      { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.25, aggregation = "sum" },
                      { id = "TRANASMISSION_HEAT_MODIFIER", value = 0.15, aggregation = "sum" }
                 },
@@ -1475,6 +1532,7 @@ ADS_Breakdowns.BreakdownRegistry = {
         system = systems.TRANSMISSION,
         part = parts.CVT_HYDRAULIC_CONTROL_VALVE,
         isApplicable = function(vehicle)
+            if hasCVTAddon(vehicle) then return false end
             local motor = vehicle:getMotor()
             if not motor then return false end
             if motor.minForwardGearRatio == nil then return false end
@@ -1550,6 +1608,73 @@ ADS_Breakdowns.BreakdownRegistry = {
                 },
                 inspection = {
                     { additional = "ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" },
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            }
+        }
+    },
+
+    CVT_ADDON_MALFUNCTION = {
+        isSelectable = true,
+        system = systems.TRANSMISSION,
+        part = parts.CVT,
+        isApplicable = function(vehicle)
+            if hasCVTAddon(vehicle) then return true end
+            return false
+        end,
+        probability = function(vehicle)
+            return 1.0
+        end,
+        isCanProgress = function(vehicle)
+            return false
+        end,
+        stages = {
+            { 
+                severity = "ads_breakdowns_severity_minor",
+                description = "ads_breakdowns_cvt_addon_malfunction_stage1_description",
+                detectionChance = 1.0,
+                progressMultiplier = 3.0 * breakdownProgressMultipliers.CVT_ADDON_MALFUNCTION,
+                repairPrice = 1.0 * breakdownPriceMultipliers.CVT_ADDON_MALFUNCTION,
+                effects = { 
+                },
+                indicators = {
+            
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_moderate",
+                description = "ads_breakdowns_cvt_addon_malfunction_stage2_description",
+                detectionChance = 1.0,
+                progressMultiplier = 1.5 * breakdownProgressMultipliers.CVT_ADDON_MALFUNCTION,
+                repairPrice = 2.0 * breakdownPriceMultipliers.CVT_ADDON_MALFUNCTION,
+                effects = { 
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_major",
+                description = "ads_breakdowns_cvt_addon_malfunction_stage3_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0.5 * breakdownProgressMultipliers.CVT_ADDON_MALFUNCTION,
+                repairPrice = 4.0 * breakdownPriceMultipliers.CVT_ADDON_MALFUNCTION,
+                effects = { 
+                },
+                indicators = {
+                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                }
+            },
+            { 
+                severity = "ads_breakdowns_severity_critical",
+                description = "ads_breakdowns_cvt_addon_malfunction_stage4_description",
+                detectionChance = 1.0,
+                progressMultiplier = 0,
+                repairPrice = 8.0 * breakdownPriceMultipliers.CVT_ADDON_MALFUNCTION,
+                effects = { 
+                    { id = "CVT_SLIP_EFFECT", value = 1.0, extraData = {accumulatedMod = 0.0, message = "ads_breakdowns_cvt_addon_malfunction_stage4_message", disableAi = true}, aggregation = "max" }
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
@@ -3645,7 +3770,7 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
             local modifier = tonumber(slipEffect.value) or 0
 
             if modifier >= 1 then
-                return minRatio * 10, maxRatio * 10
+                return minRatio * 100, maxRatio * 100
             end
 
             local speedFactor = math.min(self.vehicle:getLastSpeed() / (self:getMaximumForwardSpeed() * 3.6), 1.0)
@@ -3673,6 +3798,10 @@ if VehicleMotor ~= nil and VehicleMotor.getMinMaxGearRatio ~= nil then
         local isSliping = false
         if cvtSlipEffect ~= nil and cvtSlipEffect.value ~= nil and self.minForwardGearRatio ~= nil then
             local modifier = tonumber(cvtSlipEffect.value) or 0
+
+            if modifier >= 1 then
+                return minRatio * 100, maxRatio * 100
+            end
 
             cvtSlipEffect.extraData = cvtSlipEffect.extraData or {}
             local nowMs = (g_currentMission and g_currentMission.time) or 0
@@ -5355,7 +5484,6 @@ ADS_Breakdowns.EffectApplicators.GEAR_REJECTION_CHANCE = {
 
 -- ==========================================================
 -- LIGHTS_FLICKER_CHANCE
-
 ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
     getEffectName = function()
         return "LIGHTS_FLICKER_CHANCE" 
@@ -5406,13 +5534,23 @@ ADS_Breakdowns.EffectApplicators.LIGHTS_FLICKER_CHANCE = {
     end
 }
 
--- ==========================================================
+-- =========================================================
+-- EMPTY_EFFECT
+ADS_Breakdowns.EffectApplicators.EMPTY_EFFECT = {
+    apply = function(vehicle, effectData, handler)
+        log_dbg("Applying EMPTY_EFFECT effect")
+    end,
+    remove = function(vehicle, handler)
+        log_dbg("Removing EMPTY_EFFECT effect.")
+    end
+}
 
+-- ==========================================================
 function ADS_Breakdowns.getCanMotorRun(self, superFunc)
     local spec = self.spec_AdvancedDamageSystem
     if (spec and spec.activeEffects.ENGINE_FAILURE) then
         if spec.activeEffects.ENGINE_FAILURE.extraData.starter  then
-            return true
+            return superFunc(self)
         else
             return false
         end

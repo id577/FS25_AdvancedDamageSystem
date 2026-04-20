@@ -15,7 +15,7 @@ function ADS_Hud:new()
         engine = {
             name = 'engine',
             icon = g_overlayManager:createOverlay("ads_DashboardHud.engine", 0, 0, 0, 0),
-            year = 2000
+            year = 1990
         },
         transmission = {
             name = 'transmission',
@@ -53,11 +53,24 @@ function ADS_Hud:new()
             year = 1950
         }
     }
+
+    self.indicatorRuntime = {}
+    self.indicatorSoundConfig = {
+        engine =        { cooldownMs = 1800, sampleName = "warning" },
+        transmission =  { cooldownMs = 1800, sampleName = "warning" },
+        brakes =        { cooldownMs = 1800, sampleName = "warning" },
+        battery =       { cooldownMs = 1800, sampleName = "warning" },
+        coolant =       { cooldownMs = 1800, sampleName = "warning" },
+        warning =       { cooldownMs = 1400, sampleName = "warning" },
+        service =       { cooldownMs = 2500, sampleName = "warning" },
+        oil =           { cooldownMs = 1800, sampleName = "warning" }
+    }
+
     self.engineTempText = {}
     self.motorLoadText = {}
     self.batteryVoltageText = {}
     self.tsTempText = {
-        year = 2000
+        year = 1950
     }
 
     self.fuelConsoText = {}
@@ -76,12 +89,20 @@ function ADS_Hud:new()
 
     self.activeVehicleDebugPanel = {
         x = 0.20,
-        y = 0.05,
+        y = 0.0269,
         width = 0.60,
         padding = 0.01,
         lineHeight = 0.012,
         background = self.modDirectory .. "hud/ads_debugHud.dds",
         isVisible = false
+    }
+
+    self.activeVehicleDebugCache = {
+        refreshIntervalMs = 100,
+        lastUpdateTime = -math.huge,
+        vehicle = nil,
+        background = nil,
+        commands = nil
     }
 
     self.managerDebugPanel = {
@@ -112,7 +133,174 @@ function ADS_Hud:setVisible(isVisible)
 end
 
 function ADS_Hud:setVehicle(vehicle)
+    if self.vehicle ~= vehicle then
+        self.indicatorRuntime = {}
+        self.activeVehicleDebugCache.lastUpdateTime = -math.huge
+        self.activeVehicleDebugCache.vehicle = nil
+        self.activeVehicleDebugCache.background = nil
+        self.activeVehicleDebugCache.commands = nil
+    end
+
     self.vehicle = vehicle
+end
+
+function ADS_Hud:getIndicatorRuntimeState(indicatorId)
+    if self.indicatorRuntime == nil then
+        self.indicatorRuntime = {}
+    end
+
+    if self.indicatorRuntime[indicatorId] == nil then
+        self.indicatorRuntime[indicatorId] = {
+            isLit = false,
+            soundPlayedForCurrentActivation = false,
+            lastSoundTime = 0,
+            severity = 0,
+            lastSoundSeverity = 0,
+            blinkStartTime = 0,
+            blinkActive = false
+        }
+    end
+
+    return self.indicatorRuntime[indicatorId]
+end
+
+function ADS_Hud:startIndicatorBlink(indicatorId)
+    local runtimeState = self:getIndicatorRuntimeState(indicatorId)
+    local vehicle = self.vehicle
+    if vehicle == nil or vehicle.getMotorState == nil or vehicle:getMotorState() ~= 4 then
+        runtimeState.blinkActive = false
+        runtimeState.blinkStartTime = 0
+        return
+    end
+
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+
+    runtimeState.blinkActive = true
+    runtimeState.blinkStartTime = now
+end
+
+function ADS_Hud:applyIndicatorBlink(indicatorId, targetColor)
+    local runtimeState = self:getIndicatorRuntimeState(indicatorId)
+    local colors = ADS_Breakdowns ~= nil and ADS_Breakdowns.COLORS or nil
+    local vehicle = self.vehicle
+    if runtimeState == nil or colors == nil or runtimeState.blinkActive ~= true then
+        return targetColor
+    end
+
+    if vehicle == nil or vehicle.getMotorState == nil or vehicle:getMotorState() ~= 4 then
+        runtimeState.blinkActive = false
+        runtimeState.blinkStartTime = 0
+        return targetColor
+    end
+
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+    local blinkIntervalMs = 600
+    local totalPhases = 4
+    local elapsed = math.max(now - (runtimeState.blinkStartTime or 0), 0)
+    local phaseIndex = math.floor(elapsed / blinkIntervalMs)
+
+    if phaseIndex >= totalPhases then
+        runtimeState.blinkActive = false
+        return targetColor
+    end
+
+    if phaseIndex % 2 == 1 then
+        return colors.DEFAULT
+    end
+
+    return targetColor
+end
+
+function ADS_Hud:tryPlayIndicatorActivationSound(indicatorId, runtimeState, severity)
+    local vehicle = self.vehicle
+    if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+        return false
+    end
+
+    local config = self.indicatorSoundConfig ~= nil and self.indicatorSoundConfig[indicatorId] or nil
+    if config == nil then
+        return false
+    end
+
+    if vehicle.getMotorState == nil or vehicle:getMotorState() ~= 4 then
+        return false
+    end
+
+    local spec = vehicle.spec_AdvancedDamageSystem
+    local samples = spec.samples
+    if samples == nil then
+        return false
+    end
+
+    local sampleName = config.sampleName
+    local sample = sampleName ~= nil and samples[sampleName] or nil
+    if sample == nil then
+        return false
+    end
+
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+    local cooldownMs = math.max(tonumber(config.cooldownMs) or 0, 0)
+    local elapsed = now - (runtimeState.lastSoundTime or 0)
+
+    if runtimeState.soundPlayedForCurrentActivation and severity <= (runtimeState.lastSoundSeverity or 0) then
+        return false
+    end
+
+    if elapsed < cooldownMs then
+        return false
+    end
+
+    g_soundManager:playSample(sample)
+    runtimeState.lastSoundTime = now
+    runtimeState.soundPlayedForCurrentActivation = true
+    runtimeState.lastSoundSeverity = severity or 0
+    return true
+end
+
+function ADS_Hud:syncIndicatorActivation(indicatorId, shouldLight, targetColor)
+    local runtimeState = self:getIndicatorRuntimeState(indicatorId)
+    local colors = ADS_Breakdowns ~= nil and ADS_Breakdowns.COLORS or nil
+    local severity = 0
+
+    if shouldLight and colors ~= nil then
+        if targetColor == colors.CRITICAL then
+            severity = 2
+        elseif targetColor == colors.WARNING then
+            severity = 1
+        end
+    end
+
+    local wasLit = runtimeState.isLit == true
+    local previousSeverity = runtimeState.severity or 0
+    local turnedOn = shouldLight and not wasLit
+    local turnedOff = not shouldLight and wasLit
+    local escalatedToCritical = shouldLight and previousSeverity == 1 and severity == 2
+
+    if turnedOn then
+        runtimeState.isLit = true
+        runtimeState.severity = severity
+        if severity > 0 then
+            self:startIndicatorBlink(indicatorId)
+        end
+        self:tryPlayIndicatorActivationSound(indicatorId, runtimeState, severity)
+    elseif escalatedToCritical then
+        runtimeState.isLit = true
+        runtimeState.severity = severity
+        if severity > 0 then
+            self:startIndicatorBlink(indicatorId)
+        end
+        self:tryPlayIndicatorActivationSound(indicatorId, runtimeState, severity)
+    elseif turnedOff then
+        runtimeState.isLit = false
+        runtimeState.severity = 0
+        runtimeState.soundPlayedForCurrentActivation = false
+        runtimeState.lastSoundSeverity = 0
+        runtimeState.blinkActive = false
+        runtimeState.blinkStartTime = 0
+    else
+        runtimeState.isLit = shouldLight
+        runtimeState.severity = severity
+    end
 end
 
 function ADS_Hud:getVehicleTypeCategoryLabel(vehicle)
@@ -133,6 +321,20 @@ function ADS_Hud:getVehicleTypeCategoryLabel(vehicle)
     return string.format("%s/%s", vehicleTypeName, categoryName)
 end
 
+local function hasCVTTransmission(vehicle)
+    local motor = vehicle:getMotor()
+    return motor ~= nil and motor.minForwardGearRatio ~= nil
+end
+
+local function hasCVTAddon(vehicle)
+    local spec_CVTaddon = vehicle.spec_CVTaddon
+    local cvtAddonConfig = spec_CVTaddon ~= nil and (tonumber(spec_CVTaddon.CVTconfig) or 0) or 0
+    local hasActiveCVTAddon = spec_CVTaddon ~= nil
+        and spec_CVTaddon.CVTcfgExists
+        and cvtAddonConfig ~= 0
+        and cvtAddonConfig ~= 8
+    return hasActiveCVTAddon
+end
 
 -- =====================================================================================
 --                              DRAW
@@ -333,17 +535,12 @@ function ADS_Hud:drawDashboard()
     local posX = speedBgX + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetX
     local posY = speedBgY + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetY
 
-
     for hudIndicatorId, hudIndicatorData in pairs(self.indicators) do
         local icon = hudIndicatorData.icon
         local targetColor = colors.DEFAULT 
+        local isIndicatorVisible = true
         
-
-        if vehicle:getIsMotorStarted() or vehicle:getMotorState() == 2 then
-            local motorStartedDelta = g_currentMission.environment.mission.time - vehicle:getMotorStartTime()
-            if motorStartedDelta < 500 and spec.year >= 1990 then targetColor = colors.WARNING end
-            if motorStartedDelta < 1000 and motorStartedDelta > 500 and spec.year >= 2005 then targetColor = colors.CRITICAL end
-
+        if vehicle:getMotorState() ~= 1 then
             local activeData = activeIndicators[hudIndicatorId]
             if activeData then
                 local isActive = activeData.isActive
@@ -360,18 +557,34 @@ function ADS_Hud:drawDashboard()
                 end
             end
 
-            if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature < 50 then targetColor = colors.COOL
+            -- CVT Addon
+            if hasCVTAddon(vehicle) then
+                local spec_CVTaddon = vehicle.spec_CVTaddon
+
+                if hudIndicatorId == self.indicators.warning.name and targetColor == colors.DEFAULT and (spec_CVTaddon.forDBL_warndamage == 1 or spec_CVTaddon.forDBL_warnheat == 1 or spec_CVTaddon.forDBL_highpressure == 1) then
+                    targetColor = colors.WARNING
+                end
+                if hudIndicatorId == self.indicators.warning.name and targetColor == colors.WARNING and (spec_CVTaddon.forDBL_critdamage == 1 or spec_CVTaddon.forDBL_critheat == 1) then
+                    targetColor = colors.CRITICAL
+                end
+            end
+
+            local isNotHeated = 
+            (spec.engineTemperature < ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD) or 
+            (hasCVTTransmission(vehicle) and not hasCVTAddon(vehicle) and spec.transmissionTemperature < ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.COLD_TRANSMISSION_THRESHOLD) or
+            (hasCVTAddon(vehicle) and spec.transmissionTemperature < 55)
+
+            if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and isNotHeated then targetColor = colors.COOL
             elseif hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature > 99 and spec.engineTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.coolant.name and spec.engineTemperature > 110 then targetColor = colors.CRITICAL end
-
-            if hudIndicatorId == self.indicators.transmission.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
-            elseif hudIndicatorId == self.indicators.transmission.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
+            if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
+            elseif hudIndicatorId == self.indicators.coolant.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
 
             local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 0) / (self.vehicle:getMaintenanceInterval() or 5)
             if hudIndicatorId == self.indicators.service.name and serviceInterval > 1.0 then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
 
-            if vehicle:getMotorState() == 2 then
+            if vehicle:getMotorState() == 2 or vehicle:getMotorState() == 3 then
                 targetColor = colors.WARNING
             end
         else
@@ -380,28 +593,39 @@ function ADS_Hud:drawDashboard()
                 activeData.isActive = false
             end
         end
-
-        icon:setColor(unpack(targetColor))
         icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
-        if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle or hudIndicatorId == self.indicators.oil.name or hudIndicatorId == self.indicators.transmission.name then 
-            icon:setVisible(false)
+        if (hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle)
+            or hudIndicatorId == self.indicators.oil.name
+            or hudIndicatorId == self.indicators.transmission.name then
+            isIndicatorVisible = false
         else
             if vehicle:getLastSpeed() >= 99.9 then
                 if  hudIndicatorId == self.indicators.brakes.name or 
                     hudIndicatorId == self.indicators.engine.name or
                     hudIndicatorId == self.indicators.warning.name or
                     hudIndicatorId == self.indicators.battery.name then
-                        icon:setVisible(false)
+                        isIndicatorVisible = false
+                else
+                    isIndicatorVisible = hudIndicatorData.year < spec.year
                 end
             else
-                icon:setVisible(hudIndicatorData.year < spec.year)
+                isIndicatorVisible = hudIndicatorData.year < spec.year
             end
         end
+
+        icon:setVisible(isIndicatorVisible)
+
+        local isAudibleIndicator = targetColor ~= colors.DEFAULT and targetColor ~= colors.COOL
+        local shouldActivateIndicator = isIndicatorVisible and isAudibleIndicator
+        self:syncIndicatorActivation(hudIndicatorId, shouldActivateIndicator, targetColor)
+
+        local displayColor = self:applyIndicatorBlink(hudIndicatorId, targetColor)
+        icon:setColor(unpack(displayColor))
         icon:render()
-        end
+    end
 
     local engineTemp, transTemp, systemVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.systemVoltageV
-    local motorLoad = spec._smoothedMotorLoad or 0
+    local motorLoad = math.min(spec.dynamicMotorLoad or spec._smoothedMotorLoad or 0, 1)
 
     local tempSign = "°C"
     local voltageSing = "V"
@@ -413,7 +637,7 @@ function ADS_Hud:drawDashboard()
     end
 
     local tempText = ""
-    if transTemp > -90 and spec.year >= self.tsTempText.year then
+    if hasCVTTransmission(vehicle) or hasCVTAddon(vehicle) then
         tempText = string.format("%.0f%s | %.0f%s" , engineTemp, tempSign, transTemp, tempSign)
     else
         tempText = string.format("%.1f%s", engineTemp, tempSign)
@@ -515,6 +739,47 @@ end
 --                              DEBAG HUD ACTIVE
 -- =====================================================================================
 
+function ADS_Hud:renderActiveVehicleDebugCache(cache)
+    if cache == nil then
+        return
+    end
+
+    local background = cache.background
+    if background ~= nil and background.path ~= nil then
+        local overlay = Overlay.new(background.path, background.x, background.y, background.width, background.height)
+        local color = background.color or {1, 1, 1, 0.7}
+        overlay:setColor(color[1], color[2], color[3], color[4] or 1)
+        overlay:render()
+    end
+
+    local commands = cache.commands
+    if commands == nil or #commands == 0 then
+        return
+    end
+
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
+
+    local lastBold = nil
+    for _, command in ipairs(commands) do
+        local isBold = command.bold == true
+        if lastBold ~= isBold then
+            setTextBold(isBold)
+            lastBold = isBold
+        end
+
+        local color = command.color or {1, 1, 1, 1}
+        setTextColor(color[1], color[2], color[3], color[4] or 1)
+        renderText(command.x, command.y, command.size, command.text or "")
+    end
+
+    if lastBold then
+        setTextBold(false)
+    end
+
+    setTextColor(1, 1, 1, 1)
+end
+
 
 function ADS_Hud:drawActiveVehicleHUD()
     local vehicle = self.vehicle
@@ -527,6 +792,13 @@ function ADS_Hud:drawActiveVehicleHUD()
         return
     end
 
+    local cache = self.activeVehicleDebugCache
+    local now = (g_currentMission ~= nil and g_currentMission.time) or g_time or 0
+    if cache.vehicle == vehicle and cache.commands ~= nil and (now - (cache.lastUpdateTime or 0)) < (cache.refreshIntervalMs or 100) then
+        self:renderActiveVehicleDebugCache(cache)
+        return
+    end
+
     local panel = self.activeVehicleDebugPanel
     local textSettings = self.text
     local fontStep = 0.001
@@ -534,6 +806,18 @@ function ADS_Hud:drawActiveVehicleHUD()
     local activeNormalSize = textSettings.normalSize + fontStep
     local activeLineHeight = panel.lineHeight + fontStep
     local sectionGap = activeLineHeight * 0.65
+    local queuedCommands = {}
+
+    local function queueText(x, y, size, text, color, isBold)
+        table.insert(queuedCommands, {
+            x = x,
+            y = y,
+            size = size,
+            text = text,
+            color = color or {1, 1, 1, 1},
+            bold = isBold == true
+        })
+    end
 
     local function addLine(target, text, color, sizeScale)
         table.insert(target, {
@@ -806,8 +1090,9 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
     end
     addLine(overviewLines, string.format(
-        "op.hours: %d s | condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
+        "op.sec: %ds | start.op.h: %.1fh | condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
         currentOperatingSeconds,
+        factorStatsOperatingHours,
         asPercent(spec.conditionLevel or 0),
         asPercent(spec.serviceLevel or 0),
         asPercent(serviceWearRate),
@@ -832,11 +1117,6 @@ function ADS_Hud:drawActiveVehicleHUD()
         cloggingWetnessFactor
     ), {1, 1, 1, 1}, 0.95)
 
-    addLine(overviewLines, string.format(
-        "stats start hours: %.1f h",
-        factorStatsOperatingHours
-    ), {1, 1, 1, 1}, 0.95)
-
     local engineMaxFactor = math.max(
         engineDbg.motorLoadFactor or 0,
         engineDbg.airIntakeCloggingFactor or 0,
@@ -857,8 +1137,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         hydraulicsDbg.expiredServiceFactor or 0,
         hydraulicsDbg.heavyLiftFactor or 0,
         hydraulicsDbg.operatingFactor or 0,
+        hydraulicsDbg.vibFactor or 0,
         hydraulicsDbg.coldOilFactor or 0,
-        hydraulicsDbg.ptoOperatingFactor or 0,
         hydraulicsDbg.sharpAngleFactor or 0
     ) * bcw
     local coolingMaxFactor = math.max(
@@ -872,7 +1152,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         electricalDbg.weatherExposureFactor or 0,
         electricalDbg.lightsFactor or 0,
         electricalDbg.crankingStressFactor or 0,
-        electricalDbg.overheatFactor or 0
+        electricalDbg.overheatFactor or 0,
+        electricalDbg.vibFactor or 0
     ) * bcw
     local chassisMaxFactor = math.max(
         chassisDbg.expiredServiceFactor or 0,
@@ -920,6 +1201,8 @@ function ADS_Hud:drawActiveVehicleHUD()
         return string.format("%s: %.2f | %.2f | %.2f%s", shortName, currentPct, sumPct, stressPct, extraText)
     end
 
+    local avgTireGroundFrictionCoeff = tonumber(spec.avgTireGroundFrictionCoeff or 0) or 0
+
     local function buildSystemLines(systemKey, dbg, maxFactor, factorEntries)
         local lines = {}
         local systemStressMultiplier = tonumber(ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS[systemKey]) or 1
@@ -929,10 +1212,11 @@ function ADS_Hud:drawActiveVehicleHUD()
             asPercent((dbg.totalWearRate or 0) * bcw)
         ), getConditionFactorColor(maxFactor), 0.84)
         addLine(lines, string.format(
-            "S: %.2f (+%.2f) t: %.2f",
+            "S: %.2f (+%.2f) t: %.2f | a: %.2f",
             asPercent(getSystemStress(systemKey)),
             asPercent(dbg.instantStressRate or 0),
-            asPercent(getAccumulatedStat(systemKey, "stress"))
+            asPercent(getAccumulatedStat(systemKey, "stress")),
+            asPercent(dbg._avgStress or 0)
         ), {1, 1, 1, 1}, 0.84)
 
         addLine(lines, string.format(
@@ -940,10 +1224,6 @@ function ADS_Hud:drawActiveVehicleHUD()
             asPercent(dbg.breakdownProbability or 0),
             asPercent(dbg.critBreakdownProbability or 0)
         ), {1, 0.82, 0.82, 1}, 0.80)
-
-        if #factorEntries > 0 then
-            addLine(lines, "", {1, 1, 1, 1}, 0.80)
-        end
 
         for _, entry in ipairs(factorEntries) do
             addLine(
@@ -959,8 +1239,8 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local engineLines = buildSystemLines("engine", engineDbg, engineMaxFactor, {
         { shortName = "sf", statKey = "sf", value = engineDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = engineDbg.breakdownPresenceFactor or 0 },
-        { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0 },
+        { shortName = "mlf", statKey = "mlf", value = engineDbg.motorLoadFactor or 0, extraInfo = string.format("eff/ml: %.2f", engineDbg.effectiveMotorLoadRatio or 1.0) },
+        { shortName = "lf", statKey = "lf", value = engineDbg.luggingFactor or 0 },
         { shortName = "aicf", statKey = "aicf", value = engineDbg.airIntakeCloggingFactor or 0 },
         { shortName = "cmf", statKey = "cmf", value = engineDbg.coldMotorFactor or 0 },
         { shortName = "hmf", statKey = "hmf", value = engineDbg.hotMotorFactor or 0 }
@@ -968,27 +1248,25 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local transmissionLines = buildSystemLines("transmission", transmissionDbg, transmissionMaxFactor, {
         { shortName = "sf", statKey = "sf", value = transmissionDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = transmissionDbg.breakdownPresenceFactor or 0 },
-        { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("t: %.1fs", transmissionDbg.pullOverloadTimer or 0) },
-        { shortName = "htf", statKey = "htf", value = transmissionDbg.heavyTrailerFactor or 0, extraInfo = string.format("mr: %.2f", transmissionDbg.heavyTrailerMassRatio or 0) },
+        { shortName = "pof", statKey = "pof", value = transmissionDbg.pullOverloadFactor or 0, extraInfo = string.format("%.1f->%.1f", transmissionDbg.pullOverloadTimer or 0, transmissionDbg.pullOverloadTimerMin or 0) },
+        { shortName = "htf", statKey = "htf", value = transmissionDbg.heavyTrailerFactor or 0, extraInfo = string.format("hp/m: %.1f", transmissionDbg.heavyTrailerMassRatio or 0) },
         { shortName = "lf", statKey = "lf", value = transmissionDbg.luggingFactor or 0 },
-        { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("wsi: %.2f", asPercent(transmissionDbg.wheelSlipIntensity or 0)) },
+        { shortName = "wsf", statKey = "wsf", value = transmissionDbg.wheelSlipFactor or transmissionDbg.wheelSleepFactor or 0, extraInfo = string.format("s: %.1f c: %.2f", asPercent(spec.wheelSlipIntensity or 0), avgTireGroundFrictionCoeff) },
         { shortName = "ctf", statKey = "ctf", value = (transmissionDbg.coldTransFactor or transmissionDbg.coldMotorFactor) or 0 },
         { shortName = "hotf", statKey = "hotf", value = transmissionDbg.hotTransFactor or 0 }
     })
 
     local hydraulicsLines = buildSystemLines("hydraulics", hydraulicsDbg, hydraulicsMaxFactor, {
         { shortName = "sf", statKey = "sf", value = hydraulicsDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = hydraulicsDbg.breakdownPresenceFactor or 0 },
         { shortName = "hlf", statKey = "hlf", value = hydraulicsDbg.heavyLiftFactor or 0, extraInfo = string.format("mr: %.2f", asPercent(hydraulicsDbg.heavyLiftMassRatio or 0)) },
-        { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0 },
+        { shortName = "of", statKey = "of", value = hydraulicsDbg.operatingFactor or 0, extraInfo = string.format("om: %.2f t: %ds", hydraulicsDbg.operatingMassRatio or 0, math.floor(((hydraulicsDbg.operatingTimer or 0) / 1000) + 0.0001)) },
+        { shortName = "vf", statKey = "vf", value = hydraulicsDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(hydraulicsDbg.vibRaw or 0), asPercent(hydraulicsDbg.vibSignal or 0)) },
         { shortName = "cof", statKey = "cof", value = hydraulicsDbg.coldOilFactor or 0 },
         { shortName = "saf", statKey = "saf", value = hydraulicsDbg.sharpAngleFactor or 0, extraInfo = string.format("%.1f deg", hydraulicsDbg.ptoSharpAngleDeg or 0) }
     })
 
     local coolingLines = buildSystemLines("cooling", coolingDbg, coolingMaxFactor, {
         { shortName = "sf", statKey = "sf", value = coolingDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = coolingDbg.breakdownPresenceFactor or 0 },
         { shortName = "hcf", statKey = "hcf", value = coolingDbg.highCoolingFactor or 0, extraInfo = string.format("ts: %.1f", asPercent(spec.thermostatState or 0)) },
         { shortName = "ohf", statKey = "ohf", value = coolingDbg.overheatFactor or 0 },
         { shortName = "csf", statKey = "csf", value = coolingDbg.coldShockFactor or 0 }
@@ -996,24 +1274,22 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local electricalLines = buildSystemLines("electrical", electricalDbg, electricalMaxFactor, {
         { shortName = "sf", statKey = "sf", value = electricalDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = electricalDbg.breakdownPresenceFactor or 0 },
         { shortName = "wef", statKey = "wef", value = electricalDbg.weatherExposureFactor or 0 },
         { shortName = "ltf", statKey = "ltf", value = electricalDbg.lightsFactor or 0 },
-        { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s", tostring(spec.systems ~= nil and spec.systems.electrical ~= nil and spec.systems.electrical.isCranking == true)) },
-        { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 }
+        { shortName = "crf", statKey = "crf", value = electricalDbg.crankingStressFactor or 0, extraInfo = string.format("c: %s, t: %ds", tostring(spec.isCranking ~= nil and spec.isCranking == true), math.floor(((electricalDbg.crankingTimer or 0) / 1000) + 0.0001)) },
+        { shortName = "ohf", statKey = "ohf", value = electricalDbg.overheatFactor or 0 },
+        { shortName = "vf", statKey = "vf", value = electricalDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(electricalDbg.vibRaw or 0), asPercent(electricalDbg.vibSignal or 0)) }
     })
 
     local chassisLines = buildSystemLines("chassis", chassisDbg, chassisMaxFactor, {
         { shortName = "sf", statKey = "sf", value = chassisDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = chassisDbg.breakdownPresenceFactor or 0 },
         { shortName = "vf", statKey = "vf", value = chassisDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(chassisDbg.vibRaw or 0), asPercent(chassisDbg.vibSignal or 0)) },
-        { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("d: %.2f", asPercent(chassisDbg.steerDeltaRate or 0)) },
-        { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("mr: %.2f", chassisDbg.brakeMassRatio or 0) }
+        { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("lowSp: %.2f m: %s", tonumber(chassisDbg.steerLowSpeedFactor or 0) or 0, tostring(chassisDbg.steerMoving == true)) },
+        { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("hp/m: %.1f", chassisDbg.brakeMassRatio or 0) }
     })
 
     local fuelLines = buildSystemLines("fuel", fuelDbg, fuelMaxFactor, {
         { shortName = "sf", statKey = "sf", value = fuelDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = fuelDbg.breakdownPresenceFactor or 0 },
         { shortName = "lff", statKey = "lff", value = fuelDbg.lowFuelStarvationFactor or 0, extraInfo = string.format("lvl: %.2f", asPercent(fuelDbg.fuelLevel or 0)) },
         { shortName = "cff", statKey = "cff", value = fuelDbg.coldFuelFactor or 0, extraInfo = string.format("ft: %.1f C", fuelDbg.fuelTemperature or 0) },
         { shortName = "idf", statKey = "idf", value = fuelDbg.idleDepositFactor or 0, extraInfo = string.format("t: %.0fs", fuelDbg.idleTimer or 0) },
@@ -1022,7 +1298,6 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local workprocessLines = buildSystemLines("workprocess", workprocessDbg, workprocessMaxFactor, {
         { shortName = "sf", statKey = "sf", value = workprocessDbg.expiredServiceFactor or 0 },
-        { shortName = "bpf", statKey = "bpf", value = workprocessDbg.breakdownPresenceFactor or 0 },
         { shortName = "wcf", statKey = "wcf", value = workprocessDbg.wetCropFactor or 0 },
         { shortName = "lubf", statKey = "lubf", value = workprocessDbg.lubricationFactor or 0, extraInfo = string.format("lvl: %.1f%%", asPercent(lubricationLevel)) }
     })
@@ -1055,8 +1330,9 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
-        "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h/c: %.3f/%.3f | r/s/c: %.3f/%.3f/%.3f",
+        "T: %.1fC (raw: %.1fC) | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h/c: %.3f/%.3f | r/s/c: %.3f/%.3f/%.3f",
         spec.engineTemperature,
+        spec.rawEngineTemperature or spec.engineTemperature or -99,
         spec.thermostatState,
         spec.debugData.engineTemp.kp,
         spec.debugData.engineTemp.stiction,
@@ -1068,13 +1344,16 @@ function ADS_Hud:drawActiveVehicleHUD()
         spec.debugData.engineTemp.convectionCooling
     ), getTempColor(spec.engineTemperature), 0.95)
 
-    local vehicleHasCVT = motor.minForwardGearRatio ~= nil and spec.year >= self.tsTempText.year and not spec.isElectricVehicle
+    local hasActiveCVTAddon = hasCVTAddon(vehicle)
+    local vehicleHasCVT = hasCVTTransmission(vehicle)
+
     local showTransmissionSection = vehicleHasCVT and spec.transmissionTemperature > -30
     local transmissionTempLines = {}
     if showTransmissionSection then
         addLine(transmissionTempLines, string.format(
-            "T: %.1fC | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a/p/ws: %.2f/%.2f/%.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f) | cvt: a/l=%d/%d eh=%.3f",
+            "T: %.1fC (raw: %.1fC) | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h: %.3f(l/s/a/ws: %.2f/%.2f/%.2f/%.2f) | c: %.3f(r/s/c: %.3f/%.3f/%.3f) | cvt: a/l=%d/%d eh=%.3f",
             spec.transmissionTemperature,
+            spec.rawTransmissionTemperature or spec.transmissionTemperature or -99,
             spec.transmissionThermostatState,
             spec.debugData.transmissionTemp.kp or 0,
             spec.debugData.transmissionTemp.stiction or 0,
@@ -1083,7 +1362,6 @@ function ADS_Hud:drawActiveVehicleHUD()
             spec.debugData.transmissionTemp.loadFactor or 0,
             spec.debugData.transmissionTemp.slipFactor or 0,
             spec.debugData.transmissionTemp.accFactor or 0,
-            spec.debugData.transmissionTemp.pullFactor or 0,
             spec.debugData.transmissionTemp.wheelSlipFactor or 0,
             spec.debugData.transmissionTemp.totalCooling or 0,
             spec.debugData.transmissionTemp.radiatorCooling or 0,
@@ -1095,28 +1373,57 @@ function ADS_Hud:drawActiveVehicleHUD()
         ), getTempColor(spec.transmissionTemperature), 0.95)
     end
 
-    local motorPower = motor:getMotorRotSpeed() * (motor:getMotorAvailableTorque() - motor:getMotorExternalTorque()) * 1000
+    local availableTorque = motor:getMotorAvailableTorque() or 0
+    local motorPower = motor:getMotorRotSpeed() * (availableTorque - motor:getMotorExternalTorque()) * 1000
     local peakPowerHp = (motor.peakMotorPower or 0) * 1.36
     local lastRpm = motor:getLastModulatedMotorRpm()
     local maxRpm = math.max(motor.maxRpm or 1, 1)
     local rpmLoad = lastRpm / maxRpm
+    local motorLoad = vehicle:getMotorLoadPercentage() or 0
+    local dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or motorLoad
+    local avgDynamicMotorLoad = tonumber(spec.avgDynamicMotorLoad) or 0
+    local currentSpeed = tonumber(vehicle:getLastSpeed()) or 0
+    local avgSpeed = tonumber(spec.avgSpeed) or 0
+    local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
+    local dynamicLoadDeltaPct = motorLoad > 0 and ((dynamicMotorLoad - motorLoad) / motorLoad) * 100 or 0
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
+    local spec_CVTaddon = vehicle.spec_CVTaddon
+    local draftMaxForce = tonumber(spec.activeDraftMaxForce) or 0
+    local draftEffectiveForceCap = tonumber(spec.activeDraftEffectiveForceCap) or 0
+    local effectiveCapPerHp = peakPowerHp > 0 and (draftEffectiveForceCap / peakPowerHp) or 0
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
-        "hp: %d/%d | ml/rpm: %.3f/%.3f | g: %d>%d(%d,%.2f) | fuel: %.2fl/h | d/dr: %.3f/%.3f" ,
+        "sp: %.1f (avg: %.1f) | hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f (avg: %.2f%%)) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f | e/h: %.2f",
+        currentSpeed,
+        avgSpeed,
         motorPower / 735.5,
         peakPowerHp,
-        vehicle:getMotorLoadPercentage(),
-        rpmLoad,
+        math.max(motorLoad * 100, 0),
+        math.max(dynamicMotorLoad * 100, 0),
+        dynamicLoadDeltaPct,
+        avgAbsDiffAcc,
+        math.max(avgDynamicMotorLoad * 100, 0),
+        math.max(rpmLoad * 100, 0),
         motor.gear or 0,
         targetGear,
         motor.activeGearGroupIndex or 0,
         motor:getGearRatio() or 0,
-        vehicle.spec_motorized.lastFuelUsage or 0,
-        vehicle:getDamageAmount(),
-        vehicle:getDirtAmount()
-
+        draftMaxForce,
+        draftEffectiveForceCap,
+        effectiveCapPerHp
     ), {1, 1, 1, 1}, 0.95)
+
+    if hasActiveCVTAddon then
+        addLine(drivetrainLines, string.format(
+            "CA: damage: %.6f%% | wd: %s, cd: %s | wh: %s, ch: %s | hp: %s",
+            tonumber(spec_CVTaddon.CVTdamage) or 0,
+            tostring(spec_CVTaddon.forDBL_warndamage == 1),
+            tostring(spec_CVTaddon.forDBL_critdamage == 1),
+            tostring(spec_CVTaddon.forDBL_warnheat == 1),
+            tostring(spec_CVTaddon.forDBL_critheat == 1),
+            tostring(spec_CVTaddon.forDBL_highpressure == 1)
+        ), {1, 0.92, 0.78, 1}, 0.95)
+    end
 
     local batteryLines = {}
     local soc = spec.batterySoc or batteryDbg.soc or 0
@@ -1131,14 +1438,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     local chargeAh = batteryDbg.chargeAh or spec.batteryChargeAh or 0
 
     addLine(batteryLines, string.format(
-        "Voltage: sys %.2fV | term: %.2fV | ocv: %.1fV",
+        "Voltage: sys %.2fV | term: %.2fV | ocv: %.1fV - Battery: %.1fA | %.2f Ah (%.1f%%) | Temp %.1fC -> %.1fC | acc %.3f | rint %.5f",
         systemV,
         termV,
-        ocvV
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "Battery: %.1fA | %.2f Ah (%.1f%%) | Temp %.1fC -> %.1fC | acc %.3f | rint %.5f",
+        ocvV,
         iNet,
         chargeAh,
         asPercent(soc),
@@ -1149,14 +1452,10 @@ function ADS_Hud:drawActiveVehicleHUD()
     ), {0.9, 1.0, 0.9, 1}, 0.95)
 
     addLine(batteryLines, string.format(
-        "Alternator: %.1fA (raw: %.1fA | k %.2f)",
+        "Alternator: %.1fA (raw: %.1fA | k %.2f) - Loads: %.1fA (base: %.1fA | lights: %.1fA | cabFan: %.1fA | winHeat: %.1fA | pulse: %.1fA | crank: %.1fA)",
         iAlt,
         batteryDbg.iAltRaw or iAlt,
-        batteryDbg.altFactor or 0
-    ), {0.9, 1.0, 0.9, 1}, 0.95)
-
-    addLine(batteryLines, string.format(
-        "Loads: %.1fA (base: %.1fA | lights: %.1fA | cabFan: %.1fA | winHeat: %.1fA | pulse: %.1fA | crank: %.1fA)",
+        batteryDbg.altFactor or 0,
         iLoads,
         batteryDbg.baseLoadA or 0,
         batteryDbg.lightsLoadA or 0,
@@ -1311,6 +1610,36 @@ function ADS_Hud:drawActiveVehicleHUD()
     local sections = {
         {title = "Engine Temp", lines = engineTempLines}
     }
+    local implementLines = {}
+    addLine(implementLines, "", {1, 1, 1, 1}, 0.95)
+    addLine(implementLines, string.format(
+        "Implements: lowered: %s | operating: %s | lifted: %s | operatingMass: %.1f | liftedMass: %.1f | connectedPto: %s | ptoActive: %s | harvesting: %s",
+        tostring(spec.isImplementLowered == true),
+        tostring(spec.isImplementOperating == true),
+        tostring(spec.isImplementLifted == true),
+        tonumber(spec.operatingMass or 0) or 0,
+        tonumber(spec.liftedMass or 0) or 0,
+        tostring(spec.hasConnectedPto == true),
+        tostring(spec.isPtoActive == true),
+        tostring(spec.isHarvesting == true)
+    ), {1, 1, 1, 1}, 0.95)
+
+    for index, impl in ipairs(spec.implements or {}) do
+        addLine(implementLines, string.format(
+            "#%d %s | mass: %.1f | jointType: %s | lowered: %s | supportWheels: %d | moving: %s | foldMoving: %s | plowRotating: %s | cylinderMoving: %s | head: %s",
+            index,
+            tostring(impl.name or "implement"),
+            tonumber(impl.mass or 0) or 0,
+            tostring(impl.jointTypeId),
+            tostring(impl.isLowered == true),
+            tonumber(impl.supportWheelCount or 0) or 0,
+            tostring(impl.isMoving == true),
+            tostring(impl.isFoldMoving == true),
+            tostring(impl.isPlowRotationMoving == true),
+            tostring(impl.isCylinderedMoving == true),
+            tostring(impl.isHead == true)
+        ), {0.92, 0.96, 1.0, 1}, 0.90)
+    end
 
     if showTransmissionSection then
         table.insert(sections, {title = "CVT Temp", lines = transmissionTempLines})
@@ -1331,6 +1660,8 @@ function ADS_Hud:drawActiveVehicleHUD()
     if #aiCruiseLines > 0 then
         table.insert(sections, {title = "AI Cruise Control", lines = aiCruiseLines})
     end
+
+    table.insert(sections, {title = "Implements", lines = implementLines, showTitle = false})
 
     local systemColumns = math.min(8, math.max(#systemSections, 1))
     local systemGapX = 0.00012
@@ -1366,36 +1697,26 @@ function ADS_Hud:drawActiveVehicleHUD()
     for _, section in ipairs(allLinearSections) do
         totalSectionHeight = totalSectionHeight + (math.max(#section.lines, 1) * activeLineHeight)
     end
-    totalSectionHeight = totalSectionHeight + (math.max(#allLinearSections - 1, 0) * sectionGap)
-    totalSectionHeight = totalSectionHeight + sectionGap + totalSystemHeight
+    if #systemSections > 0 then
+        totalSectionHeight = totalSectionHeight + sectionGap + totalSystemHeight + sectionGap
+    end
 
     local dynamicHeight = (panel.padding * 2) + activeHeaderSize + totalSectionHeight + 0.02
-    if panel.background ~= nil then
-        local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
-        overlay:setColor(1, 1, 1, 0.7)
-        overlay:render()
-    end
 
     local textStartX = panel.x + panel.padding
     local currentY = panel.y + dynamicHeight - panel.padding
 
-    setTextAlignment(RenderText.ALIGN_LEFT)
-    setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
-    setTextBold(true)
-    setTextColor(1, 1, 1, 1)
     local vehicleTypeCategory = self:getVehicleTypeCategoryLabel(vehicle)
     local headerText = string.format("%s %s | Type/Category: %s", vehicle:getFullName(), tostring(spec.year), vehicleTypeCategory)
-    renderText(textStartX, currentY, activeHeaderSize, headerText)
-    setTextBold(false)
+    queueText(textStartX, currentY, activeHeaderSize, headerText, {1, 1, 1, 1}, true)
     currentY = currentY - activeHeaderSize - activeLineHeight
 
     local function drawSection(section)
         local sectionLines = section.lines or {}
         local showTitle = section.showTitle ~= false
         if #sectionLines == 0 then
-            setTextColor(1, 1, 1, 1)
             if showTitle then
-                renderText(textStartX, currentY, activeNormalSize, section.title .. ":")
+                queueText(textStartX, currentY, activeNormalSize, section.title .. ":", {1, 1, 1, 1}, false)
             end
             currentY = currentY - activeLineHeight
             return
@@ -1404,12 +1725,11 @@ function ADS_Hud:drawActiveVehicleHUD()
         local firstLine = sectionLines[1]
         local firstColor = firstLine.color or {1, 1, 1, 1}
         local firstSize = activeNormalSize * (firstLine.sizeScale or 1.0)
-        setTextColor(firstColor[1], firstColor[2], firstColor[3], firstColor[4] or 1)
         local firstText = firstLine.text or ""
         if showTitle then
             firstText = section.title .. ": " .. firstText
         end
-        renderText(textStartX, currentY, firstSize, firstText)
+        queueText(textStartX, currentY, firstSize, firstText, firstColor, false)
         currentY = currentY - activeLineHeight
 
         for index = 2, #sectionLines do
@@ -1417,16 +1737,15 @@ function ADS_Hud:drawActiveVehicleHUD()
             local lineText = line.text or ""
             local lineColor = line.color or {1, 1, 1, 1}
             local lineSize = activeNormalSize * (line.sizeScale or 1.0)
-            setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
-            renderText(textStartX, currentY, lineSize, lineText)
+            queueText(textStartX, currentY, lineSize, lineText, lineColor, false)
             currentY = currentY - activeLineHeight
         end
     end
 
     drawSection(overviewSection)
-    currentY = currentY - sectionGap
 
     if #systemSections > 0 then
+        currentY = currentY - sectionGap
         local gridStartX = textStartX
         local gridAvailableWidth = panel.width - panel.padding * 2
         local cardWidth = (gridAvailableWidth - (systemColumns - 1) * systemGapX) / systemColumns
@@ -1440,16 +1759,14 @@ function ADS_Hud:drawActiveVehicleHUD()
                 if section ~= nil then
                     local cardX = gridStartX + (col - 1) * (cardWidth + systemGapX)
                     local cardY = rowY
-                    setTextColor(1, 1, 1, 1)
-                    renderText(cardX, cardY, activeNormalSize, section.title .. ":")
+                    queueText(cardX, cardY, activeNormalSize, section.title .. ":", {1, 1, 1, 1}, false)
 
                     local cardLineY = cardY - activeLineHeight
                     for _, line in ipairs(section.lines) do
                         local lineText = line.text or ""
                         local lineColor = line.color or {1, 1, 1, 1}
                         local lineSize = activeNormalSize * (line.sizeScale or 1.0)
-                        setTextColor(lineColor[1], lineColor[2], lineColor[3], lineColor[4] or 1)
-                        renderText(cardX + 0.003, cardLineY, lineSize, lineText)
+                        queueText(cardX + 0.003, cardLineY, lineSize, lineText, lineColor, false)
                         cardLineY = cardLineY - activeLineHeight
                     end
                 end
@@ -1462,14 +1779,26 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
 
         currentY = currentY - totalSystemHeight
+        currentY = currentY - sectionGap
     end
 
-    for index, section in ipairs(sections) do
-        currentY = currentY - sectionGap
+    for _, section in ipairs(sections) do
         drawSection(section)
     end
 
-    setTextColor(1, 1, 1, 1)
+    cache.lastUpdateTime = now
+    cache.vehicle = vehicle
+    cache.background = panel.background ~= nil and {
+        path = panel.background,
+        x = panel.x,
+        y = panel.y,
+        width = panel.width,
+        height = dynamicHeight,
+        color = {1, 1, 1, 0.7}
+    } or nil
+    cache.commands = queuedCommands
+
+    self:renderActiveVehicleDebugCache(cache)
 end
 
 function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSize, activeNormalSize, activeLineHeight, sectionGap)
@@ -1541,11 +1870,11 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
             end
         elseif debugKey == "steerLoadFactor" then
             local parts = {}
-            if dbg.steerInputAbs ~= nil then
-                table.insert(parts, string.format("steer %.3f", tonumber(dbg.steerInputAbs) or 0))
-            end
             if dbg.steerLowSpeedFactor ~= nil then
                 table.insert(parts, string.format("lowSp %.3f", tonumber(dbg.steerLowSpeedFactor) or 0))
+            end
+            if dbg.steerMoving ~= nil then
+                table.insert(parts, string.format("moving %s", tostring(dbg.steerMoving == true)))
             end
             if #parts > 0 then
                 return table.concat(parts, " | ")
@@ -1898,12 +2227,21 @@ SpeedMeterDisplay.draw = function(self, ...)
     if selectedTool ~= nil then
         useCustomValue = true
         if selectedTool.getServiceLevel ~= nil then
-            local cs = vehicle.spec_AdvancedDamageSystem.lastInspectedConditionState
-            if cs == AdvancedDamageSystem.STATES.UNKNOWN or cs == AdvancedDamageSystem.STATES.EXCELLENT then customDamageAmount = 0.0
-            elseif cs == AdvancedDamageSystem.STATES.GOOD then customDamageAmount = 0.25
-            elseif cs == AdvancedDamageSystem.STATES.NORMAL then customDamageAmount = 0.5
-            elseif cs == AdvancedDamageSystem.STATES.BAD then customDamageAmount = 0.75
-            else customDamageAmount = 1.0 end
+            local condition, isCompleteInspection = vehicle:getLastInspectedCondition()
+            condition = math.clamp(condition or 0, 0, 1)
+            if isCompleteInspection then
+                customDamageAmount = 1 - condition
+            elseif condition > 0.8 then
+                customDamageAmount = 0.0
+            elseif condition > 0.6 then
+                customDamageAmount = 0.25
+            elseif condition > 0.4 then
+                customDamageAmount = 0.5
+            elseif condition > 0.2 then
+                customDamageAmount = 0.75
+            else
+                customDamageAmount = 1.0
+            end
         else
             customDamageAmount = selectedTool:getDamageAmount()
         end

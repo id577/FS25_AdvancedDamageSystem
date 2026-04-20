@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="If enabled, the AI worker reduces load to prevent engine overload or overheating."/>
         <text name="ads_debugMode_label" text="Debug Mode"/>
         <text name="ads_debugMode_tooltip" text="Enables or disables debug panel and extensive debug logging in the console."/>
+        <text name="ads_warningMessages_label" text="Warning Messages"/>
+        <text name="ads_warningMessages_tooltip" text="Enables or disables gameplay warning messages such as cold engine and overheating alerts."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Mobile Workshop Restrictions"/>
         <text name="ads_serviceInterval_label" text="Service Interval"/>
         <text name="ads_vehicleLifespan_label" text="Vehicle Lifespan"/>
@@ -134,6 +136,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift hydraulic pump"/>
         <text name="ads_breakdowns_part_cvt_chain" text="CVT chain"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT hydraulic control valve"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulic pump"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulic cylinder"/>
         <text name="ads_breakdowns_part_pto_clutch" text="PTO clutch"/>
@@ -236,6 +239,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Moderate CVT hydraulic control valve malfunction. Hydraulic pressure instability is frequent, engine torque is reduced, transmission temperature is increased, and the available ratio range is further limited."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Severe CVT hydraulic control valve malfunction. Hydraulic pressure drops are pronounced, engine torque is heavily reduced, transmission overheating is likely, and ratio range limitation is significant."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Critical CVT hydraulic control valve failure. Pressure control is no longer stable, the ratio range is severely restricted, transmission heating is excessive, and the powertrain operates in emergency mode."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Early signs of a CVT transmission malfunction have been detected. Inspection and repair are required."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="The CVT transmission malfunction is getting worse. Continued operation may lead to emergency mode."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Critical CVT transmission damage. The transmission is in emergency mode and the maximum vehicle speed is reduced."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Complete CVT transmission failure. Further operation is impossible until the transmission is repaired."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT transmission failure"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="CVT hydraulic control failure"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Engine thermostat is beginning to fail. The engine takes longer to reach optimal temperature or runs slightly hot."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Thermostat response is poor. Engine temperature regulation is unstable, increasing wear."/>
@@ -325,6 +333,8 @@
         <text name="ads_breakdown_at_progress_message" text="in progress"/>
 
         <text name="ads_spec_cold_engine_message" text="Engine is cold! High revs cause wear!"/>
+        <text name="ads_spec_overheat_engine_message" text="Warning! Engine overheating."/>
+        <text name="ads_spec_overheat_transmission_message" text="Warning! Transmission overheating."/>
         <text name="ads_spec_this_month" text="This month"/>
         <text name="ads_spec_months_ago" text="months ago"/>
         <text name="ads_spec_never" text="Never"/>
@@ -346,7 +356,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="cancelled"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s issue(s) detected"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="No issues detected"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s performed"/>
+        <text name="ads_spec_next_planned_service_notification" text="Scheduled procedure started: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Scheduled %s cancelled due to insufficient funds"/>
         <text name="ads_spec_workshop_dealer" text="Dealer"/>
         <text name="ads_spec_workshop_own" text="Owned"/>
@@ -626,6 +636,7 @@
         <text name="ads_sell_dialog_washing_penalty" text="Washing"/>
         <text name="ads_sell_dialog_total" text="Total"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s is unavailable for %s in the mobile workshop due to low maintainability."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Critical overload! Reduce the load on the vehicle immediately."/>
     </texts>
 </l10n>
 

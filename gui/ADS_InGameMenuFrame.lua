@@ -71,6 +71,8 @@ local function buildVehicleRow(vehicle)
     local intervalCurrent = vehicle:getHoursSinceLastMaintenance()
     local intervalTotal = vehicle:getMaintenanceInterval()
     local operatingHours = tonumber(vehicle:getFormattedOperatingTime()) or 0
+    local intervalColor = {1, 1, 1, 1}
+    local intervalRatio = intervalTotal ~= nil and intervalTotal > 0 and ((intervalCurrent or 0) / intervalTotal) or 0
 
     if isLeased then
         leasingPriceValue = (vehicle.price or vehicle:getPrice()) * (
@@ -78,6 +80,12 @@ local function buildVehicleRow(vehicle)
         )
         priceText = "-"
         priceValue = 0
+    end
+
+    if intervalRatio > 1.0 then
+        intervalColor = {0.88, 0.18, 0.18, 1}
+    elseif intervalRatio > 0.8 then
+        intervalColor = {1.0, 0.55, 0.0, 1}
     end
 
     return {
@@ -92,6 +100,7 @@ local function buildVehicleRow(vehicle)
         conditionColor = {ADS_Utils.getValueColor(conditionValue, 0.8, 0.6, 0.4, 0.2, false)},
         interval = ADS_Utils.formatOperatingHours(intervalCurrent, intervalTotal),
         intervalValue = intervalCurrent or 0,
+        intervalColor = intervalColor,
         lastInspection = ADS_Utils.formatTimeAgo(lastInspectionDate),
         lastInspectionValue = getDateSortValue(lastInspectionDate),
         lastMaintenance = ADS_Utils.formatTimeAgo(lastMaintenanceDate),
@@ -558,6 +567,7 @@ function ADS_InGameMenuFrame:populateCellForItemInSection(_list, _section, index
     local leasingPriceText = cell:getAttribute("leasingPriceText")
     local priceText = cell:getAttribute("priceText")
     local conditionColor = row.conditionColor or {1, 1, 1, 1}
+    local intervalColor = row.intervalColor or {1, 1, 1, 1}
 
     if vehicleNameText ~= nil then
         vehicleNameText:setText(row.vehicleName or "")
@@ -577,7 +587,7 @@ function ADS_InGameMenuFrame:populateCellForItemInSection(_list, _section, index
     end
     if intervalText ~= nil then
         intervalText:setText(row.interval or "")
-        intervalText:setTextColor(1, 1, 1, 1)
+        intervalText:setTextColor(intervalColor[1], intervalColor[2], intervalColor[3], intervalColor[4])
     end
     if lastInspectionText ~= nil then
         lastInspectionText:setText(row.lastInspection or "")

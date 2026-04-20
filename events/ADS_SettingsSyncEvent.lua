@@ -21,6 +21,7 @@ function ADS_SettingsSyncEvent.new()
     self.baseSystemsWear           = ADS_Config.CORE.BASE_SYSTEMS_WEAR
     self.downtimeMultiplier        = ADS_Config.CORE.DOWNTIME_MULTIPLIER
     self.generalWearEnabled        = ADS_Config.CORE.GENERAL_WEAR_ENABLED
+    self.enableWarningMessages     = ADS_Config.CORE.ENABLE_WARNING_MESSAGES
     self.systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER
     self.aiOverloadControl         = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL
     self.instantInspection         = ADS_Config.MAINTENANCE.INSTANT_INSPECTION
@@ -47,6 +48,7 @@ function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.baseSystemsWear       or 0)
     streamWriteFloat32(streamId, self.downtimeMultiplier    or 0)
     streamWriteBool(streamId,    self.generalWearEnabled    or false)
+    streamWriteBool(streamId,    self.enableWarningMessages or false)
     streamWriteFloat32(streamId, self.systemStressGlobalMultiplier or 1.0)
     streamWriteBool(streamId,    self.aiOverloadControl      or false)
     streamWriteBool(streamId,    self.instantInspection      or false)
@@ -71,6 +73,7 @@ function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.baseSystemsWear           = streamReadFloat32(streamId)
     self.downtimeMultiplier        = streamReadFloat32(streamId)
     self.generalWearEnabled        = streamReadBool(streamId)
+    self.enableWarningMessages     = streamReadBool(streamId)
     self.systemStressGlobalMultiplier = streamReadFloat32(streamId)
     self.aiOverloadControl         = streamReadBool(streamId)
     self.instantInspection         = streamReadBool(streamId)
@@ -94,10 +97,17 @@ end
 
 -- Apply received values to ADS_Config.
 local function applyConfig(event)
+    local oldBatteryCapacityFactor = ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR
+    local oldConfig = {
+        parkVehicle = ADS_Config.MAINTENANCE.PARK_VEHICLE,
+        instantInspection = ADS_Config.MAINTENANCE.INSTANT_INSPECTION
+    }
+
     ADS_Config.CORE.BASE_SERVICE_WEAR                      = event.baseServiceWear
     ADS_Config.CORE.BASE_SYSTEMS_WEAR                      = event.baseSystemsWear
     ADS_Config.CORE.DOWNTIME_MULTIPLIER                    = event.downtimeMultiplier
     ADS_Config.CORE.GENERAL_WEAR_ENABLED                   = event.generalWearEnabled
+    ADS_Config.CORE.ENABLE_WARNING_MESSAGES                = event.enableWarningMessages
     ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER        = event.systemStressGlobalMultiplier
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL       = event.aiOverloadControl
     ADS_Config.MAINTENANCE.INSTANT_INSPECTION               = event.instantInspection
@@ -114,6 +124,27 @@ local function applyConfig(event)
     ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR    = event.batteryUsableCapacityFactor
     ADS_Config.FIELD_CARE.CLOGGING_SPEED                    = event.cloggingSpeed
     ADS_Config.DEBUG                                        = event.debugMode
+
+    local newConfig = {
+        parkVehicle = event.parkVehicle,
+        instantInspection = event.instantInspection
+    }
+
+    ADS_InGameSettings.applyPendingConfigSideEffects(oldConfig, newConfig)
+
+    if math.abs((oldBatteryCapacityFactor or 0) - (event.batteryUsableCapacityFactor or 0)) > 0.0001
+        and ADS_Main ~= nil and ADS_Main.vehicles ~= nil then
+        for _, vehicle in pairs(ADS_Main.vehicles) do
+            if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
+                AdvancedDamageSystem.rescaleBatteryChargeFromSoc(vehicle)
+
+                local spec = vehicle.spec_AdvancedDamageSystem
+                if vehicle.isServer and spec.adsDirtyFlag_electrical ~= nil then
+                    vehicle:raiseDirtyFlags(spec.adsDirtyFlag_electrical)
+                end
+            end
+        end
+    end
 
     ADS_Main:forceWorkshopUpdate()
 end

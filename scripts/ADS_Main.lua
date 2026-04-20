@@ -16,6 +16,7 @@ source(g_currentModDirectory .. "gui/ADS_InGameMenuFrame.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceTwoOptionsDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceThreeOptionsDialog.lua")
 source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
+source(g_currentModDirectory .. "scripts/ADS_Telemetry.lua")
 source(g_currentModDirectory .. "scripts/ADS_PlayerInput.lua")
 source(g_currentModDirectory .. "scripts/ADS_InGameSettings.lua")
 source(g_currentModDirectory .. "events/ADS_VehicleChangeStatusEvent.lua")
@@ -29,6 +30,15 @@ source(g_currentModDirectory .. "events/ADS_ConsoleCommandEvent.lua")
 source(g_currentModDirectory .. "events/ADS_StartButtonEvent.lua")
 source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
+
+function ADS_Main.loadGuiProfiles()
+    if ADS_Main.guiProfilesLoaded or g_gui == nil then
+        return
+    end
+
+    g_gui:loadProfiles(modDirectory .. "gui/guiProfiles.xml")
+    ADS_Main.guiProfilesLoaded = true
+end
 
 -- Network hook: wrap every settings callback so changes made by an admin
 -- client are automatically replicated to the dedicated server (and then
@@ -46,13 +56,6 @@ do
         if orig ~= nil then
             ADS_InGameSettings[name] = function(self, ...)
                 orig(self, ...)
-                if g_currentMission ~= nil then
-                    if g_currentMission:getIsServer() and g_server ~= nil then
-                        g_server:broadcastEvent(ADS_SettingsSyncEvent.new())
-                    elseif g_client ~= nil then
-                        ADS_SettingsSyncEvent.send()
-                    end
-                end
             end
         end
     end
@@ -150,6 +153,7 @@ end
 -- ==========================================================
 
 function ADS_Main:onStartMission()
+    ADS_Main.loadGuiProfiles()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
 
@@ -346,12 +350,20 @@ function ADS_Main.setStatusBarValue(screenInstance, superFunc, bar, value)
     end
 
     if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
-        local cs = vehicle.spec_AdvancedDamageSystem.lastInspectedConditionState
-        if cs == AdvancedDamageSystem.STATES.UNKNOWN or cs == AdvancedDamageSystem.STATES.EXCELLENT then value = 1.0
-        elseif cs == AdvancedDamageSystem.STATES.GOOD then value = 0.75
-        elseif cs == AdvancedDamageSystem.STATES.NORMAL then value = 0.5
-        elseif cs == AdvancedDamageSystem.STATES.BAD then value = 0.25
-        else value = 0.0 end
+        local condition, isCompleteInspection = vehicle:getLastInspectedCondition()
+        if isCompleteInspection then
+            value = math.clamp(condition or 0, 0, 1)
+        elseif condition == nil or condition > 0.8 then
+            value = 1.0
+        elseif condition > 0.6 then
+            value = 0.75
+        elseif condition > 0.4 then
+            value = 0.5
+        elseif condition > 0.2 then
+            value = 0.25
+        else
+            value = 0.0
+        end
     end
     superFunc(screenInstance, bar, value)
 end
@@ -528,6 +540,7 @@ end
 
 function ADS_Main:loadMap()
     log_dbg("loadMap() called")
+    ADS_Main.loadGuiProfiles()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
     ADS_Config.loadFromXMLFile()
@@ -537,6 +550,7 @@ end
 function ADS_Main:deleteMap()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
+    ADS_Main.guiProfilesLoaded = nil
     ADS_Config._loaded = nil
 end
 

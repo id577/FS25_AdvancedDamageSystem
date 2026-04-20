@@ -68,7 +68,7 @@
                 </Bitmap>
                 
                 <SmoothList profile="ads_tableList" id="logTable" position="50px -85px" size="1290px 510px">
-                    <ListItem profile="ads_tableListItem" name="logRowTemplate" size="1290px 40.77px" onClick="onRowClick">
+                    <ListItem profile="ads_tableListItemSelected" name="logRowTemplate" size="1290px 40.77px" onClick="onRowClick">
                         <Text profile="ads_tableRowCellLeft" position="20px 0px" size="100px 40.77px" name="logDate" />
                         <Text profile="ads_tableRowCellLeft" position="120px 0px" size="160px 40.77px" name="logHours" />
                         <Text profile="ads_tableRowCellLeftUpper" position="280px 0px" size="180px 40.77px" name="logType" />
@@ -92,33 +92,4 @@
         </BoxLayout>
         
     </GuiElement>
-
-
-    <!-- =============================================================== -->
-    <!-- PROFILES              -->
-    <!-- =============================================================== -->
-    <GUIProfiles>
-
-        <Presets>
-            <Preset name="colorWhite" value="1 1 1 1"/>
-            <Preset name="colorListHeaderBackground" value="0 0 0 0.35" />
-        </Presets>
-
-        <Profile name="ads_dialogScreenBlocker" extends="baseReference" with="anchorStretchingYStretchingX pivotTopCenter">
-            <size value="100% 100%"/>
-            <color value="$preset_fs25_colorMainDark"/>
-            <cornerSize value="0"/>
-        </Profile>
-
-        <Profile name="ads_logInfoContainer" extends="emptyPanel" with="anchorTopCenter">
-            <size value="1410px 200px"/>
-            <position value="0px -10px"/>
-        </Profile>
-
-        <Profile name="ads_logTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
-            <size value="1410px 700px"/>
-            <position value="0px -160px"/>
-        </Profile>
-
-    </GUIProfiles>
 </GUI>

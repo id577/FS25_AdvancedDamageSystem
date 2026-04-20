@@ -25,6 +25,8 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Если включено, ИИ-работник будет снижать нагрузку, чтобы не допустить перегрузки двигателя или перегрева."/>
         <text name="ads_debugMode_label" text="Режим отладки"/>
         <text name="ads_debugMode_tooltip" text="Включает или отключает панель отладки и расширенное ведение журнала отладки в консоли."/>
+        <text name="ads_warningMessages_label" text="Предупреждающие сообщения"/>
+        <text name="ads_warningMessages_tooltip" text="Включает или отключает игровые предупреждения, например о холодном двигателе и перегреве."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Ограничения мобильной мастерской"/>
         <text name="ads_serviceInterval_label" text="Интервал ТО"/>
         <text name="ads_vehicleLifespan_label" text="Ресурс техники"/>
@@ -131,6 +133,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Гидронасос Powershift"/>
         <text name="ads_breakdowns_part_cvt_chain" text="Цепь CVT"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Гидравлический клапан управления CVT"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Гидравлический насос"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Гидроцилиндр"/>
         <text name="ads_breakdowns_part_pto_clutch" text="Муфта ВОМ"/>
@@ -233,6 +236,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Умеренная неисправность гидравлического распределителя. Поток нестабилен, реакция гидравлики замедлена, эффективность заметно снижена."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Сильная неисправность гидравлического распределителя. Поток сильно неравномерен, управление работает плохо, доступная гидравлическая мощность резко снижена."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Критический отказ гидравлического распределителя. Поток масла больше не может нормально регулироваться, нормальная работа невозможна."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Обнаружены первые признаки неисправности вариаторной трансмиссии. Требуется диагностика и ремонт."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Неисправность вариаторной трансмиссии прогрессирует. Продолжение эксплуатации может привести к переходу в аварийный режим."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Критическое повреждение вариаторной трансмиссии. Коробка находится в аварийном режиме, максимальная скорость снижена."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Полный отказ вариаторной трансмиссии. Дальнейшая эксплуатация невозможна до ремонта."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Отказ трансмиссии CVT"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Отказ гидравлического распределителя"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Термостат двигателя начинает выходить из строя. Двигатель дольше прогревается до оптимальной температуры или работает немного горячее."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Плохая реакция термостата. Регулирование температуры двигателя нестабильно, что увеличивает износ."/>
@@ -321,6 +329,8 @@
         <text name="ads_breakdowns_gear_disengage_message" text="Передача выключена"/>
         <text name="ads_breakdown_at_progress_message" text="в процессе"/>
         <text name="ads_spec_cold_engine_message" text="Двигатель холодный! Высокие обороты вызывают износ!"/>
+        <text name="ads_spec_overheat_engine_message" text="Внимание! Перегрев двигателя."/>
+        <text name="ads_spec_overheat_transmission_message" text="Внимание! Перегрев трансмиссии."/>
         <text name="ads_spec_this_month" text="В этом месяце"/>
         <text name="ads_spec_months_ago" text="мес. назад"/>
         <text name="ads_spec_never" text="Никогда"/>
@@ -342,7 +352,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="отменено"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="Обнаружено неисправностей: %s"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Неисправности не обнаружены"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s выполнено"/>
+        <text name="ads_spec_next_planned_service_notification" text="Запланированная процедура начата: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Запланированное %s отменено из-за недостатка средств"/>
         <text name="ads_spec_workshop_dealer" text="Дилер"/>
         <text name="ads_spec_workshop_own" text="Собственный"/>
@@ -618,5 +628,6 @@
         <text name="ads_sell_dialog_washing_penalty" text="Мойка"/>
         <text name="ads_sell_dialog_total" text="Итого"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s недоступно для %s в мобильной мастерской из-за низкой ремонтопригодности."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Критическая перегрузка! Немедленно снизьте нагрузку на технику."/>
     </texts>
 </l10n>

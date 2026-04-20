@@ -25,12 +25,15 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Si activé, l'ouvrier IA réduit la charge pour éviter la surcharge moteur ou la surchauffe."/>
         <text name="ads_debugMode_label" text="Mode débogage"/>
         <text name="ads_debugMode_tooltip" text="Active ou désactive le panneau de débogage et la journalisation de débogage étendue dans la console."/>
+        <text name="ads_warningMessages_label" text="Messages d'avertissement"/>
+        <text name="ads_warningMessages_tooltip" text="Active ou désactive les avertissements de jeu comme moteur froid ou surchauffe."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Restrictions de l'atelier mobile"/>
         <text name="ads_serviceInterval_label" text="Intervalle d'entretien"/>
         <text name="ads_vehicleLifespan_label" text="Durée de vie du véhicule"/>
         <text name="ads_downtimeWear_label" text="Usure passive"/>
         <text name="ads_generalWearEnabled_label" text="Usure liée à l'âge"/>
         <text name="ads_systemStressRate_label" text="Vitesse d'accumulation du stress"/>
+        <text name="ads_batteryCapacity_label" text="Capacité de la batterie"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilité thermique"/>
         <text name="ads_option_off" text="Arrêt"/>
         <text name="ads_serviceInterval_tooltip" text="Définit l'intervalle d'entretien de base en heures, au-delà duquel un entretien est requis. L'intervalle réel dépend de la marque du véhicule, de son âge et de la qualité des entretiens précédents."/>
@@ -39,6 +42,7 @@
         <text name="ads_generalWearEnabled_tooltip" text="Active l'usure liée à l'âge. À mesure que le véhicule s'use, chaque système subit de petites pénalités sur ses caractéristiques principales, comme la puissance moteur, la vitesse hydraulique ou l'efficacité du freinage. L'effet s'active après le premier tiers de la durée de vie, mais ne devient vraiment perceptible qu'après les deux tiers et se renforce à l'approche de la fin de vie de la machine."/>
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Lorsqu'elle est activée, la disponibilité des différentes interventions dans l'atelier mobile dépend de la maintenabilité du véhicule."/>
         <text name="ads_systemStressRate_tooltip" text="Détermine la vitesse à laquelle le stress s'accumule dans les systèmes sous l'effet de la surcharge, de la surchauffe, du patinage et d'autres conditions d'utilisation sévères. Le stress influe directement sur la probabilité de panne : plus un système accumule de stress, plus une panne devient probable."/>
+        <text name="ads_batteryCapacity_tooltip" text="Ajuste la capacité maximale réellement utilisable de la batterie. Des valeurs proches de 150 Ah sont plus réalistes, mais à ce niveau vous rencontrerez à peine des problèmes de décharge de batterie."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajuste le comportement du modèle thermique. Des réglages plus élevés rendent le moteur et la transmission plus sensibles à la charge, à la température ambiante et à l'encrassement du radiateur, générant ainsi plus de chaleur dans les mêmes conditions."/>
         <text name="ads_thermal_none" text="Passif"/>
         <text name="ads_thermal_mild" text="Modérée"/>
@@ -129,6 +133,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Pompe hydraulique Powershift"/>
         <text name="ads_breakdowns_part_cvt_chain" text="Chaîne de CVT"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Distributeur hydraulique de CVT"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Pompe hydraulique"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Vérin hydraulique"/>
         <text name="ads_breakdowns_part_pto_clutch" text="Embrayage de PDF"/>
@@ -231,6 +236,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Dysfonctionnement modéré du distributeur hydraulique. Le débit est instable, la réponse hydraulique est ralentie et l'efficacité diminue nettement."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Dysfonctionnement sévère du distributeur hydraulique. Le débit est très irrégulier, les commandes répondent mal et la puissance hydraulique disponible chute fortement."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Défaillance critique du distributeur hydraulique. Le flux hydraulique ne peut plus être correctement contrôlé et le fonctionnement devient impossible."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Les premiers signes d un dysfonctionnement de la transmission CVT ont ete detectes. Un diagnostic et une reparation sont necessaires."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Le dysfonctionnement de la transmission CVT s aggrave. Une utilisation prolongee peut entrainer le passage en mode d urgence."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Endommagement critique de la transmission CVT. La transmission est en mode d urgence et la vitesse maximale du vehicule est reduite."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Defaillance complete de la transmission CVT. Toute utilisation ulterieure est impossible jusqu a la reparation."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Transmission CVT hors service"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Défaillance du distributeur hydraulique"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Le thermostat du moteur commence à présenter des défaillances. Le moteur met plus de temps à atteindre sa température optimale ou fonctionne à une température légèrement élevée."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="La réponse du thermostat est médiocre. La régulation de la température du moteur est instable, ce qui augmente l'usure."/>
@@ -319,6 +329,8 @@
         <text name="ads_breakdowns_gear_disengage_message" text="Transmission désactivée"/>
         <text name="ads_breakdown_at_progress_message" text="en cours"/>
         <text name="ads_spec_cold_engine_message" text="Moteur froid ! Les hauts régimes causent de l'usure !"/>
+        <text name="ads_spec_overheat_engine_message" text="Attention ! Surchauffe du moteur."/>
+        <text name="ads_spec_overheat_transmission_message" text="Attention ! Surchauffe de la transmission."/>
         <text name="ads_spec_this_month" text="Ce mois-ci"/>
         <text name="ads_spec_months_ago" text="mois plus tôt"/>
         <text name="ads_spec_never" text="Jamais"/>
@@ -340,7 +352,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="annulé"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s problème(s) détecté(s)"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Aucun problème détecté"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s effectué"/>
+        <text name="ads_spec_next_planned_service_notification" text="Intervention planifiée lancée : %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Le %s planifié a été annulé faute de fonds suffisants"/>
         <text name="ads_spec_workshop_dealer" text="Concessionnaire"/>
         <text name="ads_spec_workshop_own" text="Privé"/>
@@ -616,5 +628,6 @@
         <text name="ads_sell_dialog_washing_penalty" text="Lavage"/>
         <text name="ads_sell_dialog_total" text="Total"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s est indisponible pour %s dans l'atelier mobile en raison d'une faible maintenabilite."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Surcharge critique ! Reduisez immediatement la charge sur la machine."/>
     </texts>
 </l10n>

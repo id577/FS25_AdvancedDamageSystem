@@ -25,12 +25,15 @@
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Der KI-Helfer reduziert die Motorlast bei drohender Überlastung oder Überhitzung."/>
         <text name="ads_debugMode_label" text="Debug-Modus"/>
         <text name="ads_debugMode_tooltip" text="Aktiviert oder deaktiviert das Debug-Panel und die umfangreiche Debug-Protokollierung in der Konsole."/>
+        <text name="ads_warningMessages_label" text="Warnmeldungen"/>
+        <text name="ads_warningMessages_tooltip" text="Aktiviert oder deaktiviert Warnmeldungen wie kalter Motor oder Überhitzung."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Einschränkungen der mobilen Werkstatt"/>
         <text name="ads_serviceInterval_label" text="Wartungsintervall"/>
         <text name="ads_vehicleLifespan_label" text="Fahrzeuglebensdauer"/>
         <text name="ads_downtimeWear_label" text="Passiver Verschleiß"/>
         <text name="ads_generalWearEnabled_label" text="Altersbedingter Verschleiß"/>
         <text name="ads_systemStressRate_label" text="Systemstress-Aufbau"/>
+        <text name="ads_batteryCapacity_label" text="Batteriekapazität"/>
         <text name="ads_thermalSensitivity_label" text="Thermische Empfindlichkeit"/>
         <text name="ads_option_off" text="Aus"/>
         <text name="ads_serviceInterval_tooltip" text="Legt das grundlegende Wartungsintervall in Stunden fest, nach dem eine Wartung erforderlich ist. Das tatsächliche Intervall hängt von der Fahrzeugmarke, dem Alter und der Qualität früherer Wartungen ab."/>
@@ -39,6 +42,7 @@
         <text name="ads_generalWearEnabled_tooltip" text="Aktiviert altersbedingten Verschleiß. Mit zunehmendem Verschleiß erhält jedes System kleine Abzüge auf seine wichtigsten Eigenschaften, etwa Motorleistung, Hydraulikgeschwindigkeit oder Bremswirkung. Der Effekt wird nach dem ersten Drittel der Lebensdauer aktiv, macht sich jedoch erst nach zwei Dritteln deutlich bemerkbar und verstärkt sich zum Ende der Lebensdauer der Maschine hin."/>
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Wenn aktiviert, hängt die Verfügbarkeit verschiedener Arbeiten in der mobilen Werkstatt von der Wartungsfreundlichkeit des Fahrzeugs ab."/>
         <text name="ads_systemStressRate_tooltip" text="Bestimmt, wie schnell sich Stress in den Systemen durch Überlastung, Überhitzung, Schlupf und andere harte Betriebsbedingungen aufbaut. Stress beeinflusst die Wahrscheinlichkeit von Ausfällen direkt: Je mehr Stress sich in einem System ansammelt, desto wahrscheinlicher ist eine Panne."/>
+        <text name="ads_batteryCapacity_tooltip" text="Passt die maximal nutzbare Batteriekapazität an. Werte nahe 150 Ah sind realistischer, allerdings treten bei diesem Niveau Entladeprobleme der Batterie kaum noch auf."/>
         <text name="ads_thermalSensitivity_tooltip" text="Passt das Verhalten des thermischen Modells an. Höhere Einstellungen machen Motor und Getriebe empfindlicher gegenüber Last, Umgebungstemperatur und Kühlerverschmutzung und erzeugen unter gleichen Bedingungen mehr Wärme."/>
         <text name="ads_thermal_none" text="Passiv"/>
         <text name="ads_thermal_mild" text="Leicht"/>
@@ -129,6 +133,7 @@
         <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift-Hydraulikpumpe"/>
         <text name="ads_breakdowns_part_cvt_chain" text="CVT-Kette"/>
         <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT-Hydraulikregelventil"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulikpumpe"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulikzylinder"/>
         <text name="ads_breakdowns_part_pto_clutch" text="Zapfwellenkupplung"/>
@@ -231,6 +236,11 @@
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Mäßige Fehlfunktion des Hydraulikregelventils. Der Durchfluss ist instabil, die Hydraulik reagiert verzögert und die Effizienz sinkt deutlich."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Schwere Fehlfunktion des Hydraulikregelventils. Der Durchfluss ist stark ungleichmäßig, die Steuerung reagiert schlecht und die verfügbare Hydraulikleistung sinkt deutlich."/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Kritischer Ausfall des Hydraulikregelventils. Der Hydraulikfluss kann nicht mehr korrekt geregelt werden und ein normaler Betrieb ist unmöglich."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Erste Anzeichen einer Stoerung des CVT-Getriebes wurden erkannt. Eine Diagnose und Reparatur ist erforderlich."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Die Stoerung des CVT-Getriebes schreitet fort. Weiterer Betrieb kann zum Notlauf fuehren."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Kritische Beschaedigung des CVT-Getriebes. Das Getriebe arbeitet im Notlauf und die maximale Fahrgeschwindigkeit ist reduziert."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Vollstaendiger Ausfall des CVT-Getriebes. Ein weiterer Betrieb ist bis zur Reparatur nicht moeglich."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT-Getriebe ausgefallen"/>
         <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Ausfall des Hydraulikregelventils"/>
         <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Motorthermostat beginnt auszufallen. Der Motor braucht länger, um die optimale Temperatur zu erreichen, oder läuft etwas zu heiß."/>
         <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Schlechte Reaktion des Thermostats. Die Motortemperaturregelung ist instabil, was den Verschleiß erhöht."/>
@@ -319,6 +329,8 @@
         <text name="ads_breakdowns_gear_disengage_message" text="Gang ausgelegt"/>
         <text name="ads_breakdown_at_progress_message" text="in Arbeit"/>
         <text name="ads_spec_cold_engine_message" text="Motor ist kalt! Hohe Drehzahlen verursachen Verschleiß!"/>
+        <text name="ads_spec_overheat_engine_message" text="Warnung! Motor überhitzt."/>
+        <text name="ads_spec_overheat_transmission_message" text="Warnung! Getriebe überhitzt."/>
         <text name="ads_spec_this_month" text="Diesen Monat"/>
         <text name="ads_spec_months_ago" text="Monaten"/>
         <text name="ads_spec_never" text="Nie"/>
@@ -340,7 +352,7 @@
         <text name="ads_spec_maintenance_cancelled_notification" text="abgesagt"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s Problem(e) erkannt"/>
         <text name="ads_spec_inspection_no_issues_detected_notification" text="Keine Probleme erkannt"/>
-        <text name="ads_spec_next_planned_service_notification" text="%s durchgeführt"/>
+        <text name="ads_spec_next_planned_service_notification" text="Geplante Maßnahme gestartet: %s"/>
         <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Geplanter Termin %s wegen unzureichender Mittel abgesagt"/>
         <text name="ads_spec_workshop_dealer" text="Händler"/>
         <text name="ads_spec_workshop_own" text="Eigene"/>
@@ -616,5 +628,6 @@
         <text name="ads_sell_dialog_washing_penalty" text="Reinigung"/>
         <text name="ads_sell_dialog_total" text="Gesamt"/>
         <text name="ads_mobile_workshop_low_maintainability" text="WARNING: %s ist fuer %s in der mobilen Werkstatt wegen geringer Wartungsfreundlichkeit nicht verfuegbar."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kritische Ueberlastung! Verringern Sie sofort die Belastung der Maschine."/>
     </texts>
 </l10n>

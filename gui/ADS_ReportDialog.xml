@@ -139,28 +139,4 @@
             <Button profile="buttonBack" text="$l10n_button_back" onClick="onClickBack" id="backButton"/>
         </BoxLayout>
     </GuiElement>
-
-    <GUIProfiles>
-        <Profile name="ads_dialogScreenBlocker" extends="baseReference" with="anchorStretchingYStretchingX pivotTopCenter">
-            <size value="100% 100%"/>
-            <color value="$preset_fs25_colorMainDark"/>
-            <cornerSize value="0"/>
-        </Profile>
-
-        <Profile name="ads_reportStatsContainer" extends="emptyPanel" with="anchorTopStretchingX">
-            <size value="1410px 470px"/>
-            <position value="0px -170px"/>
-        </Profile>
-
-        <Profile name="ads_reportBreakdownsContainer" extends="emptyPanel" with="anchorTopStretchingX">
-            <size value="710px 230px"/>
-            <position value="-350px -590px"/>
-        </Profile>
-
-        <Profile name="ads_reportRecContainer" extends="emptyPanel" with="anchorTopStretchingX">
-            <size value="710px 230px"/>
-            <position value="350px -590px"/>
-        </Profile>
-
-    </GUIProfiles>
 </GUI>

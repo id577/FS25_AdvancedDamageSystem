@@ -22,12 +22,19 @@
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </starterCrankingEnd>
     <alarm file="sounds/alarm.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
-        <volume indoor="1.5" outdoor="1.6" />
+        <volume indoor="1.0" outdoor="1.0" />
         <pitch indoor="1.0" outdoor="1.0" />
         <lowpassGain indoor="1.0" outdoor="1.0" />
         <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </alarm>
+    <warning file="sounds/warning.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
+        <volume indoor="1.0" outdoor="1.2" />
+        <pitch indoor="1.0" outdoor="1.0" />
+        <lowpassGain indoor="1.0" outdoor="1.0" />
+        <lowpassCutoffFrequency indoor="20000.0" outdoor="20000.0" />
+        <lowpassResonance indoor="1.0" outdoor="1.0"/>
+    </warning>
 	<transmissionShiftFailed1 file="sounds/transmissionShiftFailed_1.ogg" linkNode="0" innerRadius="7.0" outerRadius="60.0" >
         <volume indoor="2.0" outdoor="2.1" />
         <pitch indoor="1.0" outdoor="1.0" />
