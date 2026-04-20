@@ -2789,13 +2789,26 @@ local function syncOverloadWarning(vehicle, dt)
     local factorStats = ensureFactorStats(spec, vehicle)
     local stressMultipliers = ADS_Config.CORE.SYSTEM_STRESS_ACCUMULATION_MULTIPLIERS or {}
     local globalStressMultiplier = math.max(tonumber(ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER) or 1.0, 0.0)
+
+    local overloadFactorAliasesBySystem = {
+        engine = { "mlf", "hmf", "lf" },
+        transmission = { "pof", "htf", "lf", "wsf", "hotf" }
+    }
+    
     local shouldStage = 0
     local maxAvgStress = 0
     for systemName, systemData in pairs(factorStats) do
         if type(systemData) == "table" then
             local systemStressMultiplier = tonumber(stressMultipliers[systemName]) or 1.0
-            local excludedStress = (tonumber(systemData.sf) or 0) * systemStressMultiplier * globalStressMultiplier
-            local currentStress = math.max((tonumber(systemData.stress) or 0) - excludedStress, 0)
+            local selectedAliases = overloadFactorAliasesBySystem[tostring(systemName)]
+            local currentStress = 0
+
+            if type(selectedAliases) == "table" then
+                for _, alias in ipairs(selectedAliases) do
+                    currentStress = currentStress + math.max(tonumber(systemData[alias]) or 0, 0)
+                end
+                currentStress = currentStress * systemStressMultiplier * globalStressMultiplier
+            end
 
             if not isMotorStarted then
                 systemData._prevStress = currentStress
@@ -2865,7 +2878,7 @@ local function syncOverloadWarning(vehicle, dt)
                 spec.debugData[systemName]._avgStress = systemData._avgStress
             end
 
-            local affectsOverloadBreakdown = tostring(systemName) ~= "chassis"
+            local affectsOverloadBreakdown = type(selectedAliases) == "table" and #selectedAliases > 0
             if affectsOverloadBreakdown then
                 if systemData._avgStress > avgStressCriticalThreshold then
                     shouldStage = 2
