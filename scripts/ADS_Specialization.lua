@@ -5024,15 +5024,16 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
         wearRate = wearRate + weatherExposureFactor
     end
 
+    -- cranking factor
     systemData.crankingTimer = systemData.crankingTimer or 0
     if not spec.isElectricVehicle and spec.isCranking then
-        systemData.crankingTimer = math.min(systemData.crankingTimer + dt, 18000)
+        systemData.crankingTimer = math.min(systemData.crankingTimer + dt, 10000)
         if systemData.crankingTimer > 3500 then
             crankingStressFactor = C.CRANKING_STRESS_MULTIPLIER
             wearRate = wearRate + crankingStressFactor
         end
     else
-        systemData.crankingTimer = math.max(systemData.crankingTimer - dt / 10, 0)
+        systemData.crankingTimer = math.max(systemData.crankingTimer - dt / 100, 0)
     end
 
     if self:getIsMotorStarted() and not spec.isElectricVehicle then

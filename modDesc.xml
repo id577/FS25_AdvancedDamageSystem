@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="106">
     <author>id577, Squallqt</author>
-    <version>0.9.1.2</version>
+    <version>0.9.2.0</version>
     <title>
         <en>Advanced Damage System</en>
         <es>Sistema Avanzado De Daños</es>
@@ -15,6 +15,21 @@
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
 
 The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+
+Changelog 0.9.2.0:
+- Rebalanced system wear factors
+- "Quick Inspection" now finishes an active inspection instantly
+- "Park Vehicles" now applies instantly to vehicles already in a service procedure
+- Cold and overheating warnings for the engine/transmission now appear once instead of repeating constantly
+- Vehicles now warn about extreme load through dashboard indicators
+- Reworked dashboard indicator logic and added an activation sound
+- Added an option to disable all warning messages
+- Fixed multiplayer synchronization of engine and CVT temperature with the engine turned off
+- Fixed battery capacity setting changes causing mass battery discharge
+- Fixed repaired breakdown count in the maintenance log
+- Fixed chained service procedures causing unintended repaint and repaint charges
+- Fixed AutoDrive AI ignoring critical breakdowns
+- Minor UI fixes
 
 Changelog 0.9.1.2:
 - Added compatibility with CVT Addon
@@ -62,6 +77,21 @@ Changelog 0.9.0.0:
 
 El mod incluye un modelo térmico para los sistemas principales, una simulación avanzada de batería y alternador, una lógica de averías realista, flujos de trabajo ampliados en el taller, informes de servicio, historial de mantenimiento e inspecciones previas al turno. Como resultado, la gestión de los vehículos se convierte en una parte estratégica de la jugabilidad: el mantenimiento lleva tiempo, el uso incorrecto aumenta el riesgo de fallos y descuidar el estado de la maquinaria puede interrumpir trabajos de campo importantes. Un agricultor responsable que cuide su equipo, lo mantenga a tiempo y evite abusos innecesarios mantendrá una flota fiable y evitará problemas graves durante la temporada.
 
+Changelog 0.9.2.0:
+- Reequilibrados los factores de desgaste de los sistemas
+- "Inspección rápida" ahora completa al instante una inspección activa
+- "Aparcar vehículos" ahora se aplica al instante a los vehículos que ya están en servicio
+- Las advertencias de motor/transmisión fríos o sobrecalentados ahora aparecen una sola vez en lugar de repetirse constantemente
+- Ahora los vehículos avisan de cargas extremas mediante indicadores en el panel
+- Se ha rediseñado la lógica de los indicadores del panel y se ha añadido un sonido de activación
+- Añadida una opción para desactivar todos los mensajes de advertencia
+- Corregida la sincronización en multijugador de la temperatura del motor y del CVT con el motor apagado
+- Corregido un problema por el que cambiar la capacidad de la batería provocaba una descarga masiva de baterías
+- Corregido el recuento de averías reparadas en el maintenance log
+- Corregido un repintado no deseado y su coste al encadenar procedimientos de servicio
+- Corregido que la IA de AutoDrive ignorara averías críticas
+- Pequeñas correcciones de interfaz
+
 Changelog 0.9.1.2:
 - Añadida compatibilidad con CVT Addon
 - Ampliados los rangos de ajuste del intervalo de servicio y de la vida útil del vehículo en la configuración
@@ -107,6 +137,21 @@ Changelog 0.9.0.0:
          <pl><![CDATA[Advanced Damage System dodaje do gry Farming Simulator 25 rozbudowany system zużycia pojazdów, awarii, diagnostyki, konserwacji i napraw. Zamiast polegać na jednej, ogólnej wartości stanu, każda maszyna jest zbudowana wokół wielu indywidualnych systemów, posiadających własny stan, czynniki zużycia, akumulację naprężeń i ryzyko awarii. Zachowanie pojazdu i charakter usterek zależą od warunków eksploatacji, obciążenia, temperatury i jakości serwisu.
 
 Modyfikacja zawiera model temperatury kluczowych systemów, zaawansowaną symulację akumulatora i alternatora, realistyczną logikę awarii, rozszerzone przepływy pracy w warsztacie, raporty serwisowe, historię konserwacji oraz inspekcje przedrozruchowe. W rezultacie zarządzanie pojazdami staje się strategiczną częścią rozgrywki: serwis zajmuje czas, złe użytkowanie zwiększa ryzyko awarii, a zaniedbanie stanu maszyny może zakłócić krytyczne prace polowe. Odpowiedzialny rolnik, który dba o sprzęt, serwisuje go na czas i unika niepotrzebnego nadużywania, utrzyma flotę w niezawodnym stanie i uniknie poważnych problemów w trakcie sezonu.
+
+Changelog 0.9.2.0:
+- Zbalansowano czynniki zużycia systemów
+- „Szybka inspekcja” teraz natychmiast kończy aktywną inspekcję
+- „Parkuj pojazdy” teraz natychmiast działa na pojazdy już będące w procedurze serwisowej
+- Ostrzeżenia o zimnym lub przegrzanym silniku/skrzyni pojawiają się teraz tylko raz zamiast powtarzać się bez końca
+- Pojazdy ostrzegają teraz o ekstremalnym obciążeniu za pomocą wskaźników na desce rozdzielczej
+- Przeprojektowano logikę wskaźników na desce rozdzielczej i dodano dźwięk aktywacji
+- Dodano opcję wyłączenia wszystkich komunikatów ostrzegawczych
+- Naprawiono synchronizację temperatury silnika i CVT w trybie wieloosobowym przy zgaszonym silniku
+- Naprawiono problem, przez który zmiana pojemności akumulatora powodowała masowe rozładowanie baterii
+- Naprawiono liczenie usuniętych awarii w maintenance log
+- Naprawiono nieplanowane malowanie i opłaty za malowanie przy łączeniu procedur serwisowych
+- Naprawiono ignorowanie krytycznych awarii przez AutoDrive AI
+- Drobne poprawki interfejsu
 
 Changelog 0.9.1.2:
 - Dodano kompatybilność z CVT Addon
@@ -154,6 +199,21 @@ Changelog 0.9.0.0:
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
+Changelog 0.9.2.0:
+- Die Verschleißfaktoren der Systeme wurden neu ausbalanciert
+- „Schnelle Inspektion“ beendet eine laufende Inspektion jetzt sofort
+- „Fahrzeuge parken“ wirkt jetzt sofort auf Fahrzeuge, die sich bereits in einem Servicevorgang befinden
+- Warnungen bei kaltem oder überhitztem Motor/Getriebe erscheinen jetzt nur noch einmal statt sich ständig zu wiederholen
+- Fahrzeuge warnen nun über Anzeigen im Armaturenbrett bei extremer Belastung
+- Die Logik der Armaturenbrettanzeigen wurde überarbeitet und um einen Aktivierungston ergänzt
+- Es wurde eine Option zum Deaktivieren aller Warnmeldungen hinzugefügt
+- Die Synchronisierung von Motor- und CVT-Temperatur im Mehrspielermodus bei abgestelltem Motor wurde behoben
+- Ein Fehler wurde behoben, durch den Änderungen der Batteriekapazität eine Massenentladung aller Batterien auslösen konnten
+- Die Zählung behobener Defekte im maintenance log wurde korrigiert
+- Ungeplante Lackierung und Lackierkosten bei verketteten Servicevorgängen wurden behoben
+- Es wurde behoben, dass AutoDrive-KI kritische Defekte ignoriert
+- Kleinere UI-Verbesserungen
+
 Changelog 0.9.1.2:
 - Kompatibilität mit CVT Addon hinzugefügt
 - Die Einstellbereiche für Serviceintervall und Fahrzeuglebensdauer im Spiel wurden erweitert
@@ -198,6 +258,21 @@ Changelog 0.9.0.0:
         <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
 Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+
+Changelog 0.9.2.0:
+- Rééquilibrage des facteurs d'usure des systèmes
+- « Inspection rapide » termine désormais instantanément une inspection en cours
+- « Garer les véhicules » s'applique désormais instantanément aux véhicules déjà engagés dans une procédure d'entretien
+- Les avertissements de moteur/transmission froids ou en surchauffe n'apparaissent désormais qu'une seule fois au lieu de se répéter en permanence
+- Les véhicules avertissent désormais d'une charge extrême via les indicateurs du tableau de bord
+- La logique des indicateurs du tableau de bord a été retravaillée et un son d'activation a été ajouté
+- Ajout d'une option pour désactiver tous les messages d'avertissement
+- Correction de la synchronisation multijoueur des températures moteur et CVT lorsque le moteur est coupé
+- Correction d'un problème où le changement de capacité de batterie provoquait une décharge massive de toutes les batteries
+- Correction du comptage des pannes réparées dans le maintenance log
+- Correction d'une repeinture involontaire et de son coût lors de l'enchaînement de procédures d'entretien
+- Correction du problème où l'IA d'AutoDrive ignorait les pannes critiques
+- Corrections mineures de l'interface
 
 Changelog 0.9.1.2:
 - Ajout de la compatibilité avec CVT Addon
@@ -245,6 +320,21 @@ Changelog 0.9.0.0:
 
 Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine può compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrà la flotta affidabile ed eviterà problemi seri durante la stagione.
 
+Changelog 0.9.2.0:
+- Ribilanciati i fattori di usura dei sistemi
+- “Ispezione rapida” ora completa immediatamente un'ispezione attiva
+- “Parcheggia veicoli” ora si applica immediatamente ai veicoli già coinvolti in una procedura di assistenza
+- Gli avvisi di motore/trasmissione freddi o surriscaldati ora compaiono una sola volta invece di ripetersi continuamente
+- I veicoli avvisano ora di carichi estremi tramite gli indicatori sul cruscotto
+- La logica degli indicatori del cruscotto è stata rielaborata ed è stato aggiunto un suono di attivazione
+- Aggiunta un'opzione per disattivare tutti i messaggi di avviso
+- Corretta la sincronizzazione multigiocatore delle temperature di motore e CVT a motore spento
+- Corretto un problema per cui la modifica della capacità della batteria causava lo scaricamento massivo di tutte le batterie
+- Corretto il conteggio dei guasti riparati nel maintenance log
+- Corretta la verniciatura involontaria e il relativo costo nelle procedure di assistenza concatenate
+- Corretto il problema per cui l'IA di AutoDrive ignorava i guasti critici
+- Piccole correzioni all'interfaccia
+
 Changelog 0.9.1.2:
 - Aggiunta la compatibilità con CVT Addon
 - Estesi gli intervalli di regolazione dell'intervallo di manutenzione e della vita utile del veicolo nelle impostazioni
@@ -290,6 +380,21 @@ Changelog 0.9.0.0:
         <ru><![CDATA[Advanced Damage System добавляет в Farming Simulator 25 глубокую систему износа, поломок, диагностики, обслуживания и ремонта техники. Вместо одного условного параметра состояния каждая машина состоит из отдельных систем, каждая из которых имеет собственный уровень состояния, факторы износа, накопление стресса и риск отказа. Поведение техники и характер поломок зависят от условий эксплуатации, нагрузки, температуры и качества обслуживания.
 
 Мод включает температурную модель ключевых систем, продвинутую симуляцию аккумулятора и генератора, реалистичную логику поломок, расширенные сценарии работы с мастерской, сервисные отчёты, журнал обслуживания и возможность проведения предсменного осмотра. В результате техника требует не только ремонта, но и грамотного планирования: обслуживание занимает время, неправильная эксплуатация повышает риск отказов, а пренебрежение состоянием машин может сорвать важные полевые работы. Ответственный фермер, который следит за техникой, вовремя обслуживает её и не работает на пределе возможностей без необходимости, сможет сохранить парк в надёжном состоянии и избежать серьёзных проблем в сезон.
+
+Changelog 0.9.2.0:
+- Перебалансированы факторы износа систем
+- «Быстрый осмотр» теперь мгновенно завершает активный осмотр
+- «Парковать технику» теперь мгновенно применяется к технике, уже находящейся в сервисной процедуре
+- Предупреждения о холодном или перегретом двигателе/трансмиссии теперь появляются один раз вместо постоянного повторения
+- Теперь техника предупреждает об экстремальной нагрузке через индикацию на приборной панели
+- Логика индикации на приборной панели переработана, добавлен звук активации
+- Добавлена возможность отключить все предупреждающие сообщения
+- Исправлена синхронизация температуры двигателя и CVT в мультиплеере при заглушенном двигателе
+- Исправлена ошибка, из-за которой изменение ёмкости батареи могло массово разрядить все аккумуляторы
+- Исправлен подсчёт устранённых поломок в maintenance log
+- Исправлены незапланированная перекраска и списание средств при цепочке сервисных процедур
+- Исправлено игнорирование критических поломок ИИ AutoDrive
+- Небольшие исправления интерфейса
 
 Changelog 0.9.1.2:
 - Добавлена совместимость с CVT Addon
