@@ -1354,6 +1354,9 @@ function AdvancedDamageSystem:onLoad(savegame)
     
     self.spec_AdvancedDamageSystem.fuelUsage    = 0
     self.spec_AdvancedDamageSystem._fuelUsageRaw  = 0
+    self.spec_AdvancedDamageSystem.lastBlinkingWarningMessage = ""
+    self.spec_AdvancedDamageSystem.blinkingWarningTimer = 0
+    self.spec_AdvancedDamageSystem.pendingSideNotifications = {}
 
     self.spec_AdvancedDamageSystem.startButtonActionEvents = {}
     self.spec_AdvancedDamageSystem.startButtonDown = false
@@ -2237,8 +2240,8 @@ function AdvancedDamageSystem:onLeaveVehicle(wasEntered)
         return
     end
 
-    spec.lastMessage = ""
-    spec.messageTimer = 0
+    spec.lastBlinkingWarningMessage = ""
+    spec.blinkingWarningTimer = 0
 end
 
 function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveForInputIgnoreSelection)
@@ -2554,23 +2557,61 @@ end
 
 local function syncDisableAiWorkers(vehicle)
     local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil or not vehicle.isServer or not vehicle:getIsAIActive() then
+    if spec == nil or not vehicle.isServer then
         return
     end
 
     if spec.activeEffects ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
             if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.disableAi then
-                vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new())
+                local autoDriveActive = vehicle.ad ~= nil
+                    and vehicle.ad.stateModule ~= nil
+                    and vehicle.ad.stateModule.isActive ~= nil
+                    and vehicle.ad.stateModule:isActive()
+
+                if autoDriveActive and vehicle.stopAutoDrive ~= nil then
+                    vehicle.ad.isStoppingWithError = true
+
+                    if vehicle.ad.stateModule.setLoopsDone ~= nil then
+                        vehicle.ad.stateModule:setLoopsDone(0)
+                    end
+
+                    vehicle:stopAutoDrive()
+                end
+
+                if vehicle:getIsAIActive() and vehicle.stopCurrentAIJob ~= nil then
+                    vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new())
+                end
+
                 return
             end
         end
     end
 end
 
-local function syncMessages(vehicle, dt)
+local function hasEnteredPlayerInVehicleChain(rootVehicle)
+    if rootVehicle == nil then
+        return false
+    end
+
+    if rootVehicle.getIsEntered ~= nil and rootVehicle:getIsEntered() then
+        return true
+    end
+
+    if rootVehicle.getChildVehicles ~= nil then
+        for _, childVehicle in ipairs(rootVehicle:getChildVehicles()) do
+            if childVehicle ~= nil and childVehicle.getIsEntered ~= nil and childVehicle:getIsEntered() then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+local function syncBlinkingWarning(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then return end
+    if spec == nil or not vehicle.isClient then return end
 
     if ADS_Config.CORE ~= nil and ADS_Config.CORE.ENABLE_WARNING_MESSAGES == false then
         return
@@ -2578,16 +2619,16 @@ local function syncMessages(vehicle, dt)
 
     local repeatDelayMs = 180000
 
-    if spec.messageTimer == nil then
-        spec.messageTimer = 0
+    if spec.blinkingWarningTimer == nil then
+        spec.blinkingWarningTimer = 0
     end
 
-    if spec.lastMessage == nil then
-        spec.lastMessage = ""
+    if spec.lastBlinkingWarningMessage == nil then
+        spec.lastBlinkingWarningMessage = ""
     end
 
-    if spec.messageTimer > 0 then
-        spec.messageTimer = math.max(spec.messageTimer - dt, 0)
+    if spec.blinkingWarningTimer > 0 then
+        spec.blinkingWarningTimer = math.max(spec.blinkingWarningTimer - dt, 0)
     end
 
     local candidateMessage = nil
@@ -2638,11 +2679,42 @@ local function syncMessages(vehicle, dt)
         end
     end
 
-    if candidateMessage ~= nil and (spec.messageTimer == 0 or spec.lastMessage ~= candidateMessage) then
+    if candidateMessage ~= nil
+            and isActiveForInput
+            and not isAiActive
+            and not isUnderService
+            and (spec.blinkingWarningTimer == 0 or spec.lastBlinkingWarningMessage ~= candidateMessage) then
         g_currentMission:showBlinkingWarning(g_i18n:getText(candidateMessage), 3600)
-        spec.lastMessage = candidateMessage
-        spec.messageTimer = repeatDelayMs
+        spec.lastBlinkingWarningMessage = candidateMessage
+        spec.blinkingWarningTimer = repeatDelayMs
     end
+end
+
+local function syncSideNotifications(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil or not vehicle.isClient then
+        return
+    end
+
+    if ADS_Config.CORE ~= nil and ADS_Config.CORE.ENABLE_WARNING_MESSAGES == false then
+        return
+    end
+
+    if spec.pendingSideNotifications == nil or next(spec.pendingSideNotifications) == nil then
+        return
+    end
+
+    if vehicle:getOwnerFarmId() ~= g_currentMission:getFarmId()
+            or g_currentMission.hud == nil
+            or g_currentMission.hud.addSideNotification == nil then
+        return
+    end
+
+    for _, notificationText in ipairs(spec.pendingSideNotifications) do
+        g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, vehicle:getFullName() .. ": " .. notificationText)
+    end
+
+    spec.pendingSideNotifications = {}
 end
 
 local function syncFuelConsumption(vehicle)
@@ -2880,8 +2952,11 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- CVT addon breakdown sync
     syncCVTaddonBreakdown(self)
     
-    --- Messages
-    syncMessages(self, spec.onUpdateTimer)
+    --- Blinking warning for currently controlled vehicle
+    syncBlinkingWarning(self, spec.onUpdateTimer)
+
+    --- Side notifications for vehicles without players at the moment of the effect event
+    syncSideNotifications(self)
 
     --- Disable AI workers for critical effects
     syncDisableAiWorkers(self)
@@ -4901,13 +4976,13 @@ function AdvancedDamageSystem:updateElectricalSystem(dt)
 
     systemData.crankingTimer = systemData.crankingTimer or 0
     if not spec.isElectricVehicle and spec.isCranking then
-        systemData.crankingTimer = systemData.crankingTimer + dt
+        systemData.crankingTimer = math.min(systemData.crankingTimer + dt, 18000)
         if systemData.crankingTimer > 3500 then
             crankingStressFactor = C.CRANKING_STRESS_MULTIPLIER
             wearRate = wearRate + crankingStressFactor
         end
     else
-        systemData.crankingTimer = systemData.crankingTimer - dt / 10
+        systemData.crankingTimer = math.max(systemData.crankingTimer - dt / 10, 0)
     end
 
     if self:getIsMotorStarted() and not spec.isElectricVehicle then
@@ -6141,12 +6216,19 @@ function AdvancedDamageSystem:recalculateAndApplyEffects()
         if isCurrentlyActive then
             if applicator.apply then
                 applicator.apply(self, spec.activeEffects[effectId], applicator)
+            end
+
+            if self.isClient and not wasPreviouslyActive then
                 local currentEffect = spec.activeEffects[effectId]
-                if currentEffect and currentEffect.extraData ~= nil and currentEffect.extraData.message ~= nil
-                        and self.isClient and not self:getIsActiveForInput(true)
-                        and self:getOwnerFarmId() == g_currentMission:getFarmId()
-                        and g_currentMission.hud ~= nil and g_currentMission.hud.addSideNotification ~= nil then
-                    g_currentMission.hud:addSideNotification(ADS_Breakdowns.COLORS.WARNING, self:getFullName() .. ": " .. g_i18n:getText(currentEffect.extraData.message))
+                local rootVehicle = self.rootVehicle or self
+                local hasEnteredPlayer = hasEnteredPlayerInVehicleChain(rootVehicle)
+
+                if currentEffect ~= nil
+                        and currentEffect.extraData ~= nil
+                        and currentEffect.extraData.message ~= nil
+                        and not hasEnteredPlayer then
+                    spec.pendingSideNotifications = spec.pendingSideNotifications or {}
+                    table.insert(spec.pendingSideNotifications, g_i18n:getText(currentEffect.extraData.message))
                 end
             end
         elseif wasPreviouslyActive then
