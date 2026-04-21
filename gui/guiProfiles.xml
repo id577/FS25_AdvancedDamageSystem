@@ -309,8 +309,8 @@
 
     <!-- In-game fleet menu specific -->
     <Profile name="ads_menuTableContainer" extends="emptyPanel" with="anchorTopStretchingX">
-        <size value="1510px 630px"/>
-        <position value="-30px 0px"/>
+        <size value="1550px 510px"/>
+        <position value="-10px 0px"/>
     </Profile>
     <Profile name="ads_menuHeaderButtonLeft" extends="baseReference">
         <imageColor value="0 0 0 0"/>
@@ -326,6 +326,15 @@
         <textLineHeightScale value="0.95"/>
         <textDisabledColor value="$preset_colorDisabled"/>
     </Profile>
+    <Profile name="ads_menuHeaderButtonFirst" extends="ads_menuHeaderButtonLeft">
+        <textAutoWidth value="false"/>
+        <textAlignment value="left"/>
+        <textOffset value="10px 0px"/>
+    </Profile>
+    <Profile name="ads_menuHeaderButtonCenter" extends="ads_menuHeaderButtonLeft">
+        <textAutoWidth value="false"/>
+        <textAlignment value="center"/>
+    </Profile>
     <Profile name="ads_menuHeaderButtonRight" extends="ads_menuHeaderButtonLeft">
         <textAutoWidth value="false"/>
         <textAlignment value="right"/>
@@ -337,12 +346,13 @@
         <textColor value="$preset_colorWhite"/>
     </Profile>
     <Profile name="ads_menuVehicleList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
-        <position value="0px -48px"/>
-        <absoluteSizeOffset value="0px 80px"/>
+        <position value="0px -34px"/>
+        <absoluteSizeOffset value="0px 20px"/>
     </Profile>
-    <Profile name="ads_menuListSliderBox" extends="fs25_listSliderBox" with="anchorTopStretchingX pivotTopRight">
-        <position value="28px -48px"/>
-        <absoluteSizeOffset value="0px 80px"/>
+    <Profile name="ads_menuListSliderBox" extends="fs25_listSliderBox" with="anchorTopRight">
+        <position value="-5px -34px"/>
+        <size value="6px 100%"/>
+        <absoluteSizeOffset value="0px 20px"/>
     </Profile>
     <Profile name="ads_menuTableListItemAlt" extends="fs25_calendarListItem" with="anchorTopStretchingX alternating">
         <height value="40.77px"/>
@@ -364,6 +374,9 @@
         <textDisabledColor value="$preset_colorDisabled"/>
         <textSelectedColor value="$preset_fs25_colorMainDark"/>
     </Profile>
+    <Profile name="ads_menuTableRowCellFirstAlt" extends="ads_menuTableRowCellLeftAlt">
+        <textOffset value="10px 0px"/>
+    </Profile>
     <Profile name="ads_menuTableRowCellRightAlt" extends="baseReference" with="anchorStretchingYLeft">
         <textBold value="false"/>
         <textSize value="15px"/>
@@ -372,11 +385,19 @@
         <textDisabledColor value="$preset_colorDisabled"/>
         <textSelectedColor value="$preset_fs25_colorMainDark"/>
     </Profile>
+    <Profile name="ads_menuTableRowCellCenterAlt" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false"/>
+        <textSize value="15px"/>
+        <textAlignment value="center"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+    </Profile>
     <Profile name="ads_menuFooterBox" extends="baseReference" with="anchorBottomStretchingX">
-        <size value="100% 50px"/>
+        <size value="100% 30px"/>
     </Profile>
     <Profile name="ads_menuDetailBox" extends="fs25_shopItemsDetailsContainer" with="anchorTopStretchingX">
-        <size value="1510px 180px"/>
-        <position value="-30px -640px"/>
+        <size value="1550px 180px"/>
+        <position value="-10px -635px"/>
     </Profile>
 </GUIProfiles>

@@ -13,77 +13,195 @@
             </BoxLayout>
         </GuiElement>
 
-        <GuiElement profile="ads_menuTableContainer">
-            <GuiElement profile="fs25_statisticsHeaderBox">
-                <Button profile="ads_menuHeaderButtonLeft" position="42px 0px" size="280px 40px" text="$l10n_ads_ingame_menu_header_vehicle" onClick="onClickVehicleHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="-10px 0px" id="iconVehicleAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="-10px 0px" id="iconVehicleDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="328px 0px" size="110px 40px" text="$l10n_ads_ingame_menu_header_age" onClick="onClickAgeHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconAgeAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconAgeDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="444px 0px" size="110px 40px" text="$l10n_ads_ingame_menu_header_working_hours" onClick="onClickWorkingHoursHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconHoursAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconHoursDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="560px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_condition" onClick="onClickConditionHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconConditionAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconConditionDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="696px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_interval" onClick="onClickIntervalHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconIntervalAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconIntervalDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="832px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_last_inspection" onClick="onClickLastInspectionHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconInspectionAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconInspectionDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="968px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_last_maintenance" onClick="onClickLastMaintenanceHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconMaintenanceAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconMaintenanceDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="1104px 0px" size="110px 40px" text="$l10n_ads_ingame_menu_header_cost" onClick="onClickCostHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconCostAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconCostDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="1220px 0px" size="110px 40px" text="$l10n_ads_ingame_menu_header_leasing_price" onClick="onClickLeasingPriceHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconLeasingAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconLeasingDescending"/>
-                </Button>
-                <Button profile="ads_menuHeaderButtonRight" position="1336px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_price" onClick="onClickPriceHeader">
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconPriceAscending"/>
-                    <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconPriceDescending"/>
-                </Button>
-                <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -2dp"/>
+        <BoxLayout profile="fs25_subCategorySelectorTabbedBox" id="subCategoryBox" position="-10px 0px" size="1550px 57px">
+            <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[1]" text="$l10n_ads_ingame_menu_section_active" onClick="onClickActiveSection">
+                <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
+            </Button>
+            <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[2]" text="$l10n_ads_ingame_menu_section_service" onClick="onClickServiceSection">
+                <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
+            </Button>
+            <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[3]" text="$l10n_ads_ingame_menu_section_other" onClick="onClickOtherSection">
+                <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
+            </Button>
+        </BoxLayout>
+        <ThreePartBitmap profile="fs25_lineSeparatorTopHighlighted" position="-10px -57px" size="1550px 4px"/>
+        <MultiTextOption profile="fs25_subCategorySelectorTabbed" id="subCategoryPaging" position="-10px -10px" onClick="updateSubCategoryPages"/>
+
+        <GuiElement profile="fs25_subCategorySelectorTabbedContainer" id="subCategoryPages[1]">
+            <GuiElement profile="ads_menuTableContainer">
+                <GuiElement profile="fs25_statisticsHeaderBox" id="activeTableHeader">
+                    <Button profile="ads_menuHeaderButtonFirst" position="22px 0px" size="280px 40px" text="$l10n_ads_ingame_menu_header_vehicle" onClick="onClickVehicleHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="-10px 0px" id="iconVehicleAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="-10px 0px" id="iconVehicleDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="308px 0px" size="180px 40px" text="$l10n_ads_ingame_menu_header_type" onClick="onClickTypeHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconTypeAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconTypeDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="494px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_age" onClick="onClickAgeHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconAgeAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconAgeDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="581px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_working_hours" onClick="onClickWorkingHoursHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconHoursAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconHoursDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="668px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_condition" onClick="onClickConditionHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconConditionAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconConditionDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="804px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_interval" onClick="onClickIntervalHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconIntervalAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconIntervalDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="940px 0px" size="127px 40px" text="$l10n_ads_ingame_menu_header_last_inspection" onClick="onClickLastInspectionHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconInspectionAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconInspectionDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1073px 0px" size="127px 40px" text="$l10n_ads_ingame_menu_header_last_maintenance" onClick="onClickLastMaintenanceHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconMaintenanceAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconMaintenanceDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1206px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_cost" onClick="onClickCostHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconCostAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconCostDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1312px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_leasing_price" onClick="onClickLeasingPriceHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconLeasingAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconLeasingDescending"/>
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1418px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_price" onClick="onClickPriceHeader">
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconPriceAscending"/>
+                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconPriceDescending"/>
+                    </Button>
+                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -2dp"/>
+                </GuiElement>
+
+                <SmoothList profile="ads_menuVehicleList" id="vehicleList">
+                    <ListItem profile="ads_menuTableListItemAlt" id="vehicleTemplate" size="1550px 40.77px">
+                        <ThreePartBitmap profile="ads_menuTableListItemGradient" name="alternating"/>
+                        <Text profile="ads_menuTableRowCellFirstAlt" position="22px 0px" size="280px 40.77px" name="vehicleNameText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="308px 0px" size="180px 40.77px" name="vehicleTypeText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="494px 0px" size="81px 40.77px" name="ageText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="581px 0px" size="81px 40.77px" name="workingHoursText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="668px 0px" size="130px 40.77px" name="conditionText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="804px 0px" size="130px 40.77px" name="intervalText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="940px 0px" size="127px 40.77px" name="lastInspectionText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1073px 0px" size="127px 40.77px" name="lastMaintenanceText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1206px 0px" size="100px 40.77px" name="costText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1312px 0px" size="100px 40.77px" name="leasingPriceText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1418px 0px" size="100px 40.77px" name="priceText"/>
+                    </ListItem>
+                </SmoothList>
+
+                <ThreePartBitmap profile="ads_menuListSliderBox" id="activeTableSliderBox">
+                    <Slider profile="fs25_listSlider" dataElementId="vehicleList"/>
+                </ThreePartBitmap>
+                <GuiElement profile="ads_menuFooterBox" id="activeTableFooter">
+                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -18px"/>
+                </GuiElement>
+                <Text profile="ads_textHeaderGrey" id="activeEmptyTableText" text="$l10n_ads_ingame_menu_empty_active" position="0px 180px" size="100% 50px" visible="false" with="anchorMiddleCenter"/>
             </GuiElement>
+        </GuiElement>
 
-            <SmoothList profile="ads_menuVehicleList" id="vehicleList">
-                <ListItem profile="ads_menuTableListItemAlt" id="vehicleTemplate" size="1460px 40.77px">
-                    <ThreePartBitmap profile="ads_menuTableListItemGradient" name="alternating"/>
-                    <Text profile="ads_menuTableRowCellLeftAlt" position="22px 0px" size="280px 40.77px" name="vehicleNameText" textLayoutMode="scrolling"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="308px 0px" size="110px 40.77px" name="ageText"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="424px 0px" size="110px 40.77px" name="workingHoursText"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="540px 0px" size="130px 40.77px" name="conditionText"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="676px 0px" size="130px 40.77px" name="intervalText"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="812px 0px" size="130px 40.77px" name="lastInspectionText" textLayoutMode="scrolling"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="948px 0px" size="130px 40.77px" name="lastMaintenanceText" textLayoutMode="scrolling"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="1084px 0px" size="110px 40.77px" name="costText"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="1200px 0px" size="110px 40.77px" name="leasingPriceText"/>
-                    <Text profile="ads_menuTableRowCellRightAlt" position="1316px 0px" size="100px 40.77px" name="priceText"/>
-                </ListItem>
-            </SmoothList>
+        <GuiElement profile="fs25_subCategorySelectorTabbedContainer" id="subCategoryPages[2]">
+            <GuiElement profile="ads_menuTableContainer">
+                <GuiElement profile="fs25_statisticsHeaderBox" id="serviceTableHeader">
+                    <Button profile="ads_menuHeaderButtonFirst" position="22px 0px" size="280px 40px" text="$l10n_ads_ingame_menu_header_vehicle">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="308px 0px" size="180px 40px" text="$l10n_ads_ingame_menu_header_type">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="494px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_age">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="581px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_working_hours">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="668px 0px" size="260px 40px" text="$l10n_ads_ingame_menu_header_procedure">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="934px 0px" size="172px 40px" text="$l10n_ads_ingame_menu_header_time_left">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1112px 0px" size="172px 40px" text="$l10n_ads_ingame_menu_header_finish_time">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1290px 0px" size="228px 40px" text="$l10n_ads_ingame_menu_header_service_cost">
+                    </Button>
+                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -2dp"/>
+                </GuiElement>
 
-            <ThreePartBitmap profile="ads_menuListSliderBox">
-                <Slider profile="fs25_listSlider" dataElementId="vehicleList"/>
-            </ThreePartBitmap>
+                <SmoothList profile="ads_menuVehicleList" id="serviceVehicleList">
+                    <ListItem profile="ads_menuTableListItemAlt" id="serviceVehicleTemplate" size="1550px 40.77px">
+                        <ThreePartBitmap profile="ads_menuTableListItemGradient" name="alternating"/>
+                        <Text profile="ads_menuTableRowCellFirstAlt" position="22px 0px" size="280px 40.77px" name="vehicleNameText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="308px 0px" size="180px 40.77px" name="vehicleTypeText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="494px 0px" size="81px 40.77px" name="ageText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="581px 0px" size="81px 40.77px" name="workingHoursText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="668px 0px" size="260px 40.77px" name="procedureText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="934px 0px" size="172px 40.77px" name="remainingTimeText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1112px 0px" size="172px 40.77px" name="finishTimeText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1290px 0px" size="228px 40.77px" name="serviceCostText"/>
+                    </ListItem>
+                </SmoothList>
 
-            <GuiElement profile="ads_menuFooterBox">
-                <ThreePartBitmap profile="fs25_lineSeparatorTop" position="0px -15dp"/>
-                <Text profile="ads_menuHeaderBright" position="22px 0px" size="280px 40.77px" id="totalLabel"/>
-                <Text profile="ads_menuHeaderRightBright" position="1084px 0px" size="110px 40.77px" id="totalCost"/>
-                <Text profile="ads_menuHeaderRightBright" position="1200px 0px" size="110px 40.77px" id="totalLeasingPrice"/>
-                <Text profile="ads_menuHeaderRightBright" position="1316px 0px" size="100px 40.77px" id="totalPrice"/>
+                <ThreePartBitmap profile="ads_menuListSliderBox" id="serviceTableSliderBox">
+                    <Slider profile="fs25_listSlider" dataElementId="serviceVehicleList"/>
+                </ThreePartBitmap>
+                <GuiElement profile="ads_menuFooterBox" id="serviceTableFooter">
+                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -18px"/>
+                </GuiElement>
+                <Text profile="ads_textHeaderGrey" id="serviceEmptyTableText" text="$l10n_ads_ingame_menu_empty_service" position="0px 180px" size="100% 50px" visible="false" with="anchorMiddleCenter"/>
+            </GuiElement>
+        </GuiElement>
+
+        <GuiElement profile="fs25_subCategorySelectorTabbedContainer" id="subCategoryPages[3]">
+            <GuiElement profile="ads_menuTableContainer">
+                <GuiElement profile="fs25_statisticsHeaderBox" id="otherTableHeader">
+                    <Button profile="ads_menuHeaderButtonFirst" position="22px 0px" size="280px 40px" text="$l10n_ads_ingame_menu_header_vehicle" onClick="onClickVehicleHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="308px 0px" size="180px 40px" text="$l10n_ads_ingame_menu_header_type" onClick="onClickTypeHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="494px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_age" onClick="onClickAgeHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="581px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_working_hours" onClick="onClickWorkingHoursHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="668px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_condition" onClick="onClickConditionHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="804px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_interval" onClick="onClickIntervalHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="940px 0px" size="127px 40px" text="$l10n_ads_ingame_menu_header_last_inspection" onClick="onClickLastInspectionHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1073px 0px" size="127px 40px" text="$l10n_ads_ingame_menu_header_last_maintenance" onClick="onClickLastMaintenanceHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1206px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_cost" onClick="onClickCostHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1312px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_leasing_price" onClick="onClickLeasingPriceHeader">
+                    </Button>
+                    <Button profile="ads_menuHeaderButtonCenter" position="1418px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_price" onClick="onClickPriceHeader">
+                    </Button>
+                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -2dp"/>
+                </GuiElement>
+
+                <SmoothList profile="ads_menuVehicleList" id="otherVehicleList">
+                    <ListItem profile="ads_menuTableListItemAlt" id="otherVehicleTemplate" size="1550px 40.77px">
+                        <ThreePartBitmap profile="ads_menuTableListItemGradient" name="alternating"/>
+                        <Text profile="ads_menuTableRowCellFirstAlt" position="22px 0px" size="280px 40.77px" name="vehicleNameText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="308px 0px" size="180px 40.77px" name="vehicleTypeText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="494px 0px" size="81px 40.77px" name="ageText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="581px 0px" size="81px 40.77px" name="workingHoursText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="668px 0px" size="130px 40.77px" name="conditionText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="804px 0px" size="130px 40.77px" name="intervalText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="940px 0px" size="127px 40.77px" name="lastInspectionText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1073px 0px" size="127px 40.77px" name="lastMaintenanceText" textLayoutMode="scrolling"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1206px 0px" size="100px 40.77px" name="costText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1312px 0px" size="100px 40.77px" name="leasingPriceText"/>
+                        <Text profile="ads_menuTableRowCellCenterAlt" position="1418px 0px" size="100px 40.77px" name="priceText"/>
+                    </ListItem>
+                </SmoothList>
+
+                <ThreePartBitmap profile="ads_menuListSliderBox" id="otherTableSliderBox">
+                    <Slider profile="fs25_listSlider" dataElementId="otherVehicleList"/>
+                </ThreePartBitmap>
+                <GuiElement profile="ads_menuFooterBox" id="otherTableFooter">
+                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -18px"/>
+                </GuiElement>
+                <Text profile="ads_textHeaderGrey" id="otherEmptyTableText" text="$l10n_ads_ingame_menu_empty_other" position="0px 180px" size="100% 50px" visible="false" with="anchorMiddleCenter"/>
             </GuiElement>
         </GuiElement>
 

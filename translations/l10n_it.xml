@@ -618,16 +618,28 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Il cingolo appare allentato, con una tensione visibilmente irregolare."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Il cingolo presenta un evidente cedimento, e la tensione appare gravemente compromessa."/>
         <text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_section_active" text="Veicoli ADS"/>
+        <text name="ads_ingame_menu_section_service" text="In manutenzione"/>
         <text name="ads_ingame_menu_header_vehicle" text="Veicolo"/>
+        <text name="ads_ingame_menu_header_type" text="Tipo"/>
         <text name="ads_ingame_menu_header_age" text="Età"/>
         <text name="ads_ingame_menu_header_working_hours" text="Ore"/>
         <text name="ads_ingame_menu_header_condition" text="Condizione"/>
-        <text name="ads_ingame_menu_header_interval" text="Intervallo"/>
+        <text name="ads_ingame_menu_header_interval" text="Interv."/>
+        <text name="ads_ingame_menu_header_service_status" text="Ispez./Manut."/>
         <text name="ads_ingame_menu_header_last_inspection" text="Ispez."/>
         <text name="ads_ingame_menu_header_last_maintenance" text="Manut."/>
         <text name="ads_ingame_menu_header_cost" text="Gestione"/>
         <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
         <text name="ads_ingame_menu_header_price" text="Valore"/>
+        <text name="ads_ingame_menu_header_procedure" text="Proced."/>
+        <text name="ads_ingame_menu_header_time_left" text="Rimasto"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Fine"/>
+        <text name="ads_ingame_menu_header_service_cost" text="Costo"/>
+        <text name="ads_ingame_menu_section_other" text="Altri veicoli"/>
+        <text name="ads_ingame_menu_empty_other" text="Nessun veicolo senza ADS"/>
+        <text name="ads_ingame_menu_empty_active" text="Nessun veicolo ADS"/>
+        <text name="ads_ingame_menu_empty_service" text="Nessun veicolo in manutenzione"/>
         <text name="ads_sell_dialog_costs_title" text="Costi aggiuntivi"/>
         <text name="ads_sell_dialog_deposit_return" text="Restituzione del deposito"/>
         <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Manutenzione scaduta"/>
