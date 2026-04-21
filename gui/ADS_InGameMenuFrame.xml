@@ -31,48 +31,26 @@
             <GuiElement profile="ads_menuTableContainer">
                 <GuiElement profile="fs25_statisticsHeaderBox" id="activeTableHeader">
                     <Button profile="ads_menuHeaderButtonFirst" position="22px 0px" size="280px 40px" text="$l10n_ads_ingame_menu_header_vehicle" onClick="onClickVehicleHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="-10px 0px" id="iconVehicleAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="-10px 0px" id="iconVehicleDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="308px 0px" size="180px 40px" text="$l10n_ads_ingame_menu_header_type" onClick="onClickTypeHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconTypeAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconTypeDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="494px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_age" onClick="onClickAgeHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconAgeAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconAgeDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="581px 0px" size="81px 40px" text="$l10n_ads_ingame_menu_header_working_hours" onClick="onClickWorkingHoursHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconHoursAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconHoursDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="668px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_condition" onClick="onClickConditionHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconConditionAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconConditionDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="804px 0px" size="130px 40px" text="$l10n_ads_ingame_menu_header_interval" onClick="onClickIntervalHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconIntervalAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconIntervalDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="940px 0px" size="127px 40px" text="$l10n_ads_ingame_menu_header_last_inspection" onClick="onClickLastInspectionHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconInspectionAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconInspectionDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="1073px 0px" size="127px 40px" text="$l10n_ads_ingame_menu_header_last_maintenance" onClick="onClickLastMaintenanceHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconMaintenanceAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconMaintenanceDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="1206px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_cost" onClick="onClickCostHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconCostAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconCostDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="1312px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_leasing_price" onClick="onClickLeasingPriceHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconLeasingAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconLeasingDescending"/>
                     </Button>
                     <Button profile="ads_menuHeaderButtonCenter" position="1418px 0px" size="100px 40px" text="$l10n_ads_ingame_menu_header_price" onClick="onClickPriceHeader">
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortAscending" position="10px 0px" id="iconPriceAscending"/>
-                        <Bitmap profile="fs25_vehiclesHeaderIconSortDescending" position="10px 0px" id="iconPriceDescending"/>
                     </Button>
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -2dp"/>
                 </GuiElement>
