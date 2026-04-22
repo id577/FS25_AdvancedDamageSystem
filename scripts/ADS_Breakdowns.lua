@@ -2810,9 +2810,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         end,
         isCanProgress = function(vehicle)
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
-                if vehicle.spec_dischargeable.currentDischargeState ~= Dischargeable.DISCHARGE_STATE_OFF then
-                    return true
-                end
+                return true
+            else
+                return false
             end
         end,
         stages = {

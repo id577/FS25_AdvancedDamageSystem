@@ -683,6 +683,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#state", "Current State")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#plannedState", "Planned State")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#maintenanceTimer", "Maintenance Timer")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#realOperatingTime", "Real Operating Time")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#engineTemperature", "Engine Temperature")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionTemperature", "Transmission Temperature")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#batterySoc", "Battery State Of Charge")
@@ -4240,7 +4241,7 @@ function AdvancedDamageSystem:updateAiWorkerCruiseControl(dt)
         return math.clamp((value - startValue) / denominator, 0.0, 1.0)
     end
 
-    local motorLoad = math.max(self:getMotorLoadPercentage() or 0, 0)
+    local motorLoad = math.max(spec.dynamicMotorLoad or self:getMotorLoadPercentage() or 0, 0)
     local rawEngineTemperature = spec.rawEngineTemperature or spec.engineTemperature or 0
     local rawTransmissionTemperature = spec.rawTransmissionTemperature or spec.transmissionTemperature or -99
     if rawTransmissionTemperature < 0 then
