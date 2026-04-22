@@ -177,6 +177,19 @@ local function log_dbg(...)
     end
 end
 
+local PTO_SHARP_ANGLE_EXCLUDED_TYPES = {
+    combineDrivable = true,
+    combineCutter = true,
+    combineCutterFruitPreparer = true,
+    cottonHarvester = true,
+    riceHarvester = true,
+    vineHarvester = true,
+    balerDrivable = true,
+    selfPropelledMower = true,
+    woodHarvester = true,
+    ricePlanter = true
+}
+
 local function createEmptyFactorStats(systems)
     local result = {}
     if type(systems) ~= "table" then
@@ -1695,6 +1708,7 @@ function AdvancedDamageSystem:onLoad(savegame)
         }
     }
 
+    self.spec_AdvancedDamageSystem.isExcludedFromPTOSharpAngleFactor = false
     self.spec_AdvancedDamageSystem.isUnderRoof = true
     self.spec_AdvancedDamageSystem.dynamicMotorLoad = 0
     self.spec_AdvancedDamageSystem.avgDynamicMotorLoad = 0
@@ -2225,6 +2239,8 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         end
     end
 
+    local vtype = self.type.name
+    spec.isExcludedFromPTOSharpAngleFactor = PTO_SHARP_ANGLE_EXCLUDED_TYPES[vtype] == true
     enableOrDisableSystems(self)
     spec.isVehicleNeedLubricate = getIsVehicleNeedLubticate(self)
     spec.isVehicleNeedBlowOut = getIsVehicleNeedBlowOut(self)
@@ -4931,7 +4947,7 @@ function AdvancedDamageSystem:updateHydraulicsSystem(dt)
                     sharpAngleThreshold = math.deg(sharpAngleThreshold)
                 end
 
-                if hasConnectedPto and ptoAngleDeg > sharpAngleThreshold then
+                if hasConnectedPto and ptoAngleDeg > sharpAngleThreshold and not spec.isExcludedFromPTOSharpAngleFactor then
                     sharpAngleFactor = ADS_Utils.calculateQuadraticMultiplier(ptoAngleDeg, sharpAngleThreshold, false, 50)
                     sharpAngleFactor = sharpAngleFactor * (C.PTO_SHARP_ANGLE_FACTOR_MULTIPLIER or 0)
                     sharpAngleFactor = math.min(sharpAngleFactor, C.PTO_SHARP_ANGLE_FACTOR_MULTIPLIER or sharpAngleFactor)
