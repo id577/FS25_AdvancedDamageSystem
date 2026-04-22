@@ -822,7 +822,7 @@ function ADS_InGameMenuFrame:reloadRows()
     if mission ~= nil and mission.vehicleSystem ~= nil and mission.vehicleSystem.vehicles ~= nil then
         for _, vehicle in pairs(mission.vehicleSystem.vehicles) do
             if canDisplayOwnedVehicle(mission, vehicle, currentFarmId)
-                and vehicle.spec_AdvancedDamageSystem == nil then
+                and (vehicle.spec_AdvancedDamageSystem == nil or (vehicle.spec_AdvancedDamageSystem ~= nil and vehicle.spec_AdvancedDamageSystem.isExcludedVehicle == true)) then
                 table.insert(self.otherRows, buildOtherVehicleRow(vehicle))
             end
         end

@@ -719,7 +719,6 @@ function ADS_Config.saveToXMLFile()
 
     saveXMLFile(xmlFile)
     delete(xmlFile)
-    log_dbg("SAVE OK - BASE_SERVICE_WEAR=", tostring(ADS_Config.CORE.BASE_SERVICE_WEAR))
     return true
 end
 

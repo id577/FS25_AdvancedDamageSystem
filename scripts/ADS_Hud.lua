@@ -500,7 +500,7 @@ function ADS_Hud:storeScaledValues()
     local coolantWidth, coolantHeight = self:scalePixelValuesToScreenVector(19, 19)
     self.indicators.coolant.icon:setDimension(coolantWidth, coolantHeight)
 
-    self.indicators.service.offsetX, self.indicators.service.offsetY = self:scalePixelValuesToScreenVector(-13, -38)
+    self.indicators.service.offsetX, self.indicators.service.offsetY = self:scalePixelValuesToScreenVector(-13, 39)
     local serviceWidth, serviceHeight = self:scalePixelValuesToScreenVector(27, 9)
     self.indicators.service.icon:setDimension(serviceWidth, serviceHeight)
 
@@ -529,17 +529,12 @@ function ADS_Hud:drawDashboard()
     local spec = vehicle.spec_AdvancedDamageSystem
     local colors = ADS_Breakdowns.COLORS
     local activeIndicators = spec.activeIndicators
+    local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 0) / (self.vehicle:getMaintenanceInterval() or 5)
+    local isServiceOverdue = serviceInterval > 1.0
 
-    g_currentMission.hud.speedMeter.speedTextSize = self:scalePixelToScreenHeight(43)
-    local speedBgX, speedBgY = g_currentMission.hud.speedMeter.speedBg:getPosition()
-    local posX = speedBgX + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetX
-    local posY = speedBgY + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetY
+    local function calculateIndicatorTargetColor(hudIndicatorId, mutateActiveState)
+        local targetColor = colors.DEFAULT
 
-    for hudIndicatorId, hudIndicatorData in pairs(self.indicators) do
-        local icon = hudIndicatorData.icon
-        local targetColor = colors.DEFAULT 
-        local isIndicatorVisible = true
-        
         if vehicle:getMotorState() ~= 1 then
             local activeData = activeIndicators[hudIndicatorId]
             if activeData then
@@ -549,15 +544,16 @@ function ADS_Hud:drawDashboard()
 
                 if isActive and not shouldBeOff then
                     targetColor = activeData.color
-                elseif shouldBeOn and not shouldBeOff then 
-                    activeData.isActive = true
+                elseif shouldBeOn and not shouldBeOff then
+                    if mutateActiveState then
+                        activeData.isActive = true
+                    end
                     targetColor = activeData.color
-                elseif shouldBeOff then
+                elseif shouldBeOff and mutateActiveState then
                     activeData.isActive = false
                 end
             end
 
-            -- CVT Addon
             if hasCVTAddon(vehicle) then
                 local spec_CVTaddon = vehicle.spec_CVTaddon
 
@@ -569,8 +565,8 @@ function ADS_Hud:drawDashboard()
                 end
             end
 
-            local isNotHeated = 
-            (spec.engineTemperature < ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD) or 
+            local isNotHeated =
+            (spec.engineTemperature < ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD) or
             (hasCVTTransmission(vehicle) and not hasCVTAddon(vehicle) and spec.transmissionTemperature < ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.COLD_TRANSMISSION_THRESHOLD) or
             (hasCVTAddon(vehicle) and spec.transmissionTemperature < 55)
 
@@ -580,8 +576,7 @@ function ADS_Hud:drawDashboard()
             if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
             elseif hudIndicatorId == self.indicators.coolant.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
 
-            local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 0) / (self.vehicle:getMaintenanceInterval() or 5)
-            if hudIndicatorId == self.indicators.service.name and serviceInterval > 1.0 then targetColor = colors.WARNING end
+            if hudIndicatorId == self.indicators.service.name and isServiceOverdue then targetColor = colors.WARNING end
             if hudIndicatorId == self.indicators.oil.name and spec.serviceLevel < 0.2 then targetColor = colors.WARNING end
 
             if vehicle:getMotorState() == 2 or vehicle:getMotorState() == 3 then
@@ -589,10 +584,32 @@ function ADS_Hud:drawDashboard()
             end
         else
             local activeData = activeIndicators[hudIndicatorId]
-            if activeData then
+            if activeData and mutateActiveState then
                 activeData.isActive = false
             end
         end
+
+        return targetColor
+    end
+
+    local coolantTargetColor = calculateIndicatorTargetColor(self.indicators.coolant.name, false)
+    local coolantSlotVisible = not spec.isElectricVehicle and self.indicators.coolant.year < spec.year
+    local serviceVisible = vehicle:getMotorState() ~= 1
+        and isServiceOverdue
+        and self.indicators.service.year < spec.year
+        and coolantSlotVisible
+        and coolantTargetColor == colors.DEFAULT
+
+    g_currentMission.hud.speedMeter.speedTextSize = self:scalePixelToScreenHeight(43)
+    local speedBgX, speedBgY = g_currentMission.hud.speedMeter.speedBg:getPosition()
+    local posX = speedBgX + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetX
+    local posY = speedBgY + g_currentMission.hud.speedMeter.speedGaugeCenterOffsetY
+
+    for hudIndicatorId, hudIndicatorData in pairs(self.indicators) do
+        local icon = hudIndicatorData.icon
+        local targetColor = calculateIndicatorTargetColor(hudIndicatorId, true)
+        local isIndicatorVisible = true
+
         icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
         if (hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle)
             or hudIndicatorId == self.indicators.oil.name
@@ -611,6 +628,12 @@ function ADS_Hud:drawDashboard()
             else
                 isIndicatorVisible = hudIndicatorData.year < spec.year
             end
+        end
+
+        if hudIndicatorId == self.indicators.coolant.name and serviceVisible then
+            isIndicatorVisible = false
+        elseif hudIndicatorId == self.indicators.service.name then
+            isIndicatorVisible = serviceVisible
         end
 
         icon:setVisible(isIndicatorVisible)
@@ -1090,8 +1113,9 @@ function ADS_Hud:drawActiveVehicleHUD()
         end
     end
     addLine(overviewLines, string.format(
-        "op.sec: %ds | start.op.h: %.1fh | condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
+        "op.sec: %ds (real: %ds) | start.op.h: %.1fh | condition: %.2f%% | service: %.2f%% | service_wear: %.2f%% | rel: %.2f%% | mnt: %.2f%% | wf: %.3f | roof: %s | lube: %.2f%% | paint: %.2f%%",
         currentOperatingSeconds,
+        math.floor((tonumber(spec.realOperatingTime) or 0) / 1000),
         factorStatsOperatingHours,
         asPercent(spec.conditionLevel or 0),
         asPercent(spec.serviceLevel or 0),

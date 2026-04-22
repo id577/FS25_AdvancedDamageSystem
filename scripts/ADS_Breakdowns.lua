@@ -3512,9 +3512,6 @@ ADS_Breakdowns.EffectApplicators.PTO_TORQUE_TRANSFER_MODIFIER = {
 
     remove = function(vehicle, handler)
         log_dbg("Removing PTO_TORQUE_TRANSFER_MODIFIER effect.")
-        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
-            vehicle.spec_AdvancedDamageSystem._adsPtoTorqueDbgNextLogAt = nil
-        end
     end
 }
 
@@ -3543,23 +3540,6 @@ if PowerConsumer ~= nil and PowerConsumer.getTotalConsumedPtoTorque ~= nil then
                 local effectValue = tonumber(effect.value) or 0
                 local transferScale = math.max(0, 1 + effectValue)
                 local modifiedTorque = torque * transferScale
-
-                if spec ~= nil and ADS_Config ~= nil and ADS_Config.DEBUG and modifiedTorque > 0 then
-                    local now = g_currentMission ~= nil and g_currentMission.time or 0
-                    local nextLogAt = tonumber(spec._adsPtoTorqueDbgNextLogAt) or 0
-                    if now >= nextLogAt then
-                        local vehicleName = (rootVehicle ~= nil and rootVehicle.getName ~= nil) and rootVehicle:getName() or "unknown"
-                        log_dbg(string.format("[ADS][PTO_TQ] veh='%s' eff=%.3f scale=%.3f baseT=%.3f modT=%.3f exp=%s igPeak=%s",
-                            tostring(vehicleName),
-                            effectValue,
-                            transferScale,
-                            tonumber(torque) or 0,
-                            tonumber(modifiedTorque) or 0,
-                            tostring(expected),
-                            tostring(ignoreTurnOnPeak)))
-                        spec._adsPtoTorqueDbgNextLogAt = now + 500
-                    end
-                end
 
                 torque = modifiedTorque
             end

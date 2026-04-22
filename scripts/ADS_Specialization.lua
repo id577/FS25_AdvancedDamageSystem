@@ -374,6 +374,15 @@ local function computeSystemSyncHash(vehicle)
     return systemHash
 end
 
+local function getSafeMissionTimeScale()
+    local missionInfo = g_currentMission ~= nil and g_currentMission.missionInfo or nil
+    local timeScale = (missionInfo and missionInfo.timeScale) or 1
+    if timeScale <= 0 then
+        timeScale = 1
+    end
+    return timeScale
+end
+
 -- ==========================================================
 --                         DIRTY FLAGS HELPERS
 -- ==========================================================
@@ -450,15 +459,18 @@ local function markTelemetryDirty(vehicle, spec)
     end
 
     local operatingTime = getSyncOperatingTime(vehicle)
+    local realOperatingTime = spec.realOperatingTime or 0
     local motorLoad = getSyncMotorLoad(vehicle)
     local dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or 0
 
     if syncFloatChanged(spec._lastSyncTelemetry_operatingTime, operatingTime, 1.0) or
+       syncFloatChanged(spec._lastSyncTelemetry_realOperatingTime, realOperatingTime, 1.0) or
        syncFloatChanged(spec._lastSyncTelemetry_fuelUsageRaw, spec._fuelUsageRaw, 0.3) or
        syncFloatChanged(spec._lastSyncTelemetry_motorLoad, motorLoad, 0.01) or
        syncFloatChanged(spec._lastSyncTelemetry_dynamicMotorLoad, dynamicMotorLoad, 0.01) then
             vehicle:raiseDirtyFlags(spec.adsDirtyFlag_telemetry)
             spec._lastSyncTelemetry_operatingTime = operatingTime
+            spec._lastSyncTelemetry_realOperatingTime = realOperatingTime
             spec._lastSyncTelemetry_fuelUsageRaw = spec._fuelUsageRaw
             spec._lastSyncTelemetry_motorLoad = motorLoad
             spec._lastSyncTelemetry_dynamicMotorLoad = dynamicMotorLoad
@@ -885,6 +897,8 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
 
     -- [Group 3] Telemetry
     streamWriteFloat32(streamId, getSyncOperatingTime(self))
+    streamWriteFloat32(streamId, spec.realOperatingTime or getSyncOperatingTime(self))
+    streamWriteFloat32(streamId, spec.rawEngineTemperature or 0)
     streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
     streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
     streamWriteFloat32(streamId, spec.dynamicMotorLoad or 0)
@@ -931,6 +945,7 @@ end
 function AdvancedDamageSystem:onReadStream(streamId, connection)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil or spec.isExcludedVehicle then return end
+    local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
 
     -- [Group 1] State
     spec.currentState = streamReadString(streamId)
@@ -948,6 +963,10 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
 
     -- [Group 3] Telemetry
     self:setOperatingTime(streamReadFloat32(streamId), true)
+    spec.realOperatingTime = streamReadFloat32(streamId)
+    if (spec.realOperatingTime == nil or spec.realOperatingTime <= 0) and currentOperatingTime > 0 then
+        spec.realOperatingTime = currentOperatingTime
+    end
     local syncFuelRaw = streamReadFloat32(streamId)
     spec._fuelUsageRaw = syncFuelRaw
     spec.fuelUsage = syncFuelRaw
@@ -1046,6 +1065,7 @@ function AdvancedDamageSystem:onWriteUpdateStream(streamId, connection, dirtyMas
         -- [3] Telemetry
         if streamWriteBool(streamId, bitAND(dirtyMask, spec.adsDirtyFlag_telemetry) ~= 0) then
             streamWriteFloat32(streamId, getSyncOperatingTime(self))
+            streamWriteFloat32(streamId, spec.realOperatingTime or 0)
             streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
             streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
             streamWriteFloat32(streamId, spec.dynamicMotorLoad or 0)
@@ -1098,6 +1118,7 @@ end
 function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil or spec.isExcludedVehicle then return end
+    local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
 
     if connection:getIsServer() then
         -- [1] State
@@ -1121,6 +1142,10 @@ function AdvancedDamageSystem:onReadUpdateStream(streamId, timestamp, connection
         -- [3] Telemetry
         if streamReadBool(streamId) then
             self:setOperatingTime(streamReadFloat32(streamId), true)
+            spec.realOperatingTime = streamReadFloat32(streamId)
+            if (spec.realOperatingTime == nil or spec.realOperatingTime <= 0) and currentOperatingTime > 0 then
+                spec.realOperatingTime = currentOperatingTime
+            end
             spec._fuelUsageRaw = streamReadFloat32(streamId)
             spec._netMotorLoad = streamReadFloat32(streamId)
             spec._netDynamicMotorLoad = streamReadFloat32(streamId)
@@ -1199,9 +1224,18 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
     log_dbg("saveToXMLFile called for vehicle:", self:getFullName(), "with key:", key)
     local spec = self.spec_AdvancedDamageSystem
     if spec ~= nil and not spec.isExcludedVehicle then
+        local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
+        local realOperatingTime = spec.realOperatingTime
+        if (realOperatingTime == nil or realOperatingTime <= 0) and currentOperatingTime > 0 then
+            realOperatingTime = currentOperatingTime
+            spec.realOperatingTime = realOperatingTime
+        end
         xmlFile:setValue(key .. "#service", spec.serviceLevel or 1.0)
         xmlFile:setValue(key .. "#condition", spec.conditionLevel or 1.0)
-        
+        xmlFile:setValue(key .. "#realOperatingTime", realOperatingTime or currentOperatingTime)
+        if xmlFile.handle ~= nil then
+            setXMLFloat(xmlFile.handle, key .. "#realOperatingTime", tonumber(realOperatingTime or currentOperatingTime) or 0)
+        end
         local breakdownString = ADS_Utils.serializeBreakdowns(spec.activeBreakdowns)
         xmlFile:setValue(key .. "#breakdowns", breakdownString)
         xmlFile:setValue(key .. "#state", spec.currentState or AdvancedDamageSystem.STATUS.READY)
@@ -1304,6 +1338,7 @@ end
 
 function AdvancedDamageSystem:onLoad(savegame)
     log_dbg("onLoad called for vehicle:", self:getFullName())
+    
     self.spec_AdvancedDamageSystem.isExcludedVehicle = false
     self.spec_AdvancedDamageSystem.isElectricVehicle = false
     self.spec_AdvancedDamageSystem.isVehicleNeedLubricate = false
@@ -1313,6 +1348,10 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.baseConditionLevel = 1.0
     self.spec_AdvancedDamageSystem.serviceLevel = self.spec_AdvancedDamageSystem.baseServiceLevel
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
+
+    local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
+    local existingRealOperatingTime = tonumber(self.spec_AdvancedDamageSystem.realOperatingTime) or 0
+    self.spec_AdvancedDamageSystem.realOperatingTime = math.max(existingRealOperatingTime, currentOperatingTime)
     self.spec_AdvancedDamageSystem._prevConditionLevel = 0
     self.spec_AdvancedDamageSystem._allowAdsOperatingTimeWrite = false
 
@@ -1754,6 +1793,7 @@ end
 function AdvancedDamageSystem:onPostLoad(savegame)
     log_dbg("onPostLoad called for vehicle:", self:getFullName())
     local spec = self.spec_AdvancedDamageSystem
+    local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
 
     spec.isExcludedVehicle = getIsExcludedFromADS(self)
     if spec.isExcludedVehicle then return end
@@ -1767,7 +1807,20 @@ function AdvancedDamageSystem:onPostLoad(savegame)
         spec.conditionLevel = savegame.xmlFile:getValue(key .. "#condition", spec.conditionLevel)
         spec.currentState = savegame.xmlFile:getValue(key .. "#state", spec.currentState)
         spec.plannedState = savegame.xmlFile:getValue(key .. "#plannedState", spec.plannedState)
-        spec.maintenanceTimer = savegame.xmlFile:getValue(key .. "#maintenanceTimer", spec.maintenanceTimer) 
+        spec.maintenanceTimer = savegame.xmlFile:getValue(key .. "#maintenanceTimer", spec.maintenanceTimer)
+        
+        local loadedRealOperatingTime = nil
+        if savegame.xmlFile:hasProperty(key .. "#realOperatingTime") then
+            loadedRealOperatingTime = savegame.xmlFile:getValue(key .. "#realOperatingTime")
+        end
+        if loadedRealOperatingTime == nil and savegame.xmlFile.handle ~= nil then
+            loadedRealOperatingTime = getXMLFloat(savegame.xmlFile.handle, key .. "#realOperatingTime")
+        end
+        if loadedRealOperatingTime ~= nil then
+            spec.realOperatingTime = loadedRealOperatingTime
+        else
+            spec.realOperatingTime = currentOperatingTime
+        end
 
         -- Load Breakdowns
         local breakdownString = savegame.xmlFile:getValue(key .. "#breakdowns", "")
@@ -2027,6 +2080,12 @@ function AdvancedDamageSystem:onPostLoad(savegame)
             }
         end
         self:updateConditionLevel()
+    else
+        spec.realOperatingTime = currentOperatingTime
+    end
+
+    if (spec.realOperatingTime == nil or spec.realOperatingTime <= 0) and currentOperatingTime > 0 then
+        spec.realOperatingTime = currentOperatingTime
     end
 
     spec.isUnderRoof = self:isUnderRoof()
@@ -2185,6 +2244,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec._lastSyncServiceContext_workshopType = spec.workshopType
     --- [3] telemetry
     spec._lastSyncTelemetry_operatingTime = getSyncOperatingTime(self)
+    spec._lastSyncTelemetry_realOperatingTime = spec.realOperatingTime
     spec._lastSyncTelemetry_fuelUsageRaw = spec._fuelUsageRaw
     spec._lastSyncTelemetry_motorLoad  = getSyncMotorLoad(self)
     spec._lastSyncTelemetry_dynamicMotorLoad = tonumber(spec.dynamicMotorLoad) or 0
@@ -3008,16 +3068,20 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
 
     -- OP Time update for ADS vehicles
     local motorState = self.getMotorState ~= nil and self:getMotorState() or nil
-    if motorState == MotorState.ON then
-        local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
+    local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
 
+    if (spec.realOperatingTime == nil or spec.realOperatingTime <= 0) and currentOperatingTime > 0 then
+        spec.realOperatingTime = currentOperatingTime
+    end
+
+    if motorState == MotorState.ON then
         local operatingDt = dt or 0
         if g_modIsLoaded ~= nil and g_modIsLoaded["FS25_ingameTimeOperatingHours"] then
-            local missionInfo = g_currentMission ~= nil and g_currentMission.missionInfo or nil
-            local timeScale = (missionInfo and missionInfo.timeScale) or 1
+            local timeScale = getSafeMissionTimeScale()
             operatingDt = dt * timeScale
         end
 
+        spec.realOperatingTime = (spec.realOperatingTime or 0) + dt
         spec._allowAdsOperatingTimeWrite = true
         self:setOperatingTime(currentOperatingTime + operatingDt, false)
         spec._allowAdsOperatingTimeWrite = false
@@ -5623,6 +5687,10 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
                 local random = math.random()
                 if random < failureChancePerFrame or systemStress >= effectiveCondition then
                     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, systemData.name)
+                    if systemKey == nil or systemKey == "" then
+                        systemKey = string.lower(tostring(systemData.name or ""))
+                    end
+
                     local breakdownId = self:getRandomBreakdownBySystem(systemKey)
                     if breakdownId ~= nil then
                         local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
@@ -5639,18 +5707,59 @@ function AdvancedDamageSystem:tryTriggerBreakdown(dt)
                                 end
                                 self:addBreakdown(breakdownId, stage)
                             end
+                        end
+                    else
+                        local activeBreakdowns = self:getActiveBreakdowns()
+                        local lowestStage = math.huge
+                        local lowerStageBreakdownId = nil
+                        local targetStage = nil
 
-                            systemData.stress = systemStress * ADS_Config.CORE.STRESS_COOLDOWN
-                            systemStress = math.max(systemData.stress or 0.0, 0.0)
+                        for activeBreakdownId, breakdownData in pairs(activeBreakdowns) do
+                            if type(breakdownData) == "table" and breakdownData.isActive ~= false then
+                                local registryEntry = getBreakdownDefinition(self, activeBreakdownId)
+                                if registryEntry ~= nil and registryEntry.stages ~= nil and #registryEntry.stages > 0 then
+                                    local breakdownSystem = registryEntry.system
+                                    if type(breakdownSystem) == "string" and AdvancedDamageSystem.SYSTEMS[breakdownSystem] ~= nil then
+                                        breakdownSystem = AdvancedDamageSystem.SYSTEMS[breakdownSystem]
+                                    end
 
-                            local cooledStressRatio = math.max(systemStress / effectiveCondition, 0.0)
-                            if cooledStressRatio >= stressThreshold then
-                                local cooledFailureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(cooledStressRatio, probabilityData, dt)
-                                hourlyProb = 1 - (1 - cooledFailureChancePerFrame) ^ (3600000 / dt)
-                            else
-                                hourlyProb = 0.0
+                                    local breakdownSystemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, breakdownSystem)
+                                    if breakdownSystemKey == nil or breakdownSystemKey == "" then
+                                        breakdownSystemKey = string.lower(tostring(breakdownSystem or ""))
+                                    end
+
+                                    local currentStage = math.max(math.floor(tonumber(breakdownData.stage) or 1), 1)
+                                    local maxStage = #registryEntry.stages
+
+                                    if breakdownSystemKey == systemKey and currentStage < maxStage and currentStage < lowestStage then
+                                        lowestStage = currentStage
+                                        lowerStageBreakdownId = activeBreakdownId
+                                        targetStage = currentStage + 1
+                                    end
+                                end
                             end
                         end
+
+                        if lowerStageBreakdownId ~= nil and targetStage ~= nil then
+                            self:changeBreakdownStage(lowerStageBreakdownId, targetStage)
+                            log_dbg(string.format(
+                                "Increased stage of existing breakdown [%s] to stage %d for system=%s",
+                                tostring(lowerStageBreakdownId),
+                                tonumber(targetStage) or 0,
+                                tostring(systemKey)
+                            ))
+                        end
+                    end
+
+                    systemData.stress = systemStress * ADS_Config.CORE.STRESS_COOLDOWN
+                    systemStress = math.max(systemData.stress or 0.0, 0.0)
+
+                    local cooledStressRatio = math.max(systemStress / effectiveCondition, 0.0)
+                    if cooledStressRatio >= stressThreshold then
+                        local cooledFailureChancePerFrame = AdvancedDamageSystem.calculateBreakdownProbability(cooledStressRatio, probabilityData, dt)
+                        hourlyProb = 1 - (1 - cooledFailureChancePerFrame) ^ (3600000 / dt)
+                    else
+                        hourlyProb = 0.0
                     end
                 end
             end
@@ -6748,7 +6857,7 @@ function AdvancedDamageSystem:processService(dt)
     end
 
     -- timer progress
-    local timeScale = g_currentMission.missionInfo.timeScale
+    local timeScale = getSafeMissionTimeScale()
     local prevTimer = spec.maintenanceTimer or 0
     spec.maintenanceTimer = (spec.maintenanceTimer or 0) - dt * timeScale
     local progressed = math.max(prevTimer - math.max(spec.maintenanceTimer, 0), 0)
@@ -7221,6 +7330,10 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
     local env = g_currentMission.environment
     local selectedBreakdowns = ADS_Utils.shallowCopy(spec.pendingSelectedBreakdowns or {})
     local systemsSnapshot = ADS_Utils.createSystemsSnapshot(spec.systems)
+    local realHours = ((spec.realOperatingTime or 0) / (60 * 60 * 1000))
+    if realHours <= 0 then
+        realHours = self:getFormattedOperatingTime() or 0
+    end
 
     local entry = {
         id = entryId,                     
@@ -7242,8 +7355,7 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
 
         conditionData = {
             year = spec.year,
-            operatingHours = self:getFormattedOperatingTime(), 
-            age = self.age,
+            operatingHours = realHours,
             condition = self:getConditionLevel(),
             service = self:getServiceLevel(),
             systems = systemsSnapshot,
@@ -8549,7 +8661,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
     if isMotorStarted then
         local engineMaxHeat = C.ENGINE_MAX_HEAT + spec.extraEngineHeat
         local warmBoost = math.max(((C.WARMING_BOOST_THRESHOLD - spec.rawEngineTemperature) / (C.WARMING_BOOST_THRESHOLD / 2)) * C.WARMING_BOOST_POWER, 1.0)
-        heat = (C.ENGINE_MIN_HEAT + math.min(motorLoad, 1.0) * (engineMaxHeat - C.ENGINE_MIN_HEAT)) * warmBoost
+        heat = (C.ENGINE_MIN_HEAT + math.clamp(motorLoad, 0.1, 1.0) * (engineMaxHeat - C.ENGINE_MIN_HEAT)) * warmBoost
         
         local brokenFanModifier = 1.0
         if spec.fanClutchHealth < 1.0 then
@@ -9340,14 +9452,24 @@ function AdvancedDamageSystem:getMaintenanceInterval()
 
     local maintenanceIndex = ADS_Utils.getNameByValue(AdvancedDamageSystem.MAINTENANCE_TYPES, lastMaintenanceType)
     local restoreCoeff = ADS_Config.MAINTENANCE.MAINTENANCE_SERVICE_RESTORE_MULTIPLIERS[maintenanceIndex]
+    
+    local gameTimeCoeff = 1.0
+    if g_modIsLoaded ~= nil and g_modIsLoaded["FS25_ingameTimeOperatingHours"] then
+        gameTimeCoeff = getSafeMissionTimeScale()
+    end
 
-    local interval = (spec.baseServiceLevel * restoreCoeff / ADS_Config.CORE.BASE_SERVICE_WEAR / 2) * spec.reliability
+    local interval = (spec.baseServiceLevel * restoreCoeff / ADS_Config.CORE.BASE_SERVICE_WEAR / 2) * spec.reliability * gameTimeCoeff
     return interval
 end
 
 function AdvancedDamageSystem:getHoursSinceLastMaintenance()
     local spec = self.spec_AdvancedDamageSystem
     if not spec then return 0 end
+
+    local gameTimeCoeff = 1.0
+    if g_modIsLoaded ~= nil and g_modIsLoaded["FS25_ingameTimeOperatingHours"] then
+        gameTimeCoeff = getSafeMissionTimeScale()
+    end
 
     for i = #spec.maintenanceLog, 1, -1 do
         local entry = spec.maintenanceLog[i]
@@ -9356,11 +9478,13 @@ function AdvancedDamageSystem:getHoursSinceLastMaintenance()
             and entry.optionOne ~= AdvancedDamageSystem.OVERHAUL_TYPES.PARTIAL
 
         if isMaintenance or isFullOverhaul then
-            return math.max(self:getFormattedOperatingTime() - (entry.conditionData.operatingHours or 0), 0)
+            return math.max(((spec.realOperatingTime / (60 * 60 * 1000)) - (entry.conditionData.operatingHours or 0)) * gameTimeCoeff, 0)
         elseif entry.id == 1 then
             local serviceLevelAtStart = entry.conditionData.service or 0
-            local calculatedHoursForMaintenance = entry.conditionData.operatingHours - (spec.baseServiceLevel - serviceLevelAtStart) / (ADS_Config.CORE.BASE_SERVICE_WEAR / spec.reliability)
-            return math.max(self:getFormattedOperatingTime() - calculatedHoursForMaintenance, 0)
+            local serviceHoursAtInspection = entry.conditionData.operatingHours or 0
+            local maintenanceStartRealHours = serviceHoursAtInspection - (spec.baseServiceLevel - serviceLevelAtStart) / (ADS_Config.CORE.BASE_SERVICE_WEAR / spec.reliability)
+            local currentRealHours = (spec.realOperatingTime or 0) / (60 * 60 * 1000)
+            return math.max((currentRealHours - maintenanceStartRealHours) * gameTimeCoeff, 0)
         end
     end
     return 0
@@ -10630,8 +10754,10 @@ function AdvancedDamageSystem.ConsoleCommands:setService(rawArgs)
     spec.serviceLevel = value
 
     local interval = vehicle:getMaintenanceInterval()
-    local currentHours = vehicle:getFormattedOperatingTime()
-    local hoursSinceService = (1 - value) * interval
+    local currentHours = spec.realOperatingTime / (60 * 60 * 1000) or vehicle:getFormattedOperatingTime() or 0
+    local serviceExpiredThreshold = math.clamp(tonumber(ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD) or 0.5, 0, 0.9999)
+    local activeServiceRange = math.max(1 - serviceExpiredThreshold, 0.0001)
+    local hoursSinceService = ((1 - value) / activeServiceRange) * interval
     local targetOpHours = currentHours - hoursSinceService
     local found = false
     for i = #spec.maintenanceLog, 1, -1 do
