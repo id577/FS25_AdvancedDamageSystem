@@ -912,7 +912,6 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
     -- [Group 3] Telemetry
     streamWriteFloat32(streamId, getSyncOperatingTime(self))
     streamWriteFloat32(streamId, spec.realOperatingTime or getSyncOperatingTime(self))
-    streamWriteFloat32(streamId, spec.rawEngineTemperature or 0)
     streamWriteFloat32(streamId, spec._fuelUsageRaw or 0)
     streamWriteFloat32(streamId, self:getMotorLoadPercentage() or 0)
     streamWriteFloat32(streamId, spec.dynamicMotorLoad or 0)

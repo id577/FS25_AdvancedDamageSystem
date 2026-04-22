@@ -3,7 +3,7 @@
     <GuiElement profile="fs25_shopContainer">
         <GuiElement profile="fs25_shopHeaderPanel">
             <Bitmap profile="fs25_menuHeaderIconBg">
-                <Bitmap profile="fs25_menuHeaderIcon" imageSliceId="gui.icon_ingameMenu_vehicles"/>
+                <Bitmap profile="fs25_menuHeaderIcon"/>
             </Bitmap>
             <Text profile="fs25_menuHeaderTitle" id="menuHeaderTitle" text="$l10n_ads_ingame_menu_title"/>
             <RoundCorner profile="fs25_shopMoneyBoxBg" id="moneyBoxBg"/>
