@@ -247,10 +247,18 @@ local function canDisplayOwnedVehicle(mission, vehicle, currentFarmId)
 
     local hasAccess = mission ~= nil and mission.accessHandler ~= nil and mission.accessHandler:canPlayerAccess(vehicle)
     local ownerFarmId = vehicle.getOwnerFarmId ~= nil and vehicle:getOwnerFarmId() or vehicle.ownerFarmId
+    local showInVehiclesOverview = false
+
+    if vehicle.getShowInVehiclesOverview ~= nil then
+        showInVehiclesOverview = vehicle:getShowInVehiclesOverview()
+    else
+        showInVehiclesOverview = vehicle.showInVehicleOverview == true
+            and (vehicle.propertyState == VehiclePropertyState.OWNED or vehicle.propertyState == VehiclePropertyState.LEASED)
+    end
 
     return hasAccess
         and ownerFarmId == currentFarmId
-        and (vehicle.propertyState == 2 or vehicle.propertyState == 3 or vehicle.propertyState == 4)
+        and showInVehiclesOverview
 end
 
 function ADS_InGameMenuFrame.register()

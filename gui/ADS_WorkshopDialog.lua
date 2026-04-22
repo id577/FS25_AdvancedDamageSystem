@@ -137,7 +137,7 @@ function ADS_WorkshopDialog:updateScreen()
     local statusColor = {1, 1, 1, 1}
     
     self.maintanceInProgressSpinner:setVisible(false)
-    if g_workshopScreen.isDealer or g_workshopScreen.isOwnWorkshop then
+    if g_workshopScreen.isDealer then
         if not ADS_Main.isWorkshopOpen then
             buttonsDisabled = true
             statusText = g_i18n:getText("ads_ws_status_closed")
