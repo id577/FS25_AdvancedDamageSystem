@@ -2810,9 +2810,9 @@ ADS_Breakdowns.BreakdownRegistry = {
         end,
         isCanProgress = function(vehicle)
             if vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
-                if vehicle.spec_dischargeable.currentDischargeState ~= Dischargeable.DISCHARGE_STATE_OFF then
-                    return true
-                end
+                return true
+            else
+                return false
             end
         end,
         stages = {
@@ -3512,9 +3512,6 @@ ADS_Breakdowns.EffectApplicators.PTO_TORQUE_TRANSFER_MODIFIER = {
 
     remove = function(vehicle, handler)
         log_dbg("Removing PTO_TORQUE_TRANSFER_MODIFIER effect.")
-        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil then
-            vehicle.spec_AdvancedDamageSystem._adsPtoTorqueDbgNextLogAt = nil
-        end
     end
 }
 
@@ -3544,23 +3541,6 @@ if PowerConsumer ~= nil and PowerConsumer.getTotalConsumedPtoTorque ~= nil then
                 local transferScale = math.max(0, 1 + effectValue)
                 local modifiedTorque = torque * transferScale
 
-                if spec ~= nil and ADS_Config ~= nil and ADS_Config.DEBUG and modifiedTorque > 0 then
-                    local now = g_currentMission ~= nil and g_currentMission.time or 0
-                    local nextLogAt = tonumber(spec._adsPtoTorqueDbgNextLogAt) or 0
-                    if now >= nextLogAt then
-                        local vehicleName = (rootVehicle ~= nil and rootVehicle.getName ~= nil) and rootVehicle:getName() or "unknown"
-                        log_dbg(string.format("[ADS][PTO_TQ] veh='%s' eff=%.3f scale=%.3f baseT=%.3f modT=%.3f exp=%s igPeak=%s",
-                            tostring(vehicleName),
-                            effectValue,
-                            transferScale,
-                            tonumber(torque) or 0,
-                            tonumber(modifiedTorque) or 0,
-                            tostring(expected),
-                            tostring(ignoreTurnOnPeak)))
-                        spec._adsPtoTorqueDbgNextLogAt = now + 500
-                    end
-                end
-
                 torque = modifiedTorque
             end
         end
@@ -3588,6 +3568,15 @@ function ADS_Breakdowns.updateConsumers(vehicle, dt, accInput)
 	local rpmFactor = idleFactor + rpmPercentage * (1 - idleFactor)
 	local loadFactor = math.max(spec.smoothedLoadPercentage * rpmPercentage, 0)
 	local motorFactor = 0.5 * (0.2 * rpmFactor + 1.8 * loadFactor)
+    local timeScale = 1
+
+    if g_modIsLoaded ~= nil and g_modIsLoaded["FS25_ingameTimeOperatingHours"] then
+        local missionInfo = g_currentMission ~= nil and g_currentMission.missionInfo or nil
+        timeScale = (missionInfo and missionInfo.timeScale) or 1
+        if timeScale <= 0 then
+            timeScale = 1
+        end
+    end
 
     local fuelUsageFactors = {
         [1] = 1.0,
@@ -3613,7 +3602,7 @@ function ADS_Breakdowns.updateConsumers(vehicle, dt, accInput)
 
 	for _, consumer in pairs(spec.consumers) do
 		if consumer.permanentConsumption and consumer.usage > 0 then
-			local used = usageFactor * motorFactor * consumer.usage * dt
+			local used = usageFactor * motorFactor * consumer.usage * dt * timeScale
 
 			if used ~= 0 then
 				consumer.fillLevelToChange = consumer.fillLevelToChange + used
@@ -3642,10 +3631,15 @@ function ADS_Breakdowns.updateConsumers(vehicle, dt, accInput)
 					end
 				end
 
+				local usage = used / dt * 1000 * 60 * 60
+                if timeScale ~= 0 then
+                    usage = usage / timeScale
+                end
+
 				if consumer.fillType == FillType.DIESEL or consumer.fillType == FillType.ELECTRICCHARGE or consumer.fillType == FillType.METHANE then
-					spec.lastFuelUsage = used / dt * 1000 * 60 * 60
+					spec.lastFuelUsage = usage
 				elseif consumer.fillType == FillType.DEF then
-					spec.lastDefUsage = used / dt * 1000 * 60 * 60
+					spec.lastDefUsage = usage
 				end
 			end
 		end

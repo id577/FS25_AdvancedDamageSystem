@@ -611,16 +611,28 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Die Kette wirkt gelockert, und die Spannung ist deutlich ungleichmäßig."/>
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Die Kette hängt sichtbar durch, und die Spannung wirkt stark gestört."/>
         <text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_section_active" text="ADS-Fahrzeuge"/>
+        <text name="ads_ingame_menu_section_service" text="In Wartung"/>
         <text name="ads_ingame_menu_header_vehicle" text="Fahrzeug"/>
+        <text name="ads_ingame_menu_header_type" text="Typ"/>
         <text name="ads_ingame_menu_header_age" text="Alter"/>
         <text name="ads_ingame_menu_header_working_hours" text="Std."/>
         <text name="ads_ingame_menu_header_condition" text="Zustand"/>
-        <text name="ads_ingame_menu_header_interval" text="Intervall"/>
+        <text name="ads_ingame_menu_header_interval" text="Interv."/>
+        <text name="ads_ingame_menu_header_service_status" text="Geprüft/Gewartet"/>
         <text name="ads_ingame_menu_header_last_inspection" text="Geprüft"/>
-        <text name="ads_ingame_menu_header_last_maintenance" text="Gewartet"/>
-        <text name="ads_ingame_menu_header_cost" text="Unterhalt"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Gewart."/>
+        <text name="ads_ingame_menu_header_cost" text="Unterh."/>
         <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
         <text name="ads_ingame_menu_header_price" text="Wert"/>
+        <text name="ads_ingame_menu_header_procedure" text="Vorgang"/>
+        <text name="ads_ingame_menu_header_time_left" text="Restzeit"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Fertig"/>
+        <text name="ads_ingame_menu_header_service_cost" text="Kosten"/>
+        <text name="ads_ingame_menu_section_other" text="Andere Fahrzeuge"/>
+        <text name="ads_ingame_menu_empty_other" text="Keine Fahrzeuge ohne ADS vorhanden"/>
+        <text name="ads_ingame_menu_empty_active" text="Keine ADS-Fahrzeuge vorhanden"/>
+        <text name="ads_ingame_menu_empty_service" text="Keine Fahrzeuge im Service"/>
         <text name="ads_sell_dialog_costs_title" text="Zusatzkosten"/>
         <text name="ads_sell_dialog_deposit_return" text="Rückerstattung der Kaution"/>
         <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Überfällige Wartung"/>

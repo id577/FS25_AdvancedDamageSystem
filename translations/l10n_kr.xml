@@ -1,0 +1,653 @@
+<l10n>
+    <texts>
+        <text name="ads_maintenancePrice_label" text="정비 비용 배율"/>
+        <text name="ads_maintenancePrice_tooltip" text="점검, 수리 및 오버홀을 포함한 모든 정비소 서비스 비용을 조정합니다. 값이 클수록 모든 정비 활동 비용이 비싸집니다."/>
+        <text name="ads_maintenanceDuration_label" text="정비 소요 시간 배율"/>
+        <text name="ads_maintenanceDuration_tooltip" text="모든 정비소 서비스의 소요 시간을 조정합니다. 값이 클수록 차량이 정비나 수리를 받는 데 걸리는 시간이 늘어납니다."/>
+        <text name="ads_workshopOpenHour_label" text="정비소 영업 시작 시간"/>
+        <text name="ads_workshopOpenHour_tooltip" text="정비소가 문을 여는 시간입니다. 수리는 업무 시간 중에만 진행됩니다."/>
+        <text name="ads_workshopCloseHour_label" text="정비소 영업 종료 시간"/>
+        <text name="ads_workshopCloseHour_tooltip" text="정비소가 문을 닫는 시간입니다. 이 시간 이후에는 수리가 일시 중지됩니다."/>
+        <text name="ads_engineMaxHeat_label" text="최대 엔진 발열"/>
+        <text name="ads_engineMaxHeat_tooltip" text="최대 부하 상태에서 엔진이 발생시키는 기본 발열량입니다. 값이 높을수록 엔진이 더 빨리 가열됩니다."/>
+        <text name="ads_cloggingSpeed_label" text="이물질 축적 속도"/>
+        <text name="ads_cloggingSpeed_tooltip" text="먼지나 왕겨, 작물 잔여물 속에서 작업할 때 라디에이터와 흡기구가 얼마나 빨리 막히는지를 조정합니다. 값이 높을수록 더 빨리 막힙니다. 100%일 때, 막힘 속도는 정비 주기의 약 1/3입니다."/>
+        <text name="ads_ws_header_title" text="정비소"/>
+        <text name="ads_workshopAvailable_label" text="정비소 24/7 운영"/>
+        <text name="ads_workshopAvailable_tooltip" text="정비소의 24시간 운영 여부를 설정합니다."/>
+        <text name="ads_instantInspection_label" text="즉시 점검"/>
+        <text name="ads_instantInspection_tooltip" text="활성화 시 모든 점검이 시간 경과 없이 즉시 완료됩니다. 참고: 이 경우 '육안 점검' 옵션은 사용할 수 없습니다."/>
+        <text name="ads_parkVehicle_label" text="정비 중 차량 주차"/>
+        <text name="ads_parkVehicle_tooltip" text="활성화 시 정비 중인 차량은 TAB 키를 이용한 차량 전환 대상에서 제외됩니다."/>
+        <text name="ads_warrantyEnabled_label" text="신규 장비 보증"/>
+        <text name="ads_warrantyEnabled_tooltip" text="신규 차량 수리에 보증을 적용합니다(최대 20시간 운행 또는 12개월). OEM 부품 교체 시에만 비용이 면제됩니다."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="AI 과부하 및 과열 제어"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="활성화 시 AI 작업자가 엔진 과부하 또는 과열을 방지하기 위해 부하를 줄입니다."/>
+        <text name="ads_debugMode_label" text="디버그 모드"/>
+        <text name="ads_debugMode_tooltip" text="디버그 패널 및 콘솔의 상세 디버그 로그 활성 여부를 설정합니다."/>
+        <text name="ads_warningMessages_label" text="경고 메시지"/>
+        <text name="ads_warningMessages_tooltip" text="엔진 냉각 상태 및 과열 알림과 같은 게임 플레이 경고 메시지 표시 여부를 설정합니다."/>
+        <text name="ads_mobileWorkshopRestrictions_label" text="이동식 정비소 제한"/>
+        <text name="ads_serviceInterval_label" text="정비 주기"/>
+        <text name="ads_vehicleLifespan_label" text="차량 수명"/>
+        <text name="ads_downtimeWear_label" text="패시브 마모"/>
+        <text name="ads_generalWearEnabled_label" text="노후 마모"/>
+        <text name="ads_systemStressRate_label" text="시스템 스트레스율"/>
+        <text name="ads_batteryCapacity_label" text="배터리 용량"/>
+        <text name="ads_thermalSensitivity_label" text="열 민감도"/>
+        <text name="ads_option_off" text="꺼짐"/>
+        <text name="ads_serviceInterval_tooltip" text="정비가 필요한 기준 시간을 시간 단위로 설정합니다. 실제 주기는 차량 브랜드, 연식, 이전 정비 품질에 따라 달라집니다."/>
+        <text name="ads_vehicleLifespan_tooltip" text="차량 상태가 0%에 도달하는 기준 수명을 시간 단위로 설정합니다. 상태가 0%에 가까워질수록 차량의 신뢰도가 떨어집니다."/>
+        <text name="ads_downtimeWear_tooltip" text="차량이 유휴 상태일 때 발생하는 패시브 마모율을 기본 마모율(차량 수명)의 백분율로 설정합니다. 예: 수명이 100시간일 때 5%로 설정하면, 약 20시간의 유휴 시간마다 각 시스템의 상태가 1%씩 감소합니다. 참고: 차량이 지붕 아래에 보관된 동안에는 패시브 마모가 발생하지 않습니다."/>
+        <text name="ads_generalWearEnabled_tooltip" text="노후에 따른 마모를 활성화합니다. 차량이 노후화됨에 따라 엔진 출력, 유압 속도, 브레이크 효율 등 핵심 특성에 미세한 불이익이 발생합니다. 이 효과는 차량 수명의 1/3이 지난 시점부터 시작되어 2/3가 지난 후 뚜렷해지며, 수명 끝부분에 갈수록 강해집니다."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="활성화 시 이동식 정비소에서 수행 가능한 작업 범위가 차량의 정비 용이성에 따라 달라집니다."/>
+        <text name="ads_systemStressRate_tooltip" text="과부하, 과열, 휠 슬립 및 기타 가혹한 운행 조건에서 시스템 스트레스가 얼마나 빨리 쌓이는지 제어합니다. 스트레스는 고장 확률에 직접적인 영향을 줍니다."/>
+        <text name="ads_batteryCapacity_tooltip" text="최대 사용 가능한 배터리 용량을 조정합니다. 150 Ah에 가까운 값이 현실적이지만, 이 수준에서는 배터리 방전 문제를 거의 겪지 않을 수 있습니다."/>
+        <text name="ads_thermalSensitivity_tooltip" text="열 모델 동작을 조정합니다. 설정이 높을수록 엔진과 변속기가 부하, 주변 온도, 라디에이터 오염에 더 민감하게 반응하여 동일 조건에서 더 많은 열을 발생시킵니다."/>
+        <text name="ads_thermal_none" text="패시브"/>
+        <text name="ads_thermal_mild" text="완만함"/>
+        <text name="ads_thermal_default" text="기본"/>
+        <text name="ads_thermal_aggressive" text="공격적"/>
+
+        <text name="ads_ws_label_value" text="가치"/>
+        <text name="ads_ws_label_age" text="차령"/>
+        <text name="ads_ws_label_operating_hours" text="가동 시간"/>
+        <text name="ads_ws_label_service" text="정비 서비스"/>
+        <text name="ads_ws_label_condition" text="상태"/>
+        <text name="ads_ws_label_maintainability" text="정비 용이성"/>
+        <text name="ads_ws_label_maintenance_log" text="정비 기록"/>
+        <text name="ads_ws_label_last_report" text="최근 보고서"/>
+        <text name="ads_ws_label_service_interval" text="정비 주기"/>
+        <text name="ads_ws_label_last_maintenance" text="최근 정비"/>
+        <text name="ads_ws_label_last_inspection" text="최근 점검"/>
+        <text name="ads_ws_table_header_part" text="부품"/>
+        <text name="ads_ws_table_header_description" text="설명"/>
+        <text name="ads_ws_table_header_stage" text="단계"/>
+        <text name="ads_ws_table_header_price" text="가격"/>
+        <text name="ads_ws_table_header_repair_select" text="수리"/>
+        <text name="ads_ws_info_no_breakdowns" text="고장이 없거나 아직 발견되지 않았습니다."/>
+        <text name="ads_ws_status_initial" text="상태 로딩 중..."/>
+        <text name="ads_ws_action_inspection" text="점검"/>
+        <text name="ads_ws_action_maintenance" text="정비"/>
+        <text name="ads_ws_action_repair" text="수리"/>
+        <text name="ads_ws_action_overhaul" text="오버홀"/>
+        <text name="ads_ws_action_cancel_service" text="절차 취소"/>
+        <text name="ads_ws_button_show" text="보기"/>
+        <text name="ads_ws_age_unit" text="개월"/>
+        <text name="ads_ws_hours_unit" text="시간"/>
+        <text name="ads_ws_option_yes" text="예"/>
+        <text name="ads_ws_option_no" text="아니요"/>
+        <text name="ads_ws_status_open" text="정비소 영업 중"/>
+        <text name="ads_ws_status_closed" text="정비소 영업 종료"/>
+        <text name="ads_ws_inspecting_status" text="점검 중..."/>
+        <text name="ads_ws_status_in_progress_format" text="%s 진행 중 (완료 예정: %s)..."/>
+        <text name="ads_ws_task_inspection" text="점검"/>
+        <text name="ads_ws_task_maintenance" text="정비"/>
+        <text name="ads_ws_task_overhaul" text="오버홀"/>
+        <text name="ads_ws_button_price_format" text="%s (%s)"/>
+        <text name="ads_ws_no_last_report_message" text="아직 보고서가 없습니다"/>
+        <text name="ads_ws_no_report_message" text="보고서가 없습니다"/>
+        <text name="ads_ws_no_log_empty_message" text="기록이 비어 있습니다"/>
+        <text name="ads_ws_cancel_confirm_title" text="%s을(를) 취소하시겠습니까?"/>
+        <text name="ads_ws_cancel_confirm_text" text="현재 진행 상황이 그대로 저장됩니다. 비용은 환불되지 않습니다."/>
+
+        <text name="ads_log_header_title" text="정비 기록"/>
+        <text name="ads_log_title" text="기술 정비 기록부"/>
+        <text name="ads_log_total_cost_title" text="총 비용"/>
+        <text name="ads_log_cost_per_month_title" text="월간 비용"/>
+        <text name="ads_log_ownership_months_title" text="보유 기간"/>
+        <text name="ads_log_total_breakdowns_count_title" text="총 고장 횟수"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="평균 고장 간격"/>
+        <text name="ads_log_average_maintenance_interval_title" text="평균 정비 간격"/>
+        <text name="ads_log_performed" text="%s 완료됨"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="결함 없음"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="결함 발견: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="차량 재도색 완료"/>
+        <text name="ads_log_repair_desc_generic" text="수리"/>
+        <text name="ads_log_cancelled_desc" text="절차 취소됨"/>
+        <text name="ads_log_date" text="날짜"/>
+        <text name="ads_log_hours" text="가동 시간"/>
+        <text name="ads_log_type" text="작업 유형"/>
+        <text name="ads_log_description" text="설명"/>
+        <text name="ads_log_price" text="비용"/>
+        <text name="ads_log_button_show_report" text="보고서 보기"/>
+        <text name="ads_log_empty" text="기록이 없습니다"/>
+
+        <text name="ads_breakdowns_severity_permanent" text="영구적"/>
+        <text name="ads_breakdowns_severity_reduce_power" text="출력 저하"/>
+        <text name="ads_breakdowns_severity_shutdown" text="작동 중지"/>
+        <text name="ads_breakdowns_severity_minor" text="경미함"/>
+        <text name="ads_breakdowns_severity_moderate" text="보통"/>
+        <text name="ads_breakdowns_severity_major" text="심각함"/>
+        <text name="ads_breakdowns_severity_critical" text="치명적임"/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="수년간의 험난한 작업으로 쌓인 스트레스입니다. 핵심 부품의 미세하고 되돌릴 수 없는 마모로 인해 전반적인 성능이 약간 저하되었습니다."/>
+        <text name="ads_breakdowns_part_vehicle" text="차량"/>
+        <text name="ads_breakdowns_part_consumables" text="소모품"/>
+        <text name="ads_breakdowns_part_engine" text="엔진"/>
+        <text name="ads_breakdowns_part_battery" text="배터리"/>
+        <text name="ads_breakdowns_part_ecu" text="ECU"/>
+        <text name="ads_breakdowns_part_wiring" text="배선 및 커넥터"/>
+        <text name="ads_breakdowns_part_alternator_regulator" text="발전기 레귤레이터"/>
+        <text name="ads_breakdowns_part_turbocharger" text="터보차저"/>
+        <text name="ads_breakdowns_part_oil_pump" text="오일 펌프"/>
+        <text name="ads_breakdowns_part_valve_train" text="밸브 트레인"/>
+        <text name="ads_breakdowns_part_clutch" text="클러치"/>
+        <text name="ads_breakdowns_part_synchronizer" text="싱크로나이저"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="파워시프트 유압 펌프"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="CVT 체인"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT 유압 제어 밸브"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
+        <text name="ads_breakdowns_part_hydraulic_pump" text="유압 펌프"/>
+        <text name="ads_breakdowns_part_hydraulic_cylinder" text="유압 실린더"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="PTO 클러치"/>
+        <text name="ads_breakdowns_part_brake_system" text="브레이크 시스템"/>
+        <text name="ads_breakdowns_part_wheel_bearing" text="휠 베어링"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="스티어링 링케이지"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="트랙 텐셔너"/>
+        <text name="ads_breakdowns_part_thermostat" text="서모스탯"/>
+        <text name="ads_breakdowns_part_cooling_system" text="냉각 시스템"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="팬 클러치"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="연료 펌프"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="연료 인젝터"/>
+        <text name="ads_breakdowns_part_fuel_filter" text="연료 필터"/>
+        <text name="ads_breakdowns_part_fuel_line" text="연료 라인"/>
+        <text name="ads_breakdowns_part_harvest_processing_system" text="수확 처리 시스템"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="하역 오거"/>
+        <text name="ads_breakdowns_quick_fix_stage" text="임시 수리됨"/>
+        <text name="ads_breakdowns_defected_parts_stage" text="결함 있음"/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="장치는 정상 작동 중이나 점검 결과 결함 부품이 발견되었습니다. 안전 여유치가 매우 낮으므로 갑작스러운 고장을 방지하기 위해 예방적 교체를 권장합니다."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="장치는 정상 작동 중이나 전적으로 마모된 요소의 임시 수리에 의존하고 있습니다. 부하 상태에서의 고장을 피하기 위해 가능한 한 빨리 완전한 부품 교체를 권장합니다."/>
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="엔진 보호 모드"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="엔진 림프 모드 활성! 출력이 제한됩니다!"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="엔진 보호 모드"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="엔진 림프 모드 활성! 출력이 제한됩니다!"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="엔진 보호 모드"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="엔진 림프 모드 활성! 출력이 제한됩니다!"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="엔진 보호 모드"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="과열로부터 보호하기 위해 엔진이 정지되었습니다"/>
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="엔진이 완전히 고장났습니다"/>
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="엔진 고착됨"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="ECU 오류. 엔진 출력이 약간 감소합니다."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="ECU 오작동. 뚜렷한 출력 손실과 연료 소비 증가가 발생합니다."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="치명적인 ECU 오작동. 심각한 출력 손실, 높은 연료 소비 및 엔진 정지 위험이 있습니다."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="ECU 완전 고장. 엔진을 제어할 수 없으며 시동이 걸리지 않습니다."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="엔진 결함"/>
+        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="배선 및 전기 커넥터 부식. 접촉 저항 증가로 전등이 깜빡이거나 전압 공급이 불안정하며 엔진 시동이 어려울 수 있습니다."/>
+        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="배선 및 전기 커넥터 보통 부식. 접촉 불량으로 전등 깜빡임, 불안정한 전압, 시동 곤란 및 엔진 정지가 발생할 수 있습니다."/>
+        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="배선 및 전기 커넥터 심각한 부식. 핵심 회로 전원 공급이 불안정하고 조명이 완전히 나갈 수 있으며 엔진 토크가 감소하고 정지하기 쉽습니다."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="심각한 부식으로 인한 스타터 제어 회로 고장. 조명이 작동하지 않으며 엔진 시동이 불가능합니다."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_message" text="스타터 회로 고장"/>
+        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="배터리 설페이션 현상. 유효 배터리 용량이 감소하여 부하 시 전기 예비력이 낮아집니다."/>
+        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="배터리 설페이션 보통 진행. 배터리 용량이 현저히 줄어들고 엔진 시동이 어렵습니다."/>
+        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="심각한 배터리 설페이션. 가용 용량이 치명적으로 낮고 크랭킹 성능이 불안정합니다."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="치명적인 배터리 설페이션. 유효 용량이 거의 없으며 엔진 시동을 위한 크랭킹 성능이 부족합니다."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="배터리 시동 전압 부족"/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage1_description" text="발전기 레귤레이터 오작동. 충전 출력이 감소하여 배터리 충전 효율이 떨어집니다."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="보통 수준의 레귤레이터 오작동. 충전 출력이 불안정하고 감소하여 배터리 충전 불량 및 전압 손실이 발생합니다."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="심각한 레귤레이터 오작동. 충전 출력이 치명적으로 낮고 전압 공급이 불안정하여 큰 손실이 발생합니다."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="레귤레이터 완전 고장. 배터리 충전이 되지 않으며 배터리 잔량으로만 작동합니다."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_message" text="충전 시스템 고장"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="터보 베어링 마모. 미세한 휘슬 소리가 들리며 고 RPM에서 약간의 출력 손실이 발생합니다."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="터보 씰 누설. 뚜렷한 출력 손실과 연료 소비 증가가 관찰됩니다."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="터빈 블레이드 손상. 심각한 출력 손실과 고부하 시 엔진 정지 위험이 있습니다."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="터보 치명적 파손. 엔진 출력을 대부분 상실했으며 심각한 내부 손상 위험이 있습니다."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="오일 펌프 오작동. 오일 압력이 낮아지고 토크가 약간 감소하며 엔진 온도가 올라가고 노킹이 발생할 수 있습니다."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="오일 펌프 보통 오작동. 오일 압력 부족으로 토크 감소가 뚜렷하며 엔진 온도가 상승하고 노킹 소리가 확실히 들립니다."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="오일 펌프 심각한 오작동. 오일 압력이 치명적으로 낮고 엔진 과열 가능성이 높으며 심한 노킹과 정지 현상이 발생합니다."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="치명적인 오일 펌프 고장. 오일 순환이 되지 않아 안전한 운행이 불가능하며 시동을 걸 수 없습니다."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_message" text="오일 압력 고장"/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="밸브 트레인 오작동. 엔진 토크가 약간 감소하고 연료 소비가 늘어나며 비정상적인 소음이 발생합니다."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="보통 수준의 밸브 트레인 오작동. 토크 감소와 연료 소비 증가가 뚜렷하고 소음이 커지며 부하 시 엔진이 주춤거릴 수 있습니다."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="심각한 밸브 트레인 오작동. 토크가 대폭 감소하고 소음이 심하며 빈번한 주춤거림과 엔진 정지가 발생합니다."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="치명적인 밸브 트레인 고장. 정상적인 밸브 작동이 보장되지 않아 시동 및 운행이 불가능합니다."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_message" text="밸브 트레인 고장"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="연료 펌프 조기 마모. 엔진 출력이 약간 낮아지고 연료 소비가 늘어납니다."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="연료 압력 저하. 뚜렷한 출력 손실과 연료비 증가, 가끔 엔진 정지가 발생합니다."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="치명적인 연료 압력. 심각한 출력 손실과 매우 높은 연료 소비, 잦은 정지가 발생합니다."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="연료 펌프 완전 고장. 엔진에 연료가 공급되지 않습니다."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="엔진 시동 불가능"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="하나 이상의 인젝터 노즐이 약간 막혔습니다. 엔진이 약간 거칠게 작동하며 출력이 미세하게 떨어집니다."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="연료 분무 상태 불량. 부하 시 엔진 부조(미스파이어)가 발생하여 출력 저하와 주춤거림이 나타납니다."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="인젝터 고착. 엔진이 매우 열악하게 작동하며 심각한 출력 손실과 불안정한 시동을 보입니다."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="인젝터 완전 고장. 엔진이 정상 작동하지 않으며 시동이 전혀 걸리지 않을 수 있습니다."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="엔진 시동 불가능"/>
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="브레이크 패드 마모. 제동 성능이 약간 저하됩니다."/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="브레이크 액 누유 또는 디스크 마모. 제동 거리가 뚜렷하게 길어집니다."/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="제동 압력 상실 심각. 브레이크가 매우 약하고 신뢰할 수 없습니다."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="브레이크 시스템 완전 고장. 더 이상의 운행은 매우 위험합니다."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="브레이크 고장"/>
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="클러치 플레이트 마모. 부하 상태에서 변속기 미끄러짐으로 인한 일시적인 출력 손실이 발생합니다."/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="상당한 클러치 마모. 가속 시 특히 뚜렷한 미끄러짐이 나타납니다."/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="클러치 심각한 마모. 심한 미끄러짐으로 인해 휠로 동력을 전달하기 어렵습니다."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="클러치 완전 소멸. 차량이 움직일 수 없습니다."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="변속기 고장"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="싱크로나이저 마모. 기어 변속 시 간헐적인 소음이나 어려움이 발생합니다."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="싱크로나이저 손상. 기어 변속이 자주 어렵거나 실패할 수 있습니다."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="싱크로나이저 치 파손. 부하 시 변속 실패나 기어 튕김 현상이 발생할 확률이 높습니다."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="싱크로나이저 완전 고장. 기어 변속이 불가능합니다."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="변속기 고장"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="파워시프트 유압 압력 낮음. 기어 체결 시 약간의 지연과 충격이 발생합니다."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="유압 펌프 씰 마모. 기어 변속 중 뚜렷한 지연과 요동이 발생합니다."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="유압 펌프 고장 중. 변속 시 심각한 지연과 격렬한 충격이 발생합니다."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="파워시프트 유압 펌프 고장. 변속기가 중립 상태에서 고착되었습니다."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="CVT 체인 마모. 체인 슬립이 발생하며 변속기 발열이 증가합니다."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="CVT 체인 보통 마모. 슬립이 뚜렷해지고 연료 소비와 작동 온도가 상승합니다."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="CVT 체인 심각한 마모. 슬립이 심해지고 연료 소비가 대폭 늘어나며 변속기 과열이 발생하기 쉽습니다."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="치명적인 CVT 체인 마모. 토크 전달이 불가능하여 차량이 움직일 수 없습니다."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="CVT 슬립 치명적"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="CVT 유압 제어 밸브 오작동. 간헐적인 유압 저하로 토크가 약간 줄고 변속비 범위가 제한됩니다."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="CVT 유압 제어 밸브 보통 오작동. 빈번한 유압 불안정으로 토크가 감소하고 온도가 오르며 변속 범위가 더 제한됩니다."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="CVT 유압 제어 밸브 심각한 오작동. 뚜렷한 유압 저하와 토크 감소, 과열 및 심각한 변속 범위 제한이 발생합니다."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="치명적인 CVT 유압 제어 밸브 고장. 압력 제어가 불가능하고 속도가 심하게 제한되며 비상 모드로 작동합니다."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="CVT 변속기 오작동의 조기 징후가 발견되었습니다. 점검 및 수리가 필요합니다."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="CVT 변속기 오작동이 악화되고 있습니다. 계속 운행 시 비상 모드로 전환될 수 있습니다."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="치명적인 CVT 변속기 손상. 변속기가 비상 모드에 있으며 최고 속도가 제한됩니다."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="CVT 변속기 완전 고장. 수리 전까지 더 이상의 운행이 불가능합니다."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT 변속기 고장"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="CVT 유압 제어 고장"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="엔진 서모스탯 고장 시작. 적정 온도 도달 시간이 길어지거나 약간 과열됩니다."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="서모스탯 반응 불량. 엔진 온도 조절이 불안정하여 마모가 증가합니다."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="서모스탯이 닫힌 채로 고착되었습니다. 부하 시 엔진이 계속 과열됩니다."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="서모스탯 완전 고장. 냉각수가 순환되지 않아 즉각적이고 심각한 과열이 발생합니다."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="펌프 미세 내부 누설. 유압 작업 기구의 작동 속도가 약간 느려집니다."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="펌프 씰 마모. 유압 장치 작동 속도가 눈에 띄게 느려집니다."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="유압 펌프 손상. 작업 기구가 매우 느리고 힘이 없습니다."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="유압 펌프 고장. 유압 시스템을 사용할 수 없습니다."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="유압 고장"/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="유압 실린더 내부 누설. 작동 속도가 약간 줄고 장착된 기구가 부하 시 서서히 처집니다."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="유압 실린더 보통 내부 누설. 작동 속도가 뚜렷이 감소하고 부하 유지 안정성이 떨어집니다."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="유압 실린더 심각한 내부 누설. 작동이 느리고 힘이 없으며 기구가 부하를 견디지 못하고 처집니다."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="치명적인 유압 실린더 내부 누설. 유압 이동 기능을 상실했고 부하 유지가 불가능합니다."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="유압 실린더 누설 치명적"/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="PTO 클러치 슬립. PTO로 전달되는 토크가 줄어들고 부하 시 차단될 수 있습니다."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="보통 수준의 PTO 클러치 슬립. 토크가 현저히 줄어들고 부하 시 자동 차단이 빈번하게 발생합니다."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="심각한 PTO 클러치 슬립. 가용 토크가 대폭 감소하여 장비의 안정적인 작동이 불가능합니다."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="치명적인 PTO 클러치 고장. 토크 전달이 상실되어 작동할 수 없습니다."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="PTO 고장"/>
+        <text name="ads_breakdowns_bearing_wear_stage1_description" text="휠 허브 베어링 마모. 소음과 진동이 발생하며 최고 속도가 약간 제한되고 구름 저항이 늘어납니다."/>
+        <text name="ads_breakdowns_bearing_wear_stage2_description" text="휠 허브 베어링 보통 마모. 소음과 진동이 뚜렷하며 속도가 줄고 구동계 부하가 증가합니다."/>
+        <text name="ads_breakdowns_bearing_wear_stage3_description" text="휠 허브 베어링 심각한 마모. 강한 진동과 대폭적인 속도 감소가 발생하며 베어링 고착 소음이 들릴 수 있습니다."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_description" text="치명적인 휠 허브 베어링 고장. 베어링이 고착되어 바퀴 회전이 차단되었습니다."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_message" text="휠 베어링 고착"/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="스티어링 링케이지 마모. 미세하게 한쪽으로 쏠리며 조향 반응이 떨어집니다."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="스티어링 링케이지 보통 마모. 쏠림 현상이 눈에 띄며 반응 속도가 현저히 느려집니다."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="스티어링 링케이지 심각한 마모. 직진 안정성이 손상되고 쏠림과 반응 저하가 심각해집니다."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="치명적인 스티어링 링케이지 고장. 조향 반응을 거의 상실하여 방향 제어가 불가능합니다."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="조향 장치 고장"/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="트랙 텐셔너 오작동. 주행 쏠림, 진동, 소음 및 최고 속도의 미세한 감소가 나타납니다."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="트랙 텐셔너 보통 오작동. 불안정한 주행과 진동이 뚜렷하며 저항 증가로 엔진이 주춤거리거나 속도가 줄어듭니다."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="트랙 텐셔너 심각한 오작동. 주행 불안정, 진동, 소음이 심각하며 구동계 부하가 대폭 증가합니다."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="치명적인 트랙 텐셔너 고장. 트랙이 더 이상 안정적으로 유지되지 않으며 주행 장치가 고착되었습니다."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="트랙 텐셔너 고장"/>
+        <text name="ads_breakdowns_coolant_leak_stage1_description" text="냉각수 누수. 냉각 시스템 효율이 약간 저하됩니다."/>
+        <text name="ads_breakdowns_coolant_leak_stage2_description" text="보통 수준의 냉각수 누수. 부하 시 엔진 온도가 더 빨리 상승합니다."/>
+        <text name="ads_breakdowns_coolant_leak_stage3_description" text="심각한 냉각수 누수. 효율이 대폭 감소하여 부하 시 과열 가능성이 높습니다."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_description" text="치명적인 냉각수 누수. 냉각 효율을 상실하여 안전한 온도를 유지할 수 없습니다."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_message" text="냉각수 누수 치명적"/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="팬 클러치 오작동. 냉각 팬 효율이 약간 떨어지고 비정상적인 소음이 발생합니다."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="보통 수준의 팬 클러치 오작동. 냉각 팬 효율 저하와 함께 소음이 뚜렷하게 들립니다."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="심각한 팬 클러치 오작동. 효율이 대폭 감소하고 소음이 매우 심해집니다."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="치명적인 팬 클러치 고장. 효율을 거의 상실하여 적절한 공기 흐름을 보장할 수 없습니다."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="팬 클러치 고장"/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="연료 필터 막힘. 연료 흐름이 제한되어 부하 시 엔진이 미세하게 주춤거리며 토크가 약간 줄어듭니다."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="연료 필터 보통 막힘. 연료 제한이 뚜렷하며 빈번한 주춤거림, 토크 감소 및 정지가 발생할 수 있습니다."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="연료 필터 심각한 막힘. 연료 흐름이 치명적으로 제한되어 심한 주춤거림과 대폭적인 토크 감소, 잦은 정지가 발생합니다."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="치명적인 연료 필터 막힘. 엔진 운행을 위한 연료 공급이 불가능하여 시동을 걸 수 없습니다."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="연료 필터 차단됨"/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="연료 라인 공기 유입. 연료 공급이 불안정해지며 시동이 약간 더 힘들어집니다."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="연료 라인 보통 공기 유입. 공급 불안정으로 엔진 주춤거림, 시동 곤란 및 정지가 발생할 수 있습니다."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="연료 라인 심각한 공기 유입. 연료 공급 연속성이 깨져 심한 주춤거림, 시동 실패 및 잦은 정지가 발생합니다."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="치명적인 연료 라인 공기 유입. 연료 공급이 유지되지 않아 시동 및 운행이 불가능합니다."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="연료 라인 내 공기"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="절연 마모, 간헐적 전압 저하. 미세한 전기적 결함이 관찰됩니다."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="접점 부식 및 발전기 출력 불안정. 전등 고장이 발생하거나 시동이 불안정합니다."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="단락(합선) 위험. 핵심 시스템을 신뢰할 수 없으며 전등이 완전히 나갈 수 있습니다."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="조명 장치 고장"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="메인 배선 뭉치 고장. 차량의 전기 시스템이 완전히 작동을 멈췄습니다."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="스타터 반응 없음"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="기화기 미세 오염. 무거운 부하 시 엔진이 가끔 주춤거립니다."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="제트 막힘. 가속 시 특히 엔진이 자주 털털거리며 출력을 상실합니다."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="기화기 심각한 차단. 엔진이 매우 거칠게 작동하고 자주 꺼지며 출력을 유지하지 못합니다."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="기화기 완전 막힘으로 인한 연료 기아 현상. 엔진이 작동하지 않습니다."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="기화기 막힘"/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="수확 처리 시스템 마모. 처리 효율이 미세하게 감소하여 약간의 수확 손실이 발생합니다."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="수확 처리 시스템 보통 마모. 효율 감소로 인해 측정 가능한 수준의 수확 손실이 발생합니다."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="수확 처리 시스템 심각한 마모. 효율이 대폭 낮아져 높은 수확 손실이 발생합니다."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="치명적인 수확 처리 시스템 마모. 작업 중 극심한 수준의 수확 손실을 유발합니다."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_message" text="수확 처리 효율 치명적 저하"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="내부 오거 및 엘리베이터 체인 미세 마모. 내부 이송 과정에서 소량의 작물이 유실됩니다."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="오거 날개 마모 및 컨베이어 벨트 미끄러짐으로 장비 내부 유출이 증가합니다. 가끔 긁히는 소음이 들릴 수 있습니다."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="엘리베이터 패들 및 오거 손상으로 작물 이송에 어려움을 겪으며, 상당한 유실과 심각한 막힘 위험이 있습니다."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="물질 유동 시스템의 핵심 부품 고장으로 심각한 막힘이 발생했습니다. 엔진에 극심한 무리가 가고 있습니다."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="물질 유동 시스템 막힘"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="구동 벨트 늘어남. 간헐적 미끄러짐으로 하역 속도가 약간 감소합니다."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="구동 벨트 및 풀리 마모. 부하 시 현저한 미끄러짐으로 하역 속도가 뚜렷이 감소합니다."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="기어박스 손상 또는 심한 벨트 마모. 오거가 겨우 회전하며 매우 낮은 속도로 작동합니다."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="구동 벨트 단절 또는 기어박스 고착. 하역 오거가 완전히 멈췄습니다."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="하역 오거 멈춤"/>
+        <text name="ads_breakdowns_dead_battery_message" text="배터리 방전됨"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="시스템 전압 부족"/>
+        <text name="ads_breakdowns_engine_stalled_message" text="엔진 정지됨"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO 자동 차단됨"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="기어 빠짐"/>
+        <text name="ads_breakdown_at_progress_message" text="진행 중"/>
+
+        <text name="ads_spec_cold_engine_message" text="엔진이 차갑습니다! 고 RPM은 마모의 원인이 됩니다!"/>
+        <text name="ads_spec_overheat_engine_message" text="경고! 엔진 과열 중."/>
+        <text name="ads_spec_overheat_transmission_message" text="경고! 변속기 과열 중."/>
+        <text name="ads_spec_this_month" text="이번 달"/>
+        <text name="ads_spec_months_ago" text="개월 전"/>
+        <text name="ads_spec_never" text="기록 없음"/>
+        <text name="ads_spec_op_hours_short" text="시간"/>
+        <text name="ads_spec_tomorrow_at" text="내일 "/>
+        <text name="ads_spec_day_after_tommorow_at" text="모레 "/>
+        <text name="ads_spec_in_days_at" text="{days}일 후 "/>
+        <text name="ads_spec_day_s" text="일"/>
+        <text name="ads_spec_hour_s" text="시간"/>
+        <text name="ads_spec_minute_s" text="분"/>
+        <text name="ads_spec_duration_format_hours" text="%d %s"/>
+        <text name="ads_spec_duration_format_minutes" text="%d %s"/>
+        <text name="ads_spec_duration_format_combined" text="%s %s"/>
+        <text name="ads_spec_months_ago_unit" text="개월 전"/>
+        <text name="ads_spec_months_ago_format" text="%s %s"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s (남은 시간: %s)"/>
+        <text name="ads_spec_service_interval_format" text="%s 시간"/>
+        <text name="ads_spec_maintenance_complete_notification" text="완료됨"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="취소됨"/>
+        <text name="ads_spec_inspection_issues_detected_notification" text="%s개의 결함 발견"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="결함 없음"/>
+        <text name="ads_spec_next_planned_service_notification" text="예약된 절차 시작: %s"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="자금 부족으로 예약된 %s 취소됨"/>
+        <text name="ads_spec_workshop_dealer" text="대리점"/>
+        <text name="ads_spec_workshop_own" text="자가 정비"/>
+        <text name="ads_spec_workshop_mobile" text="이동식"/>
+        <text name="ads_spec_system_engine" text="엔진"/>
+        <text name="ads_spec_system_transmission" text="변속기"/>
+        <text name="ads_spec_system_hydraulics" text="유압 / PTO"/>
+        <text name="ads_spec_system_cooling" text="냉각 시스템"/>
+        <text name="ads_spec_system_electrical" text="전기 시스템"/>
+        <text name="ads_spec_system_chassis" text="섀시"/>
+        <text name="ads_spec_system_workprocess" text="작업 시스템"/>
+        <text name="ads_spec_system_fuel" text="연료 시스템"/>
+        <text name="ads_spec_state_ready" text="준비됨"/>
+        <text name="ads_spec_state_inspection" text="점검"/>
+        <text name="ads_spec_state_maintenance" text="정비"/>
+        <text name="ads_spec_state_repair" text="수리"/>
+        <text name="ads_spec_state_overhaul" text="오버홀"/>
+        <text name="ads_spec_state_broken" text="고장남"/>
+        <text name="ads_spec_state_excellent" text="최상"/>
+        <text name="ads_spec_state_good" text="양호"/>
+        <text name="ads_spec_state_normal" text="보통"/>
+        <text name="ads_spec_state_bad" text="나쁨"/>
+        <text name="ads_spec_state_terrible" text="최악"/>
+        <text name="ads_spec_state_unknown" text="알 수 없음"/>
+        <text name="ads_spec_state_optimal" text="최적"/>
+        <text name="ads_spec_state_recommended" text="권장됨"/>
+        <text name="ads_spec_state_required" text="필요함"/>
+        <text name="ads_spec_state_overdue" text="기한 지남"/>
+        <text name="ads_spec_state_legendary" text="전설적"/>
+        <text name="ads_spec_state_premium" text="프리미엄"/>
+        <text name="ads_spec_state_standart" text="표준"/>
+        <text name="ads_spec_state_budget" text="보급형"/>
+        <text name="ads_spec_state_low" text="낮음"/>
+        <text name="ads_spec_state_average" text="평균"/>
+        <text name="ads_spec_state_high" text="높음"/>
+        <text name="ads_spec_state_workhorse" text="현역"/>
+        <text name="ads_spec_part_types_used" text="중고"/>
+        <text name="ads_spec_part_types_aftermarket" text="애프터마켓"/>
+        <text name="ads_spec_part_types_oem" text="OEM (순정)"/>
+        <text name="ads_spec_part_types_premium" text="프리미엄"/>
+        <text name="ads_spec_inspection_visual" text="육안"/>
+        <text name="ads_spec_inspection_standard" text="표준"/>
+        <text name="ads_spec_inspection_complete" text="전체 정밀 검사"/>
+        <text name="ads_spec_maintenance_minimal" text="최소"/>
+        <text name="ads_spec_maintenance_standard" text="표준"/>
+        <text name="ads_spec_maintenance_extended" text="확장"/>
+        <text name="ads_spec_maintenance_preventive" text="예방"/>
+        <text name="ads_spec_overhaul_partial" text="부분"/>
+        <text name="ads_spec_overhaul_standard" text="표준"/>
+        <text name="ads_spec_overhaul_full" text="전체"/>
+        <text name="ads_spec_repair_type_fix" text="임시 수리"/>
+        <text name="ads_spec_repair_type_replacement" text="표준"/>
+        <text name="ads_spec_repair_type_advanced" text="정밀 수리"/>
+
+        <text name="ads_option_menu_option_one_title_inspection" text="점검 유형 선택"/>
+        <text name="ads_option_menu_option_two_title_inspection" text="발견된 결함 수리"/>
+        <text name="ads_option_menu_option_one_title_maintenance" text="정비 수준 선택"/>
+        <text name="ads_option_menu_option_two_title_maintenance" text="소모품 품질 선택"/>
+        <text name="ads_option_menu_option_one_title_repair" text="수리 유형 선택"/>
+        <text name="ads_option_menu_option_two_title_repair" text="교체 부품 품질 선택"/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="작업 범위 선택"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="시스템 선택"/>
+        <text name="ads_option_menu_price_text" text="가격: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="보증 수리"/>
+        <text name="ads_option_menu_duration_text" text="소요 시간: "/>
+        <text name="ads_option_menu_finish_time_text" text="완료 예정: "/>
+        <text name="ads_option_menu_start_text" text="시작"/>
+        <text name="ads_option_menu_duration_instant" text="즉시"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* 신속한 외부 점검입니다. 저렴하고 즉시 완료됩니다. 눈에 보이는 결함을 찾아내지만, 일부 결함을 놓칠 확률이 있으며 상세 기술 상태 데이터는 제공하지 않습니다."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* 일상적인 진단 절차입니다. 모든 활성 고장을 식별하고 차량 상태에 대한 일반 보고서를 생성합니다."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* 정밀 진단입니다. 잠재적인 결함을 포함한 모든 고장 발견을 보장하며, 모든 부품에 대한 정확한 상태 수치가 포함된 포괄적인 보고서를 제공합니다."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* 기본 서비스입니다. 훨씬 저렴하고 빠르지만 정비 수준을 완전히 회복시키지 못하며 다음 정비까지의 주기가 짧습니다."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* 제조사 규격에 따른 일상 정비입니다. 정비 수준을 정상으로 회복시키고 표준 정비 주기를 제공합니다."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* 포괄적인 서비스입니다. 더 오래 걸리고 비용이 많이 들지만, 정비 수준을 표준 이상으로 회복시키고 더 긴 정비 주기를 제공합니다."/>   
+        <text name="ads_option_menu_maintenance_preventive_description" text="* 표준 서비스 이상의 예방 정비입니다. 정비 수준을 정상으로 회복시키고 가장 문제가 되는 시스템을 점검하여 고장 위험을 줄입니다."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* 긴급한 작업을 위해 차량 작동 상태만 유지하려는 임시 수리입니다. 빠르고 저렴하게 기본 기능을 복구하지만, 근본적인 결함은 해결되지 않아 일정 시간 후 다시 나타납니다."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* 고장난 부품의 표준 교체입니다. 현재 결함을 완전히 제거하고 해당 유닛을 정상 작동 상태로 복구합니다."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* 고장 부품 교체뿐만 아니라 시스템 내 관련 부품까지 정비하는 정밀 수리입니다. 해당 시스템에서 고장이 재발할 위험을 크게 줄입니다."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* 선택한 시스템을 양호한 작동 상태로 재구축합니다. 차량 전체 오버홀보다 빠르고 저렴합니다."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* 모든 주요 구성 요소에 대한 포괄적인 작업입니다. 상태를 양호한 수준으로 회복시킵니다."/>
+        <text name="ads_option_menu_overhaul_full_description" text="* 완전한 재생산 작업입니다. 비용과 시간이 많이 소요되지만 상태를 최상 수준으로 회복시킵니다."/>
+        <text name="ads_option_menu_part_used_description" text="* 폐차 부품입니다. 매우 저렴하지만 결함 위험이 매우 높습니다(약 50% 확률)."/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* 저가형 복제 부품입니다. 비용이 절감되지만 보통 수준의 결함 위험이 있습니다(33%)."/>
+        <text name="ads_option_menu_part_oem_description" text="* 순정 부품입니다. 표준적인 신뢰성(10% 결함 위험)을 갖추고 있으며 정가에 제공됩니다."/>
+        <text name="ads_option_menu_part_premium_description" text="* 강화된 성능 부품입니다. 비싸지만 엄격한 품질 관리를 거칩니다(0% 결함 위험)."/>
+        <text name="ads_option_menu_perform_repair" text="발견된 모든 결함 수리"/>
+        <text name="ads_option_menu_perform_maintenance" text="수리 후 정비 수행"/>
+        <text name="ads_option_menu_perform_renew_paint" text="도색 갱신"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* 결함 발견 시 자동으로 순정 부품을 사용한 표준 수리를 시작합니다."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* 수리 후 자동으로 순정 소모품을 사용한 표준 정비를 시작합니다."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* 오버홀 중 차량을 재도색합니다."/>
+        <text name="ads_option_menu_choosen_parts_text" text="* 수리에 선택됨:"/>
+
+        <text name="ads_report_header_title" text="점검 보고서"/>
+        <text name="ads_report_vehicle_name_title" text="차량명"/>
+        <text name="ads_report_date_title" text="날짜"/>
+        <text name="ads_report_vehicle_age_title" text="차령"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="가동 시간"/>
+        <text name="ads_report_inspection_type_title" text="점검 유형"/>
+        <text name="ads_report_inspection_location_title" text="장소"/>
+        <text name="ads_report_overall_assessment_title" text="전반적인 상태 평가"/>
+        <text name="ads_report_vehicle_specs_title" text="차량 제원"/>
+        <text name="ads_report_detected_breakdowns_title" text="발견된 고장"/>
+        <text name="ads_report_recommendations_title" text="결론 및 권장 사항"/>
+        <text name="ads_report_state_optimal" text="최적"/>
+        <text name="ads_report_state_normal" text="보통"/>
+        <text name="ads_report_state_degraded" text="성능 저하"/>
+        <text name="ads_report_state_impaired" text="손상됨"/>
+        <text name="ads_report_state_critical" text="치명적"/>
+        <text name="ads_report_state_not_available" text="해당 없음"/>
+        <text name="ads_report_overall_assessment_condition" text="상태 수준"/>
+        <text name="ads_report_overall_assessment_service" text="정비 수준"/>
+        <text name="ads_report_overall_assessment_mtbf" text="평균 고장 간격 (시간)"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="치명적 고장 위험"/>
+        <text name="ads_report_overall_assessment_rul" text="잔여 수명 (시간)"/>
+        <text name="ads_report_overall_assessment_wear_rate" text="마모율 (%/시간)"/>
+        <text name="ads_report_overall_assessment_nominal_wear_rate" text="정격 마모율 (%/시간)"/>
+        <text name="ads_report_system_condition_title" text="시스템 상태 | 고장 위험"/>
+        <text name="ads_report_system_condition_power" text="현재 출력"/>
+        <text name="ads_report_system_condition_brakes" text="브레이크 효율"/>
+        <text name="ads_report_system_condition_transmission" text="변속기"/>
+        <text name="ads_report_system_condition_harvest" text="수확 효율"/>
+        <text name="ads_report_system_condition_cooling" text="냉각 효율"/>
+        <text name="ads_report_system_condition_consumption" text="연료 소비량"/>
+        <text name="ads_report_system_condition_hydraulic" text="유압 효율"/>
+        <text name="ads_report_transmission_slipping" text="미끄러짐"/>
+        <text name="ads_report_transmission_shifting_impaired" text="변속 손상"/>
+        <text name="ads_report_transmission_gear_rejection" text="기어 거부"/>
+        <text name="ads_report_transmission_shift_delay" text="변속 지연"/>
+        <text name="ads_report_transmission_cvt_slipping" text="벨트/체인 슬립"/>
+        <text name="ads_report_transmission_cvt_ratio_limited" text="변속비 제한"/>
+        <text name="ads_report_transmission_cvt_pressure_instability" text="압력 불안정"/>
+        <text name="ads_report_transmission_failed" text="고장남"/>
+        <text name="ads_report_vehicle_spec_max_alternator_current" text="최대 발전기 전류"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="배터리 충전량"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="배터리 용량"/>
+        <text name="ads_report_stress_absent" text="없음"/>
+        <text name="ads_report_stress_low" text="낮음"/>
+        <text name="ads_report_stress_moderate" text="보통"/>
+        <text name="ads_report_stress_elevated" text="높음"/>
+        <text name="ads_report_stress_high" text="매우 높음"/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="활성 고장이 발견되었습니다. 모든 고장에 대한 표준 수리를 권장합니다."/>
+        <text name="ads_report_recommendation_defective_parts" text="결함 있는 교체 부품이 발견됨: %s. 갑작스러운 고장을 방지하기 위해 예방적 교체를 권장합니다."/>
+        <text name="ads_report_recommendation_quick_fix" text="임시 수리 상태가 발견됨: %s. 빠른 시일 내에 표준 교체를 권장합니다."/>
+        <text name="ads_report_recommendation_service_due" text="정비 주기 임계값에 도달했습니다. 정비를 수행하십시오."/>
+        <text name="ads_report_recommendation_service_urgent" text="정비 주기가 지났습니다. 즉시 정비를 수행하십시오!"/>
+        <text name="ads_report_recommendation_overhaul" text="핵심 부품의 노후화가 발견되었습니다. 오버홀을 수행하십시오."/>
+        <text name="ads_report_recommendation_system_overhaul" text="%s에서 치명적인 노후화가 발견되었습니다. 해당 시스템의 부분 오버홀을 수행하십시오."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="%s에서 고장 위험 상승이 발견되었습니다. 위험을 줄이기 위해 예방 정비를 수행하십시오."/>
+        <text name="ads_report_recommendation_operating_conditions" text="집중적인 과사용 흔적이 발견되었습니다. 운행 조건을 개선하십시오."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="결함 있는 소모품이 발견되었습니다. 결함 부품 교체를 위해 정비를 다시 수행하십시오."/>
+        <text name="ads_report_recommendation_all_ok" text="특별한 권장 사항이 없습니다. 차량이 정상 운행 가능한 상태입니다."/>
+
+        <text name="ads_grease_gun_name" text="그리스 건"/>
+        <text name="ads_grease_gun_function" text="윤활 서비스 절차에 사용됩니다"/>
+        <text name="ads_grease_gun_action" text="그리스 주입"/>
+        <text name="ads_grease_gun_no_vehicle" text="주입 범위 내에 차량이 없습니다"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s은(는) 윤활이 필요하지 않습니다"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s은(는) 이미 윤활되었습니다"/>
+        <text name="ads_air_blower_name" text="에어 블로워"/>
+        <text name="ads_air_blower_function" text="라디에이터 및 흡기구 청소에 사용됩니다"/>
+        <text name="ads_air_blower_action" text="라디에이터 및 흡기구 청소"/>
+        <text name="ads_air_blower_no_vehicle" text="청소 범위 내에 차량이 없습니다"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s은(는) 청소가 필요하지 않습니다"/>
+        <text name="ads_air_blower_already_clean" text="%s: 라디에이터 및 흡기구가 이미 깨끗합니다"/>
+        <text name="ads_jumper_cables_name" text="점프 케이블"/>
+        <text name="ads_jumper_cables_function" text="차량 배터리를 연결하여 방전된 엔진의 시동을 거는 데 사용됩니다"/>
+        <text name="ads_jumper_cables_action" text="점프 케이블 연결/분리"/>
+        <text name="ads_jumper_cables_connected" text="점프 케이블이 %s에 연결되었습니다"/>
+        <text name="ads_jumper_cables_already_connected" text="점프 케이블이 이미 %s에 연결되어 있습니다"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="점프 케이블을 연결하기에 적합하지 않은 차량입니다"/>
+        <text name="ads_jumper_cables_both_already_connected" text="점프 케이블이 이미 %s와(과) %s에 연결되어 있습니다"/>
+        <text name="ads_jumper_cables_disconnected" text="점프 케이블이 %s에서 분리되었습니다"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="한 차량이 움직이기 시작하여 점프 케이블이 자동으로 분리되었습니다"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s와(과) %s 사이가 너무 멉니다"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="차량 점검"/>
+        <text name="ads_field_inspection_action" text="차량 점검하기"/>
+        <text name="ads_field_inspection_hold_to_start" text="길게 눌러 점검 시작"/>
+        <text name="ads_field_inspection_starting" text="점검 시작 중..."/>
+        <text name="ads_field_inspection_progress" text="육안 점검 수행 중... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="점검 취소됨"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="점검 전에 엔진을 정지하십시오"/>
+        <text name="ads_inspection_dialog_title" text="운행 전 육안 점검"/>
+        <text name="ads_inspection_section_fluids" text="1. 작동 유체"/>
+        <text name="ads_inspection_section_cooling_air" text="2. 냉각 및 흡기 시스템"/>
+        <text name="ads_inspection_section_lubrication" text="3. 윤활 부위"/>
+        <text name="ads_inspection_section_additional" text="4. 추가 참고 사항"/>
+        <text name="ads_inspection_engine_oil" text="엔진 오일"/>
+        <text name="ads_inspection_coolant" text="냉각수"/>
+        <text name="ads_inspection_hydraulic_fluid" text="유압유"/>
+        <text name="ads_inspection_transmission_oil" text="변속기 오일"/>
+        <text name="ads_inspection_radiator" text="라디에이터"/>
+        <text name="ads_inspection_air_duct" text="흡기 덕트"/>
+        <text name="ads_inspection_air_filter" text="에어 필터"/>
+        <text name="ads_inspection_lubrication_level" text="윤활 수준"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="의심스러운 증상이 발견되지 않았습니다"/>
+        <text name="ads_inspection_ok" text="정상"/>
+        <text name="ads_inspection_status_slightly_low" text="약간 낮음"/>
+        <text name="ads_inspection_status_low" text="낮음"/>
+        <text name="ads_inspection_status_very_low" text="매우 낮음"/>
+        <text name="ads_inspection_status_critically_low" text="치명적으로 낮음"/>
+        <text name="ads_inspection_status_slightly_darkened" text="약간 변색됨"/>
+        <text name="ads_inspection_status_darkened" text="변색됨"/>
+        <text name="ads_inspection_status_contaminated" text="오염됨"/>
+        <text name="ads_inspection_status_critical_condition" text="치명적"/>
+        <text name="ads_inspection_status_slight_moisture" text="미세 수분"/>
+        <text name="ads_inspection_status_seepage" text="스며나옴"/>
+        <text name="ads_inspection_status_active_leak" text="누유 중"/>
+        <text name="ads_inspection_status_severe_leak" text="심각한 누유"/>
+        <text name="ads_inspection_status_slightly_dirty" text="약간 더러움"/>
+        <text name="ads_inspection_status_dirty" text="더러움"/>
+        <text name="ads_inspection_status_heavily_clogged" text="심하게 막힘"/>
+        <text name="ads_inspection_status_critically_clogged" text="치명적으로 막힘"/>
+        <text name="ads_inspection_status_slightly_dry" text="약간 건조함"/>
+        <text name="ads_inspection_status_dry" text="건조함"/>
+        <text name="ads_inspection_status_very_dry" text="매우 건조함"/>
+        <text name="ads_inspection_status_critically_dry" text="치명적으로 건조함"/>
+        <text name="ads_inspection_status_not_required" text="필요 없음"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="냉각 시스템 연결부 근처에 냉각수 흔적이 미세하게 보입니다."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="냉각수 잔여물이 보이며, 수위가 정상보다 낮습니다."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="냉각 시스템 주변에 뚜렷한 냉각수 손실이 관찰됩니다."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="냉각수 수위가 치명적으로 낮고 심한 누출 흔적이 보입니다."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="엔진 오일 색상이 약간 어두워졌습니다."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="엔진 오일이 평소보다 어둡게 보입니다."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="엔진 오일이 오염된 것처럼 보입니다."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="오일 상태가 치명적인 것으로 보입니다."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="유압 실린더 주변에 옅은 오일 막이 보입니다."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="실린더 주변에 유압액이 스며나오는 것이 보입니다."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="실린더 근처에 명확한 유압유 흔적이 보입니다."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="심한 유압유 흔적이 보이며 주변이 심하게 오염되었습니다."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="라디에이터 표면이 약간 더럽습니다."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="라디에이터가 눈에 띄게 더럽습니다."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="라디에이터가 먼지와 파편으로 심하게 막혔습니다."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="라디에이터가 먼지와 파편으로 치명적으로 막혔습니다."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="흡기 덕트에 가벼운 오염이 보입니다."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="흡기 덕트가 눈에 띄게 더럽습니다."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="흡기 덕트가 먼지와 파편으로 심하게 막혔습니다."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="흡기 덕트가 먼지와 파편으로 치명적으로 막혔습니다."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="윤활 부위가 약간 건조해 보입니다."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="윤활 부위가 건조하고 그리스가 부족해 보입니다."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="윤활 부위가 매우 건조하며 그리스가 거의 남지 않았습니다."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="윤활 부위가 치명적으로 건조하며 그리스 흔적이 거의 없습니다."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="일부 전기 연결부에 미세한 산화 흔적이 보입니다."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="배선과 커넥터에 뚜렷한 산화와 오염이 보입니다."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="배선과 커넥터에 심각한 부식이 보이며 일부 절연체가 손상되었습니다."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="배터리 단자에 옅은 흰색 퇴적물이 보입니다."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="배터리 단자에 흰색 퇴적물이 보입니다."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="배터리 단자와 케이스에 뚜렷한 산화 및 퇴적물이 보입니다."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="배터리와 단자가 심한 퇴적물로 덮여 있고 케이스가 낡고 더럽습니다."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="발전기와 일부 연결부 주변에 과열 및 변색 흔적이 보입니다."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="발전기와 배선 주변에 뚜렷한 과열 흔적과 변색된 커넥터가 보입니다."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="터보차저 주변에 오일 흔적과 변색된 연결부가 보입니다."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="터보차저 주변에 심한 오일 흔적, 변색된 연결부 및 그을음 흔적이 보입니다."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="변속기 유압 연결부 주변에 오일 흔적과 오염이 보입니다."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="변속기 유압 연결부 주변에 심한 오일 흔적과 강한 오염이 보입니다."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="CVT 유압 제어 블록 주변에 오일 흔적과 변색된 연결부가 보입니다."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="CVT 유압 제어 블록 연결부 주변에 심한 오일 흔적과 강한 오염이 보입니다."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="트랙 장력이 약간 불균형해 보입니다."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="트랙이 느슨해 보이며 장력이 뚜렷하게 불균형합니다."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="트랙이 눈에 띄게 처져 있으며 장력이 심각하게 훼손되었습니다."/>
+        
+        <text name="ads_ingame_menu_title" text="고급 손상 시스템"/>
+        <text name="ads_ingame_menu_section_active" text="ADS 차량"/>
+        <text name="ads_ingame_menu_section_service" text="정비 중"/>
+        <text name="ads_ingame_menu_header_vehicle" text="차량"/>
+        <text name="ads_ingame_menu_header_type" text="종류"/>
+        <text name="ads_ingame_menu_header_age" text="차령"/>
+        <text name="ads_ingame_menu_header_working_hours" text="가동 시간"/>
+        <text name="ads_ingame_menu_header_condition" text="상태"/>
+        <text name="ads_ingame_menu_header_interval" text="주기"/>
+        <text name="ads_ingame_menu_header_service_status" text="점검/정비"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="점검일"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="정비일"/>
+        <text name="ads_ingame_menu_header_cost" text="유지비"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="리스료"/>
+        <text name="ads_ingame_menu_header_price" text="가치"/>
+        <text name="ads_ingame_menu_header_procedure" text="절차"/>
+        <text name="ads_ingame_menu_header_time_left" text="남은 시간"/>
+        <text name="ads_ingame_menu_header_finish_time" text="완료 시각"/>
+        <text name="ads_ingame_menu_header_service_cost" text="비용"/>
+        <text name="ads_ingame_menu_section_other" text="기타 차량"/>
+        <text name="ads_ingame_menu_empty_other" text="ADS 미적용 차량이 없습니다"/>
+        <text name="ads_ingame_menu_empty_active" text="ADS 차량이 없습니다"/>
+        <text name="ads_ingame_menu_empty_service" text="현재 정비 중인 차량이 없습니다"/>
+        <text name="ads_sell_dialog_costs_title" text="추가 비용"/>
+        <text name="ads_sell_dialog_deposit_return" text="보증금 반환"/>
+        <text name="ads_sell_dialog_overdue_maintenance_penalty" text="정비 기한 초과 위약금"/>
+        <text name="ads_sell_dialog_repair_penalty" text="수리비 공제"/>
+        <text name="ads_sell_dialog_washing_penalty" text="세척비 공제"/>
+        <text name="ads_sell_dialog_total" text="합계"/>
+        <text name="ads_mobile_workshop_low_maintainability" text="경고: 정비 용이성이 낮아 이동식 정비소에서 %s의 %s 작업을 수행할 수 없습니다."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="치명적 과부하! 즉시 차량의 부하를 줄이십시오."/>
+    </texts>
+</l10n>

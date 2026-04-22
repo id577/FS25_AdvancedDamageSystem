@@ -619,16 +619,28 @@
         <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Prowadnica widocznie opada, a napięcie jest znacznie obniżone."/>
         
         <text name="ads_ingame_menu_title" text="Zaawansowany system uszkodzeń"/>
+        <text name="ads_ingame_menu_section_active" text="Pojazdy ADS"/>
+        <text name="ads_ingame_menu_section_service" text="W serwisie"/>
         <text name="ads_ingame_menu_header_vehicle" text="Pojazd"/>
+        <text name="ads_ingame_menu_header_type" text="Typ"/>
         <text name="ads_ingame_menu_header_age" text="Wiek"/>
         <text name="ads_ingame_menu_header_working_hours" text="Godziny"/>
         <text name="ads_ingame_menu_header_condition" text="Kondycja"/>
         <text name="ads_ingame_menu_header_interval" text="Interwał"/>
-        <text name="ads_ingame_menu_header_last_inspection" text="Sprawdzono"/>
-        <text name="ads_ingame_menu_header_last_maintenance" text="Serwisowany"/>
-        <text name="ads_ingame_menu_header_cost" text="Utrzymanie"/>
+        <text name="ads_ingame_menu_header_service_status" text="Przegl./Serwis"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Sprawdz."/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Serwis."/>
+        <text name="ads_ingame_menu_header_cost" text="Utrzym."/>
         <text name="ads_ingame_menu_header_leasing_price" text="Wynajem długoterminowy"/>
         <text name="ads_ingame_menu_header_price" text="Wartość rynkowa"/>
+        <text name="ads_ingame_menu_header_procedure" text="Proces"/>
+        <text name="ads_ingame_menu_header_time_left" text="Pozostało"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Koniec"/>
+        <text name="ads_ingame_menu_header_service_cost" text="Koszt"/>
+        <text name="ads_ingame_menu_section_other" text="Inne pojazdy"/>
+        <text name="ads_ingame_menu_empty_other" text="Brak pojazdów bez ADS"/>
+        <text name="ads_ingame_menu_empty_active" text="Brak pojazdów ADS"/>
+        <text name="ads_ingame_menu_empty_service" text="Brak pojazdów w serwisie"/>
         <text name="ads_sell_dialog_costs_title" text="Opłaty dodatkowe"/>
         <text name="ads_sell_dialog_deposit_return" text="Zwrot kaucji"/>
         <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Zaległa konserwacja"/>
