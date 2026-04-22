@@ -424,6 +424,24 @@ local function getSyncMotorLoad(vehicle)
     return tonumber(vehicle:getMotorLoadPercentage()) or 0
 end
 
+local function serializeBreakdownsForDirtyCheck(breakdownsTable)
+    local parts = {}
+
+    for id, breakdown in pairs(breakdownsTable or {}) do
+        local stage = math.max(math.floor(tonumber(breakdown.stage) or 1), 1)
+        local visible = breakdown.isVisible and 1 or 0
+        local selected = breakdown.isSelectedForRepair and 1 or 0
+        local active = breakdown.isActive ~= false and 1 or 0
+        local source = math.max(math.floor(tonumber(breakdown.source) or 0), 0)
+
+        table.insert(parts, string.format("%s,%d,%d,%d,%d,%d", id, stage, visible, selected, active, source))
+    end
+
+    table.sort(parts)
+
+    return table.concat(parts, ";")
+end
+
 local function syncFloatChanged(a, b, epsilon)
     return math.abs((tonumber(a) or 0) - (tonumber(b) or 0)) > (epsilon or 0)
 end
@@ -576,7 +594,7 @@ local function markBreakdownsDirty(vehicle, spec)
         return false
     end
 
-    local serializedBreakdowns = ADS_Utils.serializeBreakdowns(spec.activeBreakdowns or {})
+    local serializedBreakdowns = serializeBreakdownsForDirtyCheck(spec.activeBreakdowns)
     if spec._lastSyncBreakdowns_serialized ~= serializedBreakdowns then
             vehicle:raiseDirtyFlags(spec.adsDirtyFlag_breakdowns)
             spec._lastSyncBreakdowns_serialized = serializedBreakdowns
