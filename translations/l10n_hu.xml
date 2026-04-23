@@ -1,0 +1,653 @@
+<l10n>
+    <texts>
+        <text name="ads_maintenancePrice_label" text="Karbantartási költség szorzó"/>
+        <text name="ads_maintenancePrice_tooltip" text="Módosítja a műhelyszolgáltatások költségét, beleértve az átvizsgálásokat, javításokat és a generáljavításokat. A magasabb érték drágábbá teszi a szervizelést."/>
+        <text name="ads_maintenanceDuration_label" text="Karbantartási idő szorzó"/>
+        <text name="ads_maintenanceDuration_tooltip" text="Módosítja a szervizfeladatok időtartamát. A magasabb érték növeli az időt, amit a gép a műhelyben tölt javítás alatt."/>
+        <text name="ads_workshopOpenHour_label" text="Műhely nyitási idő"/>
+        <text name="ads_workshopOpenHour_tooltip" text="Az óra, amikor a műhely kinyit. A javítások csak munkaidőben haladnak."/>
+        <text name="ads_workshopCloseHour_label" text="Műhely zárási idő"/>
+        <text name="ads_workshopCloseHour_tooltip" text="Az óra, amikor a műhely bezár. Ezen időpont után a javítási munkálatok szünetelnek."/>
+        <text name="ads_engineMaxHeat_label" text="Max. motorhőtermelés"/>
+        <text name="ads_engineMaxHeat_tooltip" text="A motor által maximális terhelés mellett generált alapvető hőmennyiség. A magasabb értékek gyorsabb melegedést okoznak."/>
+        <text name="ads_cloggingSpeed_label" text="Eltömődési sebesség"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Beállítja, milyen gyorsan tömődik el a hűtő és a légbeszívó porban, pelyvában vagy terményben végzett munka során. 100%-nál az eltömődés nagyjából a szervizintervallum egyharmada alatt következik be."/>
+        <text name="ads_ws_header_title" text="Műhely"/>
+        <text name="ads_workshopAvailable_label" text="24/7 nyitvatartás"/>
+        <text name="ads_workshopAvailable_tooltip" text="Engedélyezi vagy letiltja a műhely folyamatos, éjjel-nappali működését."/>
+        <text name="ads_instantInspection_label" text="Azonnali átvizsgálás"/>
+        <text name="ads_instantInspection_tooltip" text="Ha engedélyezve van, minden átvizsgálás azonnal befejeződik (nem telik az idő). Megjegyzés: a 'Szemrevételezés' opció ilyenkor nem elérhető."/>
+        <text name="ads_parkVehicle_label" text="Jármű parkoltatása szerviz alatt"/>
+        <text name="ads_parkVehicle_tooltip" text="Ha engedélyezve van, a TAB gombbal való váltáskor a játék átugorja a szervizelés alatt álló járműveket."/>
+        <text name="ads_warrantyEnabled_label" text="Garancia új gépekre"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Garanciális fedezetet biztosít az új járművek javítására (20 üzemóráig vagy 12 hónapig). Csak a gyári (OEM) alkatrészek költségét fedezi."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="AI túlterhelés- és hővédelem"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Ha engedélyezve van, az AI munkás visszaveszi a terhelést, hogy megelőzze a motor túlterhelését vagy túlmelegedését."/>
+        <text name="ads_debugMode_label" text="Hibakereső mód"/>
+        <text name="ads_debugMode_tooltip" text="Engedélyezi a debug panelt és a részletes naplózást a konzolban."/>
+        <text name="ads_warningMessages_label" text="Figyelmeztető üzenetek"/>
+        <text name="ads_warningMessages_tooltip" text="Engedélyezi vagy letiltja a játékmenettel kapcsolatos figyelmeztetéseket, például a hideg motorra vagy a túlmelegedésre vonatkozó riasztásokat."/>
+        <text name="ads_mobileWorkshopRestrictions_label" text="Mobil műhely korlátozások"/>
+        <text name="ads_serviceInterval_label" text="Szervizintervallum"/>
+        <text name="ads_vehicleLifespan_label" text="Jármű élettartam"/>
+        <text name="ads_downtimeWear_label" text="Passzív elhasználódás"/>
+        <text name="ads_generalWearEnabled_label" text="Életkorral összefüggő kopás"/>
+        <text name="ads_systemStressRate_label" text="Rendszerterhelési mutató"/>
+        <text name="ads_batteryCapacity_label" text="Akkumulátor kapacitás"/>
+        <text name="ads_thermalSensitivity_label" text="Hőérzékenység"/>
+        <text name="ads_option_off" text="Ki"/>
+        <text name="ads_serviceInterval_tooltip" text="Beállítja az alapvető szervizintervallumot üzemórában. A tényleges intervallum függ a márkától, a kortól és az előző karbantartás minőségétől."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Beállítja a jármű alapvető élettartamát üzemórában, amely után az állapota eléri a 0%-ot. Minél közelebb van ez az érték a nullához, annál megbízhatatlanabbá válik a gép."/>
+        <text name="ads_downtimeWear_tooltip" text="Beállítja a használaton kívüli gép elhasználódási sebességét az alapérték százalékában. Például 5% esetén egy 100 órás élettartamú gép rendszerei kb. 20 óra állás után veszítenek 1% állapotot. Megjegyzés: fedél alatt tárolva ez a kopás szünetel."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Engedélyezi az öregedés miatti kopást. Ahogy a gép használódik el, a rendszerek (motor, hidraulika, fékek) hatékonysága csökken. A hatás az élettartam egyharmada után kezdődik, és a végéhez közeledve felerősödik."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="Ha engedélyezve van, a mobil műhelyben elvégezhető feladatok köre függ a jármű szerelhetőségétől."/>
+        <text name="ads_systemStressRate_tooltip" text="Meghatározza, milyen gyorsan halmozódik fel a stressz a rendszerekben túlterhelés, túlmelegedés vagy kerékcsúszás során. A stressz közvetlenül növeli a meghibásodás esélyét."/>
+        <text name="ads_batteryCapacity_tooltip" text="Beállítja a maximális használható akkumulátorkapacitást. A 150 Ah körüli értékek a legrealisztikusabbak."/>
+        <text name="ads_thermalSensitivity_tooltip" text="Módosítja a hőmodell viselkedését. Magasabb beállításnál a motor és a váltó érzékenyebb lesz a terhelésre, a környezeti hőmérsékletre és a hűtő elkoszolódására."/>
+        <text name="ads_thermal_none" text="Passzív"/>
+        <text name="ads_thermal_mild" text="Enyhe"/>
+        <text name="ads_thermal_default" text="Alapértelmezett"/>
+        <text name="ads_thermal_aggressive" text="Agresszív"/>
+
+        <text name="ads_ws_label_value" text="Érték"/>
+        <text name="ads_ws_label_age" text="Kor"/>
+        <text name="ads_ws_label_operating_hours" text="Üzemóra"/>
+        <text name="ads_ws_label_service" text="Szerviz"/>
+        <text name="ads_ws_label_condition" text="Állapot"/>
+        <text name="ads_ws_label_maintainability" text="Szerelhetőség"/>
+        <text name="ads_ws_label_maintenance_log" text="Szerviznapló"/>
+        <text name="ads_ws_label_last_report" text="Utolsó jelentés"/>
+        <text name="ads_ws_label_service_interval" text="Szervizintervallum"/>
+        <text name="ads_ws_label_last_maintenance" text="Utolsó karbantartás"/>
+        <text name="ads_ws_label_last_inspection" text="Utolsó átvizsgálás"/>
+        <text name="ads_ws_table_header_part" text="Alkatrész"/>
+        <text name="ads_ws_table_header_description" text="Leírás"/>
+        <text name="ads_ws_table_header_stage" text="Szint"/>
+        <text name="ads_ws_table_header_price" text="Ár"/>
+        <text name="ads_ws_table_header_repair_select" text="Javítás"/>
+        <text name="ads_ws_info_no_breakdowns" text="Nincsenek aktív vagy észlelt meghibásodások."/>
+        <text name="ads_ws_status_initial" text="Állapot betöltése..."/>
+        <text name="ads_ws_action_inspection" text="Átvizsgálás"/>
+        <text name="ads_ws_action_maintenance" text="Karbantartás"/>
+        <text name="ads_ws_action_repair" text="Javítás"/>
+        <text name="ads_ws_action_overhaul" text="Generáljavítás"/>
+        <text name="ads_ws_action_cancel_service" text="Folyamat megszakítása"/>
+        <text name="ads_ws_button_show" text="Megtekintés"/>
+        <text name="ads_ws_age_unit" text="hónap"/>
+        <text name="ads_ws_hours_unit" text="ó"/>
+        <text name="ads_ws_option_yes" text="Igen"/>
+        <text name="ads_ws_option_no" text="Nem"/>
+        <text name="ads_ws_status_open" text="Műhely nyitva"/>
+        <text name="ads_ws_status_closed" text="Műhely zárva"/>
+        <text name="ads_ws_inspecting_status" text="Átvizsgálás..."/>
+        <text name="ads_ws_status_in_progress_format" text="%s folyamatban, várható befejezés: %s..."/>
+        <text name="ads_ws_task_inspection" text="Átvizsgálás"/>
+        <text name="ads_ws_task_maintenance" text="Karbantartás"/>
+        <text name="ads_ws_task_overhaul" text="Generáljavítás"/>
+        <text name="ads_ws_button_price_format" text="%s (%s)"/>
+        <text name="ads_ws_no_last_report_message" text="Még nincsenek jelentések"/>
+        <text name="ads_ws_no_report_message" text="Nincs jelentés"/>
+        <text name="ads_ws_no_log_empty_message" text="A napló még üres"/>
+        <text name="ads_ws_cancel_confirm_title" text="Megszakítja: %s?"/>
+        <text name="ads_ws_cancel_confirm_text" text="A jelenlegi folyamat mentésre kerül. Pénzvisszatérítés nem lehetséges."/>
+
+        <text name="ads_log_header_title" text="Szerviznapló"/>
+        <text name="ads_log_title" text="Műszaki karbantartási napló"/>
+        <text name="ads_log_total_cost_title" text="Összes kiadás"/>
+        <text name="ads_log_cost_per_month_title" text="Havi költség"/>
+        <text name="ads_log_ownership_months_title" text="Birtoklás ideje"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Összes meghibásodás"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Átlagos hiba-intervallum"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Átlagos szerviz-intervallum"/>
+        <text name="ads_log_performed" text="%s elvégezve"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Nem észlelhető hiba"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Észlelt hibák: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="A jármű újra lett fényezve"/>
+        <text name="ads_log_repair_desc_generic" text="Javítás"/>
+        <text name="ads_log_cancelled_desc" text="Folyamat megszakítva"/>
+        <text name="ads_log_date" text="Dátum"/>
+        <text name="ads_log_hours" text="Üzemóra"/>
+        <text name="ads_log_type" text="Munka típusa"/>
+        <text name="ads_log_description" text="Leírás"/>
+        <text name="ads_log_price" text="Költség"/>
+        <text name="ads_log_button_show_report" text="Jelentés mutatása"/>
+        <text name="ads_log_empty" text="A napló üres"/>
+
+        <text name="ads_breakdowns_severity_permanent" text="Állandó"/>
+        <text name="ads_breakdowns_severity_reduce_power" text="Teljesítménycsökkenés"/>
+        <text name="ads_breakdowns_severity_shutdown" text="Leállás"/>
+        <text name="ads_breakdowns_severity_minor" text="Csekély"/>
+        <text name="ads_breakdowns_severity_moderate" text="Mérsékelt"/>
+        <text name="ads_breakdowns_severity_major" text="Súlyos"/>
+        <text name="ads_breakdowns_severity_critical" text="Kritikus"/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Az évekig tartó kemény munka során felgyülemlett stressz. Kisebb, visszafordíthatatlan kopás a főegységeken, ami enyhén csökkenti a teljesítményt."/>
+        <text name="ads_breakdowns_part_vehicle" text="Jármű"/>
+        <text name="ads_breakdowns_part_consumables" text="Segédanyagok"/>
+        <text name="ads_breakdowns_part_engine" text="Motor"/>
+        <text name="ads_breakdowns_part_battery" text="Akkumulátor"/>
+        <text name="ads_breakdowns_part_ecu" text="Motorvezérlő (ECU)"/>
+        <text name="ads_breakdowns_part_wiring" text="Kábelköteg és csatlakozók"/>
+        <text name="ads_breakdowns_part_alternator_regulator" text="Feszültségszabályzó"/>
+        <text name="ads_breakdowns_part_turbocharger" text="Turbófeltöltő"/>
+        <text name="ads_breakdowns_part_oil_pump" text="Olajszivattyú"/>
+        <text name="ads_breakdowns_part_valve_train" text="Szelepvezérlés"/>
+        <text name="ads_breakdowns_part_clutch" text="Tengelykapcsoló (Kuplung)"/>
+        <text name="ads_breakdowns_part_synchronizer" text="Szinkrongyűrű"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift hidraulika szivattyú"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="CVT lánc/szíj"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT hidraulikus vezérlőszelep"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT váltó"/>
+        <text name="ads_breakdowns_part_hydraulic_pump" text="Hidraulika szivattyú"/>
+        <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hidraulika munkahenger"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="TLT tengelykapcsoló"/>
+        <text name="ads_breakdowns_part_brake_system" text="Fékrendszer"/>
+        <text name="ads_breakdowns_part_wheel_bearing" text="Kerékcsapágy"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="Kormánymű/Rudazat"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="Lánctalp-feszítő"/>
+        <text name="ads_breakdowns_part_thermostat" text="Termosztát"/>
+        <text name="ads_breakdowns_part_cooling_system" text="Hűtőrendszer"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="Ventilátor tengelykapcsoló"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="Üzemanyag-szivattyú"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="Befecskendezők"/>
+        <text name="ads_breakdowns_part_fuel_filter" text="Üzemanyagszűrő"/>
+        <text name="ads_breakdowns_part_fuel_line" text="Üzemanyagvezeték"/>
+        <text name="ads_breakdowns_part_harvest_processing_system" text="Cséplő/Feldolgozó rendszer"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Ürítőcsiga"/>
+        <text name="ads_breakdowns_quick_fix_stage" text="Foltvarrott"/>
+        <text name="ads_breakdowns_defected_parts_stage" text="Hibás"/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="Az egység megfelelően működik, de a diagnosztika hibás alkatrészt talált. A kritikus állapot miatt a megelőző csere javasolt a hirtelen leállás elkerülése érdekében."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="Az egység működik, de csak ideiglenes javításra támaszkodik. A terhelés alatti meghibásodás elkerülése érdekében mielőbbi alkatrészcsere javasolt."/>
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="Motorvédelmi üzemmód"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Motor vészüzemmód aktív! Teljesítmény korlátozva!"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="Motorvédelmi üzemmód"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Motor vészüzemmód aktív! Teljesítmény korlátozva!"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="Motorvédelmi üzemmód"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Motor vészüzemmód aktív! Teljesítmény korlátozva!"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="Motorvédelmi üzemmód"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Motor leállítva a túlmelegedés elleni védelem érdekében!"/>
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="A motor teljesen tönkrement"/>
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="A motor megszorult"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="ECU hibák. Enyhén csökkent motorteljesítmény."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="ECU meghibásodás. Érezhető teljesítményvesztés és megnövekedett fogyasztás."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Kritikus ECU hiba. Jelentős teljesítményvesztés és fulladásveszély."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Teljes ECU leállás. A motor nem indítható és nem vezérelhető."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="A motorvezérlő meghibásodott"/>
+        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="Kábelek és csatlakozók korróziója. Érintkezési hiba miatti villódzó fények és nehézkes indítás."/>
+        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="Mérsékelt korrózió az elektromos rendszerben. Gyakori feszültségingadozás és esetleges motorleállás."/>
+        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="Súlyos korrózió. A kritikus áramkörök bizonytalanok, a világítás kieshet, az indítás megbízhatatlan."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="Önindító áramkör szakadása súlyos korrózió miatt. A motor nem indítható."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_message" text="Indítómotor áramköri hiba"/>
+        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="Akkumulátor szulfátosodás. Csökkent kapacitás, gyengébb elektromos tartalék."/>
+        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="Mérsékelt szulfátosodás. Jelentősen csökkent kapacitás, nehézkes indítás."/>
+        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="Súlyos szulfátosodás. Az akkumulátor alig tartja a töltést, bizonytalan indítás."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="Kritikus állapot. Nincs elegendő indítóáram a motor beindításához."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="Elégtelen akkumulátor indítóáram"/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage1_description" text="Feszültségszabályzó hiba. Alacsony töltési hatékonyság."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="Bizonytalan töltés, ingadozó feszültség az elektromos rendszerben."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="Kritikusan alacsony töltés, komoly veszteségek az elektromos hálózatban."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="Teljes töltéskiesés. A rendszer csak az akkumulátor tartalékáról üzemel."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_message" text="Töltésrendszer hiba"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Kopott turbócsapágyak. Halk fütyülés hallható, enyhe erővesztés magas fordulaton."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Szivárgó turbótömítések. Érezhető teljesítménycsökkenés, magasabb fogyasztás."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Sérült turbinalapátok. Súlyos erővesztés és fulladásveszély terhelés alatt."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Katasztrofális turbóhiba. A motor ereje megszűnt, fennáll a belső károsodás veszélye."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="Olajnyomás csökkenés. Enyhe kopogás és emelkedett motorhőmérséklet jelentkezhet."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="Elégtelen olajnyomás. Jól hallható mechanikai kopogás, érezhető erővesztés."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="Kritikusan alacsony olajnyomás. Túlmelegedés és súlyos kopogás, motorleállás lehetséges."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="Olajszivattyú leállása. A motor kenés nélkül maradt, nem üzemeltethető."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_message" text="Olajnyomás hiba"/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="Szelepvezérlési hiba. Enyhe erővesztés és rendellenes zaj a szelepfedél felől."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="Mérsékelt vezérlési hiba. Erősödő zaj, megugró fogyasztás és rángatás."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="Súlyos hiba. Jelentős erővesztés és gyakori lefulladás."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="Kritikus vezérlési hiba. A szelepek nem nyitnak/zárnak megfelelően, a motor nem indul."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_message" text="Szelepvezérlés hiba"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Kezdődő üzemanyag-szivattyú kopás. Enyhe teljesítményvesztés."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Üzemanyagnyomás esése. Érezhető erővesztés és alkalmankénti fulladás."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kritikus üzemanyagnyomás. Gyakori leállás, minimális motorteljesítmény."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="A szivattyú nem szállít üzemanyagot."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="A motor nem indítható"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Eldugult porlasztócsúcs. Egyenetlen alapjárat és enyhe erővesztés."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Rossz porlasztás. Terhelés alatt kihagyó henger, rángató motor."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Ragadó befecskendező. Súlyos teljesítménycsökkenés, bizonytalan üzem."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="A befecskendezés teljesen leállt."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="A motor nem indítható"/>
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Kopott fékbetétek. Enyhén csökkenő fékhatás."/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Folyadékszivárgás vagy kopott tárcsák. Megnövekedett fékút."/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Súlyos nyomásvesztés. A fékek bizonytalanok és gyengék."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Teljes fékhiba. A gép üzemeltetése életveszélyes!"/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Fékrendszer hiba"/>
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Kopott tengelykapcsoló tárcsák. Terhelés alatt néha megcsúszik a hajtás."/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Jelentős kuplungkopás. Gyakori csúszás gyorsításkor."/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Súlyosan kopott kuplung. A vonóerő átadása szinte lehetetlen."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="A kuplung teljesen elégett. A jármű képtelen a mozgásra."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="Erőátviteli hiba"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Kopott szinkrongyűrűk. Nehézkes vagy reccsenő váltás."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Sérült szinkronmű. A sebességfokozatok kapcsolása gyakran sikertelen."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Letört szinkronfogak. Terhelés alatt kidobálja a sebességet."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Teljes szinkronhiba. A sebességváltás lehetetlen."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Váltóhiba"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Alacsony hidraulikanyomás a váltóban. Késleltetett, durva fokozatkapcsolás."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Kopott szivattyútömítések. Rángatás és késlekedés váltáskor."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Haldokló szivattyú. Erős rántások és hosszú szünetek a fokozatok között."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Powershift szivattyú hiba. A váltó üresben ragadt."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="CVT lánc kopás. Megnövekedett hőtermelés és enyhe szíjcsúszás."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="Mérsékelt CVT kopás. Érezhető csúszás és magasabb üzemanyag-fogyasztás."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="Súlyos CVT lánc kopás. Gyakori túlmelegedés és jelentős vonóerő-vesztés."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="Kritikus kopás. A váltó nem tudja átadni a nyomatékot."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="CVT csúszás kritikus"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="CVT vezérlőszelep hiba. Ingadozó hidraulikanyomás és korlátozott áttételtartomány."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Gyakori nyomásingadozás, melegedő váltó és csökkenő végsebesség."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Súlyos nyomásesések, a váltó folyamatosan túlmelegszik."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Kritikus vezérlőszelep hiba. A váltó vészüzemmódban működik."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Kezdődő CVT hiba jelei. Átvizsgálás szükséges."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="A CVT hiba súlyosbodik. További használat esetén vészüzemmód várható."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Kritikus CVT károsodás. A váltó vészüzemmódban, a végsebesség korlátozott."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Teljes CVT váltóhiba. A javításig a gép nem használható."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT váltóhiba"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="CVT vezérlési hiba"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="A termosztát kezd elromlani. A motor lassan éri el az üzemi hőfokot vagy túlságosan melegszik."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Rossz szabályozás. Inga-szerű hőmérsékletváltozás, növekvő motor kopás."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="A termosztát zárva maradt. A motor terhelés alatt azonnal túlmelegszik."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Teljes hűtési hiba. A hűtőfolyadék nem kering, azonnali motorleállás szükséges."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Belső szivárgás a szivattyúban. A hidraulikus eszközök lassabban mozognak."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Kopott szivattyútömítések. Érezhetően lassabb hidraulika működés."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Sérült szivattyú. Az emelés ereje és sebessége minimális."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Teljes szivattyúhiba. A hidraulika nem működik."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hidraulika hiba"/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="Belső szivárgás a munkahengerben. Lassú eresztés terhelés alatt."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="Mérsékelt szivárgás. A munkagép nem tartja meg stabilan a pozícióját."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="Súlyos szivárgás. Gyenge emelési képesség, gyors süllyedés."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="Kritikus hiba. A munkahenger nem képes mozgásra vagy teher megtartására."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="Munkahenger szivárgás kritikus"/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="TLT kuplung csúszás. Csökkent nyomatékátvitel, terhelésnél megállhat a kihajtás."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="Mérsékelt TLT csúszás. Gyakori automatikus leoldás terhelés alatt."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="Súlyos csúszás. A TLT hajtású eszközök nem üzemeltethetők stabilan."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="Kritikus hiba. A TLT kihajtás nem működik."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="TLT hiba"/>
+        <text name="ads_breakdowns_bearing_wear_stage1_description" text="Kerékcsapágy kopás. Vibráció és zaj, enyhén megnövekedett gördülési ellenállás."/>
+        <text name="ads_breakdowns_bearing_wear_stage2_description" text="Mérsékelt kopás. Jól hallható csapágyzaj, csökkenő végsebesség."/>
+        <text name="ads_breakdowns_bearing_wear_stage3_description" text="Súlyos kopás. Erős rázkódás, fennáll a csapágy berágódásának veszélye."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_description" text="A kerékcsapágy megszorult. A kerék nem forog."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_message" text="Kerékcsapágy megszorult"/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="Kormánymű kopás. Enyhe kormányhúzás és lassabb reakció."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="Mérsékelt rudazat kopás. Bizonytalan úttartás, érezhető holtjáték."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="Súlyos kopás. Nehézkes irányíthatóság, jelentős kormányhúzás."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="Kritikus kormánymű hiba. Az irányítás szinte teljesen megszűnt."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="Kormánymű hiba"/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="Lánctalp-feszítő hiba. Vibráció, súrlódó zaj és enyhe sebességcsökkenés."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="Mérsékelt hiba. A gép félrehúz, a motor terhelése megnő."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="Súlyos feszítő hiba. Erős rázkódás, a lánctalp leugrásának veszélye."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="Kritikus hiba. A járószerkezet megszorult."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="Lánctalp-feszítő hiba"/>
+        <text name="ads_breakdowns_coolant_leak_stage1_description" text="Hűtőfolyadék szivárgás. Enyhe hatékonyságcsökkenés."/>
+        <text name="ads_breakdowns_coolant_leak_stage2_description" text="Mérsékelt szivárgás. A motor gyorsabban melegszik terhelés alatt."/>
+        <text name="ads_breakdowns_coolant_leak_stage3_description" text="Súlyos szivárgás. Fennáll a motor azonnali túlmelegedésének veszélye."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_description" text="Kritikus szint. A hűtőrendszer nem képes a hő elvezetésére."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_message" text="Kritikus hűtőfolyadék-szivárgás"/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="Ventilátor kuplung hiba. Csökkent hűtési teljesítmény, rendellenes zaj."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="Jól hallható csapágyzaj a ventilátornál, romló hűtés."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="Súlyos hiba. A ventilátor alig forog, a hűtés elégtelen."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="Kritikus hiba. Nincs légáramlás a hűtőn keresztül."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="Ventilátor hiba"/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="Üzemanyagszűrő eltömődés. Enyhe rángatás nagy terhelésnél."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="Mérsékelt eltömődés. Gyakori megtorpanás, erővesztés és esetleges leállás."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="Súlyos eltömődés. Az üzemanyag áramlása korlátozott, a motor alig indul."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="Kritikus állapot. A motor nem kap üzemanyagot."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="Üzemanyagszűrő eldugult"/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="Levegősödő üzemanyagrendszer. Bizonytalan alapjárat, nehezebb indítás."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="Rángató motor, gyakori lefulladás a rendszerbe jutó levegő miatt."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="Súlyos levegősödés. Az indítás szinte lehetetlen, folyamatos rángatás."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="Kritikus hiba. A motor nem indul a levegőbuborékok miatt."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="Levegő az üzemanyagrendszerben"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Sérült szigetelés, feszültségesések. Kisebb elektronikai zavarok."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Oxidált érintkezők. A világítás kieshet, az indítás bizonytalan."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Zárlatveszély. A kritikus rendszerek megbízhatatlanok, a lámpák nem égnek."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Világítás hiba"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Főkábelköteg hiba. Az elektromos rendszer teljesen halott."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Az önindító nem reagál"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Enyhe karburátor szennyeződés. Terhelés alatt alkalmankénti rángatás."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Eldugult fúvókák. Gyakori fulladás hirtelen gázadáskor."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Súlyos dugulás. Nagyon egyenetlen járás, minimális erő."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Teljes eldugulás. A motor nem üzemképes."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Karburátor eldugult"/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="Feldolgozó rendszer kopása. Enyhén romló tisztítási hatékonyság, kismértékű szemveszteség."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="Mérsékelt kopás. Érezhető szemveszteség és lassabb cséplési folyamat."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="Súlyos kopás. Jelentős terményveszteség a gép mögött."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="Kritikus hiba. A gép hatalmas veszteséggel és rossz minőségben dolgozik."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_message" text="Feldolgozási hatékonyság kritikusan alacsony"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Enyhe kopás a csigákon és felhordó láncokon. Minimális belső veszteség."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Kopott csigalevelek, csúszó hevederek. Rendellenes hangok belülről."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Sérült felhordó lapátok. Akadozó terményáram, nagy a bedugulás veszélye."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Főegység hiba a terményáramban. Súlyos dugulás, a motor túlterhelődik."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Terményáram elakadás"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Megnyúlt ékszíj. Terhelés alatt enyhén lassuló ürítési sebesség."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Kopott szíjtárcsák és szíj. Érezhető lassulás ürítés közben."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Sérült hajtómű vagy szakadozott szíj. Az ürítőcsiga alig forog."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Szakadt szíj vagy beállt hajtómű. Az ürítőcsiga megszorult."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Ürítőcsiga megszorult"/>
+        <text name="ads_breakdowns_dead_battery_message" text="Az akkumulátor lemerült"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="Elégtelen feszültség"/>
+        <text name="ads_breakdowns_engine_stalled_message" text="A motor lefulladt"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="TLT automatikusan leoldott"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="Fokozat kidobva"/>
+        <text name="ads_breakdown_at_progress_message" text="folyamatban"/>
+
+        <text name="ads_spec_cold_engine_message" text="A motor hideg! A magas fordulatszám károsítja!"/>
+        <text name="ads_spec_overheat_engine_message" text="Vigyázat! Motor túlmelegedés."/>
+        <text name="ads_spec_overheat_transmission_message" text="Vigyázat! Sebességváltó túlmelegedés."/>
+        <text name="ads_spec_this_month" text="E hónapban"/>
+        <text name="ads_spec_months_ago" text="hónappal ezelőtt"/>
+        <text name="ads_spec_never" text="Soha"/>
+        <text name="ads_spec_op_hours_short" text="üó"/>
+        <text name="ads_spec_tomorrow_at" text="holnap "/>
+        <text name="ads_spec_day_after_tommorow_at" text="holnapután "/>
+        <text name="ads_spec_in_days_at" text="{days} nap múlva "/>
+        <text name="ads_spec_day_s" text="nap"/>
+        <text name="ads_spec_hour_s" text="óra"/>
+        <text name="ads_spec_minute_s" text="perc"/>
+        <text name="ads_spec_duration_format_hours" text="%d %s"/>
+        <text name="ads_spec_duration_format_minutes" text="%d %s"/>
+        <text name="ads_spec_duration_format_combined" text="%s és %s"/>
+        <text name="ads_spec_months_ago_unit" text="hónapja"/>
+        <text name="ads_spec_months_ago_format" text="%s %s"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s -ig %s"/>
+        <text name="ads_spec_service_interval_format" text="%s üó"/>
+        <text name="ads_spec_maintenance_complete_notification" text="befejezve"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="megszakítva"/>
+        <text name="ads_spec_inspection_issues_detected_notification" text="%s hiba észlelve"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="Nem található hiba"/>
+        <text name="ads_spec_next_planned_service_notification" text="Ütemezett szerviz elkezdődött: %s"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="A tervezett %s elmaradt fedezethiány miatt"/>
+        <text name="ads_spec_workshop_dealer" text="Kereskedő"/>
+        <text name="ads_spec_workshop_own" text="Saját műhely"/>
+        <text name="ads_spec_workshop_mobile" text="Mobil szerviz"/>
+        <text name="ads_spec_system_engine" text="Motor"/>
+        <text name="ads_spec_system_transmission" text="Sebességváltó"/>
+        <text name="ads_spec_system_hydraulics" text="Hidraulika / TLT"/>
+        <text name="ads_spec_system_cooling" text="Hűtőrendszer"/>
+        <text name="ads_spec_system_electrical" text="Elektromos rendszer"/>
+        <text name="ads_spec_system_chassis" text="Alváz / Futómű"/>
+        <text name="ads_spec_system_workprocess" text="Munkaeszköz rendszerek"/>
+        <text name="ads_spec_system_fuel" text="Üzemanyagrendszer"/>
+        <text name="ads_spec_state_ready" text="Kész"/>
+        <text name="ads_spec_state_inspection" text="Átvizsgálás"/>
+        <text name="ads_spec_state_maintenance" text="Karbantartás"/>
+        <text name="ads_spec_state_repair" text="Javítás"/>
+        <text name="ads_spec_state_overhaul" text="Generáljavítás"/>
+        <text name="ads_spec_state_broken" text="Hibás"/>
+        <text name="ads_spec_state_excellent" text="Kiváló"/>
+        <text name="ads_spec_state_good" text="Jó"/>
+        <text name="ads_spec_state_normal" text="Normál"/>
+        <text name="ads_spec_state_bad" text="Rossz"/>
+        <text name="ads_spec_state_terrible" text="Pocsék"/>
+        <text name="ads_spec_state_unknown" text="Ismeretlen"/>
+        <text name="ads_spec_state_optimal" text="Optimális"/>
+        <text name="ads_spec_state_recommended" text="Javasolt"/>
+        <text name="ads_spec_state_required" text="Szükséges"/>
+        <text name="ads_spec_state_overdue" text="Lejárt"/>
+        <text name="ads_spec_state_legendary" text="Legendás"/>
+        <text name="ads_spec_state_premium" text="Prémium"/>
+        <text name="ads_spec_state_standart" text="Standard"/>
+        <text name="ads_spec_state_budget" text="Költséghatékony"/>
+        <text name="ads_spec_state_low" text="Alacsony"/>
+        <text name="ads_spec_state_average" text="Átlagos"/>
+        <text name="ads_spec_state_high" text="Magas"/>
+        <text name="ads_spec_state_workhorse" text="Iás állat"/>
+        <text name="ads_spec_part_types_used" text="Használt"/>
+        <text name="ads_spec_part_types_aftermarket" text="Utángyártott"/>
+        <text name="ads_spec_part_types_oem" text="Gyári (OEM)"/>
+        <text name="ads_spec_part_types_premium" text="Prémium"/>
+        <text name="ads_spec_inspection_visual" text="Szemrevételezés"/>
+        <text name="ads_spec_inspection_standard" text="Normál szerviz"/>
+        <text name="ads_spec_inspection_complete" text="Teljes körű diagnosztika"/>
+        <text name="ads_spec_maintenance_minimal" text="Minimális"/>
+        <text name="ads_spec_maintenance_standard" text="Standard"/>
+        <text name="ads_spec_maintenance_extended" text="Kiterjesztett"/>
+        <text name="ads_spec_maintenance_preventive" text="Megelőző"/>
+        <text name="ads_spec_overhaul_partial" text="Részleges"/>
+        <text name="ads_spec_overhaul_standard" text="Standard"/>
+        <text name="ads_spec_overhaul_full" text="Teljes"/>
+        <text name="ads_spec_repair_type_fix" text="Gyorsjavítás"/>
+        <text name="ads_spec_repair_type_replacement" text="Alkatrészcsere"/>
+        <text name="ads_spec_repair_type_advanced" text="Emelt szintű javítás"/>
+
+        <text name="ads_option_menu_option_one_title_inspection" text="Átvizsgálás típusának kiválasztása"/>
+        <text name="ads_option_menu_option_two_title_inspection" text="Észlelt hibák javítása"/>
+        <text name="ads_option_menu_option_one_title_maintenance" text="Karbantartási szint kiválasztása"/>
+        <text name="ads_option_menu_option_two_title_maintenance" text="Kopóalkatrészek minősége"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Javítás típusa"/>
+        <text name="ads_option_menu_option_two_title_repair" text="Pótalkatrészek minősége"/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="Munkafolyamatok köre"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="Rendszer kiválasztása"/>
+        <text name="ads_option_menu_price_text" text="Ár: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Garanciális javítás"/>
+        <text name="ads_option_menu_duration_text" text="Időtartam: "/>
+        <text name="ads_option_menu_finish_time_text" text="Befejezési idő: "/>
+        <text name="ads_option_menu_start_text" text="Kezdés"/>
+        <text name="ads_option_menu_duration_instant" text="Azonnali"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Gyors külső ellenőrzés. Alacsony költség, azonnali eredmény. Észleli a látható hibákat, de nem ad részletes műszaki adatokat."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* Rutinszerű diagnosztikai folyamat. Beazonosít minden aktív hibát és általános jelentést készít a gép állapotáról."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Mélydiagnosztika. Garantáltan észlel minden rejtett hibát, és százalékos pontossággal megadja az összes alkatrész állapotát."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Alapszintű szerviz. Olcsóbb és gyorsabb, de nem állítja vissza teljesen a szervizszintet és rövidebb intervallumot ad."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Gyártói előírás szerinti karbantartás. Helyreállítja a normál szervizszintet és alapértelmezett intervallumot biztosít."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Átfogó szervizelés. Hosszabb ideig tart, de a standard szintnél magasabb üzembiztonságot és hosszabb szervizintervallumot eredményez."/>   
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Megelőző karbantartás. A legproblémásabb rendszerek kezelésével minimalizálja a váratlan meghibásodások kockázatát."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Ideiglenes javítás a munka befejezéséhez. Olcsón visszaállítja a működőképességet, de a hiba hamarosan újra jelentkezni fog."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* A hibás alkatrész cseréje. Teljesen megszünteti a hibát és visszaállítja az egység normál működését."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* Mélyreható javítás, beleértve a kapcsolódó alkatrészek szervizelését is. Jelentősen csökkenti az ismételt meghibásodás esélyét."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* A kiválasztott rendszer felújítása jó állapotra. Gyorsabb és olcsóbb, mint a teljes generál."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* Átfogó munka minden főegységen. Visszaállítja a gép állapotát jó szintre."/>
+        <text name="ads_option_menu_overhaul_full_description" text="* Teljes újjáépítés. Magas költség és hosszú idő, de gyárihoz közeli állapotot eredményez."/>
+        <text name="ads_option_menu_part_used_description" text="* Bontott alkatrészek. Nagyon olcsó, de rendkívül kockázatos (kb. 50% hibaesély)."/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Utángyártott alkatrészek. Kedvező ár, mérsékelt kockázattal (kb. 33%)."/>
+        <text name="ads_option_menu_part_oem_description" text="* Eredeti gyártói alkatrészek. Megbízható minőség (10% hibaesély) teljes áron."/>
+        <text name="ads_option_menu_part_premium_description" text="* Megerősített prémium alkatrészek. Drágák, de szigorúan ellenőrzöttek (0% hibaesély)."/>
+        <text name="ads_option_menu_perform_repair" text="Hibák javítása"/>
+        <text name="ads_option_menu_perform_maintenance" text="Karbantartás a javítás után"/>
+        <text name="ads_option_menu_perform_renew_paint" text="Újrafényezés"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Automatikus javítás indítása OEM alkatrészekkel, ha hibát találunk."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Automatikus karbantartás indítása OEM anyagokkal a javítás végeztével."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* A jármű teljes fényezése a generáljavítás során."/>
+        <text name="ads_option_menu_choosen_parts_text" text="* Kiválasztott alkatrészek:"/>
+
+        <text name="ads_report_header_title" text="Átvizsgálási jelentés"/>
+        <text name="ads_report_vehicle_name_title" text="Gép megnevezése"/>
+        <text name="ads_report_date_title" text="Dátum"/>
+        <text name="ads_report_vehicle_age_title" text="Kor"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Üzemóra"/>
+        <text name="ads_report_inspection_type_title" text="Átvizsgálás típusa"/>
+        <text name="ads_report_inspection_location_title" text="Helyszín"/>
+        <text name="ads_report_overall_assessment_title" text="Általános állapotfelmérés"/>
+        <text name="ads_report_vehicle_specs_title" text="Műszaki adatok"/>
+        <text name="ads_report_detected_breakdowns_title" text="Észlelt meghibásodások"/>
+        <text name="ads_report_recommendations_title" text="Következtetések és javaslatok"/>
+        <text name="ads_report_state_optimal" text="Optimális"/>
+        <text name="ads_report_state_normal" text="Normális"/>
+        <text name="ads_report_state_degraded" text="Romlott"/>
+        <text name="ads_report_state_impaired" text="Sérült"/>
+        <text name="ads_report_state_critical" text="Kritikus"/>
+        <text name="ads_report_state_not_available" text="N/A"/>
+        <text name="ads_report_overall_assessment_condition" text="Állapot szintje"/>
+        <text name="ads_report_overall_assessment_service" text="Szerviz szintje"/>
+        <text name="ads_report_overall_assessment_mtbf" text="MTBF (üzemóra)"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="Kritikus hiba kockázata"/>
+        <text name="ads_report_overall_assessment_rul" text="Hátralévő élettartam (ó)"/>
+        <text name="ads_report_overall_assessment_wear_rate" text="Elhasználódási ütem (%/ó)"/>
+        <text name="ads_report_overall_assessment_nominal_wear_rate" text="Névleges kopási ütem (%/ó)"/>
+        <text name="ads_report_system_condition_title" text="Rendszer állapot | Meghibásodási kockázat"/>
+        <text name="ads_report_system_condition_power" text="Jelenlegi teljesítmény"/>
+        <text name="ads_report_system_condition_brakes" text="Fékhatékonyság"/>
+        <text name="ads_report_system_condition_transmission" text="Hajtómű állapota"/>
+        <text name="ads_report_system_condition_harvest" text="Betakarítási hatékonyság"/>
+        <text name="ads_report_system_condition_cooling" text="Hűtési hatékonyság"/>
+        <text name="ads_report_system_condition_consumption" text="Üzemanyag-fogyasztás"/>
+        <text name="ads_report_system_condition_hydraulic" text="Hidraulika hatékonyság"/>
+        <text name="ads_report_transmission_slipping" text="Csúszás"/>
+        <text name="ads_report_transmission_shifting_impaired" text="Váltási zavar"/>
+        <text name="ads_report_transmission_gear_rejection" text="Fokozat kidobás"/>
+        <text name="ads_report_transmission_shift_delay" text="Váltási késleltetés"/>
+        <text name="ads_report_transmission_cvt_slipping" text="Szíj/Lánc csúszás"/>
+        <text name="ads_report_transmission_cvt_ratio_limited" text="Korlátozott áttétel"/>
+        <text name="ads_report_transmission_cvt_pressure_instability" text="Nyomásingadozás"/>
+        <text name="ads_report_transmission_failed" text="Tönkrement"/>
+        <text name="ads_report_vehicle_spec_max_alternator_current" text="Generátor max. áram"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="Akkumulátor töltöttség"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="Akkumulátor kapacitás"/>
+        <text name="ads_report_stress_absent" text="Nincs"/>
+        <text name="ads_report_stress_low" text="Alacsony"/>
+        <text name="ads_report_stress_moderate" text="Mérsékelt"/>
+        <text name="ads_report_stress_elevated" text="Emelkedett"/>
+        <text name="ads_report_stress_high" text="Magas"/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Aktív hiba észlelve. Minden hiba azonnali javítása javasolt."/>
+        <text name="ads_report_recommendation_defective_parts" text="Hibás alkatrészek találhatók: %s. Megelőző csere javasolt."/>
+        <text name="ads_report_recommendation_quick_fix" text="Ideiglenes javítás észlelve itt: %s. Szabványos csere javasolt mielőbb."/>
+        <text name="ads_report_recommendation_service_due" text="Szervizintervallum elérve. Karbantartás szükséges."/>
+        <text name="ads_report_recommendation_service_urgent" text="A szervizintervallum túllépve! Sürgős karbantartás szükséges!"/>
+        <text name="ads_report_recommendation_overhaul" text="Főegység degradáció észlelve. Generáljavítás szükséges."/>
+        <text name="ads_report_recommendation_system_overhaul" text="Kritikus degradáció: %s. Részleges felújítás javasolt."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="Magas meghibásodási kockázat: %s. Megelőző karbantartás javasolt."/>
+        <text name="ads_report_recommendation_operating_conditions" text="Intenzív túlterhelés jelei. Javítson az üzemeltetési körülményeken."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="Hibás segédanyagok. Ismételt karbantartás szükséges."/>
+        <text name="ads_report_recommendation_all_ok" text="Nincs kritikus javaslat. A jármű üzemképes állapotban van."/>
+
+        <text name="ads_grease_gun_name" text="Zsírzópisztoly"/>
+        <text name="ads_grease_gun_function" text="Kenési folyamatokhoz használatos"/>
+        <text name="ads_grease_gun_action" text="Zsírozás alkalmazása"/>
+        <text name="ads_grease_gun_no_vehicle" text="Nincs jármű a hatótávon belül"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s nem igényel kenést"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s már le van kenve"/>
+        <text name="ads_air_blower_name" text="Légfúvó"/>
+        <text name="ads_air_blower_function" text="Hűtők és légbeszívók tisztítására szolgál"/>
+        <text name="ads_air_blower_action" text="Hűtő és légbeszívó tisztítása"/>
+        <text name="ads_air_blower_no_vehicle" text="Nincs jármű a hatótávon belül"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s nem igényel tisztítást"/>
+        <text name="ads_air_blower_already_clean" text="%s: a hűtő és a légbeszívó már tiszta"/>
+        <text name="ads_jumper_cables_name" text="Indítókábel"/>
+        <text name="ads_jumper_cables_function" text="Akkumulátorok összekötésére és bikázásra szolgál"/>
+        <text name="ads_jumper_cables_action" text="Indítókábel csatlakoztatása/leválasztása"/>
+        <text name="ads_jumper_cables_connected" text="Indítókábel csatlakoztatva: %s"/>
+        <text name="ads_jumper_cables_already_connected" text="Indítókábel már csatlakozik ide: %s"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="A jármű alkalmatlan az indítókábel fogadására"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Az indítókábel már össze van kötve: %s és %s"/>
+        <text name="ads_jumper_cables_disconnected" text="Indítókábel leválasztva: %s"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Kábel automatikusan leválasztva, mert az egyik gép elindult"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s túl messze van tőle: %s"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="Gép átvizsgálása"/>
+        <text name="ads_field_inspection_action" text="Jármű átvizsgálása"/>
+        <text name="ads_field_inspection_hold_to_start" text="Tartsa nyomva az átvizsgáláshoz"/>
+        <text name="ads_field_inspection_starting" text="Átvizsgálás kezdése..."/>
+        <text name="ads_field_inspection_progress" text="Szemrevételezés folyamatban... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Átvizsgálás megszakítva"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Átvizsgálás előtt állítsa le a motort"/>
+        <text name="ads_inspection_dialog_title" text="Műszak előtti szemrevételezés"/>
+        <text name="ads_inspection_section_fluids" text="1. Üzemi folyadékok"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Hűtés és légbeszívó rendszer"/>
+        <text name="ads_inspection_section_lubrication" text="3. Kenési pontok"/>
+        <text name="ads_inspection_section_additional" text="4. További megjegyzések"/>
+        <text name="ads_inspection_engine_oil" text="Motorolaj"/>
+        <text name="ads_inspection_coolant" text="Hűtőfolyadék"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Hidraulikaolaj"/>
+        <text name="ads_inspection_transmission_oil" text="Hajtóműolaj"/>
+        <text name="ads_inspection_radiator" text="Vízhűtő"/>
+        <text name="ads_inspection_air_duct" text="Levegőbeszívó csatorna"/>
+        <text name="ads_inspection_air_filter" text="Légszűrő"/>
+        <text name="ads_inspection_lubrication_level" text="Kenési szint"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Gyanús jel nem észlelhető"/>
+        <text name="ads_inspection_ok" text="RENDBEN"/>
+        <text name="ads_inspection_status_slightly_low" text="Enyhén alacsony"/>
+        <text name="ads_inspection_status_low" text="Alacsony"/>
+        <text name="ads_inspection_status_very_low" text="Nagyon alacsony"/>
+        <text name="ads_inspection_status_critically_low" text="Kritikusan alacsony"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Enyhén sötétedett"/>
+        <text name="ads_inspection_status_darkened" text="Sötétedett"/>
+        <text name="ads_inspection_status_contaminated" text="Szennyezett"/>
+        <text name="ads_inspection_status_critical_condition" text="Kritikus"/>
+        <text name="ads_inspection_status_slight_moisture" text="Enyhe pára"/>
+        <text name="ads_inspection_status_seepage" text="Szivárgás"/>
+        <text name="ads_inspection_status_active_leak" text="Aktív folyás"/>
+        <text name="ads_inspection_status_severe_leak" text="Súlyos szivárgás"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Enyhén koszos"/>
+        <text name="ads_inspection_status_dirty" text="Koszos"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Erősen eltömődött"/>
+        <text name="ads_inspection_status_critically_clogged" text="Kritikusan eltömődött"/>
+        <text name="ads_inspection_status_slightly_dry" text="Enyhén száraz"/>
+        <text name="ads_inspection_status_dry" text="Száraz"/>
+        <text name="ads_inspection_status_very_dry" text="Nagyon száraz"/>
+        <text name="ads_inspection_status_critically_dry" text="Kritikusan száraz"/>
+        <text name="ads_inspection_status_not_required" text="Nem szükséges"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="Enyhe fagyálló nyomok láthatók a hűtőrendszer csatlakozásainál."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Hűtőfolyadék lerakódás látható, a szint a normál alatt van."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Jól látható hűtőfolyadék veszteség a gép alatt és a motortérben."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="A hűtőfolyadék szintje kritikus, masszív folyás nyomai látszanak."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="A motorolaj enyhén sötétnek tűnik."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="A motorolaj a normálisnál sötétebb, fáradtabb."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="A motorolaj szennyezettnek, fémesnek tűnik."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Az olaj állapota kritikus, azonnali csere érett."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="Enyhe olajfilm látható a hidraulika munkahenger környékén."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Olajszivárgás nyomai láthatók a munkahenger száránál."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Tiszta hidraulikaolaj-folyás látható a munkahengeren."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Súlyos olajfolyás; a munkahenger környéke teljesen olajos."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="A hűtő felülete enyhén poros."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="A hűtőbordák láthatóan szennyezettek."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="A hűtő erősen eltömődött sárral és növénymaradványokkal."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="A hűtő teljesen elzáródott, a légáramlás akadályozott."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="A légbeszívó csatornán enyhe szennyeződés látható."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="A légbeszívó láthatóan poros."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="A légcsatorna erősen eldugult porral és pelyvával."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="A légbeszívó rendszer kritikus mértékben eltömődött."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="A kenési pontok enyhén száraznak tűnnek."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="A csapszegek szárazak, kevés a látható zsír."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="A kenési pontok nagyon szárazak, fémes súrlódás jelei látszanak."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="A kenési pontok teljesen szárazak, nincs rajtuk kenőanyag."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="Enyhe oxidáció jelei látszanak néhány elektromos csatlakozón."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="Kifejezett oxidáció és szennyeződés a kábelkötegen."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Súlyos korrózió és sérült szigetelések láthatók a vezetékeken."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="Enyhe fehér lerakódás látható az akkumulátor pólusain."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="Fehér szulfát-lerakódás látható a pólusokon."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Erős oxidáció és lerakódás az akkumulátor házán és saruin."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Az akkumulátor pólusai vastagon el vannak szulfátosodva."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Túlmelegedés és sötétedés jelei a generátor környékén."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Égett szag és elszíneződött csatlakozók a generátornál."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Olajnyomok és kormozódás látható a turbófeltöltőnél."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Súlyos olajsár és koromlerakódás a turbóház környékén."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Olajszivárgás látható a váltó hidraulikus csatlakozóinál."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Masszív olajfolyás a sebességváltó vezérlőtömbjénél."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="Olajos lerakódás látható a CVT vezérlőszelepénél."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="Erős szivárgás a CVT váltó hidraulika blokkjánál."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="A lánctalp feszessége enyhén egyenetlennek tűnik."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="A lánctalp lazának tűnik, jól látható az egyenetlenség."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="A lánctalp láthatóan lóg, a feszítés teljesen megszűnt."/>
+        
+        <text name="ads_ingame_menu_title" text="Fejlett Sebzési Rendszer (ADS)"/>
+        <text name="ads_ingame_menu_section_active" text="ADS Járművek"/>
+        <text name="ads_ingame_menu_section_service" text="Szervizelés alatt"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Jármű"/>
+        <text name="ads_ingame_menu_header_type" text="Típus"/>
+        <text name="ads_ingame_menu_header_age" text="Kor"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Órák"/>
+        <text name="ads_ingame_menu_header_condition" text="Állapot"/>
+        <text name="ads_ingame_menu_header_interval" text="Intervallum"/>
+        <text name="ads_ingame_menu_header_service_status" text="Átvizsgált/Szervizelt"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Átvizsg."/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Szerviz."/>
+        <text name="ads_ingame_menu_header_cost" text="Fenntartás"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Lízing"/>
+        <text name="ads_ingame_menu_header_price" text="Érték"/>
+        <text name="ads_ingame_menu_header_procedure" text="Folyamat"/>
+        <text name="ads_ingame_menu_header_time_left" text="Hátralévő idő"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Befejezés"/>
+        <text name="ads_ingame_menu_header_service_cost" text="Költség"/>
+        <text name="ads_ingame_menu_section_other" text="Egyéb járművek"/>
+        <text name="ads_ingame_menu_empty_other" text="Nincsenek nem-ADS járművek"/>
+        <text name="ads_ingame_menu_empty_active" text="Nincsenek ADS járművek"/>
+        <text name="ads_ingame_menu_empty_service" text="Jelenleg nincs gép a műhelyben"/>
+        <text name="ads_sell_dialog_costs_title" text="További költségek"/>
+        <text name="ads_sell_dialog_deposit_return" text="Letét visszatérítése"/>
+        <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Elmaradt karbantartási pótdíj"/>
+        <text name="ads_sell_dialog_repair_penalty" text="Javítási levonás"/>
+        <text name="ads_sell_dialog_washing_penalty" text="Tisztítási költség"/>
+        <text name="ads_sell_dialog_total" text="Összesen"/>
+        <text name="ads_mobile_workshop_low_maintainability" text="FIGYELEM: %s nem végezhető el itt: %s a mobil műhelyben az alacsony szerelhetőség miatt."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kritikus túlterhelés! Azonnal csökkentse a gép terhelését!"/>
+    </texts>
+</l10n>
