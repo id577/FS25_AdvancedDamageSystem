@@ -9,7 +9,7 @@
         <ThreePartBitmap profile="fs25_dialogBgBottom" />
 
         <GuiElement profile="fs25_dialogContentContainer">
-            <Text profile="ads_welcomeDialogTitle" id="dialogTitleElement" position="0px -25px" text="WELCOME TO ADS"/>
+            <Text profile="ads_welcomeDialogTitle" id="dialogTitleElement" position="0px -40px" text="WELCOME TO ADS"/>
             <Text profile="ads_welcomeDialogText" id="messageTextElement" position="0px -90px" size="560px 210px" text=""/>
         </GuiElement>
 

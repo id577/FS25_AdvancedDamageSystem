@@ -77,7 +77,7 @@ function ADS_Hud:new()
 
     self.notificationPanel = {
         x = 0.40,
-        y = 0.82,
+        y = 0.14,   
         width = 0.20,
         padding = 0.01,
         lineHeight = 0.016,
