@@ -841,6 +841,8 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "processBreakdowns", AdvancedDamageSystem.processBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "changeBreakdownStage", AdvancedDamageSystem.changeBreakdownStage)
     SpecializationUtil.registerFunction(vehicleType, "getActiveBreakdowns", AdvancedDamageSystem.getActiveBreakdowns)
+    SpecializationUtil.registerFunction(vehicleType, "hasBreakdown", AdvancedDamageSystem.hasBreakdown)
+    SpecializationUtil.registerFunction(vehicleType, "hasEffect", AdvancedDamageSystem.hasEffect)
     SpecializationUtil.registerFunction(vehicleType, "processGeneralWearBreakdown", AdvancedDamageSystem.processGeneralWearBreakdown)
     
     SpecializationUtil.registerFunction(vehicleType, "initService", AdvancedDamageSystem.initService)
@@ -3003,6 +3005,19 @@ local function syncOverloadWarning(vehicle, dt)
     end
 end
 
+local function syncTutorialMessages(vehicle, dt)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil or not vehicle.isClient or not ADS_Config.TUTORIAL_ENABLED then return end
+    local messageData = ADS_Config.TUTORIAL_MESSAGES or {}
+    --- hard start
+    if spec.activeEffects ~= nil and spec.activeEffects.ENGINE_HARD_START_MODIFIER ~= nil then
+        if vehicle:getIsMotorStarted() and not messageData.HARD_START then
+            messageData.HARD_START = true
+        end
+    end
+
+end
+
 local function getSmoothedMotorLoad(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then return end
@@ -3072,6 +3087,9 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     --- Disable AI workers for critical effects
     syncDisableAiWorkers(self)
+
+    --- syncing tutorial messages
+    syncTutorialMessages(self, spec.onUpdateTimer)
     
     --- just in case, reset damage amount to 0 if it's not
     if self.isServer and self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
@@ -4807,6 +4825,10 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             local aiMultiplier = self:getIsAIActive() and 0.5 or 1.0
             luggingFactor = luggingFactor * C.LUGGING_MULTIPLIER * aiMultiplier
             wearRate = wearRate + luggingFactor
+            --- tutorial timer
+            spec.luggingTutorialTimer = math.min((spec.luggingTutorialTimer or 0) + dt, 5000)
+        else
+             spec.luggingTutorialTimer = math.max((spec.luggingTutorialTimer or 0) - dt, 0)
         end
 
         -- heavy trailer factor
@@ -4825,6 +4847,10 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
             wheelSlipFactor = ADS_Utils.calculateQuadraticMultiplier(spec.wheelSlipIntensity, C.WHEEL_SLIP_THRESHOLD, false)
             wheelSlipFactor = wheelSlipFactor * (C.WHEEL_SLIP_MULTIPLIER or 0) * (groundFrictionCoef ^ 2)
             wearRate = wearRate + wheelSlipFactor
+            --- tutorial timer
+            spec.wheelSlipTutorialTimer = math.min((spec.wheelSlipTutorialTimer or 0) + dt, 3000)
+        else
+             spec.wheelSlipTutorialTimer = math.max((spec.wheelSlipTutorialTimer or 0) - dt, 0)
         end
 
         if vehicleHaveCVT then
@@ -6101,7 +6127,31 @@ function AdvancedDamageSystem:hasBreakdown(breakdownId)
         return false
     end
 
+    if breakdownId == nil then
+        for activeBreakdownId, _ in pairs(spec.activeBreakdowns) do
+            local breakdownDef = ADS_Breakdowns.BreakdownRegistry[activeBreakdownId]
+            if breakdownDef ~= nil and breakdownDef.isSelectable == true then
+                return true
+            end
+        end
+
+        return false
+    end
+
     return spec.activeBreakdowns[breakdownId] ~= nil
+end
+
+function AdvancedDamageSystem:hasEffect(effectId)
+    local spec = self.spec_AdvancedDamageSystem
+    if not spec or not spec.activeEffects or next(spec.activeEffects) == nil then
+        return false
+    end
+
+    if effectId == nil then
+        return next(spec.activeEffects) ~= nil
+    end
+
+    return spec.activeEffects[effectId] ~= nil
 end
 
 function AdvancedDamageSystem:hasSystemBreakdowns(system)
@@ -9133,6 +9183,11 @@ function AdvancedDamageSystem:cleanRadiatorAndAirIntake(dt)
     spec.radiatorClogging = math.max(prevRadiatorClogging - cleaningDelta, 0)
     spec.airIntakeClogging = math.max(prevAirIntakeClogging - cleaningDelta, 0)
 
+    --- tutorial message
+    if ADS_Config.TUTORIAL_MESSAGES ~= nil and ADS_Config.TUTORIAL_MESSAGES.RAD_OR_INTAKE_CLOGGED ~= nil and not ADS_Config.TUTORIAL_MESSAGES.RAD_OR_INTAKE_CLOGGED then
+        ADS_Config.TUTORIAL_MESSAGES.RAD_OR_INTAKE_CLOGGED = true
+    end
+
     if self.isServer then
         markFieldcareDirty(self, spec)
     end
@@ -9166,6 +9221,11 @@ function AdvancedDamageSystem:lubricateVehicle()
 
     local prevLubricationLevel = tonumber(spec.lubricationLevel) or 0
     spec.lubricationLevel = math.min(prevLubricationLevel + 0.2, 1.0)
+
+    --- tutorial message
+    if ADS_Config.TUTORIAL_MESSAGES ~= nil and ADS_Config.TUTORIAL_MESSAGES.NEEDS_LUBRICATION ~= nil and not ADS_Config.TUTORIAL_MESSAGES.NEEDS_LUBRICATION then
+        ADS_Config.TUTORIAL_MESSAGES.NEEDS_LUBRICATION = true
+    end
 
     if self.isServer then
         markFieldcareDirty(self, spec)

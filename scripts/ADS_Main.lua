@@ -7,6 +7,7 @@ source(g_currentModDirectory .. "scripts/ADS_Config.lua")
 source(g_currentModDirectory .. "scripts/ADS_Utils.lua")
 source(g_currentModDirectory .. "scripts/ADS_Breakdowns.lua")
 source(g_currentModDirectory .. "scripts/ADS_Leasing.lua")
+source(g_currentModDirectory .. "scripts/ADS_Tutorial.lua")
 source(g_currentModDirectory .. "gui/ADS_WorkshopDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceLogDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_ReportDialog.lua")
@@ -15,6 +16,7 @@ source(g_currentModDirectory .. "gui/ADS_SellItemDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_InGameMenuFrame.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceTwoOptionsDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceThreeOptionsDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_WelcomeDialog.lua")
 source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
 source(g_currentModDirectory .. "scripts/ADS_Telemetry.lua")
 source(g_currentModDirectory .. "scripts/ADS_PlayerInput.lua")
@@ -164,6 +166,7 @@ function ADS_Main:onStartMission()
     ADS_SellItemDialog.register()
     ADS_MaintenanceTwoOptionsDialog.register()
     ADS_MaintenanceThreeOptionsDialog.register()
+    ADS_WelcomeDialog.register()
 
     local mission = g_currentMission
     ADS_Main.hud = ADS_Hud:new()
@@ -420,6 +423,7 @@ ADS_Main.currentWeatherFactor = 1.0
 ADS_Main.samples = ADS_Main.samples or {}
 
 local xmlFile = loadXMLFile("adsSounds2D", Utils.getFilename("sounds/ads_sounds.xml", g_currentModDirectory))
+ADS_Main.samples.notification2D = g_soundManager:loadSample2DFromXML(xmlFile, "sounds", "notification2D", g_currentModDirectory, 1, AudioGroup.GUI)
 ADS_Main.samples.maintenanceCompleted2D = g_soundManager:loadSample2DFromXML(xmlFile, "sounds", "maintenanceCompleted2D", g_currentModDirectory, 1, AudioGroup.GUI)
 
 -- Compute workshop open/close from config hours and current game time.

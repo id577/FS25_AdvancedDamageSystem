@@ -4,9 +4,10 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 130,
+    VER = 131,
 
     DEBUG = false,
+    TUTORIAL_MODE = true,
 
     -- How often quick, interactive effects are updated, in milliseconds.
     -- This controls things that need to be very responsive, like flickering lights,
@@ -17,6 +18,7 @@ ADS_Config = {
     -- High values can cause visual glitches (like lights staying off for too long)
     -- or make gameplay effects feel unresponsive and delayed.
     ON_UPDATE_DELAY = 100, -- (100ms = 10 times per second)
+    TUTORIAL_UPDATE_DELAY = 1000, -- (60 seconds)
 
     UPDATE_VEHICLE_STATE_DELAY_ONE = 50,
     UPDATE_VEHICLE_STATE_DELAY_TWO = 200,
@@ -634,8 +636,48 @@ ADS_Config = {
             LIZARD          = {1.00, 1.00},
             GIANTS          = {1.00, 1.00},
             NONE            = {1.00, 1.00}
-    }      
+    },
+    
+    TUTORIAL_MESSAGES = {
+        WELCOME = false,
+        SERVICE_DUE_SOON = false,
+        RAD_OR_INTAKE_CLOGGED = false,
+        NEEDS_LUBRICATION = false,
+        NEEDS_REPAIR = false,
+        NEEDS_OVERHAUL = false,
+        NEEDS_PREVENTIVE = false,
+        POOR_CONSUMABLES = false,
+        POOR_PARTS = false,
+        IDLE_AND_DOWNTIME = false,
+        HOT_WEATHER = false,
+        WET_WEATHER = false,
+        LOW_FUEL = false,
+        IDLE_DEPOSIT = false,
+        ENGINE_OVERHEAT = false,
+        CVT_OVERHEAT = false,
+        HEAVY_TRAILER = false,
+        CHASSIS_VIBRATION = false,
+        STEERING = false,
+        CRANKING = false,
+        BATTERY_LOW = false,
+        HARD_START = false,
+        CRITICAL_FAILURE = false,
+        HEAVY_LIFT = false,
+        COLD_ENGINE = false,
+        PTO_SHARP_ANGLE = false,
+        WHEEL_SLIP = false,
+        ENGINE_OVERLOAD = false,
+        LUGGING = false,
+    }
 }
+
+function ADS_Config.resetTutorialMessages()
+    for messageId, _ in pairs(ADS_Config.TUTORIAL_MESSAGES) do
+        if messageId ~= "WELCOME" then
+            ADS_Config.TUTORIAL_MESSAGES[messageId] = false
+        end
+    end
+end
 
 ADS_Config.savegameFile = "advancedDamageSystem.xml"
 
@@ -716,6 +758,12 @@ function ADS_Config.saveToXMLFile()
 
     -- DEBUG
     setXMLBool (xmlFile, root .. ".DEBUG_MODE",             ADS_Config.DEBUG)
+    setXMLBool (xmlFile, root .. ".TUTORIAL_MODE",          ADS_Config.TUTORIAL_MODE)
+
+    -- TUTORIAL
+    for messageId, isShown in pairs(ADS_Config.TUTORIAL_MESSAGES) do
+        setXMLBool(xmlFile, string.format("%s.tutorialMessages.%s", root, tostring(messageId)), isShown == true)
+    end
 
     saveXMLFile(xmlFile)
     delete(xmlFile)
@@ -856,6 +904,19 @@ function ADS_Config.loadFromXMLFile()
     -- DEBUG
     v = getXMLBool(xmlFile, root .. ".DEBUG_MODE")
     if v ~= nil then ADS_Config.DEBUG = v end
+
+    -- TUTORIAL
+    v = getXMLBool(xmlFile, root .. ".TUTORIAL_MODE")
+    if v ~= nil then ADS_Config.TUTORIAL_MODE = v end
+
+    for messageId, defaultValue in pairs(ADS_Config.TUTORIAL_MESSAGES) do
+        v = getXMLBool(xmlFile, string.format("%s.tutorialMessages.%s", root, tostring(messageId)))
+        if v ~= nil then
+            ADS_Config.TUTORIAL_MESSAGES[messageId] = v
+        else
+            ADS_Config.TUTORIAL_MESSAGES[messageId] = defaultValue == true
+        end
+    end
 
     delete(xmlFile)
     ADS_Config._loaded = true

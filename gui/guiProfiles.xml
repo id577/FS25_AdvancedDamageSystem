@@ -20,6 +20,9 @@
     <Profile name="ads_dialogBgSmall" extends="fs25_dialogBg">
         <size value="600px 550px"/>
     </Profile>
+    <Profile name="ads_welcomeDialogBg" extends="fs25_dialogBg">
+        <size value="680px 430px"/>
+    </Profile>
     <Profile name="ads_dialogBgLarge" extends="fs25_dialogBg">
         <size value="600px 670px"/>
     </Profile>
@@ -65,6 +68,16 @@
     <Profile name="ads_disclaimerText" extends="ads_dialogText">
         <textSize value="12px"/>
         <textColor value="$preset_fs25_colorMainLight"/>
+    </Profile>
+    <Profile name="ads_welcomeDialogTitle" extends="fs25_dialogTitle">
+        <textBold value="true"/>
+        <textColor value="$preset_fs25_colorGreen"/>
+        <textAlignment value="center"/>
+        <textUpperCase value="false"/>
+    </Profile>
+    <Profile name="ads_welcomeDialogText" extends="fs25_dialogText">
+        <textAlignment value="center"/>
+        <textVerticalAlignment value="middle"/>
     </Profile>
     <Profile name="ads_inspectionAdditionalText" extends="fs25_dialogText">
         <textSize value="14px"/>

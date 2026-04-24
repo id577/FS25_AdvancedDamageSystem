@@ -26,6 +26,8 @@ end
 
 local function buildPendingConfigFromAdsConfig()
     return {
+        tutorialMode = ADS_Config.TUTORIAL_MODE,
+
         baseServiceWear = ADS_Config.CORE.BASE_SERVICE_WEAR,
         baseSystemsWear = ADS_Config.CORE.BASE_SYSTEMS_WEAR,
         downtimeMultiplier = ADS_Config.CORE.DOWNTIME_MULTIPLIER,
@@ -70,6 +72,12 @@ local function getCurrentSettingsPage()
         and g_gui.currentGui.target ~= nil
         and g_gui.currentGui.target.currentPage
         or nil
+end
+
+local function isCurrentMissionMultiplayer()
+    return g_currentMission ~= nil
+        and g_currentMission.missionDynamicInfo ~= nil
+        and g_currentMission.missionDynamicInfo.isMultiplayer == true
 end
 
 local function refreshCurrentSettingsPage()
@@ -119,9 +127,88 @@ function ADS_InGameSettings.applyPendingConfigSideEffects(oldConfig, newConfig)
     end
 end
 
+function ADS_InGameSettings.commitPendingConfig(current, pending)
+    if pending == nil or current == nil then
+        return
+    end
+
+    ADS_InGameSettings.applyPendingConfigSideEffects(current, pending)
+
+    local batteryFactorChanged = valuesDiffer(pending.batteryUsableCapacityFactor, current.batteryUsableCapacityFactor)
+    local workshopChanged =
+        valuesDiffer(pending.alwaysAvailable, current.alwaysAvailable) or
+        valuesDiffer(pending.mobileWorkshopRestrictionsEnabled, current.mobileWorkshopRestrictionsEnabled) or
+        valuesDiffer(pending.openHour, current.openHour) or
+        valuesDiffer(pending.closeHour, current.closeHour)
+
+    if isCurrentMissionMultiplayer() then
+        pending.tutorialMode = false
+    end
+
+    ADS_Config.TUTORIAL_MODE = pending.tutorialMode
+
+    ADS_Config.CORE.BASE_SERVICE_WEAR = pending.baseServiceWear
+    ADS_Config.CORE.BASE_SYSTEMS_WEAR = pending.baseSystemsWear
+    ADS_Config.CORE.DOWNTIME_MULTIPLIER = pending.downtimeMultiplier
+    ADS_Config.CORE.GENERAL_WEAR_ENABLED = pending.generalWearEnabled
+    ADS_Config.CORE.ENABLE_WARNING_MESSAGES = pending.enableWarningMessages
+    ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = pending.systemStressGlobalMultiplier
+    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = pending.aiOverloadControl
+
+    ADS_Config.MAINTENANCE.INSTANT_INSPECTION = pending.instantInspection
+    ADS_Config.MAINTENANCE.PARK_VEHICLE = pending.parkVehicle
+    ADS_Config.MAINTENANCE.WARRANTY_ENABLED = pending.warrantyEnabled
+    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER = pending.globalPriceMultiplier
+    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER = pending.globalTimeMultiplier
+
+    ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = pending.alwaysAvailable
+    ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = pending.mobileWorkshopRestrictionsEnabled
+    ADS_Config.WORKSHOP.OPEN_HOUR = pending.openHour
+    ADS_Config.WORKSHOP.CLOSE_HOUR = pending.closeHour
+
+    ADS_Config.THERMAL.ENGINE_MAX_HEAT = pending.engineMaxHeat
+    ADS_Config.THERMAL.TRANS_MAX_HEAT = pending.transMaxHeat
+
+    ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR = pending.batteryUsableCapacityFactor
+
+    ADS_Config.FIELD_CARE.CLOGGING_SPEED = pending.cloggingSpeed
+
+    ADS_Config.DEBUG = pending.debugMode
+
+    if batteryFactorChanged and ADS_Main ~= nil and ADS_Main.vehicles ~= nil then
+        for _, vehicle in pairs(ADS_Main.vehicles) do
+            if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
+                AdvancedDamageSystem.rescaleBatteryChargeFromSoc(vehicle)
+
+                local spec = vehicle.spec_AdvancedDamageSystem
+                if vehicle.isServer and spec.adsDirtyFlag_electrical ~= nil then
+                    vehicle:raiseDirtyFlags(spec.adsDirtyFlag_electrical)
+                end
+            end
+        end
+    end
+
+    if workshopChanged and ADS_Main ~= nil and ADS_Main.forceWorkshopUpdate ~= nil then
+        ADS_Main:forceWorkshopUpdate()
+    end
+
+    if g_currentMission ~= nil then
+        if g_currentMission:getIsServer() and g_server ~= nil then
+            g_server:broadcastEvent(ADS_SettingsSyncEvent.new())
+        elseif g_client ~= nil then
+            ADS_SettingsSyncEvent.send()
+        end
+    end
+end
+
 function ADS_InGameSettings:onFrameOpen()
     ADS_InGameSettings.pendingConfig = buildPendingConfigFromAdsConfig()
     ADS_InGameSettings.ads_hasPendingSettingsChange = false
+
+    if isCurrentMissionMultiplayer() then
+        ADS_Config.TUTORIAL_MODE = false
+        ADS_InGameSettings.pendingConfig.tutorialMode = false
+    end
 
     if self.ads_initSettingsMenuDone then
         ADS_InGameSettings:updateADSSettings(self)
@@ -134,6 +221,14 @@ function ADS_InGameSettings:onFrameOpen()
     ADS_InGameSettings:generateAllSteps()
 
     ADS_InGameSettings:addSectionHeader(self, "Advanced Damage System")
+
+    -- Tutorial mode (Binary)
+    self.ads_tutorialMode = ADS_InGameSettings:addBinaryOption(
+        self,
+        "onTutorialModeChanged",
+        g_i18n:getText("ads_tutorialMode_label"),
+        g_i18n:getText("ads_tutorialMode_tooltip")
+    )
 
     -- Base Service Interval (ex.: Service Wear)
     self.ads_serviceWear = ADS_InGameSettings:addMultiTextOption(
@@ -337,67 +432,22 @@ function ADS_InGameSettings:onFrameClose()
         return
     end
 
-    ADS_InGameSettings.applyPendingConfigSideEffects(current, pending)
+    local shouldAskTutorialReset = current.tutorialMode ~= true
+        and pending.tutorialMode == true
+        and not isCurrentMissionMultiplayer()
 
-    local batteryFactorChanged = valuesDiffer(pending.batteryUsableCapacityFactor, current.batteryUsableCapacityFactor)
-    local workshopChanged =
-        valuesDiffer(pending.alwaysAvailable, current.alwaysAvailable) or
-        valuesDiffer(pending.mobileWorkshopRestrictionsEnabled, current.mobileWorkshopRestrictionsEnabled) or
-        valuesDiffer(pending.openHour, current.openHour) or
-        valuesDiffer(pending.closeHour, current.closeHour)
-
-    ADS_Config.CORE.BASE_SERVICE_WEAR = pending.baseServiceWear
-    ADS_Config.CORE.BASE_SYSTEMS_WEAR = pending.baseSystemsWear
-    ADS_Config.CORE.DOWNTIME_MULTIPLIER = pending.downtimeMultiplier
-    ADS_Config.CORE.GENERAL_WEAR_ENABLED = pending.generalWearEnabled
-    ADS_Config.CORE.ENABLE_WARNING_MESSAGES = pending.enableWarningMessages
-    ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = pending.systemStressGlobalMultiplier
-    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = pending.aiOverloadControl
-
-    ADS_Config.MAINTENANCE.INSTANT_INSPECTION = pending.instantInspection
-    ADS_Config.MAINTENANCE.PARK_VEHICLE = pending.parkVehicle
-    ADS_Config.MAINTENANCE.WARRANTY_ENABLED = pending.warrantyEnabled
-    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER = pending.globalPriceMultiplier
-    ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER = pending.globalTimeMultiplier
-
-    ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = pending.alwaysAvailable
-    ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = pending.mobileWorkshopRestrictionsEnabled
-    ADS_Config.WORKSHOP.OPEN_HOUR = pending.openHour
-    ADS_Config.WORKSHOP.CLOSE_HOUR = pending.closeHour
-
-    ADS_Config.THERMAL.ENGINE_MAX_HEAT = pending.engineMaxHeat
-    ADS_Config.THERMAL.TRANS_MAX_HEAT = pending.transMaxHeat
-
-    ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR = pending.batteryUsableCapacityFactor
-
-    ADS_Config.FIELD_CARE.CLOGGING_SPEED = pending.cloggingSpeed
-
-    ADS_Config.DEBUG = pending.debugMode
-
-    if batteryFactorChanged and ADS_Main ~= nil and ADS_Main.vehicles ~= nil then
-        for _, vehicle in pairs(ADS_Main.vehicles) do
-            if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
-                AdvancedDamageSystem.rescaleBatteryChargeFromSoc(vehicle)
-
-                local spec = vehicle.spec_AdvancedDamageSystem
-                if vehicle.isServer and spec.adsDirtyFlag_electrical ~= nil then
-                    vehicle:raiseDirtyFlags(spec.adsDirtyFlag_electrical)
-                end
+    if shouldAskTutorialReset then
+        YesNoDialog.show(function(shouldReset)
+            if shouldReset then
+                ADS_Config.resetTutorialMessages()
             end
-        end
+
+            ADS_InGameSettings.commitPendingConfig(current, pending)
+        end, self, g_i18n:getText("ads_tutorialResetConfirm_message"), g_i18n:getText("ads_tutorialResetConfirm_title"))
+        return
     end
 
-    if workshopChanged and ADS_Main ~= nil and ADS_Main.forceWorkshopUpdate ~= nil then
-        ADS_Main:forceWorkshopUpdate()
-    end
-
-    if g_currentMission ~= nil then
-        if g_currentMission:getIsServer() and g_server ~= nil then
-            g_server:broadcastEvent(ADS_SettingsSyncEvent.new())
-        elseif g_client ~= nil then
-            ADS_SettingsSyncEvent.send()
-        end
-    end
+    ADS_InGameSettings.commitPendingConfig(current, pending)
 end
 
 
@@ -410,6 +460,17 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
 
     local steps = ADS_InGameSettings.steps
     local pending = ADS_InGameSettings.pendingConfig or buildPendingConfigFromAdsConfig()
+    local isMultiplayer = isCurrentMissionMultiplayer()
+    local tutorialOption = currentPage.ads_tutorialMode
+    local tutorialContainer = tutorialOption ~= nil and tutorialOption.parent or nil
+
+    if isMultiplayer then
+        pending.tutorialMode = false
+    end
+
+    if tutorialContainer ~= nil then
+        tutorialContainer:setVisible(not isMultiplayer)
+    end
 
     local function setIndex(element, valueList, targetValue)
         local bestIndex = 1
@@ -436,6 +497,9 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, pending.engineMaxHeat)
     setIndex(currentPage.ads_cloggingSpeed, steps.cloggingSpeed.values, pending.cloggingSpeed)
     
+    if tutorialOption ~= nil then
+        tutorialOption:setIsChecked(pending.tutorialMode, false, false)
+    end
     currentPage.ads_instantInspection:setIsChecked(pending.instantInspection, false, false)
     currentPage.ads_parkVehicle:setIsChecked(pending.parkVehicle, false, false)
     currentPage.ads_warrantyEnabled:setIsChecked(pending.warrantyEnabled, false, false)
@@ -459,6 +523,9 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
         and g_currentMission:getIsClient()
     local disableAll = not canChangeSettings
 
+    if tutorialOption ~= nil then
+        tutorialOption:setDisabled(disableAll or isMultiplayer)
+    end
     currentPage.ads_serviceWear:setDisabled(disableAll)
     currentPage.ads_conditionWear:setDisabled(disableAll)
     currentPage.ads_downtimeWear:setDisabled(disableAll)
@@ -484,11 +551,24 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
         currentPage.ads_workshopOpenHour:setDisabled(true)
         currentPage.ads_workshopCloseHour:setDisabled(true)
     end
+
+    if tutorialContainer ~= nil then
+        currentPage.gameSettingsLayout:invalidateLayout()
+        currentPage:updateAlternatingElements(currentPage.gameSettingsLayout)
+        currentPage:updateGeneralSettings(currentPage.gameSettingsLayout)
+    end
 end
 
 -- --- Callback Handlers --- --
 function ADS_InGameSettings:onServiceWearChanged(state)
     getPendingConfig().baseServiceWear = ADS_InGameSettings.steps.serviceWear.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onTutorialModeChanged(state)
+    local pending = getPendingConfig()
+    pending.tutorialMode = not isCurrentMissionMultiplayer() and (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings.ads_hasPendingSettingsChange = true
     refreshCurrentSettingsPage()
 end
