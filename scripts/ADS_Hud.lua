@@ -77,14 +77,27 @@ function ADS_Hud:new()
 
     self.notificationPanel = {
         x = 0.40,
-        y = 0.82,
+        y = 0.14,   
         width = 0.20,
         padding = 0.01,
         lineHeight = 0.016,
+        titleLineHeight = 0.018,
+        titleSpacing = 0.006,
+        titleDividerHeight = 0.001,
+        dividerSpacing = 0.003,
+        bottomDividerSpacing = 2,
+        bottomDividerExtraHeight = 5,
+        persistentDurationMs = 25000,
         background = self.modDirectory .. "hud/ads_debugHud.dds",
+        dividerBackground = "dataS/menu/base/graph_pixel.dds",
+        title = nil,
         text = nil,
         endTime = 0,
-        isVisible = false
+        isVisible = false,
+        isPersistent = false,
+        closeButtonSize = 0.016,
+        closeButtonPadding = 0.004,
+        lastCloseMouseDown = false
     }
 
     self.activeVehicleDebugPanel = {
@@ -363,9 +376,9 @@ end
 --                              NOTIFICATION PANEL
 -- =====================================================================================
 
-function ADS_Hud.showNotification(text, durationMs)
+function ADS_Hud.showNotification(text, durationMs, title, playSound)
     if ADS_Main ~= nil and ADS_Main.hud ~= nil then
-        ADS_Main.hud:setNotification(text, durationMs)
+        ADS_Main.hud:setNotification(text, durationMs, title, playSound)
     end
 end
 
@@ -375,25 +388,45 @@ function ADS_Hud.hideNotification()
     end
 end
 
-function ADS_Hud:setNotification(text, durationMs)
+function ADS_Hud:setNotification(text, durationMs, title, playSound)
     local panel = self.notificationPanel
     local normalizedText = tostring(text or ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+    local normalizedTitle = tostring(title or ""):gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+    local parsedDurationMs = tonumber(durationMs)
 
     if normalizedText == "" then
         self:clearNotification()
         return
     end
 
+    if normalizedTitle == "" then
+        normalizedTitle = nil
+    else
+        normalizedTitle = utf8ToUpper(normalizedTitle)
+    end
+
+    panel.title = normalizedTitle
     panel.text = normalizedText
-    panel.endTime = g_time + math.max(tonumber(durationMs) or 3000, 0)
+    panel.isPersistent = parsedDurationMs ~= nil and parsedDurationMs <= 0
+    panel.endTime = panel.isPersistent
+        and (g_time + math.max(panel.persistentDurationMs or 25000, 0))
+        or (g_time + math.max(parsedDurationMs or 3000, 0))
+    panel.lastCloseMouseDown = false
     panel.isVisible = true
+
+    if playSound and ADS_Main ~= nil and ADS_Main.samples ~= nil and ADS_Main.samples.notification2D ~= nil then
+        g_soundManager:playSample(ADS_Main.samples.notification2D)
+    end
 end
 
 function ADS_Hud:clearNotification()
     local panel = self.notificationPanel
+    panel.title = nil
     panel.text = nil
     panel.endTime = 0
     panel.isVisible = false
+    panel.isPersistent = false
+    panel.lastCloseMouseDown = false
 end
 
 function ADS_Hud:wrapNotificationText(text, maxWidth, textSize)
@@ -427,6 +460,17 @@ function ADS_Hud:wrapNotificationText(text, maxWidth, textSize)
     return lines
 end
 
+function ADS_Hud:drawNotificationDivider(x, y, width, height, color)
+    local snappedX = math.floor(x * g_screenWidth + 0.5) / g_screenWidth
+    local snappedY = math.floor(y * g_screenHeight + 0.5) / g_screenHeight
+    local snappedWidth = math.max(math.floor(width * g_screenWidth + 0.5) / g_screenWidth, 1 / g_screenWidth)
+    local snappedHeight = math.max(math.floor(height * g_screenHeight + 0.5) / g_screenHeight, 1 / g_screenHeight)
+
+    local overlay = Overlay.new(self.notificationPanel.dividerBackground, snappedX, snappedY, snappedWidth, snappedHeight)
+    overlay:setColor(unpack(color))
+    overlay:render()
+end
+
 function ADS_Hud:drawNotificationPanel()
     local panel = self.notificationPanel
     if panel == nil or not panel.isVisible or panel.text == nil then
@@ -438,26 +482,107 @@ function ADS_Hud:drawNotificationPanel()
         return
     end
 
+    local titleTextSize = self.text.headerSize
     local textSize = self.text.normalSize + 0.003
-    local maxTextWidth = panel.width - panel.padding * 2
-    local lines = self:wrapNotificationText(panel.text, maxTextWidth, textSize)
-    local dynamicHeight = panel.padding * 2 + (#lines * panel.lineHeight)
+    local fullTextWidth = panel.width - panel.padding * 2
+    local closeButtonReservedWidth = panel.isPersistent and (panel.closeButtonSize + panel.closeButtonPadding) or 0
+    local titleTextWidth = fullTextWidth - closeButtonReservedWidth
+    local titleLines = {}
 
-    local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
+    if panel.title ~= nil then
+        titleLines = self:wrapNotificationText(panel.title, titleTextWidth, titleTextSize)
+    end
+
+    local lines = self:wrapNotificationText(panel.text, fullTextWidth, textSize)
+    local baseHeight = panel.padding * 2 + panel.lineHeight
+    local hasTitle = #titleLines > 0
+    local titleSpacing = hasTitle and panel.titleSpacing or 0
+    local titleDividerHeight = hasTitle and panel.titleDividerHeight or 0
+    local bottomDividerSpacing = hasTitle and self:scalePixelToScreenHeight(panel.bottomDividerSpacing or 2) or 0
+    local bottomDividerExtraHeight = hasTitle and self:scalePixelToScreenHeight(panel.bottomDividerExtraHeight or 5) or 0
+    local dynamicHeight = panel.padding * 2 + (#titleLines * panel.titleLineHeight) + titleSpacing + (#lines * panel.lineHeight) + bottomDividerSpacing + bottomDividerExtraHeight
+    local anchorCenterY = panel.y + baseHeight * 0.5
+    local panelY = anchorCenterY - dynamicHeight * 0.5
+
+    local overlay = Overlay.new(panel.background, panel.x, panelY, panel.width, dynamicHeight)
     overlay:setColor(1, 1, 1, 0.78)
     overlay:render()
 
     local centerX = panel.x + panel.width * 0.5
-    local currentY = panel.y + dynamicHeight - panel.padding
+    local currentY = panelY + dynamicHeight - panel.padding
+    local closeButtonX = panel.x + panel.width - panel.closeButtonPadding - panel.closeButtonSize
+    local closeButtonY = panelY + dynamicHeight - panel.closeButtonPadding - panel.closeButtonSize
+
+    if panel.isPersistent then
+        local isMouseCursorVisible = g_inputBinding ~= nil and g_inputBinding.getShowMouseCursor ~= nil and g_inputBinding:getShowMouseCursor()
+        local mousePosX = g_inputBinding ~= nil and g_inputBinding.mousePosXLast or nil
+        local mousePosY = g_inputBinding ~= nil and g_inputBinding.mousePosYLast or nil
+        local isHoveringCloseButton = isMouseCursorVisible
+            and mousePosX ~= nil
+            and mousePosY ~= nil
+            and mousePosX >= closeButtonX
+            and mousePosX <= closeButtonX + panel.closeButtonSize
+            and mousePosY >= closeButtonY
+            and mousePosY <= closeButtonY + panel.closeButtonSize
+        local isCloseMouseDown = isMouseCursorVisible and Input.isMouseButtonPressed(Input.MOUSE_BUTTON_LEFT)
+
+        if isHoveringCloseButton and isCloseMouseDown and not panel.lastCloseMouseDown then
+            self:clearNotification()
+            return
+        end
+
+        panel.lastCloseMouseDown = isCloseMouseDown
+
+        setTextAlignment(RenderText.ALIGN_CENTER)
+        setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+        setTextBold(true)
+
+        if isHoveringCloseButton then
+            setTextColor(1, 0.45, 0.45, 1)
+        else
+            setTextColor(1, 1, 1, 0.95)
+        end
+
+        renderText(
+            closeButtonX + panel.closeButtonSize * 0.5,
+            closeButtonY + panel.closeButtonSize * 0.5,
+            textSize,
+            "X"
+        )
+    end
+
+    if hasTitle then
+        setTextAlignment(RenderText.ALIGN_CENTER)
+        setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
+        setTextBold(true)
+        setTextColor(0.45, 0.78, 0.24, 1)
+
+        for _, line in ipairs(titleLines) do
+            renderText(centerX, currentY, titleTextSize, line)
+            currentY = currentY - panel.titleLineHeight
+        end
+
+        local dividerWidth = panel.width - panel.padding * 2
+        local dividerY = currentY - panel.dividerSpacing - titleDividerHeight * 0.5
+        self:drawNotificationDivider(panel.x + panel.padding, dividerY, dividerWidth, titleDividerHeight, {0.45, 0.78, 0.24, 1})
+
+        currentY = currentY - panel.titleSpacing
+    end
 
     setTextAlignment(RenderText.ALIGN_CENTER)
     setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
-    setTextBold(true)
+    setTextBold(false)
     setTextColor(1, 1, 1, 1)
 
     for _, line in ipairs(lines) do
         renderText(centerX, currentY, textSize, line)
         currentY = currentY - panel.lineHeight
+    end
+
+    if hasTitle then
+        local dividerWidth = panel.width - panel.padding * 2
+        local bottomDividerY = currentY - panel.dividerSpacing - bottomDividerSpacing - titleDividerHeight * 0.5
+        self:drawNotificationDivider(panel.x + panel.padding, bottomDividerY, dividerWidth, titleDividerHeight, {0.45, 0.78, 0.24, 1})
     end
 
     setTextBold(false)
@@ -802,7 +927,6 @@ function ADS_Hud:renderActiveVehicleDebugCache(cache)
 
     setTextColor(1, 1, 1, 1)
 end
-
 
 function ADS_Hud:drawActiveVehicleHUD()
     local vehicle = self.vehicle

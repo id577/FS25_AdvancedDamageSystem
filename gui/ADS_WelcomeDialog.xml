@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer" />
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg" />
+
+    <GuiElement profile="ads_welcomeDialogBg" id="dialogElement">
+        <ThreePartBitmap profile="fs25_dialogBgMiddleSmall" />
+        <ThreePartBitmap profile="fs25_dialogBgTopSmall" />
+        <ThreePartBitmap profile="fs25_dialogBgBottom" />
+
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="ads_welcomeDialogTitle" id="dialogTitleElement" position="0px -40px" text="WELCOME TO ADS"/>
+            <Text profile="ads_welcomeDialogText" id="messageTextElement" position="0px -90px" size="560px 210px" text=""/>
+        </GuiElement>
+
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonBack" text="$l10n_ads_tutorial_welcome_disable_button" onClick="onClickDisableTips" />
+            <Button profile="buttonOK" text="$l10n_ads_tutorial_welcome_enable_button" onClick="onClickEnableTips" focusInit="onOpen" />
+        </BoxLayout>
+    </GuiElement>
+</GUI>

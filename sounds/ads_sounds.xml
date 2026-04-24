@@ -182,5 +182,6 @@
         <lowpassCutoffFrequency indoor="5000" outdoor="20000.0" />
         <lowpassResonance indoor="1.0" outdoor="1.0"/>
     </inspection>
+    <notification2D file="sounds/notification.ogg" volume="1.0" pitch="1.0" />
     <maintenanceCompleted2D file="sounds/maintenanceCompleted.ogg" volume="1.0" pitch="1.0" />
 </sounds>

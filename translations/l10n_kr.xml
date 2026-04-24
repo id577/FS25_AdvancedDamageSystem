@@ -649,5 +649,69 @@
         <text name="ads_sell_dialog_total" text="합계"/>
         <text name="ads_mobile_workshop_low_maintainability" text="경고: 정비 용이성이 낮아 이동식 정비소에서 %s의 %s 작업을 수행할 수 없습니다."/>
         <text name="ads_breakdowns_overload_breakdown_stage2_message" text="치명적 과부하! 즉시 차량의 부하를 줄이십시오."/>
+        <text name="ads_tutorialMode_label" text="튜토리얼 모드"/>
+        <text name="ads_tutorialMode_tooltip" text="게임 플레이 중 튜토리얼 팁을 표시합니다. 멀티플레이어에서는 비활성화됩니다."/>
+        <text name="ads_tutorialResetConfirm_title" text="튜토리얼 팁을 초기화할까요?"/>
+        <text name="ads_tutorialResetConfirm_message" text="튜토리얼 팁 기록을 초기화하고 모든 팁을 다시 표시할까요?"/>
+        <text name="ads_tutorial_welcome_dialog_title" text="Advanced Damage System에 오신 것을 환영합니다"/>
+        <text name="ads_tutorial_welcome_disable_button" text="팁 끄기"/>
+        <text name="ads_tutorial_welcome_enable_button" text="팁 켜기"/>
+        <text name="ads_tutorial_welcome_message" text="이 모드는 게임의 차량 손상 및 정비 시스템을 완전히 새롭게 바꿉니다. 변경 사항이 많기 때문에 튜토리얼 팁이 수시로 표시됩니다. 이 팁들은 새로운 메커니즘을 더 빨리 이해하고, 흔한 실수를 피하며, 기계가 고장 나지 않도록 도와줍니다.&#10;&#10;원하시면 지금 바로 튜토리얼 팁을 끌 수 있습니다. 이후에는 모드 설정의 Advanced Damage System 항목에서 언제든 다시 켤 수 있습니다."/>
+        <text name="ads_tutorial_service_due_soon_title" text="정기 정비"/>
+        <text name="ads_tutorial_service_due_soon_message" text="%s 차량은 곧 정비가 필요합니다.&#10;&#10;ADS에서는 차량이 정기적인 정비를 받아야 합니다. 이를 미루면 고장 위험이 크게 높아집니다.&#10;&#10;가장 가까운 정비소를 방문해 &quot;Maintenance&quot;를 선택하세요. 정비 주기는 모드 설정에서 조정할 수 있습니다."/>
+        <text name="ads_tutorial_rad_or_intake_clogged_title" text="라디에이터 및 흡기구 오염"/>
+        <text name="ads_tutorial_rad_or_intake_clogged_message" text="차량의 라디에이터와 흡기구가 심하게 막힌 것 같습니다.&#10;&#10;라디에이터가 더러우면 열을 제대로 방출하지 못하고, 흡기구가 막히면 엔진으로 들어가는 공기 흐름이 제한될 수 있습니다. 그러면 출력이 떨어지고 연료 소비가 증가합니다.&#10;&#10;세차장에서 청소하거나 상점에서 구입한 Air Blower로 청소할 수 있습니다.&#10;&#10;라디에이터와 흡기구 상태는 점검을 통해 확인할 수 있습니다. 차량을 바라보며 R 키를 길게 누르세요."/>
+        <text name="ads_tutorial_needs_lubrication_title" text="윤활 필요"/>
+        <text name="ads_tutorial_needs_lubrication_message" text="%s 차량은 정기적인 윤활이 필요합니다.&#10;&#10;ADS에서는 작업 부품의 윤활 상태가 매일 조금씩 감소하며, 그에 따라 마모가 증가합니다.&#10;&#10;상점에서 Grease Gun을 구입해 매일 또는 작업 시작 전마다 차량에 윤활을 해 주세요.&#10;&#10;윤활 상태는 점검을 통해 확인할 수 있습니다. 차량을 바라보며 R 키를 길게 누르세요."/>
+        <text name="ads_tutorial_needs_repair_title" text="차량 이상"/>
+        <text name="ads_tutorial_needs_repair_message" text="%s 차량에 뭔가 문제가 있는 것 같습니다. 부품 하나가 고장 났을 수 있습니다.&#10;&#10;반드시 정비소를 방문해 점검을 받으세요. 미루지 마세요. 문제가 계속 악화될 수 있고, 그만큼 수리 비용도 올라갑니다.&#10;&#10;점검 결과 고장이 확인되면 정비소의 수리 절차를 통해 해결하세요."/>
+        <text name="ads_tutorial_needs_overhaul_title" text="대정비"/>
+        <text name="ads_tutorial_needs_overhaul_message" text="%s 차량이 꽤 노후해진 것 같습니다. 교체를 고려하거나 대정비를 할 때입니다. 시간도 오래 걸리고 힘든 작업이지만, 애착이 있는 이 차량에 두 번째 생명을 불어넣는 가장 좋은 방법입니다. 설정에서 차량 수명을 조정할 수도 있습니다. 수명이 길수록 차량 마모 속도는 더 느려집니다."/>
+        <text name="ads_tutorial_needs_preventive_title" text="고장 임박"/>
+        <text name="ads_tutorial_needs_preventive_message" text="%s 차량의 시스템 중 하나가 곧 고장 날 것 같습니다. 다행히도 이를 미리 막을 수 있습니다. 이제 정비소에서 특별한 서비스인 예방 정비를 이용할 수 있습니다. 여기에는 전체 기술 점검과 문제 가능성이 있는 부품에 대한 예방 수리가 포함됩니다."/>
+        <text name="ads_tutorial_poor_consumables_title" text="저품질 소모품"/>
+        <text name="ads_tutorial_poor_consumables_message" text="작은 비밀 하나를 알려드리자면, %s 차량은 정비 과정에서 저품질 소모품의 피해를 입었습니다. 물론 직접 값싼 애프터마켓 대체품을 선택한 경우가 아니라면 말이죠.&#10;&#10;현재 정비 주기는 짧아졌고, 부품 마모는 약간 증가한 상태입니다. 다시 한 번 정비를 받으면 문제가 해결됩니다. 점검을 통해 이 문제를 확인할 수 있습니다. 기본 점검은 짧아진 정비 주기를 알려주고, 전체 진단 점검은 저품질 소모품 자체를 찾아냅니다."/>
+        <text name="ads_tutorial_poor_parts_title" text="저품질 부품"/>
+        <text name="ads_tutorial_poor_parts_message" text="작은 비밀 하나를 알려드리자면, %s 차량은 수리 과정에서 저품질 부품의 피해를 입었습니다. 이 고장은 아마도 머지않아 다시 돌아올 가능성이 큽니다.&#10;&#10;그때를 기다리거나, 지금 바로 전체 진단 점검을 수행할 수 있습니다. 이 방법은 저품질 부품을 확실하게 찾아냅니다."/>
+        <text name="ads_tutorial_idle_and_downtime_title" text="공회전과 보관"/>
+        <text name="ads_tutorial_idle_and_downtime_message" text="참고로 차량이 켜져 있지만 실제로 작업을 하지 않을 때는 마모가 훨씬 적습니다. 이는 아주 자연스러운 일입니다. 엔진이 꺼져 있으면 마모는 아주 미미해지고, 차량을 실내에 보관하면 마모는 완전히 사라집니다."/>
+        <text name="ads_tutorial_hot_weather_title" text="더운 날씨"/>
+        <text name="ads_tutorial_hot_weather_message" text="오늘은 정말 덥네요. 이런 날씨에는 라디에이터 청결 상태를 더욱 세심하게 확인하고 엔진 과부하를 피해야 합니다. 그렇지 않으면 과열은 시간문제입니다.&#10;&#10;기억하세요. 차량을 바라보며 R 키를 길게 눌러 시각 점검으로 라디에이터 상태를 확인할 수 있고, Air Blower로 청소도 할 수 있습니다."/>
+        <text name="ads_tutorial_wet_weather_title" text="정말 궂은 날씨"/>
+        <text name="ads_tutorial_wet_weather_message" text="오늘 날씨가 참 안 좋네요. 습기는 배선과 전기 장비에 좋지 않기 때문에 이런 조건에서는 전기 시스템의 마모가 약간 더 빨라집니다.&#10;&#10;게다가 이런 날씨에 수확 작업을 하는 것은 강력히 권장되지 않습니다. 콤바인만 망가뜨리게 될 것입니다."/>
+        <text name="ads_tutorial_low_fuel_title" text="연료 부족"/>
+        <text name="ads_tutorial_low_fuel_message" text="곧 연료가 바닥날 것 같습니다. 처음에는 큰 문제가 아닌 것처럼 보여도, 탱크에 남은 연료가 적을수록 연료 펌프는 더 힘들게 작동해야 합니다. 그만큼 부담이 커지고, 이는 수명에 전혀 도움이 되지 않습니다."/>
+        <text name="ads_tutorial_idle_deposit_title" text="장시간 공회전"/>
+        <text name="ads_tutorial_idle_deposit_message" text="차량이 너무 오래 공회전한 것 같습니다. 긴 공회전은 단지 연료만 낭비하는 것이 아닙니다. 시간이 지나면 연료 계통에 침전물이 쌓이고 엔진 상태 전반에도 악영향을 줍니다.&#10;&#10;지금 차량이 필요하지 않다면 엔진을 끄는 것이 좋습니다."/>
+        <text name="ads_tutorial_engine_overheat_title" text="엔진 과열"/>
+        <text name="ads_tutorial_engine_overheat_message" text="엔진이 과열되기 시작했습니다. 원인은 하나 이상일 수 있습니다. 엔진이 큰 부하를 받고 있거나, 라디에이터가 막혔거나, 날씨가 덥거나, 차량 냉각 시스템에 이상이 있을 수 있습니다.&#10;&#10;주의하세요. 과열은 모든 기계에 가장 치명적인 요인 중 하나입니다. 엔진만 손상되는 것이 아닙니다. 냉각 시스템은 한계까지 밀리며, 엔진룸의 열은 배선과 전기 부품의 열화를 가속합니다."/>
+        <text name="ads_tutorial_cvt_overheat_title" text="CVT 과열"/>
+        <text name="ads_tutorial_cvt_overheat_message" text="CVT 변속기가 과열되기 시작했습니다. 원인은 하나 이상일 수 있습니다. 변속기에 과도한 부하가 걸렸거나, 라디에이터가 막혔거나, 날씨가 매우 덥기 때문일 수 있습니다. 예를 들어 너무 무거운 쟁기를 끌고 있거나 과적된 트레일러를 견인하고 있을 수도 있습니다.&#10;&#10;주의하세요. 과열은 CVT 변속기에 일어날 수 있는 가장 치명적인 문제 중 하나입니다."/>
+        <text name="ads_tutorial_heavy_trailer_title" text="무거운 트레일러"/>
+        <text name="ads_tutorial_heavy_trailer_message" text="트랙터에 비해 너무 무거운 트레일러를 끌고 있는 것 같습니다. 계속할 수는 있겠지만, 변속기는 엄청난 부담을 받게 되고 브레이크도 이 추가 하중을 반기지 않을 것입니다.&#10;&#10;간단한 기준을 기억하세요. 견인 중량 1톤당 10마력 이상이면 차량 수명이 눈에 띄게 길어집니다."/>
+        <text name="ads_tutorial_chassis_vibration_title" text="서스펜션 부담 증가"/>
+        <text name="ads_tutorial_chassis_vibration_message" text="잠깐, 속도를 줄이세요. 거친 지형을 빠르게 달리면 %s 차량의 서스펜션이 금방 닳아버립니다. 게다가 이런 진동은 유압계와 전기계통 같은 다른 시스템에도 해를 줍니다. 부드럽고 차분하게 운전하세요."/>
+        <text name="ads_tutorial_steering_title" text="정지 상태 조향"/>
+        <text name="ads_tutorial_steering_message" text="정지 상태에서는 가급적 조향하지 않는 것이 좋습니다. 이때 조향기어, 파워스티어링 시스템, 앞차축 부품에 큰 부담이 걸리며, 그 결과 하부 주행계의 마모가 증가합니다.&#10;&#10;조금만 움직이기 시작해도 바퀴는 훨씬 쉽게 돌아갑니다."/>
+        <text name="ads_tutorial_cranking_title" text="잦은 시동"/>
+        <text name="ads_tutorial_cranking_message" text="엔진을 너무 자주 시동 거는 것 같습니다. 엔진을 시동할 때마다 전기 시스템에는 매우 높은 전류가 흐르며, 이로 인해 배선, 스타터, 기타 전기 부품의 마모가 빨라집니다.&#10;&#10;스타터를 너무 자주 돌리지 말고, 차량에 스타트-스톱 시스템이 달린 것처럼 엔진을 계속 껐다 켰다 하지 마세요."/>
+        <text name="ads_tutorial_hard_start_title" text="시동 어려움"/>
+        <text name="ads_tutorial_hard_start_message" text="%s 차량의 엔진 시동이 어렵습니다. 배터리 부족, 심한 추위, 기계적 고장, 스타터 마모 등이 원인일 수 있습니다. 엔진을 시동하려면 시동 버튼을 길게 누르세요. 참고: 시동 시 큰 돌입 전류로 인해 전기 시스템에는 큰 부하가 걸립니다."/>
+        <text name="ads_tutorial_critical_failure_title" text="치명적 고장"/>
+        <text name="ads_tutorial_critical_failure_message" text="정말 운이 없군요. %s 차량은 완전히 고장 나서 더 이상 스스로 움직일 수 없습니다. 이동식 정비소를 이용해 빠른 수리를 하면 차량이 스스로 정비소까지 이동할 수 있게 만들 수 있습니다.&#10;&#10;그렇지 않다면 다른 회수 방법을 찾아야 합니다."/>
+        <text name="ads_tutorial_heavy_lift_title" text="너무 무거운 작업기"/>
+        <text name="ads_tutorial_heavy_lift_message" text="이 작업기는 %s 차량에 너무 무거운 것 같습니다. 유압 시스템이 한계까지 일하고 있으며, 이는 수명에 부정적인 영향을 줍니다.&#10;&#10;간단한 기준을 따르세요. 작업기 무게는 차량 자체 중량의 60%%를 넘지 않아야 합니다."/>
+        <text name="ads_tutorial_cold_engine_title" text="차량 예열하기"/>
+        <text name="ads_tutorial_cold_engine_message" text="작업에 투입하기 전에 항상 차량을 예열하세요. 엔진뿐만 아니라 다른 여러 부품들도 예열 시간이 필요합니다. 유압 오일, CVT 변속기, 심지어 연료 온도까지도 그렇습니다. 특히 혹한기에는 더욱 그렇습니다. 차가운 상태로 차량을 운행하면 여러 시스템에 문제가 생길 수 있습니다.&#10;&#10;엔진 온도가 50도를 넘으면 모든 것이 충분히 예열된 것이며 차량을 안전하게 사용할 수 있습니다."/>
+        <text name="ads_tutorial_pto_sharp_angle_title" text="PTO 각도 과다"/>
+        <text name="ads_tutorial_pto_sharp_angle_message" text="주의하세요. 차량과 작업기 사이의 PTO 각도가 너무 큽니다. 프로펠러 샤프트가 강한 맥동과 함께 작동하기 시작하고, 진동이 증가하며 마모가 빠르게 쌓입니다.&#10;&#10;각도를 30도 이하로 유지하고, 급회전이나 두렁 끝 선회 시에는 가능하면 PTO를 해제하세요."/>
+        <text name="ads_tutorial_engine_overload_title" text="엔진 과부하"/>
+        <text name="ads_tutorial_engine_overload_message" text="엔진이 엄청난 부담을 받고 있습니다. 지금 하고 있는 작업이 이 기계에게는 너무 벅찰 수도 있으니 더 강한 장비를 고려해야 할 수도 있습니다. 혹은 단순히 속도를 줄이는 것만으로도 엔진 부하를 낮출 수 있습니다.&#10;&#10;어쨌든 이런 부담 아래에서는 마모가 눈에 띄게 증가한다는 점을 꼭 기억하세요."/>
+        <text name="ads_tutorial_lugging_title" text="저회전 고부하 운전"/>
+        <text name="ads_tutorial_lugging_message" text="엔진, 특히 변속기는 저회전에서 높은 부하로 운행되는 것을 좋아하지 않습니다. 차량에 너무 무거운 장비를 연결했거나, 수동 변속기라면 단순히 기어 선택이 좋지 않을 수도 있습니다."/>
+        <text name="ads_tutorial_wheel_slip_title" text="휠 슬립"/>
+        <text name="ads_tutorial_wheel_slip_message" text="바퀴가 심하게 헛돌고 있는 것 같습니다. 지금 이미 빠져서 조언을 들을 기분이 아닐 수도 있지만, 이것만은 기억하세요. 휠 슬립은 변속기에 가장 치명적인 요인 중 하나이며, 다음 정비소 방문 시점을 훨씬 앞당기게 됩니다."/>
+        <text name="ads_tutorial_battery_low_title" text="배터리 약함"/>
+        <text name="ads_tutorial_battery_low_message" text="앗, 배터리가 거의 방전될 것 같습니다. 장기간 방치, 심한 추위, 전기 시스템 이상 등이 원인일 수 있습니다.&#10;&#10;충전량이 낮으면 시동이 어렵거나 아예 걸리지 않을 수 있습니다. 시동이 되지 않으면 Jumper Cables를 사용해 다른 차량에서 점프 시동을 걸 수 있습니다."/>
     </texts>
 </l10n>
