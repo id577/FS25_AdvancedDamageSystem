@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="106">
     <author>id577, Squallqt</author>
-    <version>0.9.2.1</version>
+    <version>0.9.2.2</version>
     <title>
         <en>Advanced Damage System</en>
         <es>Sistema Avanzado De Daños</es>
@@ -15,6 +15,10 @@
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
 
 The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+
+Changelog 0.9.2.2:
+- Added optional tutorial tips that help explain the mod mechanics and warn the player when something is being done incorrectly. Singleplayer only
+- Added Hungarian and Portuguese translations
 
 Changelog 0.9.2.1:
 - Reworked the ADS Fleet Management menu: added tabs for vehicles in service and non-ADS vehicles, creating a unified fleet control center
@@ -86,6 +90,10 @@ Changelog 0.9.0.0:
 
 El mod incluye un modelo térmico para los sistemas principales, una simulación avanzada de batería y alternador, una lógica de averías realista, flujos de trabajo ampliados en el taller, informes de servicio, historial de mantenimiento e inspecciones previas al turno. Como resultado, la gestión de los vehículos se convierte en una parte estratégica de la jugabilidad: el mantenimiento lleva tiempo, el uso incorrecto aumenta el riesgo de fallos y descuidar el estado de la maquinaria puede interrumpir trabajos de campo importantes. Un agricultor responsable que cuide su equipo, lo mantenga a tiempo y evite abusos innecesarios mantendrá una flota fiable y evitará problemas graves durante la temporada.
 
+Changelog 0.9.2.2:
+- Añadidos consejos tutoriales opcionales que ayudan a entender las mecánicas del mod y advierten al jugador cuando hace algo incorrectamente. Solo para un jugador
+- Añadidas las traducciones al húngaro y al portugués
+
 Changelog 0.9.2.1:
 - Se ha rediseñado el menú ADS Fleet Management: se han añadido pestañas para vehículos en servicio y vehículos sin ADS, creando un centro unificado de gestión de flota
 - Añadida compatibilidad con In-Game Time Operating Hours; los intervalos de servicio ahora se ajustan dinámicamente a la aceleración del tiempo
@@ -155,6 +163,10 @@ Changelog 0.9.0.0:
          <pl><![CDATA[Advanced Damage System dodaje do gry Farming Simulator 25 rozbudowany system zużycia pojazdów, awarii, diagnostyki, konserwacji i napraw. Zamiast polegać na jednej, ogólnej wartości stanu, każda maszyna jest zbudowana wokół wielu indywidualnych systemów, posiadających własny stan, czynniki zużycia, akumulację naprężeń i ryzyko awarii. Zachowanie pojazdu i charakter usterek zależą od warunków eksploatacji, obciążenia, temperatury i jakości serwisu.
 
 Modyfikacja zawiera model temperatury kluczowych systemów, zaawansowaną symulację akumulatora i alternatora, realistyczną logikę awarii, rozszerzone przepływy pracy w warsztacie, raporty serwisowe, historię konserwacji oraz inspekcje przedrozruchowe. W rezultacie zarządzanie pojazdami staje się strategiczną częścią rozgrywki: serwis zajmuje czas, złe użytkowanie zwiększa ryzyko awarii, a zaniedbanie stanu maszyny może zakłócić krytyczne prace polowe. Odpowiedzialny rolnik, który dba o sprzęt, serwisuje go na czas i unika niepotrzebnego nadużywania, utrzyma flotę w niezawodnym stanie i uniknie poważnych problemów w trakcie sezonu.
+
+Changelog 0.9.2.2:
+- Dodano opcjonalne podpowiedzi samouczka, które pomagają zrozumieć mechaniki moda i ostrzegają gracza, gdy robi coś nieprawidłowo. Działa tylko w trybie jednoosobowym
+- Dodano tłumaczenia węgierskie i portugalskie
 
 Changelog 0.9.2.1:
 - Przebudowano menu ADS Fleet Management: dodano zakładki dla pojazdów w serwisie i pojazdów bez ADS, tworząc jedno centrum zarządzania flotą
@@ -226,6 +238,10 @@ Changelog 0.9.0.0:
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
+Changelog 0.9.2.2:
+- Es wurden optionale Tutorial-Hinweise hinzugefügt, die helfen, die Mechaniken des Mods zu verstehen und den Spieler warnen, wenn etwas falsch gemacht wird. Nur im Einzelspieler
+- Ungarische und portugiesische Übersetzungen hinzugefügt
+
 Changelog 0.9.2.1:
 - Das ADS-Fleet-Management-Menü wurde überarbeitet: Neue Tabs für Fahrzeuge im Service und Fahrzeuge ohne ADS machen es zu einer zentralen Flottenübersicht
 - Kompatibilität mit In-Game Time Operating Hours hinzugefügt; Serviceintervalle skalieren nun dynamisch mit der Zeitbeschleunigung
@@ -294,6 +310,10 @@ Changelog 0.9.0.0:
         <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
 Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+
+Changelog 0.9.2.2:
+- Ajout d'astuces de didacticiel optionnelles qui aident à comprendre les mécaniques du mod et avertissent le joueur lorsqu'il fait quelque chose de travers. Solo uniquement
+- Ajout des traductions hongroise et portugaise
 
 Changelog 0.9.2.1:
 - Refonte du menu ADS Fleet Management : ajout d'onglets pour les véhicules en service et les véhicules non ADS afin d'en faire un centre unique de gestion de flotte
@@ -365,6 +385,10 @@ Changelog 0.9.0.0:
 
 Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine può compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrà la flotta affidabile ed eviterà problemi seri durante la stagione.
 
+Changelog 0.9.2.2:
+- Aggiunti suggerimenti tutorial opzionali che aiutano a comprendere le meccaniche del mod e avvisano il giocatore quando fa qualcosa in modo errato. Solo in giocatore singolo
+- Aggiunte le traduzioni in ungherese e portoghese
+
 Changelog 0.9.2.1:
 - Rielaborato il menu ADS Fleet Management: aggiunte schede per i veicoli in assistenza e per quelli senza ADS, creando un centro unico di gestione della flotta
 - Aggiunta la compatibilità con In-Game Time Operating Hours; gli intervalli di manutenzione ora si adattano dinamicamente all'accelerazione del tempo
@@ -434,6 +458,10 @@ Changelog 0.9.0.0:
         <ru><![CDATA[Advanced Damage System добавляет в Farming Simulator 25 глубокую систему износа, поломок, диагностики, обслуживания и ремонта техники. Вместо одного условного параметра состояния каждая машина состоит из отдельных систем, каждая из которых имеет собственный уровень состояния, факторы износа, накопление стресса и риск отказа. Поведение техники и характер поломок зависят от условий эксплуатации, нагрузки, температуры и качества обслуживания.
 
 Мод включает температурную модель ключевых систем, продвинутую симуляцию аккумулятора и генератора, реалистичную логику поломок, расширенные сценарии работы с мастерской, сервисные отчёты, журнал обслуживания и возможность проведения предсменного осмотра. В результате техника требует не только ремонта, но и грамотного планирования: обслуживание занимает время, неправильная эксплуатация повышает риск отказов, а пренебрежение состоянием машин может сорвать важные полевые работы. Ответственный фермер, который следит за техникой, вовремя обслуживает её и не работает на пределе возможностей без необходимости, сможет сохранить парк в надёжном состоянии и избежать серьёзных проблем в сезон.
+
+Changelog 0.9.2.2:
+- Добавлены отключаемые обучающие подсказки, которые помогают разобраться в механиках мода и предупреждают игрока, если он делает что-то неправильно. Работает только в одиночной игре
+- Добавлены венгерский и португальский переводы
 
 Changelog 0.9.2.1:
 - Переработано меню ADS Fleet Management: добавлены вкладки для техники в сервисе и техники без ADS, чтобы сделать его единым центром управления парком
