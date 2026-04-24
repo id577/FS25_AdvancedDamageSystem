@@ -93,9 +93,10 @@ For testing and debugging, ADS includes console commands. Most commands require 
 
 # Screenshots
 <img width="2560" height="1440" alt="444" src="https://github.com/user-attachments/assets/4286276b-d204-4166-886f-4eebe964fba9" />
+<img width="1280" height="719" alt="Снимок экрана 2026-04-24 170740" src="https://github.com/user-attachments/assets/d98b3fa3-8a50-4322-9a0d-8678519b10b5" />
 <img width="1907" height="1308" alt="666" src="https://github.com/user-attachments/assets/aaa4f359-e4cb-4c77-857a-6e3af5a00304" />
 <img width="1314" height="839" alt="111" src="https://github.com/user-attachments/assets/66e7e049-59e6-4f26-937a-a74f1e19a247" />
-<img width="2381" height="1358" alt="image" src="https://github.com/user-attachments/assets/f33415b6-c38f-4de8-8b3f-4c858adeabe0" />
+<img width="1280" height="719" alt="Снимок экрана 2026-04-24 174821" src="https://github.com/user-attachments/assets/771f6fce-5b96-462c-aae5-b45887b01366" />
 <img width="1253" height="763" alt="image" src="https://github.com/user-attachments/assets/18fe2f51-44f8-46fe-a1ac-8b892d25852c" />
 <img width="1233" height="832" alt="222" src="https://github.com/user-attachments/assets/64748b85-6e3c-43d6-b19a-d7027e66df49" />
 <img width="1334" height="788" alt="Снимок экрана 2026-03-29 224955" src="https://github.com/user-attachments/assets/77ca8ae3-a531-4934-96d0-b53c941e5095" />
