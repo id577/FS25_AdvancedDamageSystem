@@ -3,9 +3,26 @@ ADS_Hud.modDirectory = g_currentModDirectory
 ADS_Hud.debugViewMode = ADS_Hud.debugViewMode or "default"
 local ADS_Hud_mt = Class(ADS_Hud, HUDDisplay)
 
+ADS_Hud.ROUNDED_PANEL_TEXTURE_SIZE = 64
+ADS_Hud.ROUNDED_PANEL_CORNER_SIZE = 5
+ADS_Hud.ROUNDED_PANEL_UV = {
+    topLeft     = {  0,  0,  5,  5 },
+    top         = {  5,  0, 54,  5 },
+    topRight    = { 59,  0,  5,  5 },
+    left        = {  0,  5,  5, 54 },
+    center      = {  5,  5, 54, 54 },
+    right       = { 59,  5,  5, 54 },
+    bottomLeft  = {  0, 59,  5,  5 },
+    bottom      = {  5, 59, 54,  5 },
+    bottomRight = { 59, 59,  5,  5 }
+}
+ADS_Hud.COLOR_GAME_GREEN = {0.529, 0.706, 0, 1}
+
 function ADS_Hud:new()
 	local self = ADS_Hud:superClass().new(ADS_Hud_mt)
 	self.vehicle = nil
+
+    self.panelBackgroundRounded = self.modDirectory .. "hud/panelRounded.dds"
 
     g_overlayManager:addTextureConfigFile(ADS_Hud.modDirectory .. "hud/ads_dashboardHud.xml", "ads_DashboardHud")
     g_overlayManager:createOverlay("ads_DashboardHud.reliability", 0, 0, 0, 0)
@@ -87,8 +104,8 @@ function ADS_Hud:new()
         dividerSpacing = 0.003,
         bottomDividerSpacing = 2,
         bottomDividerExtraHeight = 5,
-        persistentDurationMs = 25000,
-        background = self.modDirectory .. "hud/ads_debugHud.dds",
+        persistentDurationMs = 60000,
+        background = self.panelBackgroundRounded,
         dividerBackground = "dataS/menu/base/graph_pixel.dds",
         title = nil,
         text = nil,
@@ -97,8 +114,17 @@ function ADS_Hud:new()
         isPersistent = false,
         closeButtonSize = 0.016,
         closeButtonPadding = 0.004,
+        closeGlyphSize = 26,
+        closeGlyphSpacing = 6,
+        closeGlyphTextSpacing = 6,
+        closeHitbox = nil,
+        closeMouseDown = false,
         lastCloseMouseDown = false
     }
+
+    self.notificationCloseGlyph = nil
+    self.notificationCloseGlyphInputMode = nil
+    self.notificationMouseButtonDownLast = false
 
     self.activeVehicleDebugPanel = {
         x = 0.20,
@@ -106,7 +132,7 @@ function ADS_Hud:new()
         width = 0.60,
         padding = 0.01,
         lineHeight = 0.012,
-        background = self.modDirectory .. "hud/ads_debugHud.dds",
+        background = self.panelBackgroundRounded,
         isVisible = false
     }
 
@@ -124,7 +150,7 @@ function ADS_Hud:new()
         width = 0.22,
         padding = 0.01,
         lineHeight = 0.012,
-        background = self.modDirectory .. "hud/ads_debugHud.dds",
+        background = self.panelBackgroundRounded,
         isVisible = false
     }
 
@@ -358,6 +384,8 @@ function ADS_Hud:draw()
         return
     end
 
+    self:updateNotificationMouseInput()
+
     -- manager debug panel temporarily disabled
 
     self:drawNotificationPanel()
@@ -426,7 +454,85 @@ function ADS_Hud:clearNotification()
     panel.endTime = 0
     panel.isVisible = false
     panel.isPersistent = false
+    panel.closeHitbox = nil
+    panel.closeMouseDown = false
     panel.lastCloseMouseDown = false
+end
+
+function ADS_Hud:updateNotificationMouseInput()
+    local isMouseDown = Input.isMouseButtonPressed ~= nil and Input.isMouseButtonPressed(Input.MOUSE_BUTTON_LEFT)
+
+    if g_gui ~= nil and g_gui:getIsGuiVisible() then
+        self.notificationMouseButtonDownLast = isMouseDown
+        return
+    end
+
+    if self:hasClosableNotification() and isMouseDown and not self.notificationMouseButtonDownLast then
+        self:closePersistentNotification()
+        self.notificationMouseButtonDownLast = true
+        return
+    end
+
+    self.notificationMouseButtonDownLast = isMouseDown
+end
+
+function ADS_Hud:hasClosableNotification()
+    local panel = self.notificationPanel
+
+    return panel ~= nil and panel.isVisible and panel.isPersistent
+end
+
+function ADS_Hud:closePersistentNotification()
+    if not self:hasClosableNotification() then
+        return false
+    end
+
+    self:clearNotification()
+
+    return true
+end
+
+function ADS_Hud:onNotificationConfirm(actionName, inputValue)
+    if g_gui ~= nil and g_gui:getIsGuiVisible() then
+        return
+    end
+
+    self:closePersistentNotification()
+end
+
+function ADS_Hud:mouseEvent(posX, posY, isDown, isUp, button)
+    local panel = self.notificationPanel
+    if panel == nil or not panel.isVisible or not panel.isPersistent or button ~= Input.MOUSE_BUTTON_LEFT then
+        return false
+    end
+
+    local hitbox = panel.closeHitbox
+    if hitbox == nil then
+        panel.closeMouseDown = false
+        return false
+    end
+
+    local isInside = posX >= hitbox.x
+        and posX <= hitbox.x + hitbox.width
+        and posY >= hitbox.y
+        and posY <= hitbox.y + hitbox.height
+
+    if isDown then
+        panel.closeMouseDown = isInside
+        return isInside
+    end
+
+    if isUp then
+        local shouldClose = panel.closeMouseDown and isInside
+        panel.closeMouseDown = false
+
+        if shouldClose then
+            self:clearNotification()
+            return true
+        end
+    end
+
+    return false
 end
 
 function ADS_Hud:wrapNotificationText(text, maxWidth, textSize)
@@ -471,6 +577,93 @@ function ADS_Hud:drawNotificationDivider(x, y, width, height, color)
     overlay:render()
 end
 
+function ADS_Hud:getNotificationCloseGlyph(glyphWidth, glyphHeight)
+    if g_inputDisplayManager == nil or InputGlyphElement == nil or InputAction == nil or InputAction.SKIP_MESSAGE_BOX == nil then
+        return nil
+    end
+
+    if self.notificationCloseGlyph == nil then
+        self.notificationCloseGlyph = InputGlyphElement.new(g_inputDisplayManager, glyphWidth, glyphHeight)
+        self.notificationCloseGlyph:setKeyboardGlyphColor(ADS_Hud.COLOR_GAME_GREEN, {0, 0, 0, 0.8})
+        self.notificationCloseGlyph:setButtonGlyphColor(ADS_Hud.COLOR_GAME_GREEN)
+    elseif self.notificationCloseGlyph.baseWidth ~= glyphWidth or self.notificationCloseGlyph.baseHeight ~= glyphHeight then
+        self.notificationCloseGlyph:delete()
+        self.notificationCloseGlyph = InputGlyphElement.new(g_inputDisplayManager, glyphWidth, glyphHeight)
+        self.notificationCloseGlyph:setKeyboardGlyphColor(ADS_Hud.COLOR_GAME_GREEN, {0, 0, 0, 0.8})
+        self.notificationCloseGlyph:setButtonGlyphColor(ADS_Hud.COLOR_GAME_GREEN)
+        self.notificationCloseGlyphInputMode = nil
+    end
+
+    local inputMode = g_inputBinding ~= nil and g_inputBinding:getInputHelpMode() or nil
+    if self.notificationCloseGlyphInputMode ~= inputMode then
+        self.notificationCloseGlyph:setAction(InputAction.SKIP_MESSAGE_BOX, nil, nil, true)
+        self.notificationCloseGlyphInputMode = inputMode
+    end
+
+    return self.notificationCloseGlyph
+end
+
+function ADS_Hud:snapScreenRect(x, y, width, height)
+    local snappedX = math.floor(x * g_screenWidth + 0.5) / g_screenWidth
+    local snappedY = math.floor(y * g_screenHeight + 0.5) / g_screenHeight
+    local snappedWidth = math.max(math.floor(width * g_screenWidth + 0.5) / g_screenWidth, 1 / g_screenWidth)
+    local snappedHeight = math.max(math.floor(height * g_screenHeight + 0.5) / g_screenHeight, 1 / g_screenHeight)
+
+    return snappedX, snappedY, snappedWidth, snappedHeight
+end
+
+function ADS_Hud:renderPanelQuad(texturePath, x, y, width, height, color, uvs)
+    if texturePath == nil or width <= 0 or height <= 0 then
+        return
+    end
+
+    local overlay = Overlay.new(texturePath, x, y, width, height)
+    if uvs ~= nil then
+        overlay:setUVs(GuiUtils.getUVs(uvs, {ADS_Hud.ROUNDED_PANEL_TEXTURE_SIZE, ADS_Hud.ROUNDED_PANEL_TEXTURE_SIZE}))
+    end
+
+    overlay:setColor(color[1], color[2], color[3], color[4] or 1)
+    overlay:render()
+end
+
+function ADS_Hud:drawPanelBackground(texturePath, x, y, width, height, color)
+    local panelColor = color or {0, 0, 0, 0.7}
+    if texturePath == nil then
+        return
+    end
+
+    local panelX, panelY, panelWidth, panelHeight = self:snapScreenRect(x, y, width, height)
+    local cornerWidth = math.min(
+        math.floor(self:scalePixelToScreenWidth(ADS_Hud.ROUNDED_PANEL_CORNER_SIZE) * g_screenWidth + 0.5) / g_screenWidth,
+        panelWidth * 0.5
+    )
+    local cornerHeight = math.min(
+        math.floor(self:scalePixelToScreenHeight(ADS_Hud.ROUNDED_PANEL_CORNER_SIZE) * g_screenHeight + 0.5) / g_screenHeight,
+        panelHeight * 0.5
+    )
+    local leftX = panelX
+    local centerX = panelX + cornerWidth
+    local rightX = panelX + panelWidth - cornerWidth
+    local bottomY = panelY
+    local centerY = panelY + cornerHeight
+    local topY = panelY + panelHeight - cornerHeight
+    local centerWidth = math.max(rightX - centerX, 0)
+    local centerHeight = math.max(topY - centerY, 0)
+    local uv = ADS_Hud.ROUNDED_PANEL_UV
+
+    self:renderPanelQuad(texturePath, leftX, bottomY, cornerWidth, cornerHeight, panelColor, uv.bottomLeft)
+    self:renderPanelQuad(texturePath, centerX, bottomY, centerWidth, cornerHeight, panelColor, uv.bottom)
+    self:renderPanelQuad(texturePath, rightX, bottomY, cornerWidth, cornerHeight, panelColor, uv.bottomRight)
+
+    self:renderPanelQuad(texturePath, leftX, centerY, cornerWidth, centerHeight, panelColor, uv.left)
+    self:renderPanelQuad(texturePath, centerX, centerY, centerWidth, centerHeight, panelColor, uv.center)
+    self:renderPanelQuad(texturePath, rightX, centerY, cornerWidth, centerHeight, panelColor, uv.right)
+
+    self:renderPanelQuad(texturePath, leftX, topY, cornerWidth, cornerHeight, panelColor, uv.topLeft)
+    self:renderPanelQuad(texturePath, centerX, topY, centerWidth, cornerHeight, panelColor, uv.top)
+    self:renderPanelQuad(texturePath, rightX, topY, cornerWidth, cornerHeight, panelColor, uv.topRight)
+end
+
 function ADS_Hud:drawNotificationPanel()
     local panel = self.notificationPanel
     if panel == nil or not panel.isVisible or panel.text == nil then
@@ -485,8 +678,7 @@ function ADS_Hud:drawNotificationPanel()
     local titleTextSize = self.text.headerSize
     local textSize = self.text.normalSize + 0.003
     local fullTextWidth = panel.width - panel.padding * 2
-    local closeButtonReservedWidth = panel.isPersistent and (panel.closeButtonSize + panel.closeButtonPadding) or 0
-    local titleTextWidth = fullTextWidth - closeButtonReservedWidth
+    local titleTextWidth = fullTextWidth
     local titleLines = {}
 
     if panel.title ~= nil then
@@ -498,64 +690,38 @@ function ADS_Hud:drawNotificationPanel()
     local hasTitle = #titleLines > 0
     local titleSpacing = hasTitle and panel.titleSpacing or 0
     local titleDividerHeight = hasTitle and panel.titleDividerHeight or 0
-    local bottomDividerSpacing = hasTitle and self:scalePixelToScreenHeight(panel.bottomDividerSpacing or 2) or 0
-    local bottomDividerExtraHeight = hasTitle and self:scalePixelToScreenHeight(panel.bottomDividerExtraHeight or 5) or 0
-    local dynamicHeight = panel.padding * 2 + (#titleLines * panel.titleLineHeight) + titleSpacing + (#lines * panel.lineHeight) + bottomDividerSpacing + bottomDividerExtraHeight
+    local titleTextExtraSpacing = hasTitle and self:scalePixelToScreenHeight(10) or 0
+    local dividerSpacing = hasTitle and (panel.dividerSpacing + self:scalePixelToScreenHeight(5)) or 0
+    local bottomDividerTextSpacing = hasTitle and self:scalePixelToScreenHeight((panel.bottomDividerSpacing or 2) + 2) or 0
+    local closeGlyphVisible = panel.isPersistent and hasTitle
+    local closeGlyphWidth = closeGlyphVisible and self:scalePixelToScreenWidth(panel.closeGlyphSize or 18) or 0
+    local closeGlyphHeight = closeGlyphVisible and self:scalePixelToScreenHeight(panel.closeGlyphSize or 18) or 0
+    local closeGlyphSpacing = closeGlyphVisible and self:scalePixelToScreenHeight(panel.closeGlyphSpacing or 4) or 0
+    local topSectionHeight = hasTitle and (panel.padding + (#titleLines * panel.titleLineHeight) + dividerSpacing + titleDividerHeight) or 0
+    local bottomSectionHeight = hasTitle and (topSectionHeight + dividerSpacing + bottomDividerTextSpacing) or 0
+    local dynamicHeight = hasTitle
+        and (panel.padding + (#titleLines * panel.titleLineHeight) + titleSpacing + titleTextExtraSpacing + (#lines * panel.lineHeight) + bottomSectionHeight)
+        or (panel.padding * 2 + (#lines * panel.lineHeight))
     local anchorCenterY = panel.y + baseHeight * 0.5
     local panelY = anchorCenterY - dynamicHeight * 0.5
 
-    local overlay = Overlay.new(panel.background, panel.x, panelY, panel.width, dynamicHeight)
-    overlay:setColor(1, 1, 1, 0.78)
-    overlay:render()
+    self:drawPanelBackground(
+        panel.background,
+        panel.x,
+        panelY,
+        panel.width,
+        dynamicHeight,
+        {0, 0, 0, 0.72}
+    )
 
     local centerX = panel.x + panel.width * 0.5
     local currentY = panelY + dynamicHeight - panel.padding
-    local closeButtonX = panel.x + panel.width - panel.closeButtonPadding - panel.closeButtonSize
-    local closeButtonY = panelY + dynamicHeight - panel.closeButtonPadding - panel.closeButtonSize
-
-    if panel.isPersistent then
-        local isMouseCursorVisible = g_inputBinding ~= nil and g_inputBinding.getShowMouseCursor ~= nil and g_inputBinding:getShowMouseCursor()
-        local mousePosX = g_inputBinding ~= nil and g_inputBinding.mousePosXLast or nil
-        local mousePosY = g_inputBinding ~= nil and g_inputBinding.mousePosYLast or nil
-        local isHoveringCloseButton = isMouseCursorVisible
-            and mousePosX ~= nil
-            and mousePosY ~= nil
-            and mousePosX >= closeButtonX
-            and mousePosX <= closeButtonX + panel.closeButtonSize
-            and mousePosY >= closeButtonY
-            and mousePosY <= closeButtonY + panel.closeButtonSize
-        local isCloseMouseDown = isMouseCursorVisible and Input.isMouseButtonPressed(Input.MOUSE_BUTTON_LEFT)
-
-        if isHoveringCloseButton and isCloseMouseDown and not panel.lastCloseMouseDown then
-            self:clearNotification()
-            return
-        end
-
-        panel.lastCloseMouseDown = isCloseMouseDown
-
-        setTextAlignment(RenderText.ALIGN_CENTER)
-        setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
-        setTextBold(true)
-
-        if isHoveringCloseButton then
-            setTextColor(1, 0.45, 0.45, 1)
-        else
-            setTextColor(1, 1, 1, 0.95)
-        end
-
-        renderText(
-            closeButtonX + panel.closeButtonSize * 0.5,
-            closeButtonY + panel.closeButtonSize * 0.5,
-            textSize,
-            "X"
-        )
-    end
 
     if hasTitle then
         setTextAlignment(RenderText.ALIGN_CENTER)
         setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)
         setTextBold(true)
-        setTextColor(0.45, 0.78, 0.24, 1)
+        setTextColor(unpack(ADS_Hud.COLOR_GAME_GREEN))
 
         for _, line in ipairs(titleLines) do
             renderText(centerX, currentY, titleTextSize, line)
@@ -563,10 +729,10 @@ function ADS_Hud:drawNotificationPanel()
         end
 
         local dividerWidth = panel.width - panel.padding * 2
-        local dividerY = currentY - panel.dividerSpacing - titleDividerHeight * 0.5
-        self:drawNotificationDivider(panel.x + panel.padding, dividerY, dividerWidth, titleDividerHeight, {0.45, 0.78, 0.24, 1})
+        local dividerY = currentY - dividerSpacing - titleDividerHeight * 0.5
+        self:drawNotificationDivider(panel.x + panel.padding, dividerY, dividerWidth, titleDividerHeight, ADS_Hud.COLOR_GAME_GREEN)
 
-        currentY = currentY - panel.titleSpacing
+        currentY = currentY - panel.titleSpacing - titleTextExtraSpacing
     end
 
     setTextAlignment(RenderText.ALIGN_CENTER)
@@ -581,8 +747,38 @@ function ADS_Hud:drawNotificationPanel()
 
     if hasTitle then
         local dividerWidth = panel.width - panel.padding * 2
-        local bottomDividerY = currentY - panel.dividerSpacing - bottomDividerSpacing - titleDividerHeight * 0.5
-        self:drawNotificationDivider(panel.x + panel.padding, bottomDividerY, dividerWidth, titleDividerHeight, {0.45, 0.78, 0.24, 1})
+        local bottomDividerY = currentY - dividerSpacing - bottomDividerTextSpacing - titleDividerHeight * 0.5
+        self:drawNotificationDivider(panel.x + panel.padding, bottomDividerY, dividerWidth, titleDividerHeight, ADS_Hud.COLOR_GAME_GREEN)
+
+        if closeGlyphVisible then
+            local glyph = self:getNotificationCloseGlyph(closeGlyphWidth, closeGlyphHeight)
+            if glyph ~= nil then
+                local glyphWidth = glyph:getGlyphWidth()
+                local okText = "OK"
+                local okTextSize = textSize
+                local textSpacing = self:scalePixelToScreenWidth(panel.closeGlyphTextSpacing or 6)
+                local okTextWidth = getTextWidth(okTextSize, okText)
+                local glyphX = centerX - (glyphWidth + textSpacing + okTextWidth) * 0.5
+                local glyphY = panelY + math.max((topSectionHeight - titleDividerHeight - closeGlyphHeight) * 0.5, 0)
+                local hitboxPaddingX = self:scalePixelToScreenWidth(6)
+                local hitboxPaddingY = self:scalePixelToScreenHeight(4)
+                panel.closeHitbox = {
+                    x = glyphX - hitboxPaddingX,
+                    y = glyphY - hitboxPaddingY,
+                    width = glyphWidth + textSpacing + okTextWidth + hitboxPaddingX * 2,
+                    height = closeGlyphHeight + hitboxPaddingY * 2
+                }
+
+                glyph:setPosition(glyphX, glyphY)
+                glyph:draw()
+
+                setTextAlignment(RenderText.ALIGN_LEFT)
+                setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+                setTextBold(true)
+                setTextColor(1, 1, 1, 0.95)
+                renderText(glyphX + glyphWidth + textSpacing - self:scalePixelToScreenWidth(4), glyphY + closeGlyphHeight * 0.5 + self:scalePixelToScreenHeight(2), okTextSize, okText)
+            end
+        end
     end
 
     setTextBold(false)
@@ -894,10 +1090,15 @@ function ADS_Hud:renderActiveVehicleDebugCache(cache)
 
     local background = cache.background
     if background ~= nil and background.path ~= nil then
-        local overlay = Overlay.new(background.path, background.x, background.y, background.width, background.height)
-        local color = background.color or {1, 1, 1, 0.7}
-        overlay:setColor(color[1], color[2], color[3], color[4] or 1)
-        overlay:render()
+        local color = background.color or {0, 0, 0, 0.7}
+        self:drawPanelBackground(
+            background.path,
+            background.x,
+            background.y,
+            background.width,
+            background.height,
+            color
+        )
     end
 
     local commands = cache.commands
@@ -1942,7 +2143,7 @@ function ADS_Hud:drawActiveVehicleHUD()
         y = panel.y,
         width = panel.width,
         height = dynamicHeight,
-        color = {1, 1, 1, 0.7}
+        color = {0, 0, 0, 0.7}
     } or nil
     cache.commands = queuedCommands
 
@@ -2225,9 +2426,14 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
 
     local dynamicHeight = (panel.padding * 2) + activeHeaderSize + totalSectionHeight + 0.02
     if panel.background ~= nil then
-        local overlay = Overlay.new(panel.background, panel.x, panel.y, panel.width, dynamicHeight)
-        overlay:setColor(1, 1, 1, 0.7)
-        overlay:render()
+        self:drawPanelBackground(
+            panel.background,
+            panel.x,
+            panel.y,
+            panel.width,
+            dynamicHeight,
+            {0, 0, 0, 0.7}
+        )
     end
 
     local textStartX = panel.x + panel.padding
@@ -2319,9 +2525,14 @@ function ADS_Hud:drawManagerHUD()
     local panelY = panel.y - dynamicHeight
 
     if panel.background ~= nil then
-        local overlay = Overlay.new(panel.background, panel.x, panelY, panel.width, dynamicHeight)
-        overlay:setColor(1, 1, 1, 0.7)
-        overlay:render()
+        self:drawPanelBackground(
+            panel.background,
+            panel.x,
+            panelY,
+            panel.width,
+            dynamicHeight,
+            {0, 0, 0, 0.7}
+        )
     end
 
     setTextColor(unpack(textSettings.color))

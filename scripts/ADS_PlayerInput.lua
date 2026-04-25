@@ -1,5 +1,6 @@
 local adsInspectionVehicle = nil
 local adsInspectionActionId = nil
+local adsNotificationAcceptActionIds = {}
 
 local adsInspectionHoldVehicle = nil
 local adsInspectionHoldTime = 0
@@ -203,6 +204,18 @@ end
 local function adsOnPlayerInputComponentUpdate(inputComponent, superFunc, dt)
     superFunc(inputComponent, dt)
 
+    if #adsNotificationAcceptActionIds > 0 then
+        local canCloseNotification = ADS_Main ~= nil
+            and ADS_Main.hud ~= nil
+            and ADS_Main.hud.hasClosableNotification ~= nil
+            and ADS_Main.hud:hasClosableNotification()
+            and (g_gui == nil or not g_gui:getIsGuiVisible())
+
+        for _, actionId in ipairs(adsNotificationAcceptActionIds) do
+            g_inputBinding:setActionEventActive(actionId, canCloseNotification)
+        end
+    end
+
     if not inputComponent.player.isOwner
         or g_inputBinding:getContextName() ~= PlayerInputComponent.INPUT_CONTEXT_NAME
         or adsInspectionActionId == nil then
@@ -269,5 +282,64 @@ local function adsOnPlayerInputComponentRegisterActionEvents(inputComponent)
     g_inputBinding:endActionEventsModification()
 end
 
+local function adsOnInputConfirmNotification(actionName, inputValue, callbackState, isAnalog)
+    if inputValue == 0 or ADS_Main == nil or ADS_Main.hud == nil then
+        return
+    end
+
+    if g_gui ~= nil and g_gui:getIsGuiVisible() then
+        return
+    end
+
+    ADS_Main.hud:onNotificationConfirm(actionName, inputValue)
+end
+
+local function adsOnPlayerInputComponentRegisterGlobalPlayerActionEvents(inputComponent, superFunc, ...)
+    superFunc(inputComponent, ...)
+
+    if not inputComponent.player.isOwner then
+        return
+    end
+
+    adsNotificationAcceptActionIds = {}
+
+    local _, menuAcceptId = g_inputBinding:registerActionEvent(
+        InputAction.MENU_ACCEPT,
+        inputComponent,
+        adsOnInputConfirmNotification,
+        false,
+        true,
+        false,
+        true,
+        nil,
+        true
+    )
+
+    if menuAcceptId ~= nil then
+        g_inputBinding:setActionEventTextVisibility(menuAcceptId, false)
+        g_inputBinding:setActionEventActive(menuAcceptId, false)
+        table.insert(adsNotificationAcceptActionIds, menuAcceptId)
+    end
+
+    local _, skipMessageId = g_inputBinding:registerActionEvent(
+        InputAction.SKIP_MESSAGE_BOX,
+        inputComponent,
+        adsOnInputConfirmNotification,
+        false,
+        true,
+        false,
+        true,
+        nil,
+        true
+    )
+
+    if skipMessageId ~= nil then
+        g_inputBinding:setActionEventTextVisibility(skipMessageId, false)
+        g_inputBinding:setActionEventActive(skipMessageId, false)
+        table.insert(adsNotificationAcceptActionIds, skipMessageId)
+    end
+end
+
 PlayerInputComponent.update = Utils.overwrittenFunction(PlayerInputComponent.update, adsOnPlayerInputComponentUpdate)
 PlayerInputComponent.registerActionEvents = Utils.appendedFunction(PlayerInputComponent.registerActionEvents, adsOnPlayerInputComponentRegisterActionEvents)
+PlayerInputComponent.registerGlobalPlayerActionEvents = Utils.overwrittenFunction(PlayerInputComponent.registerGlobalPlayerActionEvents, adsOnPlayerInputComponentRegisterGlobalPlayerActionEvents)
