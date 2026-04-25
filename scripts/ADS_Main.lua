@@ -95,7 +95,7 @@ function ADS_Main.registerSpecializationToVehicles()
             vehicleType ~= "motorbike" and 
             vehicleType ~= "inlineWrapper" and 
             vehicleType ~= "locomotive" and 
-            vehicleType ~= "сonveyorBelt" and 
+            vehicleType ~= "conveyorBelt" and 
             vehicleType ~= "pickupConveyorBelt" and 
             vehicleType ~= "woodCrusherTrailermotorized" and 
             vehicleType ~= "baleWrapper" and 
