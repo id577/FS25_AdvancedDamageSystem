@@ -841,7 +841,6 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "processBreakdowns", AdvancedDamageSystem.processBreakdowns)
     SpecializationUtil.registerFunction(vehicleType, "changeBreakdownStage", AdvancedDamageSystem.changeBreakdownStage)
     SpecializationUtil.registerFunction(vehicleType, "getActiveBreakdowns", AdvancedDamageSystem.getActiveBreakdowns)
-    SpecializationUtil.registerFunction(vehicleType, "hasBreakdown", AdvancedDamageSystem.hasBreakdown)
     SpecializationUtil.registerFunction(vehicleType, "hasEffect", AdvancedDamageSystem.hasEffect)
     SpecializationUtil.registerFunction(vehicleType, "processGeneralWearBreakdown", AdvancedDamageSystem.processGeneralWearBreakdown)
     
