@@ -103,7 +103,6 @@ function ADS_Hud:new()
         titleDividerHeight = 0.001,
         dividerSpacing = 0.003,
         bottomDividerSpacing = 2,
-        bottomDividerExtraHeight = 5,
         persistentDurationMs = 60000,
         background = self.panelBackgroundRounded,
         dividerBackground = "dataS/menu/base/graph_pixel.dds",
@@ -112,14 +111,8 @@ function ADS_Hud:new()
         endTime = 0,
         isVisible = false,
         isPersistent = false,
-        closeButtonSize = 0.016,
-        closeButtonPadding = 0.004,
         closeGlyphSize = 26,
-        closeGlyphSpacing = 6,
-        closeGlyphTextSpacing = 6,
-        closeHitbox = nil,
-        closeMouseDown = false,
-        lastCloseMouseDown = false
+        closeGlyphTextSpacing = 6
     }
 
     self.notificationCloseGlyph = nil
@@ -439,7 +432,6 @@ function ADS_Hud:setNotification(text, durationMs, title, playSound)
     panel.endTime = panel.isPersistent
         and (g_time + math.max(panel.persistentDurationMs or 25000, 0))
         or (g_time + math.max(parsedDurationMs or 3000, 0))
-    panel.lastCloseMouseDown = false
     panel.isVisible = true
 
     if playSound and ADS_Main ~= nil and ADS_Main.samples ~= nil and ADS_Main.samples.notification2D ~= nil then
@@ -454,9 +446,6 @@ function ADS_Hud:clearNotification()
     panel.endTime = 0
     panel.isVisible = false
     panel.isPersistent = false
-    panel.closeHitbox = nil
-    panel.closeMouseDown = false
-    panel.lastCloseMouseDown = false
 end
 
 function ADS_Hud:updateNotificationMouseInput()
@@ -490,49 +479,6 @@ function ADS_Hud:closePersistentNotification()
     self:clearNotification()
 
     return true
-end
-
-function ADS_Hud:onNotificationConfirm(actionName, inputValue)
-    if g_gui ~= nil and g_gui:getIsGuiVisible() then
-        return
-    end
-
-    self:closePersistentNotification()
-end
-
-function ADS_Hud:mouseEvent(posX, posY, isDown, isUp, button)
-    local panel = self.notificationPanel
-    if panel == nil or not panel.isVisible or not panel.isPersistent or button ~= Input.MOUSE_BUTTON_LEFT then
-        return false
-    end
-
-    local hitbox = panel.closeHitbox
-    if hitbox == nil then
-        panel.closeMouseDown = false
-        return false
-    end
-
-    local isInside = posX >= hitbox.x
-        and posX <= hitbox.x + hitbox.width
-        and posY >= hitbox.y
-        and posY <= hitbox.y + hitbox.height
-
-    if isDown then
-        panel.closeMouseDown = isInside
-        return isInside
-    end
-
-    if isUp then
-        local shouldClose = panel.closeMouseDown and isInside
-        panel.closeMouseDown = false
-
-        if shouldClose then
-            self:clearNotification()
-            return true
-        end
-    end
-
-    return false
 end
 
 function ADS_Hud:wrapNotificationText(text, maxWidth, textSize)
@@ -696,7 +642,6 @@ function ADS_Hud:drawNotificationPanel()
     local closeGlyphVisible = panel.isPersistent and hasTitle
     local closeGlyphWidth = closeGlyphVisible and self:scalePixelToScreenWidth(panel.closeGlyphSize or 18) or 0
     local closeGlyphHeight = closeGlyphVisible and self:scalePixelToScreenHeight(panel.closeGlyphSize or 18) or 0
-    local closeGlyphSpacing = closeGlyphVisible and self:scalePixelToScreenHeight(panel.closeGlyphSpacing or 4) or 0
     local topSectionHeight = hasTitle and (panel.padding + (#titleLines * panel.titleLineHeight) + dividerSpacing + titleDividerHeight) or 0
     local bottomSectionHeight = hasTitle and (topSectionHeight + dividerSpacing + bottomDividerTextSpacing) or 0
     local dynamicHeight = hasTitle
@@ -760,15 +705,6 @@ function ADS_Hud:drawNotificationPanel()
                 local okTextWidth = getTextWidth(okTextSize, okText)
                 local glyphX = centerX - (glyphWidth + textSpacing + okTextWidth) * 0.5
                 local glyphY = panelY + math.max((topSectionHeight - titleDividerHeight - closeGlyphHeight) * 0.5, 0)
-                local hitboxPaddingX = self:scalePixelToScreenWidth(6)
-                local hitboxPaddingY = self:scalePixelToScreenHeight(4)
-                panel.closeHitbox = {
-                    x = glyphX - hitboxPaddingX,
-                    y = glyphY - hitboxPaddingY,
-                    width = glyphWidth + textSpacing + okTextWidth + hitboxPaddingX * 2,
-                    height = closeGlyphHeight + hitboxPaddingY * 2
-                }
-
                 glyph:setPosition(glyphX, glyphY)
                 glyph:draw()
 

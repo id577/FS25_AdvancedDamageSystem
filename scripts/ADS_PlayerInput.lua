@@ -1,6 +1,5 @@
 local adsInspectionVehicle = nil
 local adsInspectionActionId = nil
-local adsNotificationAcceptActionIds = {}
 
 local adsInspectionHoldVehicle = nil
 local adsInspectionHoldTime = 0
@@ -204,18 +203,6 @@ end
 local function adsOnPlayerInputComponentUpdate(inputComponent, superFunc, dt)
     superFunc(inputComponent, dt)
 
-    if #adsNotificationAcceptActionIds > 0 then
-        local canCloseNotification = ADS_Main ~= nil
-            and ADS_Main.hud ~= nil
-            and ADS_Main.hud.hasClosableNotification ~= nil
-            and ADS_Main.hud:hasClosableNotification()
-            and (g_gui == nil or not g_gui:getIsGuiVisible())
-
-        for _, actionId in ipairs(adsNotificationAcceptActionIds) do
-            g_inputBinding:setActionEventActive(actionId, canCloseNotification)
-        end
-    end
-
     if not inputComponent.player.isOwner
         or g_inputBinding:getContextName() ~= PlayerInputComponent.INPUT_CONTEXT_NAME
         or adsInspectionActionId == nil then
@@ -282,8 +269,14 @@ local function adsOnPlayerInputComponentRegisterActionEvents(inputComponent)
     g_inputBinding:endActionEventsModification()
 end
 
-local function adsOnInputConfirmNotification(actionName, inputValue, callbackState, isAnalog)
-    if inputValue == 0 or ADS_Main == nil or ADS_Main.hud == nil then
+local function adsOnJumpOrConfirm(inputComponent, actionName, inputValue)
+    local value = tonumber(inputValue) or 0
+
+    if inputComponent ~= nil and inputComponent.onInputJump ~= nil then
+        inputComponent:onInputJump(actionName, value)
+    end
+
+    if value == 0 or ADS_Main == nil or ADS_Main.hud == nil or g_inputBinding == nil then
         return
     end
 
@@ -291,7 +284,15 @@ local function adsOnInputConfirmNotification(actionName, inputValue, callbackSta
         return
     end
 
-    ADS_Main.hud:onNotificationConfirm(actionName, inputValue)
+    if g_inputBinding:getInputHelpMode() ~= GS_INPUT_HELP_MODE_GAMEPAD then
+        return
+    end
+
+    if ADS_Main.hud.hasClosableNotification == nil or not ADS_Main.hud:hasClosableNotification() then
+        return
+    end
+
+    ADS_Main.hud:closePersistentNotification()
 end
 
 local function adsOnPlayerInputComponentRegisterGlobalPlayerActionEvents(inputComponent, superFunc, ...)
@@ -301,12 +302,12 @@ local function adsOnPlayerInputComponentRegisterGlobalPlayerActionEvents(inputCo
         return
     end
 
-    adsNotificationAcceptActionIds = {}
-
-    local _, menuAcceptId = g_inputBinding:registerActionEvent(
-        InputAction.MENU_ACCEPT,
+    local _, jumpId = g_inputBinding:registerActionEvent(
+        InputAction.JUMP,
         inputComponent,
-        adsOnInputConfirmNotification,
+        function(_, actionName, inputValue)
+            adsOnJumpOrConfirm(inputComponent, actionName, inputValue)
+        end,
         false,
         true,
         false,
@@ -315,28 +316,8 @@ local function adsOnPlayerInputComponentRegisterGlobalPlayerActionEvents(inputCo
         true
     )
 
-    if menuAcceptId ~= nil then
-        g_inputBinding:setActionEventTextVisibility(menuAcceptId, false)
-        g_inputBinding:setActionEventActive(menuAcceptId, false)
-        table.insert(adsNotificationAcceptActionIds, menuAcceptId)
-    end
-
-    local _, skipMessageId = g_inputBinding:registerActionEvent(
-        InputAction.SKIP_MESSAGE_BOX,
-        inputComponent,
-        adsOnInputConfirmNotification,
-        false,
-        true,
-        false,
-        true,
-        nil,
-        true
-    )
-
-    if skipMessageId ~= nil then
-        g_inputBinding:setActionEventTextVisibility(skipMessageId, false)
-        g_inputBinding:setActionEventActive(skipMessageId, false)
-        table.insert(adsNotificationAcceptActionIds, skipMessageId)
+    if jumpId ~= nil then
+        g_inputBinding:setActionEventTextVisibility(jumpId, false)
     end
 end
 

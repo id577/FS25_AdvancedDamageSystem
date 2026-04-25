@@ -542,14 +542,6 @@ function ADS_Main:update(dt)
     updateOpenWorkshopDialog()
 end
 
-function ADS_Main:mouseEvent(posX, posY, isDown, isUp, button)
-    if ADS_Main.hud ~= nil and ADS_Main.hud.mouseEvent ~= nil then
-        return ADS_Main.hud:mouseEvent(posX, posY, isDown, isUp, button)
-    end
-
-    return false
-end
-
 function ADS_Main:loadMap()
     log_dbg("loadMap() called")
     ADS_Main.loadGuiProfiles()
