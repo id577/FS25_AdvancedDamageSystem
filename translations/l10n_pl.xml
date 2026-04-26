@@ -533,6 +533,7 @@
         <text name="ads_jumper_cables_auto_disconnected" text="Rozłączono kable rozruchowe – wykryto ruch jednego z pojazdów"/>
         <text name="ads_jumper_cables_is_too_far" text="Odległość między %s a %s jest zbyt duża"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Badanie stanu technicznego pojazdu"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
         <text name="ads_field_inspection_action" text="Dokonaj przeglądu pojazdu"/>
         <text name="ads_field_inspection_hold_to_start" text="Przytrzymaj, aby rozpocząć przegląd"/>
         <text name="ads_field_inspection_starting" text="Rozpoczynanie inspekcji..."/>

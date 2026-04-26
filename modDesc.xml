@@ -542,10 +542,15 @@ Changelog 0.9.0.0:
     </extraSourceFiles>
     <actions>
         <action name="ADS_FIELD_INSPECTION" axisType="HALF" displayCategory="PLAYER_INTERACTIVE"/>
+        <action name="ADS_CLOSE_NOTIFICATION" displayCategory="PLAYER_INTERACTIVE"/>
     </actions>
     <inputBinding>
         <actionBinding action="ADS_FIELD_INSPECTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_r"/>
+        </actionBinding>
+        <actionBinding action="ADS_CLOSE_NOTIFICATION">
+            <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_LEFT"/>
+            <binding device="0_XINPUT_GAMEPAD" input="BUTTON_1"/>
         </actionBinding>
     </inputBinding>
     <l10n filenamePrefix="translations/l10n"/>

@@ -526,6 +526,7 @@
         <text name="ads_jumper_cables_auto_disconnected" text="Starthilfekabel wurden getrennt, weil eines der Fahrzeuge losgefahren ist"/>
         <text name="ads_jumper_cables_is_too_far" text="%s ist zu weit von %s entfernt"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Fahrzeuginspektion"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
         <text name="ads_field_inspection_action" text="Fahrzeug inspizieren"/>
         <text name="ads_field_inspection_hold_to_start" text="Gedrückt halten, um die Inspektion zu starten"/>
         <text name="ads_field_inspection_starting" text="Inspektion wird gestartet..."/>

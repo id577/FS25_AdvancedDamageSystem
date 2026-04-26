@@ -1,6 +1,5 @@
 local adsInspectionVehicle = nil
 local adsInspectionActionId = nil
-
 local adsInspectionHoldVehicle = nil
 local adsInspectionHoldTime = 0
 local adsInspectionHoldThreshold = 600
@@ -269,58 +268,5 @@ local function adsOnPlayerInputComponentRegisterActionEvents(inputComponent)
     g_inputBinding:endActionEventsModification()
 end
 
-local function adsOnJumpOrConfirm(inputComponent, actionName, inputValue)
-    local value = tonumber(inputValue) or 0
-
-    if inputComponent ~= nil and inputComponent.onInputJump ~= nil then
-        inputComponent:onInputJump(actionName, value)
-    end
-
-    if value == 0 or ADS_Main == nil or ADS_Main.hud == nil or g_inputBinding == nil then
-        return
-    end
-
-    if g_gui ~= nil and g_gui:getIsGuiVisible() then
-        return
-    end
-
-    if g_inputBinding:getInputHelpMode() ~= GS_INPUT_HELP_MODE_GAMEPAD then
-        return
-    end
-
-    if ADS_Main.hud.hasClosableNotification == nil or not ADS_Main.hud:hasClosableNotification() then
-        return
-    end
-
-    ADS_Main.hud:closePersistentNotification()
-end
-
-local function adsOnPlayerInputComponentRegisterGlobalPlayerActionEvents(inputComponent, superFunc, ...)
-    superFunc(inputComponent, ...)
-
-    if not inputComponent.player.isOwner then
-        return
-    end
-
-    local _, jumpId = g_inputBinding:registerActionEvent(
-        InputAction.JUMP,
-        inputComponent,
-        function(_, actionName, inputValue)
-            adsOnJumpOrConfirm(inputComponent, actionName, inputValue)
-        end,
-        false,
-        true,
-        false,
-        true,
-        nil,
-        true
-    )
-
-    if jumpId ~= nil then
-        g_inputBinding:setActionEventTextVisibility(jumpId, false)
-    end
-end
-
 PlayerInputComponent.update = Utils.overwrittenFunction(PlayerInputComponent.update, adsOnPlayerInputComponentUpdate)
 PlayerInputComponent.registerActionEvents = Utils.appendedFunction(PlayerInputComponent.registerActionEvents, adsOnPlayerInputComponentRegisterActionEvents)
-PlayerInputComponent.registerGlobalPlayerActionEvents = Utils.overwrittenFunction(PlayerInputComponent.registerGlobalPlayerActionEvents, adsOnPlayerInputComponentRegisterGlobalPlayerActionEvents)

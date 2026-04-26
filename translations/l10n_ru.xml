@@ -526,6 +526,7 @@
         <text name="ads_jumper_cables_auto_disconnected" text="Пусковые провода отключены, так как одна из машин начала движение"/>
         <text name="ads_jumper_cables_is_too_far" text="%s находится слишком далеко от %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Осмотр техники"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
         <text name="ads_field_inspection_action" text="Осмотреть технику"/>
         <text name="ads_field_inspection_hold_to_start" text="Удерживайте для начала осмотра"/>
         <text name="ads_field_inspection_starting" text="Начинаем осмотр..."/>

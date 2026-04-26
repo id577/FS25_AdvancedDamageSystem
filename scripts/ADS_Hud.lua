@@ -17,6 +17,7 @@ ADS_Hud.ROUNDED_PANEL_UV = {
     bottomRight = { 59, 59,  5,  5 }
 }
 ADS_Hud.COLOR_GAME_GREEN = {0.529, 0.706, 0, 1}
+ADS_Hud.NOTIFICATION_GAMEPAD_CLOSE_BUTTON = 1
 
 function ADS_Hud:new()
 	local self = ADS_Hud:superClass().new(ADS_Hud_mt)
@@ -118,6 +119,7 @@ function ADS_Hud:new()
     self.notificationCloseGlyph = nil
     self.notificationCloseGlyphInputMode = nil
     self.notificationMouseButtonDownLast = false
+    self.notificationGamepadButtonDownLast = false
 
     self.activeVehicleDebugPanel = {
         x = 0.20,
@@ -448,21 +450,48 @@ function ADS_Hud:clearNotification()
     panel.isPersistent = false
 end
 
+function ADS_Hud:getNotificationGamepadState()
+    if getNumOfGamepads == nil or getInputButton == nil then
+        return false
+    end
+
+    local numGamepads = getNumOfGamepads()
+    for gamepadId = 0, numGamepads - 1 do
+        if getInputButton(ADS_Hud.NOTIFICATION_GAMEPAD_CLOSE_BUTTON, gamepadId) > 0 then
+            return true
+        end
+    end
+
+    return false
+end
+
 function ADS_Hud:updateNotificationMouseInput()
     local isMouseDown = Input.isMouseButtonPressed ~= nil and Input.isMouseButtonPressed(Input.MOUSE_BUTTON_LEFT)
+    local isGamepadDown = self:getNotificationGamepadState()
+    local isClosable = self:hasClosableNotification()
 
     if g_gui ~= nil and g_gui:getIsGuiVisible() then
         self.notificationMouseButtonDownLast = isMouseDown
+        self.notificationGamepadButtonDownLast = isGamepadDown
         return
     end
 
-    if self:hasClosableNotification() and isMouseDown and not self.notificationMouseButtonDownLast then
+    if isClosable and isMouseDown and not self.notificationMouseButtonDownLast then
         self:closePersistentNotification()
         self.notificationMouseButtonDownLast = true
+        self.notificationGamepadButtonDownLast = isGamepadDown
+        return
+    end
+
+    if isClosable and isGamepadDown and not self.notificationGamepadButtonDownLast then
+        self:closePersistentNotification()
+        self.notificationMouseButtonDownLast = isMouseDown
+        self.notificationGamepadButtonDownLast = true
         return
     end
 
     self.notificationMouseButtonDownLast = isMouseDown
+    self.notificationGamepadButtonDownLast = isGamepadDown
 end
 
 function ADS_Hud:hasClosableNotification()
@@ -524,7 +553,7 @@ function ADS_Hud:drawNotificationDivider(x, y, width, height, color)
 end
 
 function ADS_Hud:getNotificationCloseGlyph(glyphWidth, glyphHeight)
-    if g_inputDisplayManager == nil or InputGlyphElement == nil or InputAction == nil or InputAction.SKIP_MESSAGE_BOX == nil then
+    if g_inputDisplayManager == nil or InputGlyphElement == nil or InputAction == nil or InputAction.ADS_CLOSE_NOTIFICATION == nil then
         return nil
     end
 
@@ -542,7 +571,7 @@ function ADS_Hud:getNotificationCloseGlyph(glyphWidth, glyphHeight)
 
     local inputMode = g_inputBinding ~= nil and g_inputBinding:getInputHelpMode() or nil
     if self.notificationCloseGlyphInputMode ~= inputMode then
-        self.notificationCloseGlyph:setAction(InputAction.SKIP_MESSAGE_BOX, nil, nil, true)
+        self.notificationCloseGlyph:setAction(InputAction.ADS_CLOSE_NOTIFICATION, nil, nil, true)
         self.notificationCloseGlyphInputMode = inputMode
     end
 

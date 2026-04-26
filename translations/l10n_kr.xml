@@ -533,6 +533,7 @@
         <text name="ads_jumper_cables_auto_disconnected" text="한 차량이 움직이기 시작하여 점프 케이블이 자동으로 분리되었습니다"/>
         <text name="ads_jumper_cables_is_too_far" text="%s와(과) %s 사이가 너무 멉니다"/>
         <text name="input_ADS_FIELD_INSPECTION" text="차량 점검"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
         <text name="ads_field_inspection_action" text="차량 점검하기"/>
         <text name="ads_field_inspection_hold_to_start" text="길게 눌러 점검 시작"/>
         <text name="ads_field_inspection_starting" text="점검 시작 중..."/>

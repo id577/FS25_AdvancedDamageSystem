@@ -526,6 +526,7 @@
         <text name="ads_jumper_cables_auto_disconnected" text="Les câbles de démarrage ont été déconnectés parce que l'un des véhicules a commencé à bouger"/>
         <text name="ads_jumper_cables_is_too_far" text="%s est trop éloigné de %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Inspection du véhicule"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
         <text name="ads_field_inspection_action" text="Inspecter le véhicule"/>
         <text name="ads_field_inspection_hold_to_start" text="Maintenir pour commencer l'inspection"/>
         <text name="ads_field_inspection_starting" text="Démarrage de l'inspection..."/>

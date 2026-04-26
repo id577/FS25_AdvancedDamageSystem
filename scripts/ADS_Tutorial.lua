@@ -44,6 +44,8 @@ function ADS_Tutorial:getADSVehicle()
     local vehicle = g_localPlayer.getCurrentVehicle() 
     if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
         self.vehicle = vehicle
+    else
+        self.vehicle = nil
     end
 end
 

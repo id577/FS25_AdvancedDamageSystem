@@ -533,6 +533,7 @@
         <text name="ads_jumper_cables_auto_disconnected" text="Cavi di avviamento scollegati perche uno dei veicoli ha iniziato a muoversi"/>
         <text name="ads_jumper_cables_is_too_far" text="%s e troppo lontano da %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Ispezione del veicolo"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
         <text name="ads_field_inspection_action" text="Ispeziona il veicolo"/>
         <text name="ads_field_inspection_hold_to_start" text="Tieni premuto per avviare l'ispezione"/>
         <text name="ads_field_inspection_starting" text="Avvio dell'ispezione..."/>

@@ -533,6 +533,7 @@
         <text name="ads_jumper_cables_auto_disconnected" text="Jumper cables disconnected because one of the vehicles started moving"/>
         <text name="ads_jumper_cables_is_too_far" text="%s is too far from %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Vehicle inspection"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
         <text name="ads_field_inspection_action" text="Inspect vehicle"/>
         <text name="ads_field_inspection_hold_to_start" text="Hold to start inspection"/>
         <text name="ads_field_inspection_starting" text="Starting inspection..."/>
