@@ -399,8 +399,8 @@ function ADS_ReportDialog:updateScreen()
     local dateStr = string.format("%s %s. '%s", dDay, g_i18n:formatPeriod(dMonth, true), yearStr)
     
     self.reportDateValue:setText(dateStr)
-    self.vehicleAgeValue:setText(self.lastReport.conditionData.age .. " " .. g_i18n:getText("ads_ws_age_unit"))
-    self.vehicleOperatingHoursValue:setText(string.format("%.1f", self.lastReport.conditionData.operatingHours) .. " " .. g_i18n:getText("ads_ws_hours_unit"))
+    self.vehicleAgeValue:setText(tostring(self.lastReport.conditionData.age or 0) .. " " .. g_i18n:getText("ads_ws_age_unit"))
+    self.vehicleOperatingHoursValue:setText(string.format("%.1f", self.lastReport.conditionData.operatingHours or 0) .. " " .. g_i18n:getText("ads_ws_hours_unit"))
         
 
     self.inspectionTypeValue:setText(g_i18n:getText(self.lastReport.type) .. " (" .. g_i18n:getText(self.lastReport.optionOne) .. ")")

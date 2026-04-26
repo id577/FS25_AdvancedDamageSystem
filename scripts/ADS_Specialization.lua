@@ -7439,6 +7439,7 @@ function AdvancedDamageSystem:addEntryToMaintenanceLog(maintenanceType, optionOn
         conditionData = {
             year = spec.year,
             operatingHours = realHours,
+            age = self.age or 0,
             condition = self:getConditionLevel(),
             service = self:getServiceLevel(),
             systems = systemsSnapshot,
