@@ -11562,6 +11562,53 @@ function AdvancedDamageSystem.ConsoleCommands:setHorsePower(rawArgs)
     ))
 end
 
+function AdvancedDamageSystem.ConsoleCommands:setOperatingTime(rawArgs)
+    if not g_currentMission:getIsServer() then
+        local vehicle = self:getTargetVehicle()
+        if vehicle then ADS_ConsoleCommandEvent.sendToServer("setOperatingTime", rawArgs, nil, vehicle) end
+        return
+    end
+
+    local vehicle = self:getTargetVehicle()
+    if not vehicle then
+        return
+    end
+
+    local args = parseArguments(rawArgs)
+    if not args or not args[1] then
+        print("ADS Error: Usage: ads_setOperatingTime <hours>")
+        print("Example: ads_setOperatingTime 22.1")
+        return
+    end
+
+    local hours = tonumber(args[1])
+    if hours == nil or hours < 0 then
+        print("ADS Error: Operating time must be a number >= 0.")
+        return
+    end
+
+    local operatingTimeMs = hours * 60 * 60 * 1000
+    local previousOperatingTimeMs = getSyncOperatingTime(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+
+    spec._allowAdsOperatingTimeWrite = true
+    vehicle:setOperatingTime(operatingTimeMs, false)
+    spec._allowAdsOperatingTimeWrite = false
+    spec.realOperatingTime = operatingTimeMs
+
+    if vehicle.isServer and spec.adsDirtyFlag_telemetry ~= nil then
+        vehicle:raiseDirtyFlags(spec.adsDirtyFlag_telemetry)
+    end
+
+    print(string.format(
+        "ADS: Operating time for '%s' changed: %.2f h -> %.2f h (%.0f ms).",
+        vehicle:getFullName(),
+        previousOperatingTimeMs / (60 * 60 * 1000),
+        operatingTimeMs / (60 * 60 * 1000),
+        operatingTimeMs
+    ))
+end
+
 function AdvancedDamageSystem.ConsoleCommands:setPlowMaxForce(rawArgs)
     if not g_currentMission:getIsServer() then
         local vehicle = self:getTargetVehicle()
@@ -11724,6 +11771,7 @@ addConsoleCommand("ads_getDebugVehicleInfo", "Vehicle debug info", "getDebugVehi
 addConsoleCommand("ads_setDirtAmount", "Sets vehicle dirt amount. Usage: ads_setDirtAmount [0.0-1.0]", "setDirtAmount", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setFuelLevel", "Sets vehicle fuel level. Usage: ads_setFuelLevel [0.0-1.0 or 0..100]", "setFuelLevel", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setHorsePower", "Sets horsepower on current vehicle. Usage: ads_setHorsePower [hp]", "setHorsePower", AdvancedDamageSystem.ConsoleCommands)
+addConsoleCommand("ads_setOperatingTime", "Sets operating time on current vehicle. Usage: ads_setOperatingTime [hours]", "setOperatingTime", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_setPlowMaxForce", "Sets maxForce on selected/attached plow. Usage: ads_setPlowMaxForce [kN]", "setPlowMaxForce", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_resetFactorStats", "Resets accumulated factor stats for current vehicle.", "resetFactorStats", AdvancedDamageSystem.ConsoleCommands)
 addConsoleCommand("ads_toggleHudDebugView", "Switch debug HUD view. Usage: ads_toggleHudDebugView [default|stats|toggle]", "toggleHudDebugView", AdvancedDamageSystem.ConsoleCommands)
