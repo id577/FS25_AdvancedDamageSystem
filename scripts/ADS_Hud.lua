@@ -1699,6 +1699,8 @@ function ADS_Hud:drawActiveVehicleHUD()
     local currentSpeed = tonumber(vehicle:getLastSpeed()) or 0
     local avgSpeed = tonumber(spec.avgSpeed) or 0
     local avgAbsDiffAcc = tonumber(spec.avgAbsDiffAcc) or 0
+    local acceleratorPedal = tonumber(motor.lastAcceleratorPedal or 0) or 0
+    local brakePedal = tonumber(((spec.chassisBrakeState or {}).pedal) or 0) or 0
     local dynamicLoadDeltaPct = motorLoad > 0 and ((dynamicMotorLoad - motorLoad) / motorLoad) * 100 or 0
     local targetGear = (motor.targetGear or 0) * (motor.currentDirection or 1)
     local spec_CVTaddon = vehicle.spec_CVTaddon
@@ -1707,9 +1709,11 @@ function ADS_Hud:drawActiveVehicleHUD()
     local effectiveCapPerHp = peakPowerHp > 0 and (draftEffectiveForceCap / peakPowerHp) or 0
     local drivetrainLines = {}
     addLine(drivetrainLines, string.format(
-        "sp: %.1f (avg: %.1f) | hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f (avg: %.2f%%)) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f | e/h: %.2f",
+        "sp: %.1f (avg: %.1f) | ap: %.0f%% bp: %.0f%% | hp: %d/%d | ml/dml: %.0f/%.0f (+%.0f%%, ada: %.2f (avg: %.2f%%)) | rpm: %.0f%% | g: %d>%d(%d,%.2f) | max.f: %.2f, eff.c: %.2f | e/h: %.2f",
         currentSpeed,
         avgSpeed,
+        math.max(acceleratorPedal * 100, 0),
+        math.max(brakePedal * 100, 0),
         motorPower / 735.5,
         peakPowerHp,
         math.max(motorLoad * 100, 0),
