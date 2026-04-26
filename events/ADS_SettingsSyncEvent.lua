@@ -130,7 +130,7 @@ local function applyConfig(event)
         instantInspection = event.instantInspection
     }
 
-    ADS_InGameSettings.applyPendingConfigSideEffects(oldConfig, newConfig)
+    ADS_SettingsPage.applyPendingConfigSideEffects(oldConfig, newConfig)
 
     if math.abs((oldBatteryCapacityFactor or 0) - (event.batteryUsableCapacityFactor or 0)) > 0.0001
         and ADS_Main ~= nil and ADS_Main.vehicles ~= nil then

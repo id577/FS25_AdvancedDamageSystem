@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI name="ADSsettings">
+    <GuiElement profile="fs25_menuContainer">
+        <BoxLayout profile="fs25_subCategorySelectorTabbedBox">
+            <Button profile="fs25_subCategorySelectorTabbedTab" id="adsTab" text="$l10n_ads_settings_title" onClick="onClickADS" textUpperCase="false">
+                <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
+            </Button>
+        </BoxLayout>
+        <GuiElement profile="fs25_subCategorySelectorTabbedContainer" id="adsPage">
+            <Text profile="fs25_settingsNoPermissionText" id="noPermissionText" text="$l10n_ui_mpNoPermissionGeneralSettings"/>
+            <ScrollingLayout profile="fs25_settingsLayout" id="settingsLayout">
+                <Text profile="fs25_settingsSectionHeader" name="sectionHeader" id="subTitlePrefab"/>
+                <Bitmap profile="fs25_multiTextOptionContainer" id="binaryPrefab">
+                    <BinaryOption profile="fs25_settingsBinaryOption" onClick="onClickBinaryOption" id="checkPrefab">
+                        <Text profile="fs25_multiTextOptionTooltip" name="ignore" />
+                    </BinaryOption>
+                    <Text profile="fs25_settingsMultiTextOptionTitle" />
+                </Bitmap>
+                <Bitmap profile="fs25_multiTextOptionContainer" id="multiPrefab">
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onClickMultiOption" id="multiTextPrefab">
+                        <Text profile="fs25_multiTextOptionTooltip" name="ignore" />
+                    </MultiTextOption>
+                    <Text profile="fs25_settingsMultiTextOptionTitle" />
+                </Bitmap>
+            </ScrollingLayout>
+            <Bitmap profile="fs25_settingsTooltipSeparator" id="adsSeparator"/>
+        </GuiElement>
+    </GuiElement>
+</GUI>

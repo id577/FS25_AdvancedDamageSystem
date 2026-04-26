@@ -17,10 +17,10 @@ source(g_currentModDirectory .. "gui/ADS_InGameMenuFrame.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceTwoOptionsDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceThreeOptionsDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_WelcomeDialog.lua")
+source(g_currentModDirectory .. "gui/ADS_SettingsPage.lua")
 source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
 source(g_currentModDirectory .. "scripts/ADS_Telemetry.lua")
 source(g_currentModDirectory .. "scripts/ADS_PlayerInput.lua")
-source(g_currentModDirectory .. "scripts/ADS_InGameSettings.lua")
 source(g_currentModDirectory .. "events/ADS_VehicleChangeStatusEvent.lua")
 source(g_currentModDirectory .. "events/ADS_WorkshopChangeStatusEvent.lua")
 source(g_currentModDirectory .. "events/ADS_ServiceRequestEvent.lua")
@@ -34,35 +34,23 @@ source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
 
 function ADS_Main.loadGuiProfiles()
+    if ADS_SettingsPage ~= nil and ADS_SettingsPage.registerGlobalTitleText ~= nil then
+        ADS_SettingsPage.registerGlobalTitleText()
+    end
+
     if ADS_Main.guiProfilesLoaded or g_gui == nil then
         return
     end
 
     g_gui:loadProfiles(modDirectory .. "gui/guiProfiles.xml")
+
+    if g_overlayManager ~= nil
+        and (g_overlayManager.textureConfigs == nil or g_overlayManager.textureConfigs.ads_MenuIcon == nil) then
+        g_overlayManager:addTextureConfigFile(modDirectory .. "images/menuIcon.xml", "ads_MenuIcon")
+    end
+
     ADS_Main.guiProfilesLoaded = true
 end
-
--- Network hook: wrap every settings callback so changes made by an admin
--- client are automatically replicated to the dedicated server (and then
--- re-broadcast to all other clients via ADS_SettingsSyncEvent).
-do
-    local cbs = {
-        "onServiceWearChanged", "onConditionWearChanged", "onDowntimeWearChanged", "onGeneralWearEnabledChanged",
-        "onSystemStressRateChanged", "onInstantInspectionChanged", "onParkVehicleChanged", "onWarrantyEnabledChanged",
-        "onMaintenancePriceChanged", "onMaintenanceDurationChanged", "onWorkshopAvailableChanged", "onMobileWorkshopRestrictionsChanged",
-        "onWorkshopOpenHourChanged", "onWorkshopCloseHourChanged", "onThermalSensitivityChanged",
-        "onBatteryCapacityChanged", "onCloggingSpeedChanged", "onAiOverloadAndOverheatControlChanged", "onDebugModeChanged"
-    }
-    for _, name in ipairs(cbs) do
-        local orig = ADS_InGameSettings[name]
-        if orig ~= nil then
-            ADS_InGameSettings[name] = function(self, ...)
-                orig(self, ...)
-            end
-        end
-    end
-end
-
 
 local function log_dbg(...)
     if ADS_Config.DEBUG then
@@ -545,9 +533,11 @@ end
 function ADS_Main:loadMap()
     log_dbg("loadMap() called")
     ADS_Main.loadGuiProfiles()
+    ADS_SettingsPage.reset()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
     ADS_Config.loadFromXMLFile()
+    ADS_SettingsPage.installSettingsPage()
     self:tryRegisterShopMenuPage()
 end
 
@@ -556,6 +546,7 @@ function ADS_Main:deleteMap()
     self.shopMenuFrame = nil
     ADS_Main.guiProfilesLoaded = nil
     ADS_Config._loaded = nil
+    ADS_SettingsPage.reset()
 end
 
 addModEventListener(ADS_Main)

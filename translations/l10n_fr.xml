@@ -1,5 +1,7 @@
 <l10n>
     <texts>
+        <text name="ads_settings_title" text="ADS PARAMÈTRES"/>
+        <text name="ADS_SETTINGS_TITLE" text="Advanced Damage System"/>
         <text name="ads_maintenancePrice_label" text="Multiplicateur de prix de la maintenance"/>
         <text name="ads_maintenancePrice_tooltip" text="Ajuste le coût de tous les services d'atelier, y compris les inspections, les réparations et les révisions. Une valeur plus élevée rend toutes les activités de maintenance plus coûteuses."/>
         <text name="ads_maintenanceDuration_label" text="Multiplicateur de durée de maintenance"/>
