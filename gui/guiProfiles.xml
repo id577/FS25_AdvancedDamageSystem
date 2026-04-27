@@ -325,6 +325,68 @@
         <size value="1550px 510px"/>
         <position value="-10px 0px"/>
     </Profile>
+    <Profile name="ads_menuSettingsContainer" extends="emptyPanel" with="anchorTopStretchingX">
+        <size value="1650px 775px"/>
+        <position value="30px 0px"/>
+    </Profile>
+    <Profile name="ads_menuDockedSliderBg" extends="fs25_sliderDockedBg" with="anchorTopRight">
+        <position value="130px 30px"/>
+    </Profile>
+    <Profile name="ads_menuSettingsDockedSliderBg" extends="fs25_sliderDockedBg" with="anchorTopRight">
+        <position value="-10px 30px"/>
+    </Profile>
+    <Profile name="ads_menuDockedSliderBox" extends="fs25_sliderDockedBox"/>
+    <Profile name="ads_menuDockedSlider" extends="fs25_helpLineSlider">
+        <sliderImageColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
+    <Profile name="ads_settingsButton" extends="emptyPanel" with="anchorMiddleRight">
+        <size value="280px 32px"/>
+        <position value="-10px 0px"/>
+        <focusOnHighlight value="true"/>
+        <textResizeWidth value="200px"/>
+        <textSize value="16px"/>
+        <textOffset value="-5px 0px"/>
+        <iconColor value="$preset_colorTransparent"/>
+        <iconFocusedColor value="$preset_colorTransparent"/>
+        <iconTextOffset value="0px -1px"/>
+        <iconHighlightedColor value="$preset_colorTransparent"/>
+        <textBold value="true"/>
+        <textUpperCase value="true"/>
+        <textAlignment value="center"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textFocusedColor value="$preset_fs25_colorMainDark"/>
+        <textHighlightedColor value="$preset_fs25_colorMainDark"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+    <Profile name="ads_settingsButtonBg" extends="fs25_settingsButtonBg">
+        <imageFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <imageHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <imagePressedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImageFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImageHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImagePressedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImageFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImageHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImagePressedColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
+    <Profile name="ads_settingsMultiTextOptionBg" extends="fs25_multiTextOptionBg">
+        <imageFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <imageHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <imagePressedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImageFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImageHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <startImagePressedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImageFocusedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImageHighlightedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <endImagePressedColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
     <Profile name="ads_menuHeaderButtonLeft" extends="baseReference">
         <imageColor value="0 0 0 0"/>
         <textFocusedColor value="$preset_fs25_colorMainHighlight"/>
@@ -360,11 +422,6 @@
     </Profile>
     <Profile name="ads_menuVehicleList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
         <position value="0px -34px"/>
-        <absoluteSizeOffset value="0px 20px"/>
-    </Profile>
-    <Profile name="ads_menuListSliderBox" extends="fs25_listSliderBox" with="anchorTopRight">
-        <position value="-5px -34px"/>
-        <size value="6px 100%"/>
         <absoluteSizeOffset value="0px 20px"/>
     </Profile>
     <Profile name="ads_menuTableListItemAlt" extends="fs25_calendarListItem" with="anchorTopStretchingX alternating">

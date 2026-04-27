@@ -34,10 +34,6 @@ source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
 
 function ADS_Main.loadGuiProfiles()
-    if ADS_SettingsPage ~= nil and ADS_SettingsPage.registerGlobalTitleText ~= nil then
-        ADS_SettingsPage.registerGlobalTitleText()
-    end
-
     if ADS_Main.guiProfilesLoaded or g_gui == nil then
         return
     end
@@ -421,16 +417,33 @@ function ADS_Main:evaluateWorkshopState()
         return self.isWorkshopOpen
     end
     local currentDayHour = g_currentMission.environment.dayTime / (60 * 60 * 1000)
-    return ADS_Config.WORKSHOP.ALWAYS_AVAILABLE
-        or (currentDayHour >= ADS_Config.WORKSHOP.OPEN_HOUR
+    return (currentDayHour >= ADS_Config.WORKSHOP.OPEN_HOUR
         and currentDayHour < ADS_Config.WORKSHOP.CLOSE_HOUR)
+end
+
+function ADS_Main:isWorkshopTypeAlwaysAvailable(workshopType)
+    local workshopConfig = ADS_Config.WORKSHOP
+
+    if workshopType == AdvancedDamageSystem.WORKSHOP.DEALER then
+        return workshopConfig.DEALER_ALWAYS_AVAILABLE == true
+    elseif workshopType == AdvancedDamageSystem.WORKSHOP.MOBILE then
+        return workshopConfig.MOBILE_ALWAYS_AVAILABLE == true
+    elseif workshopType == AdvancedDamageSystem.WORKSHOP.OWN then
+        return workshopConfig.OWN_ALWAYS_AVAILABLE == true
+    end
+
+    return false
+end
+
+function ADS_Main:isWorkshopTypeOpen(workshopType)
+    return self:isWorkshopTypeAlwaysAvailable(workshopType) or self.isWorkshopOpen == true
 end
 
 
 -- Re-evaluate and broadcast workshop state immediately (settings change).
-function ADS_Main:forceWorkshopUpdate()
+function ADS_Main:forceWorkshopUpdate(forceNotify)
     local isWorkshopOpen = self:evaluateWorkshopState()
-    if isWorkshopOpen ~= self.isWorkshopOpen then
+    if forceNotify or isWorkshopOpen ~= self.isWorkshopOpen then
         self.isWorkshopOpen = isWorkshopOpen
         if g_currentMission:getIsServer() then
             ADS_WorkshopChangeStatusEvent.send(self.isWorkshopOpen)
@@ -537,7 +550,6 @@ function ADS_Main:loadMap()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
     ADS_Config.loadFromXMLFile()
-    ADS_SettingsPage.installSettingsPage()
     self:tryRegisterShopMenuPage()
 end
 

@@ -1,7 +1,7 @@
 <l10n>
     <texts>
         <text name="ads_settings_title" text="ADS PARAMÈTRES"/>
-        <text name="ADS_SETTINGS_TITLE" text="Advanced Damage System"/>
+        <text name="ads_settings_admin_required" text="ADS settings require administrator permissions in multiplayer."/>
         <text name="ads_maintenancePrice_label" text="Multiplicateur de prix de la maintenance"/>
         <text name="ads_maintenancePrice_tooltip" text="Ajuste le coût de tous les services d'atelier, y compris les inspections, les réparations et les révisions. Une valeur plus élevée rend toutes les activités de maintenance plus coûteuses."/>
         <text name="ads_maintenanceDuration_label" text="Multiplicateur de durée de maintenance"/>
@@ -14,9 +14,22 @@
         <text name="ads_engineMaxHeat_tooltip" text="Le taux de base de chaleur générée par le moteur à charge maximale. Des valeurs plus élevées feront chauffer le moteur plus rapidement."/>
         <text name="ads_cloggingSpeed_label" text="Vitesse d'encrassement"/>
         <text name="ads_cloggingSpeed_tooltip" text="Règle la vitesse à laquelle le radiateur et l'admission d'air s'encrassent lors du travail dans la poussière, la menue paille et les résidus de culture. Des valeurs plus élevées accélèrent l'encrassement. À 100 %, la vitesse d'encrassement correspond à environ un tiers de l'intervalle d'entretien."/>
+        <text name="ads_fieldInspectionDuration_label" text="Inspection Duration"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Sets how long a pre-shift field inspection takes, in real seconds."/>
+        <text name="ads_lubricationReducePerDay_label" text="Lubrication Drying Rate"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Sets how much lubrication dries out over one in-game day. At 0%, lubrication does not dry out over time."/>
         <text name="ads_ws_header_title" text="Atelier"/>
-        <text name="ads_workshopAvailable_label" text="Atelier ouvert 24/7"/>
-        <text name="ads_workshopAvailable_tooltip" text="Active ou désactive l'ouverture de l'atelier 24h/24 et 7j/7."/>
+        <text name="ads_settings_section_service_wear" text="Service and Wear"/>
+        <text name="ads_settings_section_thermal_model" text="Thermal Model"/>
+        <text name="ads_settings_section_battery_alternator" text="Battery and Alternator"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Pre-shift Maintenance"/>
+        <text name="ads_settings_section_other" text="Other"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Dealer Workshop 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Keeps the dealer workshop available at any time of day."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Mobile Workshop 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Keeps the mobile workshop available at any time of day."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Owned Workshop 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Keeps your owned workshop available at any time of day."/>
         <text name="ads_instantInspection_label" text="Inspection instantanée"/>
         <text name="ads_instantInspection_tooltip" text="Lorsqu'elle est activée, toutes les inspections se terminent instantanément (sans écoulement du temps). Remarque : l'option d'inspection « Visuelle » devient indisponible."/>
         <text name="ads_parkVehicle_label" text="Stationner le véhicule pendant l'entretien"/>
@@ -38,6 +51,7 @@
         <text name="ads_batteryCapacity_label" text="Capacité de la batterie"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilité thermique"/>
         <text name="ads_option_off" text="Arrêt"/>
+        <text name="ads_option_none" text="None"/>
         <text name="ads_serviceInterval_tooltip" text="Définit l'intervalle d'entretien de base en heures, au-delà duquel un entretien est requis. L'intervalle réel dépend de la marque du véhicule, de son âge et de la qualité des entretiens précédents."/>
         <text name="ads_vehicleLifespan_tooltip" text="Définit la durée de vie de base du véhicule en heures, après laquelle son état atteindra 0 %. Plus l'état se rapproche de zéro, plus le véhicule devient peu fiable."/>
         <text name="ads_downtimeWear_tooltip" text="Définit la vitesse d'usure passive lorsqu'un véhicule reste à l'arrêt, en pourcentage du taux d'usure de base (Durée de vie du véhicule). Par exemple, 5 % avec la durée de vie par défaut de 100 heures signifie que chaque système perd environ 1 % d'état après environ 20 heures d'immobilisation. Remarque : l'usure passive est désactivée lorsque le véhicule est stocké sous abri."/>
@@ -45,7 +59,17 @@
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Lorsqu'elle est activée, la disponibilité des différentes interventions dans l'atelier mobile dépend de la maintenabilité du véhicule."/>
         <text name="ads_systemStressRate_tooltip" text="Détermine la vitesse à laquelle le stress s'accumule dans les systèmes sous l'effet de la surcharge, de la surchauffe, du patinage et d'autres conditions d'utilisation sévères. Le stress influe directement sur la probabilité de panne : plus un système accumule de stress, plus une panne devient probable."/>
         <text name="ads_batteryCapacity_tooltip" text="Ajuste la capacité maximale réellement utilisable de la batterie. Des valeurs proches de 150 Ah sont plus réalistes, mais à ce niveau vous rencontrerez à peine des problèmes de décharge de batterie."/>
+        <text name="ads_alternatorMaxOutput_label" text="Alternator Max Output"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Sets the maximum alternator output current. Higher values allow the alternator to recharge the battery faster."/>
+        <text name="ads_idleCurrent_label" text="Standby Current"/>
+        <text name="ads_idleCurrent_tooltip" text="Sets the battery drain current while the engine is stopped. For example, at 0.5 A a 15 Ah battery would take about 30 real hours to fully discharge, before temperature effects are applied."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajuste le comportement du modèle thermique. Des réglages plus élevés rendent le moteur et la transmission plus sensibles à la charge, à la température ambiante et à l'encrassement du radiateur, générant ainsi plus de chaleur dans les mêmes conditions."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Radiator Dirt Influence"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Reduces radiator cooling capacity by this percentage at maximum dirt buildup."/>
+        <text name="ads_warmingBoostPower_label" text="Warm-up Acceleration"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Artificially speeds up engine and transmission warm-up. Use Off for unmodified thermal behavior."/>
+        <text name="ads_coolingSlowdownPower_label" text="Cooling Slowdown"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Artificially slows engine and transmission cooling after the vehicle is shut down. Use Off for unmodified cooling."/>
         <text name="ads_thermal_none" text="Passif"/>
         <text name="ads_thermal_mild" text="Modérée"/>
         <text name="ads_thermal_default" text="Par défaut"/>
@@ -646,6 +670,9 @@
         <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Surcharge critique ! Reduisez immediatement la charge sur la machine."/>
         <text name="ads_tutorialMode_label" text="Mode tutoriel"/>
         <text name="ads_tutorialMode_tooltip" text="Affiche des conseils tutoriels pendant le jeu. Désactivé en multijoueur."/>
+        <text name="ads_tutorialResetTips_label" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_text" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Reset tutorial tip history and show all tips again. Available only in singleplayer."/>
         <text name="ads_tutorialResetConfirm_title" text="Réinitialiser les conseils tutoriels ?"/>
         <text name="ads_tutorialResetConfirm_message" text="Réinitialiser l'historique des conseils tutoriels et tous les réafficher ?"/>
         <text name="ads_tutorial_welcome_dialog_title" text="Bienvenue dans Advanced Damage System"/>

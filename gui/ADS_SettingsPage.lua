@@ -4,32 +4,7 @@ ADS_InGameSettings.name = g_currentModName
 ADS_InGameSettings.modDirectory = g_currentModDirectory
 
 ADS_InGameSettings.steps = {}
-ADS_InGameSettings.pageInserted = false
 
-ADSSettingsPage = {}
-local ADSSettingsPage_mt = Class(ADSSettingsPage, FrameElement)
-
-function ADSSettingsPage.new(custom_mt)
-    return FrameElement.new(nil, custom_mt or ADSSettingsPage_mt)
-end
-
-function ADSSettingsPage:onClickADS()
-    local pageSettings = g_inGameMenu ~= nil and g_inGameMenu.pageSettings or nil
-    if pageSettings ~= nil and InGameMenuSettingsFrame.SUB_CATEGORY.ADS ~= nil then
-        for state, value in ipairs(pageSettings.subCategoryPaging.texts) do
-            if tonumber(value) == InGameMenuSettingsFrame.SUB_CATEGORY.ADS then
-                pageSettings.subCategoryPaging:setState(state, true)
-                break
-            end
-        end
-    end
-end
-
-local function formatPercent(val) return string.format("%.0f%%", val * 100) end
-local function formatPercentPrecise(val) return string.format("%.1f%%", val * 100) end
-local function formatMultiplier(val) return string.format("%.1fx", val) end
-local function formatHour(val) return string.format("%02d:00", val) end
-local function formatFloat2(val) return string.format("%.2f", val) end
 local function formatAh(val)
     local text = string.format("%.2f", val)
     text = text:gsub("(%..-)0+$", "%1")
@@ -63,17 +38,26 @@ local function buildPendingConfigFromAdsConfig()
         globalPriceMultiplier = ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER,
         globalTimeMultiplier = ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER,
 
-        alwaysAvailable = ADS_Config.WORKSHOP.ALWAYS_AVAILABLE,
+        dealerAlwaysAvailable = ADS_Config.WORKSHOP.DEALER_ALWAYS_AVAILABLE,
+        mobileAlwaysAvailable = ADS_Config.WORKSHOP.MOBILE_ALWAYS_AVAILABLE,
+        ownAlwaysAvailable = ADS_Config.WORKSHOP.OWN_ALWAYS_AVAILABLE,
         mobileWorkshopRestrictionsEnabled = ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED,
         openHour = ADS_Config.WORKSHOP.OPEN_HOUR,
         closeHour = ADS_Config.WORKSHOP.CLOSE_HOUR,
 
         engineMaxHeat = ADS_Config.THERMAL.ENGINE_MAX_HEAT,
         transMaxHeat = ADS_Config.THERMAL.TRANS_MAX_HEAT,
+        maxDirtInfluence = ADS_Config.THERMAL.MAX_DIRT_INFLUENCE,
+        warmingBoostPower = ADS_Config.THERMAL.WARMING_BOOST_POWER,
+        coolingSlowdownPower = ADS_Config.THERMAL.COOLING_SLOWDOWN_POWER,
 
         batteryUsableCapacityFactor = ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR,
+        alternatorMaxOutput = ADS_Config.ELECTRICAL.ALT_MAX_OUTPUT,
+        idleCurrentA = ADS_Config.ELECTRICAL.IDLE_CURRENT_A,
 
         cloggingSpeed = ADS_Config.FIELD_CARE.CLOGGING_SPEED,
+        fieldInspectionDuration = ADS_Config.FIELD_CARE.VISUAL_INSPECTION_DURATION,
+        lubricationReducePerDay = ADS_Config.FIELD_CARE.LUBRICATION_REDUCE_PER_DAY,
 
         debugMode = ADS_Config.DEBUG
     }
@@ -87,83 +71,120 @@ local function getPendingConfig()
     return ADS_InGameSettings.pendingConfig
 end
 
-local function addElementAtPosition(element, target, pos)
-    if element.parent ~= nil then
-        element.parent:removeElement(element)
-    end
-
-    table.insert(target.elements, pos, element)
-    element.parent = target
+local function getSettingsProfile(defaultProfileName)
+    return g_gui:getProfile(defaultProfileName)
 end
 
-local function getSettingsFrame()
-    return g_inGameMenu ~= nil and g_inGameMenu.pageSettings or nil
+local function applyButtonBackgroundProfile(button)
+    if button == nil or button.elements == nil then
+        return
+    end
+
+    for _, child in pairs(button.elements) do
+        if child ~= nil and child.applyProfile ~= nil and child.profile == "fs25_settingsButtonBg" then
+            child:applyProfile("ads_settingsButtonBg")
+            return
+        end
+    end
 end
 
-local function getGlobalI18N()
-    local globalEnv = getmetatable(_G) ~= nil and getmetatable(_G).__index or nil
-    if globalEnv ~= nil and globalEnv.g_i18n ~= nil then
-        return globalEnv.g_i18n
+local function applyMultiTextOptionBackgroundProfile(option)
+    if option == nil or option.elements == nil then
+        return
     end
 
-    return g_i18n
+    for _, child in pairs(option.elements) do
+        if child ~= nil and child.applyProfile ~= nil and child.profile == "fs25_multiTextOptionBg" then
+            child:applyProfile("ads_settingsMultiTextOptionBg")
+            return
+        end
+    end
 end
 
-local function isMissingI18NText(text)
-    return type(text) ~= "string" or text == "" or text:lower():sub(1, 7) == "missing"
-end
-
-function ADS_InGameSettings.getSettingsTabTitle()
-    if g_i18n == nil then
-        return "ADS SETTINGS"
-    end
-
-    local title = nil
-    if g_i18n.texts ~= nil then
-        title = g_i18n.texts.ads_settings_title
-    end
-
-    if title == nil and g_i18n.getText ~= nil then
-        title = g_i18n:getText("ads_settings_title")
-    end
-
-    if isMissingI18NText(title) then
-        title = "ADS SETTINGS"
-    end
-
-    return title
-end
-
-function ADS_InGameSettings.registerGlobalTitleText()
-    local title = nil
-    if g_i18n ~= nil and g_i18n.texts ~= nil then
-        title = g_i18n.texts.ADS_SETTINGS_TITLE
-    end
-
-    if isMissingI18NText(title) then
-        title = "Advanced Damage System"
-    end
-
-    local globalI18N = getGlobalI18N()
-    if globalI18N ~= nil and globalI18N.setText ~= nil then
-        globalI18N:setText("ADS_SETTINGS_TITLE", title)
-    end
-
-    return title
-end
-
-local function getCurrentSettingsPage()
-    local settingsFrame = getSettingsFrame()
-    if settingsFrame == nil or ADS_InGameSettings.modPage == nil or ADS_InGameSettings.modPage.adsPage == nil then
+local function addDisabledLockToSettingsRow(rowElement, optionElement, tooltip)
+    if rowElement == nil or optionElement == nil then
         return nil
     end
 
-    local currentState = settingsFrame.subCategoryPaging ~= nil and settingsFrame.subCategoryPaging:getState() or nil
-    if currentState ~= nil and settingsFrame.subCategoryPaging.texts[currentState] ~= nil then
-        local pageId = tonumber(settingsFrame.subCategoryPaging.texts[currentState])
-        if pageId == InGameMenuSettingsFrame.SUB_CATEGORY.ADS then
-            return ADS_InGameSettings.modPage
+    local lockButton = ButtonElement.new()
+    lockButton.name = "iconDisabled"
+    lockButton:loadProfile(getSettingsProfile("fs25_settingsMultiTextOptionLocked"), true)
+    lockButton.target = ADS_InGameSettings
+    lockButton:setCallback("onClickCallback", "onClickSettingsLockedIcon")
+    lockButton:setCallback("onFocusCallback", "onFocusSettingsLockedIcon")
+
+    local lockTooltip = TextElement.new()
+    lockTooltip:loadProfile(getSettingsProfile("fs25_multiTextOptionTooltip"), true)
+    lockTooltip:setText(tooltip)
+    lockTooltip:setPosition(unpack(GuiUtils.getNormalizedScreenValues("940px 0px", lockTooltip.position)))
+    lockButton:addElement(lockTooltip)
+
+    rowElement:addElement(lockButton)
+    lockButton:onGuiSetupFinished()
+    lockTooltip:onGuiSetupFinished()
+    lockButton:setDisabled(true)
+
+    local oldSetDisabled = optionElement.setDisabled
+    optionElement.setDisabled = function(element, disabled, ...)
+        oldSetDisabled(element, disabled, ...)
+        lockButton:setDisabled(not disabled)
+    end
+
+    optionElement.ads_disabledLockIcon = lockButton
+
+    return lockButton
+end
+
+local function applySettingsRowColor(page, rowElement)
+    if page == nil or not page.ads_useFleetMenuStyle or rowElement == nil or rowElement.setImageColor == nil then
+        return
+    end
+
+    if InGameMenuSettingsFrame ~= nil and InGameMenuSettingsFrame.COLOR_ALTERNATING ~= nil then
+        rowElement:setImageColor(nil, table.unpack(InGameMenuSettingsFrame.COLOR_ALTERNATING[page.ads_settingsRowIsEven]))
+    end
+
+    page.ads_settingsRowIsEven = not page.ads_settingsRowIsEven
+end
+
+local function getVanillaSettingsButtonTemplate()
+    local settingsPage = g_inGameMenu ~= nil and g_inGameMenu.pageSettings or nil
+    local scrollPanel = settingsPage ~= nil and settingsPage.gameSettingsLayout or nil
+
+    if scrollPanel == nil or scrollPanel.elements == nil then
+        return nil
+    end
+
+    for _, element in pairs(scrollPanel.elements) do
+        if element.typeName == "Bitmap"
+            and element.elements ~= nil
+            and element.elements[1] ~= nil
+            and element.elements[1].typeName == "Button" then
+            return element
         end
+    end
+
+    return nil
+end
+
+function ADS_InGameSettings:onClickSettingsLockedIcon()
+end
+
+function ADS_InGameSettings:onFocusSettingsLockedIcon(icon)
+    local page = ADS_InGameSettings.embeddedPage
+    if page ~= nil and page.settingsLayout ~= nil and page.settingsLayout.scrollToMakeElementVisible ~= nil then
+        page.settingsLayout:scrollToMakeElementVisible(icon)
+    end
+end
+
+local function getCurrentSettingsPage()
+    local embeddedPage = ADS_InGameSettings.embeddedPage
+    if embeddedPage ~= nil
+        and embeddedPage.getCurrentSubCategory ~= nil
+        and ADS_InGameMenuFrame ~= nil
+        and ADS_InGameMenuFrame.SUB_CATEGORY ~= nil
+        and embeddedPage:getCurrentSubCategory() == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS then
+        return embeddedPage
     end
 
     return nil
@@ -173,6 +194,13 @@ local function isCurrentMissionMultiplayer()
     return g_currentMission ~= nil
         and g_currentMission.missionDynamicInfo ~= nil
         and g_currentMission.missionDynamicInfo.isMultiplayer == true
+end
+
+local function canChangeADSSettings()
+    return g_currentMission ~= nil
+        and g_currentMission.getIsClient ~= nil
+        and g_currentMission:getIsClient()
+        and (not isCurrentMissionMultiplayer() or g_currentMission:getIsServer() or g_currentMission.isMasterUser)
 end
 
 local function refreshCurrentSettingsPage()
@@ -231,7 +259,9 @@ function ADS_InGameSettings.commitPendingConfig(current, pending)
 
     local batteryFactorChanged = valuesDiffer(pending.batteryUsableCapacityFactor, current.batteryUsableCapacityFactor)
     local workshopChanged =
-        valuesDiffer(pending.alwaysAvailable, current.alwaysAvailable) or
+        valuesDiffer(pending.dealerAlwaysAvailable, current.dealerAlwaysAvailable) or
+        valuesDiffer(pending.mobileAlwaysAvailable, current.mobileAlwaysAvailable) or
+        valuesDiffer(pending.ownAlwaysAvailable, current.ownAlwaysAvailable) or
         valuesDiffer(pending.mobileWorkshopRestrictionsEnabled, current.mobileWorkshopRestrictionsEnabled) or
         valuesDiffer(pending.openHour, current.openHour) or
         valuesDiffer(pending.closeHour, current.closeHour)
@@ -256,17 +286,26 @@ function ADS_InGameSettings.commitPendingConfig(current, pending)
     ADS_Config.MAINTENANCE.GLOBAL_SERVICE_PRICE_MULTIPLIER = pending.globalPriceMultiplier
     ADS_Config.MAINTENANCE.GLOBAL_SERVICE_TIME_MULTIPLIER = pending.globalTimeMultiplier
 
-    ADS_Config.WORKSHOP.ALWAYS_AVAILABLE = pending.alwaysAvailable
+    ADS_Config.WORKSHOP.DEALER_ALWAYS_AVAILABLE = pending.dealerAlwaysAvailable
+    ADS_Config.WORKSHOP.MOBILE_ALWAYS_AVAILABLE = pending.mobileAlwaysAvailable
+    ADS_Config.WORKSHOP.OWN_ALWAYS_AVAILABLE = pending.ownAlwaysAvailable
     ADS_Config.WORKSHOP.MOBILE_WORKSHOP_RESTRICTIONS_ENABLED = pending.mobileWorkshopRestrictionsEnabled
     ADS_Config.WORKSHOP.OPEN_HOUR = pending.openHour
     ADS_Config.WORKSHOP.CLOSE_HOUR = pending.closeHour
 
     ADS_Config.THERMAL.ENGINE_MAX_HEAT = pending.engineMaxHeat
     ADS_Config.THERMAL.TRANS_MAX_HEAT = pending.transMaxHeat
+    ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = pending.maxDirtInfluence
+    ADS_Config.THERMAL.WARMING_BOOST_POWER = pending.warmingBoostPower
+    ADS_Config.THERMAL.COOLING_SLOWDOWN_POWER = pending.coolingSlowdownPower
 
     ADS_Config.ELECTRICAL.BATTERY_USABLE_CAPACITY_FACTOR = pending.batteryUsableCapacityFactor
+    ADS_Config.ELECTRICAL.ALT_MAX_OUTPUT = pending.alternatorMaxOutput
+    ADS_Config.ELECTRICAL.IDLE_CURRENT_A = pending.idleCurrentA
 
     ADS_Config.FIELD_CARE.CLOGGING_SPEED = pending.cloggingSpeed
+    ADS_Config.FIELD_CARE.VISUAL_INSPECTION_DURATION = pending.fieldInspectionDuration
+    ADS_Config.FIELD_CARE.LUBRICATION_REDUCE_PER_DAY = pending.lubricationReducePerDay
 
     ADS_Config.DEBUG = pending.debugMode
 
@@ -284,7 +323,7 @@ function ADS_InGameSettings.commitPendingConfig(current, pending)
     end
 
     if workshopChanged and ADS_Main ~= nil and ADS_Main.forceWorkshopUpdate ~= nil then
-        ADS_Main:forceWorkshopUpdate()
+        ADS_Main:forceWorkshopUpdate(true)
     end
 
     if g_currentMission ~= nil then
@@ -296,7 +335,7 @@ function ADS_InGameSettings.commitPendingConfig(current, pending)
     end
 end
 
-function ADS_InGameSettings:onFrameOpen()
+function ADS_InGameSettings.beginSettingsSession()
     ADS_InGameSettings.pendingConfig = buildPendingConfigFromAdsConfig()
     ADS_InGameSettings.ads_hasPendingSettingsChange = false
 
@@ -305,219 +344,83 @@ function ADS_InGameSettings:onFrameOpen()
         ADS_InGameSettings.pendingConfig.tutorialMode = false
     end
 
-    ADS_InGameSettings:ensureSettingsPage(self)
-    ADS_InGameSettings:updateADSPageVisibility()
-    ADS_InGameSettings:updateADSSettings(ADS_InGameSettings.modPage)
 end
 
-function ADS_InGameSettings:loadGui()
-    if self.modPage ~= nil or g_gui == nil then
-        return self.modPage ~= nil
-    end
-
-    local filename = self.modDirectory .. "gui/ADS_SettingsPage.xml"
-    if not fileExists(filename) then
-        Logging.error("[ADS] Missing settings page GUI: %s", filename)
-        return false
-    end
-
-    local page = ADSSettingsPage.new()
-    if g_gui:loadGui(filename, "ADSSettingsFrame", page) == nil then
-        Logging.error("[ADS] Failed to load settings page GUI: %s", filename)
-        return false
-    end
-
-    self.modPage = page
-    if page.adsTab ~= nil then
-        ADS_InGameSettings.registerGlobalTitleText()
-        page.adsTab:setText(ADS_InGameSettings.getSettingsTabTitle())
-    end
-
-    return true
-end
-
-function ADS_InGameSettings:insertSettingsPage(settingsFrame)
-    if self.pageInserted or self.modPage == nil or settingsFrame == nil then
+function ADS_InGameSettings:initializeSettingsPageControls(targetPage)
+    local page = targetPage
+    if page == nil or page.ads_initSettingsMenuDone then
         return
     end
 
-    local pos = #settingsFrame.subCategoryTabs + 1
-    local adsPage = self.modPage.adsPage
-    local adsTab = self.modPage.adsTab
-
-    addElementAtPosition(adsPage, settingsFrame.subCategoryPages[1].parent, pos)
-    addElementAtPosition(adsTab, settingsFrame.subCategoryBox, pos)
-    settingsFrame:updateAbsolutePosition()
-
-    adsPage:setTarget(settingsFrame, adsPage.target)
-    adsTab:setTarget(settingsFrame, adsTab.target)
-
-    settingsFrame.subCategoryPages[pos] = adsPage
-    settingsFrame.subCategoryTabs[pos] = adsTab
-
-    self.pageInserted = true
-
-    InGameMenuSettingsFrame.SUB_CATEGORY.ADS = pos
-    ADS_InGameSettings.registerGlobalTitleText()
-    InGameMenuSettingsFrame.HEADER_SLICES[InGameMenuSettingsFrame.SUB_CATEGORY.ADS] = "ads_MenuIcon.menuIcon"
-    InGameMenuSettingsFrame.HEADER_TITLES[InGameMenuSettingsFrame.SUB_CATEGORY.ADS] = "ADS_SETTINGS_TITLE"
-end
-
-function ADS_InGameSettings.updateBetterContractsState(settingsFrame)
-    if BetterContracts == nil
-        or BetterContracts.settingsMgr == nil
-        or InGameMenuSettingsFrame.SUB_CATEGORY.BCONTRACTS == nil
-        or settingsFrame == nil
-        or settingsFrame.subCategoryPaging == nil then
-        return
-    end
-
-    for state, value in ipairs(settingsFrame.subCategoryPaging.texts) do
-        if tonumber(value) == InGameMenuSettingsFrame.SUB_CATEGORY.BCONTRACTS then
-            BetterContracts.settingsMgr.modState = state
-            return
-        end
-    end
-end
-
-function ADS_InGameSettings.patchBetterContractsClick()
-    if ADS_InGameSettings.bcClickPatchInstalled
-        or BetterContracts == nil
-        or SettingsPage == nil
-        or SettingsPage.onClickBC == nil then
-        return
-    end
-
-    local originalOnClickBC = SettingsPage.onClickBC
-    SettingsPage.onClickBC = function(self, ...)
-        local pageSettings = BetterContracts.frSet or (g_inGameMenu ~= nil and g_inGameMenu.pageSettings or nil)
-        if pageSettings ~= nil
-            and pageSettings.subCategoryPaging ~= nil
-            and InGameMenuSettingsFrame.SUB_CATEGORY.BCONTRACTS ~= nil then
-            for state, value in ipairs(pageSettings.subCategoryPaging.texts) do
-                if tonumber(value) == InGameMenuSettingsFrame.SUB_CATEGORY.BCONTRACTS then
-                    pageSettings.subCategoryPaging:setState(state, true)
-                    return
-                end
-            end
-        end
-
-        return originalOnClickBC(self, ...)
-    end
-
-    ADS_InGameSettings.bcClickPatchInstalled = true
-end
-
-function ADS_InGameSettings:initializeSettingsPageControls()
-    if self.modPage == nil or self.modPage.ads_initSettingsMenuDone then
-        return
-    end
-
-    local page = self.modPage
     local function deleteElementById(elementId)
-        local element = page.adsPage:getDescendantById(elementId)
+        local root = page.settingsPage or page.settingsLayout or page
+        local element = root ~= nil and root:getDescendantById(elementId) or nil
         if element ~= nil then
             element:delete()
         end
     end
 
     ADS_InGameSettings:generateAllSteps()
+    page.ads_settingsRowIsEven = false
 
-    -- Tutorial mode (Binary)
+    -- General
     page.ads_tutorialMode = ADS_InGameSettings:addBinaryOption(
         page,
         "onTutorialModeChanged",
         g_i18n:getText("ads_tutorialMode_label"),
         g_i18n:getText("ads_tutorialMode_tooltip")
     )
-
-    -- Service interval
-    page.ads_serviceWear = ADS_InGameSettings:addMultiTextOption(
-        page, "onServiceWearChanged",
-        ADS_InGameSettings.steps.serviceWear.texts,
-        g_i18n:getText("ads_serviceInterval_label"),
-        g_i18n:getText("ads_serviceInterval_tooltip")
-    )
-
-    -- Vehicle lifespan
-    page.ads_conditionWear = ADS_InGameSettings:addMultiTextOption(
-        page, "onConditionWearChanged",
-        ADS_InGameSettings.steps.conditionWear.texts,
-        g_i18n:getText("ads_vehicleLifespan_label"),
-        g_i18n:getText("ads_vehicleLifespan_tooltip")
-    )
-
-    -- Passive Wear During Downtime
-    page.ads_downtimeWear = ADS_InGameSettings:addMultiTextOption(
-        page, "onDowntimeWearChanged",
-        ADS_InGameSettings.steps.downtimeWear.texts,
-        g_i18n:getText("ads_downtimeWear_label"),
-        g_i18n:getText("ads_downtimeWear_tooltip")
-    )
-
-    -- General Wear (Binary)
-    page.ads_generalWearEnabled = ADS_InGameSettings:addBinaryOption(
+    page.ads_tutorialResetTips = ADS_InGameSettings:addButtonOption(
         page,
-        "onGeneralWearEnabledChanged",
-        g_i18n:getText("ads_generalWearEnabled_label"),
-        g_i18n:getText("ads_generalWearEnabled_tooltip")
+        "onResetTutorialTipsClicked",
+        g_i18n:getText("ads_tutorialResetTips_label"),
+        g_i18n:getText("ads_tutorialResetTips_text"),
+        g_i18n:getText("ads_tutorialResetTips_tooltip")
     )
-
-    -- System Stress Rate
-    page.ads_systemStressRate = ADS_InGameSettings:addMultiTextOption(
-        page, "onSystemStressRateChanged",
-        ADS_InGameSettings.steps.systemStressRate.texts,
-        g_i18n:getText("ads_systemStressRate_label"),
-        g_i18n:getText("ads_systemStressRate_tooltip")
-    )
-
-    -- Thermal Sensitivity (engine + trans heat)
-    page.ads_thermalSensitivity = ADS_InGameSettings:addMultiTextOption(
-        page, "onThermalSensitivityChanged",
-        ADS_InGameSettings.steps.thermalSensitivity.texts,
-        g_i18n:getText("ads_thermalSensitivity_label"),
-        g_i18n:getText("ads_thermalSensitivity_tooltip")
-    )
-
-    -- Battery Capacity
-    page.ads_batteryCapacity = ADS_InGameSettings:addMultiTextOption(
-        page, "onBatteryCapacityChanged",
-        ADS_InGameSettings.steps.batteryCapacity.texts,
-        g_i18n:getText("ads_batteryCapacity_label"),
-        g_i18n:getText("ads_batteryCapacity_tooltip")
-    )
-
-    -- Clogging Speed
-    page.ads_cloggingSpeed = ADS_InGameSettings:addMultiTextOption(
-        page,
-        "onCloggingSpeedChanged",
-        ADS_InGameSettings.steps.cloggingSpeed.texts,
-        g_i18n:getText("ads_cloggingSpeed_label"),
-        g_i18n:getText("ads_cloggingSpeed_tooltip")
-    )
-
-    -- AI overload and overheat control (Binary)
-    page.ads_aiOverloadAndOverheatControl = ADS_InGameSettings:addBinaryOption(
-        page,
-        "onAiOverloadAndOverheatControlChanged",
-        g_i18n:getText("ads_aiOverloadAndOverheatControl_label"),
-        g_i18n:getText("ads_aiOverloadAndOverheatControl_tooltip")
-    )
-
-    -- Warning Messages (Binary)
     page.ads_warningMessages = ADS_InGameSettings:addBinaryOption(
         page,
         "onWarningMessagesChanged",
         g_i18n:getText("ads_warningMessages_label"),
         g_i18n:getText("ads_warningMessages_tooltip")
     )
-
-    -- Debug mode
     page.ads_debugMode = ADS_InGameSettings:addBinaryOption(
         page,
         "onDebugModeChanged",
         g_i18n:getText("ads_debugMode_label"),
         g_i18n:getText("ads_debugMode_tooltip")
+    )
+
+    ADS_InGameSettings:addSectionHeader(page, g_i18n:getText("ads_settings_section_service_wear"))
+
+    page.ads_serviceWear = ADS_InGameSettings:addMultiTextOption(
+        page, "onServiceWearChanged",
+        ADS_InGameSettings.steps.serviceWear.texts,
+        g_i18n:getText("ads_serviceInterval_label"),
+        g_i18n:getText("ads_serviceInterval_tooltip")
+    )
+    page.ads_conditionWear = ADS_InGameSettings:addMultiTextOption(
+        page, "onConditionWearChanged",
+        ADS_InGameSettings.steps.conditionWear.texts,
+        g_i18n:getText("ads_vehicleLifespan_label"),
+        g_i18n:getText("ads_vehicleLifespan_tooltip")
+    )
+    page.ads_systemStressRate = ADS_InGameSettings:addMultiTextOption(
+        page, "onSystemStressRateChanged",
+        ADS_InGameSettings.steps.systemStressRate.texts,
+        g_i18n:getText("ads_systemStressRate_label"),
+        g_i18n:getText("ads_systemStressRate_tooltip")
+    )
+    page.ads_downtimeWear = ADS_InGameSettings:addMultiTextOption(
+        page, "onDowntimeWearChanged",
+        ADS_InGameSettings.steps.downtimeWear.texts,
+        g_i18n:getText("ads_downtimeWear_label"),
+        g_i18n:getText("ads_downtimeWear_tooltip")
+    )
+    page.ads_generalWearEnabled = ADS_InGameSettings:addBinaryOption(
+        page,
+        "onGeneralWearEnabledChanged",
+        g_i18n:getText("ads_generalWearEnabled_label"),
+        g_i18n:getText("ads_generalWearEnabled_tooltip")
     )
 
     ADS_InGameSettings:addSectionHeader(page, g_i18n:getText("ads_ws_header_title"))
@@ -572,12 +475,28 @@ function ADS_InGameSettings:initializeSettingsPageControls()
         g_i18n:getText("ads_mobileWorkshopRestrictions_tooltip")
     )
 
-    -- Workshop Available (Binary)
-    page.ads_workshopAvailable = ADS_InGameSettings:addBinaryOption(
+    -- Dealer Workshop Available (Binary)
+    page.ads_dealerWorkshopAvailable = ADS_InGameSettings:addBinaryOption(
         page,
-        "onWorkshopAvailableChanged",
-        g_i18n:getText("ads_workshopAvailable_label"),
-        g_i18n:getText("ads_workshopAvailable_tooltip")
+        "onDealerWorkshopAvailableChanged",
+        g_i18n:getText("ads_dealerWorkshopAvailable_label"),
+        g_i18n:getText("ads_dealerWorkshopAvailable_tooltip")
+    )
+
+    -- Mobile Workshop Available (Binary)
+    page.ads_mobileWorkshopAvailable = ADS_InGameSettings:addBinaryOption(
+        page,
+        "onMobileWorkshopAvailableChanged",
+        g_i18n:getText("ads_mobileWorkshopAvailable_label"),
+        g_i18n:getText("ads_mobileWorkshopAvailable_tooltip")
+    )
+
+    -- Own Workshop Available (Binary)
+    page.ads_ownWorkshopAvailable = ADS_InGameSettings:addBinaryOption(
+        page,
+        "onOwnWorkshopAvailableChanged",
+        g_i18n:getText("ads_ownWorkshopAvailable_label"),
+        g_i18n:getText("ads_ownWorkshopAvailable_tooltip")
     )
 
     -- Workshop Open Hour
@@ -598,6 +517,92 @@ function ADS_InGameSettings:initializeSettingsPageControls()
         g_i18n:getText("ads_workshopCloseHour_tooltip")
     )
 
+    ADS_InGameSettings:addSectionHeader(page, g_i18n:getText("ads_settings_section_thermal_model"))
+
+    page.ads_thermalSensitivity = ADS_InGameSettings:addMultiTextOption(
+        page, "onThermalSensitivityChanged",
+        ADS_InGameSettings.steps.thermalSensitivity.texts,
+        g_i18n:getText("ads_thermalSensitivity_label"),
+        g_i18n:getText("ads_thermalSensitivity_tooltip")
+    )
+    page.ads_radiatorDirtInfluence = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onRadiatorDirtInfluenceChanged",
+        ADS_InGameSettings.steps.radiatorDirtInfluence.texts,
+        g_i18n:getText("ads_radiatorDirtInfluence_label"),
+        g_i18n:getText("ads_radiatorDirtInfluence_tooltip")
+    )
+    page.ads_warmingBoostPower = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onWarmingBoostPowerChanged",
+        ADS_InGameSettings.steps.thermalPower.texts,
+        g_i18n:getText("ads_warmingBoostPower_label"),
+        g_i18n:getText("ads_warmingBoostPower_tooltip")
+    )
+    page.ads_coolingSlowdownPower = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onCoolingSlowdownPowerChanged",
+        ADS_InGameSettings.steps.thermalPower.texts,
+        g_i18n:getText("ads_coolingSlowdownPower_label"),
+        g_i18n:getText("ads_coolingSlowdownPower_tooltip")
+    )
+
+    ADS_InGameSettings:addSectionHeader(page, g_i18n:getText("ads_settings_section_battery_alternator"))
+
+    page.ads_batteryCapacity = ADS_InGameSettings:addMultiTextOption(
+        page, "onBatteryCapacityChanged",
+        ADS_InGameSettings.steps.batteryCapacity.texts,
+        g_i18n:getText("ads_batteryCapacity_label"),
+        g_i18n:getText("ads_batteryCapacity_tooltip")
+    )
+    page.ads_alternatorMaxOutput = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onAlternatorMaxOutputChanged",
+        ADS_InGameSettings.steps.alternatorMaxOutput.texts,
+        g_i18n:getText("ads_alternatorMaxOutput_label"),
+        g_i18n:getText("ads_alternatorMaxOutput_tooltip")
+    )
+    page.ads_idleCurrent = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onIdleCurrentChanged",
+        ADS_InGameSettings.steps.idleCurrent.texts,
+        g_i18n:getText("ads_idleCurrent_label"),
+        g_i18n:getText("ads_idleCurrent_tooltip")
+    )
+
+    ADS_InGameSettings:addSectionHeader(page, g_i18n:getText("ads_settings_section_preshift_maintenance"))
+
+    page.ads_cloggingSpeed = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onCloggingSpeedChanged",
+        ADS_InGameSettings.steps.cloggingSpeed.texts,
+        g_i18n:getText("ads_cloggingSpeed_label"),
+        g_i18n:getText("ads_cloggingSpeed_tooltip")
+    )
+    page.ads_fieldInspectionDuration = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onFieldInspectionDurationChanged",
+        ADS_InGameSettings.steps.fieldInspectionDuration.texts,
+        g_i18n:getText("ads_fieldInspectionDuration_label"),
+        g_i18n:getText("ads_fieldInspectionDuration_tooltip")
+    )
+    page.ads_lubricationReducePerDay = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onLubricationReducePerDayChanged",
+        ADS_InGameSettings.steps.lubricationReducePerDay.texts,
+        g_i18n:getText("ads_lubricationReducePerDay_label"),
+        g_i18n:getText("ads_lubricationReducePerDay_tooltip")
+    )
+
+    ADS_InGameSettings:addSectionHeader(page, g_i18n:getText("ads_settings_section_other"))
+
+    page.ads_aiOverloadAndOverheatControl = ADS_InGameSettings:addBinaryOption(
+        page,
+        "onAiOverloadAndOverheatControlChanged",
+        g_i18n:getText("ads_aiOverloadAndOverheatControl_label"),
+        g_i18n:getText("ads_aiOverloadAndOverheatControl_tooltip")
+    )
+
     deleteElementById("subTitlePrefab")
     deleteElementById("binaryPrefab")
     deleteElementById("multiPrefab")
@@ -606,83 +611,79 @@ function ADS_InGameSettings:initializeSettingsPageControls()
     page.ads_initSettingsMenuDone = true
 end
 
-function ADS_InGameSettings:ensureSettingsPage(settingsFrame)
-    if settingsFrame == nil then
+function ADS_InGameSettings:activateEmbeddedSettingsPage(page)
+    if page == nil then
         return
     end
 
-    if not ADS_InGameSettings:loadGui() then
+    self.embeddedPage = page
+    page.ads_useFleetMenuStyle = true
+
+    if self.pendingConfig == nil then
+        ADS_InGameSettings.beginSettingsSession()
+    end
+
+    self:updateADSPageVisibility(page)
+
+    if not canChangeADSSettings() then
         return
     end
 
-    if not self.pageInserted then
-        self:insertSettingsPage(settingsFrame)
-        self:initializeSettingsPageControls()
-
-        local currentGui = FocusManager.currentGui
-        FocusManager:setGui(settingsFrame.name)
-        FocusManager:removeElement(self.modPage.adsPage)
-        FocusManager:removeElement(self.modPage.adsTab)
-        FocusManager:loadElementFromCustomValues(self.modPage.adsPage)
-        FocusManager:loadElementFromCustomValues(self.modPage.adsTab)
-        if currentGui ~= nil then
-            FocusManager:setGui(currentGui)
-        end
-
+    self:initializeSettingsPageControls(page)
+    if page.settingsSlider ~= nil and page.settingsSlider.setDataElement ~= nil then
+        page.settingsSlider:setDataElement(page.settingsLayout)
     end
-
-    self:initializeSettingsPageControls()
-    ADS_InGameSettings.updateBetterContractsState(settingsFrame)
-    ADS_InGameSettings.patchBetterContractsClick()
+    ADS_InGameSettings.registerEmbeddedFocus(page)
+    self:updateADSPageVisibility(page)
+    self:updateADSSettings(page)
 end
 
-function ADS_InGameSettings.installSettingsPage()
-    local settingsFrame = getSettingsFrame()
-    if settingsFrame ~= nil then
-        ADS_InGameSettings:ensureSettingsPage(settingsFrame)
-    end
-end
-
-function ADS_InGameSettings:updateADSPageVisibility()
-    local page = self.modPage
-    if page == nil or not page.ads_initSettingsMenuDone then
+function ADS_InGameSettings.registerEmbeddedFocus(page)
+    if page == nil
+        or page.ads_settingsFocusLoaded
+        or page.settingsLayout == nil
+        or FocusManager == nil
+        or FocusManager.loadElementFromCustomValues == nil then
         return
     end
 
-    local canChangeSettings = g_currentMission ~= nil
-        and (g_currentMission:getIsServer() or g_currentMission.isMasterUser)
-        and g_currentMission:getIsClient()
+    local currentGui = FocusManager.currentGui
+    if page.name ~= nil and FocusManager.setGui ~= nil then
+        FocusManager:setGui(page.name)
+    end
 
-    page.noPermissionText:setVisible(not canChangeSettings)
-    page.settingsLayout:setVisible(canChangeSettings)
-    page.adsPage:setVisible(true)
+    if FocusManager.removeElement ~= nil then
+        FocusManager:removeElement(page.settingsLayout)
+    end
+    FocusManager:loadElementFromCustomValues(page.settingsLayout)
+
+    if currentGui ~= nil and FocusManager.setGui ~= nil then
+        FocusManager:setGui(currentGui)
+    end
+
+    page.ads_settingsFocusLoaded = true
 end
 
-function ADS_InGameSettings.onUpdateSubCategoryPages(settingsFrame, superFunc, state, ...)
-    local result = nil
-    if superFunc ~= nil then
-        result = superFunc(settingsFrame, state, ...)
+function ADS_InGameSettings:updateADSPageVisibility(targetPage)
+    local page = targetPage
+    if page == nil then
+        return
     end
 
-    local modPage = ADS_InGameSettings.modPage
-    if settingsFrame ~= nil and modPage ~= nil and modPage.ads_initSettingsMenuDone then
-        local value = settingsFrame.subCategoryPaging.texts[state]
-        if value ~= nil and tonumber(value) == InGameMenuSettingsFrame.SUB_CATEGORY.ADS then
-            settingsFrame.settingsSlider:setDataElement(modPage.settingsLayout)
-            if #modPage.settingsLayout.elements > 0 then
-                local lastElement = modPage.settingsLayout.elements[#modPage.settingsLayout.elements]
-                if lastElement.elements ~= nil and lastElement.elements[1] ~= nil then
-                    FocusManager:linkElements(settingsFrame.subCategoryPaging, FocusManager.TOP, lastElement.elements[1])
-                end
-            end
-            FocusManager:linkElements(settingsFrame.subCategoryPaging, FocusManager.BOTTOM, modPage.settingsLayout:findFirstFocusable(true))
-            settingsFrame:updateAlternatingElements(modPage.settingsLayout)
-            settingsFrame:updateGeneralSettings(modPage.settingsLayout)
-            ADS_InGameSettings:updateADSSettings(modPage)
-        end
-    end
+    local canChangeSettings = canChangeADSSettings()
 
-    return result
+    if page.noPermissionText ~= nil then
+        page.noPermissionText:setVisible(not canChangeSettings)
+    end
+    if page.settingsLayout ~= nil then
+        page.settingsLayout:setVisible(canChangeSettings and page.ads_initSettingsMenuDone == true)
+    end
+    if page.settingsSliderBox ~= nil then
+        page.settingsSliderBox:setVisible(canChangeSettings and page.ads_initSettingsMenuDone == true)
+    end
+    if page.settingsTooltipSeparator ~= nil then
+        page.settingsTooltipSeparator:setVisible(canChangeSettings and page.ads_initSettingsMenuDone == true)
+    end
 end
 
 function ADS_InGameSettings:onFrameClose()
@@ -713,29 +714,9 @@ function ADS_InGameSettings:onFrameClose()
         return
     end
 
-    local shouldAskTutorialReset = current.tutorialMode ~= true
-        and pending.tutorialMode == true
-        and not isCurrentMissionMultiplayer()
-
-    if shouldAskTutorialReset then
-        YesNoDialog.show(function(shouldReset)
-            if shouldReset then
-                ADS_Config.resetTutorialMessages()
-            end
-
-            ADS_InGameSettings.commitPendingConfig(current, pending)
-        end, self, g_i18n:getText("ads_tutorialResetConfirm_message"), g_i18n:getText("ads_tutorialResetConfirm_title"))
-        return
-    end
-
     ADS_InGameSettings.commitPendingConfig(current, pending)
 end
 
-
-function ADS_InGameSettings:updateGameSettings()
-    ADS_InGameSettings:updateADSPageVisibility()
-    ADS_InGameSettings:updateADSSettings(ADS_InGameSettings.modPage)
-end
 
 function ADS_InGameSettings:updateADSSettings(currentPage)
     if currentPage == nil or not currentPage.ads_initSettingsMenuDone then return end
@@ -745,6 +726,8 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     local isMultiplayer = isCurrentMissionMultiplayer()
     local tutorialOption = currentPage.ads_tutorialMode
     local tutorialContainer = tutorialOption ~= nil and tutorialOption.parent or nil
+    local tutorialResetButton = currentPage.ads_tutorialResetTips
+    local tutorialResetContainer = tutorialResetButton ~= nil and tutorialResetButton.parent or nil
 
     if isMultiplayer then
         pending.tutorialMode = false
@@ -752,6 +735,9 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
 
     if tutorialContainer ~= nil then
         tutorialContainer:setVisible(not isMultiplayer)
+    end
+    if tutorialResetContainer ~= nil then
+        tutorialResetContainer:setVisible(not isMultiplayer)
     end
 
     local function setIndex(element, valueList, targetValue)
@@ -771,13 +757,20 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
 
     setIndex(currentPage.ads_systemStressRate, steps.systemStressRate.values, pending.systemStressGlobalMultiplier)
     setIndex(currentPage.ads_batteryCapacity, steps.batteryCapacity.values, pending.batteryUsableCapacityFactor)
+    setIndex(currentPage.ads_alternatorMaxOutput, steps.alternatorMaxOutput.values, pending.alternatorMaxOutput)
+    setIndex(currentPage.ads_idleCurrent, steps.idleCurrent.values, pending.idleCurrentA)
     setIndex(currentPage.ads_serviceWear, steps.serviceWear.values, pending.baseServiceWear)
     setIndex(currentPage.ads_conditionWear, steps.conditionWear.values, pending.baseSystemsWear)
     setIndex(currentPage.ads_downtimeWear, steps.downtimeWear.values, pending.downtimeMultiplier)
     setIndex(currentPage.ads_maintenancePrice, steps.maintPrice.values, pending.globalPriceMultiplier * 100)
     setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, pending.globalTimeMultiplier * 100)
     setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, pending.engineMaxHeat)
+    setIndex(currentPage.ads_radiatorDirtInfluence, steps.radiatorDirtInfluence.values, pending.maxDirtInfluence)
+    setIndex(currentPage.ads_warmingBoostPower, steps.thermalPower.values, pending.warmingBoostPower)
+    setIndex(currentPage.ads_coolingSlowdownPower, steps.thermalPower.values, pending.coolingSlowdownPower)
     setIndex(currentPage.ads_cloggingSpeed, steps.cloggingSpeed.values, pending.cloggingSpeed)
+    setIndex(currentPage.ads_fieldInspectionDuration, steps.fieldInspectionDuration.values, pending.fieldInspectionDuration)
+    setIndex(currentPage.ads_lubricationReducePerDay, steps.lubricationReducePerDay.values, pending.lubricationReducePerDay)
     
     if tutorialOption ~= nil then
         tutorialOption:setIsChecked(pending.tutorialMode, false, false)
@@ -788,25 +781,30 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_generalWearEnabled:setIsChecked(pending.generalWearEnabled, false, false)
     currentPage.ads_warningMessages:setIsChecked(pending.enableWarningMessages, false, false)
     currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(pending.aiOverloadControl, false, false)
-    currentPage.ads_workshopAvailable:setIsChecked(pending.alwaysAvailable, false, false)
+    currentPage.ads_dealerWorkshopAvailable:setIsChecked(pending.dealerAlwaysAvailable, false, false)
+    currentPage.ads_mobileWorkshopAvailable:setIsChecked(pending.mobileAlwaysAvailable, false, false)
+    currentPage.ads_ownWorkshopAvailable:setIsChecked(pending.ownAlwaysAvailable, false, false)
     currentPage.ads_mobileWorkshopRestrictions:setIsChecked(pending.mobileWorkshopRestrictionsEnabled, false, false)
     currentPage.ads_debugMode:setIsChecked(pending.debugMode, false, false)
     
     setIndex(currentPage.ads_workshopOpenHour, steps.hours.values, pending.openHour)
     setIndex(currentPage.ads_workshopCloseHour, steps.hours.values, pending.closeHour)
 
-    local isAlwaysAvailable = pending.alwaysAvailable
-    currentPage.ads_workshopOpenHour:setDisabled(isAlwaysAvailable)
-    currentPage.ads_workshopCloseHour:setDisabled(isAlwaysAvailable)
+    local areAllWorkshopAlwaysAvailableOptionsOff = not pending.dealerAlwaysAvailable
+        and not pending.mobileAlwaysAvailable
+        and not pending.ownAlwaysAvailable
+    currentPage.ads_workshopOpenHour:setDisabled(areAllWorkshopAlwaysAvailableOptionsOff)
+    currentPage.ads_workshopCloseHour:setDisabled(areAllWorkshopAlwaysAvailableOptionsOff)
 
     -- MP permission: only server host or dedicated-server admin can change settings.
-    local canChangeSettings = g_currentMission ~= nil
-        and (g_currentMission:getIsServer() or g_currentMission.isMasterUser)
-        and g_currentMission:getIsClient()
+    local canChangeSettings = canChangeADSSettings()
     local disableAll = not canChangeSettings
 
     if tutorialOption ~= nil then
         tutorialOption:setDisabled(disableAll or isMultiplayer)
+    end
+    if tutorialResetButton ~= nil then
+        tutorialResetButton:setDisabled(disableAll or isMultiplayer)
     end
     currentPage.ads_serviceWear:setDisabled(disableAll)
     currentPage.ads_conditionWear:setDisabled(disableAll)
@@ -815,32 +813,33 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
 
     currentPage.ads_systemStressRate:setDisabled(disableAll)
     currentPage.ads_batteryCapacity:setDisabled(disableAll)
+    currentPage.ads_alternatorMaxOutput:setDisabled(disableAll)
+    currentPage.ads_idleCurrent:setDisabled(disableAll)
     currentPage.ads_instantInspection:setDisabled(disableAll)
     currentPage.ads_parkVehicle:setDisabled(disableAll)
     currentPage.ads_warrantyEnabled:setDisabled(disableAll)
     currentPage.ads_maintenancePrice:setDisabled(disableAll)
     currentPage.ads_maintenanceDuration:setDisabled(disableAll)
-    currentPage.ads_workshopAvailable:setDisabled(disableAll)
+    currentPage.ads_dealerWorkshopAvailable:setDisabled(disableAll)
+    currentPage.ads_mobileWorkshopAvailable:setDisabled(disableAll)
+    currentPage.ads_ownWorkshopAvailable:setDisabled(disableAll)
     currentPage.ads_mobileWorkshopRestrictions:setDisabled(disableAll)
     currentPage.ads_thermalSensitivity:setDisabled(disableAll)
     currentPage.ads_cloggingSpeed:setDisabled(disableAll)
+    currentPage.ads_fieldInspectionDuration:setDisabled(disableAll)
+    currentPage.ads_lubricationReducePerDay:setDisabled(disableAll)
     currentPage.ads_aiOverloadAndOverheatControl:setDisabled(disableAll)
     currentPage.ads_warningMessages:setDisabled(disableAll)
     currentPage.ads_debugMode:setDisabled(disableAll)
 
-    -- Workshop hour controls: disabled if non-server OR always-available is on.
-    if disableAll or isAlwaysAvailable then
+    -- Workshop hour controls are disabled while all workshop 24/7 options are off.
+    if disableAll or areAllWorkshopAlwaysAvailableOptionsOff then
         currentPage.ads_workshopOpenHour:setDisabled(true)
         currentPage.ads_workshopCloseHour:setDisabled(true)
     end
 
-    if tutorialContainer ~= nil then
+    if tutorialContainer ~= nil or tutorialResetContainer ~= nil then
         currentPage.settingsLayout:invalidateLayout()
-        local settingsFrame = getSettingsFrame()
-        if settingsFrame ~= nil then
-            settingsFrame:updateAlternatingElements(currentPage.settingsLayout)
-            settingsFrame:updateGeneralSettings(currentPage.settingsLayout)
-        end
     end
 end
 
@@ -851,11 +850,39 @@ function ADS_InGameSettings:onServiceWearChanged(state)
     refreshCurrentSettingsPage()
 end
 
-function ADS_InGameSettings:onTutorialModeChanged(state)
+function ADS_InGameSettings:onTutorialModeChanged(state, optionElement)
     local pending = getPendingConfig()
-    pending.tutorialMode = not isCurrentMissionMultiplayer() and (state == BinaryOptionElement.STATE_RIGHT)
+    local newValue = false
+
+    if not isCurrentMissionMultiplayer() then
+        if optionElement ~= nil and optionElement.getIsChecked ~= nil then
+            newValue = optionElement:getIsChecked()
+        elseif ADS_InGameSettings.embeddedPage ~= nil
+            and ADS_InGameSettings.embeddedPage.ads_tutorialMode ~= nil
+            and ADS_InGameSettings.embeddedPage.ads_tutorialMode.getIsChecked ~= nil then
+            newValue = ADS_InGameSettings.embeddedPage.ads_tutorialMode:getIsChecked()
+        elseif BinaryOptionElement ~= nil and state == BinaryOptionElement.STATE_RIGHT then
+            newValue = true
+        elseif type(state) == "boolean" then
+            newValue = not state
+        end
+    end
+
+    pending.tutorialMode = newValue
     ADS_InGameSettings.ads_hasPendingSettingsChange = true
     refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onResetTutorialTipsClicked()
+    if isCurrentMissionMultiplayer() then
+        return
+    end
+
+    YesNoDialog.show(function(shouldReset)
+        if shouldReset then
+            ADS_Config.resetTutorialMessages()
+        end
+    end, nil, g_i18n:getText("ads_tutorialResetConfirm_message"), g_i18n:getText("ads_tutorialResetConfirm_title"))
 end
 
 function ADS_InGameSettings:onConditionWearChanged(state)
@@ -906,8 +933,20 @@ function ADS_InGameSettings:onMaintenanceDurationChanged(state)
     refreshCurrentSettingsPage()
 end
 
-function ADS_InGameSettings:onWorkshopAvailableChanged(state)
-    getPendingConfig().alwaysAvailable = (state == BinaryOptionElement.STATE_RIGHT)
+function ADS_InGameSettings:onDealerWorkshopAvailableChanged(state)
+    getPendingConfig().dealerAlwaysAvailable = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onMobileWorkshopAvailableChanged(state)
+    getPendingConfig().mobileAlwaysAvailable = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onOwnWorkshopAvailableChanged(state)
+    getPendingConfig().ownAlwaysAvailable = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings.ads_hasPendingSettingsChange = true
     refreshCurrentSettingsPage()
 end
@@ -971,6 +1010,18 @@ function ADS_InGameSettings:onBatteryCapacityChanged(state)
     refreshCurrentSettingsPage()
 end
 
+function ADS_InGameSettings:onAlternatorMaxOutputChanged(state)
+    getPendingConfig().alternatorMaxOutput = ADS_InGameSettings.steps.alternatorMaxOutput.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onIdleCurrentChanged(state)
+    getPendingConfig().idleCurrentA = ADS_InGameSettings.steps.idleCurrent.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
 
 function ADS_InGameSettings:onThermalSensitivityChanged(state)
     local val = ADS_InGameSettings.steps.thermalSensitivity.values[state]
@@ -981,8 +1032,38 @@ function ADS_InGameSettings:onThermalSensitivityChanged(state)
     refreshCurrentSettingsPage()
 end
 
+function ADS_InGameSettings:onRadiatorDirtInfluenceChanged(state)
+    getPendingConfig().maxDirtInfluence = ADS_InGameSettings.steps.radiatorDirtInfluence.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onWarmingBoostPowerChanged(state)
+    getPendingConfig().warmingBoostPower = ADS_InGameSettings.steps.thermalPower.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onCoolingSlowdownPowerChanged(state)
+    getPendingConfig().coolingSlowdownPower = ADS_InGameSettings.steps.thermalPower.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
 function ADS_InGameSettings:onCloggingSpeedChanged(state)
     getPendingConfig().cloggingSpeed = ADS_InGameSettings.steps.cloggingSpeed.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onFieldInspectionDurationChanged(state)
+    getPendingConfig().fieldInspectionDuration = ADS_InGameSettings.steps.fieldInspectionDuration.values[state]
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onLubricationReducePerDayChanged(state)
+    getPendingConfig().lubricationReducePerDay = ADS_InGameSettings.steps.lubricationReducePerDay.values[state]
     ADS_InGameSettings.ads_hasPendingSettingsChange = true
     refreshCurrentSettingsPage()
 end
@@ -1009,7 +1090,7 @@ end
 -- --- UI Helper Methods --- --
 function ADS_InGameSettings:addSectionHeader(inGameMenuSettingsFrame, titleText)
     local textElement = TextElement.new()
-    local textElementProfile = g_gui:getProfile("fs25_settingsSectionHeader")
+    local textElementProfile = getSettingsProfile("fs25_settingsSectionHeader")
     textElement.name = "sectionHeader"
     textElement:loadProfile(textElementProfile, true)
     textElement:setText(titleText)
@@ -1019,32 +1100,36 @@ end
 
 function ADS_InGameSettings:addMultiTextOption(inGameMenuSettingsFrame, onClickCallback, texts, title, tooltip)
     local bitMap = BitmapElement.new()
-    local bitMapProfile = g_gui:getProfile("fs25_multiTextOptionContainer")
+    local bitMapProfile = getSettingsProfile("fs25_multiTextOptionContainer")
     bitMap:loadProfile(bitMapProfile, true)
+    applySettingsRowColor(inGameMenuSettingsFrame, bitMap)
 
     local multiTextOption = MultiTextOptionElement.new()
-    local multiTextOptionProfile = g_gui:getProfile("fs25_settingsMultiTextOption")
+    local multiTextOptionProfile = getSettingsProfile("fs25_settingsMultiTextOption")
     multiTextOption:loadProfile(multiTextOptionProfile, true)
+    multiTextOption.updateChildrenState = true
     multiTextOption.target = ADS_InGameSettings
     multiTextOption:setCallback("onClickCallback", onClickCallback)
     multiTextOption:setTexts(texts)
 
     local multiTextOptionTitle = TextElement.new()
-    local multiTextOptionTitleProfile = g_gui:getProfile("fs25_settingsMultiTextOptionTitle")
+    local multiTextOptionTitleProfile = getSettingsProfile("fs25_settingsMultiTextOptionTitle")
     multiTextOptionTitle:loadProfile(multiTextOptionTitleProfile, true)
     multiTextOptionTitle:setText(title)
 
     local multiTextOptionTooltip = TextElement.new()
-    local multiTextOptionTooltipProfile = g_gui:getProfile("fs25_multiTextOptionTooltip")
+    local multiTextOptionTooltipProfile = getSettingsProfile("fs25_multiTextOptionTooltip")
     multiTextOptionTooltip.name = "ignore"
     multiTextOptionTooltip:loadProfile(multiTextOptionTooltipProfile, true)
     multiTextOptionTooltip:setText(tooltip)
 
     multiTextOption:addElement(multiTextOptionTooltip)
     bitMap:addElement(multiTextOption)
+    addDisabledLockToSettingsRow(bitMap, multiTextOption, tooltip)
     bitMap:addElement(multiTextOptionTitle)
 
     multiTextOption:onGuiSetupFinished()
+    applyMultiTextOptionBackgroundProfile(multiTextOption)
     multiTextOptionTitle:onGuiSetupFinished()
     multiTextOptionTooltip:onGuiSetupFinished()
 
@@ -1056,29 +1141,31 @@ end
 
 function ADS_InGameSettings:addBinaryOption(inGameMenuSettingsFrame, onClickCallback, title, tooltip)
     local bitMap = BitmapElement.new()
-    local bitMapProfile = g_gui:getProfile("fs25_multiTextOptionContainer")
+    local bitMapProfile = getSettingsProfile("fs25_multiTextOptionContainer")
     bitMap:loadProfile(bitMapProfile, true)
+    applySettingsRowColor(inGameMenuSettingsFrame, bitMap)
 
     local binaryOption = BinaryOptionElement.new()
     binaryOption.useYesNoTexts = true
-    local binaryOptionProfile = g_gui:getProfile("fs25_settingsBinaryOption")
+    local binaryOptionProfile = getSettingsProfile("fs25_settingsBinaryOption")
     binaryOption:loadProfile(binaryOptionProfile, true)
     binaryOption.target = ADS_InGameSettings
     binaryOption:setCallback("onClickCallback", onClickCallback)
 
     local binaryOptionTitle = TextElement.new()
-    local binaryOptionTitleProfile = g_gui:getProfile("fs25_settingsMultiTextOptionTitle")
+    local binaryOptionTitleProfile = getSettingsProfile("fs25_settingsMultiTextOptionTitle")
     binaryOptionTitle:loadProfile(binaryOptionTitleProfile, true)
     binaryOptionTitle:setText(title)
 
     local binaryOptionTooltip = TextElement.new()
-    local binaryOptionTooltipProfile = g_gui:getProfile("fs25_multiTextOptionTooltip")
+    local binaryOptionTooltipProfile = getSettingsProfile("fs25_multiTextOptionTooltip")
     binaryOptionTooltip.name = "ignore"
     binaryOptionTooltip:loadProfile(binaryOptionTooltipProfile, true)
     binaryOptionTooltip:setText(tooltip)
 
     binaryOption:addElement(binaryOptionTooltip)
     bitMap:addElement(binaryOption)
+    addDisabledLockToSettingsRow(bitMap, binaryOption, tooltip)
     bitMap:addElement(binaryOptionTitle)
 
     binaryOption:onGuiSetupFinished()
@@ -1089,6 +1176,79 @@ function ADS_InGameSettings:addBinaryOption(inGameMenuSettingsFrame, onClickCall
     bitMap:onGuiSetupFinished()
     
     return binaryOption
+end
+
+function ADS_InGameSettings:addButtonOption(inGameMenuSettingsFrame, onClickCallback, title, text, tooltip)
+    local template = getVanillaSettingsButtonTemplate()
+    local bitMap
+    local clonedTemplate = template ~= nil and template.clone ~= nil
+
+    if clonedTemplate then
+        bitMap = template:clone(inGameMenuSettingsFrame.settingsLayout)
+        bitMap.id = nil
+    else
+        bitMap = BitmapElement.new()
+        local bitMapProfile = getSettingsProfile("fs25_multiTextOptionContainer")
+        bitMap:loadProfile(bitMapProfile, true)
+        inGameMenuSettingsFrame.settingsLayout:addElement(bitMap)
+    end
+
+    applySettingsRowColor(inGameMenuSettingsFrame, bitMap)
+
+    local button
+    local buttonTitle
+
+    for _, element in pairs(bitMap.elements) do
+        if element.typeName == "Button" then
+            button = element
+        elseif element.typeName == "Text" and element.name ~= "ignore" then
+            buttonTitle = element
+        end
+    end
+
+    if button == nil then
+        button = ButtonElement.new()
+        bitMap:addElement(button)
+    end
+
+    button:applyProfile("ads_settingsButton")
+    applyButtonBackgroundProfile(button)
+    button.target = ADS_InGameSettings
+    button:setCallback("onClickCallback", onClickCallback)
+    button:setText(text)
+    button.id = nil
+    button.isAlwaysFocusedOnOpen = false
+    button.focused = false
+
+    if buttonTitle == nil then
+        buttonTitle = TextElement.new()
+        local buttonTitleProfile = getSettingsProfile("fs25_settingsMultiTextOptionTitle")
+        buttonTitle:loadProfile(buttonTitleProfile, true)
+        bitMap:addElement(buttonTitle)
+    end
+
+    buttonTitle:setText(title)
+    buttonTitle.id = nil
+
+    local buttonTooltip = button:getDescendantByName("ignore")
+    if buttonTooltip == nil then
+        buttonTooltip = TextElement.new()
+        local buttonTooltipProfile = getSettingsProfile("fs25_multiTextOptionTooltip")
+        buttonTooltip.name = "ignore"
+        buttonTooltip:loadProfile(buttonTooltipProfile, true)
+        button:addElement(buttonTooltip)
+    end
+
+    buttonTooltip:setText(tooltip)
+    buttonTooltip.id = nil
+
+    button:onGuiSetupFinished()
+    buttonTitle:onGuiSetupFinished()
+    buttonTooltip:onGuiSetupFinished()
+
+    bitMap:onGuiSetupFinished()
+
+    return button
 end
 
 
@@ -1193,6 +1353,22 @@ function ADS_InGameSettings:generateAllSteps()
         self.steps.batteryCapacity = data
     end
 
+    -- Alternator Max Output: 100 A to 300 A.
+    self.steps.alternatorMaxOutput = createSteps(100, 5, 50, function(v)
+        return string.format("%d A", v)
+    end)
+
+    -- Idle Current: none, then 0.1 A to 2.0 A.
+    do
+        local data = { values = {0.0}, texts = {g_i18n:getText("ads_option_none")} }
+        for tenths = 1, 20 do
+            local value = tenths / 10
+            table.insert(data.values, value)
+            table.insert(data.texts, string.format("%.1f A", value))
+        end
+        self.steps.idleCurrent = data
+    end
+
     -- Maint Price: 10% to 300%
     self.steps.maintPrice = createSteps(10, 30, 10, function(v)
         return string.format("%.0f%%", v)
@@ -1219,31 +1395,53 @@ function ADS_InGameSettings:generateAllSteps()
         }
     }
 
+    -- Radiator Dirt Influence: Off, then 10% to 50%.
+    do
+        local data = { values = {0.0}, texts = {g_i18n:getText("ads_option_off")} }
+        for percent = 10, 50, 10 do
+            table.insert(data.values, percent / 100)
+            table.insert(data.texts, string.format("%d%%", percent))
+        end
+        self.steps.radiatorDirtInfluence = data
+    end
+
+    -- Thermal artificial scaling: Off, then 2x to 20x.
+    do
+        local data = { values = {1.0}, texts = {g_i18n:getText("ads_option_off")} }
+        for multiplier = 2, 20 do
+            table.insert(data.values, multiplier)
+            table.insert(data.texts, string.format("%dx", multiplier))
+        end
+        self.steps.thermalPower = data
+    end
+
     -- Clogging Speed: 10% to 300%
     self.steps.cloggingSpeed = createSteps(0.1, 30, 0.1, function(v)
         return string.format("%.0f%%", v * 100)
     end)
 
+    -- Field Inspection Duration: 1 s to 30 s.
+    self.steps.fieldInspectionDuration = createSteps(1000, 30, 1000, function(v)
+        return string.format("%d s", v / 1000)
+    end)
+
+    -- Lubrication Drying: Off, then 10% to 100% per day.
+    do
+        local data = { values = {0.0}, texts = {g_i18n:getText("ads_option_off")} }
+        for percent = 10, 100, 10 do
+            table.insert(data.values, percent / 100)
+            table.insert(data.texts, string.format("%d%%", percent))
+        end
+        self.steps.lubricationReducePerDay = data
+    end
+
     self.steps.generated = true
 end
 
-
--- --- Initialization Hook --- --
-
-function ADS_InGameSettings.init()
-    InGameMenuSettingsFrame.updateSubCategoryPages = Utils.overwrittenFunction(InGameMenuSettingsFrame.updateSubCategoryPages, ADS_InGameSettings.onUpdateSubCategoryPages)
-    InGameMenuSettingsFrame.updateGameSettings = Utils.appendedFunction(InGameMenuSettingsFrame.updateGameSettings, ADS_InGameSettings.updateGameSettings)
-    InGameMenuSettingsFrame.onFrameOpen = Utils.appendedFunction(InGameMenuSettingsFrame.onFrameOpen, ADS_InGameSettings.onFrameOpen)
-    InGameMenuSettingsFrame.onFrameClose = Utils.appendedFunction(InGameMenuSettingsFrame.onFrameClose, ADS_InGameSettings.onFrameClose)
-end
 
 function ADS_InGameSettings.reset()
     ADS_InGameSettings.steps = {}
     ADS_InGameSettings.pendingConfig = nil
     ADS_InGameSettings.ads_hasPendingSettingsChange = false
-    ADS_InGameSettings.modPage = nil
-    ADS_InGameSettings.pageInserted = false
+    ADS_InGameSettings.embeddedPage = nil
 end
-
-
-ADS_InGameSettings.init()

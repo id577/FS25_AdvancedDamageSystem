@@ -137,15 +137,17 @@ function ADS_WorkshopDialog:updateScreen()
     local statusColor = {1, 1, 1, 1}
     
     self.maintanceInProgressSpinner:setVisible(false)
-    if g_workshopScreen.isDealer then
-        if not ADS_Main.isWorkshopOpen then
-            buttonsDisabled = true
-            statusText = g_i18n:getText("ads_ws_status_closed")
-            statusColor = {0.6, 0.6, 0.6, 1}
-        else
-            statusText = g_i18n:getText("ads_ws_status_open")
-            buttonsDisabled = false
-        end
+    local isWorkshopTypeOpen = ADS_Main == nil
+        or ADS_Main.isWorkshopTypeOpen == nil
+        or ADS_Main:isWorkshopTypeOpen(self.workshopType)
+
+    if not isWorkshopTypeOpen then
+        buttonsDisabled = true
+        statusText = g_i18n:getText("ads_ws_status_closed")
+        statusColor = {0.6, 0.6, 0.6, 1}
+    else
+        statusText = g_i18n:getText("ads_ws_status_open")
+        buttonsDisabled = false
     end
 
     if spec.currentState ~= STATUS.READY then
@@ -186,9 +188,9 @@ function ADS_WorkshopDialog:updateScreen()
         self.repairButton.disabled = buttonsDisabled
         self.overhaulButton.disabled = buttonsDisabled or not hasSystemEligibleForOverhaul
     else
-        self.inscpectionButton.disabled = false or spec.currentState ~= STATUS.READY
-        self.maintenanceButton.disabled = spec.currentState ~= STATUS.READY
-        self.repairButton.disabled = spec.currentState ~= STATUS.READY
+        self.inscpectionButton.disabled = buttonsDisabled or spec.currentState ~= STATUS.READY
+        self.maintenanceButton.disabled = buttonsDisabled or spec.currentState ~= STATUS.READY
+        self.repairButton.disabled = buttonsDisabled or spec.currentState ~= STATUS.READY
         self.overhaulButton.disabled = true
     end
 

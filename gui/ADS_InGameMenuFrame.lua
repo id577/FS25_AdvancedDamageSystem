@@ -2,10 +2,12 @@ ADS_InGameMenuFrame = {}
 ADS_InGameMenuFrame.MOD_DIR = g_currentModDirectory
 ADS_InGameMenuFrame.PAGE_NAME = "pageADSFleet"
 ADS_InGameMenuFrame.REFRESH_INTERVAL_MS = 1000
+ADS_InGameMenuFrame.SCREEN_EDGE_SLIDER_MARGIN_X = 0
 ADS_InGameMenuFrame.SUB_CATEGORY = {
     ACTIVE = 1,
     SERVICE = 2,
-    OTHER = 3
+    OTHER = 3,
+    SETTINGS = 4
 }
 ADS_InGameMenuFrame.SORT_COLUMN = {
     VEHICLE = "vehicle",
@@ -383,7 +385,7 @@ function ADS_InGameMenuFrame:initialize()
     end
 
     if self.subCategoryTabs ~= nil then
-        for i, tab in pairs(self.subCategoryTabs) do
+        for i, tab in ipairs(self.subCategoryTabs) do
             local background = tab:getDescendantByName("background")
             if background ~= nil then
                 background.getIsSelected = function()
@@ -398,7 +400,7 @@ function ADS_InGameMenuFrame:initialize()
     end
 
     if self.subCategoryPaging ~= nil then
-        self.subCategoryPaging:setTexts({"1", "2", "3"})
+        self.subCategoryPaging:setTexts({"1", "2", "3", "4"})
         self.subCategoryPaging:setState(self.subCategoryState, false)
     end
 
@@ -462,16 +464,49 @@ function ADS_InGameMenuFrame:updateSubCategoryPages(subCategoryIndex)
         end
     end
 
+    if state == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS and ADS_SettingsPage ~= nil then
+        ADS_SettingsPage:activateEmbeddedSettingsPage(self)
+    end
+
     self:updateEmptyStates()
     self:updateDetailsForCurrentSection()
+    self:updateDetailBoxVisibility()
     self:updateActionButtons()
     self:setMenuButtonInfoDirty()
+end
+
+function ADS_InGameMenuFrame:updateDetailBoxVisibility()
+    if self.detailBox ~= nil then
+        self.detailBox:setVisible(self:getCurrentSubCategory() ~= ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS and self.selectedVehicleId ~= nil)
+    end
+end
+
+function ADS_InGameMenuFrame:updateScreenEdgeSliders()
+    local sliderBoxes = {
+        self.activeTableSliderBox,
+        self.serviceTableSliderBox,
+        self.otherTableSliderBox,
+        self.settingsSliderBox
+    }
+
+    for _, sliderBox in ipairs(sliderBoxes) do
+        if sliderBox ~= nil and sliderBox.absSize ~= nil and sliderBox.absSize[1] ~= nil and sliderBox.absSize[2] ~= nil then
+            local x = 1 - sliderBox.absSize[1] - ADS_InGameMenuFrame.SCREEN_EDGE_SLIDER_MARGIN_X
+            local y = 0.5 - sliderBox.absSize[2] * 0.5
+
+            sliderBox:setAbsolutePosition(x, y)
+
+            for _, child in ipairs(sliderBox.elements) do
+                child:updateAbsolutePosition()
+            end
+        end
+    end
 end
 
 function ADS_InGameMenuFrame:onFrameOpen()
     if self.subCategoryBox ~= nil and self.subCategoryPaging ~= nil and self.subCategoryTabs ~= nil then
         local texts = {}
-        for index, tab in pairs(self.subCategoryTabs) do
+        for index, tab in ipairs(self.subCategoryTabs) do
             tab:setVisible(true)
             table.insert(texts, tostring(index))
         end
@@ -483,10 +518,9 @@ function ADS_InGameMenuFrame:onFrameOpen()
     end
 
     self:updateSubCategoryPages(self:getCurrentSubCategory())
+    self:updateScreenEdgeSliders()
 
-    if self.detailBox ~= nil then
-        self.detailBox:setVisible(true)
-    end
+    self:updateDetailBoxVisibility()
     if self.itemDetailsMap ~= nil and g_currentMission ~= nil and g_currentMission.hud ~= nil then
         self.itemDetailsMap:setIngameMap(g_currentMission.hud:getIngameMap())
     end
@@ -495,6 +529,7 @@ function ADS_InGameMenuFrame:onFrameOpen()
     self.refreshTimerMs = 0
     self:updateBalanceDisplay()
     self:reloadRows()
+    self:updateScreenEdgeSliders()
 end
 
 function ADS_InGameMenuFrame:onFrameClose()
@@ -509,11 +544,19 @@ function ADS_InGameMenuFrame:onFrameClose()
     end
     self.selectedServiceRowIndex = 1
     self.selectedOtherRowIndex = 1
+    if ADS_SettingsPage ~= nil then
+        ADS_SettingsPage:onFrameClose()
+        ADS_SettingsPage.embeddedPage = nil
+    end
     ADS_InGameMenuFrame:superClass().onFrameClose(self)
 end
 
 function ADS_InGameMenuFrame:getSelectedVehicle()
     local state = self:getCurrentSubCategory()
+    if state == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS then
+        return nil
+    end
+
     local row = nil
 
     if state == ADS_InGameMenuFrame.SUB_CATEGORY.SERVICE then
@@ -529,6 +572,16 @@ end
 
 function ADS_InGameMenuFrame:updateActionButtons()
     local currentSection = self:getCurrentSubCategory()
+    if currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS then
+        self:setMenuButtonInfo({
+            self.backButtonInfo,
+            self.prevPageButtonInfo,
+            self.nextPageButtonInfo
+        })
+        self:setMenuButtonInfoDirty()
+        return
+    end
+
     local isVehicleSection = currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.ACTIVE
         or currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.OTHER
     local isADSSection = currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.ACTIVE
@@ -565,6 +618,11 @@ end
 
 function ADS_InGameMenuFrame:update(dt)
     ADS_InGameMenuFrame:superClass().update(self, dt)
+    self:updateScreenEdgeSliders()
+
+    if self:getCurrentSubCategory() == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS then
+        return
+    end
 
     self.refreshTimerMs = self.refreshTimerMs - dt
     if self.refreshTimerMs <= 0 then
@@ -589,6 +647,8 @@ function ADS_InGameMenuFrame:updateDetailsPanel(vehicle)
     if self.detailBox ~= nil then
         self.detailBox:setVisible(vehicle ~= nil)
     end
+
+    self:updateDetailBoxVisibility()
 
     if vehicle == nil then
         return
@@ -645,6 +705,12 @@ function ADS_InGameMenuFrame:updateDetailsPanel(vehicle)
 end
 
 function ADS_InGameMenuFrame:updateDetailsForCurrentSection()
+    if self:getCurrentSubCategory() == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS then
+        self.selectedVehicleId = nil
+        self:updateDetailsPanel(nil)
+        return
+    end
+
     local row = nil
 
     if self:getCurrentSubCategory() == ADS_InGameMenuFrame.SUB_CATEGORY.SERVICE then
@@ -1082,6 +1148,14 @@ function ADS_InGameMenuFrame:onClickOtherSection()
     end
 
     self:updateSubCategoryPages(ADS_InGameMenuFrame.SUB_CATEGORY.OTHER)
+end
+
+function ADS_InGameMenuFrame:onClickSettingsSection()
+    if self.subCategoryPaging ~= nil then
+        self.subCategoryPaging:setState(ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS, true)
+    end
+
+    self:updateSubCategoryPages(ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS)
 end
 
 function ADS_InGameMenuFrame:onClickTypeHeader(element)

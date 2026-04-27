@@ -1,7 +1,7 @@
 <l10n>
     <texts>
         <text name="ads_settings_title" text="ADS НАСТРОЙКИ"/>
-        <text name="ADS_SETTINGS_TITLE" text="Advanced Damage System"/>
+        <text name="ads_settings_admin_required" text="Для изменения настроек ADS нужны права администратора."/>
         <text name="ads_maintenancePrice_label" text="Множитель стоимости обслуживания"/>
         <text name="ads_maintenancePrice_tooltip" text="Изменяет стоимость всех услуг мастерской, включая осмотр, ремонт и капитальный ремонт. Более высокое значение делает все виды обслуживания дороже."/>
         <text name="ads_maintenanceDuration_label" text="Множитель длительности обслуживания"/>
@@ -14,9 +14,22 @@
         <text name="ads_engineMaxHeat_tooltip" text="Базовый уровень тепла, генерируемого двигателем при максимальной нагрузке. Более высокие значения заставят двигатель нагреваться быстрее."/>
         <text name="ads_cloggingSpeed_label" text="Скорость засорения"/>
         <text name="ads_cloggingSpeed_tooltip" text="Регулирует, как быстро радиатор и воздухозаборник засоряются во время работы в пыли, полове и растительных остатках. Более высокие значения ускоряют накопление засорения. При 100% скорость засорения составляет примерно треть от сервисного интервала."/>
+        <text name="ads_fieldInspectionDuration_label" text="Длительность осмотра"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Задает длительность предсменного осмотра техники в реальных секундах."/>
+        <text name="ads_lubricationReducePerDay_label" text="Высыхание смазки"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Определяет, какая доля смазки высыхает за одни игровые сутки. При 0% смазка не высыхает со временем."/>
         <text name="ads_ws_header_title" text="Мастерская"/>
-        <text name="ads_workshopAvailable_label" text="Мастерская 24/7"/>
-        <text name="ads_workshopAvailable_tooltip" text="Включает или отключает круглосуточную работу мастерской."/>
+        <text name="ads_settings_section_service_wear" text="Сервис и износ"/>
+        <text name="ads_settings_section_thermal_model" text="Тепловая модель"/>
+        <text name="ads_settings_section_battery_alternator" text="Аккумулятор и генератор"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Предсменное обслуживание"/>
+        <text name="ads_settings_section_other" text="Прочее"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Дилерская мастерская 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Делает дилерскую мастерскую доступной в любое время суток."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Мобильная мастерская 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Делает мобильную мастерскую доступной в любое время суток."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Своя мастерская 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Делает собственную мастерскую доступной в любое время суток."/>
         <text name="ads_instantInspection_label" text="Мгновенный осмотр"/>
         <text name="ads_instantInspection_tooltip" text="Если включено, все осмотры завершаются мгновенно (время не проходит). Примечание: вариант осмотра «Визуальный» станет недоступен."/>
         <text name="ads_parkVehicle_label" text="Парковать технику на время обслуживания"/>
@@ -38,6 +51,7 @@
         <text name="ads_batteryCapacity_label" text="Емкость батареи"/>
         <text name="ads_thermalSensitivity_label" text="Термическая чувствительность"/>
         <text name="ads_option_off" text="Выкл."/>
+        <text name="ads_option_none" text="Нет"/>
         <text name="ads_serviceInterval_tooltip" text="Задает базовый интервал обслуживания в часах, после которого требуется ТО. Фактический интервал зависит от марки техники, возраста и качества предыдущего обслуживания."/>
         <text name="ads_vehicleLifespan_tooltip" text="Задает базовый ресурс техники в часах, после которого ее состояние достигнет 0%. Чем ближе состояние к нулю, тем ниже надежность машины."/>
         <text name="ads_downtimeWear_tooltip" text="Устанавливает скорость пассивного износа, когда техника находится в простое, в процентах от базового износа (Ресурс техники). Например, 5% при настройках по умолчанию, где ресурс техники составляет 100 часов, означает, что примерно за 20 часов простоя каждая система потеряет 1% состояния. Примечание: при хранении техники под крышей пассивный износ отключается."/>
@@ -45,7 +59,17 @@
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Когда включено, доступность различных процедур в мобильной мастерской зависит от ремонтопригодности техники."/>
         <text name="ads_systemStressRate_tooltip" text="Определяет, как быстро в системах накапливается стресс от перегрузки, перегрева, пробуксовки и других тяжелых режимов работы. Стресс напрямую влияет на вероятность поломок: чем больше стресса накопилось в системе, тем вероятнее поломка."/>
         <text name="ads_batteryCapacity_tooltip" text="Регулирует максимальную используемую емкость батареи. Значения, близкие к 150 Ah, ближе к реализму, однако в этом случае вы можете почти не сталкиваться с проблемами, связанными с разрядом батареи."/>
+        <text name="ads_alternatorMaxOutput_label" text="Максимальный ток генератора"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Регулирует максимальный ток генератора. Чем выше значение, тем быстрее генератор сможет заряжать батарею."/>
+        <text name="ads_idleCurrent_label" text="Ток покоя"/>
+        <text name="ads_idleCurrent_tooltip" text="Регулирует ток разряда батареи при заглушенном двигателе. Например, при 0.5 A батарея емкостью 15 Ah полностью разрядится примерно за 30 реальных часов, без учета влияния температуры."/>
         <text name="ads_thermalSensitivity_tooltip" text="Регулирует поведение тепловой модели. Более высокие настройки делают двигатель и трансмиссию более чувствительными к нагрузке, температуре окружающей среды и загрязнению радиатора, выделяя больше тепла при тех же условиях."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Влияние загрязнения радиатора"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Уменьшает охлаждающую способность радиатора на этот процент при максимальном загрязнении."/>
+        <text name="ads_warmingBoostPower_label" text="Ускорение прогрева"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Искусственно ускоряет прогрев двигателя и коробки передач. Выберите Выкл., чтобы оставить естественное поведение тепловой модели."/>
+        <text name="ads_coolingSlowdownPower_label" text="Замедление охлаждения"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Искусственно замедляет охлаждение двигателя и коробки передач после выключения техники. Выберите Выкл., чтобы оставить естественное охлаждение."/>
         <text name="ads_thermal_none" text="Пассивный"/>
         <text name="ads_thermal_mild" text="Мягкий"/>
         <text name="ads_thermal_default" text="По умолчанию"/>
@@ -646,6 +670,9 @@
         <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Критическая перегрузка! Немедленно снизьте нагрузку на технику."/>
         <text name="ads_tutorialMode_label" text="Режим обучения"/>
         <text name="ads_tutorialMode_tooltip" text="Показывает обучающие подсказки во время игры. В мультиплеере отключено."/>
+        <text name="ads_tutorialResetTips_label" text="Сбросить подсказки"/>
+        <text name="ads_tutorialResetTips_text" text="Сбросить подсказки"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Сбрасывает историю обучающих подсказок и показывает их заново. Доступно только в одиночной игре."/>
         <text name="ads_tutorialResetConfirm_title" text="Сбросить подсказки?"/>
         <text name="ads_tutorialResetConfirm_message" text="Сбросить историю обучающих подсказок и показывать их заново?"/>
         <text name="ads_tutorial_welcome_dialog_title" text="Добро пожаловать в Advanced Damage System"/>

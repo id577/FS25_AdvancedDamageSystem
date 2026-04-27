@@ -1,7 +1,7 @@
 <l10n>
     <texts>
         <text name="ads_settings_title" text="ADS 설정"/>
-        <text name="ADS_SETTINGS_TITLE" text="Advanced Damage System"/>
+        <text name="ads_settings_admin_required" text="ADS settings require administrator permissions in multiplayer."/>
         <text name="ads_maintenancePrice_label" text="정비 비용 배율"/>
         <text name="ads_maintenancePrice_tooltip" text="점검, 수리 및 오버홀을 포함한 모든 정비소 서비스 비용을 조정합니다. 값이 클수록 모든 정비 활동 비용이 비싸집니다."/>
         <text name="ads_maintenanceDuration_label" text="정비 소요 시간 배율"/>
@@ -14,9 +14,22 @@
         <text name="ads_engineMaxHeat_tooltip" text="최대 부하 상태에서 엔진이 발생시키는 기본 발열량입니다. 값이 높을수록 엔진이 더 빨리 가열됩니다."/>
         <text name="ads_cloggingSpeed_label" text="이물질 축적 속도"/>
         <text name="ads_cloggingSpeed_tooltip" text="먼지나 왕겨, 작물 잔여물 속에서 작업할 때 라디에이터와 흡기구가 얼마나 빨리 막히는지를 조정합니다. 값이 높을수록 더 빨리 막힙니다. 100%일 때, 막힘 속도는 정비 주기의 약 1/3입니다."/>
+        <text name="ads_fieldInspectionDuration_label" text="Inspection Duration"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Sets how long a pre-shift field inspection takes, in real seconds."/>
+        <text name="ads_lubricationReducePerDay_label" text="Lubrication Drying Rate"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Sets how much lubrication dries out over one in-game day. At 0%, lubrication does not dry out over time."/>
         <text name="ads_ws_header_title" text="정비소"/>
-        <text name="ads_workshopAvailable_label" text="정비소 24/7 운영"/>
-        <text name="ads_workshopAvailable_tooltip" text="정비소의 24시간 운영 여부를 설정합니다."/>
+        <text name="ads_settings_section_service_wear" text="Service and Wear"/>
+        <text name="ads_settings_section_thermal_model" text="Thermal Model"/>
+        <text name="ads_settings_section_battery_alternator" text="Battery and Alternator"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Pre-shift Maintenance"/>
+        <text name="ads_settings_section_other" text="Other"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Dealer Workshop 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Keeps the dealer workshop available at any time of day."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Mobile Workshop 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Keeps the mobile workshop available at any time of day."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Owned Workshop 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Keeps your owned workshop available at any time of day."/>
         <text name="ads_instantInspection_label" text="즉시 점검"/>
         <text name="ads_instantInspection_tooltip" text="활성화 시 모든 점검이 시간 경과 없이 즉시 완료됩니다. 참고: 이 경우 '육안 점검' 옵션은 사용할 수 없습니다."/>
         <text name="ads_parkVehicle_label" text="정비 중 차량 주차"/>
@@ -38,6 +51,7 @@
         <text name="ads_batteryCapacity_label" text="배터리 용량"/>
         <text name="ads_thermalSensitivity_label" text="열 민감도"/>
         <text name="ads_option_off" text="꺼짐"/>
+        <text name="ads_option_none" text="None"/>
         <text name="ads_serviceInterval_tooltip" text="정비가 필요한 기준 시간을 시간 단위로 설정합니다. 실제 주기는 차량 브랜드, 연식, 이전 정비 품질에 따라 달라집니다."/>
         <text name="ads_vehicleLifespan_tooltip" text="차량 상태가 0%에 도달하는 기준 수명을 시간 단위로 설정합니다. 상태가 0%에 가까워질수록 차량의 신뢰도가 떨어집니다."/>
         <text name="ads_downtimeWear_tooltip" text="차량이 유휴 상태일 때 발생하는 패시브 마모율을 기본 마모율(차량 수명)의 백분율로 설정합니다. 예: 수명이 100시간일 때 5%로 설정하면, 약 20시간의 유휴 시간마다 각 시스템의 상태가 1%씩 감소합니다. 참고: 차량이 지붕 아래에 보관된 동안에는 패시브 마모가 발생하지 않습니다."/>
@@ -45,7 +59,17 @@
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="활성화 시 이동식 정비소에서 수행 가능한 작업 범위가 차량의 정비 용이성에 따라 달라집니다."/>
         <text name="ads_systemStressRate_tooltip" text="과부하, 과열, 휠 슬립 및 기타 가혹한 운행 조건에서 시스템 스트레스가 얼마나 빨리 쌓이는지 제어합니다. 스트레스는 고장 확률에 직접적인 영향을 줍니다."/>
         <text name="ads_batteryCapacity_tooltip" text="최대 사용 가능한 배터리 용량을 조정합니다. 150 Ah에 가까운 값이 현실적이지만, 이 수준에서는 배터리 방전 문제를 거의 겪지 않을 수 있습니다."/>
+        <text name="ads_alternatorMaxOutput_label" text="Alternator Max Output"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Sets the maximum alternator output current. Higher values allow the alternator to recharge the battery faster."/>
+        <text name="ads_idleCurrent_label" text="Standby Current"/>
+        <text name="ads_idleCurrent_tooltip" text="Sets the battery drain current while the engine is stopped. For example, at 0.5 A a 15 Ah battery would take about 30 real hours to fully discharge, before temperature effects are applied."/>
         <text name="ads_thermalSensitivity_tooltip" text="열 모델 동작을 조정합니다. 설정이 높을수록 엔진과 변속기가 부하, 주변 온도, 라디에이터 오염에 더 민감하게 반응하여 동일 조건에서 더 많은 열을 발생시킵니다."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Radiator Dirt Influence"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Reduces radiator cooling capacity by this percentage at maximum dirt buildup."/>
+        <text name="ads_warmingBoostPower_label" text="Warm-up Acceleration"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Artificially speeds up engine and transmission warm-up. Use Off for unmodified thermal behavior."/>
+        <text name="ads_coolingSlowdownPower_label" text="Cooling Slowdown"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Artificially slows engine and transmission cooling after the vehicle is shut down. Use Off for unmodified cooling."/>
         <text name="ads_thermal_none" text="패시브"/>
         <text name="ads_thermal_mild" text="완만함"/>
         <text name="ads_thermal_default" text="기본"/>
@@ -654,6 +678,9 @@
         <text name="ads_breakdowns_overload_breakdown_stage2_message" text="치명적 과부하! 즉시 차량의 부하를 줄이십시오."/>
         <text name="ads_tutorialMode_label" text="튜토리얼 모드"/>
         <text name="ads_tutorialMode_tooltip" text="게임 플레이 중 튜토리얼 팁을 표시합니다. 멀티플레이어에서는 비활성화됩니다."/>
+        <text name="ads_tutorialResetTips_label" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_text" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Reset tutorial tip history and show all tips again. Available only in singleplayer."/>
         <text name="ads_tutorialResetConfirm_title" text="튜토리얼 팁을 초기화할까요?"/>
         <text name="ads_tutorialResetConfirm_message" text="튜토리얼 팁 기록을 초기화하고 모든 팁을 다시 표시할까요?"/>
         <text name="ads_tutorial_welcome_dialog_title" text="Advanced Damage System에 오신 것을 환영합니다"/>

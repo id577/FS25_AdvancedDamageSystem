@@ -80,6 +80,12 @@ function ADS_ServiceRequestEvent:run(connection)
                 return
             end
 
+            if ADS_Main ~= nil
+                and ADS_Main.isWorkshopTypeOpen ~= nil
+                and not ADS_Main:isWorkshopTypeOpen(self.workshopType) then
+                return
+            end
+
             local serverPrice = self.vehicle:getServicePrice(self.serviceType, self.optionOne, self.optionTwo, self.optionThree, self.workshopType) or 0
 
             self.vehicle:initService(self.serviceType, self.workshopType, self.optionOne, self.optionTwo, self.optionThree)

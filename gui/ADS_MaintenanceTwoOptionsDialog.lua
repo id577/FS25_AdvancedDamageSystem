@@ -62,6 +62,18 @@ local function getMobileWorkshopAvailability(dialog)
     return currentMaintainability >= requiredMaintainability
 end
 
+local function getSelectedWorkshopAvailability(dialog)
+    local vehicle = dialog ~= nil and dialog.vehicle or nil
+    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    local workshopType = ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.workshopType or (spec ~= nil and spec.workshopType or nil)
+
+    if ADS_Main ~= nil and ADS_Main.isWorkshopTypeOpen ~= nil then
+        return ADS_Main:isWorkshopTypeOpen(workshopType)
+    end
+
+    return true
+end
+
 local function getSelectedProcedureDisplayName(dialog)
     if dialog == nil then
         return ""
@@ -176,6 +188,7 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
     end
 
     local isAllowedInMobileWorkshop = getMobileWorkshopAvailability(self)
+    local isWorkshopOpen = getSelectedWorkshopAvailability(self)
 
     -- price, duration, finishtime
     local workshopType = ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.workshopType or spec.workshopType
@@ -239,7 +252,7 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
     end
 
     if self.startServiceButton ~= nil then
-        self.startServiceButton:setDisabled(not isAllowedInMobileWorkshop)
+        self.startServiceButton:setDisabled(not isAllowedInMobileWorkshop or not isWorkshopOpen)
     end
 end
 
@@ -266,7 +279,7 @@ function ADS_MaintenanceTwoOptionsDialog:onClickOptionThree(state, binaryOptionE
 end
 
 function ADS_MaintenanceTwoOptionsDialog:onClickStartService()
-    if not getMobileWorkshopAvailability(self) then
+    if not getMobileWorkshopAvailability(self) or not getSelectedWorkshopAvailability(self) then
         return
     end
 

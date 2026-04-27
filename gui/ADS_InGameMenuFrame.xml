@@ -23,6 +23,9 @@
             <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[3]" text="$l10n_ads_ingame_menu_section_other" onClick="onClickOtherSection">
                 <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
             </Button>
+            <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[4]" text="$l10n_ads_settings_title" onClick="onClickSettingsSection">
+                <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
+            </Button>
         </BoxLayout>
         <ThreePartBitmap profile="fs25_lineSeparatorTopHighlighted" position="-10px -57px" size="1550px 4px"/>
         <MultiTextOption profile="fs25_subCategorySelectorTabbed" id="subCategoryPaging" position="-10px -10px" onClick="updateSubCategoryPages"/>
@@ -72,8 +75,10 @@
                     </ListItem>
                 </SmoothList>
 
-                <ThreePartBitmap profile="ads_menuListSliderBox" id="activeTableSliderBox">
-                    <Slider profile="fs25_listSlider" dataElementId="vehicleList"/>
+                <ThreePartBitmap profile="ads_menuDockedSliderBg" id="activeTableSliderBox">
+                    <ThreePartBitmap profile="ads_menuDockedSliderBox">
+                        <Slider profile="ads_menuDockedSlider" dataElementId="vehicleList"/>
+                    </ThreePartBitmap>
                 </ThreePartBitmap>
                 <GuiElement profile="ads_menuFooterBox" id="activeTableFooter">
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -18px"/>
@@ -118,8 +123,10 @@
                     </ListItem>
                 </SmoothList>
 
-                <ThreePartBitmap profile="ads_menuListSliderBox" id="serviceTableSliderBox">
-                    <Slider profile="fs25_listSlider" dataElementId="serviceVehicleList"/>
+                <ThreePartBitmap profile="ads_menuDockedSliderBg" id="serviceTableSliderBox">
+                    <ThreePartBitmap profile="ads_menuDockedSliderBox">
+                        <Slider profile="ads_menuDockedSlider" dataElementId="serviceVehicleList"/>
+                    </ThreePartBitmap>
                 </ThreePartBitmap>
                 <GuiElement profile="ads_menuFooterBox" id="serviceTableFooter">
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -18px"/>
@@ -173,13 +180,44 @@
                     </ListItem>
                 </SmoothList>
 
-                <ThreePartBitmap profile="ads_menuListSliderBox" id="otherTableSliderBox">
-                    <Slider profile="fs25_listSlider" dataElementId="otherVehicleList"/>
+                <ThreePartBitmap profile="ads_menuDockedSliderBg" id="otherTableSliderBox">
+                    <ThreePartBitmap profile="ads_menuDockedSliderBox">
+                        <Slider profile="ads_menuDockedSlider" dataElementId="otherVehicleList"/>
+                    </ThreePartBitmap>
                 </ThreePartBitmap>
                 <GuiElement profile="ads_menuFooterBox" id="otherTableFooter">
                     <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -18px"/>
                 </GuiElement>
                 <Text profile="ads_textHeaderGrey" id="otherEmptyTableText" text="$l10n_ads_ingame_menu_empty_other" position="0px 180px" size="100% 50px" visible="false" with="anchorMiddleCenter"/>
+            </GuiElement>
+        </GuiElement>
+
+        <GuiElement profile="fs25_subCategorySelectorTabbedContainer" id="subCategoryPages[4]">
+            <GuiElement profile="ads_menuSettingsContainer" id="settingsPage">
+                <ScrollingLayout profile="fs25_settingsLayout" id="settingsLayout">
+                    <Text profile="fs25_settingsSectionHeader" name="sectionHeader" id="subTitlePrefab"/>
+                    <Bitmap profile="fs25_multiTextOptionContainer" id="binaryPrefab">
+                        <BinaryOption profile="fs25_settingsBinaryOption" onClick="onClickBinaryOption" id="checkPrefab">
+                            <Text profile="fs25_multiTextOptionTooltip" name="ignore" />
+                        </BinaryOption>
+                        <Text profile="fs25_settingsMultiTextOptionTitle" />
+                    </Bitmap>
+                    <Bitmap profile="fs25_multiTextOptionContainer" id="multiPrefab">
+                        <MultiTextOption profile="fs25_settingsMultiTextOption" onClick="onClickMultiOption" id="multiTextPrefab">
+                            <Text profile="fs25_multiTextOptionTooltip" name="ignore" />
+                        </MultiTextOption>
+                        <Text profile="fs25_settingsMultiTextOptionTitle" />
+                    </Bitmap>
+                </ScrollingLayout>
+                <Bitmap profile="fs25_settingsTooltipSeparator" id="settingsTooltipSeparator"/>
+                <ThreePartBitmap profile="ads_menuSettingsDockedSliderBg" id="settingsSliderBox">
+                    <ThreePartBitmap profile="ads_menuDockedSliderBox">
+                        <Slider profile="ads_menuDockedSlider" id="settingsSlider" dataElementId="settingsLayout"/>
+                    </ThreePartBitmap>
+                </ThreePartBitmap>
+            </GuiElement>
+            <GuiElement profile="ads_menuTableContainer">
+                <Text profile="ads_textHeaderGrey" id="noPermissionText" text="$l10n_ads_settings_admin_required" position="0px 180px" size="100% 50px" visible="false" with="anchorMiddleCenter"/>
             </GuiElement>
         </GuiElement>
 

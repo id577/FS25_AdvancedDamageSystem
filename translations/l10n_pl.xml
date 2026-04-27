@@ -1,7 +1,7 @@
 <l10n>
     <texts>
         <text name="ads_settings_title" text="ADS USTAWIENIA"/>
-        <text name="ADS_SETTINGS_TITLE" text="Advanced Damage System"/>
+        <text name="ads_settings_admin_required" text="ADS settings require administrator permissions in multiplayer."/>
         <text name="ads_maintenancePrice_label" text="Mnożnik kosztów utrzymania"/>
         <text name="ads_maintenancePrice_tooltip" text="Dostosuj koszt wszystkich usług warsztatowych, w tym przeglądów, napraw i remontów. Wyższa wartość sprawia, że wszystkie czynności związane z utrzymaniem stają się droższe."/>
         <text name="ads_maintenanceDuration_label" text="Współczynnik czasu trwania konserwacji"/>
@@ -14,9 +14,22 @@
         <text name="ads_engineMaxHeat_tooltip" text="Bazowe tempo generowania ciepła przez silnik przy maksymalnym obciążeniu. Wyższe wartości powodują szybsze nagrzewanie się silnika."/>
         <text name="ads_cloggingSpeed_label" text="Szybkość zapychania się"/>
         <text name="ads_cloggingSpeed_tooltip" text="Dostosuj, jak szybko chłodnica i dolot powietrza zapychają się podczas pracy w kurzu, plewach i resztkach roślinnych. Wyższe wartości powodują szybsze narastanie zanieczyszczeń. Przy 100% tempo zapychania wynosi około jednej trzeciej interwału serwisowego."/>
+        <text name="ads_fieldInspectionDuration_label" text="Inspection Duration"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Sets how long a pre-shift field inspection takes, in real seconds."/>
+        <text name="ads_lubricationReducePerDay_label" text="Lubrication Drying Rate"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Sets how much lubrication dries out over one in-game day. At 0%, lubrication does not dry out over time."/>
         <text name="ads_ws_header_title" text="Warsztat"/>
-        <text name="ads_workshopAvailable_label" text="Warsztat otwarty 24/7"/>
-        <text name="ads_workshopAvailable_tooltip" text="Włącz lub wyłącz działanie warsztatu 24/7 (całą dobę)."/>
+        <text name="ads_settings_section_service_wear" text="Service and Wear"/>
+        <text name="ads_settings_section_thermal_model" text="Thermal Model"/>
+        <text name="ads_settings_section_battery_alternator" text="Battery and Alternator"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Pre-shift Maintenance"/>
+        <text name="ads_settings_section_other" text="Other"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Dealer Workshop 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Keeps the dealer workshop available at any time of day."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Mobile Workshop 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Keeps the mobile workshop available at any time of day."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Owned Workshop 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Keeps your owned workshop available at any time of day."/>
         <text name="ads_instantInspection_label" text="Natychmiastowy przegląd"/>
         <text name="ads_instantInspection_tooltip" text="Gdy włączysz, wszystkie przeglądy są one wykonywane natychmiast (bez upływu czasu). Uwaga: opcja „wizualnego” przeglądu stanie się niedostępna."/>
         <text name="ads_parkVehicle_label" text="Odstaw pojazd na czas konserwacji"/>
@@ -38,6 +51,7 @@
         <text name="ads_batteryCapacity_label" text="Pojemność akumulatora"/>
         <text name="ads_thermalSensitivity_label" text="Czułość na temperaturę"/>
         <text name="ads_option_off" text="Wyłącz"/>
+        <text name="ads_option_none" text="None"/>
         <text name="ads_serviceInterval_tooltip" text="Ustaw bazowy interwał serwisowy w godzinach, po którym wymagane jest wykonanie konserwacji. Rzeczywisty interwał może się różnić w zależności od marki pojazdu, jego wieku oraz jakości poprzednich przeglądów."/>
         <text name="ads_vehicleLifespan_tooltip" text="Ustaw bazową żywotność pojazdu w godzinach, po której jego stan techniczny osiągnie 0%. Im bliżej zera znajduje się stan pojazdu, tym staje się on bardziej zawodny."/>
         <text name="ads_downtimeWear_tooltip" text="Ustaw tempo pasywnego zużycia pojazdu podczas jego bezczynności jako procent bazowego tempa zużycia (żywotności pojazdu). Na przykład 5% przy domyślnej żywotności 100 godzin oznacza, że każdy system traci około 1% stanu technicznego po około 20 godzinach bezczynności. Uwaga: zużycie pasywne jest wyłączone, gdy pojazd jest przechowywany pod zadaszeniem."/>
@@ -45,7 +59,17 @@
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Gdy jest włączone, dostępność różnych procedur w mobilnym warsztacie zależy od możliwości serwisowych pojazdu."/>
         <text name="ads_systemStressRate_tooltip" text="Kontroluj, jak szybko w systemach narasta obciążenie wynikające z przeciążenia, przegrzania, poślizgu kół oraz innych trudnych warunków pracy. Obciążenie bezpośrednio wpływa na prawdopodobieństwo awarii: im więcej stresu gromadzi dany system, tym większe jest ryzyko jego uszkodzenia."/>
         <text name="ads_batteryCapacity_tooltip" text="Dostosuj maksymalną użyteczną pojemność akumulatora. Wartości bliskie 150 Ah są bardziej realistyczne, jednak przy takim poziomie problemy z rozładowaniem akumulatora mogą występować bardzo rzadko."/>
+        <text name="ads_alternatorMaxOutput_label" text="Alternator Max Output"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Sets the maximum alternator output current. Higher values allow the alternator to recharge the battery faster."/>
+        <text name="ads_idleCurrent_label" text="Standby Current"/>
+        <text name="ads_idleCurrent_tooltip" text="Sets the battery drain current while the engine is stopped. For example, at 0.5 A a 15 Ah battery would take about 30 real hours to fully discharge, before temperature effects are applied."/>
         <text name="ads_thermalSensitivity_tooltip" text="Dostosuj zachowanie modelu termicznego. Wyższe ustawienia sprawiają, że silnik i skrzynia biegów są bardziej wrażliwe na obciążenie, temperaturę otoczenia oraz zabrudzenie chłodnicy — generując więcej ciepła w tych samych warunkach pracy."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Radiator Dirt Influence"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Reduces radiator cooling capacity by this percentage at maximum dirt buildup."/>
+        <text name="ads_warmingBoostPower_label" text="Warm-up Acceleration"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Artificially speeds up engine and transmission warm-up. Use Off for unmodified thermal behavior."/>
+        <text name="ads_coolingSlowdownPower_label" text="Cooling Slowdown"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Artificially slows engine and transmission cooling after the vehicle is shut down. Use Off for unmodified cooling."/>
         <text name="ads_thermal_none" text="Pasywny"/>
         <text name="ads_thermal_mild" text="Umiarkowany"/>
         <text name="ads_thermal_default" text="Domyślne"/>
@@ -654,6 +678,9 @@
         <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Krytyczne przeciążenie! Natychmiast zmniejsz obciążenie maszyny."/>
         <text name="ads_tutorialMode_label" text="Tryb samouczka"/>
         <text name="ads_tutorialMode_tooltip" text="Wyświetla wskazówki samouczka podczas gry. Wyłączone w trybie wieloosobowym."/>
+        <text name="ads_tutorialResetTips_label" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_text" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Reset tutorial tip history and show all tips again. Available only in singleplayer."/>
         <text name="ads_tutorialResetConfirm_title" text="Zresetować wskazówki samouczka?"/>
         <text name="ads_tutorialResetConfirm_message" text="Zresetować historię wskazówek samouczka i pokazać wszystkie ponownie?"/>
         <text name="ads_tutorial_welcome_dialog_title" text="Witamy w Advanced Damage System"/>

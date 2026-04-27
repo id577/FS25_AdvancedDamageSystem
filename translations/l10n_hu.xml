@@ -1,7 +1,7 @@
 <l10n>
     <texts>
         <text name="ads_settings_title" text="ADS BEÁLLÍTÁSOK"/>
-        <text name="ADS_SETTINGS_TITLE" text="Advanced Damage System"/>
+        <text name="ads_settings_admin_required" text="ADS settings require administrator permissions in multiplayer."/>
         <text name="ads_maintenancePrice_label" text="Karbantartási költség szorzó"/>
         <text name="ads_maintenancePrice_tooltip" text="Módosítja a műhelyszolgáltatások költségét, beleértve az átvizsgálásokat, javításokat és a generáljavításokat. A magasabb érték drágábbá teszi a szervizelést."/>
         <text name="ads_maintenanceDuration_label" text="Karbantartási idő szorzó"/>
@@ -14,9 +14,22 @@
         <text name="ads_engineMaxHeat_tooltip" text="A motor által maximális terhelés mellett generált alapvető hőmennyiség. A magasabb értékek gyorsabb melegedést okoznak."/>
         <text name="ads_cloggingSpeed_label" text="Eltömődési sebesség"/>
         <text name="ads_cloggingSpeed_tooltip" text="Beállítja, milyen gyorsan tömődik el a hűtő és a légbeszívó porban, pelyvában vagy terményben végzett munka során. 100%-nál az eltömődés nagyjából a szervizintervallum egyharmada alatt következik be."/>
+        <text name="ads_fieldInspectionDuration_label" text="Inspection Duration"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Sets how long a pre-shift field inspection takes, in real seconds."/>
+        <text name="ads_lubricationReducePerDay_label" text="Lubrication Drying Rate"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Sets how much lubrication dries out over one in-game day. At 0%, lubrication does not dry out over time."/>
         <text name="ads_ws_header_title" text="Műhely"/>
-        <text name="ads_workshopAvailable_label" text="24/7 nyitvatartás"/>
-        <text name="ads_workshopAvailable_tooltip" text="Engedélyezi vagy letiltja a műhely folyamatos, éjjel-nappali működését."/>
+        <text name="ads_settings_section_service_wear" text="Service and Wear"/>
+        <text name="ads_settings_section_thermal_model" text="Thermal Model"/>
+        <text name="ads_settings_section_battery_alternator" text="Battery and Alternator"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Pre-shift Maintenance"/>
+        <text name="ads_settings_section_other" text="Other"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Dealer Workshop 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Keeps the dealer workshop available at any time of day."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Mobile Workshop 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Keeps the mobile workshop available at any time of day."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Owned Workshop 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Keeps your owned workshop available at any time of day."/>
         <text name="ads_instantInspection_label" text="Azonnali átvizsgálás"/>
         <text name="ads_instantInspection_tooltip" text="Ha engedélyezve van, minden átvizsgálás azonnal befejeződik (nem telik az idő). Megjegyzés: a 'Szemrevételezés' opció ilyenkor nem elérhető."/>
         <text name="ads_parkVehicle_label" text="Jármű parkoltatása szerviz alatt"/>
@@ -38,6 +51,7 @@
         <text name="ads_batteryCapacity_label" text="Akkumulátor kapacitás"/>
         <text name="ads_thermalSensitivity_label" text="Hőérzékenység"/>
         <text name="ads_option_off" text="Ki"/>
+        <text name="ads_option_none" text="None"/>
         <text name="ads_serviceInterval_tooltip" text="Beállítja az alapvető szervizintervallumot üzemórában. A tényleges intervallum függ a márkától, a kortól és az előző karbantartás minőségétől."/>
         <text name="ads_vehicleLifespan_tooltip" text="Beállítja a jármű alapvető élettartamát üzemórában, amely után az állapota eléri a 0%-ot. Minél közelebb van ez az érték a nullához, annál megbízhatatlanabbá válik a gép."/>
         <text name="ads_downtimeWear_tooltip" text="Beállítja a használaton kívüli gép elhasználódási sebességét az alapérték százalékában. Például 5% esetén egy 100 órás élettartamú gép rendszerei kb. 20 óra állás után veszítenek 1% állapotot. Megjegyzés: fedél alatt tárolva ez a kopás szünetel."/>
@@ -45,7 +59,17 @@
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Ha engedélyezve van, a mobil műhelyben elvégezhető feladatok köre függ a jármű szerelhetőségétől."/>
         <text name="ads_systemStressRate_tooltip" text="Meghatározza, milyen gyorsan halmozódik fel a stressz a rendszerekben túlterhelés, túlmelegedés vagy kerékcsúszás során. A stressz közvetlenül növeli a meghibásodás esélyét."/>
         <text name="ads_batteryCapacity_tooltip" text="Beállítja a maximális használható akkumulátorkapacitást. A 150 Ah körüli értékek a legrealisztikusabbak."/>
+        <text name="ads_alternatorMaxOutput_label" text="Alternator Max Output"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Sets the maximum alternator output current. Higher values allow the alternator to recharge the battery faster."/>
+        <text name="ads_idleCurrent_label" text="Standby Current"/>
+        <text name="ads_idleCurrent_tooltip" text="Sets the battery drain current while the engine is stopped. For example, at 0.5 A a 15 Ah battery would take about 30 real hours to fully discharge, before temperature effects are applied."/>
         <text name="ads_thermalSensitivity_tooltip" text="Módosítja a hőmodell viselkedését. Magasabb beállításnál a motor és a váltó érzékenyebb lesz a terhelésre, a környezeti hőmérsékletre és a hűtő elkoszolódására."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Radiator Dirt Influence"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Reduces radiator cooling capacity by this percentage at maximum dirt buildup."/>
+        <text name="ads_warmingBoostPower_label" text="Warm-up Acceleration"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Artificially speeds up engine and transmission warm-up. Use Off for unmodified thermal behavior."/>
+        <text name="ads_coolingSlowdownPower_label" text="Cooling Slowdown"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Artificially slows engine and transmission cooling after the vehicle is shut down. Use Off for unmodified cooling."/>
         <text name="ads_thermal_none" text="Passzív"/>
         <text name="ads_thermal_mild" text="Enyhe"/>
         <text name="ads_thermal_default" text="Alapértelmezett"/>
@@ -654,6 +678,9 @@
         <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kritikus túlterhelés! Azonnal csökkentse a gép terhelését!"/>
         <text name="ads_tutorialMode_label" text="Oktató mód"/>
         <text name="ads_tutorialMode_tooltip" text="Oktató tippeket jelenít meg játék közben. Többjátékos módban le van tiltva."/>
+        <text name="ads_tutorialResetTips_label" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_text" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Reset tutorial tip history and show all tips again. Available only in singleplayer."/>
         <text name="ads_tutorialResetConfirm_title" text="Oktató tippek visszaállítása?"/>
         <text name="ads_tutorialResetConfirm_message" text="Visszaállítsa az oktató tippek előzményeit, és mutassa meg őket újra?"/>
         <text name="ads_tutorial_welcome_dialog_title" text="Üdvözöl az Advanced Damage System"/>

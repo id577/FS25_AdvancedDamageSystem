@@ -1,7 +1,7 @@
 <l10n>
     <texts>
         <text name="ads_settings_title" text="ADS CONFIGURAÇÕES"/>
-        <text name="ADS_SETTINGS_TITLE" text="Advanced Damage System"/>
+        <text name="ads_settings_admin_required" text="ADS settings require administrator permissions in multiplayer."/>
         <text name="ads_maintenancePrice_label" text="Multiplicador de preço da manutenção"/>
         <text name="ads_maintenancePrice_tooltip" text="Ajusta o custo de todos os serviços de oficina, incluindo inspeções, reparos e revisões. Um valor mais alto torna todas as atividades de manutenção mais caras."/>
         <text name="ads_maintenanceDuration_label" text="Multiplicador de duração da manutenção"/>
@@ -14,9 +14,22 @@
         <text name="ads_engineMaxHeat_tooltip" text="A taxa básica de calor gerada pelo motor em carga máxima. Valores mais elevados farão o motor aquecer mais rapidamente."/>
         <text name="ads_cloggingSpeed_label" text="Velocidade de entupimento"/>
         <text name="ads_cloggingSpeed_tooltip" text="Define a velocidade com que o radiador e a admissão de ar entopem ao trabalhar em poeira, palha fina e resíduos de colheita. Valores mais altos aceleram o entupimento. A 100%, a velocidade de entupimento corresponde a cerca de um terço do intervalo de manutenção."/>
+        <text name="ads_fieldInspectionDuration_label" text="Inspection Duration"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Sets how long a pre-shift field inspection takes, in real seconds."/>
+        <text name="ads_lubricationReducePerDay_label" text="Lubrication Drying Rate"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Sets how much lubrication dries out over one in-game day. At 0%, lubrication does not dry out over time."/>
         <text name="ads_ws_header_title" text="Oficina"/>
-        <text name="ads_workshopAvailable_label" text="Oficina aberta 24/7"/>
-        <text name="ads_workshopAvailable_tooltip" text="Ativa ou desativa a oficina 24 horas por dia, 7 dias por semana."/>
+        <text name="ads_settings_section_service_wear" text="Service and Wear"/>
+        <text name="ads_settings_section_thermal_model" text="Thermal Model"/>
+        <text name="ads_settings_section_battery_alternator" text="Battery and Alternator"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Pre-shift Maintenance"/>
+        <text name="ads_settings_section_other" text="Other"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Dealer Workshop 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Keeps the dealer workshop available at any time of day."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Mobile Workshop 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Keeps the mobile workshop available at any time of day."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Owned Workshop 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Keeps your owned workshop available at any time of day."/>
         <text name="ads_instantInspection_label" text="Inspeção instantânea"/>
         <text name="ads_instantInspection_tooltip" text="Quando ativada, todas as inspeções terminam instantaneamente (sem passar o tempo). Nota: a opção de inspeção 'Visual' fica indisponível."/>
         <text name="ads_parkVehicle_label" text="Estacionar o veículo durante a manutenção"/>
@@ -38,6 +51,7 @@
         <text name="ads_batteryCapacity_label" text="Capacidade da bateria"/>
         <text name="ads_thermalSensitivity_label" text="Sensibilidade térmica"/>
         <text name="ads_option_off" text="Desligado"/>
+        <text name="ads_option_none" text="None"/>
         <text name="ads_serviceInterval_tooltip" text="Define o intervalo de manutenção básico em horas, após o qual a manutenção é necessária. O intervalo real depende da marca do veículo, idade e qualidade das manutenções anteriores."/>
         <text name="ads_vehicleLifespan_tooltip" text="Define a vida útil básica do veículo em horas, após a qual seu estado atingirá 0%. Quanto mais próximo o estado estiver de zero, menos confiável o veículo se torna."/>
         <text name="ads_downtimeWear_tooltip" text="Define a velocidade de desgaste passivo quando um veículo fica parado, como porcentagem da taxa de desgaste básica (Vida útil do veículo). Por exemplo, 5% com a vida útil padrão de 100 horas significa que cada sistema perde cerca de 1% de estado após cerca de 20 horas parado. Nota: o desgaste passivo é desativado quando o veículo está armazenado em local coberto."/>
@@ -45,7 +59,17 @@
         <text name="ads_mobileWorkshopRestrictions_tooltip" text="Quando ativada, a disponibilidade das diferentes intervenções na oficina móvel depende da manutenibilidade do veículo."/>
         <text name="ads_systemStressRate_tooltip" text="Determina a velocidade com que o estresse se acumula nos sistemas sob efeito de sobrecarga, superaquecimento, patinação e outras condições severas de uso. O estresse influencia diretamente a probabilidade de falha: quanto mais estresse um sistema acumula, mais provável se torna uma falha."/>
         <text name="ads_batteryCapacity_tooltip" text="Ajusta a capacidade máxima utilizável da bateria. Valores próximos de 150 Ah são mais realistas, mas nesse nível você quase não encontrará problemas de descarga da bateria."/>
+        <text name="ads_alternatorMaxOutput_label" text="Alternator Max Output"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Sets the maximum alternator output current. Higher values allow the alternator to recharge the battery faster."/>
+        <text name="ads_idleCurrent_label" text="Standby Current"/>
+        <text name="ads_idleCurrent_tooltip" text="Sets the battery drain current while the engine is stopped. For example, at 0.5 A a 15 Ah battery would take about 30 real hours to fully discharge, before temperature effects are applied."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajusta o comportamento do modelo térmico. Configurações mais altas tornam o motor e a transmissão mais sensíveis à carga, temperatura ambiente e entupimento do radiador, gerando assim mais calor nas mesmas condições."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Radiator Dirt Influence"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Reduces radiator cooling capacity by this percentage at maximum dirt buildup."/>
+        <text name="ads_warmingBoostPower_label" text="Warm-up Acceleration"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Artificially speeds up engine and transmission warm-up. Use Off for unmodified thermal behavior."/>
+        <text name="ads_coolingSlowdownPower_label" text="Cooling Slowdown"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Artificially slows engine and transmission cooling after the vehicle is shut down. Use Off for unmodified cooling."/>
         <text name="ads_thermal_none" text="Passivo"/>
         <text name="ads_thermal_mild" text="Moderada"/>
         <text name="ads_thermal_default" text="Padrão"/>
@@ -646,6 +670,9 @@
         <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Sobrecarga crítica! Reduza a carga do veículo imediatamente."/>
         <text name="ads_tutorialMode_label" text="Modo tutorial"/>
         <text name="ads_tutorialMode_tooltip" text="Mostra dicas de tutorial durante o jogo. Desativado no multijogador."/>
+        <text name="ads_tutorialResetTips_label" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_text" text="Reset tips"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Reset tutorial tip history and show all tips again. Available only in singleplayer."/>
         <text name="ads_tutorialResetConfirm_title" text="Redefinir dicas do tutorial?"/>
         <text name="ads_tutorialResetConfirm_message" text="Redefinir o histórico das dicas do tutorial e mostrar todas novamente?"/>
         <text name="ads_tutorial_welcome_dialog_title" text="Bem-vindo ao Advanced Damage System"/>

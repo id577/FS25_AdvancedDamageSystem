@@ -2126,7 +2126,7 @@ function AdvancedDamageSystem:onPostLoad(savegame)
     spec.fieldInspection = spec.fieldInspection or {
         isActive = false,
         elapsedTime = 0,
-        duration = ADS_Config.FIELD_CARE.FIELD_INSPECTION_DURATION,
+        duration = ADS_Config.FIELD_CARE.VISUAL_INSPECTION_DURATION,
         startTime = 0,
         targetNode = nil,
         targetVehicle = nil,
@@ -5434,8 +5434,9 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
 
         -- lubrication
         if isTurnedOn and spec.isVehicleNeedLubricate then
-            local missedDays = (1 - spec.lubricationLevel) / ADS_Config.FIELD_CARE.LUBRICATION_REDUCE_PER_DAY
-            lubricationFactor = (C.LUBRICATION_FACTOR_MULTIPLIER or 0) * missedDays
+            local lubricationLevel = math.clamp(tonumber(spec.lubricationLevel) or 1.0, 0.0, 1.0)
+            lubricationFactor = ADS_Utils.calculateQuadraticMultiplier(lubricationLevel, 1.0, true, 0.0)
+            lubricationFactor = lubricationFactor * (C.LUBRICATION_FACTOR_MULTIPLIER or 0)
             wearRate = wearRate + lubricationFactor
         end
 
@@ -6755,12 +6756,18 @@ function AdvancedDamageSystem:initService(type, workshopType, optionOne, optionT
     local totalTimeMs = 0
     local repairPrice = nil
 
-    if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil and C.PARK_VEHICLE then
-        self.spec_enterable:setIsTabbable(false)
-    end
-
     if vehicleState ~= states.READY or (spec.maintenanceTimer or 0) ~= 0 then
         return
+    end
+
+    if ADS_Main ~= nil
+        and ADS_Main.isWorkshopTypeOpen ~= nil
+        and not ADS_Main:isWorkshopTypeOpen(workshopType) then
+        return
+    end
+
+    if self.spec_enterable ~= nil and self.spec_enterable.setIsTabbable ~= nil and C.PARK_VEHICLE then
+        self.spec_enterable:setIsTabbable(false)
     end
 
     if type == states.OVERHAUL
@@ -6933,10 +6940,11 @@ function AdvancedDamageSystem:processService(dt)
     local vehicleState = self:getCurrentStatus()
     local C = ADS_Config.MAINTENANCE
 
-    if vehicleState == states.READY 
-        or (spec.workshopType == AdvancedDamageSystem.WORKSHOP.DEALER and not ADS_Main.isWorkshopOpen)
-        or (spec.workshopType == AdvancedDamageSystem.WORKSHOP.OWN and not ADS_Main.isWorkshopOpen) then
-            return
+    if vehicleState == states.READY
+        or (ADS_Main ~= nil
+            and ADS_Main.isWorkshopTypeOpen ~= nil
+            and not ADS_Main:isWorkshopTypeOpen(spec.workshopType)) then
+        return
     end
 
     -- timer progress
@@ -7598,9 +7606,10 @@ local function calculateCurrentLoadAmps(vehicle, isMotorStarted, envTemp)
     if spec == nil then
         return
     end
+    local C = ADS_Config.ELECTRICAL or {}
 
    -- base load
-    local baseLoadA = isMotorStarted and 18 or 0.3
+    local baseLoadA = isMotorStarted and 18 or C.IDLE_CURRENT_A or 0.5
 
     -- cab fan
     local cabFanA = isMotorStarted and 12 or 0
@@ -8744,7 +8753,7 @@ function AdvancedDamageSystem:updateEngineThermalModel(dt, spec, isMotorStarted,
 
     if isMotorStarted then
         local engineMaxHeat = C.ENGINE_MAX_HEAT + spec.extraEngineHeat
-        local warmBoost = math.max(((C.WARMING_BOOST_THRESHOLD - spec.rawEngineTemperature) / (C.WARMING_BOOST_THRESHOLD / 2)) * C.WARMING_BOOST_POWER, 1.0)
+        local warmBoost = spec.rawEngineTemperature < ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD and C.WARMING_BOOST_POWER or 1.0
         heat = (C.ENGINE_MIN_HEAT + math.clamp(motorLoad, 0.1, 1.0) * (engineMaxHeat - C.ENGINE_MIN_HEAT)) * warmBoost
         
         local brokenFanModifier = 1.0
@@ -8837,14 +8846,14 @@ function AdvancedDamageSystem:updateTransmissionThermalModel(dt, spec, isMotorSt
         end
         
         local maxHeat = C.TRANS_MAX_HEAT + spec.extraTransmissionHeat
-        local warmBoost = math.max(((C.WARMING_BOOST_THRESHOLD - spec.rawTransmissionTemperature) / (C.WARMING_BOOST_THRESHOLD / 2)) * C.WARMING_BOOST_POWER, 1.0)
+        local warmBoost = spec.rawTransmissionTemperature < ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.COLD_TRANSMISSION_THRESHOLD and C.WARMING_BOOST_POWER or 1.0
         heat = C.TRANS_MIN_HEAT + (maxHeat - C.TRANS_MIN_HEAT) * loadFactor * slipFactor * accFactor * wheelSlipFactor * warmBoost
         local dirtRadiatorMaxCooling = C.TRANS_RADIATOR_MAX_COOLING * (1 - C.MAX_DIRT_INFLUENCE * (dirt ^ 3))
         
         radiatorCooling = math.max(dirtRadiatorMaxCooling * spec.transmissionThermostatState, C.TRANS_RADIATOR_MIN_COOLING) * (deltaTemp ^ C.DELTATEMP_FACTOR_DEGREE)
         cooling = (radiatorCooling +  convectionCooling) * (1 + speedCooling)
     else
-        if (spec.engineTemperature or -99) < C.TRANS_PID_TARGET_TEMP then
+        if (spec.rawTransmissionTemperature or -99) < C.TRANS_PID_TARGET_TEMP then
             cooling = convectionCooling / C.COOLING_SLOWDOWN_POWER
         else
             cooling = convectionCooling
@@ -9206,8 +9215,11 @@ function AdvancedDamageSystem:updateLubricationLevel(dt)
         return
     end
 
+    local lubricationReducePerDay = math.max(tonumber(C.LUBRICATION_REDUCE_PER_DAY) or 0, 0)
     if currentDay > spec.lastLubricationProcessedDay and not self:getIsMotorStarted() then
-        spec.lubricationLevel = math.max(spec.lubricationLevel - C.LUBRICATION_REDUCE_PER_DAY, 0)
+        if lubricationReducePerDay > 0 then
+            spec.lubricationLevel = math.max(spec.lubricationLevel - lubricationReducePerDay, 0)
+        end
         spec.lastLubricationProcessedDay = currentDay
     end
 end
@@ -9260,7 +9272,7 @@ function AdvancedDamageSystem:startFieldVisualInspectionProcess()
 
     inspection.isActive = true
     inspection.elapsedTime = 0
-    inspection.duration = 5000
+    inspection.duration = ADS_Config.FIELD_CARE.VISUAL_INSPECTION_DURATION
     inspection.startTime = g_time
     inspection.targetVehicle = self
     inspection.wasSoundStarted = false
@@ -9874,7 +9886,9 @@ function AdvancedDamageSystem:getServiceDuration(maintenanceType, optionOne, opt
 
     local totalElapsedHours
 
-    if workshopType == AdvancedDamageSystem.WORKSHOP.MOBILE or ADS_Config.WORKSHOP.ALWAYS_AVAILABLE then
+    if ADS_Main ~= nil
+        and ADS_Main.isWorkshopTypeAlwaysAvailable ~= nil
+        and ADS_Main:isWorkshopTypeAlwaysAvailable(workshopType) then
         totalElapsedHours = workDurationHours
     else
         local WORKSHOP_HOURS = ADS_Config.WORKSHOP
