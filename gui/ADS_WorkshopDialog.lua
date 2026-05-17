@@ -64,7 +64,7 @@ function ADS_WorkshopDialog:updateScreen()
     -- 1: Vehicle Info Panel
     -- ====================================================================
 
-    local balanceText = g_i18n:formatMoney(math.floor(g_currentMission:getMoney()), 2, true, true)
+    local balanceText = g_i18n:formatMoney(math.floor(g_currentMission:getMoney()), 2, true, false)
     self.balanceElement:setText(balanceText)
     ADS_Utils.updateMoneyBoxLayout(
         self.balanceTitleElement,
@@ -77,7 +77,7 @@ function ADS_WorkshopDialog:updateScreen()
     self.vehicleImage:setImageFilename(vehicle:getImageFilename())
     self.vehicleNameValue:setText(vehicle:getFullName())
     local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-    local currentValue = g_i18n:formatMoney(math.min(math.floor(vehicle:getSellPrice() * EconomyManager.DIRECT_SELL_MULTIPLIER), vehicle:getPrice()))
+    local currentValue = g_i18n:formatMoney(math.min(math.floor(vehicle:getSellPrice() * EconomyManager.DIRECT_SELL_MULTIPLIER), vehicle:getPrice()), 0, true, false)
     local newPrice = nil
     if storeItem ~= nil then
         newPrice = StoreItemUtil.getDefaultPrice(storeItem, vehicle.configurations)
@@ -86,7 +86,7 @@ function ADS_WorkshopDialog:updateScreen()
         end
     end
     if newPrice ~= nil and newPrice > 0 then
-        self.valueValue:setText(string.format("%s / %s", currentValue, g_i18n:formatMoney(newPrice)))
+        self.valueValue:setText(string.format("%s / %s", currentValue, g_i18n:formatMoney(newPrice, 0, true, false)))
     else
         self.valueValue:setText(currentValue)
     end
@@ -219,14 +219,14 @@ function ADS_WorkshopDialog:updateScreen()
     end
     
     local buttonFormat = g_i18n:getText("ads_ws_button_price_format")
-    self.inscpectionButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_inspection"), g_i18n:formatMoney(inspectionPrice)))
-    self.maintenanceButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_maintenance"), g_i18n:formatMoney(maintenancePrice)))
+    self.inscpectionButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_inspection"), g_i18n:formatMoney(inspectionPrice, 0, true, false)))
+    self.maintenanceButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_maintenance"), g_i18n:formatMoney(maintenancePrice, 0, true, false)))
     if self.vehicle:isWarrantyRepairCovered(AdvancedDamageSystem.REPAIR_TYPES.MEDIUM, AdvancedDamageSystem.PART_TYPES.OEM) and selectedRepairCount > 0 then
         self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:getText("ads_option_menu_warranty_repair_text")))
     else
-        self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:formatMoney(repairPrice)))
+        self.repairButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_repair"), g_i18n:formatMoney(repairPrice, 0, true, false)))
     end
-    self.overhaulButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_overhaul"), g_i18n:formatMoney(overhaulPrice)))
+    self.overhaulButton:setText(string.format(buttonFormat, g_i18n:getText("ads_ws_action_overhaul"), g_i18n:formatMoney(overhaulPrice, 0, true, false)))
 
     -- ====================================================================
     -- 5: Table Visibility
@@ -329,7 +329,7 @@ function ADS_WorkshopDialog:populateCellForItemInSection(list, section, index, c
     cell:getAttribute("ads_tableBreakdownName"):setText(g_i18n:getText(part_key))
     cell:getAttribute("ads_tableBreakdownDisc"):setText(descriptionText)
     cell:getAttribute("ads_tableBreakdownStage"):setText(stageText)
-    cell:getAttribute("ads_tableBreakdownPrice"):setText(g_i18n:formatMoney(price))
+    cell:getAttribute("ads_tableBreakdownPrice"):setText(g_i18n:formatMoney(price, 0, true, false))
     
     
     local selectedText = g_i18n:getText("ads_ws_option_no")

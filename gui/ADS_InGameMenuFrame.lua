@@ -83,6 +83,15 @@ local function getLocalizedStoreCategoryTitle(vehicle)
     return tostring(storeItem.categoryName or "")
 end
 
+local function getVehicleStoreImageFilename(vehicle)
+    if vehicle == nil or g_storeManager == nil or g_storeManager.getItemByXMLFilename == nil or vehicle.configFileName == nil then
+        return ""
+    end
+
+    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+    return storeItem and storeItem.imageFilename or ""
+end
+
 local function getVehicleOperatingHoursValue(vehicle)
     if vehicle == nil then
         return 0
@@ -113,7 +122,7 @@ local function buildVehicleRow(vehicle)
     )
     local isLeased = vehicle.propertyState == 3
     local leasingPriceValue = 0
-    local priceText = g_i18n:formatMoney(currentValue, 0, true, true)
+    local priceText = g_i18n:formatMoney(currentValue, 0, true, false)
     local priceValue = currentValue
     local lastInspectionDate = vehicle:getLastInspectionDate()
     local lastMaintenanceDate = vehicle:getLastMaintenanceDate()
@@ -140,6 +149,7 @@ local function buildVehicleRow(vehicle)
     return {
         vehicle = vehicle,
         vehicleName = vehicle:getFullName() or "",
+        vehicleIconFilename = getVehicleStoreImageFilename(vehicle),
         vehicleType = getLocalizedStoreCategoryTitle(vehicle),
         age = string.format("%d %s", vehicle.age or 0, g_i18n:getText("ads_ws_age_unit")),
         ageValue = vehicle.age or 0,
@@ -155,9 +165,9 @@ local function buildVehicleRow(vehicle)
         lastInspectionValue = getDateSortValue(lastInspectionDate),
         lastMaintenance = ADS_Utils.formatTimeAgo(lastMaintenanceDate),
         lastMaintenanceValue = getDateSortValue(lastMaintenanceDate),
-        cost = g_i18n:formatMoney(totalCost, 0, true, true),
+        cost = g_i18n:formatMoney(totalCost, 0, true, false),
         costValue = totalCost,
-        leasingPrice = leasingPriceValue > 0 and g_i18n:formatMoney(leasingPriceValue, 0, true, true) or "-",
+        leasingPrice = leasingPriceValue > 0 and g_i18n:formatMoney(leasingPriceValue, 0, true, false) or "-",
         leasingPriceValue = leasingPriceValue,
         price = priceText,
         priceValue = priceValue
@@ -184,7 +194,7 @@ local function buildServiceRow(vehicle)
     baseRow.procedure = currentState ~= nil and g_i18n:getText(currentState) or ""
     baseRow.remainingTime = ADS_Utils.formatDuration(duration)
     baseRow.finishTime = ADS_Utils.formatFinishTime(finishTime, daysToAdd)
-    baseRow.serviceCost = g_i18n:formatMoney(pendingServicePrice or 0, 0, true, true)
+    baseRow.serviceCost = g_i18n:formatMoney(pendingServicePrice or 0, 0, true, false)
     baseRow.serviceCostValue = pendingServicePrice or 0
 
     return baseRow
@@ -197,7 +207,7 @@ local function buildOtherVehicleRow(vehicle)
     )
     local isLeased = vehicle.propertyState == 3
     local leasingPriceValue = 0
-    local priceText = g_i18n:formatMoney(currentValue, 0, true, true)
+    local priceText = g_i18n:formatMoney(currentValue, 0, true, false)
     local priceValue = currentValue
     local operatingHours = getVehicleOperatingHoursValue(vehicle)
     local damageAmount = tonumber(vehicle.getDamageAmount ~= nil and vehicle:getDamageAmount() or vehicle.damageAmount or 0) or 0
@@ -214,6 +224,7 @@ local function buildOtherVehicleRow(vehicle)
     return {
         vehicle = vehicle,
         vehicleName = vehicle:getFullName() or "",
+        vehicleIconFilename = getVehicleStoreImageFilename(vehicle),
         vehicleType = getLocalizedStoreCategoryTitle(vehicle),
         age = string.format("%d %s", vehicle.age or 0, g_i18n:getText("ads_ws_age_unit")),
         ageValue = vehicle.age or 0,
@@ -231,7 +242,7 @@ local function buildOtherVehicleRow(vehicle)
         lastMaintenanceValue = -1,
         cost = "-",
         costValue = -1,
-        leasingPrice = leasingPriceValue > 0 and g_i18n:formatMoney(leasingPriceValue, 0, true, true) or "-",
+        leasingPrice = leasingPriceValue > 0 and g_i18n:formatMoney(leasingPriceValue, 0, true, false) or "-",
         leasingPriceValue = leasingPriceValue,
         price = priceText,
         priceValue = priceValue
@@ -307,21 +318,24 @@ function ADS_InGameMenuFrame:setTemplates()
 end
 
 function ADS_InGameMenuFrame:updateBalanceDisplay()
-    if self.balanceElement == nil or self.balanceTitleElement == nil or self.moneyBox == nil or self.moneyBoxBg == nil then
+    if self.balanceElement == nil then
         return
     end
 
-    local balanceText = g_i18n:formatMoney(math.floor(g_currentMission:getMoney()), 2, true, true)
+    local money = g_currentMission ~= nil and g_currentMission:getMoney() or 0
+    if money <= -1 then
+        self.balanceElement:applyProfile(ShopMenu.GUI_PROFILE.SHOP_MONEY_NEGATIVE, nil, true)
+    else
+        self.balanceElement:applyProfile(ShopMenu.GUI_PROFILE.SHOP_MONEY, nil, true)
+    end
+
+    local balanceText = g_i18n:formatMoney(money, 0, true, false)
     self.balanceElement:setText(balanceText)
 
-    ADS_Utils.updateMoneyBoxLayout(
-        self.balanceTitleElement,
-        self.balanceElement,
-        self.moneyBox,
-        self.moneyBoxBg,
-        g_i18n:getText("ui_balance"),
-        balanceText
-    )
+    if self.moneyBox ~= nil and self.moneyBoxBg ~= nil then
+        self.moneyBox:invalidateLayout()
+        self.moneyBoxBg:setSize(self.moneyBox.flowSizes[1] + 60 * g_pixelSizeScaledX)
+    end
 end
 
 function ADS_InGameMenuFrame:initialize()
@@ -1033,6 +1047,17 @@ function ADS_InGameMenuFrame:populateCellForItemInSection(_list, _section, index
     local serviceCostText = cell:getAttribute("serviceCostText")
     local conditionColor = row.conditionColor or {1, 1, 1, 1}
     local intervalColor = row.intervalColor or {1, 1, 1, 1}
+    local vehicleIcon = cell:getDescendantByName("vehicleIcon")
+
+    if vehicleIcon ~= nil then
+        local iconFilename = row.vehicleIconFilename or ""
+        if iconFilename ~= "" then
+            vehicleIcon:setImageFilename(iconFilename)
+            vehicleIcon:setVisible(true)
+        else
+            vehicleIcon:setVisible(false)
+        end
+    end
 
     if vehicleNameText ~= nil then
         vehicleNameText:setText(row.vehicleName or "")

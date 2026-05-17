@@ -192,7 +192,7 @@ function ADS_MaintenanceTwoOptionsDialog:updateScreen()
 
     -- price, duration, finishtime
     local workshopType = ADS_WorkshopDialog.INSTANCE ~= nil and ADS_WorkshopDialog.INSTANCE.workshopType or spec.workshopType
-    local priceValue = g_i18n:formatMoney(self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType))
+    local priceValue = g_i18n:formatMoney(self.vehicle:getServicePrice(self.maintenanceType, self.selectedOptionOne, self.selectedOptionTwo, self.selectedOptionThree, workshopType), 0, true, false)
     local durationValue = ""
     if ADS_Config.MAINTENANCE.INSTANT_INSPECTION and  self.maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
         durationValue = g_i18n:getText("ads_option_menu_duration_instant")

@@ -12,7 +12,7 @@ end
 local function formatSignedMoney(value)
     local amount = tonumber(value) or 0
     local sign = amount > 0 and "+" or amount < 0 and "-" or ""
-    return string.format("%s%s", sign, g_i18n:formatMoney(math.abs(amount), 0, true, true))
+    return string.format("%s%s", sign, g_i18n:formatMoney(math.abs(amount), 0, true, false))
 end
 
 local function applyMoneyColor(element, value)

@@ -366,7 +366,7 @@ function ADS_ReportDialog:updateScreen()
     self.breakdownsData = {}
     self.recommendationsData = {}
 
-    local balanceText = g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true)
+    local balanceText = g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, false)
     self.balanceElement:setText(balanceText)
     ADS_Utils.updateMoneyBoxLayout(
         self.balanceTitleElement,

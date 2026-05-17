@@ -802,8 +802,8 @@ function ADS_Hud:storeScaledValues()
     self.tsTempText.offsetX, self.tsTempText.offsetY = self:scalePixelValuesToScreenVector(38, 3)
 	self.tsTempText.size = self:scalePixelToScreenHeight(8)
 
-    self.fuelConsoText.offsetX, self.fuelConsoText.offsetY = self:scalePixelValuesToScreenVector(8, 4)
-    self.fuelConsoText.size = self:scalePixelToScreenHeight(13)
+    self.fuelConsoText.offsetX, self.fuelConsoText.offsetY = self:scalePixelValuesToScreenVector(8, 1)
+    self.fuelConsoText.size = self:scalePixelToScreenHeight(10)
 end
 
 function ADS_Hud:drawDashboard()

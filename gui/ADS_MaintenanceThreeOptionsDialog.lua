@@ -332,7 +332,7 @@ function ADS_MaintenanceThreeOptionsDialog:updateScreen()
     if isWarrantyRepair then
         priceValue = g_i18n:getText("ads_option_menu_warranty_repair_text")
     else
-        priceValue = g_i18n:formatMoney(servicePrice)
+        priceValue = g_i18n:formatMoney(servicePrice, 0, true, false)
     end
     local durationValue = ADS_Utils.formatDuration(self.vehicle:getServiceDuration(self.maintenanceType, self.selectedOptionOne, effectiveOptionTwo, self.selectedOptionThree, workshopType))
     local finishTimeValue = ADS_Utils.formatFinishTime(self.vehicle:getServiceFinishTime(self.maintenanceType, self.selectedOptionOne, effectiveOptionTwo, self.selectedOptionThree, workshopType))

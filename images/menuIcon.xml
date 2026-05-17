@@ -2,9 +2,9 @@
 <texture>
     <meta>
         <filename>menuIcon.dds</filename>
-        <size width="1024" height="1024" />
+        <size width="256" height="256" />
     </meta>
     <slices>
-        <slice id="menuIcon" uvs="0px 0px 1024px 1024px" />
+        <slice id="menuIcon" uvs="0px 0px 256px 256px" />
     </slices>
 </texture>

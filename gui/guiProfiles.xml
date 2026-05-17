@@ -7,6 +7,11 @@
         <Preset name="colorBalanceGreen" value="0.659 0.847 0.286 1"/>
     </Presets>
 
+    <!-- Header icon -->
+    <Profile name="ads_menuHeaderIcon" extends="fs25_menuHeaderIcon">
+        <imageSliceId value="ads_MenuIcon.menuIcon"/>
+    </Profile>
+
     <!-- Shared dialog backgrounds and blockers -->
     <Profile name="ads_dialogScreenBlocker" extends="baseReference" with="anchorStretchingYStretchingX pivotTopCenter">
         <size value="100% 100%"/>
@@ -406,6 +411,9 @@
         <textAlignment value="left"/>
         <textOffset value="10px 0px"/>
     </Profile>
+    <Profile name="ads_menuHeaderButtonVehicle" extends="ads_menuHeaderButtonFirst">
+        <textOffset value="56px 0px"/>
+    </Profile>
     <Profile name="ads_menuHeaderButtonCenter" extends="ads_menuHeaderButtonLeft">
         <textAutoWidth value="false"/>
         <textAlignment value="center"/>
@@ -423,6 +431,7 @@
     <Profile name="ads_menuVehicleList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
         <position value="0px -34px"/>
         <absoluteSizeOffset value="0px 20px"/>
+        <listItemSpacing value="-1px"/>
     </Profile>
     <Profile name="ads_menuTableListItemAlt" extends="fs25_calendarListItem" with="anchorTopStretchingX alternating">
         <height value="40.77px"/>
@@ -435,6 +444,12 @@
         <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
         <startImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
         <endImageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
+    <Profile name="ads_menuVehicleIcon" extends="emptyPanel" with="anchorTopLeft">
+        <position value="20px 7px"/>
+        <size value="46px 46px"/>
+        <imageColor value="1 1 1 1"/>
+        <imageSelectedColor value="1 1 1 1"/>
     </Profile>
     <Profile name="ads_menuTableRowCellLeftAlt" extends="baseReference" with="anchorStretchingYLeft">
         <textBold value="false"/>

@@ -137,7 +137,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
     self.logDataAll = spec.maintenanceLog or {}
     self:rebuildVisibleLogData()
 
-    local balanceText = g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, true)
+    local balanceText = g_i18n:formatMoney(g_currentMission:getMoney(), 0, true, false)
     self.balanceElement:setText(balanceText)
     ADS_Utils.updateMoneyBoxLayout(
         self.balanceTitleElement,
@@ -162,7 +162,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
         end
     end
 
-    self.totalCostValue:setText(g_i18n:formatMoney(totalCost, 0, true, true))
+    self.totalCostValue:setText(g_i18n:formatMoney(totalCost, 0, true, false))
 
     local currentYear = g_currentMission.environment.currentYear
     local currentMonth = g_currentMission.environment.currentPeriod
@@ -175,7 +175,7 @@ function ADS_MaintenanceLogDialog:updateScreen()
     local avgBreakdownInterval = totalBreakdowns > 0 and math.max(((self.vehicle:getFormattedOperatingTime() - (purchaseHours or 0)) / totalBreakdowns), 0) or 0
     local averageMaintenanceInterval = 0
 
-    self.costPerMonthValue:setText(g_i18n:formatMoney(costPerMonth, 0, true, true) .. " / " .. g_i18n:getText("ads_ws_age_unit"))
+    self.costPerMonthValue:setText(g_i18n:formatMoney(costPerMonth, 0, true, false) .. " / " .. g_i18n:getText("ads_ws_age_unit"))
     self.ownershipMonthsValue:setText(tostring(age) .. " " .. g_i18n:getText("ads_ws_age_unit"))
     self.totalBreakdownsCountValue:setText(string.format("%d", totalBreakdowns))
     if totalBreakdowns > 0 then
@@ -350,7 +350,7 @@ function ADS_MaintenanceLogDialog:populateCellForItemInSection(list, section, in
 
     cell:getAttribute("logDescription"):setText(descText)
     
-    cell:getAttribute("logPrice"):setText(g_i18n:formatMoney(entry.price or 0, 0, true, true))
+    cell:getAttribute("logPrice"):setText(g_i18n:formatMoney(entry.price or 0, 0, true, false))
     color = {0.88, 0.12, 0.12, 1}
     cell:getAttribute("logPrice"):setTextColor(unpack(color))
 end

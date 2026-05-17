@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="106">
+<modDesc descVersion="108">
     <author>id577, Squallqt</author>
     <version>0.9.2.4</version>
     <title>
         <en>Advanced Damage System</en>
-        <es>Sistema Avanzado De DaГ±os</es>
-		<pl>Zaawansowany system obraЕјeЕ„</pl>
         <de>Erweitertes Schadenssystem</de>
-        <fr>SystГЁme AvancГ© De DГ©gГўts</fr>
-        <it>Sistema Avanzato Di Danni</it>
-        <ru>РџСЂРѕРґРІРёРЅСѓС‚Р°СЏ РЎРёСЃС‚РµРјР° РџРѕРІСЂРµР¶РґРµРЅРёР№</ru>
+        <fr>Système Avancé De Dégâts</fr>
     </title>
     <description>
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
@@ -98,192 +94,176 @@ Changelog 0.9.0.0:
 - Changed the hard engine start logic: the starter must now be held to crank the engine
 - Numerous minor balance and interface improvements]]></en>
 
-        <es><![CDATA[Advanced Damage System aГ±ade a Farming Simulator 25 un sistema profundo de desgaste, averГ­as, diagnГіstico, mantenimiento y reparaciГіn de vehГ­culos. En lugar de depender de un Гєnico valor genГ©rico de estado, cada mГЎquina se compone de varios sistemas individuales con su propia condiciГіn, factores de desgaste, acumulaciГіn de estrГ©s y riesgo de fallo. El comportamiento del vehГ­culo y la naturaleza de las averГ­as dependen de las condiciones de trabajo, la carga, la temperatura y la calidad del mantenimiento.
+        <de><![CDATA[Advanced Damage System fügt Farming Simulator 25 ein tiefgehendes System für Verschleiß, Ausfälle, Diagnose, Wartung und Reparatur von Fahrzeugen hinzu. Anstelle eines einzigen allgemeinen Zustandswerts besteht jede Maschine aus mehreren einzelnen Systemen mit eigenem Zustand, eigenen Verschleißfaktoren, Stressaufbau und Ausfallrisiko. Fahrverhalten und Art der Defekte hängen von Einsatzbedingungen, Belastung, Temperatur und Wartungsqualität ab.
 
-El mod incluye un modelo tГ©rmico para los sistemas principales, una simulaciГіn avanzada de baterГ­a y alternador, una lГіgica de averГ­as realista, flujos de trabajo ampliados en el taller, informes de servicio, historial de mantenimiento e inspecciones previas al turno. Como resultado, la gestiГіn de los vehГ­culos se convierte en una parte estratГ©gica de la jugabilidad: el mantenimiento lleva tiempo, el uso incorrecto aumenta el riesgo de fallos y descuidar el estado de la maquinaria puede interrumpir trabajos de campo importantes. Un agricultor responsable que cuide su equipo, lo mantenga a tiempo y evite abusos innecesarios mantendrГЎ una flota fiable y evitarГЎ problemas graves durante la temporada.]]></es>
-
-         <pl><![CDATA[Advanced Damage System dodaje do gry Farming Simulator 25 rozbudowany system zuЕјycia pojazdГіw, awarii, diagnostyki, konserwacji i napraw. Zamiast polegaД‡ na jednej, ogГіlnej wartoЕ›ci stanu, kaЕјda maszyna jest zbudowana wokГіЕ‚ wielu indywidualnych systemГіw, posiadajД…cych wЕ‚asny stan, czynniki zuЕјycia, akumulacjД™ naprД™ЕјeЕ„ i ryzyko awarii. Zachowanie pojazdu i charakter usterek zaleЕјД… od warunkГіw eksploatacji, obciД…Ејenia, temperatury i jakoЕ›ci serwisu.
-
-Modyfikacja zawiera model temperatury kluczowych systemГіw, zaawansowanД… symulacjД™ akumulatora i alternatora, realistycznД… logikД™ awarii, rozszerzone przepЕ‚ywy pracy w warsztacie, raporty serwisowe, historiД™ konserwacji oraz inspekcje przedrozruchowe. W rezultacie zarzД…dzanie pojazdami staje siД™ strategicznД… czД™Е›ciД… rozgrywki: serwis zajmuje czas, zЕ‚e uЕјytkowanie zwiД™ksza ryzyko awarii, a zaniedbanie stanu maszyny moЕјe zakЕ‚ГіciД‡ krytyczne prace polowe. Odpowiedzialny rolnik, ktГіry dba o sprzД™t, serwisuje go na czas i unika niepotrzebnego naduЕјywania, utrzyma flotД™ w niezawodnym stanie i uniknie powaЕјnych problemГіw w trakcie sezonu.]]></pl>
-
-        <de><![CDATA[Advanced Damage System fГјgt Farming Simulator 25 ein tiefgehendes System fГјr VerschleiГџ, AusfГ¤lle, Diagnose, Wartung und Reparatur von Fahrzeugen hinzu. Anstelle eines einzigen allgemeinen Zustandswerts besteht jede Maschine aus mehreren einzelnen Systemen mit eigenem Zustand, eigenen VerschleiГџfaktoren, Stressaufbau und Ausfallrisiko. Fahrverhalten und Art der Defekte hГ¤ngen von Einsatzbedingungen, Belastung, Temperatur und WartungsqualitГ¤t ab.
-
-Der Mod umfasst ein Temperaturmodell fГјr wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte WerkstattablГ¤ufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhГ¶ht das Ausfallrisiko, und vernachlГ¤ssigter Maschinenzustand kann wichtige Feldarbeiten gefГ¤hrden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnГ¶tige Гњberlastung vermeidet, hГ¤lt seinen Fuhrpark zuverlГ¤ssig und vermeidet ernsthafte Probleme in der Saison.
+Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
 Changelog 0.9.2.4:
-- Die ADS-Einstellungen wurden erneut verschoben; sie befinden sich jetzt neben dem ADS-Fleet-Management-MenГј
-- Die Liste der verfГјgbaren Optionen in den Einstellungen wurde deutlich erweitert
-- Mehrere neue Tutorial-Hinweise wurden hinzugefГјgt
+- Die ADS-Einstellungen wurden erneut verschoben; sie befinden sich jetzt neben dem ADS-Fleet-Management-Menü
+- Die Liste der verfügbaren Optionen in den Einstellungen wurde deutlich erweitert
+- Mehrere neue Tutorial-Hinweise wurden hinzugefügt
 
 Changelog 0.9.2.3:
-- Die ADS-Einstellungen wurden in einen eigenen Tab verschoben, damit kГјnftig mehr Einstellungen hinzugefГјgt werden kГ¶nnen, ohne den Bereich Game Settings zu Гјberladen
-- Behoben: Die ADS-Spezialisierung wurde fГ¤lschlicherweise auf conveyorBelt angewendet
-- Ein Fehler wurde behoben, durch den die Fahrtrichtung beim DrГјcken der Leertaste nicht geГ¤ndert werden konnte
+- Die ADS-Einstellungen wurden in einen eigenen Tab verschoben, damit künftig mehr Einstellungen hinzugefügt werden können, ohne den Bereich Game Settings zu überladen
+- Behoben: Die ADS-Spezialisierung wurde fälschlicherweise auf conveyorBelt angewendet
+- Ein Fehler wurde behoben, durch den die Fahrtrichtung beim Drücken der Leertaste nicht geändert werden konnte
 - Ein Fehler wurde behoben, durch den der letzte Bericht nach einer Inspektion nicht angezeigt werden konnte
-- Der Konsolenbefehl ads_setOpertaingTime zum Setzen der Betriebsstunden wurde hinzugefГјgt, da Easy Development Controls die Betriebsstunden fГјr ADS-Fahrzeuge nicht setzen kann
+- Der Konsolenbefehl ads_setOpertaingTime zum Setzen der Betriebsstunden wurde hinzugefügt, da Easy Development Controls die Betriebsstunden für ADS-Fahrzeuge nicht setzen kann
 
 Changelog 0.9.2.2:
-- Es wurden optionale Tutorial-Hinweise hinzugefГјgt, die helfen, die Mechaniken des Mods zu verstehen und den Spieler warnen, wenn etwas falsch gemacht wird. Nur im Einzelspieler
-- Ungarische und portugiesische Гњbersetzungen hinzugefГјgt
+- Es wurden optionale Tutorial-Hinweise hinzugefügt, die helfen, die Mechaniken des Mods zu verstehen und den Spieler warnen, wenn etwas falsch gemacht wird. Nur im Einzelspieler
+- Ungarische und portugiesische Übersetzungen hinzugefügt
 
 Changelog 0.9.2.1:
-- Das ADS-Fleet-Management-MenГј wurde Гјberarbeitet: Neue Tabs fГјr Fahrzeuge im Service und Fahrzeuge ohne ADS machen es zu einer zentralen FlottenГјbersicht
-- KompatibilitГ¤t mit In-Game Time Operating Hours hinzugefГјgt; Serviceintervalle skalieren nun dynamisch mit der Zeitbeschleunigung
-- Eine Endlosschleife wurde behoben, wenn kein passender Defekt zum HinzufГјgen verfГјgbar war
+- Das ADS-Fleet-Management-Menü wurde überarbeitet: Neue Tabs für Fahrzeuge im Service und Fahrzeuge ohne ADS machen es zu einer zentralen Flottenübersicht
+- Kompatibilität mit In-Game Time Operating Hours hinzugefügt; Serviceintervalle skalieren nun dynamisch mit der Zeitbeschleunigung
+- Eine Endlosschleife wurde behoben, wenn kein passender Defekt zum Hinzufügen verfügbar war
 - Behoben: Einige Mod-Fahrzeuge wurden im Leerlauf nicht warm
-- Behoben: MГ¤hdrescher erhielten wegen falscher Erkennung des Zapfwellenwinkels zu viel Hydraulikstress
-- Behoben: Mobile und eigene WerkstГ¤tten nutzen keine Arbeitszeiten mehr und sind im Gegensatz zum HГ¤ndler rund um die Uhr verfГјgbar
-- Die Anzeige fГјr ГјberfГ¤llige Serviceintervalle wurde fГјr die KompatibilitГ¤t mit Enhanced Vehicle verschoben
+- Behoben: Mähdrescher erhielten wegen falscher Erkennung des Zapfwellenwinkels zu viel Hydraulikstress
+- Behoben: Mobile und eigene Werkstätten nutzen keine Arbeitszeiten mehr und sind im Gegensatz zum Händler rund um die Uhr verfügbar
+- Die Anzeige für überfällige Serviceintervalle wurde für die Kompatibilität mit Enhanced Vehicle verschoben
 
 Changelog 0.9.2.0:
-- Die VerschleiГџfaktoren der Systeme wurden neu ausbalanciert
-- вЂћSchnelle InspektionвЂњ beendet eine laufende Inspektion jetzt sofort
-- вЂћFahrzeuge parkenвЂњ wirkt jetzt sofort auf Fahrzeuge, die sich bereits in einem Servicevorgang befinden
-- Warnungen bei kaltem oder Гјberhitztem Motor/Getriebe erscheinen jetzt nur noch einmal statt sich stГ¤ndig zu wiederholen
-- Fahrzeuge warnen nun Гјber Anzeigen im Armaturenbrett bei extremer Belastung
-- Die Logik der Armaturenbrettanzeigen wurde Гјberarbeitet und um einen Aktivierungston ergГ¤nzt
-- Es wurde eine Option zum Deaktivieren aller Warnmeldungen hinzugefГјgt
+- Die Verschleißfaktoren der Systeme wurden neu ausbalanciert
+- „Schnelle Inspektion“ beendet eine laufende Inspektion jetzt sofort
+- „Fahrzeuge parken“ wirkt jetzt sofort auf Fahrzeuge, die sich bereits in einem Servicevorgang befinden
+- Warnungen bei kaltem oder überhitztem Motor/Getriebe erscheinen jetzt nur noch einmal statt sich ständig zu wiederholen
+- Fahrzeuge warnen nun über Anzeigen im Armaturenbrett bei extremer Belastung
+- Die Logik der Armaturenbrettanzeigen wurde überarbeitet und um einen Aktivierungston ergänzt
+- Es wurde eine Option zum Deaktivieren aller Warnmeldungen hinzugefügt
 - Die Synchronisierung von Motor- und CVT-Temperatur im Mehrspielermodus bei abgestelltem Motor wurde behoben
-- Ein Fehler wurde behoben, durch den Г„nderungen der BatteriekapazitГ¤t eine Massenentladung aller Batterien auslГ¶sen konnten
-- Die ZГ¤hlung behobener Defekte im maintenance log wurde korrigiert
-- Ungeplante Lackierung und Lackierkosten bei verketteten ServicevorgГ¤ngen wurden behoben
+- Ein Fehler wurde behoben, durch den Änderungen der Batteriekapazität eine Massenentladung aller Batterien auslösen konnten
+- Die Zählung behobener Defekte im maintenance log wurde korrigiert
+- Ungeplante Lackierung und Lackierkosten bei verketteten Servicevorgängen wurden behoben
 - Es wurde behoben, dass AutoDrive-KI kritische Defekte ignoriert
 - Kleinere UI-Verbesserungen
 
 Changelog 0.9.1.2:
-- KompatibilitГ¤t mit CVT Addon hinzugefГјgt
-- Die Einstellbereiche fГјr Serviceintervall und Fahrzeuglebensdauer im Spiel wurden erweitert
-- Die Progression von Pannen und anderen zeitbasierten Mechaniken wurde an benutzerdefinierte Serviceintervalle und verlГ¤ngerte Fahrzeuglebensdauer angepasst
+- Kompatibilität mit CVT Addon hinzugefügt
+- Die Einstellbereiche für Serviceintervall und Fahrzeuglebensdauer im Spiel wurden erweitert
+- Die Progression von Pannen und anderen zeitbasierten Mechaniken wurde an benutzerdefinierte Serviceintervalle und verlängerte Fahrzeuglebensdauer angepasst
 - Die Synchronisierung der Betriebsstunden im Mehrspielermodus wurde behoben
 - Die Berechnung des Fortschritts des Serviceintervalls bei der Fahrzeuginitialisierung wurde behoben
-- Polnische und spanische Гњbersetzungen hinzugefГјgt
+- Polnische und spanische Übersetzungen hinzugefügt
 - Kleinere UI-Verbesserungen
 
 Changelog 0.9.1.1:
-- Interaktions- und Verbindungsdistanzen fГјr Starthilfekabel wurden erhГ¶ht
-- Ein Filter fГјr SystemverschleiГџ und Stressaufbau wurde implementiert, der anhaltend hohe Faktoren dГ¤mpft, wГ¤hrend kurze Impulse weiterhin durchgelassen werden
-- Neue Konfigurationsoptionen wurden hinzugefГјgt und die Einstellbereiche bestehender Optionen erweitert
-- Multiplikatoren fГјr VerschleiГџfaktoren wurden neu ausbalanciert und fГјr ein besseres Gameplay insgesamt reduziert
+- Interaktions- und Verbindungsdistanzen für Starthilfekabel wurden erhöht
+- Ein Filter für Systemverschleiß und Stressaufbau wurde implementiert, der anhaltend hohe Faktoren dämpft, während kurze Impulse weiterhin durchgelassen werden
+- Neue Konfigurationsoptionen wurden hinzugefügt und die Einstellbereiche bestehender Optionen erweitert
+- Multiplikatoren für Verschleißfaktoren wurden neu ausbalanciert und für ein besseres Gameplay insgesamt reduziert
 
 Changelog 0.9.1.0:
-- Die Stressakkumulation wurde Гјberarbeitet: Stress kann nun den aktuellen Zustandswert des jeweiligen Systems nicht mehr Гјberschreiten. Erreicht der Stress den Zustandswert, tritt sofort eine Panne auf
-- Bei der RГјckgabe geleaster ADS-Fahrzeuge werden nun Strafkosten fГјr aktive Defekte und ГјberfГ¤llige Wartung berechnet. Kompatibel mit Extended Leasing
+- Die Stressakkumulation wurde überarbeitet: Stress kann nun den aktuellen Zustandswert des jeweiligen Systems nicht mehr überschreiten. Erreicht der Stress den Zustandswert, tritt sofort eine Panne auf
+- Bei der Rückgabe geleaster ADS-Fahrzeuge werden nun Strafkosten für aktive Defekte und überfällige Wartung berechnet. Kompatibel mit Extended Leasing
 - Behoben: Die Schmierung von Erntemaschinen nimmt jetzt korrekt ab, statt dauerhaft auf normalem Niveau zu bleiben
-- Behoben: ErnteaktivitГ¤t wird nun korrekt fГјr die Berechnung des VerschleiГџes im Arbeitssystem und fГјr die Erkennung von grobem Schmutz erfasst
-- Die Verschmutzungsgeschwindigkeit von KГјhler und Lufteinlass ist nun an das gewГ¤hlte Wartungsintervall gekoppelt, um unterschiedliche Spielstile besser zu unterstГјtzen
+- Behoben: Ernteaktivität wird nun korrekt für die Berechnung des Verschleißes im Arbeitssystem und für die Erkennung von grobem Schmutz erfasst
+- Die Verschmutzungsgeschwindigkeit von Kühler und Lufteinlass ist nun an das gewählte Wartungsintervall gekoppelt, um unterschiedliche Spielstile besser zu unterstützen
 - Der Long-Harvest-Faktor wurde aus dem Arbeitssystem entfernt
-- Der High Pressure Factor des Kraftstoffsystems wurde Гјberarbeitet: Er wird nun durch hohen Kraftstoffverbrauch statt durch indirekte Motorlast ausgelГ¶st
+- Der High Pressure Factor des Kraftstoffsystems wurde überarbeitet: Er wird nun durch hohen Kraftstoffverbrauch statt durch indirekte Motorlast ausgelöst
 - Fehlerhafte Datenanzeige im Wartungsprotokoll und im Inspektionsbericht wurde behoben
 - ADS steuert jetzt den Vanilla-Wert der Motortemperatur
-- Ein Fehler wurde behoben, bei dem sich die Batterie zu schnell entladen konnte, wenn die KI bei aktivem ENGINE_HARD_START_MODIFIER versuchte, ein Fahrzeug zu starten. Als vorlГ¤ufige LГ¶sung ist die KI gegen ENGINE_HARD_START_MODIFIER immun
-- ADS steuert jetzt die Erfassung der Betriebsstunden fГјr ADS-Fahrzeuge, sodass sie weiterlaufen, auch wenn der Spieler das Fahrzeug mit laufendem Motor verlГ¤sst
+- Ein Fehler wurde behoben, bei dem sich die Batterie zu schnell entladen konnte, wenn die KI bei aktivem ENGINE_HARD_START_MODIFIER versuchte, ein Fahrzeug zu starten. Als vorläufige Lösung ist die KI gegen ENGINE_HARD_START_MODIFIER immun
+- ADS steuert jetzt die Erfassung der Betriebsstunden für ADS-Fahrzeuge, sodass sie weiterlaufen, auch wenn der Spieler das Fahrzeug mit laufendem Motor verlässt
 
 Changelog 0.9.0.0:
-- Mehrspieler-UnterstГјtzung hinzugefГјgt
-- Das Zustandsmodell der Fahrzeuge wurde Гјberarbeitet: Der Gesamtzustand basiert nun auf mehreren einzelnen Systemen mit eigenem Zustand und eigenen VerschleiГџfaktoren
-- Neues Stresssystem hinzugefГјgt: Bei falscher Nutzung sammeln die Fahrzeugsysteme Belastung an, wodurch das Ausfallrisiko steigt
-- Erweiterte Simulation von Batterie und Lichtmaschine hinzugefГјgt
-- Vorschicht-Inspektion fГјr Fahrzeuge hinzugefГјgt
-- Neue Shop-GegenstГ¤nde hinzugefГјgt: Fettpresse, LuftgeblГ¤se und Starthilfekabel fГјr Vorschicht-Service und Starthilfe bei entladener Batterie
-- Eine FlottenГјbersicht mit allen ADS-Fahrzeugen fГјr eine einfachere Verwaltung hinzugefГјgt
-- Viele neue Pannen hinzugefГјgt und bestehende Гјberarbeitet; AusfГ¤lle sind nun klar einzelnen Systemen zugeordnet
-- Ein neues System zur Auswahl von Pannen hinzugefГјgt, das Defekte danach bestimmt, welche Systemfaktoren am stГ¤rksten belastet oder verletzt wurden
-- Neue Werkstattoptionen hinzugefГјgt und bestehende Service- und ReparaturablГ¤ufe Гјberarbeitet
-- Die Logik des erschwerten Motorstarts geГ¤ndert: Der Anlasser muss nun gehalten werden, um den Motor durchzudrehen
+- Mehrspieler-Unterstützung hinzugefügt
+- Das Zustandsmodell der Fahrzeuge wurde überarbeitet: Der Gesamtzustand basiert nun auf mehreren einzelnen Systemen mit eigenem Zustand und eigenen Verschleißfaktoren
+- Neues Stresssystem hinzugefügt: Bei falscher Nutzung sammeln die Fahrzeugsysteme Belastung an, wodurch das Ausfallrisiko steigt
+- Erweiterte Simulation von Batterie und Lichtmaschine hinzugefügt
+- Vorschicht-Inspektion für Fahrzeuge hinzugefügt
+- Neue Shop-Gegenstände hinzugefügt: Fettpresse, Luftgebläse und Starthilfekabel für Vorschicht-Service und Starthilfe bei entladener Batterie
+- Eine Flottenübersicht mit allen ADS-Fahrzeugen für eine einfachere Verwaltung hinzugefügt
+- Viele neue Pannen hinzugefügt und bestehende überarbeitet; Ausfälle sind nun klar einzelnen Systemen zugeordnet
+- Ein neues System zur Auswahl von Pannen hinzugefügt, das Defekte danach bestimmt, welche Systemfaktoren am stärksten belastet oder verletzt wurden
+- Neue Werkstattoptionen hinzugefügt und bestehende Service- und Reparaturabläufe überarbeitet
+- Die Logik des erschwerten Motorstarts geändert: Der Anlasser muss nun gehalten werden, um den Motor durchzudrehen
 - Zahlreiche kleinere Balance- und Interface-Verbesserungen]]></de>
-        <fr><![CDATA[Advanced Damage System ajoute Г  Farming Simulator 25 un systГЁme approfondi d'usure, de pannes, de diagnostic, d'entretien et de rГ©paration des vГ©hicules. Au lieu de reposer sur une seule valeur gГ©nГ©rale d'Г©tat, chaque machine est composГ©e de plusieurs systГЁmes distincts ayant leur propre Г©tat, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des dГ©faillances dГ©pendent des conditions d'utilisation, de la charge, de la tempГ©rature et de la qualitГ© de l'entretien.
+        <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
-Le mod comprend un modГЁle thermique pour les systГЁmes clГ©s, une simulation avancГ©e de la batterie et de l'alternateur, une logique de pannes rГ©aliste, des procГ©dures d'atelier Г©tendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matГ©riel devient ainsi une dimension stratГ©gique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et nГ©gliger l'Г©tat des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matГ©riel, l'entretient Г  temps et Г©vite les mauvais traitements inutiles conservera une flotte fiable et Г©vitera de graves problГЁmes en saison.
+Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
 
 Changelog 0.9.2.4:
-- Les paramГЁtres ADS ont de nouveau Г©tГ© dГ©placГ©s ; ils se trouvent dГ©sormais Г  cГґtГ© du menu ADS Fleet Management
-- La liste des options disponibles dans les paramГЁtres a Г©tГ© considГ©rablement Г©largie
-- Plusieurs nouvelles astuces de didacticiel ont Г©tГ© ajoutГ©es
+- Les paramètres ADS ont de nouveau été déplacés ; ils se trouvent désormais à côté du menu ADS Fleet Management
+- La liste des options disponibles dans les paramètres a été considérablement élargie
+- Plusieurs nouvelles astuces de didacticiel ont été ajoutées
 
 Changelog 0.9.2.3:
-- Les paramГЁtres ADS ont Г©tГ© dГ©placГ©s dans un onglet dГ©diГ© afin de permettre l'ajout futur de davantage d'options sans surcharger la section Game Settings
-- Correction de l'application incorrecte de la spГ©cialisation ADS aux conveyorBelt
-- Correction d'un bug empГЄchant de changer le sens de conduite en appuyant sur Espace
-- Correction d'un bug empГЄchant de consulter le dernier rapport aprГЁs une inspection
-- Ajout de la commande console ads_setOpertaingTime pour dГ©finir les heures de fonctionnement, car Easy Development Controls ne peut pas les dГ©finir pour les vГ©hicules ADS
+- Les paramètres ADS ont été déplacés dans un onglet dédié afin de permettre l'ajout futur de davantage d'options sans surcharger la section Game Settings
+- Correction de l'application incorrecte de la spécialisation ADS aux conveyorBelt
+- Correction d'un bug empêchant de changer le sens de conduite en appuyant sur Espace
+- Correction d'un bug empêchant de consulter le dernier rapport après une inspection
+- Ajout de la commande console ads_setOpertaingTime pour définir les heures de fonctionnement, car Easy Development Controls ne peut pas les définir pour les véhicules ADS
 
 Changelog 0.9.2.2:
-- Ajout d'astuces de didacticiel optionnelles qui aident Г  comprendre les mГ©caniques du mod et avertissent le joueur lorsqu'il fait quelque chose de travers. Solo uniquement
+- Ajout d'astuces de didacticiel optionnelles qui aident à comprendre les mécaniques du mod et avertissent le joueur lorsqu'il fait quelque chose de travers. Solo uniquement
 - Ajout des traductions hongroise et portugaise
 
 Changelog 0.9.2.1:
-- Refonte du menu ADS Fleet Management : ajout d'onglets pour les vГ©hicules en service et les vГ©hicules non ADS afin d'en faire un centre unique de gestion de flotte
-- Ajout de la compatibilitГ© avec In-Game Time Operating Hours ; les intervalles de service s'adaptent dГ©sormais dynamiquement Г  l'accГ©lГ©ration du temps
-- Correction d'une boucle infinie lorsqu'aucune panne valide n'Г©tait disponible Г  ajouter
-- Correction d'un problГЁme oГ№ certains vГ©hicules moddГ©s ne chauffaient pas au ralenti
-- Correction d'un stress hydraulique excessif sur les moissonneuses dГ» Г  une dГ©tection incorrecte de l'angle de prise de force
+- Refonte du menu ADS Fleet Management : ajout d'onglets pour les véhicules en service et les véhicules non ADS afin d'en faire un centre unique de gestion de flotte
+- Ajout de la compatibilité avec In-Game Time Operating Hours ; les intervalles de service s'adaptent désormais dynamiquement à l'accélération du temps
+- Correction d'une boucle infinie lorsqu'aucune panne valide n'était disponible à ajouter
+- Correction d'un problème où certains véhicules moddés ne chauffaient pas au ralenti
+- Correction d'un stress hydraulique excessif sur les moissonneuses dû à une détection incorrecte de l'angle de prise de force
 - Correction : les ateliers mobiles et personnels n'utilisent plus les heures d'ouverture et sont disponibles 24 h/24, contrairement au concessionnaire
-- DГ©placement de l'indicateur d'intervalle de service dГ©passГ© pour la compatibilitГ© avec Enhanced Vehicle
+- Déplacement de l'indicateur d'intervalle de service dépassé pour la compatibilité avec Enhanced Vehicle
 
 Changelog 0.9.2.0:
-- RГ©Г©quilibrage des facteurs d'usure des systГЁmes
-- В« Inspection rapide В» termine dГ©sormais instantanГ©ment une inspection en cours
-- В« Garer les vГ©hicules В» s'applique dГ©sormais instantanГ©ment aux vГ©hicules dГ©jГ  engagГ©s dans une procГ©dure d'entretien
-- Les avertissements de moteur/transmission froids ou en surchauffe n'apparaissent dГ©sormais qu'une seule fois au lieu de se rГ©pГ©ter en permanence
-- Les vГ©hicules avertissent dГ©sormais d'une charge extrГЄme via les indicateurs du tableau de bord
-- La logique des indicateurs du tableau de bord a Г©tГ© retravaillГ©e et un son d'activation a Г©tГ© ajoutГ©
-- Ajout d'une option pour dГ©sactiver tous les messages d'avertissement
-- Correction de la synchronisation multijoueur des tempГ©ratures moteur et CVT lorsque le moteur est coupГ©
-- Correction d'un problГЁme oГ№ le changement de capacitГ© de batterie provoquait une dГ©charge massive de toutes les batteries
-- Correction du comptage des pannes rГ©parГ©es dans le maintenance log
-- Correction d'une repeinture involontaire et de son coГ»t lors de l'enchaГ®nement de procГ©dures d'entretien
-- Correction du problГЁme oГ№ l'IA d'AutoDrive ignorait les pannes critiques
+- Rééquilibrage des facteurs d'usure des systèmes
+- « Inspection rapide » termine désormais instantanément une inspection en cours
+- « Garer les véhicules » s'applique désormais instantanément aux véhicules déjà engagés dans une procédure d'entretien
+- Les avertissements de moteur/transmission froids ou en surchauffe n'apparaissent désormais qu'une seule fois au lieu de se répéter en permanence
+- Les véhicules avertissent désormais d'une charge extrême via les indicateurs du tableau de bord
+- La logique des indicateurs du tableau de bord a été retravaillée et un son d'activation a été ajouté
+- Ajout d'une option pour désactiver tous les messages d'avertissement
+- Correction de la synchronisation multijoueur des températures moteur et CVT lorsque le moteur est coupé
+- Correction d'un problème où le changement de capacité de batterie provoquait une décharge massive de toutes les batteries
+- Correction du comptage des pannes réparées dans le maintenance log
+- Correction d'une repeinture involontaire et de son coût lors de l'enchaînement de procédures d'entretien
+- Correction du problème où l'IA d'AutoDrive ignorait les pannes critiques
 - Corrections mineures de l'interface
 
 Changelog 0.9.1.2:
-- Ajout de la compatibilitГ© avec CVT Addon
-- Extension des plages de rГ©glage de l'intervalle d'entretien et de la durГ©e de vie des vГ©hicules dans les paramГЁtres
-- Ajustement de la progression des pannes et des autres mГ©caniques basГ©es sur le temps aux intervalles d'entretien personnalisГ©s et aux durГ©es de vie prolongГ©es des vГ©hicules
+- Ajout de la compatibilité avec CVT Addon
+- Extension des plages de réglage de l'intervalle d'entretien et de la durée de vie des véhicules dans les paramètres
+- Ajustement de la progression des pannes et des autres mécaniques basées sur le temps aux intervalles d'entretien personnalisés et aux durées de vie prolongées des véhicules
 - Correction de la synchronisation des heures de fonctionnement en multijoueur
-- Correction du calcul de la progression de l'intervalle d'entretien lors de l'initialisation du vГ©hicule
+- Correction du calcul de la progression de l'intervalle d'entretien lors de l'initialisation du véhicule
 - Ajout des traductions polonaise et espagnole
 - Corrections mineures de l'interface
 
 Changelog 0.9.1.1:
-- Augmentation des distances d'interaction et de connexion des cГўbles de dГ©marrage
-- Mise en place d'un filtre pour l'usure des systГЁmes et l'accumulation de stress, qui attГ©nue les facteurs Г©levГ©s durables tout en laissant passer les impulsions courtes
-- Ajout de nouvelles options de configuration et extension des plages de rГ©glage des options existantes
-- RГ©Г©quilibrage des multiplicateurs des facteurs d'usure, globalement rГ©duits pour un meilleur Г©quilibre de jeu
+- Augmentation des distances d'interaction et de connexion des câbles de démarrage
+- Mise en place d'un filtre pour l'usure des systèmes et l'accumulation de stress, qui atténue les facteurs élevés durables tout en laissant passer les impulsions courtes
+- Ajout de nouvelles options de configuration et extension des plages de réglage des options existantes
+- Rééquilibrage des multiplicateurs des facteurs d'usure, globalement réduits pour un meilleur équilibre de jeu
 
 Changelog 0.9.1.0:
-- Refonte de l'accumulation de stress : le stress ne peut dГ©sormais plus dГ©passer le niveau de condition actuel de son systГЁme. Lorsque le stress atteint la condition, une panne survient instantanГ©ment
-- Le retour des vГ©hicules ADS en leasing applique dГ©sormais des pГ©nalitГ©s pour les pannes actives et l'entretien en retard. Compatible avec Extended Leasing
-- Correction : la lubrification des machines de rГ©colte diminue dГ©sormais correctement au lieu de rester en permanence Г  un niveau normal
-- Correction : l'activitГ© de rГ©colte est maintenant dГ©tectГ©e correctement pour les calculs d'usure du systГЁme de travail et pour la dГ©tection de gros dГ©bris
-- La vitesse d'encrassement du radiateur et de l'admission d'air est dГ©sormais liГ©e Г  la durГ©e de l'intervalle d'entretien sГ©lectionnГ©, pour mieux s'adapter aux diffГ©rents styles de jeu
-- Suppression du facteur long harvest du systГЁme de travail
-- Refonte du High Pressure Factor du systГЁme de carburant : il se dГ©clenche dГ©sormais en fonction d'une forte consommation de carburant plutГґt que d'une charge moteur indirecte
-- Correction d'un affichage incorrect des donnГ©es dans le journal d'entretien et le rapport d'inspection
-- ADS contrГґle dГ©sormais la valeur vanilla de la tempГ©rature moteur
-- Correction d'un bug oГ№ la batterie pouvait se dГ©charger trop rapidement lorsque l'IA tentait de dГ©marrer un vГ©hicule avec ENGINE_HARD_START_MODIFIER actif. Comme solution temporaire, l'IA est immunisГ©e contre ENGINE_HARD_START_MODIFIER
-- ADS contrГґle dГ©sormais l'accumulation des heures de fonctionnement pour les vГ©hicules ADS, afin qu'elles continuent Г  s'accumuler mГЄme lorsque le joueur quitte un vГ©hicule avec le moteur en marche
+- Refonte de l'accumulation de stress : le stress ne peut désormais plus dépasser le niveau de condition actuel de son système. Lorsque le stress atteint la condition, une panne survient instantanément
+- Le retour des véhicules ADS en leasing applique désormais des pénalités pour les pannes actives et l'entretien en retard. Compatible avec Extended Leasing
+- Correction : la lubrification des machines de récolte diminue désormais correctement au lieu de rester en permanence à un niveau normal
+- Correction : l'activité de récolte est maintenant détectée correctement pour les calculs d'usure du système de travail et pour la détection de gros débris
+- La vitesse d'encrassement du radiateur et de l'admission d'air est désormais liée à la durée de l'intervalle d'entretien sélectionné, pour mieux s'adapter aux différents styles de jeu
+- Suppression du facteur long harvest du système de travail
+- Refonte du High Pressure Factor du système de carburant : il se déclenche désormais en fonction d'une forte consommation de carburant plutôt que d'une charge moteur indirecte
+- Correction d'un affichage incorrect des données dans le journal d'entretien et le rapport d'inspection
+- ADS contrôle désormais la valeur vanilla de la température moteur
+- Correction d'un bug où la batterie pouvait se décharger trop rapidement lorsque l'IA tentait de démarrer un véhicule avec ENGINE_HARD_START_MODIFIER actif. Comme solution temporaire, l'IA est immunisée contre ENGINE_HARD_START_MODIFIER
+- ADS contrôle désormais l'accumulation des heures de fonctionnement pour les véhicules ADS, afin qu'elles continuent à s'accumuler même lorsque le joueur quitte un véhicule avec le moteur en marche
 
 Changelog 0.9.0.0:
 - Ajout du support multijoueur
-- Refonte du modГЁle d'Г©tat des vГ©hicules : l'Г©tat global repose dГ©sormais sur plusieurs systГЁmes distincts, chacun avec son propre Г©tat et ses propres facteurs d'usure
-- Ajout d'un nouveau systГЁme de stress : une mauvaise utilisation augmente la charge des systГЁmes et le risque de panne
-- Ajout d'une simulation avancГ©e de la batterie et de l'alternateur
+- Refonte du modèle d'état des véhicules : l'état global repose désormais sur plusieurs systèmes distincts, chacun avec son propre état et ses propres facteurs d'usure
+- Ajout d'un nouveau système de stress : une mauvaise utilisation augmente la charge des systèmes et le risque de panne
+- Ajout d'une simulation avancée de la batterie et de l'alternateur
 - Ajout de l'inspection visuelle avant prise de poste
-- Ajout de nouveaux objets en boutique : pompe Г  graisse, souffleur d'air et cГўbles de dГ©marrage pour l'entretien avant service et le dГ©marrage d'un vГ©hicule Г  batterie dГ©chargГ©e
-- Ajout d'un tableau de gestion regroupant tous les vГ©hicules ADS pour un suivi plus pratique
-- Ajout de nombreuses nouvelles pannes et refonte des anciennes ; chaque panne est dГ©sormais strictement rattachГ©e Г  un systГЁme prГ©cis
-- Ajout d'un systГЁme de sГ©lection des pannes qui choisit les dГ©faillances en fonction des facteurs de systГЁme les plus sollicitГ©s ou les plus perturbГ©s
-- Ajout de nouvelles options d'atelier et refonte des anciens flux d'entretien et de rГ©paration
-- Modification de la logique de dГ©marrage difficile du moteur : il faut dГ©sormais maintenir le dГ©marreur pour lancer le moteur
-- De nombreuses amГ©liorations mineures d'Г©quilibrage et d'interface]]></fr>
-
-        <it><![CDATA[Advanced Damage System aggiunge a Farming Simulator 25 un sistema approfondito di usura, guasti, diagnostica, manutenzione e riparazione dei veicoli. Invece di basarsi su un unico valore generico di condizione, ogni macchina ГЁ composta da piГ№ sistemi separati con la propria condizione, i propri fattori di usura, accumulo di stress e rischio di guasto. Il comportamento del veicolo e la natura dei guasti dipendono dalle condizioni operative, dal carico, dalla temperatura e dalla qualitГ  della manutenzione.
-
-Il mod include un modello termico per i sistemi principali, una simulazione avanzata di batteria e alternatore, una logica dei guasti realistica, procedure d'officina ampliate, rapporti di servizio, storico della manutenzione e ispezioni pre-turno. Di conseguenza, la gestione dei veicoli diventa una parte strategica del gameplay: la manutenzione richiede tempo, l'uso scorretto aumenta il rischio di guasti e trascurare lo stato delle macchine puГІ compromettere lavori agricoli importanti. Un agricoltore responsabile che si prende cura dei mezzi, li manutiene in tempo ed evita abusi inutili manterrГ  la flotta affidabile ed eviterГ  problemi seri durante la stagione.]]></it>
-
-        <ru><![CDATA[Advanced Damage System РґРѕР±Р°РІР»СЏРµС‚ РІ Farming Simulator 25 РіР»СѓР±РѕРєСѓСЋ СЃРёСЃС‚РµРјСѓ РёР·РЅРѕСЃР°, РїРѕР»РѕРјРѕРє, РґРёР°РіРЅРѕСЃС‚РёРєРё, РѕР±СЃР»СѓР¶РёРІР°РЅРёСЏ Рё СЂРµРјРѕРЅС‚Р° С‚РµС…РЅРёРєРё. Р’РјРµСЃС‚Рѕ РѕРґРЅРѕРіРѕ СѓСЃР»РѕРІРЅРѕРіРѕ РїР°СЂР°РјРµС‚СЂР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РєР°Р¶РґР°СЏ РјР°С€РёРЅР° СЃРѕСЃС‚РѕРёС‚ РёР· РѕС‚РґРµР»СЊРЅС‹С… СЃРёСЃС‚РµРј, РєР°Р¶РґР°СЏ РёР· РєРѕС‚РѕСЂС‹С… РёРјРµРµС‚ СЃРѕР±СЃС‚РІРµРЅРЅС‹Р№ СѓСЂРѕРІРµРЅСЊ СЃРѕСЃС‚РѕСЏРЅРёСЏ, С„Р°РєС‚РѕСЂС‹ РёР·РЅРѕСЃР°, РЅР°РєРѕРїР»РµРЅРёРµ СЃС‚СЂРµСЃСЃР° Рё СЂРёСЃРє РѕС‚РєР°Р·Р°. РџРѕРІРµРґРµРЅРёРµ С‚РµС…РЅРёРєРё Рё С…Р°СЂР°РєС‚РµСЂ РїРѕР»РѕРјРѕРє Р·Р°РІРёСЃСЏС‚ РѕС‚ СѓСЃР»РѕРІРёР№ СЌРєСЃРїР»СѓР°С‚Р°С†РёРё, РЅР°РіСЂСѓР·РєРё, С‚РµРјРїРµСЂР°С‚СѓСЂС‹ Рё РєР°С‡РµСЃС‚РІР° РѕР±СЃР»СѓР¶РёРІР°РЅРёСЏ.
-
-РњРѕРґ РІРєР»СЋС‡Р°РµС‚ С‚РµРјРїРµСЂР°С‚СѓСЂРЅСѓСЋ РјРѕРґРµР»СЊ РєР»СЋС‡РµРІС‹С… СЃРёСЃС‚РµРј, РїСЂРѕРґРІРёРЅСѓС‚СѓСЋ СЃРёРјСѓР»СЏС†РёСЋ Р°РєРєСѓРјСѓР»СЏС‚РѕСЂР° Рё РіРµРЅРµСЂР°С‚РѕСЂР°, СЂРµР°Р»РёСЃС‚РёС‡РЅСѓСЋ Р»РѕРіРёРєСѓ РїРѕР»РѕРјРѕРє, СЂР°СЃС€РёСЂРµРЅРЅС‹Рµ СЃС†РµРЅР°СЂРёРё СЂР°Р±РѕС‚С‹ СЃ РјР°СЃС‚РµСЂСЃРєРѕР№, СЃРµСЂРІРёСЃРЅС‹Рµ РѕС‚С‡С‘С‚С‹, Р¶СѓСЂРЅР°Р» РѕР±СЃР»СѓР¶РёРІР°РЅРёСЏ Рё РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРѕРІРµРґРµРЅРёСЏ РїСЂРµРґСЃРјРµРЅРЅРѕРіРѕ РѕСЃРјРѕС‚СЂР°. Р’ СЂРµР·СѓР»СЊС‚Р°С‚Рµ С‚РµС…РЅРёРєР° С‚СЂРµР±СѓРµС‚ РЅРµ С‚РѕР»СЊРєРѕ СЂРµРјРѕРЅС‚Р°, РЅРѕ Рё РіСЂР°РјРѕС‚РЅРѕРіРѕ РїР»Р°РЅРёСЂРѕРІР°РЅРёСЏ: РѕР±СЃР»СѓР¶РёРІР°РЅРёРµ Р·Р°РЅРёРјР°РµС‚ РІСЂРµРјСЏ, РЅРµРїСЂР°РІРёР»СЊРЅР°СЏ СЌРєСЃРїР»СѓР°С‚Р°С†РёСЏ РїРѕРІС‹С€Р°РµС‚ СЂРёСЃРє РѕС‚РєР°Р·РѕРІ, Р° РїСЂРµРЅРµР±СЂРµР¶РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёРµРј РјР°С€РёРЅ РјРѕР¶РµС‚ СЃРѕСЂРІР°С‚СЊ РІР°Р¶РЅС‹Рµ РїРѕР»РµРІС‹Рµ СЂР°Р±РѕС‚С‹. РћС‚РІРµС‚СЃС‚РІРµРЅРЅС‹Р№ С„РµСЂРјРµСЂ, РєРѕС‚РѕСЂС‹Р№ СЃР»РµРґРёС‚ Р·Р° С‚РµС…РЅРёРєРѕР№, РІРѕРІСЂРµРјСЏ РѕР±СЃР»СѓР¶РёРІР°РµС‚ РµС‘ Рё РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РЅР° РїСЂРµРґРµР»Рµ РІРѕР·РјРѕР¶РЅРѕСЃС‚РµР№ Р±РµР· РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё, СЃРјРѕР¶РµС‚ СЃРѕС…СЂР°РЅРёС‚СЊ РїР°СЂРє РІ РЅР°РґС‘Р¶РЅРѕРј СЃРѕСЃС‚РѕСЏРЅРёРё Рё РёР·Р±РµР¶Р°С‚СЊ СЃРµСЂСЊС‘Р·РЅС‹С… РїСЂРѕР±Р»РµРј РІ СЃРµР·РѕРЅ.]]></ru>
+- Ajout de nouveaux objets en boutique : pompe à graisse, souffleur d'air et câbles de démarrage pour l'entretien avant service et le démarrage d'un véhicule à batterie déchargée
+- Ajout d'un tableau de gestion regroupant tous les véhicules ADS pour un suivi plus pratique
+- Ajout de nombreuses nouvelles pannes et refonte des anciennes ; chaque panne est désormais strictement rattachée à un système précis
+- Ajout d'un système de sélection des pannes qui choisit les défaillances en fonction des facteurs de système les plus sollicités ou les plus perturbés
+- Ajout de nouvelles options d'atelier et refonte des anciens flux d'entretien et de réparation
+- Modification de la logique de démarrage difficile du moteur : il faut désormais maintenir le démarreur pour lancer le moteur
+- De nombreuses améliorations mineures d'équilibrage et d'interface]]></fr>
         
     </description>
     <storeItems>
