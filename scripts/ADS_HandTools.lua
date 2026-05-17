@@ -623,7 +623,7 @@ function adsHandTools:handleJumperCablesActionServer(state, targetVehicle, conne
     -- connect second
     elseif spec.connectedVehicleA == nil or spec.connectedVehicleB == nil then
         local firstVehicle = spec.connectedVehicleA or spec.connectedVehicleB
-        local isValid, reason = AdvancedDamageSystem.isValidPowerPair(firstVehicle, vehicle)
+        local isValid, reason = ADS_Electrical.isValidPowerPair(firstVehicle, vehicle)
 
         if not isValid then
             if reason == "TOO_FAR" then

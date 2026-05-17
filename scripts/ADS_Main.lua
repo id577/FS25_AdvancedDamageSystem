@@ -5,7 +5,6 @@ local modName = g_currentModName
 
 source(g_currentModDirectory .. "scripts/ADS_Config.lua")
 source(g_currentModDirectory .. "scripts/ADS_Utils.lua")
-source(g_currentModDirectory .. "scripts/ADS_Breakdowns.lua")
 source(g_currentModDirectory .. "scripts/ADS_Leasing.lua")
 source(g_currentModDirectory .. "scripts/ADS_Tutorial.lua")
 source(g_currentModDirectory .. "gui/ADS_WorkshopDialog.lua")
@@ -63,7 +62,7 @@ end
 -- ===========================================================
 
 function ADS_Main.initSpec()
-    g_specializationManager:addSpecialization("AdvancedDamageSystem", "AdvancedDamageSystem", g_currentModDirectory.."scripts/ADS_Specialization.lua", "")
+    g_specializationManager:addSpecialization("AdvancedDamageSystem", "AdvancedDamageSystem", g_currentModDirectory.."scripts/core/ADS_Specialization.lua", "")
     TypeManager.finalizeTypes = Utils.appendedFunction(TypeManager.finalizeTypes, ADS_Main.registerSpecializationToVehicles)
 end
 

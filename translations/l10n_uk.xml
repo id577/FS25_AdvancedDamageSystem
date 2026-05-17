@@ -1,0 +1,760 @@
+<l10n>
+    <translationContributors>Kalderone, Petro2000</translationContributors>
+    <texts>
+        <text name="ads_settings_title" text="НАЛАШТУВАННЯ ADS"/>
+        <text name="ads_settings_admin_required" text="Налаштування ADS потребують прав адміністратора в багатокористувацькій грі."/>
+        <text name="ads_maintenancePrice_label" text="Множник ціни обслуговування"/>
+        <text name="ads_maintenancePrice_tooltip" text="Регулює вартість усіх послуг майстерні, включаючи огляди, ремонт та капітальний ремонт. Вище значення робить усі види технічного обслуговування дорожчими."/>
+        <text name="ads_maintenanceDuration_label" text="Множник тривалості обслуговування"/>
+        <text name="ads_maintenanceDuration_tooltip" text="Регулює тривалість усіх послуг майстерні. Вище значення збільшує час, який ваш транспортний засіб проведе на обслуговуванні або ремонті."/>
+        <text name="ads_workshopOpenHour_label" text="Час відкриття майстерні"/>
+        <text name="ads_workshopOpenHour_tooltip" text="Година дня, коли відкривається майстерня. Ремонт активний лише в робочі години."/>
+        <text name="ads_workshopCloseHour_label" text="Час закриття майстерні"/>
+        <text name="ads_workshopCloseHour_tooltip" text="Година дня, коли закривається майстерня. Ремонт буде призупинено після цього часу."/>
+        <text name="ads_engineMaxHeat_label" text="Макс. нагрів двигуна"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Базова швидкість виділення тепла двигуном при максимальному навантаженні. Вищі значення призведуть до швидшого нагрівання двигуна."/>
+        <text name="ads_cloggingSpeed_label" text="Швидкість засмічення"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Регулює швидкість засмічення радіатора та повітрозабірника під час роботи в пилу, соломі та рослинних залишках. Вищі значення прискорюють засмічення. При 100% швидкість засмічення становить приблизно третину сервісного інтервалу."/>
+        <text name="ads_fieldInspectionDuration_label" text="Тривалість огляду"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Встановлює час проведення передзмінного огляду в реальних секундах."/>
+        <text name="ads_lubricationReducePerDay_label" text="Швидкість висихання змазки"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Встановлює, наскільки сильно змазка висихає за один ігровий день. При 0% змазка не висихає з часом."/>
+        <text name="ads_ws_header_title" text="Майстерня"/>
+        <text name="ads_settings_section_service_wear" text="Обслуговування та зношування"/>
+        <text name="ads_settings_section_thermal_model" text="Теплова модель"/>
+        <text name="ads_settings_section_battery_alternator" text="Акумулятор та генератор"/>		
+		<text name="ads_settings_section_preshift_maintenance" text="Передзмінне обслуговування"/>
+        <text name="ads_settings_section_other" text="Інше"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Майстерня дилера 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Робить майстерню дилера доступною в будь-який час доби."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Мобільна майстерня 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Робить мобільну майстерню доступною в будь-який час доби."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Власна майстерня 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Робить вашу власну майстерню доступною в будь-який час доби."/>
+        <text name="ads_instantInspection_label" text="Миттєвий огляд"/>
+        <text name="ads_instantInspection_tooltip" text="Якщо увімкнено, усі огляди завершуються миттєво (час не минає). Примітка: опція «Візуального» огляду стане недоступною."/>
+        <text name="ads_parkVehicle_label" text="Паркувати транспорт під час обслуговування"/>
+        <text name="ads_parkVehicle_tooltip" text="Якщо увімкнено, транспортні засоби, що проходять обслуговування, пропускаються при перемиканні клавішею TAB."/>
+        <text name="ads_warrantyEnabled_label" text="Гарантія на нове обладнання"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Застосовує гарантійне покриття до ремонту нових транспортних засобів (до 20 мотогодин або 12 місяців). Безкоштовно покриваються лише оригінальні запчастини (OEM)."/>
+		<text name="ads_aiOverloadAndOverheatControl_label" text="Контроль перевантаження та перегріву ШІ"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Якщо увімкнено, працівник ШІ зменшує навантаження, щоб запобігти перевантаженню або перегріву двигуна."/>
+        <text name="ads_aiWorkerTargetStress_label" text="Реакція ШІ на швидкість"/>
+        <text name="ads_aiWorkerTargetStress_tooltip" text="Контролює, наскільки рано працівник ШІ реагує на перевантаження та перегрів. Вищі значення менш чутливі та реагують пізніше; нижчі значення більш чутливі та сповільнюються раніше."/>
+        <text name="ads_aiWorkerTargetStress_relaxed" text="Розслаблено"/>
+        <text name="ads_aiWorkerTargetStress_balanced" text="Збалансовано"/>
+        <text name="ads_aiWorkerTargetStress_sensitive" text="Чутливо"/>
+        <text name="ads_aiWorkerTargetStress_verySensitive" text="Дуже чутливо"/>
+        <text name="ads_aiWorkerMinSpeed_label" text="Мінімальна швидкість ШІ"/>
+        <text name="ads_aiWorkerMinSpeed_tooltip" text="Встановлює найнижчу швидкість круїз-контролю працівника ШІ при зниженні швидкості для уникнення перевантаження або перегріву."/>
+        <text name="ads_debugMode_label" text="Режим налагодження"/>
+        <text name="ads_debugMode_tooltip" text="Вмикає або вимикає панель налагодження та розширене логування в консолі."/>
+        <text name="ads_warningMessages_label" text="Попереджувальні повідомлення"/>
+        <text name="ads_warningMessages_tooltip" text="Вмикає або вимикає ігрові попереджувальні повідомлення, такі як сповіщення про холодний двигун та перегрів."/>
+		<text name="ads_mobileWorkshopRestrictions_label" text="Обмеження мобільної майстерні"/>
+        <text name="ads_serviceInterval_label" text="Сервісний інтервал"/>
+        <text name="ads_vehicleLifespan_label" text="Термін служби техніки"/>
+        <text name="ads_downtimeWear_label" text="Пасивний знос"/>
+        <text name="ads_generalWearEnabled_label" text="Віковий знос"/>
+        <text name="ads_systemStressRate_label" text="Рівень стресу систем"/>
+        <text name="ads_batteryCapacity_label" text="Ємність акумулятора"/>
+        <text name="ads_thermalSensitivity_label" text="Теплова чутливість"/>
+        <text name="ads_option_off" text="Вимк."/>
+        <text name="ads_option_none" text="Немає"/>
+        <text name="ads_serviceInterval_tooltip" text="Встановлює базовий сервісний інтервал у годинах, після якого потрібне обслуговування. Фактичний інтервал варіюється залежно від марки техніки, віку та якості попереднього обслуговування."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Встановлює базовий термін служби техніки в годинах, після якого її стан досягне 0%. Чим ближче стан до нуля, тим менш надійною стає техніка."/>
+        <text name="ads_downtimeWear_tooltip" text="Встановлює швидкість пасивного зносу під час простою як відсоток від базової швидкості зносу. Наприклад, 5% при терміні служби 100 годин означає, що кожна система втрачає близько 1% стану після приблизно 20 годин простою. Примітка: пасивний знос вимкнено, якщо техніка зберігається під накриттям."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Вмикає знос, пов'язаний з віком. У міру зношування техніка отримує невеликі штрафи до основних характеристик (потужність двигуна, швидкість гідравліки тощо). Ефект стає помітним після другої третини терміну служби."/>
+		
+		<text name="ads_mobileWorkshopRestrictions_tooltip" text="Якщо увімкнено, доступність процедур у мобільній майстерні залежить від ремонтопридатності техніки."/>
+        <text name="ads_systemStressRate_tooltip" text="Контролює швидкість накопичення стресу в системах від перевантаження, перегріву, пробуксовки тощо. Стрес безпосередньо впливає на ймовірність поломки."/>
+        <text name="ads_batteryCapacity_tooltip" text="Регулює максимальну корисну ємність акумулятора. Значення близько 150 Аг є більш реалістичними."/>
+        <text name="ads_alternatorMaxOutput_label" text="Макс. вихід генератора"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Встановлює максимальний струм генератора. Вищі значення дозволяють швидше заряджати акумулятор."/>
+        <text name="ads_idleCurrent_label" text="Струм у режимі очікування"/>
+        <text name="ads_idleCurrent_tooltip" text="Встановлює розряд акумулятора при вимкненому двигуні. Наприклад, при 0.5 А акумулятор на 15 Аг повністю розрядиться приблизно за 30 реальних годин."/>
+        <text name="ads_thermalSensitivity_tooltip" text="Регулює поведінку теплової моделі. Вищі параметри роблять двигун і трансмісію більш чутливими до навантаження та температури навколишнього середовища."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Вплив бруду на радіатор"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Зменшує охолоджуючу здатність радіатора на цей відсоток при максимальному забрудненні."/>
+        <text name="ads_warmingBoostPower_label" text="Прискорення прогріву"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Штучно прискорює прогрів двигуна та трансмісії. Вимкніть для стандартної поведінки."/>
+        <text name="ads_coolingSlowdownPower_label" text="Сповільнення охолодження"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Штучно сповільнює охолодження після вимкнення техніки."/>
+        <text name="ads_thermal_none" text="Пасивна"/>
+        <text name="ads_thermal_mild" text="М'яка"/>
+        <text name="ads_thermal_default" text="Стандартна"/>
+        <text name="ads_thermal_aggressive" text="Агресивна"/>
+		<text name="ads_ws_label_value" text="Вартість"/>
+        <text name="ads_ws_label_age" text="Вік"/>
+        <text name="ads_ws_label_operating_hours" text="Мотогодини"/>
+        <text name="ads_ws_label_service" text="Сервіс"/>
+        <text name="ads_ws_label_condition" text="Стан"/>
+        <text name="ads_ws_label_maintainability" text="Ремонтопридатність"/>
+        <text name="ads_ws_label_maintenance_log" text="Журнал обслуговування"/>
+        <text name="ads_ws_label_last_report" text="Останній звіт"/>
+        <text name="ads_ws_label_service_interval" text="Сервісний інтервал"/>
+        <text name="ads_ws_label_last_maintenance" text="Останнє обслуговування"/>
+        <text name="ads_ws_label_last_inspection" text="Останній огляд"/>
+        <text name="ads_ws_table_header_part" text="Деталь"/>
+        <text name="ads_ws_table_header_description" text="Опис"/>
+        <text name="ads_ws_table_header_stage" text="Стадія"/>
+        <text name="ads_ws_table_header_price" text="Ціна"/>
+        <text name="ads_ws_table_header_repair_select" text="Ремонт"/>
+        <text name="ads_ws_info_no_breakdowns" text="Поломок немає або вони ще не виявлені."/>
+        <text name="ads_ws_status_initial" text="Завантаження статусу..."/>
+        <text name="ads_ws_action_inspection" text="Огляд"/>
+        <text name="ads_ws_action_maintenance" text="Обслуговування"/>
+        <text name="ads_ws_action_repair" text="Ремонт"/>
+        <text name="ads_ws_action_overhaul" text="Кап. ремонт"/>
+		<text name="ads_ws_action_cancel_service" text="Скасувати процедуру"/>
+        <text name="ads_ws_button_show" text="Показати"/>
+        <text name="ads_ws_age_unit" text="міс."/>
+        <text name="ads_ws_hours_unit" text="год"/>
+        <text name="ads_ws_option_yes" text="Так"/>
+        <text name="ads_ws_option_no" text="Ні"/>
+        <text name="ads_ws_status_open" text="Майстерня відкрита"/>
+        <text name="ads_ws_status_closed" text="Майстерня закрита"/>
+        <text name="ads_ws_inspecting_status" text="Огляд..."/>
+        <text name="ads_ws_status_in_progress_format" text="%s триває до %s..."/>
+        <text name="ads_ws_task_inspection" text="Огляд"/>
+        <text name="ads_ws_task_maintenance" text="Обслуговування"/>
+        <text name="ads_ws_task_overhaul" text="Кап. ремонт"/>
+        <text name="ads_ws_button_price_format" text="%s (%s)"/>
+        <text name="ads_ws_no_last_report_message" text="Звітів ще немає"/>
+        <text name="ads_ws_no_report_message" text="Звіт відсутній"/>
+        <text name="ads_ws_no_log_empty_message" text="Журнал поки порожній"/>
+        <text name="ads_ws_cancel_confirm_title" text="Скасувати %s?"/>
+        <text name="ads_ws_cancel_confirm_text" text="Поточний прогрес буде збережено як є. Гроші не повертаються."/>
+		<text name="ads_log_header_title" text="Журнал обслуговування"/>
+        <text name="ads_log_title" text="Журнал технічного обслуговування"/>
+        <text name="ads_log_total_cost_title" text="Загальні витрати"/>
+        <text name="ads_log_cost_per_month_title" text="Вартість на місяць"/>
+        <text name="ads_log_ownership_months_title" text="Тривалість володіння"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Всього поломок"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Сер. інтервал поломок"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Сер. інтервал обслуговування"/>
+        <text name="ads_log_performed" text="Виконано %s"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Несправностей не виявлено"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Виявлені несправності: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="Транспортний засіб було перефарбовано"/>
+        <text name="ads_log_repair_desc_generic" text="Ремонт"/>
+        <text name="ads_log_cancelled_desc" text="Процедуру скасовано"/>
+        <text name="ads_log_date" text="Дата"/>
+        <text name="ads_log_hours" text="Мотогодини"/>
+        <text name="ads_log_type" text="Тип робіт"/>
+        <text name="ads_log_description" text="Опис"/>
+        <text name="ads_log_price" text="Вартість"/>
+        <text name="ads_log_button_show_report" text="Показати звіт"/>
+        <text name="ads_log_empty" text="Журнал порожній"/>
+        <text name="ads_breakdowns_severity_permanent" text="Постійна"/>
+        <text name="ads_breakdowns_severity_reduce_power" text="Зниження потужності"/>
+        <text name="ads_breakdowns_severity_shutdown" text="Вимкнення"/>
+        <text name="ads_breakdowns_severity_minor" text="Незначна"/>
+        <text name="ads_breakdowns_severity_moderate" text="Середня"/>
+        <text name="ads_breakdowns_severity_major" text="Серйозна"/>
+        <text name="ads_breakdowns_severity_critical" text="Критична"/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Накопичений стрес за роки важкої роботи. Незначний, незворотний знос основних компонентів злегка знижує загальну продуктивність."/>
+        <text name="ads_breakdowns_part_vehicle" text="Транспортний засіб"/>
+        <text name="ads_breakdowns_part_consumables" text="Витратні матеріали"/>
+        <text name="ads_breakdowns_part_engine" text="Двигун"/>
+        <text name="ads_breakdowns_part_battery" text="Акумулятор"/>
+        <text name="ads_breakdowns_part_ecu" text="ЕБУ (Блок управління)"/>
+        <text name="ads_breakdowns_part_wiring" text="Проводка та роз'єми"/>
+        <text name="ads_breakdowns_part_alternator_regulator" text="Регулятор генератора"/>
+        <text name="ads_breakdowns_part_turbocharger" text="Турбокомпресор"/>
+        <text name="ads_breakdowns_part_oil_pump" text="Масляний насос"/>
+        <text name="ads_breakdowns_part_valve_train" text="ГРМ (Клапанний механізм)"/>
+        <text name="ads_breakdowns_part_clutch" text="Зчеплення"/>
+        <text name="ads_breakdowns_part_synchronizer" text="Синхронізатор"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Гідронасос Powershift"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="Ланцюг варіатора (CVT)"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Гідроклапан управління варіатором"/>
+        <text name="ads_breakdowns_part_cvt" text="Варіатор (CVT)"/>
+        <text name="ads_breakdowns_part_hydraulic_pump" text="Гідравлічний насос"/>
+        <text name="ads_breakdowns_part_hydraulic_cylinder" text="Гідроциліндр"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="Муфта ВВП"/>
+        <text name="ads_breakdowns_part_brake_system" text="Гальмівна система"/>
+        <text name="ads_breakdowns_part_wheel_bearing" text="Підшипник колеса"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="Рульова тяга"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="Натягувач гусениці"/>
+        <text name="ads_breakdowns_part_thermostat" text="Термостат"/>
+        <text name="ads_breakdowns_part_cooling_system" text="Система охолодження"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="Муфта вентилятора"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="Паливний насос"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="Паливні форсунки"/>
+        <text name="ads_breakdowns_part_fuel_filter" text="Паливний фільтр"/>
+        <text name="ads_breakdowns_part_fuel_line" text="Паливопровід"/>
+        <text name="ads_breakdowns_part_harvest_processing_system" text="Система обробки врожаю"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Вивантажувальний шнек"/>
+		
+		<text name="ads_breakdowns_quick_fix_stage" text="Підлатано"/>
+        <text name="ads_breakdowns_defected_parts_stage" text="Дефект"/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="Вузол працює нормально, але діагностика виявила дефектну деталь. Через критично низький запас міцності рекомендована профілактична заміна, щоб уникнути раптової поломки."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="Вузол працює нормально, але тримається виключно на швидкому ремонті зношених елементів. Щоб уникнути неминучої поломки під навантаженням, рекомендується якомога швидше провести повну заміну деталей."/>
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="Режим захисту двигуна"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Аварійний режим двигуна! Потужність обмежена!"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="Режим захисту двигуна"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Аварійний режим двигуна! Потужність обмежена!"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="Режим захисту двигуна"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Аварійний режим двигуна! Потужність обмежена!"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="Режим захисту двигуна"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Двигун вимкнено для захисту від перегріву"/>
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="Двигун повністю вийшов з ладу"/>
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="Двигун заклинив"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="Помилки ЕБУ. Злегка знижена потужність двигуна."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="Несправність ЕБУ. Помітна втрата потужності та підвищена витрата палива."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Критична несправність ЕБУ. Значна втрата потужності, висока витрата палива та ризик зупинки двигуна."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Повна відмова ЕБУ. Двигун некерований і не заводиться."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Двигун несправний"/>
+        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="Корозія проводки та електричних роз'ємів. Підвищений опір контактів викликає епізодичне мерехтіння світла, нестабільну напругу та утруднений запуск двигуна."/>
+        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="Середня корозія проводки та роз'ємів. Втрати контакту викликають часте мерехтіння світла, нестабільну напругу, важкий запуск і можливі зупинки двигуна."/>
+        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="Сильна корозія проводки та роз'ємів. Живлення критичних ланцюгів нестабільне, освітлення може повністю відмовити, крутний момент двигуна знижений, запуск ненадійний."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="Відмова ланцюга управління стартером через сильну корозію. Освітлення не працює, запуск двигуна неможливий."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_message" text="Відмова ланцюга стартера"/>
+        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="Сульфатація акумулятора. Ефективна ємність знижена, що призводить до меншого резерву енергії під навантаженням."/>
+        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="Середня сульфатація акумулятора. Ефективна ємність значно знижена, запуск двигуна утруднений."/>
+        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="Сильна сульфатація акумулятора. Корисна ємність критично низька, робота стартера нестабільна."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="Критична сульфатація акумулятора. Ефективна ємність майже відсутня, потужності стартера недостатньо для надійного запуску."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="Недостатньо пускової потужності АКБ"/>
+        <text name="ads_alternator_regulator_failure_stage1_description" text="Несправність регулятора генератора. Потужність зарядки знижена, що погіршує ефективність зарядки акумулятора."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="Середня несправність регулятора. Зарядка нестабільна, що призводить до поганої зарядки АКБ та втрат напруги в системі."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="Сильна несправність регулятора. Зарядка критично знижена, напруга нестабільна, електрична система працює з великими втратами."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="Повна відмова регулятора генератора. Зарядка акумулятора відсутня, система працює лише на залишках резерву АКБ."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_message" text="Відмова системи зарядки"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Знос підшипників турбіни. Чутне слабке свистіння, невелика втрата потужності на високих обертах."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Витік ущільнювачів турбіни. Помітна втрата потужності, підвищена витрата палива."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Пошкодження лопатей турбіни. Сильна втрата потужності та ризик зупинки двигуна під великим навантаженням."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Катастрофічна відмова турбіни. Двигун втратив більшу частину потужності, існує загроза серйозних внутрішніх пошкоджень."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="Несправність масляного насоса. Тиск масла знижений, крутний момент двигуна трохи впав, температура підвищена, можливий механічний стукіт."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="Середня несправність масляного насоса. Тиск масла недостатній, помітна втрата моменту, температура зросла, чітко чутно стукіт."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="Сильна несправність масляного насоса. Тиск масла критично низький, можливий перегрів двигуна, сильний гуркіт та зупинки двигуна."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="Критична відмова масляного насоса. Циркуляція масла недостатня для безпечної роботи, подальша експлуатація неможлива."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_message" text="Відсутній тиск масла"/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="Несправність клапанного механізму. Крутний момент трохи знижений, витрата палива зросла, присутній аномальний шум ГРМ."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="Середня несправність ГРМ. Помітне зниження потужності, шум клапанів виражений, можливі перебої в роботі під навантаженням."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="Сильна несправність ГРМ. Крутний момент сильно знижений, витрата палива значно зросла, шум ГРМ дуже сильний, можливі зупинки двигуна."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="Критична відмова ГРМ. Правильна робота клапанів не забезпечується, запуск або подальша робота двигуна неможливі."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_message" text="Відмова механізму ГРМ"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Початковий знос паливного насоса. Злегка знижена потужність двигуна та підвищена витрата палива."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Падіння тиску палива. Помітна втрата потужності, висока витрата палива, епізодичні зупинки двигуна."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Критичний тиск палива. Сильна втрата потужності, дуже висока витрата, часті зупинки двигуна."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Повна відмова паливного насоса. Паливо не подається до двигуна."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Запуск двигуна неможливий"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Одна або кілька форсунок мають злегка засмічені сопла. Двигун може працювати нерівномірно, з незначною втратою потужності."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Погане розпилення палива. Пропуски запалювання під навантаженням, що призводить до помітної втрати потужності та «провалів»."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Форсунка заклинює. Двигун працює дуже погано, значна втрата потужності та ненадійний запуск."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Форсунка повністю вийшла з ладу. Двигун не працюватиме правильно або не заведеться зовсім."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Запуск двигуна неможливий"/>
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Зношені гальмівні колодки. Невелике зниження ефективності гальмування."/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Витік гальмівної рідини або зношені диски. Гальмівний шлях помітно збільшився."/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Сильна втрата тиску в гальмівній системі. Гальма дуже слабкі та ненадійні."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Повна відмова гальмівної системи. Подальша експлуатація вкрай небезпечна."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Відмова гальм"/>
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Зношені диски зчеплення. Епізодична втрата потужності через пробуксовування трансмісії під навантаженням."/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Значний знос зчеплення. Помітне пробуксовування трансмісії, особливо під час прискорення."/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Сильно зношене зчеплення. Через сильне буксування передача потужності на колеса утруднена."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="Зчеплення повністю згоріло. Транспортний засіб не може рухатися."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="Відмова трансмісії"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Зношені синхронізатори. Епізодичний скрегіт або труднощі при перемиканні передач."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Пошкоджені синхронізатори. Перемикання передач часто ускладнене або неможливе."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Зламані зуби синхронізатора. Висока ймовірність вибивання передачі під навантаженням."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Синхронізатори повністю вийшли з ладу. Перемикання передач неможливе."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Відмова трансмісії"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Низький тиск гідравліки в Powershift. Невелика затримка та жорсткість при ввімкненні передач."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Зношені ущільнювачі гідронасоса. Помітна затримка та ривки при перемиканні."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Вихід з ладу гідронасоса. Сильна затримка та жорсткі удари при перемиканні."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Гідронасос Powershift відмовив. Трансмісія застрягла на нейтралі."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="Знос ланцюга варіатора. Присутнє проковзування ланцюга, підвищене виділення тепла трансмісією."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="Середній знос ланцюга варіатора. Проковзування помітне, витрата палива зросла, робоча температура трансмісії підвищена."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="Сильний знос ланцюга варіатора. Проковзування виражене, витрата палива значно зросла, ймовірний перегрів трансмісії."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="Критичний знос ланцюга варіатора. Передача моменту через варіатор більше не надійна, рух техніки не забезпечується."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="Критичне буксування варіатора"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="Несправність гідроклапана управління варіатором. Епізодичні падіння тиску, крутний момент злегка знижений, діапазон передавальних чисел обмежений."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Середня несправність гідроклапана варіатора. Часта нестабільність тиску, температура трансмісії підвищена, діапазон передач обмежений."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Сильна несправність гідроклапана варіатора. Виражені падіння тиску, крутний момент сильно знижений, ймовірний перегрів трансмісії."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Критична відмова гідроклапана варіатора. Контроль тиску нестабільний, діапазон передач суворо обмежений, робота в аварійному режимі."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Виявлено перші ознаки несправності трансмісії варіатора. Потрібен огляд та ремонт."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Несправність варіатора посилюється. Подальша експлуатація може призвести до переходу в аварійний режим."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Критичне пошкодження варіатора. Трансмісія в аварійному режимі, максимальна швидкість обмежена."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Повна відмова варіатора. Подальша експлуатація неможлива до ремонту трансмісії."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Відмова трансмісії варіатора"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Відмова гідроуправління варіатора"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Термостат двигуна починає виходити з ладу. Двигун довше прогрівається або працює на дещо підвищеній температурі."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Погана реакція термостата. Регулювання температури нестабільне, що прискорює знос."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Термостат заклинив у закритому стані. Двигун буде постійно перегріватися під навантаженням."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Повна відмова термостата. Охолоджуюча рідина не може циркулювати правильно, що призводить до негайного перегріву."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Невеликий внутрішній витік насоса. Гідравлічне обладнання працює трохи повільніше."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Зношені ущільнювачі насоса. Помітне уповільнення роботи гідравліки."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Пошкоджений гідронасос. Робота обладнання вкрай повільна та слабка."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Відмова гідронасоса. Гідравлічна система не працює."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Відмова гідравліки"/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="Внутрішній витік у гідроциліндрі. Швидкість спрацьовування злегка знижена, обладнання може повільно опускатися під навантаженням."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="Середній внутрішній витік у гідроциліндрі. Швидкість роботи помітно впала, стабільність утримання вантажу порушена."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="Сильний внутрішній витік у гідроциліндрі. Робота повільна та слабка, обладнання не може надійно тримати позицію."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="Критичний витік у гідроциліндрі. Рух майже відсутній, утримання вантажу неможливе."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="Критичний витік гідроциліндра"/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="Пробуксовування муфти ВВП. Передача моменту знижена, ВВП може вимикатися під навантаженням."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="Середнє пробуксовування муфти ВВП. Передача моменту значно знижена, часті самовільні вимкнення ВВП."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="Сильне пробуксовування муфти ВВП. Корисний момент вкрай низький, стабільна робота обладнання не забезпечується."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="Критична відмова муфти ВВП. Передача моменту повністю відсутня."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="Відмова ВВП"/>
+        <text name="ads_breakdowns_bearing_wear_stage1_description" text="Знос підшипника ступиці. Присутні шум та вібрація, максимальна швидкість злегка обмежена."/>
+        <text name="ads_breakdowns_bearing_wear_stage2_description" text="Середній знос підшипника ступиці. Шум та вібрація виражені, навантаження на трансмісію зросло."/>
+        <text name="ads_breakdowns_bearing_wear_stage3_description" text="Сильний знос підшипника ступиці. Сильна вібрація, значне обмеження швидкості, можливий скрегіт заклинювання."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_description" text="Критична відмова підшипника ступиці. Підшипник заклинив, обертання колеса заблоковано."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_message" text="Підшипник колеса заклинив"/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="Знос рульової тяги. Присутнє невелике відведення керма вбік, реакція на поворот погіршилася."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="Середній знос рульової тяги. Відведення керма помітне, реакція на рульове управління значно гірша."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="Сильний знос рульової тяги. Порушена курсова стійкість, реакція на поворот керма вкрай слабка."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="Критична відмова рульової тяги. Контроль над напрямком руху майже втрачено, безпечне керування неможливе."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="Відмова рульової тяги"/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="Несправність натягувача гусениці. Присутні відведення вбік, вібрація та невелике зниження швидкості."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="Середня несправність натягувача. Помітна нестабільність руху, опір коченню зріс, швидкість знижена."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="Сильна несправність натягувача. Виражена вібрація та шум, сильне навантаження на трансмісію, швидкість суттєво обмежена."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="Критична відмова натягувача гусениці. Стабільний рух гусениці неможливий, сталося заклинювання ходової частини."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="Відмова натягувача гусениці"/>
+        <text name="ads_breakdowns_coolant_leak_stage1_description" text="Витік охолоджуючої рідини. Ефективність системи охолодження злегка знижена."/>
+        <text name="ads_breakdowns_coolant_leak_stage2_description" text="Середній витік антифризу. Температура двигуна під навантаженням зростає швидше."/>
+        <text name="ads_breakdowns_coolant_leak_stage3_description" text="Сильний витік антифризу. Ефективність охолодження значно впала, перегрів під навантаженням дуже ймовірний."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_description" text="Критичний витік охолоджуючої рідини. Безпечна температура двигуна не може бути забезпечена."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_message" text="Критичний витік антифризу"/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="Несправність муфти вентилятора. Ефективність обдування злегка знижена, присутній аномальний шум муфти."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="Середня несправність муфти вентилятора. Ефективність охолодження знижена, шум муфти чітко чутно."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="Сильна несправність муфти вентилятора. Обдування значно погіршилося, шум муфти дуже сильний."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="Критична відмова муфти вентилятора. Ефективність охолодження критично низька, потік повітря через радіатор не забезпечується."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="Відмова муфти вентилятора"/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="Засмічення паливного фільтра. Потік палива обмежений, що викликає легкі перебої під навантаженням та невелике падіння моменту."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="Середнє засмічення фільтра. Перебої в роботі часті, потужність двигуна знижена, можливі зупинки."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="Сильне засмічення паливного фільтра. Потік палива критично обмежений, крутний момент сильно впав, зупинки двигуна дуже ймовірні."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="Критичне засмічення фільтра. Пропускна здатність недостатня для роботи, запуск двигуна неможливий."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="Паливний фільтр забитий"/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="Підсмоктування повітря в паливній магістралі. Подача палива стає нестабільною, запуск двигуна ускладнюється."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="Середнє підсмоктування повітря. Нестабільна робота, важкий запуск, можливі раптові зупинки двигуна."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="Сильне підсмоктування повітря. Безперервність подачі палива порушена, запуск вкрай ненадійний, двигун часто глохне."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="Критичне підсмоктування повітря. Подача палива неможлива, запуск або подальша робота двигуна виключені."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="Повітря в паливній системі"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Зношена ізоляція, епізодичні падіння напруги. Спостерігаються дрібні збої в електроніці."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Корозія контактів та нестабільна напруга генератора. Можливі відмови освітлення, запуск ненадійний."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Ризик короткого замикання. Критичні системи працюють ненадійно, світло може повністю згаснути."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Відмова освітлення"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Відмова головного джгута проводки. Електрична система транспортного засобу повністю мертва."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Стартер не реагує"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Невелике забруднення карбюратора. Двигун іноді «затинається» під великим навантаженням."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Засмічені жиклери. Двигун часто чхає і втрачає потужність, особливо при різкому відкритті дроселя."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Сильне засмічення карбюратора. Двигун працює дуже нерівномірно, часто глохне і ледь тримає потужність."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Паливне голодування через повністю забитий карбюратор. Двигун не працюватиме."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Карбюратор засмічений"/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="Знос системи збирання та обробки. Ефективність обробки врожаю злегка знижена, що призводить до незначних втрат."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="Середній знос системи обробки. Ефективність помітно знижена, втрати врожаю стають відчутними."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="Сильний знос системи обробки. Значне зниження ефективності, високі втрати врожаю."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="Критичний знос системи обробки врожаю. Критичне зниження ефективності, екстремальні втрати під час роботи."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_message" text="Критичне падіння ефективності збирання"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Незначний знос внутрішніх шнеків та ланцюгів елеватора. Невелика кількість врожаю втрачається під час внутрішнього транспортування."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Зношені витки шнеків та проковзування конвеєрних стрічок викликають втрати всередині машини. Можливий періодичний скрегіт."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Пошкоджені лопаті елеватора та шнеки ледве справляються з масою врожаю, що призводить до значних втрат та ризику серйозного затору."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Основний компонент системи подачі матеріалу вийшов з ладу, викликавши серйозне блокування. Двигун працює з екстремальним навантаженням."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Затор у системі подачі"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Розтягнутий приводний ремінь. Епізодичне проковзування призводить до невеликого зниження швидкості вивантаження."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Зношений ремінь та шківи. Значне буксування під навантаженням помітно сповільнює вивантаження."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Пошкоджений редуктор або сильно зношений ремінь. Шнек ледве обертається, працюючи на дуже низькій швидкості."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Приводний ремінь порвався або редуктор заклинив. Вивантажувальний шнек повністю заблоковано."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Вивантажувальний шнек заклинив"/>
+        <text name="ads_breakdowns_dead_battery_message" text="Заряд акумулятора вичерпано"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="Недостатня напруга в системі"/>
+        <text name="ads_breakdowns_engine_stalled_message" text="Двигун заглох"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="ВВП автоматично вимкнено"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="Передачу вибито"/>
+        <text name="ads_breakdown_at_progress_message" text="триває"/>
+		<text name="ads_spec_cold_engine_message" text="Двигун холодний! Високі оберти спричиняють знос!"/>
+        <text name="ads_spec_overheat_engine_message" text="Увага! Перегрів двигуна."/>
+        <text name="ads_spec_overheat_transmission_message" text="Увага! Перегрів трансмісії."/>
+        <text name="ads_spec_this_month" text="Цього місяця"/>
+        <text name="ads_spec_months_ago" text="міс. тому"/>
+        <text name="ads_spec_never" text="Ніколи"/>
+        <text name="ads_spec_op_hours_short" text="м/год"/>
+        <text name="ads_spec_tomorrow_at" text="завтра о "/>
+        <text name="ads_spec_day_after_tommorow_at" text="післязавтра о "/>
+        <text name="ads_spec_in_days_at" text="через {days} дн. о "/>
+        <text name="ads_spec_day_s" text="дн."/>
+        <text name="ads_spec_hour_s" text="год."/>
+        <text name="ads_spec_minute_s" text="хв."/>
+        <text name="ads_spec_duration_format_hours" text="%d %s"/>
+        <text name="ads_spec_duration_format_minutes" text="%d %s"/>
+        <text name="ads_spec_duration_format_combined" text="%s і %s"/>
+        <text name="ads_spec_months_ago_unit" text="міс. тому"/>
+        <text name="ads_spec_months_ago_format" text="%s %s"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s до %s"/>
+        <text name="ads_spec_service_interval_format" text="%s м/год"/>
+        <text name="ads_spec_maintenance_complete_notification" text="завершено"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="скасовано"/>
+        <text name="ads_spec_inspection_issues_detected_notification" text="Виявлено проблем: %s"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="Проблем не виявлено"/>
+        <text name="ads_spec_next_planned_service_notification" text="Планова процедура розпочата: %s"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Планову процедуру %s скасовано через брак коштів"/>
+        <text name="ads_spec_workshop_dealer" text="Дилер"/>
+        <text name="ads_spec_workshop_own" text="Власна"/>
+        <text name="ads_spec_workshop_mobile" text="Мобільна"/>
+        <text name="ads_spec_system_engine" text="Двигун"/>
+        <text name="ads_spec_system_transmission" text="Трансмісія"/>
+        <text name="ads_spec_system_hydraulics" text="Гідравліка / ВВП"/>
+        <text name="ads_spec_system_cooling" text="Система охолодження"/>
+        <text name="ads_spec_system_electrical" text="Електросистема"/>
+        <text name="ads_spec_system_chassis" text="Ходова частина"/>
+        <text name="ads_spec_system_workprocess" text="Робочі системи"/>
+        <text name="ads_spec_system_fuel" text="Паливна система"/>
+        <text name="ads_spec_state_ready" text="Готово"/>
+        <text name="ads_spec_state_inspection" text="Огляд"/>
+        <text name="ads_spec_state_maintenance" text="Обслуговування"/>
+        <text name="ads_spec_state_repair" text="Ремонт"/>
+        <text name="ads_spec_state_overhaul" text="Кап. ремонт"/>
+        <text name="ads_spec_state_broken" text="Поломка"/>
+        <text name="ads_spec_state_excellent" text="Відмінний"/>
+        <text name="ads_spec_state_good" text="Гарний"/>
+        <text name="ads_spec_state_normal" text="Нормальний"/>
+        <text name="ads_spec_state_bad" text="Поганий"/>
+        <text name="ads_spec_state_terrible" text="Жахливий"/>
+        <text name="ads_spec_state_unknown" text="Невідомо"/>
+        <text name="ads_spec_state_optimal" text="Оптимальний"/>
+        <text name="ads_spec_state_recommended" text="Рекомендовано"/>
+        <text name="ads_spec_state_required" text="Необхідно"/>
+        <text name="ads_spec_state_overdue" text="Прострочено"/>
+        <text name="ads_spec_state_legendary" text="Легендарний"/>
+        <text name="ads_spec_state_premium" text="Преміум"/>
+        <text name="ads_spec_state_standart" text="Стандартний"/>
+        <text name="ads_spec_state_budget" text="Бюджетний"/>
+        <text name="ads_spec_state_low" text="Низький"/>
+        <text name="ads_spec_state_average" text="Середній"/>
+        <text name="ads_spec_state_high" text="Високий"/>
+        <text name="ads_spec_state_workhorse" text="Робоча конячка"/>
+        <text name="ads_spec_part_types_used" text="Вживані"/>
+        <text name="ads_spec_part_types_aftermarket" text="Аналоги"/>
+        <text name="ads_spec_part_types_oem" text="Оригінальні (OEM)"/>
+        <text name="ads_spec_part_types_premium" text="Преміальні"/>
+        <text name="ads_spec_inspection_visual" text="Візуальний"/>
+        <text name="ads_spec_inspection_standard" text="Стандартний"/>
+        <text name="ads_spec_inspection_complete" text="Повна дефектоскопія"/>
+        <text name="ads_spec_maintenance_minimal" text="Мінімальне"/>
+        <text name="ads_spec_maintenance_standard" text="Стандартне"/>
+        <text name="ads_spec_maintenance_extended" text="Розширене"/>
+        <text name="ads_spec_maintenance_preventive" text="Профілактичне"/>
+        <text name="ads_spec_overhaul_partial" text="Частковий"/>
+        <text name="ads_spec_overhaul_standard" text="Стандартний"/>
+        <text name="ads_spec_overhaul_full" text="Повний"/>
+        <text name="ads_spec_repair_type_fix" text="Швидка латка"/>
+        <text name="ads_spec_repair_type_replacement" text="Стандартний"/>
+        <text name="ads_spec_repair_type_advanced" text="Поглиблений"/>
+
+        <text name="ads_option_menu_option_one_title_inspection" text="Оберіть тип огляду"/>
+        <text name="ads_option_menu_option_two_title_inspection" text="Ремонт виявлених несправностей"/>
+        <text name="ads_option_menu_option_one_title_maintenance" text="Оберіть рівень обслуговування"/>
+        <text name="ads_option_menu_option_two_title_maintenance" text="Оберіть якість витратних матеріалів"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Оберіть тип ремонту"/>
+        <text name="ads_option_menu_option_two_title_repair" text="Оберіть якість запчастин"/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="Оберіть обсяг робіт"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="Оберіть систему"/>
+        <text name="ads_option_menu_price_text" text="Ціна: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Гарантійний ремонт"/>
+        <text name="ads_option_menu_duration_text" text="Тривалість: "/>
+        <text name="ads_option_menu_finish_time_text" text="Час завершення: "/>
+        <text name="ads_option_menu_start_text" text="Почати"/>
+        <text name="ads_option_menu_duration_instant" text="Миттєво"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Швидкий зовнішній огляд. Низька ціна та миттєвий результат. Виявляє очевидні поломки, проте є ризик пропустити приховані дефекти. Не надає точних даних про техстан."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* Планова діагностична процедура. Виявляє всі активні несправності та формує загальний звіт про стан транспортного засобу."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Глибока діагностика. Гарантує виявлення всіх поломок, включно з потенційними, та надає вичерпний звіт із точним відсотком зносу всіх вузлів."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Базовий сервіс. Значно дешевший і швидший, проте не повністю відновлює рівень сервісу та скорочує інтервал до наступного ТО."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Регламентне обслуговування згідно зі специфікаціями виробника. Відновлює рівень сервісу до норми та забезпечує стандартний сервісний інтервал."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Всебічне обслуговування. Триває довше і коштує дорожче, але відновлює рівень сервісу вище стандарту та подовжує інтервал до наступного ТО."/>   
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Профілактика понад стандарти виробника. Відновлює рівень сервісу та фокусується на найбільш проблемних вузлах для зниження ризику поломок."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Тимчасовий ремонт для термінової роботи. Швидко та дешево відновлює функціональність, проте причина поломки не усувається і вона знову з'явиться з часом."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Стандартна заміна несправного компонента. Повністю усуває поточну поломку та відновлює вузол до нормального робочого стану."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* Поглиблений ремонт із заміною несправного вузла та обслуговуванням суміжних деталей. Значно знижує ризик повторних поломок у цій системі."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Відновлює обрану систему до гарного робочого стану. Швидше та дешевше, ніж капітальний ремонт усього засобу."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* Комплексна робота над усіма основними вузлами. Відновлює загальний стан до гарного рівня."/>
+        <text name="ads_option_menu_overhaul_full_description" text="* Повне заводське відновлення. Висока вартість і тривалість, проте відновлює стан до відмінного рівня."/>
+        <text name="ads_option_menu_part_used_description" text="* Вживані деталі з розборок. Дуже дешево, але вкрай ризиковано (~50% шанс дефекту)."/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Бюджетні копії-аналоги. Знижена вартість, але з помірним ризиком дефектів (33%)."/>
+        <text name="ads_option_menu_part_oem_description" text="* Оригінальні деталі від виробника. Стандартна надійність (10% ризику) за повну ціну."/>
+        <text name="ads_option_menu_part_premium_description" text="* Посилені компоненти. Дорого, але з суворим контролем якості (0% ризику дефектів)."/>
+        <text name="ads_option_menu_perform_repair" text="Ремонтувати виявлені несправності"/>
+        <text name="ads_option_menu_perform_maintenance" text="Провести ТО після ремонту"/>
+        <text name="ads_option_menu_perform_renew_paint" text="Оновити лакофарбове покриття"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Автоматично почати стандартний ремонт із запчастинами OEM у разі виявлення поломок."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Автоматично почати стандартне ТО з витратними матеріалами OEM після ремонту."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Перефарбувати транспортний засіб під час капітального ремонту."/>
+        <text name="ads_option_menu_choosen_parts_text" text="* Обрано для ремонту:"/>
+
+        <text name="ads_report_header_title" text="Звіт про огляд"/>
+        <text name="ads_report_vehicle_name_title" text="Назва техніки"/>
+        <text name="ads_report_date_title" text="Дата"/>
+        <text name="ads_report_vehicle_age_title" text="Вік"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Мотогодини"/>
+        <text name="ads_report_inspection_type_title" text="Тип огляду"/>
+        <text name="ads_report_inspection_location_title" text="Місце проведення"/>
+        <text name="ads_report_overall_assessment_title" text="Загальна оцінка стану"/>
+        <text name="ads_report_vehicle_specs_title" text="Характеристики техніки"/>
+        <text name="ads_report_detected_breakdowns_title" text="Виявлені поломки"/>
+        <text name="ads_report_recommendations_title" text="Висновки та рекомендації"/>
+        <text name="ads_report_state_optimal" text="Оптимально"/>
+        <text name="ads_report_state_normal" text="Нормально"/>
+        <text name="ads_report_state_degraded" text="Погіршено"/>
+        <text name="ads_report_state_impaired" text="Порушено"/>
+        <text name="ads_report_state_critical" text="Критично"/>
+        <text name="ads_report_state_not_available" text="Н/Д"/>
+        <text name="ads_report_overall_assessment_condition" text="Рівень стану"/>
+        <text name="ads_report_overall_assessment_service" text="Рівень сервісу"/>
+        <text name="ads_report_overall_assessment_mtbf" text="MTBF (год)"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="Ризик крит. відмови"/>
+        <text name="ads_report_overall_assessment_rul" text="Залишковий ресурс (год)"/>
+        <text name="ads_report_overall_assessment_wear_rate" text="Швидкість зносу (%/год)"/>
+        <text name="ads_report_overall_assessment_nominal_wear_rate" text="Номінальний знос (%/год)"/>
+        <text name="ads_report_system_condition_title" text="Стан системи | Ризик відмови"/>
+        <text name="ads_report_system_condition_power" text="Поточна потужність"/>
+        <text name="ads_report_system_condition_brakes" text="Ефективність гальм"/>
+        <text name="ads_report_system_condition_transmission" text="Трансмісія"/>
+        <text name="ads_report_system_condition_harvest" text="Ефективність збирання"/>
+        <text name="ads_report_system_condition_cooling" text="Ефективність охолодження"/>
+        <text name="ads_report_system_condition_consumption" text="Витрата палива"/>
+        <text name="ads_report_system_condition_hydraulic" text="Ефективність гідравліки"/>
+        <text name="ads_report_transmission_slipping" text="Пробуксовування"/>
+        <text name="ads_report_transmission_shifting_impaired" text="Збій перемикання"/>
+        <text name="ads_report_transmission_gear_rejection" text="Вибивання передачі"/>
+        <text name="ads_report_transmission_shift_delay" text="Затримка перемикання"/>
+        <text name="ads_report_transmission_cvt_slipping" text="Буксування ременя/ланцюга"/>
+        <text name="ads_report_transmission_cvt_ratio_limited" text="Діапазон обмежено"/>
+        <text name="ads_report_transmission_cvt_pressure_instability" text="Нестабільність тиску"/>
+        <text name="ads_report_transmission_failed" text="Відмова"/>
+        <text name="ads_report_vehicle_spec_max_alternator_current" text="Макс. струм генератора"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="Заряд акумулятора"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="Ємність акумулятора"/>
+        <text name="ads_report_stress_absent" text="Відсутній"/>
+        <text name="ads_report_stress_low" text="Низький"/>
+        <text name="ads_report_stress_moderate" text="Середній"/>
+        <text name="ads_report_stress_elevated" text="Підвищений"/>
+        <text name="ads_report_stress_high" text="Високий"/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Виявлено активні несправності. Рекомендується стандартний ремонт усіх виявлених дефектів."/>
+        <text name="ads_report_recommendation_defective_parts" text="Виявлено дефектні запчастини: %s. Рекомендується профілактична заміна для уникнення раптової відмови."/>
+        <text name="ads_report_recommendation_quick_fix" text="Виявлено тимчасовий ремонт (латку): %s. Рекомендується провести стандартну заміну за першої можливості."/>
+        <text name="ads_report_recommendation_service_due" text="Досягнуто порогу сервісного інтервалу. Проведіть технічне обслуговування."/>
+        <text name="ads_report_recommendation_service_urgent" text="Сервісний інтервал порушено. Терміново проведіть технічне обслуговування!"/>
+        <text name="ads_report_recommendation_overhaul" text="Виявлено деградацію основних вузлів. Проведіть капітальний ремонт."/>
+        <text name="ads_report_recommendation_system_overhaul" text="Виявлено критичну деградацію в системі: %s. Проведіть частковий капітальний ремонт цієї системи."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="Виявлено підвищений ризик поломки в системі: %s. Проведіть профілактичне обслуговування для зниження ризику."/>
+        <text name="ads_report_recommendation_operating_conditions" text="Виявлено ознаки інтенсивного перевантаження. Покращте умови експлуатації."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="Виявлено дефектні витратні матеріали. Повторіть ТО для заміни несправних компонентів."/>
+        <text name="ads_report_recommendation_all_ok" text="Критичних рекомендацій немає. Техніка перебуває у придатному для роботи стані."/>
+
+        <text name="ads_grease_gun_name" text="Шприц для змащування"/>
+        <text name="ads_grease_gun_function" text="Використовується для проведення процедур змащування"/>
+        <text name="ads_grease_gun_action" text="Змастити"/>
+        <text name="ads_grease_gun_no_vehicle" text="У зоні доступу немає техніки для змащування"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s не потребує змащування"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s вже змащено"/>
+        <text name="ads_air_blower_name" text="Повітродувка"/>
+        <text name="ads_air_blower_function" text="Використовується для чищення радіаторів та повітрозабірників"/>
+        <text name="ads_air_blower_action" text="Очистити радіатор та повітрозабірник"/>
+        <text name="ads_air_blower_no_vehicle" text="У зоні доступу немає техніки для очищення"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s не потребує очищення"/>
+        <text name="ads_air_blower_already_clean" text="%s: радіатор та повітрозабірник вже чисті"/>
+        <text name="ads_jumper_cables_name" text="Пускові дроти"/>
+        <text name="ads_jumper_cables_function" text="Використовуються для з'єднання акумуляторів та запуску двигуна від іншого засобу"/>
+        <text name="ads_jumper_cables_action" text="Під'єднати/від'єднати дроти"/>
+        <text name="ads_jumper_cables_connected" text="Пускові дроти під'єднано до %s"/>
+        <text name="ads_jumper_cables_already_connected" text="Пускові дроти вже під'єднані до %s"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="Техніка не підходить для під'єднання пускових дротів"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Пускові дроти вже з'єднують %s та %s"/>
+        <text name="ads_jumper_cables_disconnected" text="Пускові дроти від'єднано від %s"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Дроти від'єднано, оскільки одна з машин почала рух"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s занадто далеко від %s"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="Огляд техніки"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
+        <text name="ads_field_inspection_action" text="Оглянути техніку"/>
+        <text name="ads_field_inspection_hold_to_start" text="Утримуйте для початку огляду"/>
+        <text name="ads_field_inspection_starting" text="Початок огляду..."/>
+        <text name="ads_field_inspection_progress" text="Виконується візуальний огляд... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Огляд скасовано"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Зупиніть двигун перед оглядом"/>
+        <text name="ads_inspection_dialog_title" text="Передзмінний візуальний огляд"/>
+        <text name="ads_inspection_section_fluids" text="1. Технічні рідини"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Система охолодження та впуску"/>
+        <text name="ads_inspection_section_lubrication" text="3. Точки змащування"/>
+        <text name="ads_inspection_section_additional" text="4. Додаткові замітки"/>
+        <text name="ads_inspection_engine_oil" text="Моторне масло"/>
+        <text name="ads_inspection_coolant" text="Антифриз"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Гідравлічне масло"/>
+        <text name="ads_inspection_transmission_oil" text="Трансмісійне масло"/>
+        <text name="ads_inspection_radiator" text="Радіатор"/>
+        <text name="ads_inspection_air_duct" text="Повітропровід"/>
+        <text name="ads_inspection_air_filter" text="Повітряний фільтр"/>
+        <text name="ads_inspection_lubrication_level" text="Рівень змазки"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Підозрілих симптомів не виявлено"/>
+        <text name="ads_inspection_ok" text="OK"/>
+        <text name="ads_inspection_status_slightly_low" text="Трохи низький"/>
+        <text name="ads_inspection_status_low" text="Низький"/>
+        <text name="ads_inspection_status_very_low" text="Дуже низький"/>
+        <text name="ads_inspection_status_critically_low" text="Критично низький"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Злегка потемніла"/>
+        <text name="ads_inspection_status_darkened" text="Потемніла"/>
+        <text name="ads_inspection_status_contaminated" text="Забруднена"/>
+        <text name="ads_inspection_status_critical_condition" text="Критичний стан"/>
+        <text name="ads_inspection_status_slight_moisture" text="Легка вологість"/>
+        <text name="ads_inspection_status_seepage" text="Просочування"/>
+        <text name="ads_inspection_status_active_leak" text="Активний витік"/>
+        <text name="ads_inspection_status_severe_leak" text="Сильний витік"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Злегка брудний"/>
+        <text name="ads_inspection_status_dirty" text="Брудний"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Сильно засмічений"/>
+        <text name="ads_inspection_status_critically_clogged" text="Критично засмічений"/>
+        <text name="ads_inspection_status_slightly_dry" text="Трохи сухі"/>
+        <text name="ads_inspection_status_dry" text="Сухі"/>
+        <text name="ads_inspection_status_very_dry" text="Дуже сухі"/>
+        <text name="ads_inspection_status_critically_dry" text="Критично сухі"/>
+        <text name="ads_inspection_status_not_required" text="Не потрібно"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="Помітні незначні сліди антифризу біля з'єднань системи охолодження."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Видимі залишки антифризу, рівень рідини нижче норми."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Помітна втрата антифризу в районі системи охолодження."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Рівень антифризу критично низький, видимі сильні патьоки."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="Моторне масло виглядає злегка потемнілою."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="Моторне масло темніша, ніж зазвичай."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="Моторне масло виглядає забрудненою."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Стан оливи виглядає критичним."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="Ледь помітна олійна плівка в районі гідроциліндра."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Видиме просочування гідравлічної рідини навколо циліндра."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Чіткі сліди рідини біля гідроциліндра."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Сильні патьоки гідравлічної рідини. Область навколо циліндра сильно забруднена."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="Поверхня радіатора злегка брудна."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Радіатор помітно брудний."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Радіатор сильно забитий брудом та рослинними залишками."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Радіатор критично забитий брудом та рослинними залишками."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="На повітрозабірнику помітні легкі забруднення."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Повітрозабірник помітно брудний."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Повітрозабірник сильно забитий пилом та сміттям."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Повітрозабірник критично забитий пилом та сміттям."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="Точки змащування виглядають злегка сухими."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Точки змащування виглядають сухими, мастила недостатньо."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Точки змащування дуже сухі, видимих залишків мастила майже немає."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Точки змащування критично сухі, мастило повністю відсутнє."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="На деяких електричних з'єднаннях помітні легкі сліди окислення."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="Виражене окислення та забруднення на проводці та роз'ємах."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Сильна корозія проводки та роз'ємів, помітні пошкодження ізоляції."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="На клемах акумулятора помітний слабкий білуватий наліт."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="На клемах акумулятора видно білуватий наліт."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Виражене окислення та відкладення на клемах та корпусі акумулятора."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Акумулятор і клеми вкриті густим нальотом, корпус виглядає брудним та зношеним."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Помітні ознаки перегріву та потемніння навколо генератора та деяких з'єднань."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Виражені ознаки перегріву та потемнілі роз'єми генератора та його проводки."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Олійні сліди та потемнілі з'єднання в районі турбокомпресора."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Сильні олійні патьоки, потемнілі з'єднання та сліди кіптяви навколо турбіни."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Олійні сліди та забруднення навколо гідравлічних з'єднань трансмісії."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Сильні олійні патьоки та сильне забруднення гідравлічних ліній трансмісії."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="Олійні сліди та потемнілі з'єднання навколо блоку гідроуправління варіатора."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="Сильні олійні патьоки та значне забруднення з'єднань блоку управління варіатора."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Натяг гусениці виглядає злегка нерівномірним."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Гусениця виглядає ослабленою, помітний нерівномірний натяг."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Гусениця помітно провисає, натяг серйозно порушено."/>
+		<text name="ads_ingame_menu_title" text="Advanced Damage System"/>
+        <text name="ads_ingame_menu_section_active" text="Техніка ADS"/>
+        <text name="ads_ingame_menu_section_service" text="На обслуговуванні"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Транспорт"/>
+        <text name="ads_ingame_menu_header_type" text="Тип"/>
+        <text name="ads_ingame_menu_header_age" text="Вік"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Години"/>
+        <text name="ads_ingame_menu_header_condition" text="Стан"/>
+        <text name="ads_ingame_menu_header_interval" text="Інтервал"/>
+        <text name="ads_ingame_menu_header_service_status" text="Оглянуто/Обслужено"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Огляд"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Сервіс"/>
+        <text name="ads_ingame_menu_header_cost" text="Утримання"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Лізинг"/>
+        <text name="ads_ingame_menu_header_price" text="Вартість"/>
+        <text name="ads_ingame_menu_header_procedure" text="Процедура"/>
+        <text name="ads_ingame_menu_header_time_left" text="Залишилось часу"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Час завершення"/>
+        <text name="ads_ingame_menu_header_service_cost" text="Ціна"/>
+        <text name="ads_ingame_menu_section_other" text="Інша техніка"/>
+        <text name="ads_ingame_menu_empty_other" text="Техніки без підтримки ADS не знайдено"/>
+        <text name="ads_ingame_menu_empty_active" text="Техніки ADS не знайдено"/>
+        <text name="ads_ingame_menu_empty_service" text="Зараз немає техніки на обслуговуванні"/>
+        <text name="ads_sell_dialog_costs_title" text="Додаткові витрати"/>
+        <text name="ads_sell_dialog_deposit_return" text="Повернення застави"/>
+        <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Прострочене ТО"/>
+        <text name="ads_sell_dialog_repair_penalty" text="Ремонт"/>
+        <text name="ads_sell_dialog_washing" text="Мийка"/>
+        <text name="ads_sell_dialog_total" text="Разом"/>
+        <text name="ads_mobile_workshop_low_maintainability" text="УВАГА: %s недоступний для %s у мобільній майстерні через низьку ремонтопридатність."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Критичне перевантаження! Негайно зменште навантаження на машину."/>
+    
+        <text name="ads_tutorialMode_label" text="Режим навчання"/>
+        <text name="ads_tutorialMode_tooltip" text="Показує підказки під час гри. Вимкнено в багатокористувацькому режимі."/>
+        <text name="ads_tutorialResetTips_label" text="Скинути підказки"/>
+        <text name="ads_tutorialResetTips_text" text="Скинути підказки"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Скинути історію підказок і показати їх знову. Доступно тільки в одиночній грі."/>
+        <text name="ads_tutorialResetConfirm_title" text="Скинути підказки навчання?"/>
+        <text name="ads_tutorialResetConfirm_message" text="Скинути історію підказок і показати їх всі знову?"/>
+        <text name="ads_tutorial_welcome_dialog_title" text="Ласкаво просимо до Advanced Damage System"/>
+        <text name="ads_tutorial_welcome_disable_button" text="Вимкнути підказки"/>
+        <text name="ads_tutorial_welcome_enable_button" text="Увімкнути підказки"/>
+        <text name="ads_tutorial_welcome_message" text="Цей мод повністю переробляє системи пошкоджень та обслуговування техніки в грі. Змін багато, тому час від часу з’являтимуться підказки. Вони допоможуть швидше розібратися в механіках, уникнути помилок та вберегти вашу техніку від поломок.&#10;&#10;Якщо бажаєте, ви можете вимкнути їх прямо зараз. Ви завжди зможете увімкнути їх пізніше в налаштуваннях моду в розділі Advanced Damage System."/>
+        <text name="ads_tutorial_service_due_soon_title" text="Періодичне ТО"/>
+        <text name="ads_tutorial_service_due_soon_message" text="%s скоро потребуватиме технічного обслуговування.&#10;&#10;В ADS техніка вимагає регулярного сервісу. Якщо його затримати, ризик поломок значно зростає.&#10;&#10;Відвідайте найближчу майстерню та оберіть «Обслуговування». Сервісний інтервал можна налаштувати в меню моду."/>
+        <text name="ads_tutorial_service_interval_expired_title" text="Термін ТО вичерпано"/>
+        <text name="ads_tutorial_service_interval_expired_message" text="%s перевищив сервісний інтервал і потребує ТО.&#10;&#10;Якомога швидше вирушайте до майстерні та проведіть процедуру «Обслуговування». Подальша робота на техніці з простроченим інтервалом значно збільшує ризик множинних відмов."/>
+        <text name="ads_tutorial_rad_or_intake_clogged_title" text="Засмічення радіатора та впуску"/>
+        <text name="ads_tutorial_rad_or_intake_clogged_message" text="Схоже, радіатор та повітрозабірники вашої техніки сильно забиті.&#10;&#10;Брудний радіатор не може ефективно відводити тепло, а засмічений впуск обмежує потік повітря до двигуна. Це знижує потужність та підвищує витрату палива.&#10;&#10;Ви можете очистити їх на мийці або за допомогою повітродувки з магазину.&#10;&#10;Перевірити стан радіатора можна через огляд: утримуйте клавішу R, дивлячись на техніку."/>
+        <text name="ads_tutorial_needs_lubrication_title" text="Необхідне змащування"/>
+        <text name="ads_tutorial_needs_lubrication_message" text="Ваш %s потребує регулярного змащування.&#10;&#10;В ADS рівень змазки робочих вузлів поступово знижується щодня, що прискорює знос.&#10;&#10;Придбайте шприц для змащування в магазині та змащуйте машину щодня або перед кожною робочою зміною.&#10;&#10;Перевірити рівень змазки можна через огляд: утримуйте клавішу R, дивлячись на техніку."/>
+        <text name="ads_tutorial_needs_repair_title" text="Несправність техніки"/>
+        <text name="ads_tutorial_needs_repair_message" text="Схоже, з вашим %s щось не так. Можливо, один із вузлів вийшов з ладу.&#10;&#10;Обов'язково завітайте до майстерні та проведіть огляд. Не зволікайте: несправність може прогресувати, а вартість ремонту — зростати.&#10;&#10;Якщо огляд підтвердить поломку, усуньте її за допомогою процедури ремонту в майстерні."/>
+        <text name="ads_tutorial_needs_overhaul_title" text="Капітальний ремонт"/>
+        <text name="ads_tutorial_needs_overhaul_message" text="Схоже, ваш %s вже не молодий. Час подумати про заміну або капітальний ремонт. Це довгий і витратний процес, але це найкращий спосіб дати друге життя улюбленій техніці! П.С. Ви можете змінити термін служби в налаштуваннях — його збільшення сповільнить знос техніки."/>
+        <text name="ads_tutorial_age_degradation_title" text="Вікова деградація"/>
+        <text name="ads_tutorial_age_degradation_message" text="Чи знаєте ви, що в ADS техніка з часом втрачає частину своїх характеристик?&#10;&#10;Приблизно після третини терміну служби починається вікова деградація, що поступово знижує потужність, ефективність гальм та інших систем. Чим старіша машина, тим сильніший цей ефект.&#10;&#10;Ви можете вимкнути вікову деградацію в налаштуваннях моду."/>
+        <text name="ads_tutorial_needs_preventive_title" text="Загроза поломки"/>
+        <text name="ads_tutorial_needs_preventive_message" text="Схоже, одна із систем %s ось-ось відмовить. Гарна новина — ви можете цьому запобігти! У майстерні тепер доступна послуга: Профілактичне обслуговування. Вона включає повну діагностику та превентивний ремонт компонентів, що починають виходити з ладу."/>
+        <text name="ads_tutorial_poor_consumables_title" text="Неякісні витратні матеріали"/>
+        <text name="ads_tutorial_poor_consumables_message" text="Маленький секрет: ваш %s став жертвою неякісних розхідників під час ТО. Таке трапляється, якщо ви самі не обрали дешеві аналоги.&#10;&#10;Зараз сервісний інтервал скорочений, а знос деталей трохи підвищений. Повторне якісне ТО виправить проблему. Виявити це можна оглядом: базовий огляд попередить про короткий інтервал, а повна діагностика вкаже на самі неякісні розхідники."/>
+        <text name="ads_tutorial_poor_parts_title" text="Неякісні запчастини"/>
+        <text name="ads_tutorial_poor_parts_message" text="Маленький секрет: ваш %s отримав неякісну деталь під час ремонту. Ця поломка, ймовірно, скоро повернеться.&#10;&#10;Ви можете дочекатися, поки це станеться, або провести повну діагностику вже зараз — вона точно виявить неякісну деталь."/>
+        <text name="ads_tutorial_idle_and_downtime_title" text="Простій та зберігання"/>
+        <text name="ads_tutorial_idle_and_downtime_message" text="До речі, знос значно нижчий, коли машина заведена, але не працює активно. Коли двигун вимкнений, знос стає мізерним, а якщо техніка стоїть під навісом — він зникає зовсім."/>
+        <text name="ads_tutorial_hot_weather_title" text="Спекотна погода"/>
+        <text name="ads_tutorial_hot_weather_message" text="Сьогодні справді спекотно. У таку погоду потрібно особливо пильно стежити за чистотою радіатора та не перевантажувати двигун — інакше перегрів буде лише питанням часу.&#10;&#10;Пам’ятайте: перевірити стан радіатора можна візуально (клавіша R), а очистити його — повітродувкою."/>
+        <text name="ads_tutorial_wet_weather_title" text="Ну і погода!"/>
+        <text name="ads_tutorial_wet_weather_message" text="Яка погода сьогодні... Волога шкодить проводці та електрообладнанню, тому знос електросистеми в таких умовах трохи вищий.&#10;&#10;Крім того, збирати врожай у таку погоду вкрай не рекомендовано — ви лише нашкодите своєму комбайну."/>
+        <text name="ads_tutorial_low_fuel_title" text="Мало палива"/>
+        <text name="ads_tutorial_low_fuel_message" text="Схоже, у вас закінчується паливо. На перший погляд це не проблема, але чим менше палива в баку, тим важче працювати паливному насосу. Його навантаження зростає, що точно не сприяє довговічності."/>
+        <text name="ads_tutorial_idle_deposit_title" text="Тривалий холостий хід"/>
+        <text name="ads_tutorial_idle_deposit_message" text="Схоже, машина занадто довго працює на холостих обертах. Це не лише марно витрачене паливо: з часом це сприяє утворенню відкладень у паливній системі та шкодить «здоров'ю» двигуна.&#10;&#10;Якщо техніка зараз не потрібна, краще вимкнути двигун."/>
+        <text name="ads_tutorial_engine_overheat_title" text="Перегрів двигуна"/>
+        <text name="ads_tutorial_engine_overheat_message" text="Двигун починає перегріватися. Це може статися через велике навантаження, забитий радіатор, спеку або несправність системи охолодження.&#10;&#10;Будьте пильні: перегрів — один із найруйнівніших факторів. Він шкодить не лише двигуну: система охолодження працює на межі, а висока температура під капотом прискорює деградацію проводки та електроніки."/>
+        <text name="ads_tutorial_cvt_overheat_title" text="Перегрів варіатора (CVT)"/>
+        <text name="ads_tutorial_cvt_overheat_message" text="Варіатор починає перегріватися. Причини: надмірне навантаження на трансмісію, забитий радіатор або сильна спека. Наприклад, ви тягнете занадто важкий плуг або перевантажений причіп.&#10;&#10;Будьте уважні: перегрів — це найгірше, що може статися з трансмісією типу CVT."/>
+        <text name="ads_tutorial_heavy_trailer_title" text="Важкий причіп"/>
+        <text name="ads_tutorial_heavy_trailer_message" text="Схоже, ви намагаєтеся тягнути причіп, занадто важкий для вашого трактора. Ви можете продовжувати, але трансмісія працюватиме під величезним стресом, а гальма теж не зрадіють такому навантаженню.&#10;&#10;Дотримуйтесь простого правила: 10 к.с. або більше на 1 тонну ваги, і техніка служитиме помітно довше."/>
+        <text name="ads_tutorial_chassis_vibration_title" text="Навантаження на підвіску"/>
+        <text name="ads_tutorial_chassis_vibration_message" text="Гей, легше на поворотах! Швидка їзда бездоріжжям швидко виведе з ладу підвіску вашого %s. Крім того, вібрації шкодять іншим системам — особливо гідравліці та електриці. Їдьте плавніше."/>
+        <text name="ads_tutorial_steering_title" text="Поворот коліс на місці"/>
+        <text name="ads_tutorial_steering_message" text="Краще не крутити кермо, стоючи на місці. Це створює велике навантаження на рульовий механізм, гідропідсилювач та вузли передньої осі, що прискорює їх знос.&#10;&#10;Просто почніть рух хоча б на мінімальній швидкості, і колеса повертатимуться значно легше."/>
+        <text name="ads_tutorial_cranking_title" text="Часті запуски"/>
+        <text name="ads_tutorial_cranking_message" text="Схоже, ви занадто часто запускаєте двигун. Кожен запуск — це сильний удар струму по електросистемі, що прискорює знос проводки, стартера та акумулятора.&#10;&#10;Намагайтеся не глушити двигун кожну хвилину, ніби на машині стоїть система старт-стоп."/>
+        <text name="ads_tutorial_hard_start_title" text="Важкий запуск"/>
+        <text name="ads_tutorial_hard_start_message" text="Двигун %s запускається важко. Причиною може бути розряджений акумулятор, мороз, механічні несправності або знос стартера. Щоб завести двигун, утримуйте кнопку запалювання. Примітка: під час запуску електросистема зазнає величезних навантажень!"/>
+        <text name="ads_tutorial_critical_failure_title" text="Критична відмова"/>
+        <text name="ads_tutorial_critical_failure_message" text="Що ж, це невдача. Ваш %s повністю виведений з ладу і не може рухатися самостійно. Ви можете скористатися мобільною майстернею для швидкого ремонту, щоб машина доїхала до бази своїм ходом.&#10;&#10;В іншому випадку доведеться шукати спосіб евакуації."/>
+        <text name="ads_tutorial_heavy_lift_title" text="Заважке обладнання"/>
+        <text name="ads_tutorial_heavy_lift_message" text="Схоже, це знаряддя занадто важке для вашого %s. Гідравліка працює на межі можливостей, що негативно вплине на її ресурс.&#10;&#10;Дотримуйтесь правила: вага обладнання не повинна перевищувати 60% від власної ваги техніки."/>
+        <text name="ads_tutorial_cold_engine_title" text="Прогрійте машину"/>
+        <text name="ads_tutorial_cold_engine_message" text="Завжди прогрівайте техніку перед роботою. Крім двигуна, прогріву потребують гідравлічне масло, варіатор і навіть паливо — особливо в морози. Робота «на холодну» спричиняє проблеми в багатьох системах одночасно.&#10;&#10;Коли температура двигуна вище 50 градусів, техніка готова до безпечного використання."/>
+        <text name="ads_tutorial_pto_sharp_angle_title" text="Гострий кут ВВП"/>
+        <text name="ads_tutorial_pto_sharp_angle_message" text="Обережно: кут вала ВВП між машиною та знаряддям занадто великий. Вал починає працювати з ривками, вібрація зростає, а знос накопичується дуже швидко.&#10;&#10;Тримайте кут менше 30 градусів і намагайтеся вимикати ВВП під час крутих поворотів."/>
+        <text name="ads_tutorial_overload_indicator_title" text="Попередження про перевантаження"/>
+        <text name="ads_tutorial_overload_indicator_message" text="%s працює під великим навантаженням. Про це сигналізує індикатор, що спалахнув на панелі.&#10;&#10;Машині може бракувати потужності для поточного завдання. Спробуйте зменшити навантаження: обмежте швидкість круїз-контролем або скиньте газ замість роботи «в підлогу»."/>
+        <text name="ads_tutorial_engine_overload_title" text="Перевантаження двигуна"/>
+        <text name="ads_tutorial_engine_overload_message" text="Двигун працює з надмірним зусиллям. Можливо, поточне завдання занадто важке для цієї машини, і варто використати потужнішу техніку. Або ж просто сповільніться.&#10;&#10;У будь-якому разі пам'ятайте: знос при такому навантаженні зростає в рази."/>
+        <text name="ads_tutorial_lugging_title" text="Робота «внатяжку»"/>
+        <text name="ads_tutorial_lugging_message" text="Двигун, а особливо трансмісія, дуже не люблять роботу на низьких обертах під великим навантаженням. Можливо, ви підчепили занадто важке знаряддя або обрали занадто високу передачу (якщо КПП ручна)."/>
+        <text name="ads_tutorial_wheel_slip_title" text="Пробуксовування"/>
+        <text name="ads_tutorial_wheel_slip_message" text="Схоже, ваші колеса сильно буксують. Можливо, ви застрягли і вам зараз не до порад, але пам’ятайте: пробуксовування — один із найгірших факторів для трансмісії, що наближає наступний візит до сервісу."/>
+        <text name="ads_tutorial_battery_low_title" text="Слабкий акумулятор"/>
+        <text name="ads_tutorial_battery_low_message" text="Ой, схоже, акумулятор скоро сяде. Це трапляється після тривалого простою, через сильний мороз або несправності в електромережі.&#10;&#10;При низькому заряді запуск буде важким або неможливим. Якщо не зможете завестися — скористайтеся пусковими дротами від іншої техніки."/>		
+    </texts>
+</l10n>

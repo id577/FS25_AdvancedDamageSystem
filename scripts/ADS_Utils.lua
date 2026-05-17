@@ -180,7 +180,6 @@ function ADS_Utils.serializeBreakdowns(breakdownsTable)
     return table.concat(parts, ";")
 end
 
-
 function ADS_Utils.serializeDate(dateTable)
     if dateTable == nil or dateTable.day == nil then
         return ""
@@ -208,7 +207,6 @@ function ADS_Utils.decodeDelimitedString(value)
     end))
 end
 
-
 function ADS_Utils.deserializeDate(dateString)
     if dateString == nil or dateString == "" then
         return {}
@@ -224,7 +222,6 @@ function ADS_Utils.deserializeDate(dateString)
     end
     return {}
 end
-
 
 function ADS_Utils.deserializeBreakdowns(breakdownString)
     local breakdowns = {}
@@ -985,8 +982,6 @@ function ADS_Utils.deepCopy(original, seen)
 
     return result
 end
-
-
 
 -- ==========================================================
 --           MAINTENANCE LOG STREAM SERIALIZATION

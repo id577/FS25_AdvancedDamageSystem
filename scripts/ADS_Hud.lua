@@ -1642,6 +1642,22 @@ function ADS_Hud:drawActiveVehicleHUD()
         table.insert(systemSections, {title = "Work Process", lines = workprocessLines})
     end
 
+    local engConsumptablesDbg = (spec.debugData or {}).engConsumptables or {}
+    local motorOil = spec.motorOil or {}
+    local engineLubLines = {}
+    addLine(engineLubLines, string.format(
+        "%.0f%% | lvl: %.1f%% (-%.1f%%) | qlt: %.1f%% (-%.1f%%) | ctm: %.1f%% (+%.1f%%) | fc: %.1f%% (+%.1f%%)",
+        (tonumber(spec.engineLubricationLevel) or 0) * 100,
+        (tonumber(motorOil.level) or 0) * 100,
+        (tonumber(engConsumptablesDbg.levelToReducePerInterval) or tonumber(engConsumptablesDbg.levelToReduce) or 0) * 100,
+        (tonumber(motorOil.quality) or 0) * 100,
+        (tonumber(engConsumptablesDbg.qualityToReducePerInterval) or tonumber(engConsumptablesDbg.qualityToReduce) or 0) * 100,
+        (tonumber(motorOil.contamination) or 0) * 100,
+        (tonumber(engConsumptablesDbg.contaminationToAddPerInterval) or tonumber(engConsumptablesDbg.contaminationToAdd) or 0) * 100,
+        (tonumber(spec.oilFilterClogging) or 0) * 100,
+        (tonumber(engConsumptablesDbg.filterContaminationPerInterval) or tonumber(engConsumptablesDbg.filterContamination) or 0) * 100
+    ), {0.72, 0.95, 0.72, 1}, 0.95)
+
     local engineTempLines = {}
     addLine(engineTempLines, string.format(
         "T: %.1fC (raw: %.1fC) | ts: %.3f | k/s/w: %.2f/%.3f/%.3f | h/c: %.3f/%.3f | r/s/c: %.3f/%.3f/%.3f",
@@ -1926,6 +1942,7 @@ function ADS_Hud:drawActiveVehicleHUD()
 
     local overviewSection = {title = "Overall", lines = overviewLines}
     local sections = {
+        {title = "Engine Lub", lines = engineLubLines},
         {title = "Engine Temp", lines = engineTempLines}
     }
     local implementLines = {}

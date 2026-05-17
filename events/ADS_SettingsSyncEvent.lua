@@ -180,7 +180,7 @@ local function applyConfig(event)
         and ADS_Main ~= nil and ADS_Main.vehicles ~= nil then
         for _, vehicle in pairs(ADS_Main.vehicles) do
             if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
-                AdvancedDamageSystem.rescaleBatteryChargeFromSoc(vehicle)
+                ADS_Electrical.rescaleBatteryChargeFromSoc(vehicle)
 
                 local spec = vehicle.spec_AdvancedDamageSystem
                 if vehicle.isServer and spec.adsDirtyFlag_electrical ~= nil then

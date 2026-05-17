@@ -379,7 +379,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- wheel slip
-            elseif not messagedData.WHEEL_SLIP and isMotorStarted and spec.wheelSlipIntensity > 0.9 and spec.wheelSlipTutorialTimer >= 3000 then
+            elseif not messagedData.WHEEL_SLIP and isMotorStarted and spec.wheelSlipIntensity ~= nil and spec.wheelSlipIntensity > 0.9 and spec.wheelSlipTutorialTimer ~= nil and spec.wheelSlipTutorialTimer >= 3000 then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_wheel_slip_message"),
                     0,
