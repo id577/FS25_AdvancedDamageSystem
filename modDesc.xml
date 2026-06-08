@@ -270,10 +270,6 @@ Changelog 0.9.0.0:
         <storeItem xmlFilename="objects/greaseGun/greaseGun.xml"/>
         <storeItem xmlFilename="objects/airBlower/airBlower.xml"/>
         <storeItem xmlFilename="objects/jumperCables/jumperCables.xml"/>
-        <storeItem xmlFilename="objects/oilCanister/motorOilCanister.xml"/>
-        <storeItem xmlFilename="objects/oilCanister/transmissionOilCanister.xml"/>
-        <storeItem xmlFilename="objects/oilCanister/hydraulicFluidCanister.xml"/>
-        <storeItem xmlFilename="objects/oilCanister/coolantCanister.xml"/>
     </storeItems>
     <fillTypes filename="objects/oilCanister/ads_fillTypes.xml"/>
     <iconFilename>icon_ads.dds</iconFilename>

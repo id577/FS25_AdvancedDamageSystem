@@ -12,6 +12,7 @@
         <image>icon_ads.dds</image>
         <price>35</price>
         <allowLeasing>false</allowLeasing>
+        <showInStore>false</showInStore>
         <canBeSold>true</canBeSold>
         <rotation>0</rotation>
         <brand>LIZARD</brand>

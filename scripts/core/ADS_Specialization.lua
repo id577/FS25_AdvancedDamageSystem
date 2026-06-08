@@ -2975,7 +2975,7 @@ end
 local function syncOverloadWarning(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil or not vehicle.isServer then return end
-    local period = 40000
+    local period = 60000
     local wearScale = ADS_Config.CORE.BASE_SYSTEMS_WEAR / ADS_Config.CORE.DEFAULT_SYSTEM_WEAR
     local avgStressWarningThreshold = ADS_Config.CORE.AVG_STRESS_WARNING_THRESHOLD * ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER * wearScale
     local avgStressCriticalThreshold = ADS_Config.CORE.AVG_STRESS_CRITICAL_THRESHOLD * ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER * wearScale
@@ -3569,11 +3569,66 @@ local function updateWheelSlip(vehicle)
     local wheelSlipIntensity = 0
 
     if spec_wheels ~= nil and spec_wheels.wheels ~= nil then
+        local drivenWheels = {}
+        local drivenWheelCount = 0
+        local differentials = vehicle.spec_motorized ~= nil and vehicle.spec_motorized.differentials or nil
+
+        if differentials ~= nil and next(differentials) ~= nil then
+            local visitedDifferentials = {}
+            local function collectDifferential(diffIndex)
+                local runtimeIndex = (tonumber(diffIndex) or -1) + 1
+                if runtimeIndex < 1 or visitedDifferentials[runtimeIndex] then
+                    return
+                end
+
+                local differential = differentials[runtimeIndex]
+                if differential == nil then
+                    return
+                end
+
+                visitedDifferentials[runtimeIndex] = true
+
+                if differential.diffIndex1IsWheel then
+                    local wheelIndex = tonumber(differential.diffIndex1)
+                    if wheelIndex ~= nil and drivenWheels[wheelIndex] ~= true then
+                        drivenWheels[wheelIndex] = true
+                        drivenWheelCount = drivenWheelCount + 1
+                    end
+                else
+                    collectDifferential(differential.diffIndex1)
+                end
+
+                if differential.diffIndex2IsWheel then
+                    local wheelIndex = tonumber(differential.diffIndex2)
+                    if wheelIndex ~= nil and drivenWheels[wheelIndex] ~= true then
+                        drivenWheels[wheelIndex] = true
+                        drivenWheelCount = drivenWheelCount + 1
+                    end
+                else
+                    collectDifferential(differential.diffIndex2)
+                end
+            end
+
+            for differentialIndex, _ in ipairs(differentials) do
+                collectDifferential(differentialIndex - 1)
+            end
+        end
+
+        if drivenWheelCount == 0 then
+            for wheelIndex, wheel in ipairs(spec_wheels.wheels) do
+                local physicsWheel = wheel.physics
+                if physicsWheel ~= nil and (tonumber(physicsWheel.driveMode) or 0) ~= 0 then
+                    drivenWheels[wheelIndex] = true
+                    drivenWheelCount = drivenWheelCount + 1
+                end
+            end
+        end
+
         local slipValues = {}
 
-        for _, wheel in ipairs(spec_wheels.wheels) do
+        for wheelIndex, wheel in ipairs(spec_wheels.wheels) do
             local physicsWheel = wheel.physics
-            if physicsWheel ~= nil and physicsWheel.netInfo ~= nil then
+            if drivenWheels[wheelIndex] == true and physicsWheel ~= nil and physicsWheel.netInfo ~= nil and physicsWheel.hasGroundContact then
                 local vanillaSlip = math.max(tonumber(physicsWheel.netInfo.slip) or 0, 0)
                 table.insert(slipValues, vanillaSlip)
             end
@@ -4939,10 +4994,10 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         end
 
         -- wheel slip factor
-        if spec.wheelSlipIntensity > C.WHEEL_SLIP_THRESHOLD then
+        if spec.wheelSlipIntensity > C.WHEEL_SLIP_THRESHOLD and speed < 20 and motorLoad > 0.5 then
             local groundFrictionCoef = spec.avgTireGroundFrictionCoeff
             wheelSlipFactor = ADS_Utils.calculateQuadraticMultiplier(spec.wheelSlipIntensity, C.WHEEL_SLIP_THRESHOLD, false)
-            wheelSlipFactor = wheelSlipFactor * (C.WHEEL_SLIP_MULTIPLIER or 0) * (groundFrictionCoef ^ 2)
+            wheelSlipFactor = math.max(wheelSlipFactor * (C.WHEEL_SLIP_MULTIPLIER or 0) * (groundFrictionCoef ^ 2) * motorLoad, 0)
             wearRate = wearRate + wheelSlipFactor
             --- tutorial timer
             spec.wheelSlipTutorialTimer = math.min((spec.wheelSlipTutorialTimer or 0) + dt, 3000)
@@ -5555,8 +5610,6 @@ function AdvancedDamageSystem:updateWorkProcessSystem(dt)
         lubricationFactor = lubricationFactor
     })
 end
-
-
 
 -- ==========================================================
 --                       BREAKDOWNS
