@@ -1911,11 +1911,13 @@ function AdvancedDamageSystem:onLoad(savegame)
         fieldMultiplier = 1
     }
     self.spec_AdvancedDamageSystem.chassisSteerState = {
-        prevSteerAbs = nil,
-        inputAbs = 0,
+        prevPosition = nil,
+        position = 0,
         deltaRate = 0,
+        rateFactor = 0,
         groundContact = 0,
-        isLowSpeedActive = false
+        isLowSpeedActive = false,
+        isMoving = false
     }
     self.spec_AdvancedDamageSystem.chassisBrakeState = {
         pedal = 0,
@@ -4035,6 +4037,8 @@ local function updateChassisSteeringState(vehicle, dt)
         steerState = {
             prevPosition = nil,
             position = 0,
+            deltaRate = 0,
+            rateFactor = 0,
             groundContact = 0,
             isLowSpeedActive = false,
             isMoving = false
@@ -4043,7 +4047,8 @@ local function updateChassisSteeringState(vehicle, dt)
     end
 
     local speed = tonumber(vehicle.getLastSpeed ~= nil and vehicle:getLastSpeed() or 0) or 0
-    local steerSpeedThreshold = tonumber(ADS_Config.CORE.CHASSIS_FACTOR_DATA.STEER_LOAD_SPEED_THRESHOLD) or 4.0
+    local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
+    local steerSpeedThreshold = tonumber(C.STEER_LOAD_SPEED_THRESHOLD) or 4.0
     local steeringPosition = 0
 
     if vehicle.spec_wheels ~= nil and vehicle.spec_wheels.rotatedTime ~= nil then
@@ -4053,12 +4058,22 @@ local function updateChassisSteeringState(vehicle, dt)
     end
 
     local prevSteeringPosition = tonumber(steerState.prevPosition)
-    local steerMoving = false
+    local steerDeltaRate = 0
+    local steerRateFactor = 0
     if prevSteeringPosition ~= nil then
-        steerMoving = math.abs(steeringPosition - prevSteeringPosition) > 0.0005
+        local dtSeconds = math.max((tonumber(dt) or 0) / 1000, 0.001)
+        local steerDelta = math.abs(steeringPosition - prevSteeringPosition)
+        steerDeltaRate = steerDelta / dtSeconds
+
+        local rateDeadzone = math.max(tonumber(C.STEER_LOAD_RATE_DEADZONE) or 0.02, 0)
+        local fullRate = math.max(tonumber(C.STEER_LOAD_RATE_FULL) or 0.60, rateDeadzone + 0.0001)
+        local normalizedRate = math.clamp((steerDeltaRate - rateDeadzone) / math.max(fullRate - rateDeadzone, 0.0001), 0, 1)
+        steerRateFactor = normalizedRate * normalizedRate
     end
     steerState.prevPosition = steeringPosition
     steerState.position = steeringPosition
+    steerState.deltaRate = steerDeltaRate
+    steerState.rateFactor = steerRateFactor
 
     local steerGroundContact = 0
     if vehicle.spec_wheels ~= nil and vehicle.spec_wheels.wheels ~= nil then
@@ -4079,7 +4094,7 @@ local function updateChassisSteeringState(vehicle, dt)
 
     steerState.groundContact = steerGroundContact
     steerState.isLowSpeedActive = steerSpeedThreshold > 0 and speed <= steerSpeedThreshold
-    steerState.isMoving = steerMoving
+    steerState.isMoving = steerRateFactor > 0
 end
 
 local function updateChassisBrakingState(vehicle)
@@ -5382,6 +5397,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local vibFieldMultiplier = tonumber(vibState.fieldMultiplier or 1) or 1
     local steerLowSpeedFactor = 0
     local steerGroundContact = tonumber(steerState.groundContact or 0) or 0
+    local steerRateFactor = tonumber(steerState.rateFactor or 0) or 0
+    local steerDeltaRate = tonumber(steerState.deltaRate or 0) or 0
     local steerMoving = steerState.isMoving == true
     local brakeMassFactor = 0
     local hpBrakeMassRatio = tonumber(brakeState.hpMassRatio or 0) or 0
@@ -5431,7 +5448,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         if steerSpeedThreshold > 0 and steerState.isLowSpeedActive and steerGroundContact > 0 and steerMoving then
             steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
             if steerLowSpeedFactor > 0 then
-                steerLoadFactor = steerLowSpeedFactor * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
+                steerLoadFactor = steerLowSpeedFactor * steerRateFactor * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
                 wearRate = wearRate + steerLoadFactor
             end
         end
@@ -5461,6 +5478,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         vibFieldMultiplier = vibFieldMultiplier,
         steerLoadFactor = steerLoadFactor,
         steerLowSpeedFactor = steerLowSpeedFactor,
+        steerRateFactor = steerRateFactor,
+        steerDeltaRate = steerDeltaRate,
         steerGroundContact = steerGroundContact,
         steerMoving = steerMoving,
         brakeMassFactor = brakeMassFactor,
