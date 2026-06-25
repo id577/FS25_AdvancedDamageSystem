@@ -402,7 +402,7 @@ ADS_Config = {
             [1] = 1.0,  STANDARD = 1.0,
             [2] = 0.65, MINIMAL  = 0.65,
             [3] = 1.25, EXTENDED = 1.25,
-            [4] = 4.0,  PREVENTIVE = 4.0,
+            [4] = 3.0,  PREVENTIVE = 3.0,
         },
 
         REPAIR_PRICE_MULTIPLIERS = {
@@ -420,6 +420,12 @@ ADS_Config = {
             [2] = 0.1, VISUAL   = 0.1,
             [3] = 4.0, COMPLETE = 4.0,
         },
+        INSPECTION_PRICE_LIMITS = {
+            [1] = {min = 100, max = 400},  STANDARD = {min = 100, max = 400},
+            [2] = {min = 20,  max = 100},  VISUAL   = {min = 20,  max = 100},
+            [3] = {min = 400, max = 1600}, COMPLETE = {min = 400, max = 1600},
+        },
+        OVERHAUL_MAX_PRICE_RATIO = 1.0,
         AGE_FACTOR_PRICE_FACTOR = 0.01,
         OWN_WORKSHOP_PRICE_MULTIPLIER = 0.8,
     },

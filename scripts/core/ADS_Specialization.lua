@@ -8091,6 +8091,10 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
     if maintenanceType == AdvancedDamageSystem.STATUS.INSPECTION then
         local key = ADS_Utils.getNameByValue(AdvancedDamageSystem.INSPECTION_TYPES, optionOne)
         local inspectionPrice = math.ceil(math.max((C.GLOBAL_SERVICE_PRICE_MULTIPLIER * C.INSPECTION_PRICE_MULTIPLIERS[key] * price * 0.001 * ownWorkshopDiscount / 10) / spec.maintainability, 2)) * 10
+        local inspectionPriceLimits = C.INSPECTION_PRICE_LIMITS ~= nil and C.INSPECTION_PRICE_LIMITS[key] or nil
+        if inspectionPriceLimits ~= nil then
+            inspectionPrice = math.clamp(inspectionPrice, inspectionPriceLimits.min or inspectionPrice, inspectionPriceLimits.max or inspectionPrice)
+        end
         log_dbg(string.format("Calculated inspection price: %.2f (base price: %.2f, multiplier: %.4f, own workshop discount: %.2f, maintainability: %.2f)", inspectionPrice, price, C.INSPECTION_PRICE_MULTIPLIERS[key] * C.GLOBAL_SERVICE_PRICE_MULTIPLIER * 0.0005, ownWorkshopDiscount, spec.maintainability))
         return inspectionPrice
         
@@ -8120,6 +8124,7 @@ function AdvancedDamageSystem:getServicePrice(maintenanceType, optionOne, option
             overhaulPrice = overhaulPrice + Wearable.calculateRepaintPrice(self:getSellPrice(), self:getWearTotalAmount()) * 0.25
         end
         overhaulPrice = math.max(overhaulPrice, 100)
+        overhaulPrice = math.min(overhaulPrice, price * (C.OVERHAUL_MAX_PRICE_RATIO or 1.0))
         log_dbg(string.format("Calculated overhaul price: %.2f (base price: %.2f, multiplier: %.2f, own workshop discount: %.2f, maintainability: %.2f)", overhaulPrice, price, C.OVERHAUL_PRICE_MULTIPLIERS[key] * C.GLOBAL_SERVICE_PRICE_MULTIPLIER, ownWorkshopDiscount, spec.maintainability))
         return overhaulPrice
     
