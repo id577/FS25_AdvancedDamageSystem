@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="108">
     <author>id577, Squallqt</author>
-    <version>0.9.2.4</version>
+    <version>0.9.2.5</version>
     <title>
         <en>Advanced Damage System</en>
         <de>Erweitertes Schadenssystem</de>
@@ -11,6 +11,17 @@
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
 
 The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+
+Changelog 0.9.2.5:
+- Added vehicle icons to the ADS Fleet Management menu
+- Improved validation of game-engine data and excluded more unsupported vehicle types
+- Fixed a CVT Addon tutorial error
+- Rebalanced most wear factors, generally reducing them by 20-30%
+- Fixed incorrect wheel slip and steering wear triggers; improved PTO angle detection
+- Added inspection price limits and capped overhaul cost at vehicle value
+- Mobile workshop service and repairs no longer wash vehicles
+- Improved service interval display in reports and workshop status
+- Added Ukrainian and Turkish translations; updated Hungarian translation
 
 Changelog 0.9.2.4:
 - ADS settings have been moved again; they are now located next to the ADS Fleet Management menu
@@ -98,6 +109,17 @@ Changelog 0.9.0.0:
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
+Changelog 0.9.2.5:
+- Fahrzeugsymbole zum ADS-Fleet-Management-Menü hinzugefügt
+- Validierung von Spieldaten verbessert und weitere nicht unterstützte Fahrzeugtypen ausgeschlossen
+- Tutorial-Fehler mit CVT Addon behoben
+- Die meisten Verschleißfaktoren neu ausbalanciert und generell um 20-30% reduziert
+- Falsche Auslösung von Radschlupf- und Lenkverschleiß behoben; Zapfwinkel-Erkennung verbessert
+- Preisgrenzen für Inspektionen hinzugefügt und Kosten für Generalüberholungen auf den Fahrzeugwert begrenzt
+- Wartung und Reparaturen in der mobilen Werkstatt waschen Fahrzeuge nicht mehr
+- Anzeige des Serviceintervalls in Berichten und Werkstattstatus verbessert
+- Ukrainische und türkische Übersetzungen hinzugefügt; ungarische Übersetzung aktualisiert
+
 Changelog 0.9.2.4:
 - Die ADS-Einstellungen wurden erneut verschoben; sie befinden sich jetzt neben dem ADS-Fleet-Management-Menü
 - Die Liste der verfügbaren Optionen in den Einstellungen wurde deutlich erweitert
@@ -182,6 +204,17 @@ Changelog 0.9.0.0:
         <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
 Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+
+Changelog 0.9.2.5:
+- Ajout d'icônes de véhicules dans le menu ADS Fleet Management
+- Validation des données du jeu améliorée et davantage de types de véhicules non pris en charge exclus
+- Correction d'une erreur de didacticiel avec CVT Addon
+- Rééquilibrage de la plupart des facteurs d'usure, généralement réduits de 20 à 30%
+- Correction des déclenchements incorrects des facteurs de patinage et de direction ; détection de l'angle de prise de force améliorée
+- Ajout de limites de prix pour les inspections et plafonnement du coût de révision à la valeur du véhicule
+- L'entretien et les réparations en atelier mobile ne lavent plus les véhicules
+- Affichage de l'intervalle d'entretien amélioré dans les rapports et l'état d'atelier
+- Ajout des traductions ukrainienne et turque ; traduction hongroise mise à jour
 
 Changelog 0.9.2.4:
 - Les paramètres ADS ont de nouveau été déplacés ; ils se trouvent désormais à côté du menu ADS Fleet Management
