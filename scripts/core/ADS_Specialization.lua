@@ -7268,6 +7268,7 @@ function AdvancedDamageSystem:completeService()
     local optionOne = spec.serviceOptionOne
     local optionTwo = spec.serviceOptionTwo
     local optionThree = spec.serviceOptionThree
+    local isMobileWorkshop = spec.workshopType == AdvancedDamageSystem.WORKSHOP.MOBILE
     local selectedBreakdowns = ADS_Utils.shallowCopy(spec.pendingSelectedBreakdowns or {})
     local plannedRepairCandidateIds = {}
 
@@ -7378,7 +7379,9 @@ function AdvancedDamageSystem:completeService()
 
     -- clean vehicle
     if serviceType ~= states.INSPECTION then
-        self:setDirtAmount(0)
+        if not isMobileWorkshop then
+            self:setDirtAmount(0)
+        end
         spec.radiatorClogging = 0
         spec.airIntakeClogging = 0
         spec.lubricationLevel = 1.0
