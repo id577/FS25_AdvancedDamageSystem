@@ -21,7 +21,7 @@ Changelog 0.9.2.5:
 - Added inspection price limits and capped overhaul cost at vehicle value
 - Mobile workshop service and repairs no longer wash vehicles
 - Improved service interval display in reports and workshop status
-- Added Ukrainian and Turkish translations; updated Hungarian translation
+- Added Czech, Finnish, Turkish, and Ukrainian translations; updated Hungarian translation
 
 Changelog 0.9.2.4:
 - ADS settings have been moved again; they are now located next to the ADS Fleet Management menu
@@ -118,7 +118,7 @@ Changelog 0.9.2.5:
 - Preisgrenzen für Inspektionen hinzugefügt und Kosten für Generalüberholungen auf den Fahrzeugwert begrenzt
 - Wartung und Reparaturen in der mobilen Werkstatt waschen Fahrzeuge nicht mehr
 - Anzeige des Serviceintervalls in Berichten und Werkstattstatus verbessert
-- Ukrainische und türkische Übersetzungen hinzugefügt; ungarische Übersetzung aktualisiert
+- Tschechische, finnische, türkische und ukrainische Übersetzungen hinzugefügt; ungarische Übersetzung aktualisiert
 
 Changelog 0.9.2.4:
 - Die ADS-Einstellungen wurden erneut verschoben; sie befinden sich jetzt neben dem ADS-Fleet-Management-Menü
@@ -214,7 +214,7 @@ Changelog 0.9.2.5:
 - Ajout de limites de prix pour les inspections et plafonnement du coût de révision à la valeur du véhicule
 - L'entretien et les réparations en atelier mobile ne lavent plus les véhicules
 - Affichage de l'intervalle d'entretien amélioré dans les rapports et l'état d'atelier
-- Ajout des traductions ukrainienne et turque ; traduction hongroise mise à jour
+- Ajout des traductions tchèque, finnoise, turque et ukrainienne ; traduction hongroise mise à jour
 
 Changelog 0.9.2.4:
 - Les paramètres ADS ont de nouveau été déplacés ; ils se trouvent désormais à côté du menu ADS Fleet Management
