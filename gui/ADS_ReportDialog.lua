@@ -414,8 +414,9 @@ function ADS_ReportDialog:updateScreen()
     -- condition and service
     local condition = self.lastReport.conditionData.condition or 1.0
     local service = self.lastReport.conditionData.service or 1.0
+    local serviceIntervalRemaining = ADS_Utils.getServiceIntervalRemainingRatio(service)
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_condition', condition})
-    table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_service', service})
+    table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_service', serviceIntervalRemaining, service})
 
     -- currentMTBF calculation
     local systems = self.lastReport.conditionData.systems or {}
@@ -444,12 +445,13 @@ function ADS_ReportDialog:updateScreen()
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_crit_fail_risk', critFailureRisk})
     
     -- wear rate
-    local wearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR
+    local reportReliability = math.max(tonumber(self.lastReport.conditionData.reliability or spec.reliability) or 1.0, 0.001)
+    local nominalWearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR / reportReliability
+    local wearRate = nominalWearRate
     local startOperatingTime = 0.0
     local startCondition = 1.0
     local startSystems = nil
     local currentOperatingTime = self.lastReport.conditionData.operatingHours or 0.0
-    local systemWearRates = {}
 
     for i = #self.maintenanceLog, 1, -1 do
         local entry = self.maintenanceLog[i]
@@ -467,9 +469,10 @@ function ADS_ReportDialog:updateScreen()
     end
 
     local operatingTimeDiff = math.max(currentOperatingTime - startOperatingTime, 0.001)
+    local hasEnoughWearSample = currentOperatingTime >= 1.0 and operatingTimeDiff >= 1.0
 
-    if currentOperatingTime < 0.1 or operatingTimeDiff < 0.1 then 
-        wearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR
+    if not hasEnoughWearSample then
+        wearRate = nominalWearRate
     else
         local totalWearRate = 0.0
         local wearRateSystemsCount = 0
@@ -488,7 +491,6 @@ function ADS_ReportDialog:updateScreen()
 
                 local conditionDiff = math.max(startSystemCondition - currentSystemCondition, 0.0)
                 local systemWearRate = conditionDiff / operatingTimeDiff
-                systemWearRates[systemKey] = systemWearRate
                 totalWearRate = totalWearRate + systemWearRate
                 wearRateSystemsCount = wearRateSystemsCount + 1
             end
@@ -497,48 +499,18 @@ function ADS_ReportDialog:updateScreen()
         if wearRateSystemsCount > 0 then
             wearRate = totalWearRate / wearRateSystemsCount
         else
-            wearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR
+            wearRate = nominalWearRate
         end
     end
 
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_wear_rate',  wearRate})
 
     -- nominalWearRate
-    local nominalWearRate = 1 / spec.reliability / 100
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_nominal_wear_rate', nominalWearRate})
 
     -- expected residual life
-    local rul = 0
-    local targetCondition = ADS_Config.CORE.GENERAL_WEAR_EARLY_STAGE_THRESHOLD or 0.66
-    local minSystemRUL = math.huge
-    local hasValidRUL = false
-
-    for systemKey, systemData in pairs(systems) do
-        if systemData.enabled ~= false then
-            local currentSystemCondition = math.max(math.min(systemData.condition or 1.0, 1.0), 0.0)
-            local remainingCondition = math.max(currentSystemCondition - targetCondition, 0.0)
-            local systemWearRate = systemWearRates[systemKey]
-
-            if type(systemWearRate) ~= "number" or systemWearRate <= 0 then
-                systemWearRate = nominalWearRate
-            end
-
-            if systemWearRate > 0 then
-                local systemRUL = remainingCondition / systemWearRate
-                if systemRUL < minSystemRUL then
-                    minSystemRUL = systemRUL
-                end
-                hasValidRUL = true
-            end
-        end
-    end
-
-    if hasValidRUL then
-        rul = minSystemRUL
-    else
-        local remainingCondition = math.max(currentCondition - targetCondition, 0.0)
-        rul = nominalWearRate > 0 and (remainingCondition / nominalWearRate) or 0
-    end
+    local effectiveWearRate = wearRate > 0 and wearRate or nominalWearRate
+    local rul = effectiveWearRate > 0 and (math.max(currentCondition, 0.0) / effectiveWearRate) or 0
 
     table.insert(self.overallAssessmentData, {'ads_report_overall_assessment_rul', rul})
 
@@ -920,14 +892,15 @@ function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
     local minCrit = ADS_Config.CORE.BREAKDOWN_PROBABILITIES.CRITICAL_MIN
     local maxCrit = ADS_Config.CORE.BREAKDOWN_PROBABILITIES.CRITICAL_MAX
     local critDiff = maxCrit - minCrit
-    local rel = 1 / (ADS_Config.CORE.BASE_SYSTEMS_WEAR / spec.reliability)
-    local nominalWearRate = 1 / spec.reliability / 100
+    local reportReliability = math.max(tonumber(self.lastReport.conditionData.reliability or spec.reliability) or 1.0, 0.001)
+    local rel = 1 / (ADS_Config.CORE.BASE_SYSTEMS_WEAR / reportReliability)
+    local nominalWearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR / reportReliability
 
     local assessmentConfig = {
         ads_report_overall_assessment_condition =  {inverted = false, ideal = 0.99, high = 0.8, mid = 0.6, low = 0.4, stdVisible = true, isPercent = true},
-        ads_report_overall_assessment_service = {inverted = false, ideal = 0.9, high = 0.7, mid = 0.6, low = 0.5, stdVisible = true, isPercent = true},
+        ads_report_overall_assessment_service = {inverted = false, ideal = 0.9, high = 0.5, mid = 0.2, low = 0.001, stdVisible = true, isPercent = true},
         ads_report_overall_assessment_mtbf = {inverted = false, ideal = maxMtbf, high = diffMtbf * 0.66, mid = diffMtbf * 0.33, low = minMtbf, stdVisible = false, isPercent = false},
-        ads_report_overall_assessment_rul = {inverted = false, ideal = rel, high = rel * 0.66, mid = rel * 0.33, low = minMtbf, stdVisible = false, isPercent = false},
+        ads_report_overall_assessment_rul = {inverted = false, ideal = rel, high = rel * 0.66, mid = rel * 0.33, low = rel * 0.1, stdVisible = false, isPercent = false},
         ads_report_overall_assessment_wear_rate = {inverted = true, ideal = nominalWearRate, high = nominalWearRate * 1.1, mid = nominalWearRate * 1.2, low = nominalWearRate * 1.3, stdVisible = false, isPercent = true},
         ads_report_overall_assessment_nominal_wear_rate = {inverted = true, ideal = nominalWearRate, high = nominalWearRate * 1.1, mid = nominalWearRate * 1.2, low = nominalWearRate * 1.3, stdVisible = false, isPercent = true},
         ads_report_overall_assessment_crit_fail_risk = {inverted = true, ideal = minCrit, high = critDiff * 0.33, mid = critDiff * 0.66, low = maxCrit * 1.3, stdVisible = false, isPercent = true},
@@ -937,6 +910,7 @@ function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
     local key = data[1]
     local cfg = assessmentConfig[key] or defaultConfig
     local val = data[2]
+    local rawVal = data[3] or val
 
     local function getColor(smooth)
         if not cfg.stdVisible and not self.isCompleteInspection then
@@ -970,19 +944,11 @@ function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
             g_i18n:getText("ads_spec_state_terrible")
         }
 
-        local serviceStateTexts = {
-            g_i18n:getText("ads_spec_state_optimal"),
-            g_i18n:getText("ads_spec_state_good"),
-            g_i18n:getText("ads_spec_state_recommended"),
-            g_i18n:getText("ads_spec_state_required"),
-            g_i18n:getText("ads_spec_state_overdue")
-        }
-
         if cfg.stdVisible then
             if key == 'ads_report_overall_assessment_condition' then
                 valueElement:setText(ADS_Utils.getValueLabel(val, cfg.ideal, cfg.high, cfg.mid, cfg.low, table.unpack(conditionStateTexts)))
             elseif key == 'ads_report_overall_assessment_service' then
-                 valueElement:setText(ADS_Utils.getValueLabel(val, cfg.ideal, cfg.high, cfg.mid, cfg.low, table.unpack(serviceStateTexts)))
+                 valueElement:setText(ADS_Utils.formatService(rawVal, false))
             end
         else
             valueElement:setText(g_i18n:getText('ads_report_state_not_available'))

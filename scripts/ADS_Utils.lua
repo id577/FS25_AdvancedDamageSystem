@@ -359,22 +359,28 @@ function ADS_Utils.formatCondition(condition, isCompleteInspection)
     end
 end
 
+function ADS_Utils.getServiceIntervalRemainingRatio(service)
+    local threshold = math.clamp(tonumber(ADS_Config.CORE.SERVICE_EXPIRED_THRESHOLD) or 0.5, 0.0, 0.9999)
+    local activeRange = math.max(1.0 - threshold, 0.0001)
+    return math.clamp(((tonumber(service) or 0.0) - threshold) / activeRange, 0.0, 1.0)
+end
+
 function ADS_Utils.formatService(service, isCompleteInspection)
     if isCompleteInspection then
-        return string.format("%.0f%%", service * 100)
+        return string.format("%.0f%%", ADS_Utils.getServiceIntervalRemainingRatio(service) * 100)
     end
-    local consumed = 1.0 - service
+    service = tonumber(service) or 0.0
     local STATES = AdvancedDamageSystem.STATES
-    if consumed > 0.55 then
-        return g_i18n:getText(STATES.OVERDUE)
-    elseif consumed > 0.45 then
-        return g_i18n:getText(STATES.REQUIRED)
-    elseif consumed > 0.35 then
-        return g_i18n:getText(STATES.RECOMMENDED)
-    elseif consumed > 0.1 then
-        return g_i18n:getText(STATES.GOOD)
-    else
+    if service >= 0.9 then
         return g_i18n:getText(STATES.OPTIMAL)
+    elseif service >= 0.7 then
+        return g_i18n:getText(STATES.GOOD)
+    elseif service >= 0.6 then
+        return g_i18n:getText(STATES.RECOMMENDED)
+    elseif service >= 0.5 then
+        return g_i18n:getText(STATES.REQUIRED)
+    else
+        return g_i18n:getText(STATES.OVERDUE)
     end
 end
 
