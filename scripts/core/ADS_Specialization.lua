@@ -3816,7 +3816,7 @@ local function updateImplementChainState(vehicle)
                         local inLen = MathUtil.vector3Length(inDirX, inDirY, inDirZ)
                         if outLen > 0.0001 and inLen > 0.0001 then
                             local cosine = MathUtil.dotProduct(outDirX, outDirY, outDirZ, inDirX, inDirY, inDirZ)
-                            angleDeg = math.deg(math.acos(math.clamp(cosine, -1.0, 1.0)))
+                            angleDeg = math.deg(math.acos(math.abs(math.clamp(cosine, -1.0, 1.0))))
                         end
 
                         if angleDeg == nil then

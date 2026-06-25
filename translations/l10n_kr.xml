@@ -744,7 +744,7 @@
         <text name="ads_tutorial_heavy_lift_title" text="너무 무거운 작업기"/>
         <text name="ads_tutorial_heavy_lift_message" text="이 작업기는 %s 차량에 너무 무거운 것 같습니다. 유압 시스템이 한계까지 일하고 있으며, 이는 수명에 부정적인 영향을 줍니다.&#10;&#10;간단한 기준을 따르세요. 작업기 무게는 차량 자체 중량의 60%%를 넘지 않아야 합니다."/>
         <text name="ads_tutorial_cold_engine_title" text="차량 예열하기"/>
-        <text name="ads_tutorial_cold_engine_message" text="작업에 투입하기 전에 항상 차량을 예열하세요. 엔진뿐만 아니라 다른 여러 부품들도 예열 시간이 필요합니다. 유압 오일, CVT 변속기, 심지어 연료 온도까지도 그렇습니다. 특히 혹한기에는 더욱 그렇습니다. 차가운 상태로 차량을 운행하면 여러 시스템에 문제가 생길 수 있습니다.&#10;&#10;엔진 온도가 50도를 넘으면 모든 것이 충분히 예열된 것이며 차량을 안전하게 사용할 수 있습니다."/>
+        <text name="ads_tutorial_cold_engine_message" text="작업에 투입하기 전에 항상 차량을 예열하세요. 엔진뿐만 아니라 다른 여러 부품들도 예열 시간이 필요합니다. 유압 오일, CVT 변속기, 심지어 연료 온도까지도 그렇습니다. 특히 혹한기에는 더욱 그렇습니다. 차가운 상태로 차량을 운행하면 여러 시스템에 문제가 생길 수 있습니다.&#10;&#10;엔진 온도가 50도(122°F)를 넘으면 모든 것이 충분히 예열된 것이며 차량을 안전하게 사용할 수 있습니다."/>
         <text name="ads_tutorial_pto_sharp_angle_title" text="PTO 각도 과다"/>
         <text name="ads_tutorial_pto_sharp_angle_message" text="주의하세요. 차량과 작업기 사이의 PTO 각도가 너무 큽니다. 프로펠러 샤프트가 강한 맥동과 함께 작동하기 시작하고, 진동이 증가하며 마모가 빠르게 쌓입니다.&#10;&#10;각도를 30도 이하로 유지하고, 급회전이나 두렁 끝 선회 시에는 가능하면 PTO를 해제하세요."/>
         <text name="ads_tutorial_overload_indicator_title" text="과부하 경고"/>
