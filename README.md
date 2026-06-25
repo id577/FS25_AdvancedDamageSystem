@@ -1,4 +1,23 @@
+> [!IMPORTANT]
+> ### Support the Project
+>
+> Advanced Damage System is a passion project, and I’m doing my best to make it more realistic, stable, and enjoyable for the FS25 community.
+>
+> If you like the mod and want to support its development, your donation would mean a lot. Continued development depends heavily on the time I can afford to dedicate to the project, and your support helps me choose development over extra paid work.
+>
+> Every donation helps me keep working on new features, fixes, and improvements.
+>
+> Thank you for helping keep ADS alive and growing.
+>
+> [Donate via DonationAlerts](https://dalink.to/id577) · [Donate via Coindrop](https://coindrop.to/id577) · [Donate via Ko-fi](https://ko-fi.com/themodworkshop) - please include 'ADS' in the donation message.
+
+
+
 # FS25_AdvancedDamageSystem
+
+[![Advanced Damage System Feature Showcase](https://img.youtube.com/vi/HV9-DvFaPSM/maxresdefault.jpg)](https://www.youtube.com/watch?v=HV9-DvFaPSM)
+
+▶️ [Watch ADS Feature Showcase on YouTube](https://www.youtube.com/watch?v=HV9-DvFaPSM)
 
 Advanced Damage System is a mod that completely reworks the standard vehicle damage and maintenance system in Farming Simulator 25. A machine's reliability now depends directly on how carefully and efficiently you use it: the harder you push your equipment and the worse you maintain it, the more often it will break down.
 
@@ -25,6 +44,8 @@ Forget about one-click repairs. Maintenance now takes time, resources, and prope
 # Acknowledgements 
 
 A huge thank you to **Frvetz** (https://github.com/Frvetz), creator of the Realistic Damage System mod for FS22, for the permission to use ideas from his mod and for the support during the early stages of development.
+
+Special thanks to [Saibotsu](https://github.com/Saibotsu) ([The Mod Workshop](https://www.youtube.com/@TheModWorkshop)) for extensive balance testing, helpful feedback, and ongoing support throughout development.
 
 A huge special thanks to **Squallqt** (https://github.com/Squallqt) for his direct contributions to the project. He implemented multiplayer support and provided invaluable help with testing and technical advice.
 
@@ -61,8 +82,6 @@ If you do not want to read the full guide at the bottom of this page but still w
 
   ... More information below in the guide
 
-Demonstration of some breakdown's effects: https://www.youtube.com/watch?v=NpnlvY25Xl0&list=PL73V6HaxZ69gRgpLGkHpb_k5Qh1w4ZtHa
-
 # Console Commands
 For testing and debugging, ADS includes console commands. Most commands require you to be inside a vehicle that supports this mod.
 
@@ -93,15 +112,19 @@ For testing and debugging, ADS includes console commands. Most commands require 
 
 # Screenshots
 <img width="2560" height="1440" alt="444" src="https://github.com/user-attachments/assets/4286276b-d204-4166-886f-4eebe964fba9" />
+<img width="1280" height="719" alt="Снимок экрана 2026-04-24 170740" src="https://github.com/user-attachments/assets/d98b3fa3-8a50-4322-9a0d-8678519b10b5" />
 <img width="1907" height="1308" alt="666" src="https://github.com/user-attachments/assets/aaa4f359-e4cb-4c77-857a-6e3af5a00304" />
 <img width="1314" height="839" alt="111" src="https://github.com/user-attachments/assets/66e7e049-59e6-4f26-937a-a74f1e19a247" />
-<img width="2381" height="1358" alt="image" src="https://github.com/user-attachments/assets/f33415b6-c38f-4de8-8b3f-4c858adeabe0" />
+<img width="1280" height="719" alt="Снимок экрана 2026-04-24 174821" src="https://github.com/user-attachments/assets/771f6fce-5b96-462c-aae5-b45887b01366" />
 <img width="1253" height="763" alt="image" src="https://github.com/user-attachments/assets/18fe2f51-44f8-46fe-a1ac-8b892d25852c" />
 <img width="1233" height="832" alt="222" src="https://github.com/user-attachments/assets/64748b85-6e3c-43d6-b19a-d7027e66df49" />
 <img width="1334" height="788" alt="Снимок экрана 2026-03-29 224955" src="https://github.com/user-attachments/assets/77ca8ae3-a531-4934-96d0-b53c941e5095" />
 
 
 # Mod Guide
+
+> [!IMPORTANT]
+> The mod is actively being developed: some mechanics are constantly being expanded, changed, and reworked, so the guide may contain some inaccuracies.
 
 The Advanced Damage System (ADS) mod completely replaces the standard damage system, offering a deep and detailed simulation of wear, breakdowns, and technical service.
 This guide will help you understand all aspects of the mod.

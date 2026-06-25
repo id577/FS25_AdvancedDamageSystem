@@ -1,0 +1,763 @@
+<l10n>
+    <texts>
+        <text name="ads_settings_title" text="NASTAVENÍ ADS"/>
+        <text name="ads_settings_admin_required" text="Nastavení ADS vyžaduje v režimu více hráčů oprávnění administrátora."/>
+        <text name="ads_maintenancePrice_label" text="Násobitel ceny údržby"/>
+        <text name="ads_maintenancePrice_tooltip" text="Upravuje náklady na všechny služby dílny, včetně prohlídek, oprav a generálních oprav. Vyšší hodnota prodražuje veškerou údržbu."/>
+        <text name="ads_maintenanceDuration_label" text="Násobitel doby údržby"/>
+        <text name="ads_maintenanceDuration_tooltip" text="Upravuje dobu trvání všech služeb v dílně. Vyšší hodnota prodlužuje čas, který vozidlo stráví údržbou nebo opravami."/>
+        <text name="ads_workshopOpenHour_label" text="Otevírací doba dílny"/>
+        <text name="ads_workshopOpenHour_tooltip" text="Hodina, kdy se dílna otevírá. Opravy jsou aktivní pouze během pracovní doby."/>
+        <text name="ads_workshopCloseHour_label" text="Zavírací doba dílny"/>
+        <text name="ads_workshopCloseHour_tooltip" text="Hodina, kdy se dílna zavírá. Po této době budou opravy pozastaveny."/>
+        <text name="ads_engineMaxHeat_label" text="Max. teplota motoru"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Základní míra tepla generovaného motorem při maximálním zatížení. Vyšší hodnoty způsobí rychlejší zahřívání motoru."/>
+        <text name="ads_cloggingSpeed_label" text="Rychlost zanášení"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Upravuje, jak rychle se zanáší chladič a sání vzduchu při práci v prachu, plevách a zbytcích plodin. Vyšší hodnoty způsobují rychlejší zanášení. Při 100 % odpovídá rychlost zanášení zhruba jedné třetině servisního intervalu."/>
+        <text name="ads_fieldInspectionDuration_label" text="Doba trvání prohlídky"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Nastavuje, jak dlouho trvá předsměnová kontrola v terénu (v reálných sekundách)."/>
+        <text name="ads_lubricationReducePerDay_label" text="Rychlost vysychání maziva"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Nastavuje, kolik maziva vyschne za jeden herní den. Při 0 % mazivo časem nevysychá."/>
+        <text name="ads_ws_header_title" text="Dílna"/>
+        <text name="ads_settings_section_service_wear" text="Servis a opotřebení"/>
+        <text name="ads_settings_section_thermal_model" text="Tepelný model"/>
+        <text name="ads_settings_section_battery_alternator" text="Baterie a alternátor"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Předsměnová údržba"/>
+        <text name="ads_settings_section_other" text="Ostatní"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Dílna prodejce 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Udržuje dílnu u prodejce dostupnou v jakoukoli denní dobu."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Mobilní dílna 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Udržuje mobilní dílnu dostupnou v jakoukoli denní dobu."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Vlastní dílna 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Udržuje vaši vlastní dílnu dostupnou v jakoukoli denní dobu."/>
+        <text name="ads_instantInspection_label" text="Okamžitá prohlídka"/>
+        <text name="ads_instantInspection_tooltip" text="Je-li povoleno, všechny prohlídky proběhnou okamžitě (neplyne herní čas). Poznámka: možnost 'Vizuální' prohlídky nebude k dispozici."/>
+        <text name="ads_parkVehicle_label" text="Zaparkovat vozidlo během údržby"/>
+        <text name="ads_parkVehicle_tooltip" text="Je-li povoleno, vozidla v údržbě jsou vynechána při přepínání klávesou TAB."/>
+        <text name="ads_warrantyEnabled_label" text="Záruka na nové vybavení"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Uplatňuje záruku na opravy nových vozidel (do 20 motohodin nebo 12 měsíců). Zdarma jsou kryty pouze originální (OEM) díly."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="AI kontrola přetížení a přehřátí"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Je-li povoleno, AI pracovník sníží zatížení, aby zabránil přetížení nebo přehřátí motoru."/>
+        <text name="ads_aiWorkerTargetStress_label" text="Odezva AI na zátěž"/>
+        <text name="ads_aiWorkerTargetStress_tooltip" text="Určuje, jak brzy AI pracovník reaguje na přetížení a přehřátí. Vyšší hodnoty jsou méně citlivé a reagují později; nižší hodnoty jsou citlivější a zpomalují dříve."/>
+        <text name="ads_aiWorkerTargetStress_relaxed" text="Uvolněná"/>
+        <text name="ads_aiWorkerTargetStress_balanced" text="Vyvážená"/>
+        <text name="ads_aiWorkerTargetStress_sensitive" text="Citlivá"/>
+        <text name="ads_aiWorkerTargetStress_verySensitive" text="Velmi citlivá"/>
+        <text name="ads_aiWorkerMinSpeed_label" text="Minimální rychlost AI"/>
+        <text name="ads_aiWorkerMinSpeed_tooltip" text="Nastavuje nejnižší povolenou rychlost tempomatu AI pracovníka při snižování rychlosti kvůli ochraně stroje."/>
+        <text name="ads_debugMode_label" text="Ladící režim"/>
+        <text name="ads_debugMode_tooltip" text="Povolí nebo zakáže ladící panel a podrobné záznamy v konzoli."/>
+        <text name="ads_warningMessages_label" text="Varovné zprávy"/>
+        <text name="ads_warningMessages_tooltip" text="Povolí nebo zakáže varovné zprávy ve hře, jako jsou upozornění na studený motor nebo přehřátí."/>
+        <text name="ads_mobileWorkshopRestrictions_label" text="Omezení mobilní dílny"/>
+        <text name="ads_serviceInterval_label" text="Servisní interval"/>
+        <text name="ads_vehicleLifespan_label" text="Životnost vozidla"/>
+        <text name="ads_downtimeWear_label" text="Pasivní opotřebení"/>
+        <text name="ads_generalWearEnabled_label" text="Opotřebení úměrné věku"/>
+        <text name="ads_systemStressRate_label" text="Míra namáhání systému"/>
+        <text name="ads_batteryCapacity_label" text="Kapacita baterie"/>
+        <text name="ads_thermalSensitivity_label" text="Tepelná citlivost"/>
+        <text name="ads_option_off" text="Vypnuto"/>
+        <text name="ads_option_none" text="Žádné"/>
+        <text name="ads_serviceInterval_tooltip" text="Nastavuje základní servisní interval v hodinách, po kterém je vyžadována údržba. Skutečný interval se liší podle značky a věku vozidla a kvality předchozí údržby."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Nastavuje základní životnost vozidla v hodinách, po které jeho stav dosáhne 0 %. Čím blíže je stav k nule, tím nespolehlivějším se vozidlo stává."/>
+        <text name="ads_downtimeWear_tooltip" text="Nastavuje míru pasivního opotřebení, když vozidlo nepracuje, jako procento základní míry opotřebení (Životnost vozidla). Například 5 % při výchozí životnosti 100 hodin znamená, že každý systém ztratí asi 1 % stavu po zhruba 20 hodinách nečinnosti. Poznámka: pasivní opotřebení je vypnuto, pokud je vozidlo pod střechou."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Povoluje opotřebení související s věkem. Jak stroj stárne, systémy dostávají drobné postihy k výkonu motoru, rychlosti hydrauliky nebo účinnosti brzd. Efekt se začne projevovat po první třetině životnosti, znatelným se stává po druhé třetině a nejsilněji roste ke konci životnosti stroje."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="Je-li povoleno, dostupnost úkonů v mobilní dílně závisí na udržovatelnosti vozidla."/>
+        <text name="ads_systemStressRate_tooltip" text="Určuje, jak rychle se v systémech hromadí stres z přetížení, přehřátí, prokluzu kol a dalších náročných podmínek. Stres přímo ovlivňuje pravděpodobnost poruchy: čím více stresu systém naakumuluje, tím pravděpodobněji selže."/>
+        <text name="ads_batteryCapacity_tooltip" text="Upravuje maximální využitelnou kapacitu baterie. Hodnoty kolem 150 Ah jsou realističtější, ale na této úrovni se s problémy s vybíjením baterie téměř nesetkáte."/>
+        <text name="ads_alternatorMaxOutput_label" text="Max. výkon alternátoru"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Nastavuje maximální výstupní proud alternátoru. Vyšší hodnoty umožňují alternátoru dobíjet baterii rychleji."/>
+        <text name="ads_idleCurrent_label" text="Proud v pohotovostním režimu"/>
+        <text name="ads_idleCurrent_tooltip" text="Nastavuje odběr proudu z baterie při vypnutém motoru. Například při 0,5 A by se 15 Ah baterie plně vybila za přibližně 30 reálných hodin (před započtením vlivu teploty)."/>
+        <text name="ads_thermalSensitivity_tooltip" text="Upravuje chování tepelného modelu. Vyšší nastavení činí motor a převodovku citlivější na zatížení, okolní teplotu a znečištění chladiče – generují více tepla za stejných podmínek."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Vliv znečištění chladiče"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Snižuje kapacitu chlazení o toto procento při maximálním znečištění chladiče."/>
+        <text name="ads_warmingBoostPower_label" text="Zrychlení zahřívání"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Uměle zrychluje zahřívání motoru a převodovky. Použijte 'Vypnuto' pro původní tepelné chování."/>
+        <text name="ads_coolingSlowdownPower_label" text="Zpomalení chladnutí"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Uměle zpomaluje chladnutí motoru a převodovky po vypnutí vozidla. Použijte 'Vypnuto' pro původní rychlost chladnutí."/>
+        <text name="ads_thermal_none" text="Pasivní"/>
+        <text name="ads_thermal_mild" text="Mírné"/>
+        <text name="ads_thermal_default" text="Výchozí"/>
+        <text name="ads_thermal_aggressive" text="Agresivní"/>
+
+        <text name="ads_ws_label_value" text="Hodnota"/>
+        <text name="ads_ws_label_age" text="Stáří"/>
+        <text name="ads_ws_label_operating_hours" text="Provozní hodiny"/>
+        <text name="ads_ws_label_service" text="Servis"/>
+        <text name="ads_ws_label_condition" text="Stav"/>
+        <text name="ads_ws_label_maintainability" text="Udržovatelnost"/>
+        <text name="ads_ws_label_maintenance_log" text="Deník údržby"/>
+        <text name="ads_ws_label_last_report" text="Poslední hlášení"/>
+        <text name="ads_ws_label_service_interval" text="Servisní interval"/>
+        <text name="ads_ws_label_last_maintenance" text="Poslední údržba"/>
+        <text name="ads_ws_label_last_inspection" text="Poslední prohlídka"/>
+        <text name="ads_ws_table_header_part" text="Díl"/>
+        <text name="ads_ws_table_header_description" text="Popis"/>
+        <text name="ads_ws_table_header_stage" text="Stupeň"/>
+        <text name="ads_ws_table_header_price" text="Cena"/>
+        <text name="ads_ws_table_header_repair_select" text="Opravit"/>
+        <text name="ads_ws_info_no_breakdowns" text="Nebyly zjištěny žádné poruchy."/>
+        <text name="ads_ws_status_initial" text="Načítání stavu..."/>
+        <text name="ads_ws_action_inspection" text="Prohlídka"/>
+        <text name="ads_ws_action_maintenance" text="Údržba"/>
+        <text name="ads_ws_action_repair" text="Oprava"/>
+        <text name="ads_ws_action_overhaul" text="Generálka"/>
+        <text name="ads_ws_action_cancel_service" text="Zrušit úkon"/>
+        <text name="ads_ws_button_show" text="Zobrazit"/>
+        <text name="ads_ws_age_unit" text="měsíců"/>
+        <text name="ads_ws_hours_unit" text="h"/>
+        <text name="ads_ws_option_yes" text="Ano"/>
+        <text name="ads_ws_option_no" text="Ne"/>
+        <text name="ads_ws_status_open" text="Dílna je otevřena"/>
+        <text name="ads_ws_status_closed" text="Dílna je zavřena"/>
+        <text name="ads_ws_inspecting_status" text="Prohlídka..."/>
+        <text name="ads_ws_status_in_progress_format" text="Probíhá %s do %s..."/>
+        <text name="ads_ws_task_inspection" text="Prohlídka"/>
+        <text name="ads_ws_task_maintenance" text="Údržba"/>
+        <text name="ads_ws_task_overhaul" text="Generální oprava"/>
+        <text name="ads_ws_button_price_format" text="%s (%s)"/>
+        <text name="ads_ws_no_last_report_message" text="Zatím žádná hlášení"/>
+        <text name="ads_ws_no_report_message" text="Žádné hlášení"/>
+        <text name="ads_ws_no_log_empty_message" text="Záznam je zatím prázdný"/>
+        <text name="ads_ws_cancel_confirm_title" text="Zrušit %s?"/>
+        <text name="ads_ws_cancel_confirm_text" text="Aktuální postup bude uložen v nynějším stavu. Peníze nebudou vráceny."/>
+
+        <text name="ads_log_header_title" text="Záznam údržby"/>
+        <text name="ads_log_title" text="Technický záznam údržby"/>
+        <text name="ads_log_total_cost_title" text="Celkové výdaje"/>
+        <text name="ads_log_cost_per_month_title" text="Měsíční náklady"/>
+        <text name="ads_log_ownership_months_title" text="Doba vlastnictví"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Celkem poruch"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Prům. interval poruch"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Prům. interval údržby"/>
+        <text name="ads_log_performed" text="Provedeno: %s"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Nebyly zjištěny žádné závady"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Zjištěné závady: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="Vozidlo bylo přelakováno"/>
+        <text name="ads_log_repair_desc_generic" text="Oprava"/>
+        <text name="ads_log_cancelled_desc" text="Úkon byl zrušen"/>
+        <text name="ads_log_date" text="Datum"/>
+        <text name="ads_log_hours" text="Motohodiny"/>
+        <text name="ads_log_type" text="Typ práce"/>
+        <text name="ads_log_description" text="Popis"/>
+        <text name="ads_log_price" text="Cena"/>
+        <text name="ads_log_button_show_report" text="Zobrazit zprávu"/>
+        <text name="ads_log_empty" text="Záznam je prázdný"/>
+
+        <text name="ads_breakdowns_severity_permanent" text="Trvalé"/>
+        <text name="ads_breakdowns_severity_reduce_power" text="Snížený výkon"/>
+        <text name="ads_breakdowns_severity_shutdown" text="Vypnutí"/>
+        <text name="ads_breakdowns_severity_minor" text="Drobná"/>
+        <text name="ads_breakdowns_severity_moderate" text="Střední"/>
+        <text name="ads_breakdowns_severity_major" text="Vážná"/>
+        <text name="ads_breakdowns_severity_critical" text="Kritická"/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Nahromaděný stres z let tvrdé práce. Drobné, nevratné opotřebení klíčových komponent mírně snižuje celkový výkon."/>
+        <text name="ads_breakdowns_part_vehicle" text="Vozidlo"/>
+        <text name="ads_breakdowns_part_consumables" text="Spotřební materiál"/>
+        <text name="ads_breakdowns_part_engine" text="Motor"/>
+        <text name="ads_breakdowns_part_battery" text="Baterie"/>
+        <text name="ads_breakdowns_part_ecu" text="Řídicí jednotka (ECU)"/>
+        <text name="ads_breakdowns_part_wiring" text="Kabeláž a konektory"/>
+        <text name="ads_breakdowns_part_alternator_regulator" text="Regulátor alternátoru"/>
+        <text name="ads_breakdowns_part_turbocharger" text="Turbodmychadlo"/>
+        <text name="ads_breakdowns_part_oil_pump" text="Olejové čerpadlo"/>
+        <text name="ads_breakdowns_part_valve_train" text="Ventilový rozvod"/>
+        <text name="ads_breakdowns_part_clutch" text="Spojka"/>
+        <text name="ads_breakdowns_part_synchronizer" text="Synchronizátor"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Hydraulické čerpadlo Powershiftu"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="Řetěz CVT"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Hydraulický ventil CVT"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT převodovka"/>
+        <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulické čerpadlo"/>
+        <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulický válec"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="Spojka vývodové hřídele (PTO)"/>
+        <text name="ads_breakdowns_part_brake_system" text="Brzdový systém"/>
+        <text name="ads_breakdowns_part_wheel_bearing" text="Ložisko kola"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="Táhla řízení"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="Napínák pásů"/>
+        <text name="ads_breakdowns_part_thermostat" text="Termostat"/>
+        <text name="ads_breakdowns_part_cooling_system" text="Chladicí systém"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="Spojka ventilátoru"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="Palivové čerpadlo"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="Vstřikovače paliva"/>
+        <text name="ads_breakdowns_part_fuel_filter" text="Palivový filtr"/>
+        <text name="ads_breakdowns_part_fuel_line" text="Palivové vedení"/>
+        <text name="ads_breakdowns_part_harvest_processing_system" text="Mláticí ústrojí"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Vyprazdňovací šnek"/>
+        <text name="ads_breakdowns_quick_fix_stage" text="Záplatováno"/>
+        <text name="ads_breakdowns_defected_parts_stage" text="Vadný"/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="Jednotka funguje normálně, ale diagnostika odhalila vadnou součástku. Kvůli kriticky nízké bezpečnostní rezervě se doporučuje preventivní výměna, aby se předešlo náhlému selhání."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="Jednotka funguje normálně, ale spoléhá se výhradně na rychlou opravu opotřebených prvků. Aby se předešlo nevyhnutelné poruše při zatížení, doporučuje se co nejdříve provést plnou výměnu dílů."/>
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="Režim ochrany motoru"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Nouzový režim motoru aktivní! Výkon snížen!"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="Režim ochrany motoru"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Nouzový režim motoru aktivní! Výkon snížen!"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="Režim ochrany motoru"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Nouzový režim motoru aktivní! Výkon snížen!"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="Režim ochrany motoru"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Motor byl vypnut, aby byl chráněn před přehřátím."/>
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="Motor zcela selhal"/>
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="Motor se zadřel"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="Chyby ECU. Mírně snížený výkon motoru."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="Porucha ECU. Znatelná ztráta výkonu a zvýšená spotřeba paliva."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Kritická porucha ECU. Výrazná ztráta výkonu, vysoká spotřeba paliva a riziko zhasnutí motoru."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Úplné selhání ECU. Motor nelze ovládat a nelze jej nastartovat."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Motor je vadný"/>
+        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="Koroze kabeláže a elektrických konektorů. Zvýšený odpor kontaktů způsobuje občasné blikání světel, nestabilní napětí a obtížné startování motoru."/>
+        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="Střední koroze kabeláže a konektorů. Ztráty kontaktu způsobují časté blikání světel, nestabilní napětí, obtížné startování a možné zhasínání motoru."/>
+        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="Silná koroze kabeláže a konektorů. Napájení kritických okruhů je nestabilní, osvětlení může zcela selhat, točivý moment motoru je snížen, motor často zhasíná a startování je nespolehlivé."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="Selhání řídicího obvodu startéru způsobené silnou korozí kabeláže. Osvětlení je nefunkční a nastartování motoru je nemožné."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_message" text="Selhání okruhu startéru"/>
+        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="Sulfatace baterie. Efektivní kapacita baterie je snížena, což vede k nižší elektrické rezervě při zatížení."/>
+        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="Střední sulfatace baterie. Efektivní kapacita baterie je výrazně snížena a startování motoru je obtížné."/>
+        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="Silná sulfatace baterie. Použitelná kapacita baterie je kriticky nízká a startovací výkon je nestabilní."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="Kritická sulfatace baterie. Efektivní kapacita baterie téměř chybí a startovací výkon je nedostatečný pro spolehlivé nastartování motoru."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="Nedostatečný startovací proud baterie"/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage1_description" text="Porucha regulátoru alternátoru. Nabíjecí výkon je snížen, což vede k nižší účinnosti nabíjení baterie."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="Střední porucha regulátoru alternátoru. Nabíjení je nestabilní a snížené, což způsobuje špatné dobíjení baterie a zvýšené ztráty napětí v elektrickém systému."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="Vážná porucha regulátoru alternátoru. Nabíjecí výkon je kriticky snížen, dodávka napětí je nestabilní a elektrický systém pracuje s velkými ztrátami."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="Úplné selhání regulátoru alternátoru. Baterie se nedobíjí a elektrický systém funguje pouze ze zbývající rezervy baterie."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_message" text="Selhání systému nabíjení"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Opotřebená ložiska turba. Je slyšet slabé pískání a dochází k mírné ztrátě výkonu při vysokých otáčkách."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Netěsnící těsnění turba. Znatelná ztráta výkonu a zvýšená spotřeba paliva."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Poškozené lopatky turbíny. Silná ztráta výkonu a riziko zhasnutí motoru při velkém zatížení."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Katastrofální selhání turba. Motor ztratil většinu výkonu a hrozí mu vážné vnitřní poškození."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="Porucha olejového čerpadla. Tlak oleje je snížen, točivý moment motoru mírně klesl, teplota motoru je zvýšená a může se objevit mechanické klepání."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="Střední porucha olejového čerpadla. Tlak oleje je nedostatečný, točivý moment motoru je znatelně snížen, teplota motoru je zvýšená a mechanické klepání je jasně slyšitelné."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="Vážná porucha olejového čerpadla. Tlak oleje je kriticky nízký, točivý moment motoru je silně snížen, hrozí přehřátí motoru, mechanické klepání je silné a motor může zhasínat."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="Kritické selhání olejového čerpadla. Cirkulace oleje je nedostatečná pro bezpečný chod a nastartování nebo další provoz motoru není možný."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_message" text="Selhání tlaku oleje"/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="Závada ventilového rozvodu. Točivý moment motoru je mírně snížen, spotřeba paliva je zvýšená a z rozvodu vychází abnormální hluk."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="Střední závada ventilového rozvodu. Točivý moment motoru je znatelně snížen, spotřeba paliva je zvýšená, hluk rozvodu je výrazný a motor může pod zatížením vynechávat."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="Vážná závada ventilového rozvodu. Točivý moment motoru je silně snížen, spotřeba paliva je výrazně zvýšená, hluk rozvodu je silný, motor často vynechává a může zhasínat."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="Kritické selhání ventilového rozvodu. Správná funkce ventilů již není zajištěna a nastartování nebo další provoz motoru není možný."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_message" text="Selhání ventilového rozvodu"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Počáteční opotřebení palivového čerpadla. Mírně snížený výkon motoru a zvýšená spotřeba paliva."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Pokles tlaku paliva. Znatelná ztráta výkonu, vyšší spotřeba paliva a občasné zhasínání motoru."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kritický tlak paliva. Silná ztráta výkonu, velmi vysoká spotřeba paliva a časté zhasínání motoru."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Úplné selhání palivového čerpadla. Palivo není dodáváno do motoru."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Start motoru nemožný"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Jeden nebo více vstřikovačů má mírně zanesené trysky. Motor může běžet neklidně s mírnou ztrátou výkonu."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Špatné rozprašování paliva. Motor pod zatížením vynechává, což vede k citelné ztrátě výkonu a váhání motoru."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Vstřikovač paliva se zadírá. Motor běží velmi špatně, s výraznou ztrátou výkonu a nespolehlivým startováním."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Vstřikovač zcela selhal. Motor nepoběží správně a nemusí jít vůbec nastartovat."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Start motoru nemožný"/>
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Opotřebované brzdové destičky. Mírné snížení brzdného účinku."/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Únik brzdové kapaliny nebo opotřebované kotouče. Brzdná dráha je znatelně prodloužena."/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Vážná ztráta tlaku v brzdách. Brzdy jsou velmi slabé a nespolehlivé."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Úplné selhání brzdového systému. Další provoz je extrémně nebezpečný."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Selhání brzd"/>
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Opotřebované lamely spojky. Občasná ztráta výkonu v důsledku prokluzování převodovky pod zatížením."/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Výrazné opotřebení spojky. Znatelné prokluzování převodovky, zejména při akceleraci."/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Silně opotřebovaná spojka. Silné prokluzování ztěžuje přenos výkonu na kola."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="Spojka je zcela spálená. Vozidlo se nemůže pohybovat."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="Selhání převodovky"/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Opotřebované synchrony. Občasné skřípání nebo potíže při řazení rychlostních stupňů."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Poškozené synchrony. Řazení převodových stupňů je často obtížné a může selhat."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Vylomené zuby synchronu. Vysoká pravděpodobnost neúspěšného přeřazení nebo vyskočení rychlosti pod zatížením."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Synchrony zcela selhaly. Řazení rychlostních stupňů je nemožné."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Selhání převodovky"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Nízký hydraulický tlak v Powershiftu. Mírné zpoždění a trhání při řazení stupňů."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Opotřebovaná těsnění hydraulického čerpadla. Znatelná prodleva a rázy během řazení."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Selhávající hydraulické čerpadlo. Velké zpoždění a prudké rázy při řazení."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Hydraulické čerpadlo Powershiftu selhalo. Převodovka zůstala v neutrálu."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="Opotřebení řetězu CVT. Dochází k prokluzu řetězu a zvýšenému generování tepla v převodovce."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="Střední opotřebení řetězu CVT. Prokluz řetězu je znatelný, spotřeba paliva zvýšená a provozní teplota převodovky je vysoká."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="Silné opotřebení řetězu CVT. Prokluz řetězu je výrazný, spotřeba paliva výrazně vyšší a hrozí přehřátí převodovky."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="Kritické opotřebení řetězu CVT. Přenos točivého momentu přes variátor již není spolehlivý a pohyb vozidla nelze zajistit."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="Kritický prokluz CVT"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="Porucha hydraulického regulačního ventilu CVT. Občas dochází k poklesům tlaku, točivý moment motoru je mírně snížen a rozsah převodového poměru je omezen."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Střední porucha regulačního ventilu CVT. Nestabilita tlaku je častá, točivý moment motoru snížen, teplota převodovky roste a rozsah poměrů je dále omezen."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Vážná porucha regulačního ventilu CVT. Poklesy tlaku jsou výrazné, točivý moment motoru silně snížen, hrozí přehřátí převodovky a omezení převodů je značné."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Kritické selhání regulačního ventilu CVT. Řízení tlaku již není stabilní, rozsah převodů je silně omezen, zahřívání nadměrné a pohon pracuje v nouzovém režimu."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Byly zjištěny první známky poruchy převodovky CVT. Je vyžadována prohlídka a oprava."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Závada převodovky CVT se zhoršuje. Další provoz může vést k aktivaci nouzového režimu."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Kritické poškození převodovky CVT. Převodovka je v nouzovém režimu a maximální rychlost vozidla je snížena."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Úplné selhání převodovky CVT. Další provoz není možný, dokud nebude převodovka opravena."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Selhání převodovky CVT"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Selhání hydraulického řízení CVT"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Termostat motoru začíná selhávat. Motoru trvá déle, než dosáhne optimální teploty, nebo se mírně přehřívá."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Odezva termostatu je špatná. Regulace teploty motoru je nestabilní, což zvyšuje opotřebení."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Termostat zůstal zaseknutý v zavřené poloze. Motor se bude pod zatížením neustále přehřívat."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Úplné selhání termostatu. Chladicí kapalina nemůže správně cirkulovat, což vede k okamžitému a vážnému přehřátí."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Drobný vnitřní únik čerpadla. Hydraulické nářadí pracuje o něco pomaleji."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Opotřebovaná těsnění čerpadla. Znatelně pomalejší hydraulické operace."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Poškozené hydraulické čerpadlo. Nářadí je extrémně pomalé a slabé."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Selhání hydraulického čerpadla. Hydraulický systém je nefunkční."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Selhání hydrauliky"/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="Vnitřní netěsnost hydraulického válce. Rychlost pohybu je mírně snížena a připojené nářadí se může pod zatížením pomalu sesouvat."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="Střední vnitřní netěsnost válce. Rychlost pohybu je znatelně nižší a stabilita držení nákladu je narušena."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="Vážná vnitřní netěsnost válce. Hydraulický pohyb je pomalý a slabý, nářadí neudrží polohu pod zatížením."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="Kritická vnitřní netěsnost válce. Hydraulický pohyb téměř ustal a udržení nákladu již není možné."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="Kritický únik hydraulického válce"/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="Prokluz spojky vývodové hřídele (PTO). Přenos točivého momentu je snížen a hřídel se může pod zatížením odpojit."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="Střední prokluz spojky PTO. Přenos výkonu je výrazně omezen a dochází k častému automatickému odpojování pod zátěží."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="Silný prokluz spojky PTO. Použitelný výkon hřídele je silně redukován a stabilní provoz připojeného nářadí nelze zajistit."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="Kritické selhání spojky PTO. Přenos momentu byl ztracen a provoz vývodové hřídele není možný."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="Selhání PTO"/>
+        <text name="ads_breakdowns_bearing_wear_stage1_description" text="Opotřebení ložiska náboje kola. Jsou přítomny hluk a vibrace ložiska, maximální rychlost je mírně omezena a valivý odpor je zvýšen."/>
+        <text name="ads_breakdowns_bearing_wear_stage2_description" text="Střední opotřebení ložiska náboje. Hluk a vibrace jsou výrazné, maximální rychlost snížena a zatížení pohonného ústrojí zvýšeno."/>
+        <text name="ads_breakdowns_bearing_wear_stage3_description" text="Silné opotřebení ložiska náboje. Silné vibrace, výrazně snížená maximální rychlost, vysoké zatížení pohonu, může se objevit zvuk zadírání."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_description" text="Kritické selhání ložiska náboje kola. Ložisko se zadřelo a otáčení kola je zablokováno."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_message" text="Zadřené ložisko kola"/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="Opotřebení táhel řízení. Projevuje se mírné táhnutí řízení do strany a odezva řízení je snížena."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="Střední opotřebení táhel řízení. Táhnutí řízení je znatelné a odezva řízení je výrazně snížena."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="Silné opotřebení táhel řízení. Směrová stabilita je narušena, táhnutí do strany je silné a odezva řízení výrazně omezená."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="Kritické selhání táhel řízení. Odezva řízení téměř vymizela a nelze zajistit bezpečné ovládání směru jízdy."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="Selhání táhel řízení"/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="Porucha napínáku pásů. Projevuje se táhnutí do strany, vibrace, hluk tření a mírné snížení maximální rychlosti."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="Střední porucha napínáku pásů. Směrová nestabilita a vibrace jsou znatelné, odpor v pohybu zvýšen, motor může vynechávat a rychlost je snížena."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="Vážná porucha napínáku pásů. Nestabilita je výrazná, vibrace a hluk silné, zatížení pohonu zvýšeno a rychlost výrazně omezena."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="Kritické selhání napínáku pásů. Chod pásu již není stabilní a došlo k zadření pojezdového ústrojí."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="Selhání napínáku pásů"/>
+        <text name="ads_breakdowns_coolant_leak_stage1_description" text="Únik chladicí kapaliny. Účinnost chladicího systému je mírně snížena."/>
+        <text name="ads_breakdowns_coolant_leak_stage2_description" text="Střední únik chladicí kapaliny. Účinnost chlazení klesá a provozní teplota motoru pod zatížením roste rychleji."/>
+        <text name="ads_breakdowns_coolant_leak_stage3_description" text="Vážný únik chladicí kapaliny. Účinnost chlazení je výrazně snížena a hrozí přehřívání pod zatížením."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_description" text="Kritický únik chladicí kapaliny. Účinnost chlazení je kriticky nízká a nelze udržet bezpečnou teplotu motoru."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_message" text="Kritický únik chladicí kapaliny"/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="Porucha spojky ventilátoru. Účinnost ventilátoru je mírně snížena a spojka vydává abnormální hluk."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="Střední porucha spojky ventilátoru. Účinnost chlazení je nižší a hluk spojky je jasně slyšitelný."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="Vážná porucha spojky ventilátoru. Účinnost chlazení je výrazně snížena a hluk spojky je velmi silný."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="Kritické selhání spojky ventilátoru. Účinnost chlazení je kriticky nízká a nelze zajistit dostatečné proudění vzduchu systémem."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="Selhání spojky ventilátoru"/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="Zanesení palivového filtru. Průtok paliva je omezen, což způsobuje mírné vynechávání motoru pod zátěží a pokles točivého momentu."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="Střední zanesení palivového filtru. Omezení průtoku paliva je znatelné, vynechávání motoru časté, točivý moment klesá a motor může zhasínat."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="Vážné zanesení palivového filtru. Průtok paliva je kriticky omezen, vynechávání motoru je výrazné a motor pravděpodobně zhasne."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="Kritické zanesení palivového filtru. Průtok paliva filtrem je nedostatečný pro chod motoru a nastartování není možné."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="Palivový filtr zablokován"/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="Přisávání vzduchu do palivového vedení. Dodávka paliva ztrácí stabilitu a startování motoru je obtížnější."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="Střední přisávání vzduchu. Dodávka paliva je nestabilní, motor vynechává, startování je těžké a motor může zhasínat."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="Vážné přisávání vzduchu do vedení. Kontinuita dodávky paliva je přerušena, motor silně vynechává, startování nespolehlivé a hrozí zhasnutí."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="Kritické přisávání vzduchu. Dodávku paliva nelze udržet a nastartování nebo další provoz motoru není možný."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="Vzduch v palivovém systému"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Opotřebovaná izolace, občasné poklesy napětí. Lze pozorovat drobné elektrické anomálie."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Zkorodované kontakty a nestabilní výkon alternátoru. Světla mohou selhávat, startování je nespolehlivé."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Riziko zkratu. Kritické systémy jsou nespolehlivé a osvětlení může zcela selhat."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Selhání osvětlení"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Selhání hlavního kabelového svazku. Elektrický systém vozidla je mrtvý."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Startér nereaguje"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Mírné znečištění karburátoru. Motor občas zaváhá pod velkým zatížením."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Ucpané trysky. Motor často kucká a ztrácí výkon, zejména při rychlém přidání plynu."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Vážné zanesení karburátoru. Motor běží velmi neklidně, často zhasíná a má potíže udržet výkon."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Nedostatek paliva kvůli zcela ucpanému karburátoru. Motor nepoběží."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Karburátor je ucpaný"/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="Opotřebení mláticího a separačního ústrojí. Účinnost zpracování plodin je mírně snížena, což vede k drobným ztrátám výnosu."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="Střední opotřebení mláticího ústrojí. Účinnost zpracování je znatelně nižší, což způsobuje měřitelné ztráty na výnosu."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="Silné opotřebení mláticího ústrojí. Účinnost zpracování je výrazně snížena, ztráty výnosu jsou vysoké."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="Kritické opotřebení mláticího a separačního ústrojí. Účinnost zpracování je kriticky nízká, což způsobuje extrémní ztráty během sklizně."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_message" text="Účinnost mlácení kriticky snížena"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Mírné opotřebení vnitřních šneků a řetězů dopravníků. Malé množství plodiny se ztrácí během vnitřního transportu."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Opotřebované závity šneků a prokluzující dopravníkové pásy způsobují zvýšené sypání plodiny uvnitř stroje. Můžete slyšet občasné skřípání."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Poškozené lopatky elevátoru a šneky mají potíže s přesunem masy plodiny, což vede k výrazným ztrátám a riziku velkého ucpání."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Hlavní součást systému toku materiálu selhala, což způsobilo vážné zablokování. Motor je pod extrémním zatížením."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Zablokování toku materiálu"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Vytahaný hnací řemen. Občasné prokluzování vede k mírnému snížení rychlosti vykládky."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Opotřebovaný hnací řemen a řemenice. Výrazné prokluzování pod zatížením znatelně snižuje rychlost vykládky."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Poškozená převodovka nebo silně opotřebovaný řemen. Šnek se otáčí jen s obtížemi a velmi nízkou rychlostí."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Hnací řemen praskl nebo se převodovka zadřela. Vykládací šnek je zcela zablokován."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Vykládací šnek zablokován"/>
+        <text name="ads_breakdowns_dead_battery_message" text="Baterie je vybitá"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="Nedostatečné systémové napětí"/>
+        <text name="ads_breakdowns_engine_stalled_message" text="Motor zhasl"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO automaticky odpojeno"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="Rychlostní stupeň vyřazen"/>
+        <text name="ads_breakdown_at_progress_message" text="probíhá"/>
+
+        <text name="ads_spec_cold_engine_message" text="Motor je studený! Vysoké otáčky způsobují opotřebení!"/>
+        <text name="ads_spec_overheat_engine_message" text="Varování! Přehřívání motoru."/>
+        <text name="ads_spec_overheat_transmission_message" text="Varování! Přehřívání převodovky."/>
+        <text name="ads_spec_this_month" text="Tento měsíc"/>
+        <text name="ads_spec_months_ago" text="měsíci/mĕsíci"/> 
+		<text name="ads_spec_never" text="Nikdy"/>
+        <text name="ads_spec_op_hours_short" text="mth"/>
+        <text name="ads_spec_tomorrow_at" text="zítra v "/>
+        <text name="ads_spec_day_after_tommorow_at" text="pozítří v "/>
+        <text name="ads_spec_in_days_at" text="za {days} dní v "/>
+        <text name="ads_spec_day_s" text="den/dny/dní"/>
+        <text name="ads_spec_hour_s" text="hodina/hodiny/hodin"/>
+        <text name="ads_spec_minute_s" text="minuta/minuty/minut"/>
+        <text name="ads_spec_duration_format_hours" text="%d %s"/>
+        <text name="ads_spec_duration_format_minutes" text="%d %s"/>
+        <text name="ads_spec_duration_format_combined" text="%s a %s"/>
+        <text name="ads_spec_months_ago_unit" text="měsíci"/>
+        <text name="ads_spec_months_ago_format" text="před %s %s"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s do %s"/>
+        <text name="ads_spec_service_interval_format" text="%s mth"/>
+        <text name="ads_spec_maintenance_complete_notification" text="dokončeno"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="zrušeno"/>
+        <text name="ads_spec_inspection_issues_detected_notification" text="detekováno problémů: %s"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="Nezjištěny žádné problémy"/>
+        <text name="ads_spec_next_planned_service_notification" text="Plánovaná údržba zahájena: %s"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Plánovaná údržba %s byla zrušena kvůli nedostatku financí"/>
+        <text name="ads_spec_workshop_dealer" text="Prodejce"/>
+        <text name="ads_spec_workshop_own" text="Vlastní"/>
+        <text name="ads_spec_workshop_mobile" text="Mobilní"/>
+        <text name="ads_spec_system_engine" text="Motor"/>
+        <text name="ads_spec_system_transmission" text="Převodovka"/>
+        <text name="ads_spec_system_hydraulics" text="Hydraulika / PTO"/>
+        <text name="ads_spec_system_cooling" text="Chladicí systém"/>
+        <text name="ads_spec_system_electrical" text="Elektrický systém"/>
+        <text name="ads_spec_system_chassis" text="Podvozek"/>
+        <text name="ads_spec_system_workprocess" text="Pracovní systémy"/>
+        <text name="ads_spec_system_fuel" text="Palivová soustava"/>
+        <text name="ads_spec_state_ready" text="Připraveno"/>
+        <text name="ads_spec_state_inspection" text="Prohlídka"/>
+        <text name="ads_spec_state_maintenance" text="Údržba"/>
+        <text name="ads_spec_state_repair" text="Oprava"/>
+        <text name="ads_spec_state_overhaul" text="Generální oprava"/>
+        <text name="ads_spec_state_broken" text="Rozbité"/>
+        <text name="ads_spec_state_excellent" text="Vynikající"/>
+        <text name="ads_spec_state_good" text="Dobrý"/>
+        <text name="ads_spec_state_normal" text="Normální"/>
+        <text name="ads_spec_state_bad" text="Špatný"/>
+        <text name="ads_spec_state_terrible" text="Hrozný"/>
+        <text name="ads_spec_state_unknown" text="Neznámý"/>
+        <text name="ads_spec_state_optimal" text="Optimální"/>
+        <text name="ads_spec_state_recommended" text="Doporučeno"/>
+        <text name="ads_spec_state_required" text="Vyžadováno"/>
+        <text name="ads_spec_state_overdue" text="Po termínu"/>
+        <text name="ads_spec_state_legendary" text="Legendární"/>
+        <text name="ads_spec_state_premium" text="Prémiový"/>
+        <text name="ads_spec_state_standart" text="Standardní"/>
+        <text name="ads_spec_state_budget" text="Rozpočtový"/>
+        <text name="ads_spec_state_low" text="Nízký"/>
+        <text name="ads_spec_state_average" text="Průměrný"/>
+        <text name="ads_spec_state_high" text="Vysoký"/>
+        <text name="ads_spec_state_workhorse" text="Tahoun"/>
+        <text name="ads_spec_part_types_used" text="Použité"/>
+        <text name="ads_spec_part_types_aftermarket" text="Druhovýroba"/>
+        <text name="ads_spec_part_types_oem" text="OEM"/>
+        <text name="ads_spec_part_types_premium" text="Prémiové"/>
+        <text name="ads_spec_inspection_visual" text="Vizuální"/>
+        <text name="ads_spec_inspection_standard" text="Standardní"/>
+        <text name="ads_spec_inspection_complete" text="Úplná defektoskopie"/>
+        <text name="ads_spec_maintenance_minimal" text="Minimální"/>
+        <text name="ads_spec_maintenance_standard" text="Standardní"/>
+        <text name="ads_spec_maintenance_extended" text="Rozšířená"/>
+        <text name="ads_spec_maintenance_preventive" text="Preventivní"/>
+        <text name="ads_spec_overhaul_partial" text="Částečná"/>
+        <text name="ads_spec_overhaul_standard" text="Standardní"/>
+        <text name="ads_spec_overhaul_full" text="Kompletní"/>
+        <text name="ads_spec_repair_type_fix" text="Rychlá oprava"/>
+        <text name="ads_spec_repair_type_replacement" text="Standardní"/>
+        <text name="ads_spec_repair_type_advanced" text="Pokročilá"/>
+
+        <text name="ads_option_menu_option_one_title_inspection" text="Vyberte typ prohlídky"/>
+        <text name="ads_option_menu_option_two_title_inspection" text="Opravit zjištěné závady"/>
+        <text name="ads_option_menu_option_one_title_maintenance" text="Vyberte úroveň údržby"/>
+        <text name="ads_option_menu_option_two_title_maintenance" text="Vyberte kvalitu provozních kapalin"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Vyberte typ opravy"/>
+        <text name="ads_option_menu_option_two_title_repair" text="Vyberte kvalitu náhradních dílů"/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="Vyberte rozsah prací"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="Vyberte systém"/>
+        <text name="ads_option_menu_price_text" text="Cena: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Záruční oprava"/>
+        <text name="ads_option_menu_duration_text" text="Trvání: "/>
+        <text name="ads_option_menu_finish_time_text" text="Čas dokončení: "/>
+        <text name="ads_option_menu_start_text" text="Spustit"/>
+        <text name="ads_option_menu_duration_instant" text="Okamžitě"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Rychlá vnější prohlídka. Nízká cena a okamžitý výsledek. Odhalí viditelné závady, ale existuje riziko přehlédnutí skrytých vad. Neposkytuje data o technickém stavu."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* Běžná diagnostika. Identifikuje všechny aktivní závady a vygeneruje obecnou zprávu o stavu vozidla."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Hloubková diagnostika. Zaručuje detekci všech závad, včetně těch potenciálních, a poskytuje podrobnou zprávu s přesným procentuálním stavem všech komponentů."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Základní servis. Výrazně levnější a rychlejší, ale plně neobnovuje úroveň servisu a poskytuje kratší interval do příští údržby."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Běžná údržba dle specifikací výrobce. Obnovuje úroveň servisu na normál a poskytuje standardní servisní interval."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Komplexní servis. Trvá déle a stojí více, ale obnovuje úroveň servisu nad standardní úroveň a poskytuje delší servisní interval."/>   
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Preventivní údržba nad rámec standardu. Obnovuje úroveň servisu a zaměřuje se na nejproblematičtější systémy pro snížení rizika poruchy."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Dočasná oprava určená k udržení stroje v chodu pro naléhavou práci. Rychle a levně obnoví základní funkci, nicméně závada zůstává nevyřešena a po čase se znovu objeví."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Standardní výměna vadné součásti. Zcela eliminuje aktuální závadu a obnovuje jednotku do normálního provozního stavu."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* Hloubková oprava zahrnující výměnu vadné součásti a servis souvisejících částí systému. Výrazně snižuje riziko opakovaných závad v daném systému."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Repase vybraného systému do dobrého provozního stavu. Rychlejší a levnější než generální oprava celého vozidla."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* Komplexní práce na všech hlavních součástech. Obnovuje stav vozidla na dobrou úroveň."/>
+        <text name="ads_option_menu_overhaul_full_description" text="* Kompletní generální oprava. Vysoká cena i doba trvání, ale obnovuje stav na vynikající úroveň."/>
+        <text name="ads_option_menu_part_used_description" text="* Použité díly z vrakoviště. Velmi levné, ale extrémně riskantní (~50% šance na vadu)."/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Levnější díly z druhovýroby. Snížená cena, ale nese mírné riziko vad (33 %)."/>
+        <text name="ads_option_menu_part_oem_description" text="* Originální díly od výrobce (OEM). Standardní spolehlivost (10% riziko vady) za plnou cenu."/>
+        <text name="ads_option_menu_part_premium_description" text="* Zesílené výkonné díly. Drahé, ale pod přísnou kontrolou kvality (0% riziko vady)."/>
+        <text name="ads_option_menu_perform_repair" text="Opravit všechny nalezené závady"/>
+        <text name="ads_option_menu_perform_maintenance" text="Provést údržbu po opravě"/>
+        <text name="ads_option_menu_perform_renew_paint" text="Obnovit lakování"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Automaticky spustit standardní opravu s OEM díly, pokud jsou zjištěny závady."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Automaticky spustit standardní údržbu s OEM kapalinami po dokončení opravy."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Přelakovat vozidlo během generální opravy."/>
+        <text name="ads_option_menu_choosen_parts_text" text="* Zvoleno pro opravu:"/>
+
+        <text name="ads_report_header_title" text="Zpráva o technické prohlídce"/>
+        <text name="ads_report_vehicle_name_title" text="Název vozidla"/>
+        <text name="ads_report_date_title" text="Datum"/>
+        <text name="ads_report_vehicle_age_title" text="Stáří"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Provozní hodiny"/>
+        <text name="ads_report_inspection_type_title" text="Typ prohlídky"/>
+        <text name="ads_report_inspection_location_title" text="Místo"/>
+        <text name="ads_report_overall_assessment_title" text="Celkové posouzení stavu"/>
+        <text name="ads_report_vehicle_specs_title" text="Specifikace vozidla"/>
+        <text name="ads_report_detected_breakdowns_title" text="Zjištěné závady"/>
+        <text name="ads_report_recommendations_title" text="Závěr a doporučení"/>
+        <text name="ads_report_state_optimal" text="Optimální"/>
+        <text name="ads_report_state_normal" text="Normální"/>
+        <text name="ads_report_state_degraded" text="Zhoršený"/>
+        <text name="ads_report_state_impaired" text="Poškozený"/>
+        <text name="ads_report_state_critical" text="Kritický"/>
+        <text name="ads_report_state_not_available" text="N/A"/>
+        <text name="ads_report_overall_assessment_condition" text="Úroveň stavu (Condition)"/>
+        <text name="ads_report_overall_assessment_service" text="Úroveň servisu (Service)"/>
+        <text name="ads_report_overall_assessment_mtbf" text="MTBF (hod. do poruchy)"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="Riziko krit. selhání"/>
+        <text name="ads_report_overall_assessment_rul" text="Zbytková životnost (hod.)"/>
+        <text name="ads_report_overall_assessment_wear_rate" text="Míra opotřebení (%/hod)"/>
+        <text name="ads_report_overall_assessment_nominal_wear_rate" text="Nominální opotřebení (%/h)"/>
+        <text name="ads_report_system_condition_title" text="Stav systému | Riziko selhání"/>
+        <text name="ads_report_system_condition_power" text="Aktuální výkon"/>
+        <text name="ads_report_system_condition_brakes" text="Účinnost brzd"/>
+        <text name="ads_report_system_condition_transmission" text="Převodovka"/>
+        <text name="ads_report_system_condition_harvest" text="Účinnost sklizně"/>
+        <text name="ads_report_system_condition_cooling" text="Účinnost chlazení"/>
+        <text name="ads_report_system_condition_consumption" text="Spotřeba paliva"/>
+        <text name="ads_report_system_condition_hydraulic" text="Účinnost hydrauliky"/>
+        <text name="ads_report_transmission_slipping" text="Prokluzování"/>
+        <text name="ads_report_transmission_shifting_impaired" text="Zhoršené řazení"/>
+        <text name="ads_report_transmission_gear_rejection" text="Vyskakování rychlostí"/>
+        <text name="ads_report_transmission_shift_delay" text="Prodleva řazení"/>
+        <text name="ads_report_transmission_cvt_slipping" text="Prokluz řemenu/řetězu"/>
+        <text name="ads_report_transmission_cvt_ratio_limited" text="Omezený rozsah poměrů"/>
+        <text name="ads_report_transmission_cvt_pressure_instability" text="Nestabilita tlaku"/>
+        <text name="ads_report_transmission_failed" text="Selhání"/>
+        <text name="ads_report_vehicle_spec_max_alternator_current" text="Max. proud alternátoru"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="Nabití baterie"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="Kapacita baterie"/>
+        <text name="ads_report_stress_absent" text="Žádné"/>
+        <text name="ads_report_stress_low" text="Nízké"/>
+        <text name="ads_report_stress_moderate" text="Střední"/>
+        <text name="ads_report_stress_elevated" text="Zvýšené"/>
+        <text name="ads_report_stress_high" text="Vysoké"/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Zjištěny aktivní závady. Doporučuje se standardní oprava všech závad."/>
+        <text name="ads_report_recommendation_defective_parts" text="Zjištěny vadné náhradní díly: %s. Doporučuje se preventivní výměna k zamezení náhlého selhání."/>
+        <text name="ads_report_recommendation_quick_fix" text="Zjištěn stav po dočasné opravě: %s. Doporučuje se standardní výměna při nejbližší příležitosti."/>
+        <text name="ads_report_recommendation_service_due" text="Dosažen práh servisního intervalu. Proveďte údržbu."/>
+        <text name="ads_report_recommendation_service_urgent" text="Servisní interval byl překročen. Naléhavě proveďte údržbu!"/>
+        <text name="ads_report_recommendation_overhaul" text="Zjištěna degradace klíčových součástí. Proveďte generální opravu."/>
+        <text name="ads_report_recommendation_system_overhaul" text="Zjištěna kritická degradace v systému %s. Proveďte částečnou repasi tohoto systému."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="Zjištěno zvýšené riziko poruchy v systému %s. Proveďte preventivní údržbu pro snížení rizika."/>
+        <text name="ads_report_recommendation_operating_conditions" text="Zjištěny známky intenzivního přetěžování. Zlepšete provozní podmínky."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="Zjištěny vadné provozní kapaliny/spotřební materiál. Opakujte údržbu pro výměnu vadných částí."/>
+        <text name="ads_report_recommendation_all_ok" text="Žádná kritická doporučení. Vozidlo je v provozuschopném stavu."/>
+		
+        <text name="ads_grease_gun_name" text="Mazací pistole"/>
+        <text name="ads_grease_gun_function" text="Používá se pro servisní postupy mazání"/>
+        <text name="ads_grease_gun_action" text="Aplikovat mazivo"/>
+        <text name="ads_grease_gun_no_vehicle" text="V dosahu mazání není žádné vozidlo"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s nevyžaduje mazání"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s je již namazán(o)"/>
+        <text name="ads_air_blower_name" text="Vzduchový kompresor"/>
+        <text name="ads_air_blower_function" text="Používá se k čištění chladičů a přívodů vzduchu"/>
+        <text name="ads_air_blower_action" text="Vyčistit chladič a přívod vzduchu"/>
+        <text name="ads_air_blower_no_vehicle" text="V dosahu čištění není žádné vozidlo"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s nevyžaduje čištění"/>
+        <text name="ads_air_blower_already_clean" text="%s: chladič a přívod vzduchu jsou již čisté"/>
+        <text name="ads_jumper_cables_name" text="Startovací kabely"/>
+        <text name="ads_jumper_cables_function" text="Používají se k propojení baterií vozidel a nastartování vybitých motorů"/>
+        <text name="ads_jumper_cables_action" text="Připojit/odpojit startovací kabely"/>
+        <text name="ads_jumper_cables_connected" text="Startovací kabely připojeny k %s"/>
+        <text name="ads_jumper_cables_already_connected" text="Startovací kabely jsou již k %s připojeny"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="Vozidlo není vhodné pro připojení startovacích kabelů"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Startovací kabely jsou již připojeny k %s a %s"/>
+        <text name="ads_jumper_cables_disconnected" text="Startovací kabely odpojeny od %s"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Startovací kabely byly odpojeny, protože se jedno z vozidel rozjelo"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s je příliš daleko od %s"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="Prohlídka vozidla"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
+        <text name="ads_field_inspection_action" text="Prohlédnout vozidlo"/>
+        <text name="ads_field_inspection_hold_to_start" text="Podržte pro zahájení prohlídky"/>
+        <text name="ads_field_inspection_starting" text="Zahajování prohlídky..."/>
+        <text name="ads_field_inspection_progress" text="Provádění vizuální prohlídky... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Prohlídka zrušena"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Před prohlídkou vypněte motor"/>
+        <text name="ads_inspection_dialog_title" text="Vizuální prohlídka před směnou"/>
+        <text name="ads_inspection_section_fluids" text="1. Provozní kapaliny"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Chlazení a sání vzduchu"/>
+        <text name="ads_inspection_section_lubrication" text="3. Mazací body"/>
+        <text name="ads_inspection_section_additional" text="4. Další poznámky"/>
+        <text name="ads_inspection_engine_oil" text="Motorový olej"/>
+        <text name="ads_inspection_coolant" text="Chladicí kapalina"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Hydraulická kapalina"/>
+        <text name="ads_inspection_transmission_oil" text="Převodový olej"/>
+        <text name="ads_inspection_radiator" text="Chladič"/>
+        <text name="ads_inspection_air_duct" text="Sací potrubí"/>
+        <text name="ads_inspection_air_filter" text="Vzduchový filtr"/>
+        <text name="ads_inspection_lubrication_level" text="Úroveň promazání"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Nebyly zjištěny žádné podezřelé příznaky"/>
+        <text name="ads_inspection_ok" text="V pořádku"/>
+        <text name="ads_inspection_status_slightly_low" text="Mírně nízká"/>
+        <text name="ads_inspection_status_low" text="Nízká"/>
+        <text name="ads_inspection_status_very_low" text="Velmi nízká"/>
+        <text name="ads_inspection_status_critically_low" text="Kriticky nízká"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Mírně ztmavlý"/>
+        <text name="ads_inspection_status_darkened" text="Ztmavlý"/>
+        <text name="ads_inspection_status_contaminated" text="Znečištěný"/>
+        <text name="ads_inspection_status_critical_condition" text="Kritický stav"/>
+        <text name="ads_inspection_status_slight_moisture" text="Lehká vlhkost"/>
+        <text name="ads_inspection_status_seepage" text="Průsak"/>
+        <text name="ads_inspection_status_active_leak" text="Aktivní únik"/>
+        <text name="ads_inspection_status_severe_leak" text="Silný únik"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Mírně znečištěný"/>
+        <text name="ads_inspection_status_dirty" text="Znečištěný"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Silně zanesený"/>
+        <text name="ads_inspection_status_critically_clogged" text="Kriticky zanesený"/>
+        <text name="ads_inspection_status_slightly_dry" text="Mírně suché"/>
+        <text name="ads_inspection_status_dry" text="Suché"/>
+        <text name="ads_inspection_status_very_dry" text="Velmi suché"/>
+        <text name="ads_inspection_status_critically_dry" text="Kriticky suché"/>
+        <text name="ads_inspection_status_not_required" text="Není vyžadováno"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="U spojů chladicí soustavy jsou viditelné mírné stopy chladicí kapaliny."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Jsou patrné zbytky chladicí kapaliny a její hladina je pod normálem."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="V oblasti chladicí soustavy je patrná zřetelná ztráta kapaliny."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Hladina chladicí kapaliny je kriticky nízká, s výraznými stopami úniku."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="Motorový olej se zdá být mírně ztmavlý."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="Motorový olej vypadá tmavší než obvykle."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="Motorový olej se zdá být znečištěný."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Stav oleje se zdá být kritický."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="V oblasti hydraulického válce je patrný slabý mastný film."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Kolem válce je patrný průsak hydraulické kapaliny."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="V blízkosti válce jsou viditelné jasné stopy hydraulické kapaliny."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Jsou viditelné silné stopy hydraulické kapaliny. Oblast válce je jimi silně znečištěna."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="Povrch chladiče je mírně znečištěný."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Chladič je znatelně znečištěný."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Chladič je silně zanesen hlínou a nečistotami."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Chladič je kriticky zanesen hlínou a nečistotami."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="Sací potrubí vykazuje lehké znečištění."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Sací potrubí je znatelně znečištěné."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Sací potrubí je silně zaneseno prachem a nečistotami."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Sací potrubí je kriticky zaneseno prachem a nečistotami."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="Mazací body vypadají mírně suché."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Mazací body vypadají suché a nedostatečně promazané."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Mazací body jsou velmi suché, s minimem zbývajícího maziva."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Mazací body jsou kriticky suché, téměř bez viditelného maziva."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="Na některých elektrických spojích jsou patrné lehké stopy oxidace."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="Na kabeláži a konektorech je viditelná výrazná oxidace a znečištění."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Na kabeláži a konektorech je patrná silná koroze a izolace se zdá být poškozená."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="Na svorkách baterie je patrný slabý bělavý povlak."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="Na svorkách baterie je viditelný bělavý povlak."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Na svorkách a obalu baterie je patrná výrazná oxidace a usazeniny."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Baterie a svorky jsou pokryty silnými usazeninami a obal vypadá znečištěně a opotřebovaně."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="V okolí alternátoru a některých spojů jsou patrné známky přehřívání a ztmavnutí."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="V okolí alternátoru a jeho kabeláže jsou viditelné výrazné známky přehřívání a ztmavlé konektory."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="V oblasti turbodmychadla jsou patrné mastné stopy a ztmavlé spoje."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="V oblasti turbodmychadla jsou viditelné silné mastné stopy, ztmavlé spoje a stopy sazí."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Kolem hydraulických spojů převodovky jsou patrné mastné stopy a znečištění."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Kolem hydraulických spojů převodovky jsou viditelné silné mastné stopy a značné znečištění."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="V okolí bloku hydraulického ovládání CVT jsou patrné mastné stopy a ztmavlé spoje."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="U spojů bloku hydraulického ovládání CVT jsou viditelné silné mastné stopy a značné znečištění."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Napnutí pásu se zdá být mírně nerovnoměrné."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Pás se zdá být volný, s patrným nerovnoměrným napnutím."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Pás je viditelně prověšený a napnutí se zdá být kriticky narušené."/>
+        
+        <text name="ads_ingame_menu_title" text="Pokročilý systém poškození ADS"/>
+        <text name="ads_ingame_menu_section_active" text="ADS Vozidla"/>
+        <text name="ads_ingame_menu_section_service" text="V servisu"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Vozidlo"/>
+        <text name="ads_ingame_menu_header_type" text="Typ"/>
+        <text name="ads_ingame_menu_header_age" text="Stáří"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Mh"/>
+        <text name="ads_ingame_menu_header_condition" text="Stav"/>
+        <text name="ads_ingame_menu_header_interval" text="Interval"/>
+        <text name="ads_ingame_menu_header_service_status" text="Prohlídka/Servis"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Prohlídka"/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Servis"/>
+        <text name="ads_ingame_menu_header_cost" text="Údržba"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Pronájem"/>
+        <text name="ads_ingame_menu_header_price" text="Hodnota"/>
+        <text name="ads_ingame_menu_header_procedure" text="Procedura"/>
+        <text name="ads_ingame_menu_header_time_left" text="Zbývá času"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Čas dokončení"/>
+        <text name="ads_ingame_menu_header_service_cost" text="Cena"/>
+        <text name="ads_ingame_menu_section_other" text="Ostatní vozidla"/>
+        <text name="ads_ingame_menu_empty_other" text="Nejsou k dispozici žádná vozidla bez ADS"/>
+        <text name="ads_ingame_menu_empty_active" text="Nejsou k dispozici žádná ADS vozidla"/>
+        <text name="ads_ingame_menu_empty_service" text="V servisu aktuálně nejsou žádná vozidla"/>
+        <text name="ads_sell_dialog_costs_title" text="Dodatečné náklady"/>
+        <text name="ads_sell_dialog_deposit_return" text="Vrácení kauce"/>
+        <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Zanedbaná údržba"/>
+        <text name="ads_sell_dialog_repair_penalty" text="Oprava"/>
+        <text name="ads_sell_dialog_washing_penalty" text="Mytí"/>
+        <text name="ads_sell_dialog_total" text="Celkem"/>
+        <text name="ads_mobile_workshop_low_maintainability" text="VAROVÁNÍ: %s není v mobilní dílně k dispozici pro %s kvůli nízké udržovatelnosti."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kritické přetížení! Okamžitě snižte zatížení vozidla."/>
+    
+        <text name="ads_tutorialMode_label" text="Režim tutoriálu"/>
+        <text name="ads_tutorialMode_tooltip" text="Zobrazuje tipy tutoriálu během hraní. V režimu více hráčů je zakázáno."/>
+        <text name="ads_tutorialResetTips_label" text="Resetovat tipy"/>
+        <text name="ads_tutorialResetTips_text" text="Resetovat tipy"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Vymaže historii zobrazených tipů a začne je ukazovat znovu. Dostupné pouze v režimu jednoho hráče."/>
+        <text name="ads_tutorialResetConfirm_title" text="Resetovat tipy tutoriálu?"/>
+        <text name="ads_tutorialResetConfirm_message" text="Přejete si resetovat historii tipů a začít je zobrazovat znovu?"/>
+        <text name="ads_tutorial_welcome_dialog_title" text="Vítejte v Advanced Damage System"/>
+        <text name="ads_tutorial_welcome_disable_button" text="Zakázat tipy"/>
+        <text name="ads_tutorial_welcome_enable_button" text="Povolit tipy"/>
+        <text name="ads_tutorial_welcome_message" text="Tento mód kompletně přepracovává systém poškození a údržby vozidel ve hře. Změn je mnoho, proto se čas od času objeví tipy tutoriálu. Pomohou vám rychleji pochopit nové mechaniky, vyvarovat se běžných chyb a ochránit vaše stroje před poruchami.&#10;&#10;Pokud si přejete, můžete tipy tutoriálu hned vypnout. Později je můžete kdykoliv znovu zapnout v nastavení módu v sekci Advanced Damage System."/>
+        <text name="ads_tutorial_service_due_soon_title" text="Pravidelná údržba"/>
+        <text name="ads_tutorial_service_due_soon_message" text="Vozidlo %s bude brzy vyžadovat údržbu.&#10;&#10;V systému ADS vyžadují vozidla pravidelný servis. Pokud jej odložíte, výrazně se zvyšuje riziko poruch.&#10;&#10;Navštivte nejbližší dílnu a zvolte možnost „Údržba“. Servisní interval lze upravit v nastavení módu."/>
+        <text name="ads_tutorial_service_interval_expired_title" text="Servisní interval vypršel"/>
+        <text name="ads_tutorial_service_interval_expired_message" text="Vozidlo %s překročilo servisní interval a vyžaduje údržbu.&#10;&#10;Co nejdříve se vydejte do dílny a proveďte proceduru „Údržba“. Další provozování vozidla s prošlým intervalem značně zvyšuje riziko řetězových poruch."/>
+        <text name="ads_tutorial_rad_or_intake_clogged_title" text="Znečištění chladiče a sání"/>
+        <text name="ads_tutorial_rad_or_intake_clogged_message" text="Vypadá to, že chladič a přívody vzduchu vašeho vozidla jsou silně zanesené.&#10;&#10;Špinavý chladič nemůže efektivně odvádět teplo a ucpané sání omezuje přívod vzduchu do motoru. To snižuje výkon a zvyšuje spotřebu paliva.&#10;&#10;Můžete je vyčistit v myčce nebo pomocí vzduchového dmychadla zakoupeného v obchodě.&#10;&#10;Stav chladiče a sání můžete ověřit prohlídkou: podržte klávesu R, zatímco se díváte na vozidlo."/>
+        <text name="ads_tutorial_needs_lubrication_title" text="Vyžadováno promazání"/>
+        <text name="ads_tutorial_needs_lubrication_message" text="Vaše %s potřebuje pravidelné mazání.&#10;&#10;V ADS úroveň promazání pracovních částí postupně klesá každý den, což zvyšuje opotřebení.&#10;&#10;Kupte si v obchodě mazací lis a promažte svůj stroj denně nebo před každou směnou.&#10;&#10;Stav promazání můžete ověřit prohlídkou: podržte klávesu R, zatímco se díváte na vozidlo."/>
+        <text name="ads_tutorial_needs_repair_title" text="Závada na vozidle"/>
+        <text name="ads_tutorial_needs_repair_message" text="Zdá se, že s vaším vozidlem %s není něco v pořádku. Jedna z jeho částí zřejmě selhala.&#10;&#10;Určitě navštivte dílnu a proveďte prohlídku. Neodkládejte to: závada se může dále šířit a náklady na opravu s časem porostou.&#10;&#10;Pokud prohlídka potvrdí závadu, opravte ji v dílně pomocí procedury opravy."/>
+        <text name="ads_tutorial_needs_overhaul_title" text="Generální oprava"/>
+        <text name="ads_tutorial_needs_overhaul_message" text="Vypadá to, že %s už má svá nejlepší léta za sebou. Je na čase zvážit výměnu nebo generální opravu. Je to sice dlouhý a náročný proces, ale je to nejlepší způsob, jak dát druhý život vašemu oblíbenému stroji! P.S. Životnost vozidel můžete změnit v nastavení – jejím zvýšením snížíte rychlost opotřebení."/>
+        <text name="ads_tutorial_age_degradation_title" text="Degradace stářím"/>
+        <text name="ads_tutorial_age_degradation_message" text="Věděli jste, že vozidla v ADS s věkem postupně ztrácejí část svého původního výkonu?&#10;&#10;Zhruba po první třetině životnosti začíná degradace mírně snižovat klíčové vlastnosti, jako je výkon motoru, brzdný účinek a další systémy. Čím je vozidlo starší, tím je tento efekt výraznější.&#10;&#10;Degradaci stářím můžete vypnout v nastavení módu."/>
+        <text name="ads_tutorial_needs_preventive_title" text="Hrozící porucha"/>
+        <text name="ads_tutorial_needs_preventive_message" text="Vypadá to, že jeden ze systémů vozidla %s brzy selže. Dobrou zprávou je, že tomu můžete předejít! V dílně je nyní k dispozici speciální služba: Preventivní údržba. Ta zahrnuje plnou technickou prohlídku a proaktivní výměnu všech dosluhujících komponentů!"/>
+        <text name="ads_tutorial_poor_consumables_title" text="Nekvalitní provozní kapaliny"/>
+        <text name="ads_tutorial_poor_consumables_message" text="Malé tajemství: vaše %s se stalo obětí nekvalitních kapalin či filtrů při poslední údržbě. To se může stát, pokud jste sami vědomě nezvolili levné náhrady z druhovýroby.&#10;&#10;Momentálně je servisní interval zkrácen a opotřebení dílů mírně zvýšeno. Opakovaná údržba problém vyřeší. Problém odhalíte prohlídkou: základní prohlídka vás varuje před zkráceným intervalem, zatímco plná diagnostika odhalí přímo nekvalitní materiál."/>
+        <text name="ads_tutorial_poor_parts_title" text="Nekvalitní díly"/>
+        <text name="ads_tutorial_poor_parts_message" text="Malé tajemství: vaše %s se stalo obětí nekvalitních náhradních dílů při poslední opravě. Tato závada se pravděpodobně brzy vrátí.&#10;&#10;Můžete počkat, až se tak stane, nebo hned provést plnou diagnostickou prohlídku – ta nekvalitní díl spolehlivě odhalí."/>
+        <text name="ads_tutorial_idle_and_downtime_title" text="Volnoběh a parkování"/>
+        <text name="ads_tutorial_idle_and_downtime_message" text="Mimochodem, opotřebení je mnohem nižší, když stroj běží, ale aktivně nepracuje. Pokud je motor vypnutý, opotřebení je minimální, a pokud je stroj zaparkován pod střechou, mizí úplně."/>
+        <text name="ads_tutorial_hot_weather_title" text="Horké počasí"/>
+        <text name="ads_tutorial_hot_weather_message" text="Dnes je opravdu horko. V takovém počasí musíte obzvláště bedlivě sledovat čistotu chladiče a vyhýbat se přetěžování motoru – jinak je přehřátí jen otázkou času.&#10;&#10;Nezapomeňte: stav chladiče můžete vždy zkontrolovat vizuálně (podržte R při pohledu na stroj) a vyčistit jej můžete vzduchovým dmychadlem."/>
+        <text name="ads_tutorial_wet_weather_title" text="To je ale počasí!"/>
+        <text name="ads_tutorial_wet_weather_message" text="Dnešní počasí nestojí za nic. Vlhkost nesvědčí kabeláži a elektronice, takže opotřebení elektrického systému je v těchto podmínkách o něco vyšší.&#10;&#10;Navíc se v tomto počasí důrazně nedoporučuje sklízet úrodu – svému kombajnu tím jen uškodíte."/>
+        <text name="ads_tutorial_low_fuel_title" text="Málo paliva"/>
+        <text name="ads_tutorial_low_fuel_message" text="Vypadá to, že vám dochází palivo. Na první pohled se to nemusí zdát jako velký problém, ale čím méně paliva v nádrži zbývá, tím více se namáhá palivové čerpadlo. Jeho zatížení roste, což mu na životnosti rozhodně nepřidá."/>
+        <text name="ads_tutorial_idle_deposit_title" text="Dlouhý volnoběh"/>
+        <text name="ads_tutorial_idle_deposit_message" text="Zdá se, že stroj běží na volnoběh příliš dlouho. Dlouhé stání s nastartovaným motorem není jen plýtvání palivem: časem také podporuje tvorbu usazenin v palivovém systému a škodí celkovému zdraví motoru.&#10;&#10;Pokud stroj právě nepotřebujete, raději motor vypněte."/>
+        <text name="ads_tutorial_engine_overheat_title" text="Přehřívání motoru"/>
+        <text name="ads_tutorial_engine_overheat_message" text="Motor se začíná přehřívat. Může to mít několik příčin: motor je pod velkým zatížením, chladič je ucpaný, je horké počasí nebo je závada přímo v chladicím systému.&#10;&#10;Buďte ve střehu: přehřátí je jedním z nejničivějších faktorů pro každý stroj. Neškodí jen motoru, ale i chladicí soustavě, a vysoká teplota pod kapotou urychluje degradaci kabeláže a elektroniky."/>
+        <text name="ads_tutorial_cvt_overheat_title" text="Přehřívání CVT"/>
+        <text name="ads_tutorial_cvt_overheat_message" text="Převodovka CVT se začíná přehřívat. Příčinou může být nadměrné zatížení, ucpaný chladič nebo velmi horké počasí. Například můžete táhnout příliš těžký pluh nebo přetížený přívěs.&#10;&#10;Pozor: přehřátí je pro CVT převodovku jednou z nejhorších věcí, co se může stát."/>
+        <text name="ads_tutorial_heavy_trailer_title" text="Těžký přívěs"/>
+        <text name="ads_tutorial_heavy_trailer_message" text="Vypadá to, že se pokoušíte táhnout přívěs, který je na váš traktor příliš těžký. Můžete v tom pokračovat, ale převodovka bude pod obrovským tlakem a brzdy vám za tohle extra zatížení také nepoděkují.&#10;&#10;Držte se jednoduchého pravidla: alespoň 10 koní na 1 tunu tažené váhy a stroj vám vydrží znatelně déle."/>
+        <text name="ads_tutorial_chassis_vibration_title" text="Namáhání podvozku"/>
+        <text name="ads_tutorial_chassis_vibration_message" text="Prrr, zpomalte! Rychlá jízda nerovným terénem rychle odrovná odpružení vašeho vozidla %s. Navíc tyhle vibrace škodí i ostatním systémům – hlavně hydraulice a elektrice. Jezděte plynule a s rozvahou."/>
+        <text name="ads_tutorial_steering_title" text="Zatáčení na místě"/>
+        <text name="ads_tutorial_steering_message" text="Nejlepší je nezatáčet koly, když stroj úplně stojí. Klade to velký odpor řízení, posilovači a komponentům přední nápravy, což zvyšuje opotřebení podvozku.&#10;&#10;Stačí se alespoň trochu rozjet a koly půjde otáčet mnohem snáze."/>
+        <text name="ads_tutorial_cranking_title" text="Časté startování"/>
+        <text name="ads_tutorial_cranking_message" text="Zdá se, že startujete motor příliš často. Každý start posílá elektrickým systémem velmi vysoký proud, což urychluje opotřebení kabeláže, startéru a dalších komponentů.&#10;&#10;Snažte se nestartovat každou chvíli a nevypínejte motor tak často, jako by byl stroj vybaven systémem start-stop."/>
+        <text name="ads_tutorial_hard_start_title" text="Těžký start"/>
+        <text name="ads_tutorial_hard_start_message" text="Startování motoru u %s je obtížné. Příčinou může být slabá baterie, mrazy, mechanické závady nebo opotřebovaný startér. Pro nastartování držte tlačítko zapalování déle. Poznámka: Elektrický systém je při startu silně namáhán vysokými nárazovými proudy!"/>
+        <text name="ads_tutorial_critical_failure_title" text="Kritické selhání"/>
+        <text name="ads_tutorial_critical_failure_message" text="Tak to je smůla. Vaše %s je zcela vyřazeno z provozu a už se nepohne vlastní silou. Můžete využít mobilní dílnu a provést rychlou nouzovou opravu, aby vozidlo dojelo do servisu samo.&#10;&#10;Jinak budete muset vymyslet jiný způsob, jak ho odtáhnout."/>
+        <text name="ads_tutorial_heavy_lift_title" text="Příliš těžké nářadí"/>
+        <text name="ads_tutorial_heavy_lift_message" text="Zdá se, že toto nářadí je pro vaše %s příliš těžké. Hydraulika pracuje na hranici svých možností, což negativně ovlivní její životnost.&#10;&#10;Držte se pravidla: váha nářadí by neměla přesáhnout 60 %% vlastní váhy vozidla."/>
+        <text name="ads_tutorial_cold_engine_title" text="Zahřejte svůj stroj"/>
+        <text name="ads_tutorial_cold_engine_message" text="Předtím než se pustíte do práce, nechte stroj vždy zahřát. Kromě motoru potřebuje čas i mnoho dalších částí: hydraulický olej, převodovka CVT a dokonce i palivo – zejména v mrazivém počasí. Provoz stroje „za studena“ může způsobit problémy v mnoha systémech.&#10;&#10;Pokud je teplota motoru nad 50 stupňů, je vše dostatečně prohřáté a stroj lze bezpečně používat."/>
+        <text name="ads_tutorial_pto_sharp_angle_title" text="Příliš ostrý úhel hřídele"/>
+        <text name="ads_tutorial_pto_sharp_angle_message" text="Pozor: úhel kloubového hřídele (PTO) mezi strojem a nářadím je příliš velký. Hřídel začíná pracovat s rázy, zvyšují se vibrace a opotřebení rapidně roste.&#10;&#10;Snažte se držet úhel pod 30 stupňů a při ostrém zatáčení na souvratích náhon raději vypínejte."/>
+        <text name="ads_tutorial_overload_indicator_title" text="Varování před přetížením"/>
+        <text name="ads_tutorial_overload_indicator_message" text="Vozidlo %s je pod velkým zatížením. Upozorňuje vás na to varovná kontrolka, která se právě rozsvítila na palubní desce.&#10;&#10;Stroj zřejmě nemá dostatek výkonu pro aktuální úkol. Zkuste snížit zátěž: omezte rychlost pomocí tempomatu nebo uberte plyn, místo abyste jeli na plný výkon."/>
+        <text name="ads_tutorial_engine_overload_title" text="Přetížení motoru"/>
+        <text name="ads_tutorial_engine_overload_message" text="Motor je pod enormním tlakem. Je možné, že úkol, který se snažíte splnit, je pro tento stroj prostě příliš a měli byste zvážit silnější jednotku. Nebo možná stačí jen zpomalit a snížit nároky na motor.&#10;&#10;V každém případě mějte na paměti, že při takovém stresu opotřebení roste raketovým tempem."/>
+        <text name="ads_tutorial_lugging_title" text="Podtáčení motoru"/>
+        <text name="ads_tutorial_lugging_message" text="Motor a zejména převodovka nemají rádi podtáčení (lugging): nízké otáčky při vysokém zatížení motoru. Možná jste připojili něco příliš těžkého, nebo u manuální převodovky volíte nevhodné rychlostní stupně."/>
+        <text name="ads_tutorial_wheel_slip_title" text="Prokluz kol"/>
+        <text name="ads_tutorial_wheel_slip_message" text="Vypadá to, že vám kola silně prokluzují. Možná jste zrovna zapadli a nemáte na rady náladu, ale pamatujte na tohle: prokluz kol je jedním z nejničivějších faktorů pro převodovku a výrazně vám přiblíží příští návštěvu servisu."/>
+        <text name="ads_tutorial_battery_low_title" text="Slabá baterie"/>
+        <text name="ads_tutorial_battery_low_message" text="Jejda, vypadá to, že baterie brzy vypoví službu. To se může stát po dlouhém stání, kvůli silnému mrazu nebo závadě v elektroinstalaci.&#10;&#10;S nízkou kapacitou bude startování obtížné nebo i nemožné. Pokud nenastartujete, můžete stroj nahodit z jiného vozidla pomocí startovacích kabelů."/>
+    </texts>
+</l10n>
+

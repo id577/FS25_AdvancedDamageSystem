@@ -550,21 +550,21 @@
         <text name="ads_grease_gun_no_vehicle" text="No hay vehículo en el rango de lubricación"/>
         <text name="ads_grease_gun_lubrication_not_require" text="%s no requiere lubricación"/>
         <text name="ads_grease_gun_already_lubricated" text="%s ya está lubricado"/>
-        <text name="ads_air_blower_name" text="Soplador de aire"/>
+        <text name="ads_air_blower_name" text="Soplador de Aire"/>
         <text name="ads_air_blower_function" text="Se utiliza para limpiar radiadores y tomas de aire"/>
         <text name="ads_air_blower_action" text="Limpiar radiador y toma de aire"/>
         <text name="ads_air_blower_no_vehicle" text="No hay vehículo en el rango de limpieza"/>
         <text name="ads_air_blower_cleaning_not_require" text="%s no requiere limpieza"/>
         <text name="ads_air_blower_already_clean" text="%s: el radiador y la toma de aire ya están limpios"/>
-        <text name="ads_jumper_cables_name" text="Cables de arranque"/>
+        <text name="ads_jumper_cables_name" text="Cables de Arranque"/>
         <text name="ads_jumper_cables_function" text="Se utilizan para conectar baterías de vehículos y arrancar motores descargados"/>
-        <text name="ads_jumper_cables_action" text="Conectar/desconectar cables de arranque"/>
-        <text name="ads_jumper_cables_connected" text="Cables de arranque conectados a %s"/>
-        <text name="ads_jumper_cables_already_connected" text="Los cables de arranque ya están conectados a %s"/>
-        <text name="ads_jumper_cables_impossible_to_connect" text="El vehículo no es adecuado para conectar cables de arranque"/>
-        <text name="ads_jumper_cables_both_already_connected" text="Los cables de arranque ya están conectados a %s y %s"/>
-        <text name="ads_jumper_cables_disconnected" text="Cables de arranque desconectados de %s"/>
-        <text name="ads_jumper_cables_auto_disconnected" text="Cables de arranque desconectados porque uno de los vehículos comenzó a moverse"/>
+        <text name="ads_jumper_cables_action" text="Conectar/desconectar Cables de Arranque"/>
+        <text name="ads_jumper_cables_connected" text="Cables de Arranque conectados a %s"/>
+        <text name="ads_jumper_cables_already_connected" text="Los Cables de Arranque ya están conectados a %s"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="El vehículo no es adecuado para conectar Cables de Arranque"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Los Cables de Arranque ya están conectados a %s y %s"/>
+        <text name="ads_jumper_cables_disconnected" text="Cables de Arranque desconectados de %s"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Cables de Arranque desconectados porque uno de los vehículos comenzó a moverse"/>
         <text name="ads_jumper_cables_is_too_far" text="%s está demasiado lejos de %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Inspección de vehículo"/>
         <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
@@ -700,9 +700,9 @@
         <text name="ads_tutorial_service_interval_expired_title" text="Intervalo de servicio vencido"/>
         <text name="ads_tutorial_service_interval_expired_message" text="%s ha superado su intervalo de servicio y necesita mantenimiento.&#10;&#10;Dirígete a un taller lo antes posible y ejecuta el procedimiento de &quot;Mantenimiento&quot;. Seguir utilizando un vehículo con el servicio vencido aumenta mucho el riesgo de múltiples fallos."/>
         <text name="ads_tutorial_rad_or_intake_clogged_title" text="Radiador y tomas de aire obstruidos"/>
-        <text name="ads_tutorial_rad_or_intake_clogged_message" text="El radiador y las tomas de aire de tu vehículo parecen estar muy obstruidos.&#10;&#10;Un radiador sucio no puede disipar el calor con eficacia, y unas tomas de aire obstruidas pueden restringir el flujo de aire al motor. Esto reduce la potencia y aumenta el consumo de combustible.&#10;&#10;Puedes limpiarlos en una estación de lavado o con el Air Blower de la tienda.&#10;&#10;Puedes comprobar el estado del radiador y de las tomas de aire mediante la inspección: mantén pulsada la tecla R mientras miras al vehículo."/>
+        <text name="ads_tutorial_rad_or_intake_clogged_message" text="El radiador y las tomas de aire de tu vehículo parecen estar muy obstruidos.&#10;&#10;Un radiador sucio no puede disipar el calor con eficacia, y unas tomas de aire obstruidas pueden restringir el flujo de aire al motor. Esto reduce la potencia y aumenta el consumo de combustible.&#10;&#10;Puedes limpiarlos en una estación de lavado o con el Soplador de Aire de la tienda.&#10;&#10;Puedes comprobar el estado del radiador y de las tomas de aire mediante la inspección: mantén pulsada la tecla R mientras miras al vehículo."/>
         <text name="ads_tutorial_needs_lubrication_title" text="Lubricación necesaria"/>
-        <text name="ads_tutorial_needs_lubrication_message" text="Tu %s necesita lubricación regular.&#10;&#10;En ADS, el nivel de lubricación de los componentes de trabajo baja gradualmente cada día, lo que aumenta el desgaste.&#10;&#10;Compra una Grease Gun en la tienda y lubrica tu máquina a diario o antes de cada jornada de trabajo.&#10;&#10;Puedes comprobar el nivel de lubricación mediante la inspección: mantén pulsada la tecla R mientras miras al vehículo."/>
+        <text name="ads_tutorial_needs_lubrication_message" text="Tu %s necesita lubricación regular.&#10;&#10;En ADS, el nivel de lubricación de los componentes de trabajo baja gradualmente cada día, lo que aumenta el desgaste.&#10;&#10;Compra una Engrasadora en la tienda y lubrica tu máquina a diario o antes de cada jornada de trabajo.&#10;&#10;Puedes comprobar el nivel de lubricación mediante la inspección: mantén pulsada la tecla R mientras miras al vehículo."/>
         <text name="ads_tutorial_needs_repair_title" text="Fallo del vehículo"/>
         <text name="ads_tutorial_needs_repair_message" text="Parece que algo va mal con tu %s. Puede que una de sus piezas haya fallado.&#10;&#10;Asegúrate de visitar un taller y realizar una inspección. No lo dejes pasar: el fallo puede seguir empeorando, y con él también aumentará el coste de la reparación.&#10;&#10;Si la inspección confirma una avería, soluciónala con el procedimiento de reparación en el taller."/>
         <text name="ads_tutorial_needs_overhaul_title" text="Revisión general"/>
@@ -718,7 +718,7 @@
         <text name="ads_tutorial_idle_and_downtime_title" text="Ralentí y tiempo parado"/>
         <text name="ads_tutorial_idle_and_downtime_message" text="Por cierto, el desgaste es mucho menor cuando tu máquina está en marcha pero sin trabajar activamente, lo cual tiene todo el sentido. Cuando el motor está apagado, el desgaste se vuelve mínimo, y si la máquina se guarda bajo techo, desaparece por completo."/>
         <text name="ads_tutorial_hot_weather_title" text="Tiempo caluroso"/>
-        <text name="ads_tutorial_hot_weather_message" text="Hoy hace muchísimo calor. Con un tiempo así, debes vigilar especialmente la limpieza del radiador y evitar sobrecargar el motor; de lo contrario, el sobrecalentamiento será solo cuestión de tiempo.&#10;&#10;Recuerda: siempre puedes comprobar el estado del radiador con una inspección visual manteniendo pulsada la tecla R mientras miras la máquina, y también puedes limpiarlo con el Air Blower."/>
+        <text name="ads_tutorial_hot_weather_message" text="Hoy hace muchísimo calor. Con un tiempo así, debes vigilar especialmente la limpieza del radiador y evitar sobrecargar el motor; de lo contrario, el sobrecalentamiento será solo cuestión de tiempo.&#10;&#10;Recuerda: siempre puedes comprobar el estado del radiador con una inspección visual manteniendo pulsada la tecla R mientras miras la máquina, y también puedes limpiarlo con el Soplador de Aire."/>
         <text name="ads_tutorial_wet_weather_title" text="Vaya tiempo"/>
         <text name="ads_tutorial_wet_weather_message" text="Vaya tiempo hace hoy. La humedad perjudica el cableado y el equipo eléctrico, por lo que el desgaste del sistema eléctrico es ligeramente mayor en estas condiciones.&#10;&#10;Además, está muy desaconsejado cosechar con un tiempo así: solo perjudicarás a tu cosechadora."/>
         <text name="ads_tutorial_low_fuel_title" text="Poco combustible"/>
@@ -756,6 +756,6 @@
         <text name="ads_tutorial_wheel_slip_title" text="Patinaje de ruedas"/>
         <text name="ads_tutorial_wheel_slip_message" text="Parece que tus ruedas están patinando mucho. Puede que incluso estés atascado ahora mismo y no tengas ganas de consejos, pero tenlo en cuenta: el patinaje de ruedas es uno de los factores más destructivos para la transmisión y acercará bastante tu próxima visita al taller."/>
         <text name="ads_tutorial_battery_low_title" text="Batería débil"/>
-        <text name="ads_tutorial_battery_low_message" text="Ups, parece que la batería está a punto de agotarse. Esto puede ocurrir después de un largo periodo parada, por frío intenso o debido a fallos en el sistema eléctrico.&#10;&#10;Con poca carga, arrancar será difícil o incluso imposible. Si no consigues ponerla en marcha, puedes arrancarla con pinzas desde otro vehículo usando los Jumper Cables."/>
+        <text name="ads_tutorial_battery_low_message" text="Ups, parece que la batería está a punto de agotarse. Esto puede ocurrir después de un largo periodo parada, por frío intenso o debido a fallos en el sistema eléctrico.&#10;&#10;Con poca carga, arrancar será difícil o incluso imposible. Si no consigues ponerla en marcha, puedes arrancarla con pinzas desde otro vehículo usando los Cables de Arranque."/>
     </texts>
 </l10n>

@@ -1,0 +1,762 @@
+<l10n>
+    <texts>
+        <text name="ads_settings_title" text="ADS-ASETUKSET"/>
+        <text name="ads_settings_admin_required" text="ADS-asetukset vaativat järjestelmänvalvojan oikeudet moninpelissä."/>
+        <text name="ads_maintenancePrice_label" text="Huoltokustannusten kerroin"/>
+        <text name="ads_maintenancePrice_tooltip" text="Säätää kaikkien korjaamopalveluiden kustannuksia, mukaan lukien tarkastukset, korjaukset ja yleishuollot. Suurempi arvo tekee kaikesta huoltotoiminnasta kalliimpaa."/>
+        <text name="ads_maintenanceDuration_label" text="Huoltoajan kerroin"/>
+        <text name="ads_maintenanceDuration_tooltip" text="Säätää kaikkien korjaamopalveluiden kestoa. Suurempi arvo pidentää aikaa, jonka ajoneuvo viettää huollossa tai korjauksessa."/>
+        <text name="ads_workshopOpenHour_label" text="Korjaamon aukioloaika"/>
+        <text name="ads_workshopOpenHour_tooltip" text="Vuorokaudenaika, jolloin korjaamo avautuu. Korjaukset ovat aktiivisia vain aukioloaikana."/>
+        <text name="ads_workshopCloseHour_label" text="Korjaamon sulkemisaika"/>
+        <text name="ads_workshopCloseHour_tooltip" text="Vuorokaudenaika, jolloin korjaamo sulkeutuu. Korjaukset keskeytyvät tämän jälkeen."/>
+        <text name="ads_engineMaxHeat_label" text="Moottorin max. lämpö"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Moottorin tuottaman lämmön perusnopeus täydellä kuormalla. Suuremmat arvot aiheuttavat moottorin nopeamman lämpenemisen."/>
+        <text name="ads_cloggingSpeed_label" text="Tukkeutumisnopeus"/>
+        <text name="ads_cloggingSpeed_tooltip" text="Säätää, kuinka nopeasti jäähdytin ja ilmanotto tukkeutuvat pölyn, ruumenien ja sadonjätteiden joukossa. Suuremmat arvot nopeuttavat tukkeutumista. 100 %:lla tukkeutumisnopeus on noin kolmasosa huoltovälistä."/>
+        <text name="ads_fieldInspectionDuration_label" text="Tarkastuksen kesto"/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Määrittää, kuinka kauan vuoron aloitustarkastus kestää reaaliajassa sekunteina."/>
+        <text name="ads_lubricationReducePerDay_label" text="Voitelun kuivumisnopeus"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Määrittää, kuinka paljon voitelu kuivuu yhden pelivuorokauden aikana. 0 %:lla voitelu ei kuivu ajan myötä."/>
+        <text name="ads_ws_header_title" text="Korjaamo"/>
+        <text name="ads_settings_section_service_wear" text="Huolto ja kuluminen"/>
+        <text name="ads_settings_section_thermal_model" text="Lämpömalli"/>
+        <text name="ads_settings_section_battery_alternator" text="Akku ja laturi"/>
+        <text name="ads_settings_section_preshift_maintenance" text="Vuoron aloitushuolto"/>
+        <text name="ads_settings_section_other" text="Muut"/>
+        <text name="ads_dealerWorkshopAvailable_label" text="Jälleenmyyjän korjaamo 24/7"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Pitää jälleenmyyjän korjaamon käytettävissä mihin vuorokauden aikaan tahansa."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="Liikkuva korjaamo 24/7"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Pitää liikkuvan korjaamon käytettävissä mihin vuorokauden aikaan tahansa."/>
+        <text name="ads_ownWorkshopAvailable_label" text="Oma korjaamo 24/7"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Pitää oman korjaamon käytettävissä mihin vuorokauden aikaan tahansa."/>
+        <text name="ads_instantInspection_label" text="Välitön tarkastus"/>
+        <text name="ads_instantInspection_tooltip" text="Kun käytössä, kaikki tarkastukset valmistuvat välittömästi (aika ei kulu). Huomio: 'Visuaalinen' tarkastusvaihtoehto ei ole enää käytettävissä."/>
+        <text name="ads_parkVehicle_label" text="Pysäköi ajoneuvo huollon ajaksi"/>
+        <text name="ads_parkVehicle_tooltip" text="Jos käytössä, huollossa olevat ajoneuvot ohitetaan TAB-kierrossa."/>
+        <text name="ads_warrantyEnabled_label" text="Takuu uusille laitteille"/>
+        <text name="ads_warrantyEnabled_tooltip" text="Soveltaa takuusuojaa uusien ajoneuvojen korjauksiin (enintään 20 käyttötuntia tai 12 kuukautta). Vain alkuperäiset varaosat katetaan veloituksetta."/>
+        <text name="ads_aiOverloadAndOverheatControl_label" text="Tekoälyn ylikuormitus- ja ylikuumenemissäätö"/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Jos käytössä, tekoälytyöntekijä vähentää kuormaa estääkseen moottorin ylikuormituksen tai ylikuumenemisen."/>
+        <text name="ads_aiWorkerTargetStress_label" text="Tekoälyn nopeusreaktio"/>
+        <text name="ads_aiWorkerTargetStress_tooltip" text="Määrittää, kuinka aikaisin tekoälytyöntekijä reagoi ylikuormitukseen ja ylikuumenemiseen. Suuremmat arvot ovat vähemmän herkkiä ja reagoivat myöhemmin; pienemmät arvot ovat herkempiä ja hidastavat aiemmin."/>
+        <text name="ads_aiWorkerTargetStress_relaxed" text="Rento"/>
+        <text name="ads_aiWorkerTargetStress_balanced" text="Tasapainoinen"/>
+        <text name="ads_aiWorkerTargetStress_sensitive" text="Herkkä"/>
+        <text name="ads_aiWorkerTargetStress_verySensitive" text="Erittäin herkkä"/>
+        <text name="ads_aiWorkerMinSpeed_label" text="Tekoälyn minopeusnopeus"/>
+        <text name="ads_aiWorkerMinSpeed_tooltip" text="Asettaa pienimmän sallitun vakionopeussäätimen nopeuden tekoälytyöntekijälle ylikuormituksen tai ylikuumenemisen estämiseksi."/>
+        <text name="ads_debugMode_label" text="Virheenkorjaustila"/>
+        <text name="ads_debugMode_tooltip" text="Ottaa käyttöön tai poistaa käytöstä virheenkorjauspaneelin ja laajan kirjauksen konsolissa."/>
+        <text name="ads_warningMessages_label" text="Varoitusviestit"/>
+        <text name="ads_warningMessages_tooltip" text="Ottaa käyttöön tai poistaa käytöstä pelisisäiset varoitusviestit, kuten kylmän moottorin ja ylikuumenemisen hälytykset."/>
+        <text name="ads_mobileWorkshopRestrictions_label" text="Liikkuvan korjaamon rajoitukset"/>
+        <text name="ads_serviceInterval_label" text="Huoltoväli"/>
+        <text name="ads_vehicleLifespan_label" text="Ajoneuvon käyttöikä"/>
+        <text name="ads_downtimeWear_label" text="Passiivinen kuluminen"/>
+        <text name="ads_generalWearEnabled_label" text="Ikääntymiseen liittyvä kuluminen"/>
+        <text name="ads_systemStressRate_label" text="Järjestelmän stressinopeus"/>
+        <text name="ads_batteryCapacity_label" text="Akun kapasiteetti"/>
+        <text name="ads_thermalSensitivity_label" text="Terminen herkkyys"/>
+        <text name="ads_option_off" text="Pois"/>
+        <text name="ads_option_none" text="Ei mitään"/>
+        <text name="ads_serviceInterval_tooltip" text="Asettaa perushuoltovälin tunteina, jonka jälkeen huolto vaaditaan. Todellinen väli vaihtelee ajoneuvon merkin, iän ja aiemman huollon laadun mukaan."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Asettaa ajoneuvon peruskäyttöiän tunteina, jonka jälkeen sen kunto saavuttaa 0 %. Mitä lähempänä nolla on, sitä epäluotettavammaksi ajoneuvo tulee."/>
+        <text name="ads_downtimeWear_tooltip" text="Asettaa passiivisen kulumisnopeuden ajoneuvon ollessa käyttämättömänä prosenttina peruskulumisnopeudesta (käyttöikä). Esimerkiksi 5 % oletusarvoisen 100 tunnin käyttöiän kanssa tarkoittaa, että jokainen järjestelmä menettää noin 1 % kunnosta noin 20 tunnin käyttämättömyyden jälkeen. Huomio: passiivinen kuluminen on poistettu käytöstä, kun ajoneuvo on varastoitu katoksen alla."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Ottaa käyttöön ikääntymiseen liittyvän kulumisen. Ajoneuvon kuluessa jokainen järjestelmä saa pieniä sakkoja ydinominaisuuksiin, kuten moottorin tehoon, hydrauliikan nopeuteen tai jarrutehokkuuteen. Vaikutus alkaa ensimmäisen kolmanneksen jälkeen ajoneuvon käyttöiästä, mutta tulee havaittavaksi vasta toisen kolmanneksen jälkeen ja kasvaa voimakkaammaksi koneen käyttöiän loppua kohden."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="Kun käytössä, liikkuvassa korjaamossa saatavilla olevat toimenpiteet riippuvat ajoneuvon huollettavuudesta."/>
+        <text name="ads_systemStressRate_tooltip" text="Määrittää, kuinka nopeasti stressi kertyy järjestelmiin ylikuormituksesta, ylikuumenemisesta, pyörän luistosta ja muista kovista käyttöolosuhteista. Stressi vaikuttaa suoraan rikkoutumistodennäköisyyteen: mitä enemmän stressiä järjestelmä kerää, sitä todennäköisemmin se vikaantuu."/>
+        <text name="ads_batteryCapacity_tooltip" text="Säätää maksimikäyttökelpoista akun kapasiteettia. Arvot lähellä 150 Ah ovat realistisempia, mutta akun tyhjenemisongelmia kohtaa harvoin tuolla tasolla."/>
+        <text name="ads_alternatorMaxOutput_label" text="Laturin maksimiteho"/>
+        <text name="ads_alternatorMaxOutput_tooltip" text="Asettaa laturin maksimilatausvirran. Suuremmat arvot mahdollistavat akun nopeamman latauksen."/>
+        <text name="ads_idleCurrent_label" text="Valmiustilan virta"/>
+        <text name="ads_idleCurrent_tooltip" text="Asettaa akun purkausvirran moottorin ollessa sammutettuna. Esimerkiksi 0,5 A:lla 15 Ah:n akku tyhjenisi täyteen noin 30 reaaliaikaisessa tunnissa ennen lämpötilavaikutusten huomioimista."/>
+        <text name="ads_thermalSensitivity_tooltip" text="Säätää lämpömallin käyttäytymistä. Suuremmat asetukset tekevät moottorista ja vaihteistosta herkempiä kuormalle, ympäristön lämpötilalle ja jäähdyttimen likaantumiselle — tuottaen enemmän lämpöä samoissa olosuhteissa."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Jäähdyttimen lian vaikutus"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Vähentää jäähdyttimen jäähdytyskapasiteettia tällä prosenttiosuudella maksimiliaantumisessa."/>
+        <text name="ads_warmingBoostPower_label" text="Lämpenemisen kiihdytys"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Keinotekoinen moottorin ja vaihteiston lämpenemisen nopeutus. Käytä Pois-asetusta muokkaamattomalle lämpökäyttäytymiselle."/>
+        <text name="ads_coolingSlowdownPower_label" text="Jäähdytyksen hidastus"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Keinotekoinen moottorin ja vaihteiston jäähdytyksen hidastus ajoneuvon sammuttamisen jälkeen. Käytä Pois-asetusta muokkaamattomalle jäähdytykselle."/>
+        <text name="ads_thermal_none" text="Passiivinen"/>
+        <text name="ads_thermal_mild" text="Lievä"/>
+        <text name="ads_thermal_default" text="Oletus"/>
+        <text name="ads_thermal_aggressive" text="Aggressiivinen"/>
+
+        <text name="ads_ws_label_value" text="Arvo"/>
+        <text name="ads_ws_label_age" text="Ikä"/>
+        <text name="ads_ws_label_operating_hours" text="Käyttötunnit"/>
+        <text name="ads_ws_label_service" text="Huolto"/>
+        <text name="ads_ws_label_condition" text="Kunto"/>
+        <text name="ads_ws_label_maintainability" text="Huollettavuus"/>
+        <text name="ads_ws_label_maintenance_log" text="Huoltoloki"/>
+        <text name="ads_ws_label_last_report" text="Viimeisin raportti"/>
+        <text name="ads_ws_label_service_interval" text="Huoltoväli"/>
+        <text name="ads_ws_label_last_maintenance" text="Viimeisin huolto"/>
+        <text name="ads_ws_label_last_inspection" text="Viimeisin tarkastus"/>
+        <text name="ads_ws_table_header_part" text="Osa"/>
+        <text name="ads_ws_table_header_description" text="Kuvaus"/>
+        <text name="ads_ws_table_header_stage" text="Vaihe"/>
+        <text name="ads_ws_table_header_price" text="Hinta"/>
+        <text name="ads_ws_table_header_repair_select" text="Korjaus"/>
+        <text name="ads_ws_info_no_breakdowns" text="Ei vikoja tai niitä ei ole vielä havaittu."/>
+        <text name="ads_ws_status_initial" text="Ladataan tilaa..."/>
+        <text name="ads_ws_action_inspection" text="Tarkastus"/>
+        <text name="ads_ws_action_maintenance" text="Huolto"/>
+        <text name="ads_ws_action_repair" text="Korjaus"/>
+        <text name="ads_ws_action_overhaul" text="Yleishuolto"/>
+        <text name="ads_ws_action_cancel_service" text="Peruuta toimenpide"/>
+        <text name="ads_ws_button_show" text="Näytä"/>
+        <text name="ads_ws_age_unit" text="kuukautta"/>
+        <text name="ads_ws_hours_unit" text="t"/>
+        <text name="ads_ws_option_yes" text="Kyllä"/>
+        <text name="ads_ws_option_no" text="Ei"/>
+        <text name="ads_ws_status_open" text="Korjaamo on auki"/>
+        <text name="ads_ws_status_closed" text="Korjaamo on kiinni"/>
+        <text name="ads_ws_inspecting_status" text="Tarkastetaan..."/>
+        <text name="ads_ws_status_in_progress_format" text="%s käynnissä, valmis %s..."/>
+        <text name="ads_ws_task_inspection" text="Tarkastus"/>
+        <text name="ads_ws_task_maintenance" text="Huolto"/>
+        <text name="ads_ws_task_overhaul" text="Yleishuolto"/>
+        <text name="ads_ws_button_price_format" text="%s (%s)"/>
+        <text name="ads_ws_no_last_report_message" text="Raportteja ei ole vielä"/>
+        <text name="ads_ws_no_report_message" text="Raporttia ei ole"/>
+        <text name="ads_ws_no_log_empty_message" text="Loki on vielä tyhjä"/>
+        <text name="ads_ws_cancel_confirm_title" text="Peruuta %s?"/>
+        <text name="ads_ws_cancel_confirm_text" text="Nykyinen edistyminen tallennetaan sellaisenaan. Rahoja ei palauteta."/>
+
+        <text name="ads_log_header_title" text="Huoltoloki"/>
+        <text name="ads_log_title" text="Tekninen huoltoloki"/>
+        <text name="ads_log_total_cost_title" text="Kokonaiskulut"/>
+        <text name="ads_log_cost_per_month_title" text="Kuukausikustannus"/>
+        <text name="ads_log_ownership_months_title" text="Omistusaika"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Vikaantumiset yhteensä"/>
+        <text name="ads_log_average_breakdowns_interval_title" text="Keskim. vikaantumisväli"/>
+        <text name="ads_log_average_maintenance_interval_title" text="Keskim. huoltoväli"/>
+        <text name="ads_log_performed" text="%s suoritettu"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Ei vikoja havaittu"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Vikoja havaittu: %s"/>
+        <text name="ads_log_overhaul_desc_with_painting" text="Ajoneuvo maalattiin uudelleen"/>
+        <text name="ads_log_repair_desc_generic" text="Korjaus"/>
+        <text name="ads_log_cancelled_desc" text="Toimenpide peruttu"/>
+        <text name="ads_log_date" text="Päivämäärä"/>
+        <text name="ads_log_hours" text="Käyttötunnit"/>
+        <text name="ads_log_type" text="Työn tyyppi"/>
+        <text name="ads_log_description" text="Kuvaus"/>
+        <text name="ads_log_price" text="Kustannus"/>
+        <text name="ads_log_button_show_report" text="Näytä raportti"/>
+        <text name="ads_log_empty" text="Loki on tyhjä"/>
+
+        <text name="ads_breakdowns_severity_permanent" text="Pysyvä"/>
+        <text name="ads_breakdowns_severity_reduce_power" text="Tehon alennus"/>
+        <text name="ads_breakdowns_severity_shutdown" text="Sammutus"/>
+        <text name="ads_breakdowns_severity_minor" text="Lievä"/>
+        <text name="ads_breakdowns_severity_moderate" text="Kohtalainen"/>
+        <text name="ads_breakdowns_severity_major" text="Vakava"/>
+        <text name="ads_breakdowns_severity_critical" text="Kriittinen"/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Vuosien raskaan työn aikana kertynyt rasitus. Pienet, peruuttamattomat kulumajäljet ydinkomponenteissa heikentävät kokonaissuorituskykyä hieman."/>
+        <text name="ads_breakdowns_part_vehicle" text="Ajoneuvo"/>
+        <text name="ads_breakdowns_part_consumables" text="Kulutustarvikkeet"/>
+        <text name="ads_breakdowns_part_engine" text="Moottori"/>
+        <text name="ads_breakdowns_part_battery" text="Akku"/>
+        <text name="ads_breakdowns_part_ecu" text="ECU"/>
+        <text name="ads_breakdowns_part_wiring" text="Johdotus ja liittimet"/>
+        <text name="ads_breakdowns_part_alternator_regulator" text="Laturin säädin"/>
+        <text name="ads_breakdowns_part_turbocharger" text="Turboahdin"/>
+        <text name="ads_breakdowns_part_oil_pump" text="Öljypumppu"/>
+        <text name="ads_breakdowns_part_valve_train" text="Venttiilimekanismi"/>
+        <text name="ads_breakdowns_part_clutch" text="Kytkin"/>
+        <text name="ads_breakdowns_part_synchronizer" text="Synkronointirengas"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift-hydraulipumppu"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="CVT-ketju"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT-hydrauliohjausventtiili"/>
+        <text name="ads_breakdowns_part_cvt" text="CVT"/>
+        <text name="ads_breakdowns_part_hydraulic_pump" text="Hydraulipumppu"/>
+        <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hydraulisylinteri"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="Voimanottokytkin"/>
+        <text name="ads_breakdowns_part_brake_system" text="Jarrujärjestelmä"/>
+        <text name="ads_breakdowns_part_wheel_bearing" text="Pyörän laakeri"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="Ohjausvarsisto"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="Telakiristin"/>
+        <text name="ads_breakdowns_part_thermostat" text="Termostaatti"/>
+        <text name="ads_breakdowns_part_cooling_system" text="Jäähdytysjärjestelmä"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="Tuuletinkytkin"/>
+        <text name="ads_breakdowns_part_fuel_pump" text="Polttoainepumppu"/>
+        <text name="ads_breakdowns_part_fuel_injectors" text="Polttoaineruiskut"/>
+        <text name="ads_breakdowns_part_fuel_filter" text="Polttoainesuodatin"/>
+        <text name="ads_breakdowns_part_fuel_line" text="Polttoaineputki"/>
+        <text name="ads_breakdowns_part_harvest_processing_system" text="Puintijärjestelmä"/>
+        <text name="ads_breakdowns_part_unloading_auger" text="Purkuruuvi"/>
+        <text name="ads_breakdowns_quick_fix_stage" text="Paikkaus"/>
+        <text name="ads_breakdowns_defected_parts_stage" text="Viallinen"/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="Yksikkö toimii normaalisti, mutta diagnostiikka on paljastanut viallisen osan. Kriittisesti matalan turvamarginaalin vuoksi suositellaan ennaltaehkäisevää vaihtoa äkillisen vian välttämiseksi."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="Yksikkö toimii normaalisti, mutta on täysin riippuvainen kuluneiden osien pikakorjauksesta. Väistämättömän kuormitusvian välttämiseksi osien täydellinen vaihto on suositeltavaa mahdollisimman pian."/>
+        <text name="ads_breakdowns_overheat_protection_stage1_description" text="Moottorin suojaustila"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Moottorin hätätila aktiivinen! Teho alennettu!"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_description" text="Moottorin suojaustila"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Moottorin hätätila aktiivinen! Teho alennettu!"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_description" text="Moottorin suojaustila"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Moottorin hätätila aktiivinen! Teho alennettu!"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_description" text="Moottorin suojaustila"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Moottori sammutettu ylikuumenemisen estämiseksi"/>
+        <text name="ads_breakdowns_engine_jam_stage1_description" text="Moottori on täysin vikaantunut"/>
+        <text name="ads_breakdowns_engine_jam_stage1_message" text="Moottori jumiutunut"/>
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="ECU-virheitä. Moottorin teho hieman alentunut."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="ECU-toimintahäiriö. Havaittava tehonlasku ja lisääntynyt polttoaineen kulutus."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Kriittinen ECU-toimintahäiriö. Merkittävä tehonlasku, suuri polttoaineen kulutus ja moottorin sammumisriski."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Täydellinen ECU-vaurio. Moottoria ei voida ohjata eikä se käynnisty."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Moottori on viallinen"/>
+        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="Johdotuksen ja sähköliittimien korroosio. Lisääntynyt kosketusresistanssi aiheuttaa satunnaista valojen välkkymistä, epävakaata jännitesyöttöä ja vaikeutunutta moottorin käynnistystä."/>
+        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="Kohtalainen johdotuksen ja sähköliittimien korroosio. Kontaktiongelmat aiheuttavat tiheää valojen välkkymistä, epävakaata jännitesyöttöä, vaikeutunutta moottorin käynnistystä ja mahdollisia moottorin sammumisia."/>
+        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="Vakava johdotuksen ja sähköliittimien korroosio. Kriittisten piirien jännitesyöttö on epävakaa, valaistus voi lakata kokonaan, moottorin vääntömomentti on alentunut, moottorin sammuminen on todennäköistä ja käynnistys on epäluotettavaa."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="Käynnistimen ohjauspiirin vaurio vakavan johdotuskorrosion vuoksi. Valaistus ei toimi ja moottorin käynnistys on mahdotonta."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_message" text="Käynnistinpiirin vaurio"/>
+        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="Akun sulfatoituminen. Todellinen akun kapasiteetti on alentunut, mikä vähentää sähköistä varausta kuormituksessa."/>
+        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="Kohtalainen akun sulfatoituminen. Todellinen akun kapasiteetti on merkittävästi alentunut ja moottorin käynnistys on vaikeutunut."/>
+        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="Vakava akun sulfatoituminen. Käyttökelpoinen akun kapasiteetti on kriittisen alhainen ja käynnistysteho on epästabiili."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="Kriittinen akun sulfatoituminen. Todellinen akun kapasiteetti on lähes nolla eikä käynnistysteho riitä luotettavaan moottorin käynnistykseen."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="Akun käynnistysteho riittämätön"/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage1_description" text="Laturin säätimen toimintahäiriö. Latausvirta on alentunut, mikä vähentää akun lataustehokkuutta."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="Kohtalainen laturin säätimen toimintahäiriö. Latausvirta on epästabiili ja alentunut, mikä aiheuttaa heikon akun latauksen ja lisääntyneitä jännitehäviöitä sähköjärjestelmässä."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="Vakava laturin säätimen toimintahäiriö. Latausvirta on kriittisen alhainen, jännitesyöttö on epästabiili ja sähköjärjestelmä toimii merkittävien häviöiden kanssa."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="Täydellinen laturin säätimen vaurio. Akun lataus on lakannut ja sähköjärjestelmä toimii vain jäljellä olevalla akkuvarauksella."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_message" text="Laturijärjestelmän vaurio"/>
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Turboahdinlaakerien kuluminen. Kuuluu heikko vinkuna ja pienehkö tehonlasku suurilla kierroksilla."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Turboahdintiivisteiden vuoto. Havaittava tehonlasku ja lisääntynyt polttoaineen kulutus."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Turbiinin siipien vaurio. Vakava tehonlasku ja moottorin sammumisriski raskaassa kuormituksessa."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Katastrofaalinen turboahdinvaurio. Moottori on menettänyt suurimman osan tehostaan ja on vaarassa kärsiä vakavista sisäisistä vaurioista."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="Öljypumpun toimintahäiriö. Öljynpaine on alentunut, moottorin vääntömomentti on hieman alentunut, moottorin lämpötila on kohonnut ja mekaaninen kopina saattaa esiintyä."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="Kohtalainen öljypumpun toimintahäiriö. Öljynpaine on riittämätön, moottorin vääntömomentti on havaittavasti alentunut, moottorin lämpötila on noussut ja mekaaninen kopina on selvästi kuultavissa."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="Vakava öljypumpun toimintahäiriö. Öljynpaine on kriittisen alhainen, moottorin vääntömomentti on voimakkaasti alentunut, moottorin ylikuumeneminen on todennäköistä, mekaaninen kopina on voimakasta ja moottorin sammuminen on mahdollista."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="Kriittinen öljypumpun vaurio. Öljyn kierto on riittämätön turvalliseen moottorin toimintaan eikä moottorin käynnistys tai jatkokäyttö ole mahdollista."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_message" text="Öljynpainevaurio"/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="Venttiilimekanismin toimintahäiriö. Moottorin vääntömomentti on hieman alentunut, polttoaineen kulutus on lisääntynyt ja epänormaalia venttiilimekanismin melua esiintyy."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="Kohtalainen venttiilimekanismin toimintahäiriö. Moottorin vääntömomentti on havaittavasti alentunut, polttoaineen kulutus on lisääntynyt, venttiilimekanismin melu on voimakasta ja moottorin epäröintiä saattaa esiintyä kuormituksessa."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="Vakava venttiilimekanismin toimintahäiriö. Moottorin vääntömomentti on voimakkaasti alentunut, polttoaineen kulutus on merkittävästi lisääntynyt, venttiilimekanismin melu on vakavaa, moottorin epäröinti on tiheää ja moottorin sammuminen on mahdollista."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="Kriittinen venttiilimekanismin vaurio. Venttiilien oikeaa toimintaa ei voida enää taata eikä moottorin käynnistys tai jatkokäyttö ole mahdollista."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_message" text="Venttiilimekanismin vaurio"/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Polttoainepumpun varhainen kuluminen. Moottorin teho on hieman alentunut ja polttoaineen kulutus on lisääntynyt."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Polttoaineen paine laskee. Havaittava tehonlasku, suurempi polttoaineen kulutus ja satunnainen moottorin sammuminen."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kriittinen polttoaineen paine. Vakava tehonlasku, erittäin suuri polttoaineen kulutus ja tiheä moottorin sammuminen."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Täydellinen polttoainepumpun vaurio. Polttoainetta ei syötetä moottorille."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Moottorin käynnistys mahdotonta"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Yhdessä tai useammassa ruiskussa on hieman tukossaan olevat suuttimet. Moottori saattaa käydä hieman epätasaisesti pienellä tehonlaskulla."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Huono polttoaineen sumutus. Moottori syttyy epäsäännöllisesti kuormituksessa, aiheuttaen havaittavan tehonlaskun ja moottorin epäröinnin."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Polttoaineruisku on jumiutunut. Moottori käy erittäin huonosti merkittävällä tehonlaskulla ja epäluotettavalla käynnistyksellä."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Ruisku on täysin vikaantunut. Moottori ei toimi oikein eikä välttämättä käynnisty lainkaan."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Moottorin käynnistys mahdotonta"/>
+        <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Kuluneet jarrupalat. Jarruteho on hieman heikentynyt."/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Jarruletkuvuoto tai kuluneet levyt. Jarrutusmatka on havaittavasti pidentynyt."/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Vakava jarrupaineen menetys. Jarrut ovat erittäin heikot ja epäluotettavat."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Täydellinen jarrujärjestelmän vaurio. Jatkokäyttö on erittäin vaarallista."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Jarruvaurio"/>
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Kuluneet kytkinkiekot. Satunnainen tehonlasku vaihteiston luistuessa kuormituksessa."/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Merkittävä kytkimen kuluminen. Havaittava vaihteiston luistaminen erityisesti kiihdytyksessä."/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Pahoin kulunut kytkin. Vakava luistaminen vaikeuttaa tehon siirtoa pyörille."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_description" text="Kytkin on täysin palanut. Ajoneuvo ei pysty liikkumaan."/>
+        <text name="ads_breakdowns_transmission_slip_stage4_message" text="Vaihteiston vaurio."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Kuluneet synkronointirenkaat. Satunnaista narskumista tai vaikeuksia vaihteita vaihdettaessa."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Vaurioituneet synkronointirenkaat. Vaihteenvaihto on usein vaikeaa ja saattaa epäonnistua."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Murtuneita synkronisoinnin hampaita. Suuri riski epäonnistuneille vaihdoille tai vaihteen hylkäämiselle kuormituksessa."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Synkronointirenkaat ovat täysin vikaantuneet. Vaihteenvaihto on mahdotonta."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Vaihteiston vaurio"/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Alhainen hydraulipaine Powershiftissä. Lievä viive ja karkeus vaihteita kytkettäessä."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Kuluneet hydraulipumpun tiivisteet. Havaittava viive ja tärähdykset vaihteenvaihdon aikana."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Vikaantuva hydraulipumppu. Vakava viive ja voimakkaat tärähdykset vaihteita vaihdettaessa."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Powershift-hydraulipumppu vikaantunut. Vaihteisto on jumiutunut vapaalle."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="CVT-ketjun kuluminen. Ketjun luistamista esiintyy ja vaihteiston lämmöntuotto on lisääntynyt."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="Kohtalainen CVT-ketjun kuluminen. Ketjun luistaminen on havaittavaa, polttoaineen kulutus on lisääntynyt ja vaihteiston käyttölämpötila on kohonnut."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="Vakava CVT-ketjun kuluminen. Ketjun luistaminen on voimakasta, polttoaineen kulutus on merkittävästi lisääntynyt ja vaihteiston ylikuumeneminen on todennäköistä."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="Kriittinen CVT-ketjun kuluminen. Vääntömomentin siirto vaihteiston kautta ei ole enää luotettavaa eikä ajoneuvon liikettä voida taata."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="CVT-luistaminen kriittistä"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="CVT-hydrauliohjausventtiilin toimintahäiriö. Hydraulipaineen pudotuksia esiintyy ajoittain, moottorin vääntömomentti on hieman alentunut ja vaihteiston maksimivälityssuhde on rajoittunut."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Kohtalainen CVT-hydrauliohjausventtiilin toimintahäiriö. Hydraulipaineen epävakaus on tiheää, moottorin vääntömomentti on alentunut, vaihteiston lämpötila on kohonnut ja käytettävä välityssuhde on entisestään rajoittunut."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Vakava CVT-hydrauliohjausventtiilin toimintahäiriö. Hydraulipaineen pudotukset ovat voimakkaita, moottorin vääntömomentti on voimakkaasti alentunut, vaihteiston ylikuumeneminen on todennäköistä ja välityssuhteen rajoitus on merkittävä."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Kriittinen CVT-hydrauliohjausventtiilin vaurio. Paineensäätö ei ole enää stabiili, välityssuhde on vakavasti rajoittunut, vaihteiston lämpeneminen on liiallista ja voimansiirto toimii hätätilassa."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="CVT-vaihteistossa on havaittu varhaismerkkejä toimintahäiriöstä. Tarkastus ja korjaus vaaditaan."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="CVT-vaihteiston toimintahäiriö pahenee. Jatkokäyttö voi johtaa hätätilaan."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Kriittinen CVT-vaihteiston vaurio. Vaihteisto on hätätilassa ja ajoneuvon maksimaalinen nopeus on alentunut."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Täydellinen CVT-vaihteiston vaurio. Jatkokäyttö on mahdotonta ennen vaihteiston korjausta."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT-vaihteiston vaurio"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="CVT-hydrauliohjauksen vaurio"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Moottorin termostaatti alkaa vikaantua. Moottori lämpenee hitaammin optimaaliseen lämpötilaan tai käy hieman liian kuumana."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Termostaatin toiminta on heikko. Moottorin lämpötilansäätö on epästabiili ja lisää kulumista."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Termostaatti on jumiutunut kiinni. Moottori ylikuumenee jatkuvasti kuormituksessa."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Täydellinen termostaatin vaurio. Moottorin jäähdytysneste ei voi kiertää oikein, mikä johtaa välittömään ja vakavaan ylikuumenemiseen."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Pieni sisäinen pumpun vuoto. Hydrauliikkalaitteet toimivat hieman hitaammin."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Kuluneet pumpun tiivisteet. Havaittavasti hitaampi hydrauliikkatoiminta."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Vaurioitunut hydraulipumppu. Laitteet ovat erittäin hitaita ja heikkoja."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Hydraulipumpun vaurio. Hydraulijärjestelmä ei toimi."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hydraulivaurio"/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="Sisäinen vuoto hydraulisylinterissä. Hydraulinen toimilaite toimii hieman hitaammin ja kiinnitetyt laitteet saattavat lipua hitaasti kuormituksessa."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="Kohtalainen sisäinen vuoto hydraulisylinterissä. Hydraulinen toimilaite toimii havaittavasti hitaammin ja kuorman pitäminen on heikentynyt."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="Vakava sisäinen vuoto hydraulisylinterissä. Hydraulinen toimilaite on hidas ja heikko, eivätkä kiinnitetyt laitteet pysty luotettavasti pitämään asentoaan kuormituksessa."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="Kriittinen sisäinen vuoto hydraulisylinterissä. Hydraulinen liike on lähes lakannut eikä kuorman pitäminen ole enää mahdollista."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="Hydraulisylinterin vuoto kriittistä"/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="Voimanoton kytkimen luistaminen. Vääntömomentin siirto voimanoton kautta on alentunut ja voimanotto saattaa irrota kuormituksessa."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="Kohtalainen voimanoton kytkimen luistaminen. Vääntömomentin siirto voimanoton kautta on merkittävästi alentunut ja automaattinen voimanoton irrottaminen kuormituksessa tapahtuu usein."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="Vakava voimanoton kytkimen luistaminen. Käyttökelpoinen voimanoton vääntömomentti on voimakkaasti alentunut eikä voimanoton käyttämien laitteiden vakaa toiminta ole taattua."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="Kriittinen voimanoton kytkimen vaurio. Vääntömomentin siirto voimanoton kautta on lakannut eikä voimanoton käyttö ole mahdollista."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="Voimanoton vaurio"/>
+        <text name="ads_breakdowns_bearing_wear_stage1_description" text="Pyörän navan laakerin kuluminen. Laakerin melu ja tärinä ovat läsnä, maksimaalinen nopeus on hieman rajoittunut ja vierintävastus on lisääntynyt."/>
+        <text name="ads_breakdowns_bearing_wear_stage2_description" text="Kohtalainen pyörän navan laakerin kuluminen. Laakerin melu ja tärinä ovat voimakkaita, maksimaalinen nopeus on alentunut ja voimansiirron kuorma on lisääntynyt."/>
+        <text name="ads_breakdowns_bearing_wear_stage3_description" text="Vakava pyörän navan laakerin kuluminen. Tärinä on voimakasta, maksimaalinen nopeus on merkittävästi alentunut, voimansiirron kuorma on kohonnut ja jumiutumismelua voi esiintyä."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_description" text="Kriittinen pyörän navan laakerin vaurio. Laakeri on jumiutunut ja pyörän pyöriminen on estetty."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_message" text="Pyörän laakeri jumiutunut"/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="Ohjausvarsiston kuluminen. Lievä ohjaamon veto on läsnä ja ohjausvaste on heikentynyt."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="Kohtalainen ohjausvarsiston kuluminen. Ohjaamoveto on havaittavaa ja ohjausvaste on merkittävästi heikentynyt."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="Vakava ohjausvarsiston kuluminen. Suuntavakavuus on heikentynyt, ohjaamoveto on voimakasta ja ohjausvaste on voimakkaasti alentunut."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="Kriittinen ohjausvarsiston vaurio. Ohjausvaste on lähes lakannut eikä turvallista suunnanohjausta voida taata."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="Ohjausvarsiston vaurio"/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="Telakiristimen toimintahäiriö. Suunnanveto, tärinä, vetoääni ja lievä maksiminopeuden alennus ovat läsnä."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="Kohtalainen telakiristimen toimintahäiriö. Suunnan epästabiilisuus ja tärinä ovat havaittavia, vetovas vastus on lisääntynyt, moottorin epäröintiä voi esiintyä ja maksimaalinen nopeus on alentunut."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="Vakava telakiristimen toimintahäiriö. Suunnan epästabiilisuus on voimakasta, tärinä ja vetoääni ovat vakavia, voimansiirron kuorma on lisääntynyt ja maksimaalinen nopeus on merkittävästi alentunut."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="Kriittinen telakiristimen vaurio. Telan toiminta ei ole enää vakaata ja ajolaitteen jumiutuminen on tapahtunut."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="Telakiristimen vaurio"/>
+        <text name="ads_breakdowns_coolant_leak_stage1_description" text="Jäähdytysnesteen vuoto. Jäähdytysjärjestelmän tehokkuus on hieman alentunut."/>
+        <text name="ads_breakdowns_coolant_leak_stage2_description" text="Kohtalainen jäähdytysnesteen vuoto. Jäähdytysjärjestelmän tehokkuus on alentunut ja moottorin käyttölämpötila nousee nopeammin kuormituksessa."/>
+        <text name="ads_breakdowns_coolant_leak_stage3_description" text="Vakava jäähdytysnesteen vuoto. Jäähdytysjärjestelmän tehokkuus on merkittävästi alentunut ja ylikuumeneminen kuormituksessa on todennäköistä."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_description" text="Kriittinen jäähdytysnesteen vuoto. Jäähdytysjärjestelmän tehokkuus on kriittisen alhainen eikä turvallista moottorin lämpötilaa voida ylläpitää."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_message" text="Jäähdytysnesteen vuoto kriittistä"/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="Tuuletinkytkimen toimintahäiriö. Jäähdytystuulettimen tehokkuus on hieman alentunut ja epänormaalia tuuletinkytkimen melua esiintyy."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="Kohtalainen tuuletinkytkimen toimintahäiriö. Jäähdytystuulettimen tehokkuus on alentunut ja tuuletinkytkimen melu on selvästi kuultavissa."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="Vakava tuuletinkytkimen toimintahäiriö. Jäähdytystuulettimen tehokkuus on merkittävästi alentunut ja tuuletinkytkimen melu on vakavaa."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="Kriittinen tuuletinkytkimen vaurio. Jäähdytystuulettimen tehokkuus on kriittisen alhainen eikä riittävää ilmavirtausta jäähdytysjärjestelmän läpi voida taata."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="Tuuletinkytkimen vaurio"/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="Polttoainesuodattimen tukkeutuminen. Polttoaineen virtaus on rajoittunut aiheuttaen lievää moottorin epäröintiä kuormituksessa ja pientä moottorin vääntömomentin alenemista."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="Kohtalainen polttoainesuodattimen tukkeutuminen. Polttoaineen virtauksen rajoitus on havaittava, moottorin epäröinti kuormituksessa on tiheää, moottorin vääntömomentti on alentunut ja moottorin sammuminen on mahdollista."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="Vakava polttoainesuodattimen tukkeutuminen. Polttoaineen virtaus on kriittisen rajoittunut, moottorin epäröinti on voimakasta, moottorin vääntömomentti on voimakkaasti alentunut ja moottorin sammuminen on todennäköistä."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="Kriittinen polttoainesuodattimen tukkeutuminen. Polttoaineen virtaus suodattimen läpi on riittämätön moottorin toiminnalle eikä moottorin käynnistys ole mahdollista."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="Polttoainesuodatin tukossa"/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="Ilmavuoto polttoaineputkessa. Polttoaineen syöttö menettää vakauden ja moottorin käynnistys vaikeutuu."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="Kohtalainen ilmavuoto polttoaineputkessa. Polttoaineen syöttö on epästabiili, moottorin epäröintiä esiintyy, moottorin käynnistys on vaikeutunut ja moottorin sammuminen on mahdollista."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="Vakava ilmavuoto polttoaineputkessa. Polttoaineen syötön jatkuvuus on häiriintynyt, moottorin epäröinti on voimakasta, käynnistys on erittäin epäluotettavaa ja moottorin sammuminen on todennäköistä."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="Kriittinen ilmavuoto polttoaineputkessa. Polttoaineen syöttöä ei voida ylläpitää eikä moottorin käynnistys tai jatkokäyttö ole mahdollista."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="Ilmaa polttoaineputkessa"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Kulunut eristys, satunnaisia jännitepudotuksia. Pieniä sähköhäiriöitä voidaan havaita."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Korrodoituneet kontaktit ja epästabiili laturin lähtöjännite. Valot saattavat sammua, moottorin käynnistys on epäluotettavaa."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Oikosulkuriski. Kriittiset järjestelmät ovat epäluotettavia ja valot saattavat sammua kokonaan."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Valojen vaurio"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Pääjohtosnippu vikaantunut. Ajoneuvon sähköjärjestelmä on kuollut."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Käynnistin ei reagoi"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Lievä kaasuturin saastuminen. Moottori epäröi ajoittain raskaassa kuormituksessa."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Tukossa olevat suuttimet. Moottori sakkaa ja menettää tehoa usein, erityisesti kun kaasua painetaan nopeasti."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Vakava kaasuturin tukkeutuminen. Moottori käy erittäin epätasaisesti, sammuu usein ja kamppaillee tehon ylläpitämiseksi."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Polttoainen nälkiintyminen täysin tukossaan olevan kaasuttimen vuoksi. Moottori ei käy."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Kaasutinon tukossa"/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="Puinti- ja prosessointijärjestelmän kuluminen. Sadon käsittelytehokkuus on hieman alentunut aiheuttaen pienen sadonmenetyksen."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="Kohtalainen puinti- ja prosessointijärjestelmän kuluminen. Sadon käsittelytehokkuus on havaittavasti alentunut aiheuttaen mitattavan sadonmenetyksen."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="Vakava puinti- ja prosessointijärjestelmän kuluminen. Sadon käsittelytehokkuus on merkittävästi alentunut aiheuttaen suuren sadonmenetyksen."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="Kriittinen puinti- ja prosessointijärjestelmän kuluminen. Sadon käsittelytehokkuus on kriittisen alhainen aiheuttaen äärimmäisen sadonmenetyksen toiminnan aikana."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_message" text="Puinnin tehokkuus kriittisen alhainen"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="Lievä sisäisten ruuvien ja elevaattoriketjujen kuluminen. Pieni määrä satoa menetetään sisäisessä kuljetuksessa."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Kuluneet ruuvilenkit ja liukuvat kuljettimet aiheuttavat lisääntynyttä sirottelua koneen sisällä. Satunnaista narskumismelua voi kuulla."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Vaurioituneet elevaattorilaput ja ruuvit kamppailevat satomassan siirtämiseksi, mikä johtaa merkittäviin häviöihin ja suuren tukoksen riskiin."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Merkittävä komponentti materiaalivirtausjärjestelmässä on vikaantunut aiheuttaen vakavan tukoksen. Moottori on äärimmäisessä rasituksessa."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Materiaalivirtauksen tukos"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Vetoremmin venyminen. Satunnainen luistaminen aiheuttaa lievän purkamisnopeuden alenemisen."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Kulunut vetoremi ja hihnapyörät. Merkittävä luistaminen kuormituksessa alentaa havaittavasti purkamisnopeutta."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Vaurioitunut vaihdelaatikko tai pahoin kulunut remi. Ruuvi kamppailee pyörimiseksi toimien erittäin alhaisella nopeudella."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Vetoremi katkennut tai vaihdelaatikko jumiutunut. Purkuruuvi on täysin jumiutunut."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Purkuruuvi jumiutunut"/>
+        <text name="ads_breakdowns_dead_battery_message" text="Akku tyhjentynyt"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="Järjestelmän jännite riittämätön"/>
+        <text name="ads_breakdowns_engine_stalled_message" text="Moottori sammunut"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="Voimanotto irrotettu automaattisesti"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="Vaihde irrotettu"/>
+        <text name="ads_breakdown_at_progress_message" text="käynnissä"/>
+
+        <text name="ads_spec_cold_engine_message" text="Moottori on kylmä! Suuret kierrokset aiheuttavat kulumista!"/>
+        <text name="ads_spec_overheat_engine_message" text="Varoitus! Moottori ylikuumenee."/>
+        <text name="ads_spec_overheat_transmission_message" text="Varoitus! Vaihteisto ylikuumenee."/>
+        <text name="ads_spec_this_month" text="Tässä kuussa"/>
+        <text name="ads_spec_months_ago" text="kuukautta sitten"/>
+        <text name="ads_spec_never" text="Ei koskaan"/>
+        <text name="ads_spec_op_hours_short" text="k/t"/>
+        <text name="ads_spec_tomorrow_at" text="huomenna kello "/>
+        <text name="ads_spec_day_after_tommorow_at" text="ylihuomenna kello "/>
+        <text name="ads_spec_in_days_at" text="{days} päivän kuluttua kello "/>
+        <text name="ads_spec_day_s" text="päivä(ä)"/>
+        <text name="ads_spec_hour_s" text="tunti(a)"/>
+        <text name="ads_spec_minute_s" text="minuutti(a)"/>
+        <text name="ads_spec_duration_format_hours" text="%d %s"/>
+        <text name="ads_spec_duration_format_minutes" text="%d %s"/>
+        <text name="ads_spec_duration_format_combined" text="%s ja %s"/>
+        <text name="ads_spec_months_ago_unit" text="kuukautta sitten"/>
+        <text name="ads_spec_months_ago_format" text="%s %s"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s asti %s"/>
+        <text name="ads_spec_service_interval_format" text="%s k/t"/>
+        <text name="ads_spec_maintenance_complete_notification" text="valmis"/>
+        <text name="ads_spec_maintenance_cancelled_notification" text="peruutettu"/>
+        <text name="ads_spec_inspection_issues_detected_notification" text="%s ongelma(a) havaittu"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="Ei ongelmia havaittu"/>
+        <text name="ads_spec_next_planned_service_notification" text="Aikataulutettu toimenpide aloitettu: %s"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Aikataulutettu %s peruutettu varojen puuttumisen vuoksi"/>
+        <text name="ads_spec_workshop_dealer" text="Jälleenmyyjä"/>
+        <text name="ads_spec_workshop_own" text="Oma"/>
+        <text name="ads_spec_workshop_mobile" text="Liikkuva"/>
+        <text name="ads_spec_system_engine" text="Moottori"/>
+        <text name="ads_spec_system_transmission" text="Vaihteisto"/>
+        <text name="ads_spec_system_hydraulics" text="Hydrauliikka / Voimanotto"/>
+        <text name="ads_spec_system_cooling" text="Jäähdytysjärjestelmä"/>
+        <text name="ads_spec_system_electrical" text="Sähköjärjestelmä"/>
+        <text name="ads_spec_system_chassis" text="Alusta"/>
+        <text name="ads_spec_system_workprocess" text="Työskentelyjärjestelmät"/>
+        <text name="ads_spec_system_fuel" text="Polttoainejärjestelmä"/>
+        <text name="ads_spec_state_ready" text="Valmis"/>
+        <text name="ads_spec_state_inspection" text="Tarkastus"/>
+        <text name="ads_spec_state_maintenance" text="Huolto"/>
+        <text name="ads_spec_state_repair" text="Korjaus"/>
+        <text name="ads_spec_state_overhaul" text="Yleishuolto"/>
+        <text name="ads_spec_state_broken" text="Rikki"/>
+        <text name="ads_spec_state_excellent" text="Erinomainen"/>
+        <text name="ads_spec_state_good" text="Hyvä"/>
+        <text name="ads_spec_state_normal" text="Normaali"/>
+        <text name="ads_spec_state_bad" text="Huono"/>
+        <text name="ads_spec_state_terrible" text="Surkea"/>
+        <text name="ads_spec_state_unknown" text="Tuntematon"/>
+        <text name="ads_spec_state_optimal" text="Optimaalinen"/>
+        <text name="ads_spec_state_recommended" text="Suositeltu"/>
+        <text name="ads_spec_state_required" text="Vaadittu"/>
+        <text name="ads_spec_state_overdue" text="Myöhässä"/>
+        <text name="ads_spec_state_legendary" text="Legendaarinen"/>
+        <text name="ads_spec_state_premium" text="Premium"/>
+        <text name="ads_spec_state_standart" text="Standardi"/>
+        <text name="ads_spec_state_budget" text="Edullinen"/>
+        <text name="ads_spec_state_low" text="Alhainen"/>
+        <text name="ads_spec_state_average" text="Keskimääräinen"/>
+        <text name="ads_spec_state_high" text="Korkea"/>
+        <text name="ads_spec_state_workhorse" text="Työjuhta"/>
+        <text name="ads_spec_part_types_used" text="Käytetty"/>
+        <text name="ads_spec_part_types_aftermarket" text="Jälkimarkkinointi"/>
+        <text name="ads_spec_part_types_oem" text="OEM"/>
+        <text name="ads_spec_part_types_premium" text="Premium"/>
+        <text name="ads_spec_inspection_visual" text="Visuaalinen"/>
+        <text name="ads_spec_inspection_standard" text="Standardi"/>
+        <text name="ads_spec_inspection_complete" text="Täysi vikadiagnoosi"/>
+        <text name="ads_spec_maintenance_minimal" text="Minimaalinen"/>
+        <text name="ads_spec_maintenance_standard" text="Standardi"/>
+        <text name="ads_spec_maintenance_extended" text="Laajennettu"/>
+        <text name="ads_spec_maintenance_preventive" text="Ennaltaehkäisevä"/>
+        <text name="ads_spec_overhaul_partial" text="Osittainen"/>
+        <text name="ads_spec_overhaul_standard" text="Standardi"/>
+        <text name="ads_spec_overhaul_full" text="Täydellinen"/>
+        <text name="ads_spec_repair_type_fix" text="Pikakorjaus"/>
+        <text name="ads_spec_repair_type_replacement" text="Standardi"/>
+        <text name="ads_spec_repair_type_advanced" text="Edistynyt"/>
+
+        <text name="ads_option_menu_option_one_title_inspection" text="Valitse tarkastustyyppi"/>
+        <text name="ads_option_menu_option_two_title_inspection" text="Korjaa havaitut viat"/>
+        <text name="ads_option_menu_option_one_title_maintenance" text="Valitse huoltotaso"/>
+        <text name="ads_option_menu_option_two_title_maintenance" text="Valitse kulutustarvikkeiden laatu"/>
+        <text name="ads_option_menu_option_one_title_repair" text="Valitse korjaustyyppi"/>
+        <text name="ads_option_menu_option_two_title_repair" text="Valitse varaosien laatu"/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="Valitse työn laajuus"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="Valitse järjestelmä"/>
+        <text name="ads_option_menu_price_text" text="Hinta: "/>
+        <text name="ads_option_menu_warranty_repair_text" text="Takuukorjaus"/>
+        <text name="ads_option_menu_duration_text" text="Kesto: "/>
+        <text name="ads_option_menu_finish_time_text" text="Valmistumisaika: "/>
+        <text name="ads_option_menu_start_text" text="Aloita"/>
+        <text name="ads_option_menu_duration_instant" text="Välitön"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Nopea ulkoinen tarkastus. Alhainen kustannus ja välitön tulos. Havaitsee näkyvät viat pienellä mahdollisuudella jättää joitakin vikoja huomaamatta. Ei anna teknistä kuntotietoa."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* Rutiininomainen diagnostinen toimenpide. Tunnistaa kaikki aktiiviset viat ja tuottaa yleisen raportin ajoneuvon kunnosta."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Syvällinen diagnostiikka. Takaa kaikkien vikojen, mukaan lukien mahdollisten vikojen, havaitsemisen ja tarjoaa kattavan raportin tarkoilla kuntoprosenteilla kaikille komponenteille."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Perushuolto. Merkittävästi halvempi ja nopeampi, mutta ei täysin palauta huoltotasoa ja tarjoaa lyhyemmän huoltovälin seuraavaan huoltoon."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Rutiinihuolto valmistajan spesifikaatioiden mukaan. Palauttaa huoltotason normaaliin ja tarjoaa standardihuoltovälin seuraavaan huoltoon."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Kattava huolto. Kestää kauemmin ja maksaa enemmän, mutta palauttaa huoltotason standarditason yläpuolelle ja tarjoaa pidemmän huoltovälin seuraavaan huoltoon."/>
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Ennaltaehkäisevä huolto standardivalmistajan huollon lisäksi. Palauttaa huoltotason normaaliin ja käsittelee ongelmallisimmat järjestelmät vikaantumisriskin vähentämiseksi."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Väliaikainen korjaus, joka on tarkoitettu pitämään kone toiminnassa kiireellisen työn ajan. Palauttaa nopeasti ja edullisesti perustoiminnallisuuden, mutta vika jää ratkaisematta ja ilmestyy uudelleen jonkin ajan kuluttua."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Vikaantuneen komponentin standardivaihto. Poistaa täysin nykyisen vian ja palauttaa kyseisen yksikön normaaliin käyttökuntoon."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* Syvällinen korjaus sisältäen vikaantuneen komponentin vaihdon ja järjestelmän asiaan liittyvien osien huollon. Vähentää merkittävästi toistuvien vikojen riskiä kyseisessä järjestelmässä."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Rakentaa valitun järjestelmän uudelleen hyvään käyttökuntoon. Nopeampi ja edullisempi kuin koko ajoneuvon yleishuolto."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* Kattavat toimenpiteet kaikille pääkomponenteille. Palauttaa kunnon hyvälle tasolle."/>
+        <text name="ads_option_menu_overhaul_full_description" text="* Täydellinen uudelleenvalmistus. Korkea kustannus ja kesto, mutta palauttaa kunnon erinomaiselle tasolle."/>
+        <text name="ads_option_menu_part_used_description" text="* Puretut osat. Erittäin halpa, mutta erittäin riskialtis (~50 %:n mahdollisuus vikoihin)"/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Budjetti-jälkimarkkinointikopiot. Alennettu kustannus, mutta kohtalainen vikaantumisriski (33 %)."/>
+        <text name="ads_option_menu_part_oem_description" text="* Alkuperäiset valmistajan osat. Standardiluotettavuus (10 %:n vikariski) täydellä hinnalla."/>
+        <text name="ads_option_menu_part_premium_description" text="* Vahvistetut suorituskykyosat. Kallis, mutta tiukasti laadunvalvottu (0 %:n vikariski)."/>
+        <text name="ads_option_menu_perform_repair" text="Korjaa löydetyt viat"/>
+        <text name="ads_option_menu_perform_maintenance" text="Suorita huolto korjauksen jälkeen"/>
+        <text name="ads_option_menu_perform_renew_paint" text="Uusi maalaus"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Aloita automaattisesti standardikorjaus OEM-osilla, jos vikoja havaitaan."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Aloita automaattisesti standardihuolto OEM-kulutustarvikkeilla korjauksen jälkeen."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Maalaa ajoneuvo uudelleen yleishuollon aikana."/>
+        <text name="ads_option_menu_choosen_parts_text" text="* Valittu korjaukseen:"/>
+
+        <text name="ads_report_header_title" text="Tarkastusraportti"/>
+        <text name="ads_report_vehicle_name_title" text="Ajoneuvon nimi"/>
+        <text name="ads_report_date_title" text="Päivämäärä"/>
+        <text name="ads_report_vehicle_age_title" text="Ikä"/>
+        <text name="ads_report_vehicle_operating_hours_title" text="Käyttötunnit"/>
+        <text name="ads_report_inspection_type_title" text="Tarkastustyyppi"/>
+        <text name="ads_report_inspection_location_title" text="Sijainti"/>
+        <text name="ads_report_overall_assessment_title" text="Kokonaiskunnon arviointi"/>
+        <text name="ads_report_vehicle_specs_title" text="Ajoneuvon tekniset tiedot"/>
+        <text name="ads_report_detected_breakdowns_title" text="Havaitut viat"/>
+        <text name="ads_report_recommendations_title" text="Johtopäätökset ja suositukset"/>
+        <text name="ads_report_state_optimal" text="Optimaalinen"/>
+        <text name="ads_report_state_normal" text="Normaali"/>
+        <text name="ads_report_state_degraded" text="Heikentynyt"/>
+        <text name="ads_report_state_impaired" text="Vahingoittunut"/>
+        <text name="ads_report_state_critical" text="Kriittinen"/>
+        <text name="ads_report_state_not_available" text="Ei saatavilla"/>
+        <text name="ads_report_overall_assessment_condition" text="Kuntotaso"/>
+        <text name="ads_report_overall_assessment_service" text="Huoltotaso"/>
+        <text name="ads_report_overall_assessment_mtbf" text="MTBF (t)"/>
+        <text name="ads_report_overall_assessment_crit_fail_risk" text="Kriittisen vian riski"/>
+        <text name="ads_report_overall_assessment_rul" text="Jäljellä oleva käyttöikä (t)"/>
+        <text name="ads_report_overall_assessment_wear_rate" text="Kulumisnopeus (%/t)"/>
+        <text name="ads_report_overall_assessment_nominal_wear_rate" text="Nimellinen kulumisnopeus (%/t)"/>
+        <text name="ads_report_system_condition_title" text="Järjestelmän kunto | Vikaantumisriski"/>
+        <text name="ads_report_system_condition_power" text="Nykyinen teho"/>
+        <text name="ads_report_system_condition_brakes" text="Jarrujen tehokkuus"/>
+        <text name="ads_report_system_condition_transmission" text="Vaihteisto"/>
+        <text name="ads_report_system_condition_harvest" text="Puinnin tehokkuus"/>
+        <text name="ads_report_system_condition_cooling" text="Jäähdytyksen tehokkuus"/>
+        <text name="ads_report_system_condition_consumption" text="Polttoaineen kulutus"/>
+        <text name="ads_report_system_condition_hydraulic" text="Hydrauliikan tehokkuus"/>
+        <text name="ads_report_transmission_slipping" text="Luistaminen"/>
+        <text name="ads_report_transmission_shifting_impaired" text="Vaihteenvaihto heikentynyt"/>
+        <text name="ads_report_transmission_gear_rejection" text="Vaihteen hylkääminen"/>
+        <text name="ads_report_transmission_shift_delay" text="Vaihteen viive"/>
+        <text name="ads_report_transmission_cvt_slipping" text="Hihnan/ketjun luistaminen"/>
+        <text name="ads_report_transmission_cvt_ratio_limited" text="Välityssuhde rajoittunut"/>
+        <text name="ads_report_transmission_cvt_pressure_instability" text="Paineen epävakaus"/>
+        <text name="ads_report_transmission_failed" text="Vikaantunut"/>
+        <text name="ads_report_vehicle_spec_max_alternator_current" text="Laturin maksimaalinen virta"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="Akun varaus"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="Akun kapasiteetti"/>
+        <text name="ads_report_stress_absent" text="Poissa"/>
+        <text name="ads_report_stress_low" text="Alhainen"/>
+        <text name="ads_report_stress_moderate" text="Kohtalainen"/>
+        <text name="ads_report_stress_elevated" text="Kohonnut"/>
+        <text name="ads_report_stress_high" text="Korkea"/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Aktiiviset viat havaittu. Kaikkien aktiivisten vikojen standardikorjaus on suositeltavaa."/>
+        <text name="ads_report_recommendation_defective_parts" text="Viallisia vaihto-osia havaittu: %s. Ennaltaehkäisevä vaihto on suositeltavaa äkillisen vian välttämiseksi."/>
+        <text name="ads_report_recommendation_quick_fix" text="Väliaikainen korjaustila havaittu: %s. Standardivaihto on suositeltavaa ensitilassa."/>
+        <text name="ads_report_recommendation_service_due" text="Huoltovälin raja saavutettu. Suorita huolto."/>
+        <text name="ads_report_recommendation_service_urgent" text="Huoltoväli on ylitetty. Suorita huolto kiireellisesti!"/>
+        <text name="ads_report_recommendation_overhaul" text="Ydinkomponenttien rapautuminen havaittu. Suorita yleishuolto."/>
+        <text name="ads_report_recommendation_system_overhaul" text="Kriittinen rapautuminen havaittu %s-järjestelmässä. Suorita tämän järjestelmän osittainen yleishuolto."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="Kohonnut vikaantumisriski havaittu %s-järjestelmässä. Suorita ennaltaehkäisevä huolto vikaisken riskin vähentämiseksi."/>
+        <text name="ads_report_recommendation_operating_conditions" text="Intensiivisen ylikäytön merkkejä havaittu. Paranna käyttöolosuhteita."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="Viallisia kulutustarvikkeita havaittu. Toista huolto viallisten komponenttien vaihtamiseksi."/>
+        <text name="ads_report_recommendation_all_ok" text="Ei kriittisiä suosituksia. Ajoneuvo on käyttökunnossa."/>
+
+        <text name="ads_grease_gun_name" text="Rasvaruisku"/>
+        <text name="ads_grease_gun_function" text="Käytetään voitelutoimenpiteisiin"/>
+        <text name="ads_grease_gun_action" text="Voitele"/>
+        <text name="ads_grease_gun_no_vehicle" text="Ei ajoneuvoa voitelualueella"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s ei tarvitse voitelua"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s on jo voideltu"/>
+        <text name="ads_air_blower_name" text="Paineilmapuhallin"/>
+        <text name="ads_air_blower_function" text="Käytetään jäähdyttimien ja ilmanottimen puhdistukseen"/>
+        <text name="ads_air_blower_action" text="Puhdista jäähdytin ja ilmanotto"/>
+        <text name="ads_air_blower_no_vehicle" text="Ei ajoneuvoa puhdistusalueella"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s ei tarvitse puhdistusta"/>
+        <text name="ads_air_blower_already_clean" text="%s: jäähdytin ja ilmanotto ovat jo puhtaat"/>
+        <text name="ads_jumper_cables_name" text="Käynnistyskaapelit"/>
+        <text name="ads_jumper_cables_function" text="Käytetään ajoneuvojen akkujen yhdistämiseen ja tyhjän akun käynnistämiseen"/>
+        <text name="ads_jumper_cables_action" text="Yhdistä/irrota käynnistyskaapelit"/>
+        <text name="ads_jumper_cables_connected" text="Käynnistyskaapelit yhdistetty kohteeseen %s"/>
+        <text name="ads_jumper_cables_already_connected" text="Käynnistyskaapelit on jo yhdistetty kohteeseen %s"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="Ajoneuvo ei sovellu käynnistyskaapeleiden kytkemiseen"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Käynnistyskaapelit on jo yhdistetty kohteisiin %s ja %s"/>
+        <text name="ads_jumper_cables_disconnected" text="Käynnistyskaapelit irrotettu kohteesta %s"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Käynnistyskaapelit irrotettu, koska yksi ajoneuvoista alkoi liikkua"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s on liian kaukana kohteesta %s"/>
+        <text name="input_ADS_FIELD_INSPECTION" text="Ajoneuvon tarkastus"/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
+        <text name="ads_field_inspection_action" text="Tarkasta ajoneuvo"/>
+        <text name="ads_field_inspection_hold_to_start" text="Pidä pohjassa aloittaaksesi tarkastuksen"/>
+        <text name="ads_field_inspection_starting" text="Aloitetaan tarkastus..."/>
+        <text name="ads_field_inspection_progress" text="Suoritetaan visuaalista tarkastusta... %d%%"/>
+        <text name="ads_field_inspection_cancelled" text="Tarkastus peruutettu"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Sammuta moottori ennen tarkastusta"/>
+        <text name="ads_inspection_dialog_title" text="Vuoron aloituksen visuaalinen tarkastus"/>
+        <text name="ads_inspection_section_fluids" text="1. Tekniset nesteet"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Jäähdytys- ja ilmansyöttöjärjestelmä"/>
+        <text name="ads_inspection_section_lubrication" text="3. Voitelupisteet"/>
+        <text name="ads_inspection_section_additional" text="4. Lisähuomiot"/>
+        <text name="ads_inspection_engine_oil" text="Moottoriöljy"/>
+        <text name="ads_inspection_coolant" text="Jäähdytysneste"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Hydraulineste"/>
+        <text name="ads_inspection_transmission_oil" text="Vaihteistoöljy"/>
+        <text name="ads_inspection_radiator" text="Jäähdytin"/>
+        <text name="ads_inspection_air_duct" text="Ilmanottoletkusto"/>
+        <text name="ads_inspection_air_filter" text="Ilmasuodatin"/>
+        <text name="ads_inspection_lubrication_level" text="Voitelutaso"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Ei epäilyttäviä oireita havaittu"/>
+        <text name="ads_inspection_ok" text="OK"/>
+        <text name="ads_inspection_status_slightly_low" text="Hieman alhainen"/>
+        <text name="ads_inspection_status_low" text="Alhainen"/>
+        <text name="ads_inspection_status_very_low" text="Erittäin alhainen"/>
+        <text name="ads_inspection_status_critically_low" text="Kriittisen alhainen"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Hieman tummunut"/>
+        <text name="ads_inspection_status_darkened" text="Tummunut"/>
+        <text name="ads_inspection_status_contaminated" text="Saastunut"/>
+        <text name="ads_inspection_status_critical_condition" text="Kriittinen"/>
+        <text name="ads_inspection_status_slight_moisture" text="Kevyttä kosteutta"/>
+        <text name="ads_inspection_status_seepage" text="Vuotoa"/>
+        <text name="ads_inspection_status_active_leak" text="Aktiivinen vuoto"/>
+        <text name="ads_inspection_status_severe_leak" text="Vakava vuoto"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Hieman likainen"/>
+        <text name="ads_inspection_status_dirty" text="Likainen"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Pahasti tukossa"/>
+        <text name="ads_inspection_status_critically_clogged" text="Kriittisesti tukossa"/>
+        <text name="ads_inspection_status_slightly_dry" text="Hieman kuiva"/>
+        <text name="ads_inspection_status_dry" text="Kuiva"/>
+        <text name="ads_inspection_status_very_dry" text="Erittäin kuiva"/>
+        <text name="ads_inspection_status_critically_dry" text="Kriittisen kuiva"/>
+        <text name="ads_inspection_status_not_required" text="Ei tarvita"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="Jäähdytysnesteen pieniä jälkiä on nähtävissä jäähdytysjärjestelmän liitäntöjen läheisyydessä."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Jäähdytysnesteen jäämiä on nähtävissä ja jäähdytysnesteen taso on alle normaalin."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Havaittava jäähdytysnesteen menetys on nähtävissä jäähdytysjärjestelmän alueella."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Jäähdytysnesteen taso on kriittisen alhainen ja runsaita jäähdytysnesteen jälkiä on nähtävissä."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="Moottoriöljy näyttää hieman tummuneelta."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="Moottoriöljy näyttää tummemmalta kuin normaalisti."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="Moottoriöljy näyttää saastuneelta."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Öljyn tila näyttää kriittiseltä."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="Hydraulisylinterin alueella on nähtävissä heikko öljyinen kalvo."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Sylinterin ympärillä on nähtävissä hydraulivuoto."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Sylinterin lähellä on nähtävissä selviä hydraulinesteen jälkiä."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Runsaita hydraulinesteen jälkiä on nähtävissä. Sylinterin alue on pahasti nesteen saastuttama."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="Jäähdyttimen pinta on hieman likainen."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Jäähdytin on havaittavasti likainen."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Jäähdytin on pahasti tukossa lian ja roskan johdosta."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Jäähdytin on kriittisesti tukossa lian ja roskan johdosta."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="Ilmanottoletkussa on havaittavissa kevyttä saastumista."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Ilmanottoletkusto on havaittavasti likainen."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Ilmanottoletkusto on pahasti tukossa pölyn ja roskan johdosta."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Ilmanottoletkusto on kriittisesti tukossa pölyn ja roskan johdosta."/>
+        <text name="ads_inspection_hint_lubrication_stage1" text="Voitelupisteet näyttävät hieman kuivilta."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Voitelupisteet näyttävät kuivilta ja riittämättömästi voideluilta."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Voitelupisteet ovat erittäin kuivat ja rasvan jälkiä on vähän jäljellä."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Voitelupisteet ovat kriittisen kuivat, eikä lähes yhtään rasvaa ole näkyvissä."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="Joissakin sähköliitännöissä on nähtävissä kevyitä hapettumisen merkkejä."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage3" text="Johdotuksessa ja liittimissä on nähtävissä voimakasta hapettumista ja saastumista."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Johdotuksessa ja liittimissä on nähtävissä vakavaa korroosiota ja osa eristeistä näyttää vaurioituneelta."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="Akun navoilla on nähtävissä heikko valkoinen kerrostuma."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="Akun navoilla on nähtävissä valkoinen kerrostuma."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Akun navoissa ja kotelossa on nähtävissä voimakasta hapettumista ja kerrostumia."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Akku ja navat ovat voimakkaiden kerrostumien peitossa ja kotelo näyttää likaiselta ja kuluneelta."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Laturin ympärillä ja joissakin liitännöissä on nähtävissä ylikuumenemisen ja tummentumisen merkkejä."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Laturin ja sen johdotuksen ympärillä on nähtävissä voimakkaita ylikuumenemisen merkkejä ja tummentuneita liitäntöjä."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Turboahdinlaitteen ympärillä on nähtävissä öljyisiä jälkiä ja tummentuneita liitäntöjä."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Turboahdinlaitteen ympärillä on nähtävissä runsaita öljyisiä jälkiä, tummentuneita liitäntöjä ja noenmerkkejä."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Vaihteiston hydrauliliitäntöjen ympärillä on nähtävissä öljyisiä jälkiä ja saastumista."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Vaihteiston hydrauliliitäntöjen ympärillä on nähtävissä runsaita öljyisiä jälkiä ja voimakasta saastumista."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="CVT-hydrauliohjauspaketin ympärillä on nähtävissä öljyisiä jälkiä ja tummentuneita liitäntöjä."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="CVT-hydrauliohjauslohkon liitäntöjen ympärillä on nähtävissä runsaita öljyisiä jälkiä ja voimakasta saastumista."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Telan kireys näyttää hieman epätasaiselta."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Tela näyttää löysältä ja epätasainen kireys on havaittavissa."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Tela roikkuu näkyvästi ja kireys näyttää vakavasti kompromissoidulta."/>
+        
+        <text name="ads_ingame_menu_title" text="Edistyksellinen vauriojärjestelmä"/>
+        <text name="ads_ingame_menu_section_active" text="ADS-ajoneuvot"/>
+        <text name="ads_ingame_menu_section_service" text="Huollossa"/>
+        <text name="ads_ingame_menu_header_vehicle" text="Ajoneuvo"/>
+        <text name="ads_ingame_menu_header_type" text="Tyyppi"/>
+        <text name="ads_ingame_menu_header_age" text="Ikä"/>
+        <text name="ads_ingame_menu_header_working_hours" text="Tunnit"/>
+        <text name="ads_ingame_menu_header_condition" text="Kunto"/>
+        <text name="ads_ingame_menu_header_interval" text="Väli"/>
+        <text name="ads_ingame_menu_header_service_status" text="Tarkastettu/Huollettu"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Tarkast."/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Huolto."/>
+        <text name="ads_ingame_menu_header_cost" text="Ylläpito"/>
+        <text name="ads_ingame_menu_header_leasing_price" text="Leasing"/>
+        <text name="ads_ingame_menu_header_price" text="Arvo"/>
+        <text name="ads_ingame_menu_header_procedure" text="Toimenpide"/>
+        <text name="ads_ingame_menu_header_time_left" text="Aikaa jäljellä"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Valmistumisaika"/>
+        <text name="ads_ingame_menu_header_service_cost" text="Kustannus"/>
+        <text name="ads_ingame_menu_section_other" text="Muut ajoneuvot"/>
+        <text name="ads_ingame_menu_empty_other" text="Ei ei-ADS-ajoneuvoja saatavilla"/>
+        <text name="ads_ingame_menu_empty_active" text="Ei ADS-ajoneuvoja saatavilla"/>
+        <text name="ads_ingame_menu_empty_service" text="Yhtään ajoneuvoa ei ole tällä hetkellä huollossa"/>
+        <text name="ads_sell_dialog_costs_title" text="Lisäkustannukset"/>
+        <text name="ads_sell_dialog_deposit_return" text="Pantin palautus"/>
+        <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Myöhässä oleva huolto"/>
+        <text name="ads_sell_dialog_repair_penalty" text="Korjaus"/>
+        <text name="ads_sell_dialog_washing_penalty" text="Pesu"/>
+        <text name="ads_sell_dialog_total" text="Yhteensä"/>
+        <text name="ads_mobile_workshop_low_maintainability" text="VAROITUS: %s ei ole saatavilla kohteelle %s liikkuvassa korjaamossa alhaisen huollettavuuden vuoksi."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kriittinen ylikuormitus! Vähennä ajoneuvon kuormaa välittömästi."/>
+    
+        <text name="ads_tutorialMode_label" text="Opetustila"/>
+        <text name="ads_tutorialMode_tooltip" text="Näyttää opetusvihjaita pelin aikana. Ei käytettävissä moninpelissä."/>
+        <text name="ads_tutorialResetTips_label" text="Nollaa vihjeet"/>
+        <text name="ads_tutorialResetTips_text" text="Nollaa vihjeet"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Nollaa opetusvihjehistoria ja näytä kaikki vihjeet uudelleen. Saatavilla vain yksinpelissä."/>
+        <text name="ads_tutorialResetConfirm_title" text="Nollataanko opetusvihj eet?"/>
+        <text name="ads_tutorialResetConfirm_message" text="Nollataanko opetusvihjehistoria ja näytetäänkö kaikki vihjeet uudelleen?"/>
+        <text name="ads_tutorial_welcome_dialog_title" text="Tervetuloa edistykselliseen vauriojärjestelmään"/>
+        <text name="ads_tutorial_welcome_disable_button" text="Poista vihjeet käytöstä"/>
+        <text name="ads_tutorial_welcome_enable_button" text="Ota vihjeet käyttöön"/>
+        <text name="ads_tutorial_welcome_message" text="Tämä modi uudistaa täysin pelin ajoneuvovauriot ja huoltojärjestelmät. Muutoksia on paljon, joten opetusvihjeitä ilmestyy ajoittain. Ne auttavat sinua ymmärtämään uudet mekaniikat nopeammin, välttämään yleisiä virheitä ja pitämään koneet toimintakunnossa.&#10;&#10;Halutessasi voit poistaa opetusvihjeet käytöstä nyt. Voit aina ottaa ne uudelleen käyttöön modin asetuksissa Edistyksellinen vauriojärjestelmä -osiossa."/>
+        <text name="ads_tutorial_service_due_soon_title" text="Määräaikaishuolto"/>
+        <text name="ads_tutorial_service_due_soon_message" text="%s tarvitsee pian huollon.&#10;&#10;ADS:ssä ajoneuvot vaativat säännöllistä huoltoa. Jos viivästytät sitä, vikaantumisriski kasvaa merkittävästi.&#10;&#10;Vieraile lähimmässä korjaamossa ja valitse &quot;Huolto&quot;. Huoltoväliä voidaan säätää modin asetuksissa."/>
+        <text name="ads_tutorial_service_interval_expired_title" text="Huoltoväli ylitetty"/>
+        <text name="ads_tutorial_service_interval_expired_message" text="%s on ylittänyt huoltovälin ja tarvitsee huollon.&#10;&#10;Mene korjaamolle mahdollisimman pian ja suorita &quot;Huolto&quot;-toimenpide. Ajoneuvon käyttäminen jatkaminen ylitetyn huoltovälin jälkeen lisää merkittävästi useiden vikojen riskiä."/>
+        <text name="ads_tutorial_rad_or_intake_clogged_title" text="Jäähdyttimen ja ilmanottosuodattimen saastuminen"/>
+        <text name="ads_tutorial_rad_or_intake_clogged_message" text="Ajoneuvosi jäähdytin ja ilmanotot näyttävät olevan pahasti tukossa.&#10;&#10;Likainen jäähdytin ei voi luovuttaa lämpöä tehokkaasti, ja tukossa olevat ilmanotot voivat rajoittaa ilmavirtausta moottoriin. Tämä vähentää tehoa ja lisää polttoaineen kulutusta.&#10;&#10;Voit puhdistaa ne pesuasemalla tai kaupasta saatavalla paineilmapuhaltimella.&#10;&#10;Voit tarkistaa jäähdyttimen ja ilmanottojen kunnon tarkastuksen kautta: pidä R-näppäintä pohjassa ajoneuvoa katsoessasi."/>
+        <text name="ads_tutorial_needs_lubrication_title" text="Voitelu tarpeen"/>
+        <text name="ads_tutorial_needs_lubrication_message" text="%s tarvitsee säännöllistä voitelua.&#10;&#10;ADS:ssä työskentelevien komponenttien voitelutaso laskee vähitellen joka päivä, mikä lisää kulumista.&#10;&#10;Osta rasvaruisku kaupasta ja voitele koneesi päivittäin tai ennen jokaista työvuoroa.&#10;&#10;Voit tarkistaa voitelutason tarkastuksen kautta: pidä R-näppäintä pohjassa ajoneuvoa katsoessasi."/>
+        <text name="ads_tutorial_needs_repair_title" text="Ajoneuvon vika"/>
+        <text name="ads_tutorial_needs_repair_message" text="Näyttää siltä, että %s:ssä on jotain vialla. Yksi sen osista on saattanut vikaantua.&#10;&#10;Muista vierailla korjaamossa ja suorittaa tarkastus. Älä viivästele: vika saattaa jatkua kehittymistään ja korjauskustannukset kasvavat sen mukana.&#10;&#10;Jos tarkastus vahvistaa vian, korjaa se korjaamon korjaustoimenpiteellä."/>
+        <text name="ads_tutorial_needs_overhaul_title" text="Suuri yleishuolto"/>
+        <text name="ads_tutorial_needs_overhaul_message" text="Näyttää siltä, että %s alkaa ikääntyä. On aika harkita vaihtoa tai suurta yleishuoltoa. Se on pitkä ja vaativa prosessi, mutta se on paras tapa antaa toinen elämä sille suosikkiajoneuvolle, josta olet niin kiintynyt! P.S. Voit muuttaa käyttöikää asetuksissa — sen kasvattaminen vähentää ajoneuvojen kulumisnopeutta."/>
+        <text name="ads_tutorial_age_degradation_title" text="Ikääntymisrapautuminen"/>
+        <text name="ads_tutorial_age_degradation_message" text="Tiesitkö, että ADS:n ajoneuvot menettävät vähitellen osan alkuperäisestä suorituskyvystään ikääntyessään?&#10;&#10;Noin kolmanneksen jälkeen ajoneuvon käyttöiästä ikääntymisrapautuminen alkaa hieman alentaa keskeisiä ominaisuuksia, kuten tehoa, jarrutusta ja muita järjestelmiä. Mitä vanhemmaksi ajoneuvo tulee, sitä voimakkaampi tämä vaikutus on, ja se on erityisen havaittavissa käyttöiän lopussa.&#10;&#10;Ikääntymisrapautumisen voi poistaa käytöstä modin asetuksissa."/>
+        <text name="ads_tutorial_needs_preventive_title" text="Vikaantuminen lähellä"/>
+        <text name="ads_tutorial_needs_preventive_message" text="Näyttää siltä, että yksi %s:n järjestelmistä on lähellä vikaantumista. Hyvä uutinen on, että voit estää sen! Korjaamossa on nyt saatavilla erityinen palvelu: ennaltaehkäisevä huolto. Tähän sisältyy täydellinen tekninen tarkastus sekä vikaantuvien komponenttien ennakoiva korjaus!"/>
+        <text name="ads_tutorial_poor_consumables_title" text="Heikkolaatuiset kulutustarvikkeet"/>
+        <text name="ads_tutorial_poor_consumables_message" text="Pieni salaisuus: %s on kärsinyt heikkolaatuisista kulutustarvikkeista huollon aikana. Niin voi käydä, ellei tietoisesti valitse halpoja jälkimarkkinakorvikkeita.&#10;&#10;Tällä hetkellä huoltoväli on lyhentynyt ja komponenttien kuluminen on hieman lisääntynyt. Toistettu huolto korjaa ongelman. Voit tunnistaa sen tarkastuksen kautta: perustarkastus varoittaa lyhentyneestä välistä, kun taas täysi diagnostinen tarkastus paljastaa heikkolaatuiset kulutustarvikkeet itse."/>
+        <text name="ads_tutorial_poor_parts_title" text="Heikkolaatuiset osat"/>
+        <text name="ads_tutorial_poor_parts_message" text="Pieni salaisuus: %s on kärsinyt heikkolaatuisista osista korjauksen aikana. Tuo vika palaa todennäköisesti pian takaisin.&#10;&#10;Voit odottaa sen tapahtumista tai suorittaa täyden diagnostisen tarkastuksen heti — se paljastaa luotettavasti heikkolaatuisen osan."/>
+        <text name="ads_tutorial_idle_and_downtime_title" text="Käyttämättömyysaika ja varastointi"/>
+        <text name="ads_tutorial_idle_and_downtime_message" text="Muuten, kuluminen on paljon vähäisempää, kun koneesi käy mutta ei aktiivisesti työskentele, mikä on täysin loogista. Kun moottori on sammutettu, kuluminen on hyvin vähäistä, ja jos kone on varastoitu katoksen alla, se katoaa kokonaan."/>
+        <text name="ads_tutorial_hot_weather_title" text="Kuuma sää"/>
+        <text name="ads_tutorial_hot_weather_message" text="No, tänään on todella kuumaa. Tällaisella säällä täytyy seurata jäähdyttimen puhtautta erityisen tarkasti ja välttää moottorin ylikuormittamista — muuten ylikuumeneminen on vain ajan kysymys.&#10;&#10;Muista: voit aina tarkistaa jäähdyttimen kunnon visuaalisella tarkastuksella pitämällä R-näppäintä pohjassa konetta katsoessasi, ja voit myös puhdistaa sen paineilmapuhaltimella."/>
+        <text name="ads_tutorial_wet_weather_title" text="Huhhuh mikä keli!"/>
+        <text name="ads_tutorial_wet_weather_message" text="Vitsi mikä keli tänään! Kosteus on haitallista johdotukselle ja sähkölaitteille, joten sähköjärjestelmän kuluminen on näissä olosuhteissa hieman suurempaa.&#10;&#10;Lisäksi tällaisessa säässä puintitiintyö on voimakkaasti suositeltavaa välttää — teet vain vahinkoa kombillesi."/>
+        <text name="ads_tutorial_low_fuel_title" text="Vähän polttoainetta"/>
+        <text name="ads_tutorial_low_fuel_message" text="Näyttää siltä, että polttoaine on kohta lopussa. Ensi silmäyksellä tämä ei välttämättä vaikuta suurelta ongelmalta, mutta mitä vähemmän polttoainetta säiliössä on jäljellä, sitä kovemmin polttoainepumppu joutuu työskentelemään. Sen kuorma kasvaa, eikä se varsinkaan auta sen käyttöikää."/>
+        <text name="ads_tutorial_idle_deposit_title" text="Pitkä joutokäynti"/>
+        <text name="ads_tutorial_idle_deposit_message" text="Näyttää siltä, että kone on käynyt joutokäynnillä liian kauan. Pitkät joutokäyntijaksot eivät ole vain hukkaan heitettyä polttoainetta: ajan myötä ne edistävät myös kerrostumien syntymistä polttoainejärjestelmässä ja heikentävät moottorin yleistä terveyttä.&#10;&#10;Jos konetta ei tarvita juuri nyt, on parempi sammuttaa moottori."/>
+        <text name="ads_tutorial_engine_overheat_title" text="Moottorin ylikuumeneminen"/>
+        <text name="ads_tutorial_engine_overheat_message" text="Moottori alkaa ylikuumentua. Tämä voi tapahtua yhdestä tai useammasta syystä: moottori on raskaassa kuormituksessa, jäähdytin on tukossa, sää on kuuma tai ajoneuvon jäähdytysjärjestelmässä on vika.&#10;&#10;Pysy valppaana: ylikuumeneminen on yksi tuhoisimmista tekijöistä mistä tahansa koneelle. Se ei vahingoita vain moottoria: jäähdytysjärjestelmä joutuu äärirajoilleen, ja lämpö moottoritilassa kiihdyttää johdotuksen ja sähkökomponenttien rapautumista."/>
+        <text name="ads_tutorial_cvt_overheat_title" text="CVT:n ylikuumeneminen"/>
+        <text name="ads_tutorial_cvt_overheat_message" text="CVT alkaa ylikuumentua. Tämä voi tapahtua yhdestä tai useammasta syystä: vaihteisto on liiallisessa kuormituksessa, jäähdytin on tukossa tai sää on erittäin kuuma. Esimerkiksi saattaa olla, että vedät liian raskasta auraa tai hinaat ylikuormitettua perävaunua.&#10;&#10;Pysy valppaana: ylikuumeneminen on yksi tuhoisimmista asioista, joita CVT-vaihteistolle voi tapahtua."/>
+        <text name="ads_tutorial_heavy_trailer_title" text="Raskas perävaunu"/>
+        <text name="ads_tutorial_heavy_trailer_message" text="Näyttää siltä, että yrität hinata perävaunua, joka on liian raskas traktorillesi. Voit jatkaa sitä, mutta vaihteisto on valtavan rasituksen alla eikä jarrukaan arvosta lisäkuormaa.&#10;&#10;Noudata yksinkertaista sääntöä: 10 hv tai enemmän per 1 tonni hinattavaa massaa, niin kone kestää huomattavasti pidempään."/>
+        <text name="ads_tutorial_chassis_vibration_title" text="Jousitus rasituksessa"/>
+        <text name="ads_tutorial_chassis_vibration_message" text="Hidasta! Nopea ajaminen epätasaisessa maastossa kuluttaa %s:n jousituksen nopeasti. Lisäksi nuo tärinät vahingoittavat muita järjestelmiä — erityisesti hydrauliikkaa ja sähköjärjestelmää. Aja tasaisesti ja rauhallisesti."/>
+        <text name="ads_tutorial_steering_title" text="Ohjaaminen paikallaan"/>
+        <text name="ads_tutorial_steering_message" text="On parasta olla ohjaamatta paikallaan seisottaessa. Tämä kuormittaa voimakkaasti ohjauskoneistoa, ohjaustehostinjärjestelmää ja etuakselin komponentteja, mikä lisää alustaan kulumista.&#10;&#10;Liikahda edes hieman eteenpäin, niin pyörät kääntyvät paljon helpommin."/>
+        <text name="ads_tutorial_cranking_title" text="Toistuva käynnistäminen"/>
+        <text name="ads_tutorial_cranking_message" text="Näyttää siltä, että käynnistät moottoria liian usein. Jokainen moottorin käynnistys lähettää erittäin suuren virran sähköjärjestelmän läpi, mikä kiihdyttää johdotuksen, käynnistimen ja muiden sähkökomponenttien kulumista.&#10;&#10;Yritä olla käyttämättä käynnistintä liian usein äläkä sammuta moottoria ikään kuin koneessa olisi käynnistys-pysäytys-järjestelmä."/>
+        <text name="ads_tutorial_hard_start_title" text="Vaikea käynnistys"/>
+        <text name="ads_tutorial_hard_start_message" text="%s:n moottorin käynnistäminen on vaikeaa. Tämä voi johtua heikosta akusta, pakkaasesta lämpötilasta, mekaanisista vioista tai käynnistimen kulumisesta. Käynnistä moottori pitämällä virta-avainta pohjassa. Huomio: sähköjärjestelmä kokee suuret kuormitukset käynnistyksen aikana korkeiden alkuvirtapiikkien vuoksi!"/>
+        <text name="ads_tutorial_critical_failure_title" text="Kriittinen vika"/>
+        <text name="ads_tutorial_critical_failure_message" text="No, huonoa onnea. %s on täysin toimintakyvytön eikä enää pysty liikkumaan omalla voimallaan. Voit käyttää liikkuvaa korjaamoa ja suorittaa pikakorjauksen, jotta ajoneuvo pääsee korjaamolle omatoimisesti.&#10;&#10;Muussa tapauksessa sinun täytyy keksiä jokin muu tapa palauttaa se."/>
+        <text name="ads_tutorial_heavy_lift_title" text="Kiinnike liian raskas"/>
+        <text name="ads_tutorial_heavy_lift_message" text="Näyttää siltä, että tämä laite on liian raskas %s:lle. Hydrauliikka toimii äärirajoillaan, mikä vaikuttaa negatiivisesti sen käyttöikään.&#10;&#10;Noudata yksinkertaista sääntöä: kiinnitteen paino ei saa ylittää 60%% ajoneuvon omasta painosta."/>
+        <text name="ads_tutorial_cold_engine_title" text="Lämmitä koneesi"/>
+        <text name="ads_tutorial_cold_engine_message" text="Lämmitä koneesi aina ennen töihin ryhtymistä. Moottorin lisäksi on monia muita osia, jotka tarvitsevat lämmitysajan: hydrauliöljy, CVT-vaihteisto ja jopa polttoaineen lämpötila — erityisesti pakkassäällä. Koneen käyttäminen kylmänä voi aiheuttaa ongelmia useissa järjestelmissä.&#10;&#10;Jos moottorin lämpötila on yli 50 astetta, kaikki on kunnolla lämmennyt ja konetta voidaan käyttää turvallisesti."/>
+        <text name="ads_tutorial_pto_sharp_angle_title" text="Voimanoton kulma liian suuri"/>
+        <text name="ads_tutorial_pto_sharp_angle_message" text="Ole varovainen: voimanoton kulma koneen ja laitteen välillä on liian suuri. Nivelakseli alkaa toimia voimakkailla pulssaatioilla, tärinä lisääntyy ja kuluminen kasvaa nopeasti.&#10;&#10;Pidä kulma alle 30 asteen ja yritä irrottaa voimanotto teräskääntöjen ja pääkäännösten aikana."/>
+        <text name="ads_tutorial_overload_indicator_title" text="Ylikuormitusvaroitus"/>
+        <text name="ads_tutorial_overload_indicator_message" text="%s on raskaassa kuormituksessa. Kojelaudalle äsken syttynyt varoitusvalo kertoo sinulle tästä.&#10;&#10;Koneessa ei ehkä ole tarpeeksi tehoa nykyiseen tehtävään. Yritä vähentää kuormaa: rajoita nopeuttasi vakionopeussäätimellä tai hellitä kaasua täysitehon ajamisen sijaan."/>
+        <text name="ads_tutorial_engine_overload_title" text="Moottorin ylikuormitus"/>
+        <text name="ads_tutorial_engine_overload_message" text="Moottori on valtavassa rasituksessa. Voi olla, että yrittämäsi tehtävä on yksinkertaisesti liikaa tälle koneelle, ja kannattaa harkita tehokkaamman yksikön käyttöä. Tai voi riittää hidastaa ja vähentää moottorin kuormaa.&#10;&#10;Joka tapauksessa pidä mielessä, että kuluminen kasvaa havaittavasti tämänkaltaisessa rasituksessa."/>
+        <text name="ads_tutorial_lugging_title" text="Moottorin lugging"/>
+        <text name="ads_tutorial_lugging_message" text="Moottori, ja erityisesti vaihteisto, ei pidä luggingista: alhaisista kierroksista raskaassa moottorikuormituksessa. Olet ehkä kiinnittänyt jotain liian raskasta koneelle, tai valitset yksinkertaisesti huonoja vaihteita, jos vaihteisto on manuaalinen."/>
+        <text name="ads_tutorial_wheel_slip_title" text="Pyörän luistaminen"/>
+        <text name="ads_tutorial_wheel_slip_message" text="Näyttää siltä, että pyörät luistavat pahasti. Olet ehkä jumiutunut juuri nyt eikä sinua huvita neuvot, mutta pidä tämä mielessä: pyörän luistaminen on yksi tuhoisimmista tekijöistä vaihteistolle ja tuo seuraavan huoltokäynnin paljon lähemmäksi."/>
+        <text name="ads_tutorial_battery_low_title" text="Heikko akku"/>
+        <text name="ads_tutorial_battery_low_message" text="Hups, näyttää siltä, että akku on lähellä kuolemistaan. Tämä voi tapahtua pitkän seisontajakson jälkeen, vakavan pakkasen vuoksi tai sähköjärjestelmän vikojen takia.&#10;&#10;Alhaisella varauksella käynnistäminen on vaikeaa tai jopa mahdotonta. Jos et saa sitä käynnistymään, voit käynnistää koneen toisesta ajoneuvosta käynnistyskaapeleilla."/>
+    </texts>
+</l10n>
