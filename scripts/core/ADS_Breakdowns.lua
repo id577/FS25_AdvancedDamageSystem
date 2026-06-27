@@ -4235,64 +4235,55 @@ function ADS_Breakdowns.applyHydraulicDamageToPlowRotation(self, superFunc, rota
     local rootVehicle = self:getRootVehicle()
     local hydraulicEffect = rootVehicle.spec_AdvancedDamageSystem and rootVehicle.spec_AdvancedDamageSystem.activeEffects.HYDRAULIC_SPEED_MODIFIER
     local hydraulicModifier = (hydraulicEffect and hydraulicEffect.value) or 0
-    
-    if hydraulicModifier == 0 then
-        return superFunc(self, rotationMax, noEventSend, turnAnimationTime)
-    end
 
-    local performance = math.max(0.05, 1.0 + hydraulicModifier)
+    -- Keep the vanilla Plow event flow intact. In particular, the receiving
+    -- side calls this function with noEventSend=true to prevent event echoes.
+    local result = superFunc(self, rotationMax, noEventSend, turnAnimationTime)
 
-    if noEventSend == nil or noEventSend == false then
-        if g_server ~= nil then
-            g_server:broadcastEvent(PlowRotationEvent.new(self, rotationMax), nil, self)
-        else
-            g_client:getServerConnection():sendEvent(PlowRotationEvent.new(self, rotationMax))
+    -- Stream/savegame synchronization supplies an explicit animation time and
+    -- must not start the animation. Only adjust a newly started local animation.
+    if hydraulicModifier ~= 0 and turnAnimationTime == nil then
+        local performance = math.max(0.05, 1.0 + hydraulicModifier)
+        local spec = self.spec_plow
+        local turnAnimation = spec.rotationPart.turnAnimation
+
+        if turnAnimation ~= nil then
+            local direction = rotationMax and 1 or -1
+            self:setAnimationSpeed(turnAnimation, direction * performance)
         end
     end
 
-    local spec = self.spec_plow
-    spec.rotationMax = rotationMax
-
-    if spec.rotationPart.turnAnimation ~= nil then
-        if turnAnimationTime == nil then
-            local animTime = self:getAnimationTime(spec.rotationPart.turnAnimation)
-            
-            if spec.rotationMax then
-                self:playAnimation(spec.rotationPart.turnAnimation, 1 * performance, animTime, true)
-            else
-                self:playAnimation(spec.rotationPart.turnAnimation, -1 * performance, animTime, true)
-            end
-        else
-            self:setAnimationTime(spec.rotationPart.turnAnimation, turnAnimationTime, true)
-        end
-    end
+    return result
 end
 
 
-function ADS_Breakdowns.applyHydraulicDamageToPlowCenterRotation(self, superFunc)
+function ADS_Breakdowns.applyHydraulicDamageToPlowCenterRotation(self, superFunc, noEventSend)
     local rootVehicle = self:getRootVehicle()
     local hydraulicEffect = rootVehicle.spec_AdvancedDamageSystem and rootVehicle.spec_AdvancedDamageSystem.activeEffects.HYDRAULIC_SPEED_MODIFIER
     local hydraulicModifier = (hydraulicEffect and hydraulicEffect.value) or 0
-    
-    if hydraulicModifier == 0 then
-        return superFunc(self)
-    end
 
-    local performance = math.max(0.05, 1.0 + hydraulicModifier)
+    local result = superFunc(self, noEventSend)
 
-    local spec = self.spec_plow
+    if hydraulicModifier ~= 0 then
+        local performance = math.max(0.05, 1.0 + hydraulicModifier)
+        local spec = self.spec_plow
+        local turnAnimation = spec.rotationPart.turnAnimation
 
-    if spec.rotationPart.turnAnimation ~= nil then
-        self:setAnimationStopTime(spec.rotationPart.turnAnimation, spec.ai.centerPosition)
+        if turnAnimation ~= nil then
+            local centerPosition = spec.ai.centerPosition
+            local animTime = self:getAnimationTime(turnAnimation)
 
-        local animTime = self:getAnimationTime(spec.rotationPart.turnAnimation)
-
-        if animTime < spec.ai.centerPosition then
-            self:playAnimation(spec.rotationPart.turnAnimation, 1 * performance, animTime, true)
-        elseif spec.ai.centerPosition < animTime then
-            self:playAnimation(spec.rotationPart.turnAnimation, -1 * performance, animTime, true)
+            if animTime ~= centerPosition then
+                if animTime < centerPosition then
+                    self:setAnimationSpeed(turnAnimation, performance)
+                else
+                    self:setAnimationSpeed(turnAnimation, -performance)
+                end
+            end
         end
     end
+
+    return result
 end
 
 do
