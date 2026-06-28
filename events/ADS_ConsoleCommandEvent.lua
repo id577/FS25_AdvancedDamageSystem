@@ -29,6 +29,7 @@ ADS_ConsoleCommandEvent.ALLOWED_COMMANDS = {
     printSpecVar = true,
     setSpecVar = true,
     setConfigVar = true,
+    setExcluded = true,
     debug = true
 }
 

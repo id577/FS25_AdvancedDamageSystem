@@ -52,7 +52,7 @@ function ADS_EffectSyncEvent:run(connection)
     end
 
     local spec = vehicle.spec_AdvancedDamageSystem
-    if spec == nil then
+    if spec == nil or spec.isExcludedVehicle then
         return
     end
 

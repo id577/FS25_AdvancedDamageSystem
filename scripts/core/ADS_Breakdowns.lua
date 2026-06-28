@@ -5545,6 +5545,10 @@ ADS_Breakdowns.EffectApplicators.EMPTY_EFFECT = {
 -- ==========================================================
 function ADS_Breakdowns.getCanMotorRun(self, superFunc)
     local spec = self.spec_AdvancedDamageSystem
+    if spec ~= nil and spec.isExcludedVehicle then
+        return superFunc(self)
+    end
+
     if (spec and spec.activeEffects.ENGINE_FAILURE) then
         if spec.activeEffects.ENGINE_FAILURE.extraData.starter  then
             return superFunc(self)
