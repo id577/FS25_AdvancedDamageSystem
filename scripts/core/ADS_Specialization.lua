@@ -3549,6 +3549,15 @@ local function updateDynamicMotorLoad(vehicle, dt) -- adjusts motor load with dr
     end
 
     local motorLoad = AdvancedDamageSystem.sanitizeNumber(vehicle:getMotorLoadPercentage(), 0, 0, 1.5)
+    local hasMoreRealistic = g_modIsLoaded ~= nil and g_modIsLoaded["MoreRealistic"] == true
+
+    if hasMoreRealistic then
+        spec.dynamicMotorLoad = motorLoad
+        updateAvgDynamicMotorLoadWindow(spec, motorLoad, dt)
+        updateAvgSpeedWindow(spec, vehicle:getLastSpeed(), dt)
+        return
+    end
+
     local dynamicMotorLoad = motorLoad
 
     if vehicle:getIsOnField() then
