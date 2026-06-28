@@ -41,15 +41,31 @@ function ADS_Tutorial:showMessage(text, doPause, downtime)
 end
 
 function ADS_Tutorial:getADSVehicle()
-    local vehicle = g_localPlayer.getCurrentVehicle() 
+    self.vehicle = nil
+
+    local player = g_localPlayer
+    if player == nil or player.getCurrentVehicle == nil then
+        return
+    end
+
+    local vehicle = player:getCurrentVehicle()
     if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and not vehicle.spec_AdvancedDamageSystem.isExcludedVehicle then
         self.vehicle = vehicle
-    else
-        self.vehicle = nil
     end
 end
 
 function ADS_Tutorial:update(dt)
+    local mission = g_currentMission
+    local isSingleplayer = mission ~= nil
+        and mission.missionDynamicInfo ~= nil
+        and not mission.missionDynamicInfo.isMultiplayer
+
+    if not ADS_Config.TUTORIAL_MODE or not isSingleplayer or g_localPlayer == nil then
+        self.vehicle = nil
+        self.timer = 0
+        return
+    end
+
     self.timer = self.timer + dt
     self.messageDowntime = math.max(self.messageDowntime - dt, 0)
 
@@ -57,10 +73,7 @@ function ADS_Tutorial:update(dt)
         return
     end
 
-    local mission = g_currentMission
-    local isSingleplayer = mission ~= nil
-        and mission.missionDynamicInfo ~= nil
-        and not mission.missionDynamicInfo.isMultiplayer
+    self.timer = self.timer - ADS_Config.TUTORIAL_UPDATE_DELAY
 
     self:getADSVehicle()
 
@@ -69,7 +82,7 @@ function ADS_Tutorial:update(dt)
 
     local messagedData = ADS_Config.TUTORIAL_MESSAGES
     
-    if ADS_Config.TUTORIAL_MODE and isSingleplayer and self.messageDowntime <= 0 then
+    if self.messageDowntime <= 0 then
 
         --- GLOBAL MESSAGES
         if not messagedData.WELCOME then
@@ -545,7 +558,6 @@ function ADS_Tutorial:update(dt)
         end
     end
 
-    self.timer = self.timer - ADS_Config.TUTORIAL_UPDATE_DELAY
 end
 
 addModEventListener(ADS_Tutorial)

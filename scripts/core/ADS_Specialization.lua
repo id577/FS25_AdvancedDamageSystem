@@ -8340,7 +8340,10 @@ function AdvancedDamageSystem.ConsoleCommands:getTargetVehicle()
         print("ADS Error: Override vehicle does not have AdvancedDamageSystem support.")
         return nil
     end
-    local vehicle = g_localPlayer.getCurrentVehicle() 
+    local vehicle = g_localPlayer ~= nil
+        and g_localPlayer.getCurrentVehicle ~= nil
+        and g_localPlayer:getCurrentVehicle()
+        or nil
     if not vehicle or not vehicle.spec_AdvancedDamageSystem then
         print("ADS Error: You must be in a vehicle with AdvancedDamageSystem support.")
         return nil
