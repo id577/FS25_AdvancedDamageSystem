@@ -1,83 +1,83 @@
 <l10n>
     <texts>
-        <text name="ads_settings_title" text="ADS AYARLARI"/>
-        <text name="ads_settings_admin_required" text="Çok oyunculu modda ADS ayarları yönetici izinleri gerektirir."/>
-        <text name="ads_maintenancePrice_label" text="Bakım Fiyatı Çarpanı"/>
-        <text name="ads_maintenancePrice_tooltip" text="Muayene, onarım ve revizyon dahil olmak üzere tüm atölye hizmetlerinin maliyetini ayarlar. Daha yüksek bir değer, tüm bakım faaliyetlerini daha pahalı hale getirir."/>
+        <text name="ads_settings_title" text="GHS AYARLARI"/>
+        <text name="ads_settings_admin_required" text="GHS ayarları için çok oyunculu modda yönetici izinleri gereklidir."/>
+        <text name="ads_maintenancePrice_label" text="Bakım Fiyat Çarpanı"/>
+        <text name="ads_maintenancePrice_tooltip" text="Muayeneler, onarımlar ve revizyonlar dahil olmak üzere tüm atölye hizmetlerinin maliyetini ayarlar. Daha yüksek bir değer, tüm bakım faaliyetlerinin maliyetini artırır."/>
         <text name="ads_maintenanceDuration_label" text="Bakım Süresi Çarpanı"/>
-        <text name="ads_maintenanceDuration_tooltip" text="Tüm atölye hizmetlerinin süresini ayarlar. Daha yüksek bir değer, aracınızın bakım veya onarımda geçireceği süreyi artırır."/>
-        <text name="ads_workshopOpenHour_label" text="Atölye Açılış Saatleri"/>
-        <text name="ads_workshopOpenHour_tooltip" text="Atölyenin açıldığı günün saati. Tamir işlemleri yalnızca çalışma saatleri içinde yapılmaktadır."/>
+        <text name="ads_maintenanceDuration_tooltip" text="Tüm atölye hizmetlerinin süresini ayarlar. Daha yüksek bir değer, aracınızın bakım veya onarım işlemlerinde geçireceği süreyi uzatır."/>
+        <text name="ads_workshopOpenHour_label" text="Atölye Açılış Saati"/>
+        <text name="ads_workshopOpenHour_tooltip" text="Atölyenin açıldığı saat. Onarım hizmetleri yalnızca çalışma saatleri içinde verilmektedir."/>
         <text name="ads_workshopCloseHour_label" text="Atölye Kapanış Saati"/>
-        <text name="ads_workshopCloseHour_tooltip" text="Atölyenin kapandığı günün saati. Bu saatten sonra onarımlar durdurulacaktır."/>
-        <text name="ads_engineMaxHeat_label" text="Maksimum Motor Isısı"/>
-        <text name="ads_engineMaxHeat_tooltip" text="Motorun maksimum yükte ürettiği temel ısı oranı. Daha yüksek değerler motorun daha hızlı ısınmasına neden olur."/>
+        <text name="ads_workshopCloseHour_tooltip" text="Atölyenin kapandığı saat. Bu saatten sonra onarım işlemleri durdurulacaktır."/>
+        <text name="ads_engineMaxHeat_label" text="Maks. Motor Isısı"/>
+        <text name="ads_engineMaxHeat_tooltip" text="Motorun maksimum yükte ürettiği ısının temel değeri. Daha yüksek değerler, motorun daha hızlı ısınmasına neden olur."/>
         <text name="ads_cloggingSpeed_label" text="Tıkanma Hızı"/>
-        <text name="ads_cloggingSpeed_tooltip" text="Toz, saman ve mahsul artıklarıyla çalışırken radyatörün ve hava girişinin ne kadar hızlı tıkandığını ayarlar. Daha yüksek değerler tıkanmanın daha hızlı oluşmasına neden olur. %100'de tıkanma oranı, servis aralığının yaklaşık üçte biridir."/>
+        <text name="ads_cloggingSpeed_tooltip" text="Toz, saman ve mahsul artıkları içinde çalışırken radyatörün ve hava girişinin ne kadar hızlı tıkanacağını ayarlar. Daha yüksek değerler, tıkanmanın daha hızlı artmasına neden olur. %100 değerinde, tıkanma oranı bakım aralığının yaklaşık üçte biri kadardır."/>
         <text name="ads_fieldInspectionDuration_label" text="Denetim Süresi"/>
-        <text name="ads_fieldInspectionDuration_tooltip" text="Vardiya öncesi saha denetiminin gerçek saniye cinsinden ne kadar süreceğini ayarlar."/>
+        <text name="ads_fieldInspectionDuration_tooltip" text="Vardiya öncesi saha denetiminin ne kadar süreceğini, gerçek saniye cinsinden belirler."/>
         <text name="ads_lubricationReducePerDay_label" text="Yağlama Kuruma Hızı"/>
-        <text name="ads_lubricationReducePerDay_tooltip" text="Oyun içi bir günde ne kadar yağlama maddesinin kuruyacağını ayarlar. %0'da, yağlama maddesi zamanla kurumaz."/>
-        <text name="ads_ws_header_title" text="Atölye"/>
-        <text name="ads_settings_section_service_wear" text="Servis ve Aşınma"/>
+        <text name="ads_lubricationReducePerDay_tooltip" text="Oyun içi bir gün boyunca yağlamanın ne kadar kuruyacağını belirler. %0 ayarında, yağlama zamanla kurumaz."/>
+        <text name="ads_ws_header_title" text="Workshop"/>
+        <text name="ads_settings_section_service_wear" text="Bakım ve Aşınma"/>
         <text name="ads_settings_section_thermal_model" text="Termal Model"/>
         <text name="ads_settings_section_battery_alternator" text="Akü ve Alternatör"/>
         <text name="ads_settings_section_preshift_maintenance" text="Vardiya Öncesi Bakım"/>
         <text name="ads_settings_section_other" text="Diğer"/>
-        <text name="ads_dealerWorkshopAvailable_label" text="Bayi Atölyesi 7/24"/>
-        <text name="ads_dealerWorkshopAvailable_tooltip" text="Bayi atölyesinin günün her saatinde kullanılabilir olmasını sağlar."/>
-        <text name="ads_mobileWorkshopAvailable_label" text="Mobil Atölye 7/24"/>
-        <text name="ads_mobileWorkshopAvailable_tooltip" text="Mobil atölyeyi günün her saatinde kullanılabilir halde tutar."/>
-        <text name="ads_ownWorkshopAvailable_label" text="7/24 Hizmet Veren Atölye"/>
-        <text name="ads_ownWorkshopAvailable_tooltip" text="Sahip olduğunuz atölyeyi günün her saatinde kullanılabilir halde tutar."/>
-        <text name="ads_instantInspection_label" text="Anlık İnceleme"/>
-        <text name="ads_instantInspection_tooltip" text="Etkinleştirildiğinde, tüm denetimler anında tamamlanır (zaman geçmez). Not: 'Görsel' denetim seçeneği kullanılamaz hale gelir."/>
+        <text name="ads_dealerWorkshopAvailable_label" text="24/7 Bayi Atölyesi"/>
+        <text name="ads_dealerWorkshopAvailable_tooltip" text="Bayi atölyesinin günün her saatinde hizmet verebilir durumda olmasını sağlar."/>
+        <text name="ads_mobileWorkshopAvailable_label" text="7/24 Mobil Servis"/>
+        <text name="ads_mobileWorkshopAvailable_tooltip" text="Mobil atölyenin günün her saatinde kullanıma hazır olmasını sağlar."/>
+        <text name="ads_ownWorkshopAvailable_label" text="7/24 Açık Özel Atölye"/>
+        <text name="ads_ownWorkshopAvailable_tooltip" text="Sahip olduğunuz atölyenizi günün her saatinde kullanıma hazır tutar."/>
+        <text name="ads_instantInspection_label" text="Anında Onarım"/>
+        <text name="ads_instantInspection_tooltip" text="Etkinleştirildiğinde, tüm arıza onarım girişimleri anında tamamlanır (süre kısıtlaması kalkar). Not: ‘Görsel’ denetim seçeneği kullanılamaz hale gelir"/>
         <text name="ads_parkVehicle_label" text="Bakım Sırasında Aracı Park Et"/>
-        <text name="ads_parkVehicle_tooltip" text="Etkinleştirilirse, TAB tuşuyla döngü yapılırken bakımda olan araçlar atlanır."/>
+        <text name="ads_parkVehicle_tooltip" text="Bu özellik etkinleştirildiğinde, TAB tuşuyla geçiş yaparken bakımda olan araçlar atlanır."/>
         <text name="ads_warrantyEnabled_label" text="Yeni Ekipman Garantisi"/>
-        <text name="ads_warrantyEnabled_tooltip" text="Yeni araçlardaki onarımlar için garanti kapsamı geçerlidir (en fazla 20 çalışma saati veya 12 ay). Sadece orijinal ekipman üreticisi (OEM) parçaları ücretsiz olarak kapsam dahilindedir."/>
+        <text name="ads_warrantyEnabled_tooltip" text="Garanti kapsamı, yeni araçlarda yapılan onarımlar için geçerlidir (en fazla 20 çalışma saati veya 12 ay). Yalnızca orijinal ekipman üreticisi (OEÜ) ücretsiz olarak garanti kapsamındadır."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Yapay Zeka Aşırı Yük ve Aşırı Isınma Kontrolü"/>
-        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Etkinleştirilirse, yapay zeka çalışanı motorun aşırı yüklenmesini veya aşırı ısınmasını önlemek için yükü azaltır."/>
-        <text name="ads_aiWorkerTargetStress_label" text="Yapay Zeka Hız Tepkisi"/>
-        <text name="ads_aiWorkerTargetStress_tooltip" text="Yapay zekâ çalışanının aşırı yüklenmeye ve aşırı ısınmaya ne kadar erken tepki vereceğini kontrol eder. Daha yüksek değerler daha az hassastır ve daha geç tepki verir; daha düşük değerler daha hassastır ve daha erken yavaşlar."/>
+        <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Etkinleştirildiğinde, yapay zeka işçisi motorun aşırı yüklenmesini veya aşırı ısınmasını önlemek için yükü azaltır."/>
+        <text name="ads_aiWorkerTargetStress_label" text="Yapay Zeka Hızlı Yanıt"/>
+        <text name="ads_aiWorkerTargetStress_tooltip" text="Yapay Zeka işçisinin aşırı yüke ve aşırı ısınmaya ne kadar erken tepki vereceğini belirler. Daha yüksek değerler daha az duyarlıdır ve daha geç tepki verir; daha düşük değerler ise daha duyarlıdır ve daha erken yavaşlar."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Rahat"/>
         <text name="ads_aiWorkerTargetStress_balanced" text="Dengeli"/>
         <text name="ads_aiWorkerTargetStress_sensitive" text="Hassas"/>
         <text name="ads_aiWorkerTargetStress_verySensitive" text="Çok Hassas"/>
         <text name="ads_aiWorkerMinSpeed_label" text="Yapay Zeka Minimum Hızı"/>
-        <text name="ads_aiWorkerMinSpeed_tooltip" text="Aşırı yüklenmeyi veya aşırı ısınmayı önlemek için hızı düşürürken izin verilen en düşük yapay zeka işçi hız sabitleme hızını ayarlar."/>
+        <text name="ads_aiWorkerMinSpeed_tooltip" text="Aşırı yüklemeyi veya aşırı ısınmayı önlemek amacıyla hızı düşürürken izin verilen en düşük Yapay Zeka işçi sabit hızını belirler."/>
         <text name="ads_debugMode_label" text="Hata Ayıklama Modu"/>
         <text name="ads_debugMode_tooltip" text="Konsolda hata ayıklama panelini ve kapsamlı hata ayıklama günlüğünü etkinleştirir veya devre dışı bırakır."/>
         <text name="ads_warningMessages_label" text="Uyarı Mesajları"/>
         <text name="ads_warningMessages_tooltip" text="Soğuk motor ve aşırı ısınma uyarıları gibi oyun içi uyarı mesajlarını etkinleştirir veya devre dışı bırakır."/>
         <text name="ads_mobileWorkshopRestrictions_label" text="Mobil Atölye Kısıtlamaları"/>
-        <text name="ads_serviceInterval_label" text="Servis Aralığı"/>
-        <text name="ads_vehicleLifespan_label" text="Araç Ömrü"/>
+        <text name="ads_serviceInterval_label" text="Bakım Aralığı"/>
+        <text name="ads_vehicleLifespan_label" text="Aracın Kullanım Ömrü"/>
         <text name="ads_downtimeWear_label" text="Pasif Aşınma"/>
-        <text name="ads_generalWearEnabled_label" text="Yaşa Bağlı Aşınma"/>
+        <text name="ads_generalWearEnabled_label" text="Yaşla İlgili Aşınma"/>
         <text name="ads_systemStressRate_label" text="Sistem Stres Oranı"/>
-        <text name="ads_batteryCapacity_label" text="Akü Kapasitesi"/>
+        <text name="ads_batteryCapacity_label" text="Pil Kapasitesi"/>
         <text name="ads_thermalSensitivity_label" text="Termal Hassasiyet"/>
         <text name="ads_option_off" text="Kapalı"/>
         <text name="ads_option_none" text="Yok"/>
-        <text name="ads_serviceInterval_tooltip" text="Bakımın gerekli olduğu temel servis aralığını saat cinsinden ayarlar. Gerçek aralık, araç markasına, yaşına ve önceki bakımın kalitesine bağlı olarak değişir."/>
-        <text name="ads_vehicleLifespan_tooltip" text="Aracın temel kullanım ömrünü saat cinsinden belirler; bu süre sonunda aracın durumu %0'a ulaşır. Durum sıfıra ne kadar yakınsa, araç o kadar güvenilmez hale gelir."/>
-        <text name="ads_downtimeWear_tooltip" text="Araç kullanılmadığı süre boyunca pasif aşınma oranını, temel aşınma oranının (Araç Ömrü) yüzdesi olarak ayarlar. Örneğin, varsayılan 100 saatlik ömürle %5, her sistemin yaklaşık 20 saatlik kullanım dışı kalma süresinden sonra yaklaşık %1 oranında durumunu kaybettiği anlamına gelir. Not: Araç kapalı bir alanda saklanırken pasif aşınma devre dışı bırakılır."/>
-        <text name="ads_generalWearEnabled_tooltip" text="Yaşa bağlı aşınmayı etkinleştirir. Araç aşındıkça, her sistem motor gücü, hidrolik hızı veya fren verimliliği gibi temel özelliklerinde küçük cezalar alır. Etki, aracın kullanım ömrünün ilk üçte birinden sonra aktif hale gelir, ancak ikinci üçte birinden sonra fark edilir hale gelir ve makinenin hizmet ömrünün sonuna doğru daha da güçlenir."/>
-        <text name="ads_mobileWorkshopRestrictions_tooltip" text="Etkinleştirildiğinde, mobil atölyedeki farklı işlemlerin kullanılabilirliği aracın bakım kolaylığına bağlıdır."/>
-        <text name="ads_systemStressRate_tooltip" text="Aşırı yüklenme, aşırı ısınma, tekerlek kayması ve diğer zorlu çalışma koşullarından kaynaklanan stresin sistemlerde ne kadar hızlı biriktiğini kontrol eder. Stres, arıza olasılığını doğrudan etkiler: bir sistem ne kadar çok stres biriktirirse, arızalanma olasılığı o kadar artar."/>
-        <text name="ads_batteryCapacity_tooltip" text="Maksimum kullanılabilir akü kapasitesini ayarlar. 150 Ah'ye yakın değerler daha gerçekçidir, ancak bu seviyede akü deşarjı sorunlarıyla nadiren karşılaşabilirsiniz."/>
-        <text name="ads_alternatorMaxOutput_label" text="Alternatör Maksimum Çıkışı"/>
+        <text name="ads_serviceInterval_tooltip" text="Bakımın yapılması gereken temel servis aralığını saat cinsinden belirler. Gerçek aralık, aracın markasına, yaşına ve önceki bakımların kalitesine göre değişiklik gösterir."/>
+        <text name="ads_vehicleLifespan_tooltip" text="Aracın temel ömrünü saat cinsinden belirler; bu sürenin sonunda aracın durumu %0’a ulaşır. Durum sıfıra ne kadar yaklaşırsa, araç o kadar güvenilmez hale gelir."/>
+        <text name="ads_downtimeWear_tooltip" text="Araç rölantideyken pasif aşınma oranını, temel aşınma oranının (Araç Ömrü) yüzdesi olarak belirler. Örneğin, varsayılan 100 saatlik ömürde %5 değerinde ayar yapıldığında, her sistem yaklaşık 20 saatlik rölanti süresinden sonra durumunun yaklaşık %1’ini kaybeder. Not: Araç kapalı bir alanda depolandığında pasif aşınma devre dışı bırakılır."/>
+        <text name="ads_generalWearEnabled_tooltip" text="Yaşlanmaya bağlı aşınmayı etkinleştirir. Araç aşındıkça, her bir sistemin temel özelliklerinde (motor gücü, hidrolik hız veya fren verimliliği gibi) küçük düşüşler meydana gelir. Bu etki, araç ömrünün ilk üçte birinden sonra devreye girer, ancak ancak ikinci üçte birinden sonra fark edilir hale gelir ve makinenin hizmet ömrünün sonuna doğru daha da belirginleşir."/>
+        <text name="ads_mobileWorkshopRestrictions_tooltip" text="Bu özellik etkinleştirildiğinde, mobil atölyede gerçekleştirilebilecek farklı işlemlerin kapsamı, aracın bakım uygunluğuna bağlıdır."/>
+        <text name="ads_systemStressRate_tooltip" text="Aşırı yük, aşırı ısınma, tekerlek kayması ve diğer zorlu çalışma koşulları nedeniyle sistemlerde gerilimin ne kadar hızlı biriktiğini belirler. Gerilim, arıza olasılığını doğrudan etkiler: Bir sistem ne kadar fazla gerilim biriktirirse, arıza yapma olasılığı o kadar artar."/>
+        <text name="ads_batteryCapacity_tooltip" text="Kullanılabilir maksimum pil kapasitesini ayarlar. 150 Ah’ye yakın değerler daha gerçekçidir, ancak bu seviyede pil boşalması sorunlarıyla neredeyse hiç karşılaşmayabilirsiniz."/>
+        <text name="ads_alternatorMaxOutput_label" text="Alternatörün Maksimum Çıkış Gücü"/>
         <text name="ads_alternatorMaxOutput_tooltip" text="Alternatörün maksimum çıkış akımını ayarlar. Daha yüksek değerler, alternatörün aküyü daha hızlı şarj etmesini sağlar."/>
         <text name="ads_idleCurrent_label" text="Bekleme Akımı"/>
-        <text name="ads_idleCurrent_tooltip" text="Motor durduğu sırada aküden çekilen akımı ayarlar. Örneğin, 0,5 A'da 15 Ah'lik bir akünün tamamen boşalması, sıcaklık etkileri uygulanmadan önce yaklaşık 30 gerçek saat sürer."/>
-        <text name="ads_thermalSensitivity_tooltip" text="Termal model davranışını ayarlar. Daha yüksek ayarlar, motoru ve şanzımanı yüke, ortam sıcaklığına ve radyatör kirlenmesine karşı daha hassas hale getirir ve aynı koşullar altında daha fazla ısı üretir."/>
-        <text name="ads_radiatorDirtInfluence_label" text="Radyatör Kirinin Etkisi"/>
-        <text name="ads_radiatorDirtInfluence_tooltip" text="Maksimum kir birikiminde radyatörün soğutma kapasitesini bu yüzde oranında azaltır."/>
-        <text name="ads_warmingBoostPower_label" text="Isınma Hızlanması"/>
-        <text name="ads_warmingBoostPower_tooltip" text="Motor ve şanzımanın ısınmasını yapay olarak hızlandırır. Isıl davranışta herhangi bir değişiklik olmaması için Kapalı konumunu kullanın."/>
-        <text name="ads_coolingSlowdownPower_label" text="Soğutma Yavaşlatma"/>
-        <text name="ads_coolingSlowdownPower_tooltip" text="Araç kapatıldıktan sonra motor ve şanzıman soğutmasını yapay olarak yavaşlatır. Soğutma sistemi değiştirilmemiş haldeyken Kapalı konumunu kullanın."/>
+        <text name="ads_idleCurrent_tooltip" text="Motor dururken aküden çekilen akımı ayarlar. Örneğin, 0,5 A değerinde, 15 Ah’lık bir akünün sıcaklık etkileri hesaba katılmadan tamamen boşalması yaklaşık 30 gerçek saat sürer."/>
+        <text name="ads_thermalSensitivity_tooltip" text="Termal modelin davranışını ayarlar. Daha yüksek ayarlar, motor ve şanzımanın yüke, ortam sıcaklığına ve radyatördeki kirlenmeye karşı daha duyarlı hale gelmesini sağlar; bu da aynı koşullar altında daha fazla ısı üretilmesine yol açar."/>
+        <text name="ads_radiatorDirtInfluence_label" text="Radyatördeki Kirin Etkisi"/>
+        <text name="ads_radiatorDirtInfluence_tooltip" text="Maksimum kir birikimi durumunda radyatörün soğutma kapasitesini bu oranda azaltır."/>
+        <text name="ads_warmingBoostPower_label" text="Isınma ve Hızlanma"/>
+        <text name="ads_warmingBoostPower_tooltip" text="Motor ve şanzımanın ısınmasını yapay olarak hızlandırır. Değiştirilmemiş termal davranış için “Kapalı” seçeneğini kullanın."/>
+        <text name="ads_coolingSlowdownPower_label" text="Soğutmada Yavaşlama"/>
+        <text name="ads_coolingSlowdownPower_tooltip" text="Araç durdurulduktan sonra motor ve şanzımanın soğumasını yapay olarak yavaşlatır. Değiştirilmemiş soğutma için “Kapalı” seçeneğini kullanın."/>
         <text name="ads_thermal_none" text="Pasif"/>
         <text name="ads_thermal_mild" text="Hafif"/>
         <text name="ads_thermal_default" text="Varsayılan"/>
@@ -86,25 +86,25 @@
         <text name="ads_ws_label_value" text="Değer"/>
         <text name="ads_ws_label_age" text="Yaş"/>
         <text name="ads_ws_label_operating_hours" text="Çalışma saatleri"/>
-        <text name="ads_ws_label_service" text="Servis"/>
+        <text name="ads_ws_label_service" text="Hizmet"/>
         <text name="ads_ws_label_condition" text="Durum"/>
         <text name="ads_ws_label_maintainability" text="Bakım Kolaylığı"/>
-        <text name="ads_ws_label_maintenance_log" text="Bakım Günlüğü"/>
+        <text name="ads_ws_label_maintenance_log" text="Bakım Kaydı"/>
         <text name="ads_ws_label_last_report" text="Son Rapor"/>
-        <text name="ads_ws_label_service_interval" text="Servis Aralığı"/>
+        <text name="ads_ws_label_service_interval" text="Bakım Aralığı"/>
         <text name="ads_ws_label_last_maintenance" text="Son bakım"/>
-        <text name="ads_ws_label_last_inspection" text="Son kontrol"/>
-        <text name="ads_ws_table_header_part" text="Bölüm"/>
+        <text name="ads_ws_label_last_inspection" text="Son denetim"/>
+        <text name="ads_ws_table_header_part" text="Kısım"/>
         <text name="ads_ws_table_header_description" text="Açıklama"/>
         <text name="ads_ws_table_header_stage" text="Aşama"/>
         <text name="ads_ws_table_header_price" text="Fiyat"/>
         <text name="ads_ws_table_header_repair_select" text="Onarım"/>
-        <text name="ads_ws_info_no_breakdowns" text="Herhangi bir arıza yok veya henüz tespit edilmedi."/>
+        <text name="ads_ws_info_no_breakdowns" text="Herhangi bir arıza yok ya da henüz tespit edilmedi."/>
         <text name="ads_ws_status_initial" text="Yükleme durumu..."/>
         <text name="ads_ws_action_inspection" text="Denetim"/>
         <text name="ads_ws_action_maintenance" text="Bakım"/>
         <text name="ads_ws_action_repair" text="Onarım"/>
-        <text name="ads_ws_action_overhaul" text="Revizyon"/>
+        <text name="ads_ws_action_overhaul" text="Genel bakım"/>
         <text name="ads_ws_action_cancel_service" text="İşlemi İptal Et"/>
         <text name="ads_ws_button_show" text="Göster"/>
         <text name="ads_ws_age_unit" text="ay"/>
@@ -112,30 +112,30 @@
         <text name="ads_ws_option_yes" text="Evet"/>
         <text name="ads_ws_option_no" text="Hayır"/>
         <text name="ads_ws_status_open" text="Atölye açık"/>
-        <text name="ads_ws_status_closed" text="Atölye kapalı"/>
-        <text name="ads_ws_inspecting_status" text="İnceleniyor..."/>
-        <text name="ads_ws_status_in_progress_format" text="%s %s'ye kadar devam ediyor..."/>
+        <text name="ads_ws_status_closed" text="Atölye kapalıdır"/>
+        <text name="ads_ws_inspecting_status" text="Denetleniyor..."/>
+        <text name="ads_ws_status_in_progress_format" text="%s devam ediyor, %s'ye kadar..."/>
         <text name="ads_ws_task_inspection" text="Denetim"/>
         <text name="ads_ws_task_maintenance" text="Bakım"/>
-        <text name="ads_ws_task_overhaul" text="Revizyon"/>
+        <text name="ads_ws_task_overhaul" text="Genel bakım"/>
         <text name="ads_ws_button_price_format" text="%s (%s)"/>
-        <text name="ads_ws_no_last_report_message" text="Henüz hiçbir rapor yok"/>
-        <text name="ads_ws_no_report_message" text="Rapor yok"/>
-        <text name="ads_ws_no_log_empty_message" text="Günlük dosyası henüz boş"/>
-        <text name="ads_ws_cancel_confirm_title" text="%s iptal edilsin mi?"/>
-        <text name="ads_ws_cancel_confirm_text" text="Mevcut ilerleme olduğu gibi kaydedilecektir. Para iadesi yapılmayacaktır."/>
+        <text name="ads_ws_no_last_report_message" text="Henüz herhangi bir rapor bulunmamaktadır"/>
+        <text name="ads_ws_no_report_message" text="Herhangi bir rapor bulunmamaktadır"/>
+        <text name="ads_ws_no_log_empty_message" text="Günlük henüz boş"/>
+        <text name="ads_ws_cancel_confirm_title" text="%s'yi iptal etmek istiyor musunuz?"/>
+        <text name="ads_ws_cancel_confirm_text" text="Mevcut ilerleme durumunuz olduğu gibi kaydedilecektir. Para iadesi yapılmayacaktır."/>
 
-        <text name="ads_log_header_title" text="Bakım Günlüğü"/>
-        <text name="ads_log_title" text="Teknik Bakım Günlüğü"/>
+        <text name="ads_log_header_title" text="Bakım Kaydı"/>
+        <text name="ads_log_title" text="Teknik Bakım Kaydı"/>
         <text name="ads_log_total_cost_title" text="Toplam Giderler"/>
         <text name="ads_log_cost_per_month_title" text="Aylık Maliyet"/>
         <text name="ads_log_ownership_months_title" text="Mülkiyet Süresi"/>
-        <text name="ads_log_total_breakdowns_count_title" text="Toplam Arıza"/>
+        <text name="ads_log_total_breakdowns_count_title" text="Toplam Arızalar"/>
         <text name="ads_log_average_breakdowns_interval_title" text="Ortalama Arıza Aralığı"/>
         <text name="ads_log_average_maintenance_interval_title" text="Ortalama Bakım Aralığı"/>
-        <text name="ads_log_performed" text="%s tamamlandı"/>
-        <text name="ads_log_inspection_desc_no_breakdowns" text="Hiçbir hata tespit edilmedi"/>
-        <text name="ads_log_inspection_desc_with_breakdowns" text="Algılanan hatalar: %s"/>
+        <text name="ads_log_performed" text="%s gerçekleştirildi"/>
+        <text name="ads_log_inspection_desc_no_breakdowns" text="Herhangi bir hata tespit edilmedi"/>
+        <text name="ads_log_inspection_desc_with_breakdowns" text="Tespit edilen hatalar: %s"/>
         <text name="ads_log_overhaul_desc_with_painting" text="Araç yeniden boyandı"/>
         <text name="ads_log_repair_desc_generic" text="Onarım"/>
         <text name="ads_log_cancelled_desc" text="İşlem iptal edildi"/>
@@ -145,237 +145,237 @@
         <text name="ads_log_description" text="Açıklama"/>
         <text name="ads_log_price" text="Maliyet"/>
         <text name="ads_log_button_show_report" text="Raporu Göster"/>
-        <text name="ads_log_empty" text="Günlük dosyası boş"/>
+        <text name="ads_log_empty" text="Günlük boş"/>
 
         <text name="ads_breakdowns_severity_permanent" text="Kalıcı"/>
         <text name="ads_breakdowns_severity_reduce_power" text="Gücü Azalt"/>
-        <text name="ads_breakdowns_severity_shutdown" text="Kapatıldı"/>
-        <text name="ads_breakdowns_severity_minor" text="Hafif"/>
+        <text name="ads_breakdowns_severity_shutdown" text="Kapatma"/>
+        <text name="ads_breakdowns_severity_minor" text="Küçük"/>
         <text name="ads_breakdowns_severity_moderate" text="Orta"/>
-        <text name="ads_breakdowns_severity_major" text="Ciddi"/>
+        <text name="ads_breakdowns_severity_major" text="Büyük"/>
         <text name="ads_breakdowns_severity_critical" text="Kritik"/>
-        <text name="ads_breakdowns_general_wear_stage1_description" text="Yıllarca süren yoğun çalışmanın birikmiş stresi. Temel bileşenlerdeki küçük, geri döndürülemez aşınma, genel performansı biraz düşürür."/>
+        <text name="ads_breakdowns_general_wear_stage1_description" text="Yıllarca süren yoğun çalışmanın birikmiş yorgunluğu. Temel bileşenlerdeki küçük çaplı, geri dönüşü olmayan aşınmalar, genel performansı bir miktar düşürür."/>
         <text name="ads_breakdowns_part_vehicle" text="Araç"/>
         <text name="ads_breakdowns_part_consumables" text="Sarf Malzemeleri"/>
         <text name="ads_breakdowns_part_engine" text="Motor"/>
-        <text name="ads_breakdowns_part_battery" text="Akü"/>
-        <text name="ads_breakdowns_part_ecu" text="ECU"/>
-        <text name="ads_breakdowns_part_wiring" text="Kablolama ve bağlantı elemanları"/>
+        <text name="ads_breakdowns_part_battery" text="Pil"/>
+        <text name="ads_breakdowns_part_ecu" text="Motor Beyni"/>
+        <text name="ads_breakdowns_part_wiring" text="Kablolama ve konektörler"/>
         <text name="ads_breakdowns_part_alternator_regulator" text="Alternatör regülatörü"/>
         <text name="ads_breakdowns_part_turbocharger" text="Turboşarj"/>
         <text name="ads_breakdowns_part_oil_pump" text="Yağ pompası"/>
         <text name="ads_breakdowns_part_valve_train" text="Valf mekanizması"/>
         <text name="ads_breakdowns_part_clutch" text="Debriyaj"/>
-        <text name="ads_breakdowns_part_synchronizer" text="Senkronizasyon"/>
-        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift hidrolik pompa"/>
-        <text name="ads_breakdowns_part_cvt_chain" text="CVT zinciri"/>
-        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="CVT hidrolik kontrol valfi"/>
-        <text name="ads_breakdowns_part_cvt" text="CVT"/>
+        <text name="ads_breakdowns_part_synchronizer" text="Senkronizatör"/>
+        <text name="ads_breakdowns_part_powershift_hydraulic_pump" text="Powershift hidrolik pompası"/>
+        <text name="ads_breakdowns_part_cvt_chain" text="Otomatik Şanzıman(CVT) zinciri"/>
+        <text name="ads_breakdowns_part_cvt_hydraulic_control_valve" text="Otomatik Şanzıman(CVT) hidrolik kontrol valfi"/>
+        <text name="ads_breakdowns_part_cvt" text="Otomatik Şanzıman(CVT)"/>
         <text name="ads_breakdowns_part_hydraulic_pump" text="Hidrolik pompa"/>
         <text name="ads_breakdowns_part_hydraulic_cylinder" text="Hidrolik silindir"/>
-        <text name="ads_breakdowns_part_pto_clutch" text="PTO debriyajı"/>
+        <text name="ads_breakdowns_part_pto_clutch" text="Kuyruk mili(PTO) kavraması"/>
         <text name="ads_breakdowns_part_brake_system" text="Fren sistemi"/>
         <text name="ads_breakdowns_part_wheel_bearing" text="Tekerlek yatağı"/>
-        <text name="ads_breakdowns_part_steering_linkage" text="Direksiyon bağlantısı"/>
-        <text name="ads_breakdowns_part_track_tensioner" text="Ray gerdirici"/>
+        <text name="ads_breakdowns_part_steering_linkage" text="Direksiyon bağlantı sistemi"/>
+        <text name="ads_breakdowns_part_track_tensioner" text="Kayış gergisi"/>
         <text name="ads_breakdowns_part_thermostat" text="Termostat"/>
         <text name="ads_breakdowns_part_cooling_system" text="Soğutma sistemi"/>
-        <text name="ads_breakdowns_part_fan_clutch" text="Fan debriyajı"/>
+        <text name="ads_breakdowns_part_fan_clutch" text="Fan kavraması"/>
         <text name="ads_breakdowns_part_fuel_pump" text="Yakıt pompası"/>
         <text name="ads_breakdowns_part_fuel_injectors" text="Yakıt enjektörleri"/>
         <text name="ads_breakdowns_part_fuel_filter" text="Yakıt filtresi"/>
         <text name="ads_breakdowns_part_fuel_line" text="Yakıt hattı"/>
         <text name="ads_breakdowns_part_harvest_processing_system" text="Hasat işleme sistemi"/>
         <text name="ads_breakdowns_part_unloading_auger" text="Boşaltma burgusu"/>
-        <text name="ads_breakdowns_quick_fix_stage" text="Geçici onarıldı"/>
+        <text name="ads_breakdowns_quick_fix_stage" text="Yamalandı"/>
         <text name="ads_breakdowns_defected_parts_stage" text="Arızalı"/>
-        <text name="ads_breakdowns_defected_parts_detected_description" text="Ünite normal çalışıyor, ancak yapılan teşhislerde arızalı bir parça tespit edildi. Kritik derecede düşük güvenlik marjı nedeniyle, ani arızayı önlemek için önleyici parça değişimi önerilir."/>
-        <text name="ads_breakdowns_temporarily_repaired_description" text="Cihaz normal çalışıyor, ancak tamamen aşınmış parçaların hızlı bir şekilde onarılmasına bağlı. Yük altında kaçınılmaz bir arızayı önlemek için, parçaların en kısa sürede tamamen değiştirilmesi önerilir."/>
+        <text name="ads_breakdowns_defected_parts_detected_description" text="Cihaz normal şekilde çalışıyor, ancak arıza teşhisi sonucunda bir parçanın arızalı olduğu tespit edildi. Güvenlik marjının kritik derecede düşük olması nedeniyle, ani bir arızayı önlemek için önleyici olarak değiştirilmesi tavsiye edilmektedir."/>
+        <text name="ads_breakdowns_temporarily_repaired_description" text="Cihaz normal şekilde çalışıyor, ancak tamamen aşınmış parçaların bir an önce onarılmasına bağlıdır. Yük altında kaçınılmaz bir arızayı önlemek için, parçaların mümkün olan en kısa sürede tamamen değiştirilmesi tavsiye edilir."/>
         <text name="ads_breakdowns_overheat_protection_stage1_description" text="Motor koruma modu"/>
-        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Motor arıza modu aktif! Güç azaltıldı!"/>
+        <text name="ads_breakdowns_overheat_protection_stage1_message" text="Motor sınırlama modu aktif! Güç azaltıldı!"/>
         <text name="ads_breakdowns_overheat_protection_stage2_description" text="Motor koruma modu"/>
-        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Motor arıza modu aktif! Güç azaltıldı!"/>
+        <text name="ads_breakdowns_overheat_protection_stage2_message" text="Motor acil çalışma modu aktif! Güç azaltıldı!"/>
         <text name="ads_breakdowns_overheat_protection_stage3_description" text="Motor koruma modu"/>
-        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Motor arıza modu aktif! Güç azaltıldı!"/>
+        <text name="ads_breakdowns_overheat_protection_stage3_message" text="Motor acil çalışma modu etkin! Güç azaltıldı!"/>
         <text name="ads_breakdowns_overheat_protection_stage4_description" text="Motor koruma modu"/>
-        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Aşırı ısınmaya karşı koruma amacıyla motor kapatıldı"/>
+        <text name="ads_breakdowns_overheat_protection_stage4_message" text="Aşırı ısınmayı önlemek için motor kapatıldı"/>
         <text name="ads_breakdowns_engine_jam_stage1_description" text="Motor tamamen arızalandı"/>
         <text name="ads_breakdowns_engine_jam_stage1_message" text="Motor sıkıştı"/>
-        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="ECU hataları. Motor gücünde hafif bir azalma."/>
-        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="ECU arızası. Gözle görülür güç kaybı ve yakıt tüketiminde artış."/>
-        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Kritik ECU arızası. Önemli güç kaybı, yüksek yakıt tüketimi ve motorun stop etme riski."/>
-        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="ECU tamamen arızalandı. Motor kontrol edilemiyor ve çalışmıyor."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage1_description" text="Motor Beyni hataları. Motor gücünde hafif bir düşüş."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage2_description" text="Motor Beyni arızası. Belirgin güç kaybı ve artan yakıt tüketimi."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage3_description" text="Motor Beyninde ciddi arıza. Önemli güç kaybı, yüksek yakıt tüketimi ve motorun durma riski."/>
+        <text name="ads_breakdowns_ecu_malfunction_stage4_description" text="Motor Beyninde tam arıza. Motor kontrol edilemiyor ve çalışmıyor."/>
         <text name="ads_breakdowns_ecu_malfunction_stage4_message" text="Motor arızalı"/>
-        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="Kabloların ve elektrik bağlantı noktalarının korozyonu. Artan temas direnci, ara sıra ışık titremesine, kararsız voltaj beslemesine ve motorun zor çalışmasına neden olur."/>
-        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="Kablolarda ve elektrik bağlantı noktalarında orta derecede korozyon. Temas kayıpları sık sık ışık titremesine, kararsız voltaj beslemesine, motorun zor çalışmasına ve olası motor stop etmelerine neden olur."/>
-        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="Kablolarda ve elektrik bağlantı noktalarında ciddi korozyon. Kritik devrelere giden güç kaynağı kararsızdır, aydınlatma tamamen kesilebilir, motor torku azalır, motorun stop etmesi muhtemeldir ve çalıştırma güvenilir değildir."/>
-        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="Şiddetli kablo korozyonu nedeniyle marş kontrol devresi arızalandı. Aydınlatma çalışmıyor ve motor çalıştırılamıyor."/>
+        <text name="ads_breakdowns_corroded_wiring_stage1_description" text="Kabloların ve elektrik konektörlerinin korozyonu. Temas direncindeki artış, zaman zaman ışık titremesine, voltaj beslemesinde dengesizliğe ve motorun zor çalışmasına neden olur."/>
+        <text name="ads_breakdowns_corroded_wiring_stage2_description" text="Kablolarda ve elektrik konektörlerinde orta derecede korozyon. Temas kayıpları, ışıkların sık sık titremesine, voltaj beslemesinin dengesizleşmesine, motorun zor çalışmasına ve motorun durmasına neden olabilir."/>
+        <text name="ads_breakdowns_corroded_wiring_stage3_description" text="Kablolarda ve elektrik konektörlerinde ciddi korozyon. Kritik devrelere giden güç beslemesi dengesizdir; aydınlatma tamamen kesilebilir, motor torku azalır, motorun stop etme olasılığı yüksektir ve marş alma işlemi güvenilir değildir."/>
+        <text name="ads_breakdowns_corroded_wiring_stage4_description" text="Kablolardaki ciddi korozyonun yol açtığı marş kontrol devresindeki arıza. Aydınlatma çalışmıyor ve motorun çalıştırılması mümkün değil."/>
         <text name="ads_breakdowns_corroded_wiring_stage4_message" text="Marş devresi arızası"/>
-        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="Akü sülfatlaşması. Etkin akü kapasitesi azalır, bu da yük altında daha düşük elektrik rezervine yol açar."/>
-        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="Orta derecede akü sülfatlaşması. Etkin akü kapasitesi önemli ölçüde azalır ve motor çalıştırmak zorlaşır."/>
-        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="Ciddi akü sülfatlaşması. Kullanılabilir akü kapasitesi kritik derecede düşük ve marş performansı istikrarsız."/>
-        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="Kritik akü sülfatlaşması. Etkin akü kapasitesi neredeyse yok denecek kadar az ve güvenilir motor çalıştırma için marş performansı yetersiz."/>
-        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="Yetersiz akü marş gücü"/>
-        <text name="ads_breakdowns_alternator_regulator_failure_stage1_description" text="Alternatör regülatöründe arıza. Şarj çıkışı azaldı, bu da akü şarj verimliliğinin düşmesine neden oldu."/>
-        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="Alternatör regülatöründe orta derecede arıza. Şarj çıkışı kararsız ve azalmış durumda, bu da akünün yetersiz şarj olmasına ve elektrik sisteminde voltaj kayıplarının artmasına neden oluyor."/>
-        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="Ciddi alternatör regülatörü arızası. Şarj çıkışı kritik derecede azalmış, voltaj beslemesi kararsız ve elektrik sistemi büyük kayıplarla çalışıyor."/>
-        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="Alternatör regülatöründe tam arıza. Akü şarjı yok ve elektrik sistemi yalnızca kalan akü rezervinden çalışıyor."/>
+        <text name="ads_breakdowns_battery_sulfation_stage1_description" text="Akü sülfatlanması. Akünün etkin kapasitesi azalır ve bu da yük altında elektriksel yedeğin düşmesine neden olur."/>
+        <text name="ads_breakdowns_battery_sulfation_stage2_description" text="Orta derecede akü sülfatlanması. Akünün etkin kapasitesi önemli ölçüde azalmıştır ve motorun çalıştırılması zordur."/>
+        <text name="ads_breakdowns_battery_sulfation_stage3_description" text="Aşırı akü sülfatlanması. Akünün kullanılabilir kapasitesi kritik derecede düşük ve marş performansı dengesiz."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_description" text="Aşırı akü sülfatlanması. Akünün etkin kapasitesi neredeyse tamamen kaybolmuştur ve marş performansı, motorun güvenilir bir şekilde çalıştırılması için yetersizdir."/>
+        <text name="ads_breakdowns_battery_sulfation_stage4_message" text="Pil marş gücü yetersiz"/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage1_description" text="Alternatör regülatöründe arıza. Şarj çıkışı azalmış olup, bu da akü şarj verimliliğinin düşmesine neden olmaktadır."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage2_description" text="Alternatör regülatöründe orta derecede arıza. Şarj çıkışı dengesiz ve düşüktür; bu durum, akünün yetersiz şarj olmasına ve elektrik sisteminde voltaj kayıplarının artmasına neden olmaktadır."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage3_description" text="Alternatör regülatöründe ciddi bir arıza. Şarj çıkışı ciddi ölçüde azalmış, voltaj beslemesi dengesiz ve elektrik sistemi büyük kayıplarla çalışıyor."/>
+        <text name="ads_breakdowns_alternator_regulator_failure_stage4_description" text="Alternatör regülatöründe tam arıza. Akü şarjı gerçekleşmiyor ve elektrik sistemi yalnızca akünün kalan rezerviyle çalışıyor."/>
         <text name="ads_breakdowns_alternator_regulator_failure_stage4_message" text="Şarj sistemi arızası"/>
-        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Aşınmış turbo yatakları. Hafif bir ıslık sesi duyuluyor ve yüksek devirlerde hafif bir güç kaybı var."/>
-        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Turbo contalarında sızıntı var. Gözle görülür güç kaybı, yakıt tüketiminde artış."/>
-        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Hasarlı türbin kanatları. Ağır yük altında ciddi güç kaybı ve motor durma riski."/>
-        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Felaket niteliğinde turbo arızası. Motor gücünün büyük kısmını kaybetti ve ciddi iç hasar riski altında."/>
-        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="Yağ pompası arızası. Yağ basıncı düşer, motor torku biraz azalır, motor sıcaklığı yükselir ve mekanik vuruntu sesi duyulabilir."/>
-        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="Orta derecede yağ pompası arızası. Yağ basıncı yetersiz, motor torku belirgin şekilde azalmış, motor sıcaklığı artmış ve mekanik vuruntu sesi net bir şekilde duyulmaktadır."/>
-        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="Ciddi yağ pompası arızası. Yağ basıncı kritik derecede düşük, motor torku önemli ölçüde azalmış, motorun aşırı ısınması muhtemel, mekanik vuruntu şiddetli ve motor stop edebilir."/>
-        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="Kritik yağ pompası arızası. Güvenli motor çalışması için yağ sirkülasyonu yetersiz ve motor çalıştırma veya daha fazla çalışma mümkün değil."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage1_description" text="Aşınmış turbo yatakları. Hafif bir ıslık sesi duyuluyor ve yüksek devirlerde hafif bir güç kaybı yaşanıyor."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage2_description" text="Turbo contalarında sızıntı. Belirgin güç kaybı, artan yakıt tüketimi."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage3_description" text="Hasarlı türbin kanatları. Ağır yük altında ciddi güç kaybı ve motorun durma riski."/>
+        <text name="ads_breakdowns_turbocharger_wear_stage4_description" text="Ciddi bir turbo arızası. Motor gücünün büyük bir kısmını kaybetmiştir ve ciddi iç hasar görme tehlikesiyle karşı karşıyadır."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage1_description" text="Yağ pompasında arıza. Yağ basıncı düşer, motor torku hafifçe azalır, motor sıcaklığı yükselir ve mekanik vuruntu hissedilebilir."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage2_description" text="Orta derecede yağ pompası arızası. Yağ basıncı yetersiz, motor torkunda belirgin bir düşüş var, motor sıcaklığı yükselmiş ve mekanik vuruntu sesi açıkça duyuluyor."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage3_description" text="Ciddi yağ pompası arızası. Yağ basıncı kritik derecede düşük, motor torku önemli ölçüde azalmış, motorun aşırı ısınması muhtemel, mekanik vuruntu şiddetli ve motorun durması söz konusu olabilir."/>
+        <text name="ads_breakdowns_oil_pump_malfunction_stage4_description" text="Ciddi yağ pompası arızası. Yağ sirkülasyonu, motorun güvenli çalışması için yetersizdir; bu nedenle motorun çalıştırılması veya çalışmaya devam etmesi mümkün değildir."/>
         <text name="ads_breakdowns_oil_pump_malfunction_stage4_message" text="Yağ basıncı arızası"/>
-        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="Valf mekanizması arızası. Motor torku biraz azalmış, yakıt tüketimi artmış ve anormal valf mekanizması sesi duyulmaktadır."/>
-        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="Orta derecede supap mekanizması arızası. Motor torku belirgin şekilde azalır, yakıt tüketimi artar, supap mekanizması sesi belirginleşir ve yük altında motorda tereddütler meydana gelebilir."/>
-        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="Ciddi supap mekanizması arızası. Motor torku önemli ölçüde azalır, yakıt tüketimi belirgin şekilde artar, supap mekanizması gürültüsü şiddetlidir, motorda sık sık tereddüt yaşanır ve motorun stop etmesi meydana gelebilir."/>
-        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="Kritik valf mekanizması arızası. Valflerin doğru çalışması artık garanti edilemiyor ve motor çalıştırma veya daha fazla işlem mümkün değil."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage1_description" text="Valf mekanizmasında arıza. Motor torkunda hafif bir azalma, yakıt tüketiminde artış ve valf mekanizmasından gelen anormal sesler mevcuttur."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage2_description" text="Valf mekanizmasında orta derecede arıza. Motor torkunda belirgin bir azalma görülür, yakıt tüketimi artar, valf mekanizmasından gelen ses belirgindir ve yük altında motorda tekleme meydana gelebilir."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage3_description" text="Ciddi valf mekanizması arızası. Motor torku büyük ölçüde azalır, yakıt tüketimi önemli ölçüde artar, valf mekanizmasından gelen gürültü çok şiddetlidir, motorda sık sık takılma görülür ve motorun durması söz konusu olabilir."/>
+        <text name="ads_breakdowns_valve_train_malfunction_stage4_description" text="Valf mekanizmasında ciddi arıza. Valflerin düzgün çalışması artık garanti edilememektedir ve motorun çalıştırılması veya çalışmaya devam etmesi mümkün değildir."/>
         <text name="ads_breakdowns_valve_train_malfunction_stage4_message" text="Valf mekanizması arızası"/>
-        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Yakıt pompasında erken aşınma. Motor gücünde hafif azalma ve yakıt tüketiminde artış."/>
-        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Yakıt basıncı düşüyor. Gözle görülür güç kaybı, daha yüksek yakıt tüketimi ve ara sıra motor stop etmeleri."/>
-        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kritik yakıt basıncı. Ciddi güç kaybı, çok yüksek yakıt tüketimi ve sık sık motor stop etmesi."/>
-        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Yakıt pompası tamamen arızalandı. Motora yakıt verilmiyor."/>
-        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Motor çalıştırılamaz"/>
-        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Bir veya daha fazla enjektörün nozulları hafifçe tıkanmıştır. Motor biraz düzensiz çalışabilir ve küçük bir güç kaybı yaşanabilir."/>
-        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Yakıtın yetersiz atomizasyonu. Motor yük altında tekliyor, bu da belirgin güç kaybına ve motorun tereddüt etmesine neden oluyor."/>
-        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Bir yakıt enjektörü takılı kalmış. Motor çok kötü çalışıyor, önemli güç kaybı ve güvenilir olmayan çalıştırma sorunları var."/>
-        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Bir enjektör tamamen arızalandı. Motor düzgün çalışmayacak ve hatta hiç çalışmayabilir."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage1_description" text="Yakıt pompasının erken aşınması. Motor gücünde hafif bir azalma ve yakıt tüketiminde artış."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage2_description" text="Yakıt basıncı düşüyor. Belirgin güç kaybı, daha yüksek yakıt tüketimi ve ara sıra motorun durması."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage3_description" text="Kritik yakıt basıncı. Ciddi güç kaybı, çok yüksek yakıt tüketimi ve sık sık motorun durması."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_description" text="Yakıt pompasında tam arıza. Motora yakıt beslenmiyor."/>
+        <text name="ads_breakdowns_fuel_pump_malfunction_stage4_message" text="Motor çalıştırılamıyor"/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage1_description" text="Bir veya daha fazla enjektörün püskürtme uçları hafifçe tıkanmış. Motor biraz düzensiz çalışabilir ve güçte hafif bir düşüş görülebilir."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage2_description" text="Yetersiz yakıt püskürtme. Motor, yük altında tekleme yapıyor; bu da belirgin bir güç kaybına ve motorun takılmalarına neden oluyor."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage3_description" text="Bir yakıt enjektörü sıkışmış durumda. Motor çok kötü çalışıyor; önemli ölçüde güç kaybı var ve çalıştırma güvenilir değil."/>
+        <text name="ads_breakdowns_fuel_injector_malfunction_stage4_description" text="Bir enjektör tamamen arızalanmıştır. Motor düzgün çalışmayacak ve hiç çalışmayabilir."/>
         <text name="ads_breakdowns_fuel_injector_malfunction_stage4_message" text="Motor çalıştırılamıyor"/>
         <text name="ads_breakdowns_brake_malfunction_stage1_description" text="Aşınmış fren balataları. Frenleme etkinliğinde hafif bir azalma."/>
-        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Fren hidroliği sızıntısı veya aşınmış diskler. Fren mesafesi belirgin şekilde uzamıştır."/>
-        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Fren basıncında ciddi kayıp. Frenler çok zayıf ve güvenilmez."/>
-        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Fren sistemi tamamen arızalandı. Devamlı kullanım son derece tehlikelidir."/>
+        <text name="ads_breakdowns_brake_malfunction_stage2_description" text="Fren hidroliği sızıntısı veya aşınmış fren diskleri. Fren mesafesi belirgin şekilde uzamıştır."/>
+        <text name="ads_breakdowns_brake_malfunction_stage3_description" text="Fren basıncında ciddi düşüş. Frenler çok zayıf ve güvenilmez."/>
+        <text name="ads_breakdowns_brake_malfunction_stage4_description" text="Fren sisteminde tam arıza. Aracı kullanmaya devam etmek son derece tehlikelidir."/>
         <text name="ads_breakdowns_brake_malfunction_stage4_message" text="Fren arızası"/>
-        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Debriyaj plakaları aşınmış. Yük altında şanzımanın kayması nedeniyle zaman zaman güç kaybı yaşanıyor."/>
-        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Debriyajda belirgin aşınma. Özellikle hızlanma sırasında şanzımanda fark edilir kayma."/>
-        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Debriyaj aşırı derecede aşınmış. Şiddetli kayma, gücün tekerleklere aktarılmasını zorlaştırıyor."/>
+        <text name="ads_breakdowns_transmission_slip_stage1_description" text="Aşınmış debriyaj diskleri. Yük altında şanzımanın kayması nedeniyle ara sıra güç kaybı yaşanmaktadır."/>
+        <text name="ads_breakdowns_transmission_slip_stage2_description" text="Debriyajda ciddi aşınma. Özellikle hızlanma sırasında şanzımanda belirgin kayma."/>
+        <text name="ads_breakdowns_transmission_slip_stage3_description" text="Debriyaj aşırı derecede aşınmış. Ciddi kayma sorunu, tekerleklere güç aktarımını zorlaştırıyor."/>
         <text name="ads_breakdowns_transmission_slip_stage4_description" text="Debriyaj tamamen yanmış. Araç hareket edemiyor."/>
         <text name="ads_breakdowns_transmission_slip_stage4_message" text="Şanzıman arızası."/>
-        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Aşınmış senkronizörler. Vites değiştirirken ara sıra gıcırtı veya zorluk."/>
-        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Senkronizörler hasar görmüş. Vites değiştirmek sık sık zorlaşır ve hatta arızaya yol açabilir."/>
-        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Senkronizör dişlerinde kırık. Yük altında vites geçişlerinde arıza veya vitesin reddedilmesi olasılığı yüksek."/>
-        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Senkronizasyon sistemi tamamen arızalandı. Vites değiştirmek mümkün değil."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage1_description" text="Aşınmış senkronizörler. Vites değiştirirken ara sıra gıcırtı sesi veya zorluk yaşanması."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage2_description" text="Hasarlı senkronizörler. Vites değiştirme genellikle zorlaşır ve bazen başarısız olabilir."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage3_description" text="Senkronizör dişlerinde kırılma. Yük altında vites değiştirme hatası veya vites takılmaması olasılığı yüksektir."/>
+        <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_description" text="Senkronizatörler tamamen arızalandı. Vites değiştirmek imkânsız."/>
         <text name="ads_breakdowns_transmission_synchronizer_malfunction_stage4_message" text="Şanzıman arızası"/>
-        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Powershift'te düşük hidrolik basınç. Vites geçişlerinde hafif gecikme ve sertlik."/>
-        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Hidrolik pompa contaları aşınmış. Vites geçişlerinde belirgin gecikme ve sarsıntılar."/>
-        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Hidrolik pompa arızalı. Vites değiştirirken ciddi gecikme ve şiddetli sarsıntılar yaşanıyor."/>
-        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Powershift hidrolik pompası arızalandı. Şanzıman nötr konumda takılı kaldı."/>
-        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="CVT zincirinde aşınma. Zincirde kayma mevcut ve şanzımanda ısı üretimi artıyor."/>
-        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="Orta derecede CVT zincir aşınması. Zincir kayması fark edilir, yakıt tüketimi artar ve şanzıman çalışma sıcaklığı yükselir."/>
-        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="CVT zincirinde ciddi aşınma. Zincir kayması belirgin, yakıt tüketimi önemli ölçüde artıyor ve şanzımanın aşırı ısınması muhtemel."/>
-        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="Kritik CVT zincir aşınması. Varyatör üzerinden tork iletimi artık güvenilir değil ve araç hareketi sağlanamıyor."/>
-        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="CVT kayması kritik"/>
-        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="CVT hidrolik kontrol valfi arızası. Hidrolik basınç aralıklı olarak düşüyor, motor torku biraz azalıyor ve maksimum vites oranı aralığı sınırlı."/>
-        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Orta derecede CVT hidrolik kontrol valfi arızası. Hidrolik basınç dengesizliği sık görülür, motor torku azalır, şanzıman sıcaklığı artar ve kullanılabilir vites aralığı daha da sınırlanır."/>
-        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Ciddi CVT hidrolik kontrol valfi arızası. Hidrolik basınç düşüşleri belirgin, motor torku önemli ölçüde azalmış, şanzımanın aşırı ısınması muhtemel ve oran aralığı sınırlaması önemli."/>
-        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Kritik CVT hidrolik kontrol valfi arızası. Basınç kontrolü artık stabil değil, oran aralığı ciddi şekilde kısıtlanmış, şanzıman aşırı ısınıyor ve güç aktarma sistemi acil durum modunda çalışıyor."/>
-        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="CVT şanzımanında arıza belirtileri tespit edildi. İnceleme ve onarım gereklidir."/>
-        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="CVT şanzıman arızası kötüleşiyor. Çalışmaya devam edilmesi acil durum moduna yol açabilir."/>
-        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Kritik CVT şanzıman hasarı. Şanzıman acil durum modunda ve azami araç hızı düşürüldü."/>
-        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="CVT şanzımanında tam arıza. Şanzıman onarılana kadar daha fazla çalışma mümkün değildir."/>
-        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="CVT şanzıman arızası"/>
-        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="CVT hidrolik kontrol arızası"/>
-        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Motor termostatı arızalanmaya başlıyor. Motorun optimum sıcaklığa ulaşması daha uzun sürüyor veya biraz fazla ısınıyor."/>
-        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Termostat tepkisi zayıf. Motor sıcaklık düzenlemesi istikrarsız, aşınmayı artırıyor."/>
-        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Termostat kapalı konumda takılı kaldı. Motor yük altında sürekli aşırı ısınacaktır."/>
-        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Termostat tamamen arızalandı. Motor soğutma sıvısı düzgün şekilde dolaşamıyor, bu da yakın ve ciddi aşırı ısınmaya yol açıyor."/>
-        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Pompada küçük bir iç sızıntı var. Hidrolik ekipmanlar biraz daha yavaş çalışıyor."/>
-        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Pompa contaları aşınmış. Hidrolik işlemler gözle görülür şekilde yavaşlamış."/>
-        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Hidrolik pompa hasar görmüş. Aletler son derece yavaş ve güçsüz çalışıyor."/>
-        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Hidrolik pompa arızası. Hidrolik sistem çalışmaz durumda."/>
-        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hidrolik arıza"/>
-        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="Hidrolik silindirde iç sızıntı. Hidrolik tahrik hızı biraz azalır ve bağlı ekipmanlar yük altında yavaşça kayabilir."/>
-        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="Hidrolik silindirde orta derecede iç sızıntı. Hidrolik tahrik hızı belirgin şekilde azalmış ve yük tutma stabilitesi bozulmuştur."/>
-        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="Hidrolik silindirde ciddi iç sızıntı. Hidrolik tahrik yavaş ve zayıf, bağlı ekipmanlar yük altında güvenilir bir şekilde konumlarını koruyamıyor."/>
-        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="Hidrolik silindirde kritik iç sızıntı. Hidrolik hareket neredeyse tamamen durdu ve yük tutma artık mümkün değil."/>
-        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="Hidrolik silindirde kritik sızıntı"/>
-        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="PTO debriyajında ​​kayma. PTO üzerinden tork iletimi azalır ve yük altında PTO devreden çıkabilir."/>
-        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="Orta derecede PTO debriyaj kayması. PTO üzerinden tork iletimi önemli ölçüde azalır ve yük altında otomatik PTO devre dışı kalması sık sık meydana gelir."/>
-        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="Ciddi PTO debriyaj kayması. Kullanılabilir PTO torku önemli ölçüde azalmıştır ve PTO tahrikli ekipmanın istikrarlı çalışması sağlanamaz."/>
-        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="Kritik PTO debriyaj arızası. PTO üzerinden tork iletimi kesildi ve PTO çalışması mümkün değil."/>
-        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="PTO arızası"/>
-        <text name="ads_breakdowns_bearing_wear_stage1_description" text="Tekerlek göbeği rulmanında aşınma. Rulman gürültüsü ve titreşimi mevcut, maksimum hız biraz sınırlı ve yuvarlanma direnci artmış."/>
-        <text name="ads_breakdowns_bearing_wear_stage2_description" text="Orta derecede tekerlek göbeği rulman aşınması. Rulman gürültüsü ve titreşimi belirgindir, maksimum hız azalır ve aktarma organı yükü artar."/>
-        <text name="ads_breakdowns_bearing_wear_stage3_description" text="Ciddi tekerlek göbeği rulman aşınması. Titreşim güçlü, maksimum hız önemli ölçüde azalmış, aktarma organı yükü artmış ve sıkışma sesi oluşabilir."/>
-        <text name="ads_breakdowns_bearing_wear_stage4_description" text="Kritik tekerlek göbeği rulman arızası. Rulman sıkışmış ve tekerlek dönüşü engellenmiştir."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage1_description" text="Powershift'te düşük hidrolik basıncı. Vites değiştirirken hafif gecikme ve sarsıntı."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage2_description" text="Hidrolik pompa contaları aşınmış. Vites değiştirme sırasında belirgin gecikme ve sarsıntılar hissediliyor."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage3_description" text="Hidrolik pompada arıza. Vites değiştirirken ciddi gecikme ve şiddetli sarsıntılar."/>
+        <text name="ads_breakdowns_powershift_hydraulic_pump_malfunction_stage4_description" text="Powershift hidrolik pompası arızalandı. Şanzıman boş viteste takılı kaldı."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage1_description" text="Otomatik Şanzıman(CVT) zincirinde aşınma. Zincirde kayma gözlenmekte ve şanzımanda ısı oluşumu artmıştır."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage2_description" text="Otomatik Şanzıman(CVT) zincirinde orta derecede aşınma. Zincirde kayma gözle görülür, yakıt tüketimi artar ve şanzımanın çalışma sıcaklığı yükselir."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage3_description" text="Otomatik Şanzıman(CVT) zincirinde ciddi aşınma. Zincir kayması belirgindir, yakıt tüketimi önemli ölçüde artmıştır ve şanzımanın aşırı ısınması muhtemeldir."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_description" text="Otomatik Şanzıman(CVT) zincirinde ciddi aşınma. Varyatör aracılığıyla tork aktarımı artık güvenilir değildir ve aracın hareket etmesi sağlanamaz."/>
+        <text name="ads_breakdowns_cvt_chain_wear_stage4_message" text="Otomatik Şanzıman(CVT) kayması kritik"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage1_description" text="Otomatik Şanzıman(CVT) kayması kritik"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage2_description" text="Otomatik Şanzıman(CVT) hidrolik kontrol valfinde orta derecede arıza. Hidrolik basınçta sık sık dalgalanmalar görülür, motor torku azalır, şanzıman sıcaklığı artar ve kullanılabilir vites aralığı daha da kısıtlanır."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage3_description" text="Otomatik Şanzıman(CVT) hidrolik kontrol valfinde ciddi arıza. Hidrolik basınç düşüşleri belirgindir, motor torku önemli ölçüde azalmıştır, şanzımanın aşırı ısınması muhtemeldir ve vites aralığı kısıtlaması belirgindir."/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_description" text="Otomatik Şanzıman(CVT) hidrolik kontrol valfinde ciddi arıza. Basınç kontrolü artık istikrarlı değil, vites oranı aralığı ciddi şekilde kısıtlanmış durumda, şanzıman aşırı ısınmakta ve güç aktarma sistemi acil durum modunda çalışıyor."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage1_description" text="Otomatik Şanzımanda(CVT) bir arızanın ilk belirtileri tespit edilmiştir. Kontrol ve onarım gereklidir."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage2_description" text="Otomatik Şanzımandaki(CVT) arıza giderek kötüleşiyor. Aracın kullanmaya devam edilmesi, acil durum moduna geçilmesine neden olabilir."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage3_description" text="Otomatik Şanzımanda(CVT) ciddi hasar. Şanzıman acil durum modundadır ve aracın azami hızı düşürülmüştür."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_description" text="Otomatik Şanzımanda(CVT) tam arıza. Şanzıman onarılana kadar aracın kullanılması mümkün değildir."/>
+        <text name="ads_breakdowns_cvt_addon_malfunction_stage4_message" text="Otomatik Şanzıman(CVT) arızası"/>
+        <text name="ads_breakdowns_hydraulic_control_valve_malfunction_stage4_message" text="Otomatik Şanzıman(CVT) hidrolik kontrol arızası"/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage1_description" text="Motor termostatı arızalanmaya başlıyor. Motorun optimum sıcaklığa ulaşması daha uzun sürüyor ya da motor biraz fazla ısınarak çalışıyor."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage2_description" text="Termostatın tepki süresi uzundur. Motor sıcaklığının düzenlenmesi dengesizdir ve bu da aşınmayı artırmaktadır."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage3_description" text="Termostat kapalı konumda sıkışmış durumda. Motor, yük altında sürekli olarak aşırı ısınacaktır."/>
+        <text name="ads_breakdowns_thermostat_malfunction_stage4_description" text="Termostatın tamamen arızalanması. Motor soğutma sıvısı düzgün bir şekilde dolaşamıyor ve bu da acil ve ciddi bir aşırı ısınmaya yol açıyor."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage1_description" text="Pompada hafif bir iç sızıntı var. Hidrolik ekipmanların çalışma hızı biraz daha yavaş."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage2_description" text="Pompa contaları aşınmış. Hidrolik işlemlerde belirgin bir yavaşlama."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage3_description" text="Hidrolik pompa arızalı. Ek ekipmanların çalışması son derece yavaş ve güçsüz."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_description" text="Hidrolik pompa arızası. Hidrolik sistem çalışmıyor."/>
+        <text name="ads_breakdowns_hydraulic_pump_malfunction_stage4_message" text="Hidrolik arızası"/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage1_description" text="Hidrolik silindirde iç sızıntı. Hidrolik çalıştırma hızı biraz azalır ve bağlı ekipmanlar yük altında yavaşça kayabilir."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage2_description" text="Hidrolik silindirde orta derecede iç sızıntı. Hidrolik çalıştırma hızında belirgin bir azalma görülür ve yük tutma kararlılığı bozulur."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage3_description" text="Hidrolik silindirde ciddi bir iç sızıntı var. Hidrolik hareket yavaş ve zayıftır; ayrıca bağlı ekipmanlar, yük altında konumlarını güvenilir bir şekilde koruyamamaktadır."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_description" text="Hidrolik silindirde ciddi bir iç sızıntı. Hidrolik hareket neredeyse tamamen kaybolmuş ve yük tutma artık mümkün değil."/>
+        <text name="ads_breakdowns_hydraulic_cylinder_internal_leak_stage4_message" text="Hidrolik silindir sızıntısı kritik"/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage1_description" text="Kuyruk Mili(PTO) kavramasında kayma. PTO üzerinden tork aktarımı azalır ve PTO, yük altında devreden çıkabilir."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage2_description" text="Kuyruk Mili(PTO) kavramasında orta derecede kayma. PTO üzerinden tork aktarımı önemli ölçüde azalmıştır ve yük altında PTO’nun otomatik olarak devreden çıkması sık sık meydana gelmektedir."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage3_description" text="Kuyruk Mili(PTO) kavramasında ciddi kayma. Kullanılabilir PTO torku önemli ölçüde azalmıştır ve PTO ile tahrik edilen ekipmanların istikrarlı çalışması garanti edilememektedir."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_description" text="Kuyruk Mili(PTO) kavramasında ciddi arıza. PTO üzerinden tork aktarımı kesilmiş ve PTO'nun çalıştırılması mümkün değildir."/>
+        <text name="ads_breakdowns_pto_clutch_slip_stage4_message" text="Kuyruk Mili(PTO) arızası"/>
+        <text name="ads_breakdowns_bearing_wear_stage1_description" text="Tekerlek göbeği yatağında aşınma. Yatağından gelen ses ve titreşim hissediliyor, azami hız hafifçe kısıtlanıyor ve yuvarlanma direnci artıyor."/>
+        <text name="ads_breakdowns_bearing_wear_stage2_description" text="Tekerlek göbeği yataklarında orta derecede aşınma. Yatak gürültüsü ve titreşimi belirgindir, azami hız düşer ve aktarma organlarına binen yük artar."/>
+        <text name="ads_breakdowns_bearing_wear_stage3_description" text="Tekerlek göbeği yataklarında ciddi aşınma. Titreşim şiddetlidir, azami hız önemli ölçüde azalır, aktarma organlarına binen yük artar ve sıkışma sesi duyulabilir."/>
+        <text name="ads_breakdowns_bearing_wear_stage4_description" text="Tekerlek göbeği yatağında ciddi arıza. Yatak sıkışmış ve tekerleğin dönmesi engellenmiştir."/>
         <text name="ads_breakdowns_bearing_wear_stage4_message" text="Tekerlek yatağı sıkışmış"/>
-        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="Direksiyon bağlantılarında aşınma. Hafif bir direksiyon çekmesi mevcut ve direksiyon tepkisi azalmış."/>
-        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="Direksiyon bağlantılarında orta derecede aşınma. Direksiyon çekmesi fark ediliyor ve direksiyon tepkisi önemli ölçüde azalmış."/>
-        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="Ciddi direksiyon bağlantı aşınması. Yön stabilitesi bozulmuş, direksiyon çekmesi belirginleşmiş ve direksiyon tepkisi büyük ölçüde azalmıştır."/>
-        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="Kritik direksiyon bağlantı arızası. Direksiyon tepkisi neredeyse tamamen kayboldu ve güvenli yön kontrolü sağlanamıyor."/>
-        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="Direksiyon bağlantı arızası"/>
-        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="Ray gerdirme mekanizmasında arıza. Yönsel çekme, titreşim, sürtünme sesi ve maksimum hızda hafif bir azalma mevcut."/>
-        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="Orta derecede palet gerdirme arızası. Yönsel dengesizlik ve titreşim fark edilir, çekiş direnci artar, motorda tereddüt meydana gelebilir ve maksimum hız azalır."/>
-        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="Ciddi palet gerdirme arızası. Yönsel dengesizlik belirgin, titreşim ve sürtünme gürültüsü şiddetli, aktarma organı yükü artıyor ve maksimum hız önemli ölçüde azalıyor."/>
-        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="Kritik palet gerdirme arızası. Palet hareketi artık stabil değil ve yürüyüş takımı sıkışmış durumda."/>
-        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="Ray gerdirme mekanizması arızası"/>
-        <text name="ads_breakdowns_coolant_leak_stage1_description" text="Soğutma sıvısı sızıntısı. Soğutma sistemi verimliliği biraz azaldı."/>
-        <text name="ads_breakdowns_coolant_leak_stage2_description" text="Orta derecede soğutma sıvısı kaçağı. Soğutma sistemi verimliliği azalır ve motor çalışma sıcaklığı yük altında daha hızlı yükselir."/>
-        <text name="ads_breakdowns_coolant_leak_stage3_description" text="Ciddi soğutma sıvısı kaçağı. Soğutma sistemi verimliliği önemli ölçüde azalmıştır ve yük altında aşırı ısınma olasılığı yüksektir."/>
-        <text name="ads_breakdowns_coolant_leak_stage4_description" text="Kritik soğutma sıvısı kaçağı. Soğutma sistemi verimliliği kritik derecede azalmıştır ve güvenli motor sıcaklığı korunamamaktadır."/>
-        <text name="ads_breakdowns_coolant_leak_stage4_message" text="Soğutma sıvısı kaçağı kritik"/>
-        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="Fan debriyajı arızası. Soğutma fanının verimliliği biraz azalmış ve fan debriyajından anormal ses geliyor."/>
-        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="Orta derecede fan debriyajı arızası. Soğutma fanının verimliliği azalmış ve fan debriyajından gelen ses açıkça duyulmaktadır."/>
-        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="Ciddi fan debriyajı arızası. Soğutma fanının verimliliği önemli ölçüde azalmış ve fan debriyajından gelen gürültü şiddetlidir."/>
-        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="Kritik fan debriyaj arızası. Soğutma fanının verimliliği kritik derecede azalmıştır ve soğutma sisteminden yeterli hava akışı sağlanamamaktadır."/>
-        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="Fan debriyaj arızası"/>
-        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="Yakıt filtresi tıkanmış. Yakıt akışı kısıtlanmış, bu da yük altında motorda hafif bir tereddüte ve motor torkunda küçük bir azalmaya neden oluyor."/>
-        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="Yakıt filtresinde orta derecede tıkanma. Yakıt akışında belirgin bir kısıtlama var, yük altında motorda sık sık tereddüt yaşanıyor, motor torku azalıyor ve motorun stop etmesi meydana gelebiliyor."/>
-        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="Yakıt filtresinde ciddi tıkanma. Yakıt akışı kritik derecede kısıtlanmış, motorda belirgin bir tereddüt var, motor torku büyük ölçüde azalmış ve motorun stop etmesi muhtemel."/>
-        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="Yakıt filtresinde kritik tıkanma. Filtreden geçen yakıt akışı motorun çalışması için yetersiz ve motor çalıştırılamıyor."/>
-        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="Yakıt filtresi tıkalı"/>
-        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="Yakıt hattında hava kaçağı. Yakıt beslemesi istikrarsızlaşıyor ve motorun çalıştırılması zorlaşıyor."/>
-        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="Yakıt hattında orta derecede hava kaçağı var. Yakıt beslemesi istikrarsız, motor tekliyor, motor çalıştırmak zor ve motor stop edebilir."/>
-        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="Yakıt hattında ciddi hava kaçağı. Yakıt beslemesi kesintiye uğramış, motorda belirgin bir tereddüt var, çalıştırma son derece güvenilmez ve motorun stop etmesi muhtemel."/>
-        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="Yakıt hattında kritik hava kaçağı. Yakıt beslemesi sağlanamıyor ve motor çalıştırılamaz veya daha fazla işlem yapılamaz."/>
-        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="Yakıt hattında hava var"/>
-        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Aşınmış izolasyon, ara sıra voltaj düşüşleri. Küçük elektriksel arızalar gözlemlenebilir."/>
-        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Korozyona uğramış kontaklar ve kararsız alternatör çıkışı. Işıklar yanmayabilir, motor çalıştırma güvenilir olmayabilir."/>
-        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Kısa devre riski. Kritik sistemler güvenilmez hale gelir ve lambalar tamamen sönebilir."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage1_description" text="Direksiyon bağlantı sisteminde aşınma. Direksiyonda hafif bir çekme hissediliyor ve direksiyon tepkisi azalmış durumda."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage2_description" text="Direksiyon bağlantı sisteminde orta derecede aşınma. Direksiyonda çekme hissediliyor ve direksiyon tepkisi önemli ölçüde azalmış durumda."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage3_description" text="Direksiyon bağlantı sisteminde ciddi aşınma. Yön dengesi bozulmuş, direksiyonda belirgin bir çekme hissediliyor ve direksiyon tepkisi önemli ölçüde azalmış."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_description" text="Direksiyon bağlantı sisteminde ciddi arıza. Direksiyon tepkisi neredeyse tamamen kaybolmuş durumda ve güvenli yön kontrolü sağlanamıyor."/>
+        <text name="ads_breakdowns_steering_linkage_wear_stage4_message" text="Direksiyon bağlantı sisteminde arıza"/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage1_description" text="Zincir gergisinin arızası. Yönlü çekme, titreşim, sürtünme sesi ve maksimum hızda hafif bir düşüş gözlemlenmektedir."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage2_description" text="Orta derecede lastik gergisi arızası. Yön dengesizliği ve titreşim hissedilir, çekiş direnci artar, motorda takılma meydana gelebilir ve azami hız düşer."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage3_description" text="Palet gergisinde ciddi arıza. Yön dengesizliği belirgindir; titreşim ve sürtünme gürültüsü şiddetlidir; aktarma organlarına binen yük artmıştır ve azami hız önemli ölçüde düşmüştür."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_description" text="Kritik palet gergisi arızası. Paletin hareketi artık istikrarlı değil ve yürüyüş mekanizmasında sıkışma meydana gelmiştir."/>
+        <text name="ads_breakdowns_track_tensioner_malfunction_stage4_message" text="Pist gergi mekanizmasında arıza"/>
+        <text name="ads_breakdowns_coolant_leak_stage1_description" text="Soğutma sıvısı sızıntısı. Soğutma sisteminin verimliliği biraz azalmıştır."/>
+        <text name="ads_breakdowns_coolant_leak_stage2_description" text="Orta derecede soğutma sıvısı sızıntısı. Soğutma sisteminin verimliliği düşer ve yük altında motorun çalışma sıcaklığı daha hızlı yükselir."/>
+        <text name="ads_breakdowns_coolant_leak_stage3_description" text="Ciddi soğutma sıvısı sızıntısı. Soğutma sisteminin verimliliği önemli ölçüde azalmıştır ve yük altında aşırı ısınma olasılığı yüksektir."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_description" text="Ciddi soğutma sıvısı sızıntısı. Soğutma sisteminin verimliliği ciddi şekilde azalmıştır ve motorun güvenli sıcaklığı korunamamaktadır."/>
+        <text name="ads_breakdowns_coolant_leak_stage4_message" text="Soğutma sıvısı sızıntısı – kritik durum"/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage1_description" text="Fan kavramasında arıza. Soğutma fanının verimliliği biraz azalmıştır ve fan kavramasından anormal bir ses gelmektedir."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage2_description" text="Orta derecede fan kavraması arızası. Soğutma fanının verimliliği düşmüştür ve fan kavramasından gelen ses açıkça duyulmaktadır."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage3_description" text="Fan kavramasında ciddi bir arıza. Soğutma fanının verimliliği önemli ölçüde azalmış ve fan kavramasından gelen gürültü oldukça şiddetlidir."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_description" text="Fan kavramasında ciddi arıza. Soğutma fanının verimliliği ciddi ölçüde azalmıştır ve soğutma sisteminden yeterli hava akışı sağlanamamaktadır."/>
+        <text name="ads_breakdowns_fun_clutch_failure_stage4_message" text="Fan kavraması arızası"/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage1_description" text="Yakıt filtresinin tıkanması. Yakıt akışı kısıtlandığından, yük altında motorda hafif bir duraksama ve motor torkunda küçük bir azalma meydana gelir."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage2_description" text="Yakıt filtresinde orta derecede tıkanma. Yakıt akışında belirgin bir kısıtlama hissedilir, yük altında motorda sık sık duraksama görülür, motor torku azalır ve motorun stop etmesi söz konusu olabilir."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage3_description" text="Yakıt filtresinde ciddi tıkanma. Yakıt akışı ciddi şekilde kısıtlanmıştır; motorda belirgin bir tekleme hissedilir, motor torku önemli ölçüde azalmıştır ve motorun stop etme olasılığı yüksektir."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_description" text="Yakıt filtresinde ciddi tıkanma. Filtreden geçen yakıt akışı motorun çalışması için yetersizdir ve motor çalıştırılamamaktadır."/>
+        <text name="ads_breakdowns_fuel_filter_clogging_stage4_message" text="Yakıt filtresi tıkanmış"/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage1_description" text="Yakıt hattında hava sızıntısı. Yakıt beslemesi dengesizleşir ve motorun çalıştırılması zorlaşır."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage2_description" text="Yakıt hattında orta derecede hava kaçağı var. Yakıt beslemesi dengesiz, motorda tekleme var, motoru çalıştırmak zor ve motorun stop etmesi söz konusu olabilir."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage3_description" text="Yakıt hattında ciddi bir hava kaçağı var. Yakıt beslemesinin sürekliliği bozulmuş durumda; motorda belirgin bir tekleme var, çalıştırma işlemi son derece güvenilmez ve motorun stop etme olasılığı yüksek."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_description" text="Yakıt hattında ciddi bir hava sızıntısı var. Yakıt beslemesi sağlanamıyor ve motorun çalıştırılması veya çalışmaya devam etmesi mümkün değil."/>
+        <text name="ads_breakdowns_fuel_line_air_leak_stage4_message" text="Yakıt hattında hava"/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage1_description" text="Yıpranmış yalıtım, ara sıra voltaj düşüşleri. Küçük elektriksel arızalar gözlemlenebilir."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage2_description" text="Aşınmış kontaklar ve dengesiz alternatör çıkışı. Farlar yanmayabilir, motorun çalışması güvenilir olmayabilir."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage3_description" text="Kısa devre riski. Kritik sistemler güvenilir değildir ve ışıklar tamamen sönebilir."/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage3_message" text="Işık arızası"/>
         <text name="ads_breakdowns_electrical_system_malfunction_stage4_description" text="Ana kablo demeti arızalandı. Aracın elektrik sistemi çalışmıyor."/>
-        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Marş motoru yanıt vermiyor"/>
-        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Karbüratörde hafif kirlenme. Motor ağır yük altında zaman zaman tereddüt ediyor."/>
-        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Tıkalı jetler. Motor sık ​​sık tekliyor ve özellikle gaz hızlıca verildiğinde güç kaybediyor."/>
-        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Ciddi karbüratör tıkanıklığı. Motor çok düzensiz çalışıyor, sık sık stop ediyor ve gücü korumakta zorlanıyor."/>
-        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Tamamen tıkanmış bir karbüratör nedeniyle yakıt yetersizliği. Motor çalışmayacak."/>
+        <text name="ads_breakdowns_electrical_system_malfunction_stage4_message" text="Marş motoru çalışmıyor"/>
+        <text name="ads_breakdowns_carburetor_clogging_stage1_description" text="Karbüratörde hafif bir kirlenme var. Motor, ağır yük altında ara sıra tekliyor."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage2_description" text="Tıkanmış püskürtme uçları. Motor, özellikle gaz kolu hızlı bir şekilde açıldığında sık sık tekliyor ve güç kaybediyor."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage3_description" text="Karbüratörde ciddi tıkanma. Motor çok düzensiz çalışıyor, sık sık stop ediyor ve güç seviyesini korumakta zorlanıyor."/>
+        <text name="ads_breakdowns_carburetor_clogging_stage4_description" text="Karbüratörün tamamen tıkanması nedeniyle yakıt beslemesi kesilmiştir. Motor çalışmaz."/>
         <text name="ads_breakdowns_carburetor_clogging_stage4_message" text="Karbüratör tıkalı"/>
-        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="Hasat ve işleme sisteminde aşınma. Mahsul işleme verimliliği biraz azalır ve bu da küçük verim kayıplarına neden olur."/>
-        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="Hasat ve işleme sisteminde orta derecede aşınma. Mahsul işleme verimliliği gözle görülür şekilde azalır ve ölçülebilir verim kaybına neden olur."/>
-        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="Hasat ve işleme sisteminde ciddi aşınma. Mahsul işleme verimliliği önemli ölçüde azalır ve bu da yüksek verim kaybına yol açar."/>
-        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="Hasat ve işleme sisteminde kritik aşınma. Mahsul işleme verimliliği kritik derecede azalır ve çalışma sırasında aşırı verim kaybına neden olur."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage1_description" text="Hasat ve işleme sisteminde aşınma. Mahsul işleme verimliliği hafifçe düşer ve bu da küçük çaplı bir verim kaybına yol açar."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage2_description" text="Hasat ve işleme sisteminde orta derecede aşınma. Mahsul işleme verimliliği gözle görülür şekilde azalır ve bu da ölçülebilir bir verim kaybına yol açar."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage3_description" text="Hasat ve işleme sisteminde ciddi aşınma. Mahsul işleme verimliliği önemli ölçüde düşer ve bu da yüksek verim kaybına yol açar."/>
+        <text name="ads_breakdowns_harvest_processing_system_wear_stage4_description" text="Hasat ve işleme sisteminde ciddi aşınma. Mahsul işleme verimliliği önemli ölçüde azalır ve bu da çalışma sırasında aşırı verim kaybına yol açar."/>
         <text name="ads_breakdowns_harvest_processing_system_wear_stage4_message" text="Hasat işleme verimliliği önemli ölçüde azaldı"/>
-        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="İç helezonlarda ve elevatör zincirlerinde hafif aşınma. İç taşıma sırasında az miktarda ürün kaybı yaşanmaktadır."/>
-        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Aşınmış burgu kanatları ve kayan konveyör bantları, makine içinde artan dökülmeye neden oluyor. Ara sıra gıcırtı sesleri duyabilirsiniz."/>
-        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Hasar görmüş elevatör kanatları ve helezonlar, ürün kütlesini hareket ettirmekte zorlanıyor, bu da önemli kayıplara ve büyük bir tıkanma riskine yol açıyor."/>
-        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Malzeme akış sistemindeki önemli bir bileşen arızalandı ve ciddi bir tıkanmaya neden oldu. Motor aşırı zorlanma altında."/>
-        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Malzeme Akışı Tıkanıklığı"/>
-        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Gerilmiş tahrik kayışı. Ara sıra meydana gelen kaymalar, boşaltma hızında hafif bir düşüşe neden olur."/>
-        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Tahrik kayışı ve kasnaklar aşınmış. Yük altında belirgin kayma, boşaltma hızını gözle görülür şekilde düşürüyor."/>
-        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Hasarlı şanzıman veya aşırı aşınmış kayış. Helezon dönmekte zorlanıyor ve çok düşük hızda çalışıyor."/>
-        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Tahrik kayışı koptu veya şanzıman sıkıştı. Boşaltma burgusu tamamen sıkıştı."/>
-        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Boşaltma Helezonu Sıkıştı"/>
-        <text name="ads_breakdowns_dead_battery_message" text="Akü şarjı tükendi"/>
-        <text name="ads_breakdowns_voltage_sag_message" text="Yetersiz sistem voltajı"/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage1_description" text="İç vidalarda ve elevatör zincirlerinde hafif aşınma görülmektedir. İç nakliye sırasında az miktarda mahsul kaybı yaşanmaktadır."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage2_description" text="Aşınmış burgu kanatları ve kayan konveyör bantları, makine içinde dökülmelerin artmasına neden olmaktadır. Ara sıra gıcırtı sesleri duyabilirsiniz."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage3_description" text="Hasar görmüş elevatör kanatları ve helezonlar, mahsul kütlesini taşımakta zorlanıyor; bu durum, önemli kayıplara ve ciddi bir tıkanma riskine yol açıyor."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_description" text="Malzeme akış sistemindeki önemli bir bileşen arızalandı ve bu da ciddi bir tıkanmaya neden oldu. Motor aşırı yük altında."/>
+        <text name="ads_breakdowns_material_flow_system_wear_stage4_message" text="Malzeme Akışında Tıkanma"/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage1_description" text="Gerilmiş tahrik kayışı. Ara sıra meydana gelen kayma, boşaltma hızında hafif bir düşüşe neden olur."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage2_description" text="Aşınmış tahrik kayışı ve kasnaklar. Yük altında meydana gelen belirgin kayma, boşaltma hızını gözle görülür şekilde düşürür."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage3_description" text="Hasarlı vites kutusu veya aşırı aşınmış kayış. Burgu dönmekte zorlanıyor ve çok düşük bir hızda çalışıyor."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_description" text="Tahrik kayışı kopmuş veya şanzıman sıkışmış. Boşaltma helezonu tamamen sıkışmış."/>
+        <text name="ads_breakdowns_unloading_auger_malfunction_stage4_message" text="Boşaltma Burgusu Sıkışmış"/>
+        <text name="ads_breakdowns_dead_battery_message" text="Pil şarjı bitti"/>
+        <text name="ads_breakdowns_voltage_sag_message" text="Sistem gerilimi yetersiz"/>
         <text name="ads_breakdowns_engine_stalled_message" text="Motor durdu"/>
-        <text name="ads_breakdowns_pto_auto_disengage_message" text="PTO otomatik olarak devre dışı bırakıldı"/>
-        <text name="ads_breakdowns_gear_disengage_message" text="Vites devre dışı"/>
+        <text name="ads_breakdowns_pto_auto_disengage_message" text="Kuyruk mili(PTO) otomatik olarak devre dışı bırakıldı"/>
+        <text name="ads_breakdowns_gear_disengage_message" text="Vites ayrılması"/>
         <text name="ads_breakdown_at_progress_message" text="devam ediyor"/>
 
-        <text name="ads_spec_cold_engine_message" text="Motor soğuk! Yüksek devirler aşınmaya neden olur!"/>
-        <text name="ads_spec_overheat_engine_message" text="Uyarı! Motor aşırı ısınıyor."/>
+        <text name="ads_spec_cold_engine_message" text="Motor soğuk! Yüksek devir aşınmaya neden olur!"/>
+        <text name="ads_spec_overheat_engine_message" text="Uyarı! Motor aşırı ısınmış."/>
         <text name="ads_spec_overheat_transmission_message" text="Uyarı! Şanzıman aşırı ısınıyor."/>
         <text name="ads_spec_this_month" text="Bu ay"/>
-        <text name="ads_spec_months_ago" text="ay önce"/>
-        <text name="ads_spec_never" text="Asla"/>
+        <text name="ads_spec_months_ago" text="aylar önce"/>
+        <text name="ads_spec_never" text="Yapılmadı"/>
         <text name="ads_spec_op_hours_short" text="o/h"/>
         <text name="ads_spec_tomorrow_at" text="yarın saat "/>
         <text name="ads_spec_day_after_tommorow_at" text="yarından sonraki gün saat "/>
-        <text name="ads_spec_in_days_at" text="{days} gün sonra saat "/>
+        <text name="ads_spec_in_days_at" text="{days} gün sonra "/>
         <text name="ads_spec_day_s" text="gün(ler)"/>
         <text name="ads_spec_hour_s" text="saat(ler)"/>
         <text name="ads_spec_minute_s" text="dakika(lar)"/>
@@ -384,41 +384,41 @@
         <text name="ads_spec_duration_format_combined" text="%s ve %s"/>
         <text name="ads_spec_months_ago_unit" text="ay önce"/>
         <text name="ads_spec_months_ago_format" text="%s %s"/>
-        <text name="ads_spec_last_maintenance_until_format" text="%s, %s tarihine kadar"/>
-        <text name="ads_spec_service_interval_format" text="%so/h"/>
+        <text name="ads_spec_last_maintenance_until_format" text="%s'ye kadar %s"/>
+        <text name="ads_spec_service_interval_format" text="%s o/h"/>
         <text name="ads_spec_maintenance_complete_notification" text="tamamlandı"/>
         <text name="ads_spec_maintenance_cancelled_notification" text="iptal edildi"/>
         <text name="ads_spec_inspection_issues_detected_notification" text="%s sorun tespit edildi"/>
-        <text name="ads_spec_inspection_no_issues_detected_notification" text="Hiçbir sorun tespit edilmedi"/>
-        <text name="ads_spec_next_planned_service_notification" text="Planlanan işlem başlatıldı: %s"/>
-        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="Yetersiz bakiye nedeniyle planlanan %s iptal edildi"/>
+        <text name="ads_spec_inspection_no_issues_detected_notification" text="Herhangi bir sorun tespit edilmedi"/>
+        <text name="ads_spec_next_planned_service_notification" text="Planlı işlem başlatıldı: %s"/>
+        <text name="ads_spec_next_planned_service_not_enouth_money_notification" text="%s, yetersiz bakiye nedeniyle iptal edildi"/>
         <text name="ads_spec_workshop_dealer" text="Bayi"/>
-        <text name="ads_spec_workshop_own" text="Sahip Olunan"/>
+        <text name="ads_spec_workshop_own" text="Sahip olunan"/>
         <text name="ads_spec_workshop_mobile" text="Mobil"/>
         <text name="ads_spec_system_engine" text="Motor"/>
         <text name="ads_spec_system_transmission" text="Şanzıman"/>
-        <text name="ads_spec_system_hydraulics" text="Hidrolik / PTO"/>
+        <text name="ads_spec_system_hydraulics" text="Hidrolik / Güç Çıkışı (Kuyruk mili)"/>
         <text name="ads_spec_system_cooling" text="Soğutma Sistemi"/>
         <text name="ads_spec_system_electrical" text="Elektrik Sistemi"/>
         <text name="ads_spec_system_chassis" text="Şasi"/>
-        <text name="ads_spec_system_workprocess" text="İş Sistemleri"/>
+        <text name="ads_spec_system_workprocess" text="Çalışma Sistemleri"/>
         <text name="ads_spec_system_fuel" text="Yakıt Sistemi"/>
         <text name="ads_spec_state_ready" text="Hazır"/>
-        <text name="ads_spec_state_inspection" text="Denetim"/>
+        <text name="ads_spec_state_inspection" text="Muayene"/>
         <text name="ads_spec_state_maintenance" text="Bakım"/>
         <text name="ads_spec_state_repair" text="Onarım"/>
-        <text name="ads_spec_state_overhaul" text="Revizyon"/>
-        <text name="ads_spec_state_broken" text="Arızalı"/>
+        <text name="ads_spec_state_overhaul" text="Genel bakım"/>
+        <text name="ads_spec_state_broken" text="Kırık"/>
         <text name="ads_spec_state_excellent" text="Mükemmel"/>
         <text name="ads_spec_state_good" text="İyi"/>
         <text name="ads_spec_state_normal" text="Normal"/>
         <text name="ads_spec_state_bad" text="Kötü"/>
-        <text name="ads_spec_state_terrible" text="Çok kötü"/>
+        <text name="ads_spec_state_terrible" text="Korkunç"/>
         <text name="ads_spec_state_unknown" text="Bilinmiyor"/>
         <text name="ads_spec_state_optimal" text="Optimal"/>
         <text name="ads_spec_state_recommended" text="Önerilen"/>
-        <text name="ads_spec_state_required" text="Gerekli"/>
-        <text name="ads_spec_state_overdue" text="Gecikmiş"/>
+        <text name="ads_spec_state_required" text="Zorunlu"/>
+        <text name="ads_spec_state_overdue" text="Vadesi geçmiş"/>
         <text name="ads_spec_state_legendary" text="Efsanevi"/>
         <text name="ads_spec_state_premium" text="Premium"/>
         <text name="ads_spec_state_standart" text="Standart"/>
@@ -426,63 +426,63 @@
         <text name="ads_spec_state_low" text="Düşük"/>
         <text name="ads_spec_state_average" text="Ortalama"/>
         <text name="ads_spec_state_high" text="Yüksek"/>
-        <text name="ads_spec_state_workhorse" text="İş makinesi"/>
-        <text name="ads_spec_part_types_used" text="Kullanılan"/>
-        <text name="ads_spec_part_types_aftermarket" text="Satış Sonrası"/>
-        <text name="ads_spec_part_types_oem" text="OEM"/>
+        <text name="ads_spec_state_workhorse" text="İşgücü"/>
+        <text name="ads_spec_part_types_used" text="Kullanılmış"/>
+        <text name="ads_spec_part_types_aftermarket" text="Yedek parça pazarı"/>
+        <text name="ads_spec_part_types_oem" text="OEÜ"/>
         <text name="ads_spec_part_types_premium" text="Premium"/>
         <text name="ads_spec_inspection_visual" text="Görsel"/>
         <text name="ads_spec_inspection_standard" text="Standart"/>
-        <text name="ads_spec_inspection_complete" text="Tam Kusur Analizi"/>
-        <text name="ads_spec_maintenance_minimal" text="Asgari"/>
+        <text name="ads_spec_inspection_complete" text="Kapsamlı Arıza Tespiti"/>
+        <text name="ads_spec_maintenance_minimal" text="Minimal"/>
         <text name="ads_spec_maintenance_standard" text="Standart"/>
         <text name="ads_spec_maintenance_extended" text="Genişletilmiş"/>
         <text name="ads_spec_maintenance_preventive" text="Önleyici"/>
         <text name="ads_spec_overhaul_partial" text="Kısmi"/>
         <text name="ads_spec_overhaul_standard" text="Standart"/>
-        <text name="ads_spec_overhaul_full" text="Tam"/>
+        <text name="ads_spec_overhaul_full" text="Full"/>
         <text name="ads_spec_repair_type_fix" text="Hızlı çözüm"/>
         <text name="ads_spec_repair_type_replacement" text="Standart"/>
-        <text name="ads_spec_repair_type_advanced" text="Gelişmiş"/>
+        <text name="ads_spec_repair_type_advanced" text="İleri Düzey"/>
 
-        <text name="ads_option_menu_option_one_title_inspection" text="Muayene türünü seçin"/>
+        <text name="ads_option_menu_option_one_title_inspection" text="Denetim türünü seçin"/>
         <text name="ads_option_menu_option_two_title_inspection" text="Tespit edilen arızaları onarın"/>
         <text name="ads_option_menu_option_one_title_maintenance" text="Bakım seviyesini seçin"/>
         <text name="ads_option_menu_option_two_title_maintenance" text="Sarf malzemelerinin kalitesini seçin"/>
         <text name="ads_option_menu_option_one_title_repair" text="Onarım türünü seçin"/>
         <text name="ads_option_menu_option_two_title_repair" text="Yedek parça kalitesini seçin"/>
-        <text name="ads_option_menu_option_one_title_overhaul" text="Çalışma kapsamını seçin"/>
-        <text name="ads_option_menu_option_two_title_overhaul" text="Sistem seçin"/>
+        <text name="ads_option_menu_option_one_title_overhaul" text="İş kapsamını seçin"/>
+        <text name="ads_option_menu_option_two_title_overhaul" text="Sistemi seçin"/>
         <text name="ads_option_menu_price_text" text="Fiyat: "/>
-        <text name="ads_option_menu_warranty_repair_text" text="Garanti kapsamındaki onarım"/>
+        <text name="ads_option_menu_warranty_repair_text" text="Garanti kapsamında onarım"/>
         <text name="ads_option_menu_duration_text" text="Süre: "/>
         <text name="ads_option_menu_finish_time_text" text="Bitiş Saati: "/>
-        <text name="ads_option_menu_start_text" text="Başlat"/>
-        <text name="ads_option_menu_duration_instant" text="Anlık"/>
-        <text name="ads_option_menu_inspection_visual_description" text="* Hızlı dış muayene. Düşük maliyet ve anında sonuç. Görünür hataları tespit eder, bazı kusurları gözden kaçırma olasılığı çok düşüktür. Teknik durum verisi sağlamaz."/>
-        <text name="ads_option_menu_inspection_standard_description" text="* Rutin teşhis prosedürü. Tüm aktif arızaları belirler ve aracın genel durumu hakkında bir rapor oluşturur."/>
-        <text name="ads_option_menu_inspection_complete_description" text="* Derinlemesine teşhis. Potansiyel arızalar da dahil olmak üzere tüm arızaların tespitini garanti eder ve tüm bileşenler için kesin sağlık yüzdelerini içeren kapsamlı bir rapor sunar."/>
-        <text name="ads_option_menu_maintenance_minimal_description" text="* Temel servis. Önemli ölçüde daha ucuz ve daha hızlıdır, ancak Servis Seviyesini tamamen geri yüklemez ve bir sonraki bakıma kadar daha kısa bir servis aralığı sağlar."/>
-        <text name="ads_option_menu_maintenance_standard_description" text="* Üretici spesifikasyonlarına göre rutin bakım. Servis seviyesini normale döndürür ve bir sonraki bakıma kadar standart servis aralığını sağlar."/>
-        <text name="ads_option_menu_maintenance_extended_description" text="* Kapsamlı servis. Daha uzun sürer ve daha pahalıdır, ancak Servis Seviyesini standart seviyenin ötesine taşır ve bir sonraki bakıma kadar daha uzun bir servis aralığı sağlar."/>   
-        <text name="ads_option_menu_maintenance_preventive_description" text="* Standart üretici servisinin ötesinde önleyici bakım. Servis seviyesini normale döndürür ve arıza riskini azaltmak için en sorunlu sistemlere müdahale eder."/>
-        <text name="ads_option_menu_repair_type_fix_description" text="* Acil işler için makinenin çalışır durumda kalmasını sağlamak amacıyla yapılan geçici onarım. Temel işlevselliği hızlı ve ucuz bir şekilde geri kazandırır, ancak arıza giderilmez ve bir süre sonra tekrar ortaya çıkar."/>
-        <text name="ads_option_menu_repair_type_replacement_description" text="* Arızalı parçanın standart değişimi. Mevcut arızayı tamamen giderir ve etkilenen üniteyi normal çalışma durumuna geri getirir."/>
-        <text name="ads_option_menu_repair_type_advanced_description" text="* Arızalı parçanın değiştirilmesi ve sistem içindeki ilgili parçaların bakımı da dahil olmak üzere kapsamlı onarım. Etkilenen sistemde tekrarlanan arıza riskini önemli ölçüde azaltır."/>
-        <text name="ads_option_menu_overhaul_partial_description" text="* Seçilen sistemi iyi bir çalışma durumuna getirir. Tam araç revizyonundan daha hızlı ve daha ucuzdur."/>
-        <text name="ads_option_menu_overhaul_standard_description" text="* Tüm ana bileşenler üzerinde kapsamlı çalışma. Durumu iyi seviyeye getirir."/>
-        <text name="ads_option_menu_overhaul_full_description" text="* Komple yeniden üretim. Yüksek maliyetli ve uzun süreli, ancak durumu mükemmel seviyeye getiriyor."/>
-        <text name="ads_option_menu_part_used_description" text="* Hurda parçalar. Çok ucuz, ancak son derece riskli (~%50 kusur olasılığı)"/>
-        <text name="ads_option_menu_part_aftermarket_description" text="* Uygun fiyatlı yedek parçalar. Daha düşük maliyet, ancak orta düzeyde kusur riski (%33) taşır."/>
-        <text name="ads_option_menu_part_oem_description" text="* Orijinal Ekipman Üreticisi parçaları. Tam fiyat üzerinden standart güvenilirlik (%10 arıza riski)."/>
-        <text name="ads_option_menu_part_premium_description" text="* Güçlendirilmiş performans parçaları. Pahalı, ancak sıkı kalite kontrolünden geçirilmiş (%0 kusur riski)."/>
-        <text name="ads_option_menu_perform_repair" text="Bulunan tüm arızaları onarın"/>
-        <text name="ads_option_menu_perform_maintenance" text="Onarımdan sonra bakım yap"/>
-        <text name="ads_option_menu_perform_renew_paint" text="Boya yenileme"/>
-        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Herhangi bir arıza tespit edilirse, OEM parçalarıyla standart onarıma otomatik olarak başlanır."/>
-        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Onarımdan sonra OEM sarf malzemeleriyle standart bakımı otomatik olarak başlatın."/>
-        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Bakım sırasında aracı yeniden boyayın."/>
-        <text name="ads_option_menu_choosen_parts_text" text="* Tamir için seçilenler:"/>
+        <text name="ads_option_menu_start_text" text="Başla"/>
+        <text name="ads_option_menu_duration_instant" text="Anında"/>
+        <text name="ads_option_menu_inspection_visual_description" text="* Hızlı dış muayene. Düşük maliyetli ve anında sonuç verir. Gözle görülür kusurları tespit eder; ancak bazı kusurların gözden kaçma olasılığı az da olsa vardır. Teknik durum bilgisi sağlamaz."/>
+        <text name="ads_option_menu_inspection_standard_description" text="* Rutin teşhis prosedürü. Tüm aktif arızaları tespit eder ve aracın durumu hakkında genel bir rapor oluşturur."/>
+        <text name="ads_option_menu_inspection_complete_description" text="* Kapsamlı arıza teşhisi. Olası arızalar da dahil olmak üzere tüm arızaların tespit edilmesini garanti eder ve tüm bileşenlerin durumuna ilişkin kesin yüzdeleri içeren kapsamlı bir rapor sunar."/>
+        <text name="ads_option_menu_maintenance_minimal_description" text="* Temel servis. Önemli ölçüde daha ucuz ve daha hızlıdır, ancak Hizmet Seviyesini tam olarak geri getirmez ve bir sonraki bakım işlemine kadar daha kısa bir servis aralığı sağlar."/>
+        <text name="ads_option_menu_maintenance_standard_description" text="* Üretici teknik özelliklerine uygun rutin bakım. Hizmet seviyesini normale döndürür ve bir sonraki bakıma kadar standart servis aralığını sağlar."/>
+        <text name="ads_option_menu_maintenance_extended_description" text="* Kapsamlı servis. Daha uzun sürer ve maliyeti daha yüksektir, ancak hizmet seviyesini standart seviyenin ötesine çıkarır ve bir sonraki bakım işlemine kadar daha uzun bir servis aralığı sağlar."/>   
+        <text name="ads_option_menu_maintenance_preventive_description" text="* Üreticinin standart servis hizmetinin ötesinde önleyici bakım. Hizmet seviyesini normale döndürür ve arıza riskini azaltmak için en sorunlu sistemlere odaklanır."/>
+        <text name="ads_option_menu_repair_type_fix_description" text="* Acil işler için makinenin çalışır durumda kalmasını sağlamak amacıyla yapılan geçici onarım. Temel işlevselliği hızlı ve düşük maliyetli bir şekilde geri kazandırır; ancak arıza giderilmemiş olur ve bir süre sonra tekrar ortaya çıkar."/>
+        <text name="ads_option_menu_repair_type_replacement_description" text="* Arızalı bileşenin standart şekilde değiştirilmesi. Mevcut arızayı tamamen ortadan kaldırır ve etkilenen üniteyi normal çalışma durumuna geri getirir."/>
+        <text name="ads_option_menu_repair_type_advanced_description" text="* Arızalı bileşenin değiştirilmesi ve sistem içindeki ilgili parçaların bakımının da dahil olduğu kapsamlı onarım. Bu işlem, söz konusu sistemde arızaların tekrarlanma riskini önemli ölçüde azaltır."/>
+        <text name="ads_option_menu_overhaul_partial_description" text="* Seçilen sistemi sorunsuz bir çalışma durumuna getirir. Tam bir araç revizyonundan daha hızlı ve daha ucuzdur."/>
+        <text name="ads_option_menu_overhaul_standard_description" text="* Tüm ana bileşenler üzerinde kapsamlı bir çalışma yapılır. Aracın durumunu iyi bir seviyeye getirir."/>
+        <text name="ads_option_menu_overhaul_full_description" text="* Tam yenileme. Maliyet ve süre açısından yüksek olmakla birlikte, aracı mükemmel duruma getirir."/>
+        <text name="ads_option_menu_part_used_description" text="* Hurda parçalar. Çok ucuz, ancak son derece riskli (kusur olma olasılığı yaklaşık %50)"/>
+        <text name="ads_option_menu_part_aftermarket_description" text="* Uygun fiyatlı taklit ürünler. Maliyetleri daha düşüktür, ancak kusur riski orta düzeydedir (%33)."/>
+        <text name="ads_option_menu_part_oem_description" text="* Orijinal Ekipman Üreticisi (OEÜ) parçaları. Tam fiyat karşılığında standart güvenilirlik (%10 kusur riski)."/>
+        <text name="ads_option_menu_part_premium_description" text="* Güçlendirilmiş performans parçaları. Pahalıdır, ancak kalite kontrolü titizlikle yapılır (hata riski %0)."/>
+        <text name="ads_option_menu_perform_repair" text="Tespit edilen arızaları giderin"/>
+        <text name="ads_option_menu_perform_maintenance" text="Onarımdan sonra bakım işlemini gerçekleştirin"/>
+        <text name="ads_option_menu_perform_renew_paint" text="Boya kaplamasının yenilenmesi"/>
+        <text name="ads_option_menu_option_three_disclaimer_repair_after_detection" text="* Herhangi bir arıza tespit edildiğinde, Orjinal Ekipman Üreticisi parçaları kullanılarak standart onarım otomatik olarak başlatılır."/>
+        <text name="ads_option_menu_option_three_disclaimer_maintenance_after_repair" text="* Onarımın ardından Orjinal Ekipman Üreticisi sarf malzemeleriyle standart bakım işlemini otomatik olarak başlatın."/>
+        <text name="ads_option_menu_option_three_disclaimer_overhaul_repaint" text="* Genel bakım sırasında aracın boyasını yenileyin."/>
+        <text name="ads_option_menu_choosen_parts_text" text="* Onarım için seçilen:"/>
 
         <text name="ads_report_header_title" text="Denetim Raporu"/>
         <text name="ads_report_vehicle_name_title" text="Araç Adı"/>
@@ -497,15 +497,15 @@
         <text name="ads_report_recommendations_title" text="Sonuç ve Öneriler"/>
         <text name="ads_report_state_optimal" text="Optimal"/>
         <text name="ads_report_state_normal" text="Normal"/>
-        <text name="ads_report_state_degraded" text="Yıpranmış"/>
-        <text name="ads_report_state_impaired" text="Bozulmuş"/>
+        <text name="ads_report_state_degraded" text="Aşınmış"/>
+        <text name="ads_report_state_impaired" text="Bozuk"/>
         <text name="ads_report_state_critical" text="Kritik"/>
-        <text name="ads_report_state_not_available" text="N/A"/>
-        <text name="ads_report_overall_assessment_condition" text="Durum Düzeyi"/>
-        <text name="ads_report_overall_assessment_service" text="Servis Düzeyi"/>
+        <text name="ads_report_state_not_available" text="Yok"/>
+        <text name="ads_report_overall_assessment_condition" text="Durum Seviyesi"/>
+        <text name="ads_report_overall_assessment_service" text="Hizmet Seviyesi"/>
         <text name="ads_report_overall_assessment_mtbf" text="MTBF (saat)"/>
         <text name="ads_report_overall_assessment_crit_fail_risk" text="Kritik Arıza Riski"/>
-        <text name="ads_report_overall_assessment_rul" text="Kalan Ömür (saat)"/>
+        <text name="ads_report_overall_assessment_rul" text="Kalan Kullanım Ömrü (saat)"/>
         <text name="ads_report_overall_assessment_wear_rate" text="Aşınma Oranı (%/saat)"/>
         <text name="ads_report_overall_assessment_nominal_wear_rate" text="Nominal Aşınma Oranı (%/saat)"/>
         <text name="ads_report_system_condition_title" text="Sistem Durumu | Arıza Riski"/>
@@ -517,246 +517,247 @@
         <text name="ads_report_system_condition_consumption" text="Yakıt Tüketimi"/>
         <text name="ads_report_system_condition_hydraulic" text="Hidrolik Verimlilik"/>
         <text name="ads_report_transmission_slipping" text="Kayma"/>
-        <text name="ads_report_transmission_shifting_impaired" text="Vites Değiştirme Bozukluğu"/>
+        <text name="ads_report_transmission_shifting_impaired" text="Vites Değiştirme Sorunu"/>
         <text name="ads_report_transmission_gear_rejection" text="Vites Reddi"/>
-        <text name="ads_report_transmission_shift_delay" text="Vites Gecikmesi"/>
+        <text name="ads_report_transmission_shift_delay" text="Vites Geçiş Gecikmesi"/>
         <text name="ads_report_transmission_cvt_slipping" text="Kayış/Zincir Kayması"/>
-        <text name="ads_report_transmission_cvt_ratio_limited" text="Oran Azaltıldı"/>
+        <text name="ads_report_transmission_cvt_ratio_limited" text="Oran Düşürüldü"/>
         <text name="ads_report_transmission_cvt_pressure_instability" text="Basınç Dengesizliği"/>
-        <text name="ads_report_transmission_failed" text="Arızalı"/>
+        <text name="ads_report_transmission_failed" text="Başarısız"/>
         <text name="ads_report_vehicle_spec_max_alternator_current" text="Maksimum Alternatör Akımı"/>
-        <text name="ads_report_vehicle_spec_battery_charge" text="Akü Şarjı"/>
-        <text name="ads_report_vehicle_spec_battery_capacity" text="Akü Kapasitesi"/>
+        <text name="ads_report_vehicle_spec_battery_charge" text="Pil Şarjı"/>
+        <text name="ads_report_vehicle_spec_battery_capacity" text="Pil Kapasitesi"/>
         <text name="ads_report_stress_absent" text="Yok"/>
         <text name="ads_report_stress_low" text="Düşük"/>
         <text name="ads_report_stress_moderate" text="Orta"/>
-        <text name="ads_report_stress_elevated" text="Yüksek"/>
+        <text name="ads_report_stress_elevated" text="Yükseltilmiş"/>
         <text name="ads_report_stress_high" text="Yüksek"/>
-        <text name="ads_report_recommendation_repair_active_breakdowns" text="Aktif arızalar tespit edildi. Tüm aktif arızaların standart onarımı önerilir."/>
-        <text name="ads_report_recommendation_defective_parts" text="Arızalı yedek parçalar tespit edildi: %s. Ani arızayı önlemek için önleyici değişim önerilir."/>
-        <text name="ads_report_recommendation_quick_fix" text="Geçici onarım durumu tespit edildi: %s. En kısa sürede standart değiştirme önerilir."/>
-        <text name="ads_report_recommendation_service_due" text="Servis aralığı eşiğine ulaşıldı. Bakım işlemi gerçekleştirildi."/>
-        <text name="ads_report_recommendation_service_urgent" text="Servis aralığı ihlal edildi. Acil bakım yapın!"/>
-        <text name="ads_report_recommendation_overhaul" text="Temel bileşenlerde bozulma tespit edildi. Bir bakım işlemi gerçekleştirin."/>
-        <text name="ads_report_recommendation_system_overhaul" text="%s sisteminde kritik bozulma tespit edildi. Bu sistemde kısmi bir revizyon gerçekleştirin."/>
-        <text name="ads_report_recommendation_system_preventive_maintenance" text="%s'de yüksek arıza riski tespit edildi. Arıza riskini azaltmak için önleyici bakım yapın."/>
-        <text name="ads_report_recommendation_operating_conditions" text="Yoğun kullanımdan kaynaklanan aşırı kullanım belirtileri tespit edildi. Çalışma koşullarını iyileştirin."/>
-        <text name="ads_report_recommendation_repeat_maintenance" text="Arızalı sarf malzemeleri tespit edildi. Arızalı parçaları değiştirmek için bakımı tekrarlayın."/>
-        <text name="ads_report_recommendation_all_ok" text="Kritik bir öneri yok. Araç kullanılabilir durumda."/>
+        <text name="ads_report_recommendation_repair_active_breakdowns" text="Aktif hatalar tespit edildi. Tüm aktif hataların standart şekilde onarılması tavsiye edilir."/>
+        <text name="ads_report_recommendation_defective_parts" text="Arızalı yedek parçalar tespit edildi: %s. Ani arızaları önlemek için önleyici değiştirme yapılması önerilir."/>
+        <text name="ads_report_recommendation_quick_fix" text="Geçici onarım durumu tespit edildi: %s. En kısa zamanda standart bir yedek parça ile değiştirilmesi tavsiye edilir."/>
+        <text name="ads_report_recommendation_service_due" text="Servis aralığı eşiğine ulaşıldı. Bakım işlemini gerçekleştirin."/>
+        <text name="ads_report_recommendation_service_urgent" text="Servis aralığı ihlal edilmiştir. Acilen bakım yaptırınız!"/>
+        <text name="ads_report_recommendation_overhaul" text="Ana bileşenlerde bozulma tespit edildi. Genel bakım yapılmalıdır."/>
+        <text name="ads_report_recommendation_system_overhaul" text="%s'de ciddi bir bozulma tespit edildi. Bu sistemde kısmi bir bakım işlemi gerçekleştirin."/>
+        <text name="ads_report_recommendation_system_preventive_maintenance" text="%s'de arıza riskinde artış tespit edildi. Arıza riskini azaltmak için önleyici bakım gerçekleştirin."/>
+        <text name="ads_report_recommendation_operating_conditions" text="Yoğun aşırı kullanım belirtileri tespit edildi. Çalışma koşullarını iyileştirin."/>
+        <text name="ads_report_recommendation_repeat_maintenance" text="Arızalı sarf malzemeleri tespit edildi. Arızalı bileşenleri değiştirmek için bakım işlemini tekrarlayın."/>
+        <text name="ads_report_recommendation_all_ok" text="Önemli bir öneri bulunmamaktadır. Araç, kullanıma uygun durumdadır."/>
 
         <text name="ads_grease_gun_name" text="Gres Tabancası"/>
-        <text name="ads_grease_gun_function" text="Yağlama servis işlemlerinde kullanılır"/>
-        <text name="ads_grease_gun_action" text="Yağlama uygulayın"/>
-        <text name="ads_grease_gun_no_vehicle" text="Yağlama menzilinde araç yok"/>
-        <text name="ads_grease_gun_lubrication_not_require" text="%s yağlama gerektirmez"/>
-        <text name="ads_grease_gun_already_lubricated" text="%s zaten yağlanmış"/>
+        <text name="ads_grease_gun_function" text="Yağlama bakım işlemleri için kullanılır"/>
+        <text name="ads_grease_gun_action" text="Gres sürün"/>
+        <text name="ads_grease_gun_no_vehicle" text="Yağlama aralığı içinde hiçbir araç yok"/>
+        <text name="ads_grease_gun_lubrication_not_require" text="%s yağlanmaya gerek duymaz"/>
+        <text name="ads_grease_gun_already_lubricated" text="%s zaten yağlanmıştır"/>
         <text name="ads_air_blower_name" text="Hava Üfleyici"/>
         <text name="ads_air_blower_function" text="Radyatörleri ve hava girişlerini temizlemek için kullanılır"/>
-        <text name="ads_air_blower_action" text="Radyatörü ve hava girişini temizle"/>
-        <text name="ads_air_blower_no_vehicle" text="Temizleme alanında araç yok"/>
-        <text name="ads_air_blower_cleaning_not_require" text="%s temizlik gerektirmez"/>
-        <text name="ads_air_blower_already_clean" text="%s: radyatör ve hava girişi zaten temiz"/>
-        <text name="ads_jumper_cables_name" text="Takviye Kabloları"/>
+        <text name="ads_air_blower_action" text="Radyatörü ve hava girişini temizleyin"/>
+        <text name="ads_air_blower_no_vehicle" text="Temizlik alanında hiçbir araç yok"/>
+        <text name="ads_air_blower_cleaning_not_require" text="%s'nin temizlenmesi gerekmez"/>
+        <text name="ads_air_blower_already_clean" text="%s: Radyatör ve hava girişi zaten temiz"/>
+        <text name="ads_jumper_cables_name" text="Akü Kablosu"/>
         <text name="ads_jumper_cables_function" text="Araç akülerini bağlamak ve çalışmayan motorları çalıştırmak için kullanılır"/>
-        <text name="ads_jumper_cables_action" text="Avlama kablolarını bağla/bağlantısını kes"/>
-        <text name="ads_jumper_cables_connected" text="Jumper cable connected to %s"/>
-        <text name="ads_jumper_cables_already_connected" text="Jumper cable already connected to %s"/>
-        <text name="ads_jumper_cables_impossible_to_connect" text="Araç, takviye kablolarının bağlanması için uygun değil"/>
-        <text name="ads_jumper_cables_both_already_connected" text="Köprüleme kabloları zaten %s ve %s'ye bağlı"/>
-        <text name="ads_jumper_cables_disconnected" text="Jumper kabloları %s'den ayrıldı"/>
-        <text name="ads_jumper_cables_auto_disconnected" text="Araçlardan biri hareket etmeye başladığı için takviye kabloları bağlantısı kesildi"/>
-        <text name="ads_jumper_cables_is_too_far" text="%s, %s'den çok uzakta"/>
+        <text name="ads_jumper_cables_action" text="Bağlantı kablolarını takın/çıkarın"/>
+        <text name="ads_jumper_cables_connected" text="%s’ye bağlanan akü kablosu"/>
+        <text name="ads_jumper_cables_already_connected" text="%s'ye atlama kabloları zaten bağlı"/>
+        <text name="ads_jumper_cables_impossible_to_connect" text="Araç, akü kablosu bağlamak için uygun değildir"/>
+        <text name="ads_jumper_cables_both_already_connected" text="Akü kabloları %s ve %s'ye zaten bağlı"/>
+        <text name="ads_jumper_cables_disconnected" text="%s'den akü bağlantı kabloları çıkarıldı"/>
+        <text name="ads_jumper_cables_auto_disconnected" text="Araçlardan biri hareket etmeye başladığı için akü kablo bağlantıları kesildi"/>
+        <text name="ads_jumper_cables_is_too_far" text="%s, %s’den çok uzakta"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Araç muayenesi"/>
-        <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
-        <text name="ads_field_inspection_action" text="Aracı incele"/>
-        <text name="ads_field_inspection_hold_to_start" text="Denetimi başlatmak için basılı tutun"/>
-        <text name="ads_field_inspection_starting" text="Denetim başlatılıyor..."/>
+        <text name="input_ADS_CLOSE_NOTIFICATION" text="Tamam"/>
+        <text name="ads_field_inspection_action" text="Aracı kontrol et"/>
+        <text name="ads_field_inspection_hold_to_start" text="Denetime başlamak için basılı tutun"/>
+        <text name="ads_field_inspection_starting" text="Denetime başlanıyor..."/>
         <text name="ads_field_inspection_progress" text="Görsel inceleme yapılıyor... %d%%"/>
         <text name="ads_field_inspection_cancelled" text="Denetim iptal edildi"/>
-        <text name="ads_field_inspection_engine_must_be_stopped" text="Kontrolden önce motoru durdurun"/>
-        <text name="ads_inspection_dialog_title" text="Vardiya Öncesi Görsel İnceleme"/>
+        <text name="ads_field_inspection_engine_must_be_stopped" text="Muayene öncesinde motoru durdurun"/>
+        <text name="ads_inspection_dialog_title" text="Vardiya Öncesi Görsel Muayene"/>
         <text name="ads_inspection_section_fluids" text="1. Teknik Sıvılar"/>
-        <text name="ads_inspection_section_cooling_air" text="2. Soğutma ve Hava Giriş Sistemi"/>
+        <text name="ads_inspection_section_cooling_air" text="2. Soğutma ve Hava Emme Sistemi"/>
         <text name="ads_inspection_section_lubrication" text="3. Yağlama Noktaları"/>
         <text name="ads_inspection_section_additional" text="4. Ek Notlar"/>
         <text name="ads_inspection_engine_oil" text="Motor Yağı"/>
-        <text name="ads_inspection_coolant" text="Soğutma Sıvısı"/>
-        <text name="ads_inspection_hydraulic_fluid" text="Hidrolik Sıvı"/>
+        <text name="ads_inspection_coolant" text="Soğutma sıvısı"/>
+        <text name="ads_inspection_hydraulic_fluid" text="Hidrolik Yağı"/>
         <text name="ads_inspection_transmission_oil" text="Şanzıman Yağı"/>
         <text name="ads_inspection_radiator" text="Radyatör"/>
         <text name="ads_inspection_air_duct" text="Hava Giriş Kanalı"/>
         <text name="ads_inspection_air_filter" text="Hava Filtresi"/>
-        <text name="ads_inspection_lubrication_level" text="Yağlama Seviyesi"/>
-        <text name="ads_inspection_no_suspicious_symptoms" text="Şüpheli belirti tespit edilmedi"/>
-        <text name="ads_inspection_ok" text="OK"/>
+        <text name="ads_inspection_lubrication_level" text="Yağ Seviyesi"/>
+        <text name="ads_inspection_no_suspicious_symptoms" text="Şüpheli herhangi bir belirti tespit edilmedi"/>
+        <text name="ads_inspection_ok" text="Tamam"/>
         <text name="ads_inspection_status_slightly_low" text="Biraz Düşük"/>
         <text name="ads_inspection_status_low" text="Düşük"/>
         <text name="ads_inspection_status_very_low" text="Çok Düşük"/>
         <text name="ads_inspection_status_critically_low" text="Kritik Derecede Düşük"/>
-        <text name="ads_inspection_status_slightly_darkened" text="Hafifçe Kararmış"/>
-        <text name="ads_inspection_status_darkened" text="Karanlık"/>
+        <text name="ads_inspection_status_slightly_darkened" text="Biraz Kararmış"/>
+        <text name="ads_inspection_status_darkened" text="Kararmış"/>
         <text name="ads_inspection_status_contaminated" text="Kirlenmiş"/>
         <text name="ads_inspection_status_critical_condition" text="Kritik"/>
         <text name="ads_inspection_status_slight_moisture" text="Hafif Nem"/>
         <text name="ads_inspection_status_seepage" text="Sızıntı"/>
         <text name="ads_inspection_status_active_leak" text="Aktif Sızıntı"/>
         <text name="ads_inspection_status_severe_leak" text="Ciddi Sızıntı"/>
-        <text name="ads_inspection_status_slightly_dirty" text="Hafif Kirli"/>
+        <text name="ads_inspection_status_slightly_dirty" text="Biraz Kirli"/>
         <text name="ads_inspection_status_dirty" text="Kirli"/>
-        <text name="ads_inspection_status_heavily_clogged" text="Ağır Tıkalı"/>
-        <text name="ads_inspection_status_critically_clogged" text="Kritik Derecede Tıkalı"/>
-        <text name="ads_inspection_status_slightly_dry" text="Hafifçe Kuru"/>
+        <text name="ads_inspection_status_heavily_clogged" text="Aşırı Tıkalı"/>
+        <text name="ads_inspection_status_critically_clogged" text="Ciddi Ölçüde Tıkalı"/>
+        <text name="ads_inspection_status_slightly_dry" text="Biraz Kuru"/>
         <text name="ads_inspection_status_dry" text="Kuru"/>
         <text name="ads_inspection_status_very_dry" text="Çok Kuru"/>
-        <text name="ads_inspection_status_critically_dry" text="Kritik Derecede Kuru"/>
-        <text name="ads_inspection_status_not_required" text="Gerekli Değil"/>
-        <text name="ads_inspection_hint_coolant_leak_stage1" text="Soğutma sistemi bağlantı noktalarının yakınında az miktarda soğutma sıvısı izi görülebilir."/>
-        <text name="ads_inspection_hint_coolant_leak_stage2" text="Soğutma sıvısı kalıntısı görülebilir ve soğutma sıvısı seviyesi normalin altındadır."/>
-        <text name="ads_inspection_hint_coolant_leak_stage3" text="Soğutma sistemi çevresinde gözle görülür soğutma sıvısı kaybı mevcuttur."/>
-        <text name="ads_inspection_hint_coolant_leak_stage4" text="Soğutma sıvısı seviyesi kritik derecede düşük, yoğun soğutma sıvısı izleri görülebiliyor."/>
-        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="Motor yağı hafifçe koyulaşmış görünüyor."/>
+        <text name="ads_inspection_status_critically_dry" text="Aşırı Kuru"/>
+        <text name="ads_inspection_status_not_required" text="Zorunlu Değil"/>
+        <text name="ads_inspection_hint_coolant_leak_stage1" text="Soğutma sistemi bağlantılarının yakınında az miktarda soğutma sıvısı izleri görülüyor."/>
+        <text name="ads_inspection_hint_coolant_leak_stage2" text="Soğutma sıvısı kalıntıları görülüyor ve soğutma sıvısı seviyesi normalin altında."/>
+        <text name="ads_inspection_hint_coolant_leak_stage3" text="Soğutma sistemi çevresinde gözle görülür bir soğutma sıvısı kaybı mevcuttur."/>
+        <text name="ads_inspection_hint_coolant_leak_stage4" text="Soğutma sıvısı seviyesi kritik derecede düşük; soğutma sıvısının belirgin izleri görülüyor."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage1" text="Motor yağı biraz koyulaşmış görünüyor."/>
         <text name="ads_inspection_hint_oil_pump_malfunction_stage2" text="Motor yağı normalden daha koyu görünüyor."/>
         <text name="ads_inspection_hint_oil_pump_malfunction_stage3" text="Motor yağı kirlenmiş görünüyor."/>
-        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Yağ durumu kritik görünüyor."/>
-        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="Hidrolik silindir çevresinde hafif yağlı bir film tabakası görülmektedir."/>
-        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Silindirin etrafında hidrolik sızıntısı görülebilir."/>
-        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Silindirin yakınında belirgin hidrolik sıvı izleri görülebilir."/>
-        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Yoğun hidrolik sıvı izleri görülmektedir. Silindir alanı yoğun bir şekilde sıvı ile kirlenmiştir."/>
-        <text name="ads_inspection_hint_radiator_clogging_stage1" text="Radyatör yüzeyi hafif kirli."/>
-        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Radyatör gözle görülür derecede kirli."/>
-        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Radyatör, kir ve döküntülerle aşırı derecede tıkanmış."/>
-        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Radyatör kir ve döküntülerle kritik derecede tıkanmış."/>
-        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="Hava giriş kanalında hafif kirlenme belirtileri var."/>
-        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Hava giriş kanalı gözle görülür şekilde kirli."/>
-        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Hava giriş kanalı toz ve döküntülerle yoğun şekilde tıkanmış."/>
-        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Hava giriş kanalı toz ve döküntülerle kritik derecede tıkanmış."/>
+        <text name="ads_inspection_hint_oil_pump_malfunction_stage4" text="Yağın durumu kritik görünüyor."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage1" text="Hidrolik silindir bölgesinin çevresinde soluk, yağlı bir tabaka görülüyor."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage2" text="Silindirin çevresinde hidrolik sızıntı görülüyor."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage3" text="Silindirin yakınında berrak hidrolik sıvısı izleri görülüyor."/>
+        <text name="ads_inspection_hint_hydraulic_cylinder_internal_leak_stage4" text="Aşırı miktarda hidrolik sıvısı izleri görülmektedir. Silindir bölgesi sıvıyla aşırı derecede kirlenmiştir."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage1" text="Radyatörün yüzeyi biraz kirli."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage2" text="Radyatörün oldukça kirli olduğu görülüyor."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage3" text="Radyatör, kir ve kalıntılarla ciddi şekilde tıkanmış durumda."/>
+        <text name="ads_inspection_hint_radiator_clogging_stage4" text="Radyatör, kir ve kalıntılarla ciddi şekilde tıkanmış durumda."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage1" text="Hava giriş kanalı hafif kirlenmiş durumda."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage2" text="Hava giriş kanalı gözle görülür derecede kirli."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage3" text="Hava giriş kanalı toz ve kirle ciddi şekilde tıkanmış durumda."/>
+        <text name="ads_inspection_hint_air_intake_clogging_stage4" text="Hava giriş kanalı, toz ve kir parçacıklarıyla ciddi şekilde tıkanmış durumda."/>
         <text name="ads_inspection_hint_lubrication_stage1" text="Yağlama noktaları biraz kuru görünüyor."/>
-        <text name="ads_inspection_hint_lubrication_stage2" text="Yağlama noktaları kuru ve yeterince yağlanmamış görünüyor."/>
-        <text name="ads_inspection_hint_lubrication_stage3" text="Yağlama noktaları çok kuru, üzerinde çok az görünür yağ kalmış."/>
-        <text name="ads_inspection_hint_lubrication_stage4" text="Yağlama noktaları kritik derecede kuru, neredeyse hiç görünür yağ kalmamış."/>
-        <text name="ads_inspection_hint_corroded_wiring_stage2" text="Bazı elektrik bağlantılarında hafif oksidasyon izleri görülebilir."/>
+        <text name="ads_inspection_hint_lubrication_stage2" text="Yağlama noktaları kuru görünüyor ve yeterince yağlanmamış gibi duruyor."/>
+        <text name="ads_inspection_hint_lubrication_stage3" text="Yağlama noktaları oldukça kurudur ve üzerinde gözle görülür miktarda gres kalmamıştır."/>
+        <text name="ads_inspection_hint_lubrication_stage4" text="Yağlama noktaları son derece kuru; üzerinde neredeyse hiç görünür gres kalmamış."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage2" text="Bazı elektrik bağlantılarında hafif oksidasyon izleri görülmektedir."/>
         <text name="ads_inspection_hint_corroded_wiring_stage3" text="Kablolarda ve konektörlerde belirgin oksidasyon ve kirlenme görülmektedir."/>
-        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Kablolarda ve konektörlerde ciddi korozyon görülüyor ve bazı yalıtım malzemeleri hasar görmüş gibi görünüyor."/>
-        <text name="ads_inspection_hint_battery_sulfation_stage1" text="Akü terminallerinde hafif beyazımsı bir tortu görülebilir."/>
-        <text name="ads_inspection_hint_battery_sulfation_stage2" text="Akü terminallerinde beyazımsı bir tortu görülmektedir."/>
-        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Akü terminallerinde ve gövdesinde belirgin oksidasyon ve tortular görülebilir."/>
-        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Akü ve terminaller yoğun tortularla kaplı ve kasa kirli ve yıpranmış görünüyor."/>
-        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Alternatör ve bazı bağlantı noktalarında aşırı ısınma ve kararma belirtileri görülmektedir."/>
-        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Alternatör ve kablolarının çevresinde belirgin aşırı ısınma belirtileri ve kararmış konektörler görülmektedir."/>
-        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Turboşarj çevresinde yağlı izler ve kararmış bağlantılar görülebilir."/>
-        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Turboşarj çevresinde yoğun yağ izleri, kararmış bağlantılar ve kurum lekeleri görülmektedir."/>
-        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Şanzıman hidrolik bağlantılarının çevresinde yağlı izler ve kirlilik görülebilir."/>
-        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Şanzıman hidrolik bağlantılarının çevresinde yoğun yağ izleri ve güçlü kirlilik görülmektedir."/>
-        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="CVT hidrolik kontrol bloğu çevresinde yağlı izler ve kararmış bağlantılar görülebilir."/>
-        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="CVT hidrolik kontrol bloğu bağlantılarının çevresinde yoğun yağ izleri ve güçlü kirlilik görülmektedir."/>
-        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Ray gerginliği biraz dengesiz görünüyor."/>
-        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Ray gevşek görünüyor ve belirgin şekilde dengesiz bir gerilim var."/>
-        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Rayda gözle görülür bir sarkma var ve gerilim ciddi şekilde bozulmuş görünüyor."/>
+        <text name="ads_inspection_hint_corroded_wiring_stage4" text="Kablolarda ve konektörlerde ciddi korozyon görülmekte olup, bazı yalıtımların hasar gördüğü anlaşılmaktadır."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage1" text="Pil terminallerinde soluk, beyazımsı bir birikinti görülüyor."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage2" text="Pil terminallerinde beyazımsı bir birikinti görülüyor."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage3" text="Akü terminallerinde ve gövdesinde belirgin oksitlenme ve birikintiler görülmektedir."/>
+        <text name="ads_inspection_hint_battery_sulfation_stage4" text="Akü ve terminaller yoğun birikintilerle kaplıdır ve gövde kirli ve yıpranmış görünmektedir."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage3" text="Alternatörün çevresinde ve bazı bağlantı noktalarında aşırı ısınma ve koyulaşma belirtileri görülmektedir."/>
+        <text name="ads_inspection_hint_alternator_regulator_failure_stage4" text="Alternatörün çevresinde ve kablolarında belirgin aşırı ısınma belirtileri ve koyulaşmış konektörler görülmektedir."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage3" text="Turboşarjın çevresinde yağ izleri ve kararmış bağlantı noktaları görülüyor."/>
+        <text name="ads_inspection_hint_turbocharger_malfunction_stage4" text="Turboşarj çevresinde yoğun yağ izleri, kararmış bağlantı noktaları ve kurum lekeleri görülmektedir."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage3" text="Şanzıman hidrolik bağlantılarının çevresinde yağ izleri ve kirlenme görülmektedir."/>
+        <text name="ads_inspection_hint_powershift_hydraulic_pump_malfunction_stage4" text="Şanzıman hidrolik bağlantılarının çevresinde yoğun yağ izleri ve ciddi kirlilik görülmektedir."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage3" text="Otomatik Şanzıman(CVT) hidrolik kontrol bloğunun çevresinde yağ izleri ve kararmış bağlantı noktaları görülmektedir."/>
+        <text name="ads_inspection_hint_cvt_hydraulic_control_valve_malfunction_stage4" text="Otomatik Şanzıman(CVT) hidrolik kontrol bloğunun bağlantılarının çevresinde yoğun yağ izleri ve ciddi kirlilik görülmektedir."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage2" text="Bant gerginliği biraz dengesiz görünüyor."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage3" text="Bant gevşek görünüyor ve gerginlikte belirgin bir dengesizlik var."/>
+        <text name="ads_inspection_hint_track_tensioner_malfunction_stage4" text="Ray gözle görülür şekilde sarkmış durumda ve gerginliği ciddi şekilde bozulmuş görünüyor."/>
         
         <text name="ads_ingame_menu_title" text="Gelişmiş Hasar Sistemi"/>
-        <text name="ads_ingame_menu_section_active" text="ADS Araçları"/>
-        <text name="ads_ingame_menu_section_service" text="Hizmet Halinde"/>
+        <text name="ads_ingame_menu_section_active" text="GHS Araçları"/>
+        <text name="ads_ingame_menu_section_service" text="Hizmet İçinde"/>
         <text name="ads_ingame_menu_header_vehicle" text="Araç"/>
         <text name="ads_ingame_menu_header_type" text="Tür"/>
         <text name="ads_ingame_menu_header_age" text="Yaş"/>
         <text name="ads_ingame_menu_header_working_hours" text="Çalışma Saatleri"/>
         <text name="ads_ingame_menu_header_condition" text="Durum"/>
         <text name="ads_ingame_menu_header_interval" text="Aralık"/>
-        <text name="ads_ingame_menu_header_service_status" text="İncelendi/Servis Edildi"/>
-        <text name="ads_ingame_menu_header_last_inspection" text="İncele."/>
-        <text name="ads_ingame_menu_header_last_maintenance" text="Servis."/>
-        <text name="ads_ingame_menu_header_cost" text="Bakım Maliyeti"/>
+        <text name="ads_ingame_menu_header_service_status" text="Kontrol Edildi/Bakımı Yapıldı"/>
+        <text name="ads_ingame_menu_header_last_inspection" text="Kontrol edin."/>
+        <text name="ads_ingame_menu_header_last_maintenance" text="Hizmet."/>
+        <text name="ads_ingame_menu_header_cost" text="Bakım"/>
         <text name="ads_ingame_menu_header_leasing_price" text="Kiralama"/>
         <text name="ads_ingame_menu_header_price" text="Değer"/>
         <text name="ads_ingame_menu_header_procedure" text="Prosedür"/>
         <text name="ads_ingame_menu_header_time_left" text="Kalan Süre"/>
-        <text name="ads_ingame_menu_header_finish_time" text="Bitiş Süresi"/>
+        <text name="ads_ingame_menu_header_finish_time" text="Bitiş Saati"/>
         <text name="ads_ingame_menu_header_service_cost" text="Maliyet"/>
         <text name="ads_ingame_menu_section_other" text="Diğer Araçlar"/>
-        <text name="ads_ingame_menu_empty_other" text="ADS dışı araç mevcut değil"/>
-        <text name="ads_ingame_menu_empty_active" text="ADS araçları mevcut değil"/>
-        <text name="ads_ingame_menu_empty_service" text="Şu anda hizmette hiçbir araç yok"/>
-        <text name="ads_sell_dialog_costs_title" text="Ek maliyetler"/>
+        <text name="ads_ingame_menu_empty_other" text="GHS olmayan araç mevcut değil"/>
+        <text name="ads_ingame_menu_empty_active" text="Mevcut GHS aracı yok"/>
+        <text name="ads_ingame_menu_empty_service" text="Şu anda hizmet veren araç bulunmamaktadır"/>
+        <text name="ads_sell_dialog_costs_title" text="Ek masraflar"/>
         <text name="ads_sell_dialog_deposit_return" text="Depozito iadesi"/>
         <text name="ads_sell_dialog_overdue_maintenance_penalty" text="Gecikmiş bakım"/>
         <text name="ads_sell_dialog_repair_penalty" text="Onarım"/>
         <text name="ads_sell_dialog_washing_penalty" text="Yıkama"/>
         <text name="ads_sell_dialog_total" text="Toplam"/>
-        <text name="ads_mobile_workshop_low_maintainability" text="UYARI: Düşük bakım kolaylığı nedeniyle %s, mobil atölyede %s için kullanılamıyor."/>
-        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kritik aşırı yüklenme! Araç üzerindeki yükü derhal azaltın."/>
+        <text name="ads_mobile_workshop_low_maintainability" text="UYARI: Bakım kolaylığı yetersizliği nedeniyle, mobil atölyede %s için %s kullanılamamaktadır."/>
+        <text name="ads_breakdowns_overload_breakdown_stage2_message" text="Kritik aşırı yük! Aracın yükünü derhal azaltın."/>
     
         <text name="ads_tutorialMode_label" text="Eğitim modu"/>
-        <text name="ads_tutorialMode_tooltip" text="Oyun sırasında öğretici ipuçlarını gösterir. Çok oyunculu modda devre dışıdır."/>
-        <text name="ads_tutorialResetTips_label" text="İpuçlarını sıfırla"/>
-        <text name="ads_tutorialResetTips_text" text="İpuçlarını sıfırla"/>
-        <text name="ads_tutorialResetTips_tooltip" text="Eğitim ipucu geçmişini sıfırlayın ve tüm ipuçlarını tekrar gösterin. Yalnızca tek oyunculu modda kullanılabilir."/>
-        <text name="ads_tutorialResetConfirm_title" text="Eğitim ipuçlarını sıfırla?"/>
-        <text name="ads_tutorialResetConfirm_message" text="Eğitim ipucu geçmişini sıfırlayıp tüm ipuçlarını tekrar göster?"/>
+        <text name="ads_tutorialMode_tooltip" text="Oyun sırasında eğitim ipuçlarını gösterir. Çok oyunculu modda devre dışıdır."/>
+        <text name="ads_tutorialResetTips_label" text="İpuçlarını Sıfırla"/>
+        <text name="ads_tutorialResetTips_text" text="Sıfırla"/>
+        <text name="ads_tutorialResetTips_tooltip" text="Öğretici ipucu geçmişini sıfırla ve tüm ipuçlarını yeniden göster. Yalnızca tek oyunculu modda kullanılabilir."/>
+        <text name="ads_tutorialResetConfirm_title" text="Öğretici ipuçlarını sıfırla?"/>
+        <text name="ads_tutorialResetConfirm_message" text="Öğretici ipucu geçmişini sıfırlayıp tüm ipuçlarını yeniden göstermek ister misiniz?"/>
         <text name="ads_tutorial_welcome_dialog_title" text="Gelişmiş Hasar Sistemine Hoş Geldiniz"/>
         <text name="ads_tutorial_welcome_disable_button" text="İpuçlarını Devre Dışı Bırak"/>
         <text name="ads_tutorial_welcome_enable_button" text="İpuçlarını Etkinleştir"/>
-        <text name="ads_tutorial_welcome_message" text="Bu mod, oyundaki araç hasar ve bakım sistemlerini tamamen elden geçiriyor. Birçok değişiklik var, bu nedenle zaman zaman öğretici ipuçları görünecektir. Bunlar, yeni mekanikleri daha hızlı anlamanıza, yaygın hatalardan kaçınmanıza ve araçlarınızın arızalanmasını önlemenize yardımcı olacaktır. İsterseniz, öğretici ipuçlarını şu anda devre dışı bırakabilirsiniz. Daha sonra mod ayarlarında, Gelişmiş Hasar Sistemi bölümünden tekrar etkinleştirebilirsiniz."/>
+        <text name="ads_tutorial_welcome_message" text="Bu mod, oyundaki araç hasar ve bakım sistemlerini tamamen yeniliyor. Çok sayıda değişiklik olduğu için zaman zaman öğretici ipuçları görünecektir. Bu ipuçları, yeni mekanikleri daha hızlı anlamanıza, sık yapılan hatalardan kaçınmanıza ve araçlarınızın arızalanmasını önlemenize yardımcı olacaktır.&#10;&#10;İsterseniz, öğretici ipuçlarını hemen devre dışı bırakabilirsiniz. Daha sonra mod ayarlarında, “Gelişmiş Hasar Sistemi” bölümü altında bu ipuçlarını istediğiniz zaman tekrar etkinleştirebilirsiniz."/>
         <text name="ads_tutorial_service_due_soon_title" text="Periyodik Bakım"/>
-        <text name="ads_tutorial_service_due_soon_message" text="%s yakında bakıma ihtiyaç duyacak. ADS'de araçlar düzenli bakıma ihtiyaç duyar. Bakımı geciktirirseniz, arıza riski önemli ölçüde artar. En yakın atölyeyi ziyaret edin ve &quot;Bakım&quot; seçeneğini seçin. Servis aralığı mod ayarlarından ayarlanabilir."/>
-        <text name="ads_tutorial_service_interval_expired_title" text="Servis Aralığı Doldu"/>
-        <text name="ads_tutorial_service_interval_expired_message" text="%s servis aralığını geçmiştir ve bakıma ihtiyaç duymaktadır. En kısa sürede bir atölyeye gidin ve &quot;Bakım&quot; işlemini yaptırın. Servis aralığı geçmiş bir aracı kullanmaya devam etmek, birden fazla arıza riskini büyük ölçüde artırır."/>
-        <text name="ads_tutorial_rad_or_intake_clogged_title" text="Radyatör ve Hava Girişi Kirlenmesi"/>
-        <text name="ads_tutorial_rad_or_intake_clogged_message" text="Aracınızın radyatörü ve hava girişleri ciddi şekilde tıkanmış görünüyor. Kirli bir radyatör ısıyı verimli bir şekilde dağıtamaz ve tıkalı hava girişleri motora hava akışını kısıtlayabilir. Bu, gücü azaltır ve yakıt tüketimini artırır. Bunları bir yıkama istasyonunda veya servisten alacağınız hava üfleyici ile temizleyebilirsiniz. Radyatörün ve hava girişlerinin durumunu kontrol etmek için: araca bakarken R tuşunu basılı tutun."/>
-        <text name="ads_tutorial_needs_lubrication_title" text="Yağlama Gereklidir"/>
-        <text name="ads_tutorial_needs_lubrication_message" text="%s'nizin düzenli yağlanmaya ihtiyacı var. ADS'de, çalışma parçalarının yağlama seviyesi her gün kademeli olarak düşer ve bu da aşınmayı artırır. Atölyeden bir gres tabancası satın alın ve makinenizi günlük olarak veya her çalışma vardiyasından önce yağlayın. Yağlama seviyesini kontrol etmek için: araca bakarken R tuşunu basılı tutun."/>
+        <text name="ads_tutorial_service_due_soon_message" text="%s yakında bakıma ihtiyaç duyacak.&#10;&#10;GHS'de araçların düzenli bakıma ihtiyacı vardır. Bakımı ertelerseniz, arıza riski önemli ölçüde artar.&#10;&#10;En yakın tamirhaneye gidin ve “Bakım” seçeneğini seçin. Bakım aralığı, mod ayarlarından değiştirilebilir."/>
+        <text name="ads_tutorial_service_interval_expired_title" text="Servis Aralığı Süresi Doldu"/>
+        <text name="ads_tutorial_service_interval_expired_message" text="%s'nin bakım aralığı dolmuştur ve bakım yapılması gerekmektedir.&#10;&#10;En kısa zamanda bir servise gidin ve “Bakım” prosedürünü uygulayın. Bakım aralığı dolmuş bir aracı kullanmaya devam etmek, birden fazla arıza riskini büyük ölçüde artırır."/>
+        <text name="ads_tutorial_rad_or_intake_clogged_title" text="Radyatör ve Hava Girişinde Kirlenme"/>
+        <text name="ads_tutorial_rad_or_intake_clogged_message" text="Aracınızın radyatörü ve hava girişleri oldukça tıkanmış görünüyor.&#10;&#10;Kirli bir radyatör ısıyı verimli bir şekilde dağıtamaz ve tıkanmış hava girişleri motora giden hava akışını kısıtlayabilir. Bu durum, gücü düşürür ve yakıt tüketimini artırır.&#10;&#10;Bunları bir yıkama istasyonunda veya mağazadan alacağınız Hava Üfleyici ile temizleyebilirsiniz.&#10;&#10;R tuşunu basılı tutarken araca bakarak radyatör ve hava girişlerinin durumunu kontrol edebilirsiniz."/>
+        <text name="ads_tutorial_needs_lubrication_title" text="Yağlama Gerekiyor"/>
+        <text name="ads_tutorial_needs_lubrication_message" text="%s'nizin düzenli olarak yağlanması gerekiyor.&#10;&#10;GHS'de, çalışan parçaların yağlama seviyesi her gün kademeli olarak düşer ve bu da aşınmayı artırır.&#10;&#10;Mağazadan bir gres tabancası satın alın ve makinenizi her gün veya her vardiya öncesinde yağlayın.&#10;&#10;Yağlama seviyesini inceleme yoluyla kontrol edebilirsiniz: araca bakarken R tuşunu basılı tutun."/>
         <text name="ads_tutorial_needs_repair_title" text="Araç Arızası"/>
-        <text name="ads_tutorial_needs_repair_message" text="Görünüşe göre %s cihazınızda bir sorun var. Parçalarından biri arızalanmış olabilir. Bir atölyeye gidip kontrol yaptırdığınızdan emin olun. Gecikmeyin: arıza ilerlemeye devam edebilir ve onarım maliyeti de artacaktır. Kontrol bir arızayı doğrularsa, atölyedeki onarım prosedürüyle tamir ettirin."/>
-        <text name="ads_tutorial_needs_overhaul_title" text="Büyük Revizyon"/>
-        <text name="ads_tutorial_needs_overhaul_message" text="Görünüşe göre %s aracınız yaşlanmış durumda. Değiştirme veya büyük bir bakım zamanı geldi. Uzun ve zahmetli bir süreç, ancak çok sevdiğiniz o favori aracınıza ikinci bir hayat vermenin en iyi yolu bu! Not: Ayarlardan kullanım ömrünü değiştirebilirsiniz; süreyi uzatmak araçlarınızın aşınma oranını azaltacaktır."/>
-        <text name="ads_tutorial_age_degradation_title" text="Yaşa Bağlı Yıpranma"/>
-        <text name="ads_tutorial_age_degradation_message" text="ADS'deki araçların yaşlandıkça orijinal performanslarının bir kısmını kademeli olarak kaybettiğini biliyor muydunuz? Bir aracın ömrünün yaklaşık üçte birinden sonra, yaşlanma kaynaklı performans düşüşü güç, frenleme ve diğer sistemler gibi temel özellikleri hafifçe azaltmaya başlar. Araç ne kadar eski olursa, bu etki o kadar güçlü olur ve özellikle ömrünün sonuna doğru daha belirgin hale gelir. Yaşlanma kaynaklı performans düşüşünü mod ayarlarından devre dışı bırakabilirsiniz."/>
-        <text name="ads_tutorial_needs_preventive_title" text="Arıza Yaklaşıyor"/>
-        <text name="ads_tutorial_needs_preventive_message" text="Görünüşe göre %s sistemlerinden biri arızalanmak üzere. İyi haber şu ki, bunu önleyebilirsiniz! Atölyemizde artık özel bir hizmet mevcut: Önleyici Bakım. Bu, tam bir teknik inceleme ve arızalı bileşenlerin proaktif onarımlarını içerir!"/>
-        <text name="ads_tutorial_poor_consumables_title" text="Düşük Kaliteli Sarf Malzemeleri"/>
-        <text name="ads_tutorial_poor_consumables_message" text="Küçük bir sır: %s aracınız bakım sırasında düşük kaliteli sarf malzemelerinin kurbanı oldu. Bu, bilerek ucuz yedek parçaları kendiniz seçmediğiniz sürece olabilir. Şu anda servis aralığı kısaldı ve parça aşınması biraz arttı. Tekrarlanan bir bakım servisi sorunu çözecektir. Bunu inceleme yoluyla tespit edebilirsiniz: Temel bir inceleme sizi kısaltılmış aralık konusunda uyaracak, tam bir teşhis incelemesi ise düşük kaliteli sarf malzemelerinin kendisini ortaya çıkaracaktır."/>
-        <text name="ads_tutorial_poor_parts_title" text="Düşük Kaliteli Parçalar"/>
-        <text name="ads_tutorial_poor_parts_message" text="Küçük bir sır: %s aracınız, onarım sırasında kalitesiz parçaların kurbanı oldu. Bu arıza büyük olasılıkla yakında tekrar ortaya çıkacaktır. Bunun olmasını bekleyebilirsiniz veya hemen kapsamlı bir teşhis muayenesi yaptırabilirsiniz; bu, kalitesiz parçayı güvenilir bir şekilde ortaya çıkaracaktır."/>
-        <text name="ads_tutorial_idle_and_downtime_title" text="Boşta Kalma Süresi ve Depolama"/>
-        <text name="ads_tutorial_idle_and_downtime_message" text="Bu arada, makineniz çalışır durumda ancak aktif olarak çalışmıyorken aşınma çok daha düşüktür, bu da gayet mantıklı. Motor kapalıyken aşınma çok azalır ve makine örtü altında saklanırsa tamamen ortadan kaybolur."/>
+        <text name="ads_tutorial_needs_repair_message" text="Görünüşe göre %s'nizde bir sorun var. Parçalarından biri arızalanmış olabilir.&#10;&#10;Mutlaka bir servise gidip bir kontrol yaptırın. Bunu ertelemeyin: arıza daha da kötüleşebilir ve onarım maliyeti de buna bağlı olarak artacaktır.&#10;&#10;Kontrol sonucunda bir arıza tespit edilirse, servisteki onarım prosedürüne göre arızayı giderin."/>
+        <text name="ads_tutorial_needs_overhaul_title" text="Kapsamlı Onarım"/>
+        <text name="ads_tutorial_needs_overhaul_message" text="Görünüşe göre %s'niz artık eskimeye başlamış. Artık onu değiştirmek ya da kapsamlı bir bakım yaptırmayı düşünmenin zamanı geldi. Bu uzun ve zahmetli bir süreç, ancak çok sevdiğiniz o araca ikinci bir hayat kazandırmanın en iyi yolu budur! Not: Ayarlardan ömrü değiştirebilirsiniz; ömrü uzatmak, araçlarınızın aşınma oranını azaltacaktır."/>
+        <text name="ads_tutorial_age_degradation_title" text="Yaşlanmaya Bağlı Bozulma"/>
+        <text name="ads_tutorial_age_degradation_message" text="GHS'deki araçların yaşlandıkça orijinal performanslarının bir kısmını kademeli olarak kaybettiğini biliyor muydunuz?&#10;&#10;Bir aracın ömrünün yaklaşık üçte biri geçtikten sonra, yaşa bağlı performans kaybı, güç, frenleme ve diğer sistemler gibi temel özellikleri hafifçe azaltmaya başlar. Araç yaşlandıkça bu etki daha da güçlenir ve özellikle ömrünün sonuna doğru belirginleşir.&#10;&#10;Mod ayarlarından yaşa bağlı performans düşüşünü devre dışı bırakabilirsiniz."/>
+        <text name="ads_tutorial_needs_preventive_title" text="Çöküş Yaklaşıyor"/>
+        <text name="ads_tutorial_needs_preventive_message" text="Görünüşe göre %s sistemlerinden biri arızalanmak üzere. İyi haber şu ki, bunu önleyebilirsiniz! Atölyemizde artık özel bir hizmet sunuluyor: Önleyici Bakım. Bu hizmet, kapsamlı bir teknik incelemenin yanı sıra arızalanma riski taşıyan bileşenlerin proaktif onarımını da içeriyor!"/>
+        <text name="ads_tutorial_poor_consumables_title" text="Kalitesiz Sarf Malzemeleri"/>
+        <text name="ads_tutorial_poor_consumables_message" text="Küçük bir sır: %s cihazınız, bakım sırasında kalitesiz sarf malzemelerinin kurbanı oldu. Bilerek ucuz orijinal olmayan yedek parçaları kendiniz seçmediğiniz sürece bu durum yaşanabilir.&#10;&#10; Şu anda servis aralığı kısalmış ve bileşen aşınması biraz artmıştır. Tekrarlanan bir bakım hizmeti bu sorunu çözecektir. Bunu inceleme yoluyla tespit edebilirsiniz: temel bir inceleme sizi kısalmış servis aralığı konusunda uyarırken, tam bir teşhis incelemesi ise kalitesiz sarf malzemelerinin kendisini ortaya çıkaracaktır."/>
+        <text name="ads_tutorial_poor_parts_title" text="Kalitesiz Parçalar"/>
+        <text name="ads_tutorial_poor_parts_message" text="Küçük bir sır: %s cihazınız, onarım sırasında kalitesiz parçaların kurbanı oldu. Bu arıza büyük olasılıkla yakında tekrar ortaya çıkacaktır.&#10;&#10;Bunun gerçekleşmesini bekleyebilir ya da hemen kapsamlı bir arıza teşhisi yaptırabilirsiniz — bu sayede kalitesiz parça kesin olarak tespit edilecektir."/>
+        <text name="ads_tutorial_idle_and_downtime_title" text="Bekleme Süresi ve Depolama"/>
+        <text name="ads_tutorial_idle_and_downtime_message" text="Bu arada, makineniz çalışır durumda olsa da aktif olarak iş yapmadığında aşınma çok daha az olur; bu da gayet mantıklıdır. Motor kapalıyken aşınma çok az olur ve makine kapalı bir yerde saklanırsa aşınma tamamen ortadan kalkar."/>
         <text name="ads_tutorial_hot_weather_title" text="Sıcak Hava"/>
-        <text name="ads_tutorial_hot_weather_message" text="Evet, bugün gerçekten çok sıcak. Bu gibi havalarda radyatör temizliğine özellikle dikkat etmeli ve motoru aşırı yüklemekten kaçınmalısınız; aksi takdirde aşırı ısınma sadece zaman meselesidir. Unutmayın: Radyatörün durumunu, makineye bakarken R tuşunu basılı tutarak görsel olarak kontrol edebilir ve ayrıca hava üfleyici ile temizleyebilirsiniz."/>
-        <text name="ads_tutorial_wet_weather_title" text="Ne Hava Ama!"/>
-        <text name="ads_tutorial_wet_weather_message" text="Bugün hava ne kadar da kötü. Nem, kablolama ve elektrikli ekipmanlar için zararlıdır, bu nedenle bu koşullarda elektrik sistemindeki aşınma biraz daha fazladır. Bunun da ötesinde, bu gibi havalarda hasat yapılması kesinlikle önerilmez - sadece biçerdöverinize zarar verirsiniz."/>
-        <text name="ads_tutorial_low_fuel_title" text="Düşük Yakıt"/>
-        <text name="ads_tutorial_low_fuel_message" text="Görünüşe göre yakıtınız bitmek üzere. İlk bakışta bu büyük bir sorun gibi görünmeyebilir, ancak depoda ne kadar az yakıt kalırsa, yakıt pompası o kadar çok çalışmak zorunda kalır. Yükü artar ve bu da kullanım ömrünü kesinlikle kısaltır."/>
-        <text name="ads_tutorial_idle_deposit_title" text="Uzatılmış Boşta Kalma"/>
-        <text name="ads_tutorial_idle_deposit_message" text="Makinenin çok uzun süredir rölantide çalıştığı anlaşılıyor. Uzun rölanti süreleri sadece yakıt israfına yol açmaz: zamanla yakıt sisteminde tortu oluşumunu teşvik eder ve genel motor sağlığına zarar verir. Eğer makineye şu anda ihtiyaç duyulmuyorsa, motoru kapatmak daha iyidir."/>
-        <text name="ads_tutorial_engine_overheat_title" text="Motor Aşırı Isınması"/>
-        <text name="ads_tutorial_engine_overheat_message" text="Motor aşırı ısınmaya başlıyor. Bu, bir veya birden fazla nedenden dolayı olabilir: motor ağır yük altında, radyatör tıkalı, hava sıcak veya aracın soğutma sisteminde bir arıza var. Dikkatli olun: aşırı ısınma, herhangi bir makine için en yıkıcı faktörlerden biridir. Sadece motora zarar vermekle kalmaz: soğutma sistemi sınırlarına kadar zorlanır ve motor bölmesindeki ısı, kabloların ve elektrikli bileşenlerin bozulmasını hızlandırır."/>
-        <text name="ads_tutorial_cvt_overheat_title" text="CVT Aşırı Isınması"/>
-        <text name="ads_tutorial_cvt_overheat_message" text="CVT aşırı ısınmaya başlıyor. Bu, bir veya birkaç nedenden dolayı olabilir: şanzıman aşırı yük altında, radyatör tıkalı veya hava çok sıcak. Örneğin, çok ağır bir kar küreme makinesi çekiyor veya aşırı yüklü bir römork çekiyor olabilirsiniz. Dikkatli olun: aşırı ısınma, bir CVT şanzımanına olabilecek en yıkıcı şeylerden biridir."/>
+        <text name="ads_tutorial_hot_weather_message" text="Bugün hava gerçekten çok sıcak. Böyle havalarda, radyatörün temizliğine özellikle dikkat etmeli ve motoru aşırı yüklemekten kaçınmalısınız — aksi takdirde motorun aşırı ısınması an meselesi olur.&#10;&#10;Unutmayın: Makineye bakarken R tuşunu basılı tutarak radyatörün durumunu her zaman gözle kontrol edebilirsiniz; ayrıca Hava Üfleyici ile de temizleyebilirsiniz."/>
+        <text name="ads_tutorial_wet_weather_title" text="Ne hava ama!"/>
+        <text name="ads_tutorial_wet_weather_message" text="Bugün hava ne de kötü. Nem, kablolara ve elektrikli ekipmanlara zarar verir; bu nedenle bu koşullarda elektrik sistemindeki aşınma biraz daha fazla olur.&#10;&#10;Üstelik, bu tür havalarda hasat yapmanız kesinlikle tavsiye edilmez — biçerdöverinize sadece zarar verirsiniz."/>
+        <text name="ads_tutorial_low_fuel_title" text="Yakıt Seviyesi Düşük"/>
+        <text name="ads_tutorial_low_fuel_message" text="Görünüşe göre yakıtınız bitmek üzere. İlk bakışta bu çok büyük bir sorun gibi görünmeyebilir, ancak depoda ne kadar az yakıt kalırsa, yakıt pompasının o kadar fazla çalışması gerekir. Üzerindeki yük artar ve bu durum, pompanın kullanım ömrüne kesinlikle zarar verir."/>
+        <text name="ads_tutorial_idle_deposit_title" text="Uzun Süreli Rölantide Çalışma"/>
+        <text name="ads_tutorial_idle_deposit_message" text="Görünüşe göre makine çok uzun süredir rölantide çalışıyor. Uzun süreli rölanti sadece yakıt israfı anlamına gelmez: zamanla yakıt sisteminde birikintilere yol açar ve motorun genel sağlığını da olumsuz etkiler.&#10;&#10;Makineye şu anda ihtiyaç duyulmuyorsa, motoru kapatmak daha iyidir."/>
+        <text name="ads_tutorial_engine_overheat_title" text="Motorun Aşırı Isınması"/>
+        <text name="ads_tutorial_engine_overheat_message" text="Motor aşırı ısınmaya başlıyor. Bunun bir veya birkaç nedeni olabilir: motorun aşırı yüklenmesi, radyatörün tıkanması, havanın sıcak olması veya aracın soğutma sisteminde bir arıza olması.&#10;&#10;Dikkatli olun: Aşırı ısınma, herhangi bir makine için en yıkıcı faktörlerden biridir. Bu durum sadece motora zarar vermekle kalmaz: soğutma sistemi sınırlarına kadar zorlanır ve motor bölmesindeki ısı, kabloların ve elektrikli bileşenlerin aşınmasını hızlandırır."/>
+        <text name="ads_tutorial_cvt_overheat_title" text="Otomatik Şanzıman(CVT) Aşırı Isınması"/>
+        <text name="ads_tutorial_cvt_overheat_message" text="Otomatik Şanzıman(CVT) aşırı ısınmaya başlıyor. Bunun bir veya birkaç nedeni olabilir: şanzıman aşırı yük altında, radyatör tıkanmış ya da hava çok sıcak. Örneğin, çok ağır bir kar küreyici çekiyor ya da aşırı yüklü bir römork çekiyor olabilirsiniz.&#10;&#10;Dikkatli olun: Aşırı ısınma, bir Otomatik Şanzımana(CVT) olabilecek en yıkıcı sorunlardan biridir."/>
         <text name="ads_tutorial_heavy_trailer_title" text="Ağır Römork"/>
-        <text name="ads_tutorial_heavy_trailer_message" text="Görünüşe göre traktörünüz için çok ağır bir römork çekmeye çalışıyorsunuz. Bunu yapmaya devam edebilirsiniz, ancak şanzıman aşırı stres altında kalacak ve frenler de ekstra yükten hoşlanmayacaktır. Basit bir kurala uyun: Çekilen ağırlığın her 1 tonu için 10 HP veya daha fazla güç kullanın, böylece makineniz gözle görülür şekilde daha uzun süre dayanacaktır."/>
-        <text name="ads_tutorial_chassis_vibration_title" text="Stres Altında Süspansiyon"/>
-        <text name="ads_tutorial_chassis_vibration_message" text="Vay canına, yavaşla! Engebeli arazide hızlı sürüş, %s aracınızın süspansiyonunu hızla aşındıracaktır. Bunun da ötesinde, bu titreşimler diğer sistemlere, özellikle hidrolik ve elektrik sistemlerine de zarar verir. Sakin ve yavaş sürün."/>
-        <text name="ads_tutorial_steering_title" text="Araç Dururken Direksiyon Kullanımı"/>
-        <text name="ads_tutorial_steering_message" text="Araç dururken direksiyonu çevirmemek en iyisidir. Bu, direksiyon dişlisine, hidrolik direksiyon sistemine ve ön aks bileşenlerine ağır yük bindirir ve yürüyen aksamda aşınmayı artırır. En azından biraz hareket etmeye başlayın, tekerlekler çok daha kolay dönecektir."/>
-        <text name="ads_tutorial_cranking_title" text="Sık Çalıştırma"/>
-        <text name="ads_tutorial_cranking_message" text="Motoru çok sık çalıştırıyor gibi görünüyorsunuz. Her motor çalıştırma, elektrik sisteminden çok yüksek bir akım geçirir ve bu da kablolarda, marş motorunda ve diğer elektrikli bileşenlerde aşınmayı hızlandırır. Marş motorunu çok sık çalıştırmamaya ve makinede start-stop sistemi varmış gibi motoru aniden kapatmamaya çalışın."/>
-        <text name="ads_tutorial_hard_start_title" text="Zorlu Başlangıç"/>
-        <text name="ads_tutorial_hard_start_message" text="%s modelinde motoru çalıştırmak zordur. Bunun nedeni düşük akü, dondurucu soğuklar, mekanik arızalar veya marş motorunun aşınması olabilir. Motoru çalıştırmak için kontak düğmesini basılı tutun. Not: Yüksek ani akımlar nedeniyle elektrik sistemi çalıştırma sırasında ağır yüklere maruz kalır!"/>
+        <text name="ads_tutorial_heavy_trailer_message" text="Görünüşe göre traktörünüz için fazla ağır bir römorku çekmeye çalışıyorsunuz. Buna devam edebilirsiniz, ancak şanzıman çok büyük bir baskı altında kalacak ve frenler de bu ekstra yükten pek hoşlanmayacaktır.&#10;&#10;Basit bir kuralı uygulayın: Çekilen her 1 ton ağırlık için 10 HP veya daha fazla güç sağlayın; böylece makinenizin ömrü gözle görülür şekilde uzayacaktır."/>
+        <text name="ads_tutorial_chassis_vibration_title" text="Süspansiyon Gerilim Altında "/>
+        <text name="ads_tutorial_chassis_vibration_message" text="Hey, biraz yavaşla! Engebeli arazide hızlı sürmek, %s’inin süspansiyonunu çabucak yıpratır. Üstelik bu titreşimler diğer sistemlere de zarar verir — özellikle hidrolik ve elektrik sistemlerine. Yumuşak sür ve acele etme."/>
+        <text name="ads_tutorial_steering_title" text="Dururken Direksiyon Kullanımı"/>
+        <text name="ads_tutorial_steering_message" text="Araç dururken direksiyonu çevirmemek en iyisidir. Bu durum, direksiyon mekanizmasına, hidrolik direksiyon sistemine ve ön aks bileşenlerine aşırı yük bindirir ve bu da şasi sistemindeki aşınmayı artırır.&#10;&#10;En azından biraz hareket etmeye başladığınızda, tekerlekler çok daha kolay dönecektir."/>
+        <text name="ads_tutorial_cranking_title" text="Sık Marş Verme"/>
+        <text name="ads_tutorial_cranking_message" text="Görünüşe göre motoru çok sık çalıştırıyorsunuz. Her motor çalıştırma işlemi, elektrik sisteminden çok yüksek bir akım geçmesine neden olur ve bu da kabloların, marş motorunun ve diğer elektrikli bileşenlerin daha hızlı aşınmasına yol açar.&#10;&#10;Marş motorunu çok sık çalıştırmamaya özen gösterin ve sanki araçta bir start-stop sistemi varmış gibi motoru kapatmayın."/>
+        <text name="ads_tutorial_hard_start_title" text="Zor Başlangıç"/>
+        <text name="ads_tutorial_hard_start_message" text="%s modelinde motoru çalıştırmak zordur. Bunun nedeni akü şarjının düşük olması, donma derecesindeki sıcaklıklar, mekanik arızalar veya marş motorunun aşınması olabilir. Motoru çalıştırmak için kontak düğmesini basılı tutun. Not: Yüksek başlangıç akımları nedeniyle, çalıştırma sırasında elektrik sistemi ağır yüklerle karşı karşıya kalır!"/>
         <text name="ads_tutorial_critical_failure_title" text="Kritik Arıza"/>
-        <text name="ads_tutorial_critical_failure_message" text="Şanssızlık işte. %s aracınız tamamen devre dışı kaldı ve artık kendi gücüyle hareket edemiyor. Mobil bir atölye kullanarak hızlı bir onarım yaptırabilir ve aracın atölyeye kendi başına ulaşmasını sağlayabilirsiniz. Aksi takdirde, aracı kurtarmak için başka bir yol bulmanız gerekecek."/>
-        <text name="ads_tutorial_heavy_lift_title" text="Ekipman Çok Ağır"/>
-        <text name="ads_tutorial_heavy_lift_message" text="Görünüşe göre bu ekipman %s aracınız için çok ağır. Hidrolik sistem limitlerinde çalışıyor ve bu da kullanım ömrünü olumsuz etkileyecektir. Basit bir kurala uyun: ekipman ağırlığı aracın kendi ağırlığının %%60'ını geçmemelidir."/>
+        <text name="ads_tutorial_critical_failure_message" text="Eh, bu tam bir talihsizlik. %s'niz tamamen devre dışı kalmış ve artık kendi gücüyle hareket edemiyor. Mobil bir tamir atölyesi kullanarak hızlı bir onarım yapabilir ve aracın kendi başına tamirhaneye ulaşmasını sağlayabilirsiniz.&#10;&#10;Aksi takdirde, aracı kurtarmak için başka bir yol bulmanız gerekecek."/>
+        <text name="ads_tutorial_heavy_lift_title" text="Ek Çok Ağır"/>
+        <text name="ads_tutorial_heavy_lift_message" text="Görünüşe göre bu ekipman, %s'niz için fazla ağır. Hidrolik sistem sınırında çalışıyor ve bu durum sistemin kullanım ömrünü olumsuz etkileyecektir.&#10;&#10;Basit bir kurala uyun: Ekipmanın ağırlığı, aracın kendi ağırlığının %60'ını aşmamalıdır."/>
         <text name="ads_tutorial_cold_engine_title" text="Makinenizi Isıtın"/>
-        <text name="ads_tutorial_cold_engine_message" text="Makineyi çalıştırmadan önce daima ısıtın. Motorun yanı sıra, hidrolik yağ, CVT şanzıman ve hatta yakıt sıcaklığı gibi ısınması gereken birçok başka parça da vardır - özellikle dondurucu havalarda. Makineyi soğuk çalıştırmak, birden fazla sistemde sorunlara neden olabilir. Motor sıcaklığı 50 derece (122°F) üzerindeyse, her şey düzgün bir şekilde ısınmıştır ve makine güvenle kullanılabilir."/>
-        <text name="ads_tutorial_pto_sharp_angle_title" text="PTO Açısı Çok Keskin"/>
-        <text name="ads_tutorial_pto_sharp_angle_message" text="Dikkat: Makineniz ile ekipman arasındaki PTO açısı çok büyük. Tahrik mili sert titreşimlerle çalışmaya başlar, titreşim artar ve aşınma hızla birikir. Açıyı 30 derecenin altında tutun ve keskin dönüşler ve tarla başı manevraları sırasında PTO'yu devre dışı bırakmaya çalışın."/>
-        <text name="ads_tutorial_overload_indicator_title" text="Aşırı Yükleme Uyarısı"/>
-        <text name="ads_tutorial_overload_indicator_message" text="%s ağır yük altında. Gösterge panelinde az önce yanan uyarı göstergesi size bunu bildiriyor. Makine mevcut görev için yeterli güce sahip olmayabilir. Yükü azaltmayı deneyin: Hızınızı hız sabitleyici ile sınırlayın veya tam güçte çalışmak yerine gazı yavaşça bırakın."/>
-        <text name="ads_tutorial_engine_overload_title" text="Motor Aşırı Yüklenmesi"/>
-        <text name="ads_tutorial_engine_overload_message" text="Motor aşırı zorlanıyor. Yapmaya çalıştığınız iş bu makine için çok fazla olabilir ve daha güçlü bir ünite kullanmayı düşünmelisiniz. Ya da yavaşlayıp motor üzerindeki yükü azaltmanız yeterli olabilir. Her durumda, bu tür bir stres altında aşınmanın belirgin şekilde arttığını unutmayın."/>
-        <text name="ads_tutorial_lugging_title" text="Motoru Boğma"/>
-        <text name="ads_tutorial_lugging_message" text="Motor ve özellikle şanzıman, ağır motor yükü altında düşük devirde çalışmayı sevmez. Makineye çok ağır bir şey takmış olabilirsiniz veya şanzıman manuel ise yanlış vites seçmiş olabilirsiniz."/>
+        <text name="ads_tutorial_cold_engine_message" text="Makinenizi çalıştırmadan önce daima ısıtın. Motorun yanı sıra, ısınması için zamana ihtiyaç duyan birçok başka parça da vardır: hidrolik yağı, Otomatik Şanzıman(CVT) ve hatta yakıt sıcaklığı — özellikle dondurucu soğuklarda. Makineyi soğukken çalıştırmak, birçok sistemde sorunlara yol açabilir.&#10;&#10;Motor sıcaklığı 50 derecenin üzerindeyse, her şey düzgün bir şekilde ısınmıştır ve makine güvenle kullanılabilir."/>
+        <text name="ads_tutorial_pto_sharp_angle_title" text="Kuyruk Mili(PTO) Açısı Çok Keskin"/>
+        <text name="ads_tutorial_pto_sharp_angle_message" text="Dikkat edin: Makineniz ile ek ekipman arasındaki Kuyruk Mili(PTO) açısı çok geniş. Kuyruk mili sert titreşimlerle çalışmaya başlıyor, titreşim artıyor ve aşınma hızla artıyor.&#10;&#10;Açıyı 30 derecenin altında tutun ve keskin dönüşler ile tarla kenarı manevraları sırasında Kuyruk Mili(PTO)’ni devre dışı bırakmaya çalışın."/>
+        <text name="ads_tutorial_overload_indicator_title" text="Aşırı Yük Uyarısı"/>
+        <text name="ads_tutorial_overload_indicator_message" text="%s ağır yük altında. Gösterge panelinde az önce yanan uyarı ışığı size bunu bildiriyor.&#10;&#10;Makine, mevcut görev için yeterli güce sahip olmayabilir. Yükü azaltmayı deneyin: hız sabitleyiciyi kullanarak hızınızı sınırlayın ya da tam güçte çalışmak yerine gazdan biraz çekin."/>
+        <text name="ads_tutorial_engine_overload_title" text="Motor Aşırı Yüklemesi"/>
+        <text name="ads_tutorial_engine_overload_message" text="Motor çok büyük bir yük altında. Yapmaya çalıştığınız iş, bu makine için çok ağır olabilir; bu durumda daha güçlü bir ünite kullanmayı düşünmelisiniz. Ya da hızınızı düşürmek ve motora binen yükü azaltmak yeterli olabilir.&#10;&#10;Her halükarda, bu tür bir yük altında aşınmanın belirgin şekilde arttığını unutmayın."/>
+        <text name="ads_tutorial_lugging_title" text="Motorun Aşırı Yük Altında Çalışması"/>
+        <text name="ads_tutorial_lugging_message" text="Motor ve özellikle şanzıman, ağır motor yükü altında düşük devirde çalışmaktan hoşlanmaz. Makineye ağırlığına göre fazla ağır bir yük takmış olabilirsiniz ya da şanzıman manuel ise sadece yanlış vites seçimi yapıyor olabilirsiniz."/>
         <text name="ads_tutorial_wheel_slip_title" text="Tekerlek Kayması"/>
-        <text name="ads_tutorial_wheel_slip_message" text="Tekerleklerinizin ciddi şekilde kaydığı görülüyor. Şu anda yolda kalmış ve tavsiye almak istemeyen biri bile olabilirsiniz, ancak şunu aklınızda bulundurun: tekerlek kayması, şanzıman için en yıkıcı faktörlerden biridir ve bir sonraki servis ziyaretinizi çok daha yakın bir zamana getirecektir."/>
-        <text name="ads_tutorial_battery_low_title" text="Zayıf Akü"/>
-        <text name="ads_tutorial_battery_low_message" text="Akü bitmek üzere gibi görünüyor. Bu durum uzun süre kullanılmadığında, aşırı soğuktan veya elektrik sistemindeki arızalardan kaynaklanabilir. Şarjı düşük olduğunda, çalıştırmak zor hatta imkansız olabilir. Çalıştıramazsanız, takviye kabloları kullanarak başka bir araçtan makineyi çalıştırabilirsiniz."/>
+        <text name="ads_tutorial_wheel_slip_message" text="Görünüşe göre tekerlekleriniz ciddi şekilde kayıyor. Şu anda sıkışmış durumda olabilirsiniz ve tavsiye dinleyecek havada olmayabilirsiniz, ancak şunu unutmayın: Tekerlek kayması, şanzıman için en yıkıcı faktörlerden biridir ve bir sonraki servis ziyaretinizi çok daha yakına çekecektir."/>
+        <text name="ads_tutorial_battery_low_title" text="Pil Zayıf"/>
+        <text name="ads_tutorial_battery_low_message" text="Oops, görünüşe göre akü bitmek üzere. Bu durum, aracın uzun süre hareketsiz kalması, aşırı soğuk hava veya elektrik sistemindeki arızalar nedeniyle ortaya çıkabilir.&#10;&#10;Şarj seviyesi düşük olduğunda, aracı çalıştırmak zorlaşır, hatta imkansız hale gelebilir. Aracı çalıştıramıyorsanız, akü kablosu kullanarak başka bir araçtan akü şarjı yapabilirsiniz."/>
     </texts>
 </l10n>
+
