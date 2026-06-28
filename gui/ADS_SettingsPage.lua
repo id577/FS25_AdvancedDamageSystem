@@ -49,6 +49,7 @@ local function buildPendingConfigFromAdsConfig()
 
         engineMaxHeat = ADS_Config.THERMAL.ENGINE_MAX_HEAT,
         transMaxHeat = ADS_Config.THERMAL.TRANS_MAX_HEAT,
+        temperatureChangeSpeed = ADS_Config.THERMAL.TEMPERATURE_CHANGE_SPEED,
         maxDirtInfluence = ADS_Config.THERMAL.MAX_DIRT_INFLUENCE,
         warmingBoostPower = ADS_Config.THERMAL.WARMING_BOOST_POWER,
         coolingSlowdownPower = ADS_Config.THERMAL.COOLING_SLOWDOWN_POWER,
@@ -299,6 +300,7 @@ function ADS_InGameSettings.commitPendingConfig(current, pending)
 
     ADS_Config.THERMAL.ENGINE_MAX_HEAT = pending.engineMaxHeat
     ADS_Config.THERMAL.TRANS_MAX_HEAT = pending.transMaxHeat
+    ADS_Config.THERMAL.TEMPERATURE_CHANGE_SPEED = pending.temperatureChangeSpeed
     ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = pending.maxDirtInfluence
     ADS_Config.THERMAL.WARMING_BOOST_POWER = pending.warmingBoostPower
     ADS_Config.THERMAL.COOLING_SLOWDOWN_POWER = pending.coolingSlowdownPower
@@ -528,6 +530,13 @@ function ADS_InGameSettings:initializeSettingsPageControls(targetPage)
         ADS_InGameSettings.steps.thermalSensitivity.texts,
         g_i18n:getText("ads_thermalSensitivity_label"),
         g_i18n:getText("ads_thermalSensitivity_tooltip")
+    )
+    page.ads_temperatureChangeSpeed = ADS_InGameSettings:addMultiTextOption(
+        page,
+        "onTemperatureChangeSpeedChanged",
+        ADS_InGameSettings.steps.temperatureChangeSpeed.texts,
+        g_i18n:getText("ads_temperatureChangeSpeed_label"),
+        g_i18n:getText("ads_temperatureChangeSpeed_tooltip")
     )
     page.ads_radiatorDirtInfluence = ADS_InGameSettings:addMultiTextOption(
         page,
@@ -783,6 +792,7 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     setIndex(currentPage.ads_maintenancePrice, steps.maintPrice.values, pending.globalPriceMultiplier * 100)
     setIndex(currentPage.ads_maintenanceDuration, steps.maintDuration.values, pending.globalTimeMultiplier * 100)
     setIndex(currentPage.ads_thermalSensitivity, steps.thermalSensitivity.values, pending.engineMaxHeat)
+    setIndex(currentPage.ads_temperatureChangeSpeed, steps.temperatureChangeSpeed.values, pending.temperatureChangeSpeed)
     setIndex(currentPage.ads_radiatorDirtInfluence, steps.radiatorDirtInfluence.values, pending.maxDirtInfluence)
     setIndex(currentPage.ads_warmingBoostPower, steps.thermalPower.values, pending.warmingBoostPower)
     setIndex(currentPage.ads_coolingSlowdownPower, steps.thermalPower.values, pending.coolingSlowdownPower)
@@ -1050,6 +1060,12 @@ function ADS_InGameSettings:onThermalSensitivityChanged(state)
     local pending = getPendingConfig()
     pending.engineMaxHeat = val
     pending.transMaxHeat = val
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onTemperatureChangeSpeedChanged(state)
+    getPendingConfig().temperatureChangeSpeed = ADS_InGameSettings.steps.temperatureChangeSpeed.values[state]
     ADS_InGameSettings.ads_hasPendingSettingsChange = true
     refreshCurrentSettingsPage()
 end
@@ -1433,6 +1449,11 @@ function ADS_InGameSettings:generateAllSteps()
             g_i18n:getText("ads_thermal_aggressive"),
         }
     }
+
+    -- Overall thermal model speed: 0.5x to 2.0x.
+    self.steps.temperatureChangeSpeed = createSteps(0.5, 16, 0.1, function(v)
+        return string.format("%.1fx", v)
+    end)
 
     -- Radiator Dirt Influence: Off, then 10% to 50%.
     do

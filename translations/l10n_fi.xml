@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Valmiustilan virta"/>
         <text name="ads_idleCurrent_tooltip" text="Asettaa akun purkausvirran moottorin ollessa sammutettuna. Esimerkiksi 0,5 A:lla 15 Ah:n akku tyhjenisi täyteen noin 30 reaaliaikaisessa tunnissa ennen lämpötilavaikutusten huomioimista."/>
         <text name="ads_thermalSensitivity_tooltip" text="Säätää lämpömallin käyttäytymistä. Suuremmat asetukset tekevät moottorista ja vaihteistosta herkempiä kuormalle, ympäristön lämpötilalle ja jäähdyttimen likaantumiselle — tuottaen enemmän lämpöä samoissa olosuhteissa."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Lämpömallin nopeus"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Säätää moottorin ja vaihteiston lämpötilojen muutosnopeutta. Pienemmät arvot hidastavat lämpenemistä ja jäähtymistä, suuremmat nopeuttavat molempia. Oletusarvo on 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Jäähdyttimen lian vaikutus"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Vähentää jäähdyttimen jäähdytyskapasiteettia tällä prosenttiosuudella maksimiliaantumisessa."/>
         <text name="ads_warmingBoostPower_label" text="Lämpenemisen kiihdytys"/>

@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Standby Current"/>
         <text name="ads_idleCurrent_tooltip" text="Sets the battery drain current while the engine is stopped. For example, at 0.5 A a 15 Ah battery would take about 30 real hours to fully discharge, before temperature effects are applied."/>
         <text name="ads_thermalSensitivity_tooltip" text="Adjusts the thermal model behavior. Higher settings make the engine and transmission more sensitive to load, ambient temperature, and radiator fouling — generating more heat under the same conditions."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Thermal Model Speed"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Scales how quickly engine and transmission temperatures change. Lower values slow both heating and cooling; higher values speed them up. The default is 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Radiator Dirt Influence"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Reduces radiator cooling capacity by this percentage at maximum dirt buildup."/>
         <text name="ads_warmingBoostPower_label" text="Warm-up Acceleration"/>

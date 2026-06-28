@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Corrente a riposo"/>
         <text name="ads_idleCurrent_tooltip" text="Imposta la corrente di scarica della batteria a motore spento. Per esempio, con 0,5 A una batteria da 15 Ah impiegherebbe circa 30 ore reali a scaricarsi completamente, prima di considerare gli effetti della temperatura."/>
         <text name="ads_thermalSensitivity_tooltip" text="Regola il comportamento del modello termico. Impostazioni piu elevate rendono motore e trasmissione piu sensibili al carico, alla temperatura ambiente e all'imbrattamento del radiatore, generando piu calore nelle stesse condizioni."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Velocità del modello termico"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Regola la velocità con cui cambiano le temperature di motore e trasmissione. Valori più bassi rallentano riscaldamento e raffreddamento; valori più alti accelerano entrambi. Il valore predefinito è 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Influenza dello sporco sul radiatore"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Riduce la capacita di raffreddamento del radiatore di questa percentuale al massimo accumulo di sporco."/>
         <text name="ads_warmingBoostPower_label" text="Accelerazione riscaldamento"/>

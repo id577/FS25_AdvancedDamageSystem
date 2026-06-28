@@ -74,6 +74,8 @@
         <text name="ads_idleCurrent_label" text="Струм у режимі очікування"/>
         <text name="ads_idleCurrent_tooltip" text="Встановлює розряд акумулятора при вимкненому двигуні. Наприклад, при 0.5 А акумулятор на 15 Аг повністю розрядиться приблизно за 30 реальних годин."/>
         <text name="ads_thermalSensitivity_tooltip" text="Регулює поведінку теплової моделі. Вищі параметри роблять двигун і трансмісію більш чутливими до навантаження та температури навколишнього середовища."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Швидкість теплової моделі"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Масштабує швидкість зміни температури двигуна й трансмісії. Менші значення уповільнюють нагрівання та охолодження, а більші прискорюють їх. Значення за замовчуванням — 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Вплив бруду на радіатор"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Зменшує охолоджуючу здатність радіатора на цей відсоток при максимальному забрудненні."/>
         <text name="ads_warmingBoostPower_label" text="Прискорення прогріву"/>

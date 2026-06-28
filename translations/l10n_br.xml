@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Corrente em repouso"/>
         <text name="ads_idleCurrent_tooltip" text="Define a corrente de descarga da bateria com o motor desligado. Por exemplo, com 0,5 A, uma bateria de 15 Ah levaria cerca de 30 horas reais para descarregar completamente, antes de considerar os efeitos da temperatura."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajusta o comportamento do modelo térmico. Configurações mais altas tornam o motor e a transmissão mais sensíveis à carga, temperatura ambiente e entupimento do radiador, gerando assim mais calor nas mesmas condições."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Velocidade do modelo térmico"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Ajusta a rapidez com que as temperaturas do motor e da transmissão mudam. Valores menores desaceleram o aquecimento e o resfriamento; valores maiores aceleram ambos. O padrão é 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Influência da sujeira no radiador"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Reduz a capacidade de resfriamento do radiador nessa porcentagem quando o acúmulo de sujeira está no máximo."/>
         <text name="ads_warmingBoostPower_label" text="Aceleração do aquecimento"/>

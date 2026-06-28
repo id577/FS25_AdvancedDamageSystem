@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Bekleme Akımı"/>
         <text name="ads_idleCurrent_tooltip" text="Motor dururken aküden çekilen akımı ayarlar. Örneğin, 0,5 A değerinde, 15 Ah’lık bir akünün sıcaklık etkileri hesaba katılmadan tamamen boşalması yaklaşık 30 gerçek saat sürer."/>
         <text name="ads_thermalSensitivity_tooltip" text="Termal modelin davranışını ayarlar. Daha yüksek ayarlar, motor ve şanzımanın yüke, ortam sıcaklığına ve radyatördeki kirlenmeye karşı daha duyarlı hale gelmesini sağlar; bu da aynı koşullar altında daha fazla ısı üretilmesine yol açar."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Termal model hızı"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Motor ve şanzıman sıcaklıklarının değişim hızını ayarlar. Düşük değerler ısınma ve soğumayı yavaşlatır, yüksek değerler her ikisini de hızlandırır. Varsayılan değer 1.4x'tir."/>
         <text name="ads_radiatorDirtInfluence_label" text="Radyatördeki Kirin Etkisi"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Maksimum kir birikimi durumunda radyatörün soğutma kapasitesini bu oranda azaltır."/>
         <text name="ads_warmingBoostPower_label" text="Isınma ve Hızlanma"/>

@@ -39,6 +39,7 @@ function ADS_SettingsSyncEvent.new()
     self.closeHour                 = ADS_Config.WORKSHOP.CLOSE_HOUR
     self.engineMaxHeat             = ADS_Config.THERMAL.ENGINE_MAX_HEAT
     self.transMaxHeat              = ADS_Config.THERMAL.TRANS_MAX_HEAT
+    self.temperatureChangeSpeed    = ADS_Config.THERMAL.TEMPERATURE_CHANGE_SPEED
     self.maxDirtInfluence          = ADS_Config.THERMAL.MAX_DIRT_INFLUENCE
     self.warmingBoostPower         = ADS_Config.THERMAL.WARMING_BOOST_POWER
     self.coolingSlowdownPower      = ADS_Config.THERMAL.COOLING_SLOWDOWN_POWER
@@ -77,6 +78,7 @@ function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.closeHour              or 19)
     streamWriteFloat32(streamId, self.engineMaxHeat          or 1.05)
     streamWriteFloat32(streamId, self.transMaxHeat           or 1.05)
+    streamWriteFloat32(streamId, self.temperatureChangeSpeed or 1.4)
     streamWriteFloat32(streamId, self.maxDirtInfluence       or 0.2)
     streamWriteFloat32(streamId, self.warmingBoostPower      or 1.0)
     streamWriteFloat32(streamId, self.coolingSlowdownPower   or 1.0)
@@ -113,6 +115,7 @@ function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.closeHour                 = streamReadFloat32(streamId)
     self.engineMaxHeat             = streamReadFloat32(streamId)
     self.transMaxHeat              = streamReadFloat32(streamId)
+    self.temperatureChangeSpeed    = streamReadFloat32(streamId)
     self.maxDirtInfluence          = streamReadFloat32(streamId)
     self.warmingBoostPower         = streamReadFloat32(streamId)
     self.coolingSlowdownPower      = streamReadFloat32(streamId)
@@ -158,6 +161,7 @@ local function applyConfig(event)
     ADS_Config.WORKSHOP.CLOSE_HOUR                          = event.closeHour
     ADS_Config.THERMAL.ENGINE_MAX_HEAT                      = event.engineMaxHeat
     ADS_Config.THERMAL.TRANS_MAX_HEAT                       = event.transMaxHeat
+    ADS_Config.THERMAL.TEMPERATURE_CHANGE_SPEED             = math.clamp(event.temperatureChangeSpeed, 0.5, 2.0)
     ADS_Config.THERMAL.MAX_DIRT_INFLUENCE                   = event.maxDirtInfluence
     ADS_Config.THERMAL.WARMING_BOOST_POWER                  = event.warmingBoostPower
     ADS_Config.THERMAL.COOLING_SLOWDOWN_POWER               = event.coolingSlowdownPower

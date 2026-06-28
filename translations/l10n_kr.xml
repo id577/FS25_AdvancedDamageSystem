@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="대기 전류"/>
         <text name="ads_idleCurrent_tooltip" text="엔진이 꺼져 있을 때 배터리 방전 전류를 설정합니다. 예를 들어 0.5A라면 15Ah 배터리는 온도 영향을 제외하고 약 30시간의 실제 시간 후 완전히 방전됩니다."/>
         <text name="ads_thermalSensitivity_tooltip" text="열 모델 동작을 조정합니다. 설정이 높을수록 엔진과 변속기가 부하, 주변 온도, 라디에이터 오염에 더 민감하게 반응하여 동일 조건에서 더 많은 열을 발생시킵니다."/>
+        <text name="ads_temperatureChangeSpeed_label" text="열 모델 속도"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="엔진과 변속기 온도가 변하는 속도를 조정합니다. 낮은 값은 가열과 냉각을 모두 늦추고, 높은 값은 모두 빠르게 합니다. 기본값은 1.4x입니다."/>
         <text name="ads_radiatorDirtInfluence_label" text="라디에이터 오염 영향"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="오염이 최대치일 때 라디에이터의 냉각 성능을 이 비율만큼 감소시킵니다."/>
         <text name="ads_warmingBoostPower_label" text="예열 가속"/>

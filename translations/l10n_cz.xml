@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Proud v pohotovostním režimu"/>
         <text name="ads_idleCurrent_tooltip" text="Nastavuje odběr proudu z baterie při vypnutém motoru. Například při 0,5 A by se 15 Ah baterie plně vybila za přibližně 30 reálných hodin (před započtením vlivu teploty)."/>
         <text name="ads_thermalSensitivity_tooltip" text="Upravuje chování tepelného modelu. Vyšší nastavení činí motor a převodovku citlivější na zatížení, okolní teplotu a znečištění chladiče – generují více tepla za stejných podmínek."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Rychlost tepelného modelu"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Určuje, jak rychle se mění teplota motoru a převodovky. Nižší hodnoty zpomalují zahřívání i chladnutí, vyšší hodnoty obojí zrychlují. Výchozí hodnota je 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Vliv znečištění chladiče"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Snižuje kapacitu chlazení o toto procento při maximálním znečištění chladiče."/>
         <text name="ads_warmingBoostPower_label" text="Zrychlení zahřívání"/>

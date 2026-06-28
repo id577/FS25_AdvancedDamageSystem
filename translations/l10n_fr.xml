@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Courant de veille"/>
         <text name="ads_idleCurrent_tooltip" text="Definit le courant de decharge de la batterie lorsque le moteur est arrete. Par exemple, avec 0,5 A, une batterie de 15 Ah mettrait environ 30 heures reelles a se decharger completement, avant prise en compte des effets de la temperature."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajuste le comportement du modèle thermique. Des réglages plus élevés rendent le moteur et la transmission plus sensibles à la charge, à la température ambiante et à l'encrassement du radiateur, générant ainsi plus de chaleur dans les mêmes conditions."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Vitesse du modèle thermique"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Règle la vitesse de variation des températures du moteur et de la transmission. Les valeurs basses ralentissent le réchauffement et le refroidissement, les valeurs élevées accélèrent les deux. La valeur par défaut est 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Influence de l'encrassement du radiateur"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Reduit la capacite de refroidissement du radiateur de ce pourcentage lorsque l'encrassement est maximal."/>
         <text name="ads_warmingBoostPower_label" text="Acceleration de la mise en temperature"/>

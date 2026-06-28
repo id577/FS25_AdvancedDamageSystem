@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Ruhestrom"/>
         <text name="ads_idleCurrent_tooltip" text="Legt den Entladestrom der Batterie bei abgestelltem Motor fest. Bei 0,5 A wuerde eine 15-Ah-Batterie zum Beispiel etwa 30 Echtzeitstunden bis zur vollstaendigen Entladung benoetigen, bevor Temperatureffekte beruecksichtigt werden."/>
         <text name="ads_thermalSensitivity_tooltip" text="Passt das Verhalten des thermischen Modells an. Höhere Einstellungen machen Motor und Getriebe empfindlicher gegenüber Last, Umgebungstemperatur und Kühlerverschmutzung und erzeugen unter gleichen Bedingungen mehr Wärme."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Geschwindigkeit des Thermomodells"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Bestimmt, wie schnell sich Motor- und Getriebetemperaturen ändern. Niedrigere Werte verlangsamen Erwärmung und Abkühlung, höhere Werte beschleunigen beides. Standard ist 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Einfluss der Kuehler-Verschmutzung"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Verringert die Kuehlleistung des Kuehlers bei maximaler Verschmutzung um diesen Prozentsatz."/>
         <text name="ads_warmingBoostPower_label" text="Beschleunigte Aufwaermung"/>

@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Prąd spoczynkowy"/>
         <text name="ads_idleCurrent_tooltip" text="Ustawia prąd rozładowania akumulatora przy wyłączonym silniku. Na przykład przy 0,5 A akumulator 15 Ah rozładowałby się całkowicie po około 30 rzeczywistych godzinach, zanim zostaną uwzględnione efekty temperatury."/>
         <text name="ads_thermalSensitivity_tooltip" text="Dostosuj zachowanie modelu termicznego. Wyższe ustawienia sprawiają, że silnik i skrzynia biegów są bardziej wrażliwe na obciążenie, temperaturę otoczenia oraz zabrudzenie chłodnicy — generując więcej ciepła w tych samych warunkach pracy."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Szybkość modelu termicznego"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Określa szybkość zmian temperatury silnika i skrzyni biegów. Niższe wartości spowalniają nagrzewanie i chłodzenie, a wyższe przyspieszają oba procesy. Wartość domyślna to 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Wpływ zabrudzenia chłodnicy"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Zmniejsza wydajność chłodzenia chłodnicy o ten procent przy maksymalnym zabrudzeniu."/>
         <text name="ads_warmingBoostPower_label" text="Przyspieszenie rozgrzewania"/>

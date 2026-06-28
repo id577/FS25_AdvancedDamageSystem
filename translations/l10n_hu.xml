@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Készenléti áramfelvétel" />
         <text name="ads_idleCurrent_tooltip" text="Beállítja az akkumulátor merülési áramát leállított motor mellett. Például 0,5 A esetén egy 15 Ah-s akkumulátor nagyjából 30 valós óra alatt merülne le teljesen, még a hőmérsékleti hatások előtt." />
         <text name="ads_thermalSensitivity_tooltip" text="Módosítja a hőmodell viselkedését. Magasabb beállításon a motor és a váltó érzékenyebb lesz a terhelésre, a környezeti hőmérsékletre és a hűtő szennyeződésére, vagyis azonos körülmények között több hőt termel." />
+        <text name="ads_temperatureChangeSpeed_label" text="Hőmodell sebessége" />
+        <text name="ads_temperatureChangeSpeed_tooltip" text="A motor és a váltó hőmérséklet-változásának sebességét szabályozza. Az alacsonyabb értékek lassítják a melegedést és a hűlést, a magasabbak mindkettőt gyorsítják. Az alapérték 1.4x." />
         <text name="ads_radiatorDirtInfluence_label" text="Hűtőszennyeződés hatása" />
         <text name="ads_radiatorDirtInfluence_tooltip" text="A hűtő maximális szennyeződésénél ennyi százalékkal csökkenti a hűtési kapacitást." />
         <text name="ads_warmingBoostPower_label" text="Bemelegedés gyorsítása" />

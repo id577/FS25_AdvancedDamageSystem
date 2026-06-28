@@ -777,6 +777,7 @@ function ADS_Config.saveToXMLFile()
     -- THERMAL
     setXMLFloat(xmlFile, root .. ".ENGINE_MAX_HEAT",        ADS_Config.THERMAL.ENGINE_MAX_HEAT)
     setXMLFloat(xmlFile, root .. ".TRANS_MAX_HEAT",         ADS_Config.THERMAL.TRANS_MAX_HEAT)
+    setXMLFloat(xmlFile, root .. ".TEMPERATURE_CHANGE_SPEED", ADS_Config.THERMAL.TEMPERATURE_CHANGE_SPEED)
     setXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE",     ADS_Config.THERMAL.MAX_DIRT_INFLUENCE)
     setXMLFloat(xmlFile, root .. ".WARMING_BOOST_POWER",    ADS_Config.THERMAL.WARMING_BOOST_POWER)
     setXMLFloat(xmlFile, root .. ".COOLING_SLOWDOWN_POWER", ADS_Config.THERMAL.COOLING_SLOWDOWN_POWER)
@@ -932,6 +933,9 @@ function ADS_Config.loadFromXMLFile()
 
     v = getXMLFloat(xmlFile, root .. ".TRANS_MAX_HEAT")
     if v ~= nil then ADS_Config.THERMAL.TRANS_MAX_HEAT = v end
+
+    v = getXMLFloat(xmlFile, root .. ".TEMPERATURE_CHANGE_SPEED")
+    if v ~= nil then ADS_Config.THERMAL.TEMPERATURE_CHANGE_SPEED = math.clamp(v, 0.5, 2.0) end
 
     v = getXMLFloat(xmlFile, root .. ".MAX_DIRT_INFLUENCE")
     if v ~= nil then ADS_Config.THERMAL.MAX_DIRT_INFLUENCE = v end

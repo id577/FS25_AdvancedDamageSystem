@@ -72,6 +72,8 @@
         <text name="ads_idleCurrent_label" text="Corriente en reposo"/>
         <text name="ads_idleCurrent_tooltip" text="Establece la corriente de descarga de la batería con el motor apagado. Por ejemplo, con 0,5 A, una batería de 15 Ah tardaría unas 30 horas reales en descargarse por completo, antes de aplicar los efectos de la temperatura."/>
         <text name="ads_thermalSensitivity_tooltip" text="Ajusta el comportamiento del modelo térmico. Valores más altos hacen que el motor y la transmisión sean más sensibles a la carga, la temperatura ambiente y la suciedad del radiador, generando más calor en las mismas condiciones."/>
+        <text name="ads_temperatureChangeSpeed_label" text="Velocidad del modelo térmico"/>
+        <text name="ads_temperatureChangeSpeed_tooltip" text="Ajusta la rapidez con la que cambian las temperaturas del motor y la transmisión. Los valores bajos ralentizan el calentamiento y el enfriamiento; los altos aceleran ambos. El valor predeterminado es 1.4x."/>
         <text name="ads_radiatorDirtInfluence_label" text="Influencia de la suciedad del radiador"/>
         <text name="ads_radiatorDirtInfluence_tooltip" text="Reduce la capacidad de refrigeración del radiador en este porcentaje cuando la suciedad alcanza el nivel máximo."/>
         <text name="ads_warmingBoostPower_label" text="Aceleración del calentamiento"/>
