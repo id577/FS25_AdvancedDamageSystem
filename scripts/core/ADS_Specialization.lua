@@ -2581,6 +2581,58 @@ function AdvancedDamageSystem:onLeaveVehicle(wasEntered)
 
     spec.lastBlinkingWarningMessage = ""
     spec.blinkingWarningTimer = 0
+
+    local hadStartInput = spec.startButtonDown or spec.startButtonHeld or spec.startButtonUp
+    spec.startButtonDown = false
+    spec.startButtonHeld = false
+    spec.startButtonUp = false
+
+    if hadStartInput then
+        ADS_StartButtonEvent.send(self, false, false, false)
+    end
+end
+
+function AdvancedDamageSystem.updateStartButtonActionEvents(self)
+    if not self.isClient or not self:getIsActiveForInput(true) then
+        return
+    end
+
+    local spec = self.spec_AdvancedDamageSystem
+    local motorizedSpec = self.spec_motorized
+    if spec == nil or motorizedSpec == nil or spec.startButtonActionEvents == nil then
+        return
+    end
+
+    local automaticMotorStartEnabled = g_currentMission ~= nil
+        and g_currentMission.missionInfo ~= nil
+        and g_currentMission.missionInfo.automaticMotorStartEnabled == true
+
+    for inputAction, actionEvent in pairs(spec.startButtonActionEvents) do
+        local actionEventId = actionEvent.actionEventId
+        local registeredEvent = actionEventId ~= nil
+            and g_inputBinding.events ~= nil
+            and g_inputBinding.events[actionEventId]
+            or nil
+
+        if registeredEvent ~= nil then
+            g_inputBinding:setActionEventActive(actionEventId, true)
+
+            if inputAction == InputAction.TOGGLE_MOTOR_STATE then
+                g_inputBinding:setActionEventTextVisibility(actionEventId, not automaticMotorStartEnabled)
+
+                local motorState = self:getMotorState()
+                if motorState == MotorState.STARTING or motorState == MotorState.ON then
+                    g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_VERY_LOW)
+                    g_inputBinding:setActionEventText(actionEventId, motorizedSpec.turnOffText)
+                else
+                    g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_VERY_HIGH)
+                    g_inputBinding:setActionEventText(actionEventId, motorizedSpec.turnOnText)
+                end
+            else
+                g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+            end
+        end
+    end
 end
 
 function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveForInputIgnoreSelection)
@@ -2589,7 +2641,8 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
     end
 
     local spec = self.spec_AdvancedDamageSystem
-    if spec == nil then
+    local motorizedSpec = self.spec_motorized
+    if spec == nil or motorizedSpec == nil then
         return
     end
 
@@ -2605,6 +2658,13 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
     }
 
     for _, inputAction in ipairs(startInputActions) do
+        local motorizedActionEvent = motorizedSpec.actionEvents[inputAction]
+        if motorizedActionEvent ~= nil and motorizedActionEvent.actionEventId ~= nil then
+            g_inputBinding:removeActionEvent(motorizedActionEvent.actionEventId)
+        end
+        motorizedSpec.actionEvents[inputAction] = nil
+
+        -- One composite event owns both the vanilla action and the ADS held-state tracking.
         local _, actionEventId = self:addActionEvent(
             spec.startButtonActionEvents,
             inputAction,
@@ -2612,9 +2672,11 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
             ADS_Breakdowns.onStartButtonAction,
             true,
             true,
+            false,
             true,
-            true,
-            nil
+            nil,
+            nil,
+            true
         )
 
         if actionEventId ~= nil then
@@ -2622,6 +2684,8 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
             g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_VERY_LOW)
         end
     end
+
+    AdvancedDamageSystem.updateStartButtonActionEvents(self)
 end
 
 -- ==========================================================
@@ -3221,6 +3285,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     if spec.isExcludedVehicle then return end
 
     self:updateVehicleStateSnapshot(dt)
+    AdvancedDamageSystem.updateStartButtonActionEvents(self)
 
     spec.onUpdateTimer = spec.onUpdateTimer + dt
 

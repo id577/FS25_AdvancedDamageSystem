@@ -5261,6 +5261,20 @@ function ADS_Breakdowns.onStartButtonAction(self, actionName, inputValue, callba
     if _prevStartButtonDown ~= spec.startButtonDown or _prevStartButtonUp ~= spec.startButtonUp or _prevStartButtonHeld ~= spec.startButtonHeld then
         ADS_StartButtonEvent.send(self, spec.startButtonDown, spec.startButtonHeld, spec.startButtonUp)
     end
+
+    if spec.startButtonDown then
+        local automaticMotorStartEnabled = g_currentMission ~= nil
+            and g_currentMission.missionInfo ~= nil
+            and g_currentMission.missionInfo.automaticMotorStartEnabled == true
+
+        if not automaticMotorStartEnabled then
+            if actionName == InputAction.TOGGLE_MOTOR_STATE then
+                Motorized.actionEventToggleMotorState(self, actionName, inputValue, callbackState, isAnalog)
+            elseif actionName == InputAction.MOTOR_STATE_ON then
+                Motorized.actionEventSetMotorStateOn(self, actionName, inputValue, callbackState, isAnalog)
+            end
+        end
+    end
 end
 
 function ADS_Breakdowns.startMotor(self, superFunc, noEventSend, passed)
