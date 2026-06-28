@@ -4446,14 +4446,44 @@ end
 --                        AI WORKER
 -- ==========================================================
 
-function AdvancedDamageSystem:resetAiWorkerCruiseControlState()
+local function getIsSoilSamplingActive(vehicle)
+    local visited = {}
+
+    local function visit(object)
+        if object == nil or visited[object] then
+            return false
+        end
+        visited[object] = true
+
+        local soilSamplerSpec = object["spec_FS25_precisionFarming.soilSampler"]
+        if soilSamplerSpec ~= nil and soilSamplerSpec.isSampling then
+            return true
+        end
+
+        local attacherJoints = object.spec_attacherJoints
+        local attachedImplements = attacherJoints ~= nil and attacherJoints.attachedImplements or nil
+        if attachedImplements ~= nil then
+            for _, implementData in pairs(attachedImplements) do
+                if visit(implementData.object) then
+                    return true
+                end
+            end
+        end
+
+        return false
+    end
+
+    return visit(vehicle)
+end
+
+function AdvancedDamageSystem:resetAiWorkerCruiseControlState(restoreCruiseSpeed)
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then return end
 
     local state = spec.aiWorkerPid
     if state == nil then return end
 
-    if state.baseCruiseSpeed ~= nil and state.baseCruiseSpeed > 0 then
+    if restoreCruiseSpeed ~= false and state.baseCruiseSpeed ~= nil and state.baseCruiseSpeed > 0 then
         local motor = self:getMotor()
         self:setCruiseControlMaxSpeed(motor:getMaximumForwardSpeed() * 3.6, nil)
     end
@@ -4523,6 +4553,14 @@ function AdvancedDamageSystem:updateAiWorkerCruiseControl(dt)
 
     if not self:getIsAIActive() or not self:getIsMotorStarted() then
         self:resetAiWorkerCruiseControlState()
+        return
+    end
+
+    -- Courseplay deliberately requests a full stop while a Precision Farming
+    -- soil sample is being taken. Do not let the ADS load controller override
+    -- that stop or retain load stress from the stationary sampling operation.
+    if getIsSoilSamplingActive(self) then
+        self:resetAiWorkerCruiseControlState(false)
         return
     end
 
