@@ -4979,7 +4979,7 @@ ADS_Breakdowns.EffectApplicators.ENGINE_STALLS_CHANCE = {
 
             if not v.isServer then return end
 
-            if v:getIsMotorStarted() then
+            if v:getIsMotorStarted() and not v:getIsAIActive() then
                 local effect = v.spec_AdvancedDamageSystem.activeEffects.ENGINE_STALLS_CHANCE
                 if effect and effect.value > 0 then
                     if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
