@@ -762,6 +762,8 @@
         <text name="ads_tutorial_wheel_slip_message" text="Görünüşe göre tekerlekleriniz ciddi şekilde kayıyor. Şu anda sıkışmış durumda olabilirsiniz ve tavsiye dinleyecek havada olmayabilirsiniz, ancak şunu unutmayın: Tekerlek kayması, şanzıman için en yıkıcı faktörlerden biridir ve bir sonraki servis ziyaretinizi çok daha yakına çekecektir."/>
         <text name="ads_tutorial_battery_low_title" text="Pil Zayıf"/>
         <text name="ads_tutorial_battery_low_message" text="Oops, görünüşe göre akü bitmek üzere. Bu durum, aracın uzun süre hareketsiz kalması, aşırı soğuk hava veya elektrik sistemindeki arızalar nedeniyle ortaya çıkabilir.&#10;&#10;Şarj seviyesi düşük olduğunda, aracı çalıştırmak zorlaşır, hatta imkansız hale gelebilir. Aracı çalıştıramıyorsanız, akü kablosu kullanarak başka bir araçtan akü şarjı yapabilirsiniz."/>
+        <text name="ads_tutorial_throttle_control_title" text="Gaz kontrolü"/>
+        <text name="ads_tutorial_throttle_control_message" text="Klavye ile oynarken gazı sınırlayabilir, böylece pedala sürekli sonuna kadar basmadan sert hızlanmalarda motorun üzerindeki yükü azaltabilirsiniz. Bunun için W + T tuşlarını basılı tutun ve fare tekerleğiyle istediğiniz sınırı ayarlayın. Bundan sonra W tuşuna bastığınızda seçtiğiniz sınır uygulanır. Kısa bir süreliğine tüm gücü kullanmak ve pedala sonuna kadar basmak isterseniz W + Shift tuşlarını basılı tutmanız yeterlidir."/>
     </texts>
 </l10n>
 

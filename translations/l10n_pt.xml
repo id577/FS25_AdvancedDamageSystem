@@ -753,5 +753,7 @@
         <text name="ads_tutorial_wheel_slip_message" text="Parece que as suas rodas estão a patinar bastante. Talvez até esteja atolado agora e sem muita paciência para conselhos, mas lembre-se disto: a patinagem das rodas é um dos fatores mais destrutivos para a transmissão e vai aproximar bastante a sua próxima visita à oficina."/>
         <text name="ads_tutorial_battery_low_title" text="Bateria fraca"/>
         <text name="ads_tutorial_battery_low_message" text="Opa, parece que a bateria está prestes a acabar. Isto pode acontecer depois de muito tempo parado, por frio intenso ou devido a falhas no sistema elétrico.&#10;&#10;Com pouca carga, dar à chave será difícil ou até impossível. Se não conseguir ligá-la, pode fazer uma chupeta a partir de outro veículo usando os Jumper Cables."/>
+        <text name="ads_tutorial_throttle_control_title" text="Controlo do acelerador"/>
+        <text name="ads_tutorial_throttle_control_message" text="Ao jogar com o teclado, pode limitar o acelerador para não ter de manter o pedal a fundo e reduzir o esforço do motor durante acelerações intensas. Para isso, mantenha W + T premidos e use a roda do rato para definir o limite pretendido. A partir daí, ao premir W será respeitado o limite escolhido. Se quiser dar tudo por um momento e carregar o pedal a fundo, basta manter W + Shift premidos."/>
     </texts>
 </l10n>

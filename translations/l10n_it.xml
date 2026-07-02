@@ -760,5 +760,7 @@
         <text name="ads_tutorial_wheel_slip_message" text="Sembra che le tue ruote stiano pattinando parecchio. Potresti anche essere bloccato in questo momento e poco disposto ad ascoltare consigli, ma tienilo a mente: lo slittamento delle ruote è uno dei fattori più distruttivi per la trasmissione e avvicinerà sensibilmente la tua prossima visita in officina."/>
         <text name="ads_tutorial_battery_low_title" text="Batteria debole"/>
         <text name="ads_tutorial_battery_low_message" text="Ops, sembra che la batteria stia per scaricarsi del tutto. Questo può succedere dopo un lungo periodo di inattività, per il freddo intenso o a causa di guasti nell'impianto elettrico.&#10;&#10;Con poca carica, avviare il motore sarà difficile o persino impossibile. Se non riesci a metterla in moto, puoi fare un avviamento con i cavi da un altro veicolo usando i Jumper Cables."/>
+        <text name="ads_tutorial_throttle_control_title" text="Controllo dell’acceleratore"/>
+        <text name="ads_tutorial_throttle_control_message" text="Se giochi con la tastiera, puoi limitare l’acceleratore per evitare di tenere il pedale sempre a fondo e ridurre lo sforzo del motore durante le accelerazioni intense. Per farlo, tieni premuti W + T e usa la rotellina del mouse per impostare il limite desiderato. Da quel momento, premendo W verrà rispettato il limite selezionato. Se invece vuoi scatenarti per un momento e affondare comunque il pedale, tieni semplicemente premuti W + Shift."/>
     </texts>
 </l10n>

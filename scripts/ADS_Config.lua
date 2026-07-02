@@ -679,6 +679,7 @@ ADS_Config = {
         WET_WEATHER = false,
         LOW_FUEL = false,
         IDLE_DEPOSIT = false,
+        THROTTLE_CONTROL = false,
         ENGINE_OVERHEAT = false,
         CVT_OVERHEAT = false,
         HEAVY_TRAILER = false,

@@ -761,5 +761,7 @@
         <text name="ads_tutorial_wheel_slip_message" text="Parece que tus ruedas están patinando mucho. Puede que incluso estés atascado ahora mismo y no tengas ganas de consejos, pero tenlo en cuenta: el patinaje de ruedas es uno de los factores más destructivos para la transmisión y acercará bastante tu próxima visita al taller."/>
         <text name="ads_tutorial_battery_low_title" text="Batería débil"/>
         <text name="ads_tutorial_battery_low_message" text="Ups, parece que la batería está a punto de agotarse. Esto puede ocurrir después de un largo periodo parada, por frío intenso o debido a fallos en el sistema eléctrico.&#10;&#10;Con poca carga, arrancar será difícil o incluso imposible. Si no consigues ponerla en marcha, puedes arrancarla con pinzas desde otro vehículo usando los Cables de Arranque."/>
+        <text name="ads_tutorial_throttle_control_title" text="Control del acelerador"/>
+        <text name="ads_tutorial_throttle_control_message" text="Si juegas con teclado, puedes limitar el acelerador para no tener que pisarlo a fondo y reducir el esfuerzo del motor durante las aceleraciones intensas. Para hacerlo, mantén W + T y usa la rueda del ratón para establecer el límite deseado. A partir de ahora, al pulsar W se respetará el límite seleccionado. Si quieres darle caña durante un momento y pisar el acelerador a fondo, simplemente mantén W + Shift."/>
     </texts>
 </l10n>

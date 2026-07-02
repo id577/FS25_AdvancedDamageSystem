@@ -762,6 +762,8 @@
         <text name="ads_tutorial_wheel_slip_message" text="It looks like your wheels are slipping badly. You may even be stuck right now and not in the mood for advice, but keep this in mind: wheel slip is one of the most destructive factors for the transmission and will bring your next service visit much closer."/>
         <text name="ads_tutorial_battery_low_title" text="Weak Battery"/>
         <text name="ads_tutorial_battery_low_message" text="Oops, it looks like the battery is about to die. This can happen after a long period of standing, because of severe cold, or due to faults in the electrical system.&#10;&#10;With a low charge, starting will be difficult or even impossible. If you cannot get it started, you can jump-start the machine from another vehicle using Jumper Cables."/>
+        <text name="ads_tutorial_throttle_control_title" text="Throttle Control"/>
+        <text name="ads_tutorial_throttle_control_message" text="When playing with a keyboard, you can limit the throttle so you do not have to keep the pedal floored and can reduce engine strain during hard acceleration. To do this, hold W + T and use the mouse wheel to set the desired limit. From then on, pressing W will respect the selected limit. If you want to let it rip for a moment and floor the pedal after all, simply hold W + Shift."/>
     </texts>
 </l10n>
 

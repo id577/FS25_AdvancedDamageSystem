@@ -762,6 +762,8 @@
         <text name="ads_tutorial_wheel_slip_message" text="Vypadá to, že vám kola silně prokluzují. Možná jste zrovna zapadli a nemáte na rady náladu, ale pamatujte na tohle: prokluz kol je jedním z nejničivějších faktorů pro převodovku a výrazně vám přiblíží příští návštěvu servisu."/>
         <text name="ads_tutorial_battery_low_title" text="Slabá baterie"/>
         <text name="ads_tutorial_battery_low_message" text="Jejda, vypadá to, že baterie brzy vypoví službu. To se může stát po dlouhém stání, kvůli silnému mrazu nebo závadě v elektroinstalaci.&#10;&#10;S nízkou kapacitou bude startování obtížné nebo i nemožné. Pokud nenastartujete, můžete stroj nahodit z jiného vozidla pomocí startovacích kabelů."/>
+        <text name="ads_tutorial_throttle_control_title" text="Ovládání plynu"/>
+        <text name="ads_tutorial_throttle_control_message" text="Při hraní na klávesnici můžete omezit plyn, abyste nemuseli držet pedál sešlápnutý až na podlahu a snížili zatížení motoru při prudkém zrychlování. Podržte W + T a kolečkem myši nastavte požadovaný limit. Od této chvíle bude při stisknutí W zvolený limit zohledněn. Pokud chcete na chvíli pořádně zabrat a přece jen sešlápnout pedál až na podlahu, jednoduše podržte W + Shift."/>
     </texts>
 </l10n>
 

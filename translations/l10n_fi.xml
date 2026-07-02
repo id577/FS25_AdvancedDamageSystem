@@ -762,5 +762,7 @@
         <text name="ads_tutorial_wheel_slip_message" text="Näyttää siltä, että pyörät luistavat pahasti. Olet ehkä jumiutunut juuri nyt eikä sinua huvita neuvot, mutta pidä tämä mielessä: pyörän luistaminen on yksi tuhoisimmista tekijöistä vaihteistolle ja tuo seuraavan huoltokäynnin paljon lähemmäksi."/>
         <text name="ads_tutorial_battery_low_title" text="Heikko akku"/>
         <text name="ads_tutorial_battery_low_message" text="Hups, näyttää siltä, että akku on lähellä kuolemistaan. Tämä voi tapahtua pitkän seisontajakson jälkeen, vakavan pakkasen vuoksi tai sähköjärjestelmän vikojen takia.&#10;&#10;Alhaisella varauksella käynnistäminen on vaikeaa tai jopa mahdotonta. Jos et saa sitä käynnistymään, voit käynnistää koneen toisesta ajoneuvosta käynnistyskaapeleilla."/>
+        <text name="ads_tutorial_throttle_control_title" text="Kaasun hallinta"/>
+        <text name="ads_tutorial_throttle_control_message" text="Näppäimistöllä pelatessasi voit rajoittaa kaasua, jotta poljinta ei tarvitse pitää pohjassa ja moottorin rasitus vähenee voimakkaissa kiihdytyksissä. Pidä W + T painettuina ja aseta haluamasi raja hiiren rullalla. Tämän jälkeen W-näppäimen painaminen noudattaa valittua rajaa. Jos haluat hetkeksi antaa kunnolla kaasua ja painaa polkimen pohjaan, pidä vain W + Shift painettuina."/>
     </texts>
 </l10n>

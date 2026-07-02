@@ -309,6 +309,21 @@ function ADS_Tutorial:update(dt)
             -- ==========================================================
             -- ENGINE
             -- ==========================================================
+            --- throttle control
+            elseif not messagedData.THROTTLE_CONTROL
+                and isMotorStarted
+                and spec.dynamicMotorLoad >= 0.99
+                and speed >= 10
+                and not spec.isElectricVehicle then
+                ADS_Hud.showNotification(
+                    g_i18n:getText("ads_tutorial_throttle_control_message"),
+                    0,
+                    g_i18n:getText("ads_tutorial_throttle_control_title"),
+                    true
+                )
+                messagedData.THROTTLE_CONTROL = true
+                self.messageDowntime = downtimeAfterMessage
+
             --- engine overheat
             elseif not messagedData.ENGINE_OVERHEAT and isMotorStarted and spec.engineTemperature > 100 and not spec.isElectricVehicle then
                 ADS_Hud.showNotification(
