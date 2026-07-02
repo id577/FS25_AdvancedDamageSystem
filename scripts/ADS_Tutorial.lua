@@ -73,7 +73,7 @@ function ADS_Tutorial:update(dt)
         return
     end
 
-    self.timer = self.timer - ADS_Config.TUTORIAL_UPDATE_DELAY
+    self.timer = self.timer % ADS_Config.TUTORIAL_UPDATE_DELAY
 
     self:getADSVehicle()
 

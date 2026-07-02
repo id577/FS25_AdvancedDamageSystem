@@ -486,7 +486,7 @@ function ADS_Main:update(dt)
         self.workshopFirstEval = true
         self:forceWorkshopUpdate()
         if self.workshopCheckTimer >= ADS_Config.CORE_UPDATE_DELAY then
-            self.workshopCheckTimer = self.workshopCheckTimer - ADS_Config.CORE_UPDATE_DELAY
+            self.workshopCheckTimer = self.workshopCheckTimer % ADS_Config.CORE_UPDATE_DELAY
         end
     end
 

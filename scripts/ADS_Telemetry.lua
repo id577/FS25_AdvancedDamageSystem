@@ -541,7 +541,7 @@ function ADS_Telemetry:update(dt)
         return
     end
 
-    self.elapsedMs = self.elapsedMs - self.intervalMs
+    self.elapsedMs = self.elapsedMs % self.intervalMs
 
     local sample = self:collectSample(vehicle)
     if sample ~= nil then

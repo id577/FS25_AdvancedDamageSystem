@@ -2896,7 +2896,7 @@ local function syncColdEngineEffect(vehicle)
     end
 end
 
-local function syncOverheatProtection(vehicle)
+local function syncOverheatProtection(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil then return end
     local rawEngineTemp = AdvancedDamageSystem.sanitizeNumber(spec.rawEngineTemperature or spec.engineTemperature, -99, -99, 160)
@@ -2940,7 +2940,7 @@ local function syncOverheatProtection(vehicle)
         if vehicle.isServer then
             local engineFailedEffect = spec.activeEffects.ENGINE_FAILURE
             if rawEngineTemp > 125 and not engineFailedEffect then
-                if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(spec.onUpdateTimer, 3) then
+                if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, 3) then
                     vehicle:addBreakdown('ENGINE_JAM')
                 end
             end
@@ -3368,29 +3368,35 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     AdvancedDamageSystem.updateStartButtonActionEvents(self)
     ADS_ThrottleControl.update(self)
 
+    local updateDelay = ADS_Config.ON_UPDATE_DELAY
     spec.onUpdateTimer = spec.onUpdateTimer + dt
 
-    if spec.onUpdateTimer < ADS_Config.ON_UPDATE_DELAY then
+    if spec.onUpdateTimer < updateDelay then
         return
     end
+
+    -- State-based callbacks must only evaluate the current state once. Discard
+    -- missed sampling intervals instead of replaying them with stale data.
+    spec.onUpdateTimer = spec.onUpdateTimer % updateDelay
+    local updateDt = updateDelay
 
     --- Registration in ADS_Main.vehicles and first load checks.
     registerVehicle(self)
 
     --- Temperature smoothing
-    self:getSmoothedTemperature(spec.onUpdateTimer)
+    self:getSmoothedTemperature(updateDt)
 
     --- Fuel consumption
     syncFuelConsumption(self)
 
     --- smoothedMotorLoad
-    getSmoothedMotorLoad(self, spec.onUpdateTimer)
+    getSmoothedMotorLoad(self, updateDt)
 
     --- Checking for cold engine effect
     syncColdEngineEffect(self)
 
     --- Checking for dead alternator or dead battery
-    self:syncVoltageSagEffect(spec.onUpdateTimer)
+    self:syncVoltageSagEffect(updateDt)
 
     --- Checking for airintake clogging
     syncAirIntakeCloggingEffect(self)
@@ -3399,13 +3405,13 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     self:syncDeadBatteryEffect()
     
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
-    syncOverheatProtection(self)
+    syncOverheatProtection(self, updateDt)
 
     --- CVT addon breakdown sync
     syncCVTaddonBreakdown(self)
     
     --- Blinking warning for currently controlled vehicle
-    syncBlinkingWarning(self, spec.onUpdateTimer)
+    syncBlinkingWarning(self, updateDt)
 
     --- Side notifications for vehicles without players at the moment of the effect event
     syncSideNotifications(self)
@@ -3414,29 +3420,27 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     syncDisableAiWorkers(self)
 
     --- syncing tutorial messages
-    syncTutorialMessages(self, spec.onUpdateTimer)
+    syncTutorialMessages(self, updateDt)
     
     --- just in case, reset damage amount to 0 if it's not
     if self.isServer and self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
     
     --- AI worker overload, temp control
     if ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL then
-        self:updateAiWorkerCruiseControl(spec.onUpdateTimer)
+        self:updateAiWorkerCruiseControl(updateDt)
     end
 
     --- Enables the thermal model for neutral vehicles on the map, should the player happen to use them
     if self.isServer and ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[self.uniqueId] == nil and self:getIsControlled() then
-        self:updateThermalSystems(spec.onUpdateTimer)
+        self:updateThermalSystems(updateDt)
     end
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeFunctions) ~= nil then
         for _ , func in pairs(spec.activeFunctions) do
-            func(self, spec.onUpdateTimer)
+            func(self, updateDt)
         end
     end
-
-    spec.onUpdateTimer = spec.onUpdateTimer - ADS_Config.ON_UPDATE_DELAY
 end
 
 function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
@@ -4550,38 +4554,41 @@ function AdvancedDamageSystem:updateVehicleStateSnapshot(dt)
     local spec = self.spec_AdvancedDamageSystem
     if not self.isServer or spec == nil or spec.isExcludedVehicle then return end
 
+    local delayOne = ADS_Config.UPDATE_VEHICLE_STATE_DELAY_ONE
+    local delayTwo = ADS_Config.UPDATE_VEHICLE_STATE_DELAY_TWO
+    local delayThree = ADS_Config.UPDATE_VEHICLE_STATE_DELAY_THREE
+
     spec.updateVehicleStateTimerOne = spec.updateVehicleStateTimerOne + dt
     spec.updateVehicleStateTimerTwo = spec.updateVehicleStateTimerTwo + dt
     spec.updateVehicleStateTimerThree = spec.updateVehicleStateTimerThree + dt
 
     --- GROUP 1 ---
-    if spec.updateVehicleStateTimerOne >= ADS_Config.UPDATE_VEHICLE_STATE_DELAY_ONE then
+    if spec.updateVehicleStateTimerOne >= delayOne then
+        spec.updateVehicleStateTimerOne = spec.updateVehicleStateTimerOne % delayOne
         --- avgAbsDiffAcc for dynamic motorLoad calculations
-        updateAvgAbsDiffAccWindow(spec, self:getMotor(), spec.updateVehicleStateTimerOne)
+        updateAvgAbsDiffAccWindow(spec, self:getMotor(), delayOne)
         --- dynamic motorLoad
-        updateDynamicMotorLoad(self, spec.updateVehicleStateTimerOne)
-
-        spec.updateVehicleStateTimerOne = spec.updateVehicleStateTimerOne - ADS_Config.UPDATE_VEHICLE_STATE_DELAY_ONE
+        updateDynamicMotorLoad(self, delayOne)
     end
 
     --- GROUP 2 ---
-    if spec.updateVehicleStateTimerTwo >= ADS_Config.UPDATE_VEHICLE_STATE_DELAY_TWO then
+    if spec.updateVehicleStateTimerTwo >= delayTwo then
+        spec.updateVehicleStateTimerTwo = spec.updateVehicleStateTimerTwo % delayTwo
         --- isCranking
         updateStarterState(self)
         --- whee slip
         updateWheelSlip(self)
         --- chassis vibration
-        updateChassisVibState(self, spec.updateVehicleStateTimerTwo)
+        updateChassisVibState(self, delayTwo)
         --- low speed steering
-        updateChassisSteeringState(self, spec.updateVehicleStateTimerTwo)
+        updateChassisSteeringState(self, delayTwo)
         --- braking under mass
         updateChassisBrakingState(self)
-        
-        spec.updateVehicleStateTimerTwo = spec.updateVehicleStateTimerTwo - ADS_Config.UPDATE_VEHICLE_STATE_DELAY_TWO
     end
     
     --- GROUP 3 ---
-    if spec.updateVehicleStateTimerThree >= ADS_Config.UPDATE_VEHICLE_STATE_DELAY_THREE then
+    if spec.updateVehicleStateTimerThree >= delayThree then
+        spec.updateVehicleStateTimerThree = spec.updateVehicleStateTimerThree % delayThree
         --- max friction force
         updateActiveDraftStats(self)
         --- average tire friction coefficient
@@ -4589,11 +4596,9 @@ function AdvancedDamageSystem:updateVehicleStateSnapshot(dt)
         --- implement chain state
         updateImplementChainState(self)
         --- fuel state
-        updateFuelState(self, spec.updateVehicleStateTimerThree)
+        updateFuelState(self, delayThree)
         --- is vehicle under roof
         spec.isUnderRoof = self:isUnderRoof()
-
-        spec.updateVehicleStateTimerThree = spec.updateVehicleStateTimerThree - ADS_Config.UPDATE_VEHICLE_STATE_DELAY_THREE
     end
 end
 
