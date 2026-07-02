@@ -911,6 +911,7 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.BOOL,   baseKey .. "#isExcludedByUser", "User-controlled ADS exclusion flag")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#service", "Service Level")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#condition", "Condition Level")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#acceleratorPedalLimit", "Driver accelerator pedal limit")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#breakdowns", "Active Breakdowns")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#state", "Current State")
     schemaSavegame:register(XMLValueType.STRING, baseKey .. "#plannedState", "Planned State")
@@ -1485,6 +1486,10 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         end
         xmlFile:setValue(key .. "#service", spec.serviceLevel or 1.0)
         xmlFile:setValue(key .. "#condition", spec.conditionLevel or 1.0)
+        xmlFile:setValue(
+            key .. "#acceleratorPedalLimit",
+            AdvancedDamageSystem.sanitizeNumber(spec.acceleratorPedalLimit, 1.0, 0.0, 1.0)
+        )
         xmlFile:setValue(key .. "#realOperatingTime", realOperatingTime or currentOperatingTime)
         if xmlFile.handle ~= nil then
             setXMLFloat(xmlFile.handle, key .. "#realOperatingTime", tonumber(realOperatingTime or currentOperatingTime) or 0)
@@ -2087,6 +2092,12 @@ function AdvancedDamageSystem:onPostLoad(savegame)
 
         spec.serviceLevel = AdvancedDamageSystem.sanitizeNumber(savegame.xmlFile:getValue(key .. "#service", spec.serviceLevel), spec.serviceLevel or 1.0, 0.001)
         spec.conditionLevel = AdvancedDamageSystem.sanitizeNumber(savegame.xmlFile:getValue(key .. "#condition", spec.conditionLevel), spec.conditionLevel or 1.0, 0.001, 1.0)
+        spec.acceleratorPedalLimit = AdvancedDamageSystem.sanitizeNumber(
+            savegame.xmlFile:getValue(key .. "#acceleratorPedalLimit", 1.0),
+            1.0,
+            0.0,
+            1.0
+        )
         spec.currentState = savegame.xmlFile:getValue(key .. "#state", spec.currentState)
         spec.plannedState = savegame.xmlFile:getValue(key .. "#plannedState", spec.plannedState)
         spec.maintenanceTimer = AdvancedDamageSystem.sanitizeNumber(savegame.xmlFile:getValue(key .. "#maintenanceTimer", spec.maintenanceTimer), spec.maintenanceTimer or 0, 0)
