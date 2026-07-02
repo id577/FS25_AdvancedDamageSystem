@@ -3359,10 +3359,28 @@ ADS_Breakdowns.EffectApplicators.ENGINE_HESITATION_CHANCE = {
     end
 }
 
+function ADS_Breakdowns.getMaxAllowedAcceleration(vehicle, allowFullThrottleOverride)
+    local spec_ads = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    if spec_ads == nil then
+        return 1.0
+    end
+
+    local useFullThrottle = allowFullThrottleOverride == true and spec_ads.fullThrottleOverridePressed == true
+    local maxAllowedAcceleration = useFullThrottle
+        and 1.0
+        or math.clamp(tonumber(spec_ads.acceleratorPedalLimit) or 1.0, 0.0, 1.0)
+
+    local limpEffect = spec_ads.activeEffects ~= nil and spec_ads.activeEffects.ENGINE_LIMP_EFFECT or nil
+    if limpEffect ~= nil and limpEffect.value ~= nil then
+        maxAllowedAcceleration = math.min(maxAllowedAcceleration, math.max(1 + limpEffect.value, 0.2))
+    end
+
+    return maxAllowedAcceleration
+end
+
 function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, axisSide, doHandbrake, dt)
     local spec_ads = vehicle.spec_AdvancedDamageSystem
     local brakeEffect = spec_ads and spec_ads.activeEffects.BRAKE_FORCE_MODIFIER
-    local limpEffect = spec_ads and spec_ads.activeEffects.ENGINE_LIMP_EFFECT
     local hesitationEffect = spec_ads and spec_ads.activeEffects.ENGINE_HESITATION_CHANCE
     local steeringStaticBiasEffect = spec_ads and spec_ads.activeEffects.STEERING_STATIC_BIAS_EFFECT
     local steeringSensitivityEffect = spec_ads and spec_ads.activeEffects.STEERING_SENSITIVITY_MODIFIER
@@ -3397,21 +3415,20 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
         axisSide = math.clamp(axisSide, -1.0, 1.0)
     end
 
-    if limpEffect and limpEffect.value then
-        local maxAllowedAcceleration = math.max(1 + limpEffect.value, 0.2)
-        if math.abs(axisForward) > maxAllowedAcceleration then
-            if drivingMode == 2 then
-                if axisForward > maxAllowedAcceleration then
+    local maxAllowedAcceleration = ADS_Breakdowns.getMaxAllowedAcceleration(vehicle, true)
+
+    if math.abs(axisForward) > maxAllowedAcceleration then
+        if drivingMode == 2 then
+            if axisForward > maxAllowedAcceleration then
+                axisForward = maxAllowedAcceleration
+            end
+        else
+            if math.sign(vehicle.movingDirection) == math.sign(axisForward) then
+                if axisForward > 0 then
                     axisForward = maxAllowedAcceleration
+                else
+                    axisForward = -1 * maxAllowedAcceleration
                 end
-            else
-                if math.sign(vehicle.movingDirection) == math.sign(axisForward) then
-                    if axisForward > 0 then
-                        axisForward = maxAllowedAcceleration
-                    else
-                        axisForward = -1 * maxAllowedAcceleration
-                    end
-                end   
             end
         end
     end
@@ -3484,7 +3501,41 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
 
     return result
 end
-                  
+
+function ADS_Breakdowns.updateWheelsPhysics(vehicle, superFunc, dt, currentSpeed, acceleration, doHandbrake, stopAndGoBraking)
+    local spec_ads = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    local drivableSpec = vehicle ~= nil and vehicle.spec_drivable or nil
+    local cruiseControl = drivableSpec ~= nil and drivableSpec.cruiseControl or nil
+    local isCruiseControlActive = cruiseControl ~= nil
+        and cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF
+
+    if spec_ads ~= nil and not spec_ads.isExcludedVehicle and isCruiseControlActive and math.abs(acceleration) > 0.01 then
+        -- Cruise control replaces the driver input with full acceleration inside Drivable.
+        -- Clamp that final value here; Shift only bypasses the manual W limit, not cruise control.
+        local hesitationEffect = spec_ads.activeEffects ~= nil and spec_ads.activeEffects.ENGINE_HESITATION_CHANCE or nil
+        if hesitationEffect ~= nil
+            and hesitationEffect.extraData ~= nil
+            and hesitationEffect.extraData.status == "CHOKING" then
+            acceleration = acceleration * math.max(1 - (tonumber(hesitationEffect.extraData.amplitude) or 0), 0)
+        end
+
+        local maxAllowedAcceleration = ADS_Breakdowns.getMaxAllowedAcceleration(vehicle, false)
+        acceleration = math.clamp(acceleration, -maxAllowedAcceleration, maxAllowedAcceleration)
+    end
+
+    return superFunc(vehicle, dt, currentSpeed, acceleration, doHandbrake, stopAndGoBraking)
+end
+
+if not ADS_Breakdowns.wheelsPhysicsHookInstalled
+    and WheelsUtil ~= nil
+    and WheelsUtil.updateWheelsPhysics ~= nil then
+    WheelsUtil.updateWheelsPhysics = Utils.overwrittenFunction(
+        WheelsUtil.updateWheelsPhysics,
+        ADS_Breakdowns.updateWheelsPhysics
+    )
+    ADS_Breakdowns.wheelsPhysicsHookInstalled = true
+end
+
 -- ==========================================================
 -- ENGINE_TORQUE_MODIFIER
 ADS_Breakdowns.EffectApplicators.ENGINE_TORQUE_MODIFIER = {

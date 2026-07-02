@@ -1182,6 +1182,9 @@ function AdvancedDamageSystem:onWriteStream(streamId, connection)
         local entry = spec.maintenanceLog[i]
         streamWriteString(streamId, ADS_Utils.serializeMaintenanceLogEntry(entry))
     end
+
+    -- [Group 11] Driver controls
+    streamWriteFloat32(streamId, AdvancedDamageSystem.sanitizeNumber(spec.acceleratorPedalLimit, 1.0, 0.0, 1.0))
 end
 
 function AdvancedDamageSystem:onReadStream(streamId, connection)
@@ -1283,6 +1286,9 @@ function AdvancedDamageSystem:onReadStream(streamId, connection)
             table.insert(spec.maintenanceLog, entry)
         end
     end
+
+    -- [Group 11] Driver controls
+    spec.acceleratorPedalLimit = AdvancedDamageSystem.sanitizeNumber(streamReadFloat32(streamId), 1.0, 0.0, 1.0)
 
     self:recalculateAndApplyEffects()
     self:recalculateAndApplyIndicators()
@@ -1597,6 +1603,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.baseConditionLevel = 1.0
     self.spec_AdvancedDamageSystem.serviceLevel = self.spec_AdvancedDamageSystem.baseServiceLevel
     self.spec_AdvancedDamageSystem.conditionLevel = self.spec_AdvancedDamageSystem.baseConditionLevel
+    self.spec_AdvancedDamageSystem.acceleratorPedalLimit = 1.0
 
     local currentOperatingTime = self.getOperatingTime ~= nil and self:getOperatingTime() or self.operatingTime or 0
     local existingRealOperatingTime = tonumber(self.spec_AdvancedDamageSystem.realOperatingTime) or 0
@@ -1662,6 +1669,10 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.startButtonDown = false
     self.spec_AdvancedDamageSystem.startButtonHeld = false
     self.spec_AdvancedDamageSystem.startButtonUp = false
+    self.spec_AdvancedDamageSystem.throttleControlActionEvents = {}
+    self.spec_AdvancedDamageSystem.fullThrottleOverridePressed = false
+    self.spec_AdvancedDamageSystem.throttleAdjustmentPressed = false
+    self.spec_AdvancedDamageSystem.throttleAdjustmentModeActive = false
 
     self.spec_AdvancedDamageSystem.radiatorClogging = 0.0
     self.spec_AdvancedDamageSystem.lubricationLevel = 1.0
@@ -2590,6 +2601,16 @@ function AdvancedDamageSystem:onLeaveVehicle(wasEntered)
     if hadStartInput then
         ADS_StartButtonEvent.send(self, false, false, false)
     end
+
+    local hadFullThrottleInput = spec.fullThrottleOverridePressed == true
+    spec.fullThrottleOverridePressed = false
+
+    if hadFullThrottleInput then
+        ADS_FullThrottleEvent.send(self, false)
+    end
+
+    spec.throttleAdjustmentPressed = false
+    spec.throttleAdjustmentModeActive = false
 end
 
 function AdvancedDamageSystem.updateStartButtonActionEvents(self)
@@ -2647,9 +2668,52 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
     end
 
     self:clearActionEventsTable(spec.startButtonActionEvents)
+    self:clearActionEventsTable(spec.throttleControlActionEvents)
 
     if not isActiveForInputIgnoreSelection then
+        if spec.fullThrottleOverridePressed then
+            spec.fullThrottleOverridePressed = false
+            ADS_FullThrottleEvent.send(self, false)
+        end
+        spec.throttleAdjustmentPressed = false
+        spec.throttleAdjustmentModeActive = false
         return
+    end
+
+    if InputAction.ADS_FULL_THROTTLE ~= nil then
+        local _, actionEventId = self:addActionEvent(
+            spec.throttleControlActionEvents,
+            InputAction.ADS_FULL_THROTTLE,
+            self,
+            AdvancedDamageSystem.onFullThrottleAction,
+            true,
+            true,
+            false,
+            true,
+            nil
+        )
+
+        if actionEventId ~= nil then
+            g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+        end
+    end
+
+    if InputAction.ADS_ADJUST_THROTTLE ~= nil then
+        local _, actionEventId = self:addActionEvent(
+            spec.throttleControlActionEvents,
+            InputAction.ADS_ADJUST_THROTTLE,
+            self,
+            ADS_ThrottleControl.onAdjustmentAction,
+            true,
+            true,
+            false,
+            true,
+            nil
+        )
+
+        if actionEventId ~= nil then
+            g_inputBinding:setActionEventTextVisibility(actionEventId, false)
+        end
     end
 
     local startInputActions = {
@@ -2686,6 +2750,22 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
     end
 
     AdvancedDamageSystem.updateStartButtonActionEvents(self)
+end
+
+function AdvancedDamageSystem.onFullThrottleAction(self, actionName, inputValue, callbackState, isAnalog, isMouse, deviceCategory, binding)
+    local spec = self ~= nil and self.spec_AdvancedDamageSystem or nil
+    if spec == nil then
+        return
+    end
+
+    local value = tonumber(inputValue) or 0
+    local isPressed = binding ~= nil and binding.isPressed == true
+    local fullThrottleOverridePressed = isPressed or value > 0.5
+
+    if spec.fullThrottleOverridePressed ~= fullThrottleOverridePressed then
+        spec.fullThrottleOverridePressed = fullThrottleOverridePressed
+        ADS_FullThrottleEvent.send(self, fullThrottleOverridePressed)
+    end
 end
 
 -- ==========================================================
@@ -3286,6 +3366,7 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     self:updateVehicleStateSnapshot(dt)
     AdvancedDamageSystem.updateStartButtonActionEvents(self)
+    ADS_ThrottleControl.update(self)
 
     spec.onUpdateTimer = spec.onUpdateTimer + dt
 

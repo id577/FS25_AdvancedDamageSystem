@@ -390,9 +390,63 @@ function ADS_Hud:draw()
     end
 
     if self.vehicle ~= nil then
+        self:drawThrottlePedalLimit()
         self:drawDashboard()
         self:drawFuelConsumption()
     end
+end
+
+function ADS_Hud:drawThrottlePedalLimit()
+    local vehicle = self.vehicle
+    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
+    if spec == nil or spec.throttleAdjustmentModeActive ~= true then
+        return
+    end
+
+    local value = math.clamp(tonumber(spec.acceleratorPedalLimit) or 1.0, 0.0, 1.0)
+    local backgroundWidth = self:scalePixelToScreenWidth(10)
+    local backgroundHeight = self:scalePixelToScreenHeight(166)
+    local trackWidth = self:scalePixelToScreenWidth(4)
+    local trackHeight = self:scalePixelToScreenHeight(160)
+    local speedMeter = g_currentMission.hud.speedMeter
+    local speedBg = speedMeter ~= nil and speedMeter.speedBg or nil
+    local speedBgX = speedBg ~= nil and speedBg.x or (g_hudAnchorRight or 0.95)
+    local speedBgY = speedBg ~= nil and speedBg.y or (g_hudAnchorBottom or 0.02)
+    local speedBgHeight = speedBg ~= nil and speedBg.height or self:scalePixelToScreenHeight(232)
+    local gapPixels = 17
+    if hasCVTAddon(vehicle) then
+        gapPixels = gapPixels + 70
+    end
+    local gap = self:scalePixelToScreenWidth(gapPixels)
+    local backgroundX = speedBgX - gap - backgroundWidth
+    local backgroundY = speedBgY + (speedBgHeight - backgroundHeight) * 0.5 - self:scalePixelToScreenHeight(10)
+    local trackX = backgroundX + (backgroundWidth - trackWidth) * 0.5
+    local trackY = backgroundY + (backgroundHeight - trackHeight) * 0.5
+
+    drawFilledRect(backgroundX, backgroundY, backgroundWidth, backgroundHeight, 0, 0, 0, 0.3)
+    drawFilledRect(trackX, trackY, trackWidth, trackHeight, 0, 0, 0, 1)
+
+    local fillHeight = trackHeight * value
+    if fillHeight > 0 then
+        local activeColor = HUD ~= nil and HUD.COLOR ~= nil and HUD.COLOR.ACTIVE or ADS_Hud.COLOR_GAME_GREEN
+        drawFilledRect(trackX, trackY, trackWidth, fillHeight, unpack(activeColor))
+    end
+
+    local tickHeight = self:scalePixelToScreenHeight(2)
+    for _, fraction in ipairs({0.25, 0.5, 0.75}) do
+        local tickY = trackY + trackHeight * fraction - tickHeight * 0.5
+        drawFilledRect(trackX, tickY, trackWidth, tickHeight, 0, 0, 0, 0.55)
+    end
+
+    local textSize = self:scalePixelToScreenHeight(14)
+    local textX = backgroundX + backgroundWidth * 0.5
+    local textY = backgroundY + backgroundHeight + self:scalePixelToScreenHeight(5)
+    setTextAlignment(RenderText.ALIGN_CENTER)
+    setTextColor(1, 1, 1, 0.85)
+    setTextBold(false)
+    renderText(textX, textY, textSize, string.format("%d%%", math.floor(value * 100 + 0.5)))
+    setTextAlignment(RenderText.ALIGN_LEFT)
+    setTextColor(1, 1, 1, 1)
 end
 
 -- =====================================================================================

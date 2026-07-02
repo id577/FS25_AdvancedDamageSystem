@@ -563,6 +563,8 @@
         <text name="ads_jumper_cables_is_too_far" text="%s túl messze van ettől: %s" />
         <text name="input_ADS_FIELD_INSPECTION" text="Jármű átvizsgálása" />
         <text name="input_ADS_CLOSE_NOTIFICATION" text="OK" />
+        <text name="input_ADS_FULL_THROTTLE" text="Teljes gáz" />
+        <text name="input_ADS_ADJUST_THROTTLE" text="Gázkorlát beállítása" />
         <text name="ads_field_inspection_action" text="Jármű átvizsgálása" />
         <text name="ads_field_inspection_hold_to_start" text="Tartsd nyomva az átvizsgálás indításához" />
         <text name="ads_field_inspection_starting" text="Átvizsgálás indítása..." />

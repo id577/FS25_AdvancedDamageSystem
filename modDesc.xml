@@ -313,6 +313,8 @@ Changelog 0.9.0.0:
     <actions>
         <action name="ADS_FIELD_INSPECTION" axisType="HALF" displayCategory="PLAYER_INTERACTIVE"/>
         <action name="ADS_CLOSE_NOTIFICATION" displayCategory="PLAYER_INTERACTIVE"/>
+        <action name="ADS_FULL_THROTTLE" category="VEHICLE" axisType="HALF" displayCategory="VEHICLE_DRIVING"/>
+        <action name="ADS_ADJUST_THROTTLE" category="VEHICLE" axisType="HALF" displayCategory="VEHICLE_DRIVING"/>
     </actions>
     <inputBinding>
         <actionBinding action="ADS_FIELD_INSPECTION">
@@ -321,6 +323,12 @@ Changelog 0.9.0.0:
         <actionBinding action="ADS_CLOSE_NOTIFICATION">
             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_LEFT"/>
             <binding device="0_XINPUT_GAMEPAD" input="BUTTON_1"/>
+        </actionBinding>
+        <actionBinding action="ADS_FULL_THROTTLE">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift"/>
+        </actionBinding>
+        <actionBinding action="ADS_ADJUST_THROTTLE">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_t"/>
         </actionBinding>
     </inputBinding>
     <l10n filenamePrefix="translations/l10n"/>

@@ -563,6 +563,8 @@
         <text name="ads_jumper_cables_is_too_far" text="%s est trop éloigné de %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Inspection du véhicule"/>
         <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
+        <text name="input_ADS_FULL_THROTTLE" text="Pleine accélération"/>
+        <text name="input_ADS_ADJUST_THROTTLE" text="Régler la limite d'accélération"/>
         <text name="ads_field_inspection_action" text="Inspecter le véhicule"/>
         <text name="ads_field_inspection_hold_to_start" text="Maintenir pour commencer l'inspection"/>
         <text name="ads_field_inspection_starting" text="Démarrage de l'inspection..."/>

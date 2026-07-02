@@ -17,6 +17,7 @@ source(g_currentModDirectory .. "gui/ADS_MaintenanceTwoOptionsDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_MaintenanceThreeOptionsDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_WelcomeDialog.lua")
 source(g_currentModDirectory .. "gui/ADS_SettingsPage.lua")
+source(g_currentModDirectory .. "scripts/ADS_ThrottleControl.lua")
 source(g_currentModDirectory .. "scripts/ADS_Hud.lua")
 source(g_currentModDirectory .. "scripts/ADS_Telemetry.lua")
 source(g_currentModDirectory .. "scripts/ADS_PlayerInput.lua")
@@ -30,6 +31,8 @@ source(g_currentModDirectory .. "events/ADS_LogEntrySyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_ConsoleCommandEvent.lua")
 source(g_currentModDirectory .. "events/ADS_VehicleExclusionEvent.lua")
 source(g_currentModDirectory .. "events/ADS_StartButtonEvent.lua")
+source(g_currentModDirectory .. "events/ADS_FullThrottleEvent.lua")
+source(g_currentModDirectory .. "events/ADS_AcceleratorPedalLimitEvent.lua")
 source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
 source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
 
@@ -142,6 +145,7 @@ end
 
 function ADS_Main:onStartMission()
     ADS_Main.loadGuiProfiles()
+    ADS_ThrottleControl.installCameraHooks()
     self.shopMenuPageInstalled = false
     self.shopMenuFrame = nil
 

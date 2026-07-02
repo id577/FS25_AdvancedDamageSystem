@@ -569,6 +569,8 @@
         <text name="ads_jumper_cables_is_too_far" text="%s занадто далеко від %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Огляд техніки"/>
         <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
+        <text name="input_ADS_FULL_THROTTLE" text="Повний газ"/>
+        <text name="input_ADS_ADJUST_THROTTLE" text="Регулювання обмеження газу"/>
         <text name="ads_field_inspection_action" text="Оглянути техніку"/>
         <text name="ads_field_inspection_hold_to_start" text="Утримуйте для початку огляду"/>
         <text name="ads_field_inspection_starting" text="Початок огляду..."/>

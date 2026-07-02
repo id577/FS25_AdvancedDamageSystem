@@ -570,6 +570,8 @@
         <text name="ads_jumper_cables_is_too_far" text="Odległość między %s a %s jest zbyt duża"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Badanie stanu technicznego pojazdu"/>
         <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
+        <text name="input_ADS_FULL_THROTTLE" text="Pełny gaz"/>
+        <text name="input_ADS_ADJUST_THROTTLE" text="Regulacja ograniczenia gazu"/>
         <text name="ads_field_inspection_action" text="Dokonaj przeglądu pojazdu"/>
         <text name="ads_field_inspection_hold_to_start" text="Przytrzymaj, aby rozpocząć przegląd"/>
         <text name="ads_field_inspection_starting" text="Rozpoczynanie inspekcji..."/>

@@ -570,6 +570,8 @@
         <text name="ads_jumper_cables_is_too_far" text="%s on liian kaukana kohteesta %s"/>
         <text name="input_ADS_FIELD_INSPECTION" text="Ajoneuvon tarkastus"/>
         <text name="input_ADS_CLOSE_NOTIFICATION" text="OK"/>
+        <text name="input_ADS_FULL_THROTTLE" text="Täysi kaasu"/>
+        <text name="input_ADS_ADJUST_THROTTLE" text="Säädä kaasurajoitusta"/>
         <text name="ads_field_inspection_action" text="Tarkasta ajoneuvo"/>
         <text name="ads_field_inspection_hold_to_start" text="Pidä pohjassa aloittaaksesi tarkastuksen"/>
         <text name="ads_field_inspection_starting" text="Aloitetaan tarkastus..."/>
