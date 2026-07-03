@@ -897,7 +897,7 @@ function ADS_ReportDialog:populateOverallAssessmentCell(index, cell)
     local nominalWearRate = ADS_Config.CORE.BASE_SYSTEMS_WEAR / reportReliability
 
     local assessmentConfig = {
-        ads_report_overall_assessment_condition =  {inverted = false, ideal = 0.99, high = 0.8, mid = 0.6, low = 0.4, stdVisible = true, isPercent = true},
+        ads_report_overall_assessment_condition =  {inverted = false, ideal = 0.8, high = 0.6, mid = 0.4, low = 0.2, stdVisible = true, isPercent = true},
         ads_report_overall_assessment_service = {inverted = false, ideal = 0.9, high = 0.5, mid = 0.2, low = 0.001, stdVisible = true, isPercent = true},
         ads_report_overall_assessment_mtbf = {inverted = false, ideal = maxMtbf, high = diffMtbf * 0.66, mid = diffMtbf * 0.33, low = minMtbf, stdVisible = false, isPercent = false},
         ads_report_overall_assessment_rul = {inverted = false, ideal = rel, high = rel * 0.66, mid = rel * 0.33, low = rel * 0.1, stdVisible = false, isPercent = false},
