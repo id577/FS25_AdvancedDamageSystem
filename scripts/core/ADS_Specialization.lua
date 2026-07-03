@@ -1073,6 +1073,7 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     
     SpecializationUtil.registerFunction(vehicleType, "isUnderService", AdvancedDamageSystem.isUnderService)
     SpecializationUtil.registerFunction(vehicleType, "isUnderRoof", AdvancedDamageSystem.isUnderRoof)
+    SpecializationUtil.registerFunction(vehicleType, "isUnderRoofRaycastCallback", AdvancedDamageSystem.isUnderRoofRaycastCallback)
     SpecializationUtil.registerFunction(vehicleType, "getCurrentStatus", AdvancedDamageSystem.getCurrentStatus)
     
     SpecializationUtil.registerFunction(vehicleType, "updateThermalSystems", ADS_Thermal.updateThermalSystems)
@@ -1972,6 +1973,10 @@ function AdvancedDamageSystem:onLoad(savegame)
 
     self.spec_AdvancedDamageSystem.isExcludedFromPTOSharpAngleFactor = false
     self.spec_AdvancedDamageSystem.isUnderRoof = true
+    self.spec_AdvancedDamageSystem.roofRaycastHit = false
+    self.spec_AdvancedDamageSystem.roofRaycastResult = nil
+    self.spec_AdvancedDamageSystem.roofLastRaycastTime = nil
+    self.spec_AdvancedDamageSystem.roofWasStationary = false
     self.spec_AdvancedDamageSystem.dynamicMotorLoad = 0
     self.spec_AdvancedDamageSystem.avgDynamicMotorLoad = 0
     self.spec_AdvancedDamageSystem.avgSpeed = 0
@@ -8020,7 +8025,15 @@ function AdvancedDamageSystem:getSystemStressLevel(systemName)
     return spec.systems[systemKey].stress
 end
 
+function AdvancedDamageSystem:isUnderRoofRaycastCallback()
+    local spec = self.spec_AdvancedDamageSystem
+    if spec ~= nil then
+        spec.roofRaycastHit = true
+    end
+end
+
 function AdvancedDamageSystem:isUnderRoof()
+    local spec = self.spec_AdvancedDamageSystem
     local node = self.rootNode
     if (node == nil or node == 0) and self.components ~= nil and self.components[1] ~= nil then
         node = self.components[1].node
@@ -8032,59 +8045,85 @@ function AdvancedDamageSystem:isUnderRoof()
 
     local x, y, z = getWorldTranslation(node)
     local mission = g_currentMission
+    local isIndoorMask = false
 
     if mission ~= nil and mission.indoorMask ~= nil then
-        local handle, firstChannel, numChannels = mission.indoorMask:getDensityMapData()
-        if handle ~= nil and handle ~= 0 and mission.terrainSize ~= nil and mission.terrainSize > 0 then
-            local maskSize = getBitVectorMapSize(handle)
-            if maskSize ~= nil and maskSize > 0 then
-                local terrainHalfSize = mission.terrainSize * 0.5
-                local worldToDensityMap = maskSize / mission.terrainSize
-                local xI = math.floor((x + terrainHalfSize) * worldToDensityMap)
-                local zI = math.floor((z + terrainHalfSize) * worldToDensityMap)
+        if mission.indoorMask.getIsIndoorAtWorldPosition ~= nil then
+            isIndoorMask = mission.indoorMask:getIsIndoorAtWorldPosition(x, z) == true
+        else
+            local handle, firstChannel, numChannels = mission.indoorMask:getDensityMapData()
+            if handle ~= nil and handle ~= 0 and mission.terrainSize ~= nil and mission.terrainSize > 0 then
+                local maskSize = getBitVectorMapSize(handle)
+                if maskSize ~= nil and maskSize > 0 then
+                    local terrainHalfSize = mission.terrainSize * 0.5
+                    local worldToDensityMap = maskSize / mission.terrainSize
+                    local xI = math.floor((x + terrainHalfSize) * worldToDensityMap)
+                    local zI = math.floor((z + terrainHalfSize) * worldToDensityMap)
 
-                if xI >= 0 and xI < maskSize and zI >= 0 and zI < maskSize then
-                    local maskValue = getBitVectorMapPoint(handle, xI, zI, firstChannel, numChannels)
-                    local indoorValue = IndoorMask ~= nil and IndoorMask.INDOOR or 1
-                    return maskValue == indoorValue
-                end
-            end
-        end
-    end
-
-    if mission == nil or mission.placeableSystem == nil or mission.placeableSystem.placeables == nil then
-        return false
-    end
-
-    for _, placeable in pairs(mission.placeableSystem.placeables) do
-        local indoorAreas = placeable.spec_indoorAreas
-        if indoorAreas ~= nil and indoorAreas.areas ~= nil and placeable.rootNode ~= nil and placeable.rootNode ~= 0 then
-            local localX, _, localZ = worldToLocal(placeable.rootNode, x, y, z)
-
-            for _, area in ipairs(indoorAreas.areas) do
-                if area.start ~= nil and area.width ~= nil and area.height ~= nil then
-                    local sx, sy, sz = getWorldTranslation(area.start)
-                    local wx, wy, wz = getWorldTranslation(area.width)
-                    local hx, hy, hz = getWorldTranslation(area.height)
-
-                    local localStartX, _, localStartZ = worldToLocal(placeable.rootNode, sx, sy, sz)
-                    local localWidthX, _, localWidthZ = worldToLocal(placeable.rootNode, wx, wy, wz)
-                    local localHeightX, _, localHeightZ = worldToLocal(placeable.rootNode, hx, hy, hz)
-
-                    local minX = math.min(localStartX, localWidthX, localHeightX)
-                    local maxX = math.max(localStartX, localWidthX, localHeightX)
-                    local minZ = math.min(localStartZ, localWidthZ, localHeightZ)
-                    local maxZ = math.max(localStartZ, localWidthZ, localHeightZ)
-
-                    if localX >= minX and localX <= maxX and localZ >= minZ and localZ <= maxZ then
-                        return true
+                    if xI >= 0 and xI < maskSize and zI >= 0 and zI < maskSize then
+                        local maskValue = getBitVectorMapPoint(handle, xI, zI, firstChannel, numChannels)
+                        local indoorValue = IndoorMask ~= nil and IndoorMask.INDOOR or 1
+                        isIndoorMask = maskValue == indoorValue
                     end
                 end
             end
         end
     end
 
-    return false
+    local movementVehicle = self.rootVehicle or self
+    local speed = movementVehicle.getLastSpeed ~= nil and math.abs(tonumber(movementVehicle:getLastSpeed(true)) or 0) or 0
+    local stationarySpeedLimit = tonumber(ADS_Config.ROOF_STATIONARY_SPEED_LIMIT) or 0.5
+    local isStationary = speed <= stationarySpeedLimit
+
+    if not isStationary then
+        if spec ~= nil then
+            spec.roofWasStationary = false
+            spec.roofLastRaycastTime = nil
+            spec.roofRaycastResult = nil
+        end
+        return isIndoorMask
+    end
+
+    if spec == nil then
+        return isIndoorMask
+    end
+
+    local now = (mission ~= nil and mission.time) or g_time or 0
+    local raycastInterval = tonumber(ADS_Config.ROOF_RAYCAST_INTERVAL) or 5000
+    local lastRaycastTime = tonumber(spec.roofLastRaycastTime)
+    local needsRaycast = spec.roofWasStationary ~= true
+        or lastRaycastTime == nil
+        or now < lastRaycastTime
+        or now - lastRaycastTime >= raycastInterval
+
+    spec.roofWasStationary = true
+
+    if needsRaycast and raycastClosest ~= nil and CollisionFlag ~= nil then
+        spec.roofLastRaycastTime = now
+        spec.roofRaycastHit = false
+
+        local roofMask = CollisionFlag.STATIC_OBJECT + CollisionFlag.BUILDING
+        raycastClosest(
+            x,
+            y + (tonumber(ADS_Config.ROOF_RAYCAST_START_OFFSET) or 1),
+            z,
+            0,
+            1,
+            0,
+            tonumber(ADS_Config.ROOF_RAYCAST_DISTANCE) or 40,
+            "isUnderRoofRaycastCallback",
+            self,
+            roofMask
+        )
+
+        spec.roofRaycastResult = spec.roofRaycastHit == true
+    end
+
+    if spec.roofRaycastResult ~= nil then
+        return spec.roofRaycastResult == true
+    end
+
+    return isIndoorMask
 end
 
 function AdvancedDamageSystem:isUnderService()

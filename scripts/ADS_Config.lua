@@ -23,6 +23,10 @@ ADS_Config = {
     UPDATE_VEHICLE_STATE_DELAY_ONE = 50,
     UPDATE_VEHICLE_STATE_DELAY_TWO = 200,
     UPDATE_VEHICLE_STATE_DELAY_THREE = 500,
+    ROOF_RAYCAST_INTERVAL = 5000,
+    ROOF_RAYCAST_DISTANCE = 40,
+    ROOF_RAYCAST_START_OFFSET = 1,
+    ROOF_STATIONARY_SPEED_LIMIT = 0.5,
     
     -- How often the main simulation logic (wear, temperature, etc.) updates, in milliseconds.
     -- This handles the slow-burning processes. A higher value is better for performance
