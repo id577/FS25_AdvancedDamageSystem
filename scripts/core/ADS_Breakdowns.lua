@@ -3380,6 +3380,10 @@ end
 
 function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, axisSide, doHandbrake, dt)
     local spec_ads = vehicle.spec_AdvancedDamageSystem
+    if spec_ads == nil then
+        return superFunc(vehicle, axisForward, axisSide, doHandbrake, dt)
+    end
+
     local brakeEffect = spec_ads and spec_ads.activeEffects.BRAKE_FORCE_MODIFIER
     local hesitationEffect = spec_ads and spec_ads.activeEffects.ENGINE_HESITATION_CHANCE
     local steeringStaticBiasEffect = spec_ads and spec_ads.activeEffects.STEERING_STATIC_BIAS_EFFECT
@@ -5610,7 +5614,7 @@ ADS_Breakdowns.EffectApplicators.EMPTY_EFFECT = {
 -- ==========================================================
 function ADS_Breakdowns.getCanMotorRun(self, superFunc)
     local spec = self.spec_AdvancedDamageSystem
-    if spec ~= nil and spec.isExcludedVehicle then
+    if spec == nil or spec.isExcludedVehicle then
         return superFunc(self)
     end
 

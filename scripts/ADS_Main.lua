@@ -83,7 +83,7 @@ function ADS_Main.registerSpecializationToVehicles()
             not string.find(vehicleType, "FS25_ASM_FarmyardTrailerDolly") and
             vehicleType ~= "motorbike" and 
             vehicleType ~= "inlineWrapper" and 
-            vehicleType ~= "locomotive" and 
+            not string.find(string.lower(vehicleType), "locomotive", 1, true) and
             vehicleType ~= "conveyorBelt" and 
             vehicleType ~= "pickupConveyorBelt" and 
             vehicleType ~= "woodCrusherTrailermotorized" and 
