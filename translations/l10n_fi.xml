@@ -763,6 +763,6 @@
         <text name="ads_tutorial_battery_low_title" text="Heikko akku"/>
         <text name="ads_tutorial_battery_low_message" text="Hups, näyttää siltä, että akku on lähellä kuolemistaan. Tämä voi tapahtua pitkän seisontajakson jälkeen, vakavan pakkasen vuoksi tai sähköjärjestelmän vikojen takia.&#10;&#10;Alhaisella varauksella käynnistäminen on vaikeaa tai jopa mahdotonta. Jos et saa sitä käynnistymään, voit käynnistää koneen toisesta ajoneuvosta käynnistyskaapeleilla."/>
         <text name="ads_tutorial_throttle_control_title" text="Kaasun hallinta"/>
-        <text name="ads_tutorial_throttle_control_message" text="Näppäimistöllä pelatessasi voit rajoittaa kaasua, jotta poljinta ei tarvitse pitää pohjassa ja moottorin rasitus vähenee voimakkaissa kiihdytyksissä. Pidä W + T painettuina ja aseta haluamasi raja hiiren rullalla. Tämän jälkeen W-näppäimen painaminen noudattaa valittua rajaa. Jos haluat hetkeksi antaa kunnolla kaasua ja painaa polkimen pohjaan, pidä vain W + Shift painettuina."/>
+        <text name="ads_tutorial_throttle_control_message" text="Näppäimistöllä pelatessasi voit rajoittaa kaasua, jotta poljinta ei tarvitse pitää pohjassa ja moottorin rasitus vähenee voimakkaissa kiihdytyksissä. Pidä W + T painettuina ja aseta haluamasi raja hiiren rullalla. Tämän jälkeen W-näppäimen painaminen noudattaa valittua rajaa. Jos haluat hetkeksi antaa kunnolla kaasua ja painaa polkimen pohjaan, pidä vain W + Ctrl painettuina."/>
     </texts>
 </l10n>

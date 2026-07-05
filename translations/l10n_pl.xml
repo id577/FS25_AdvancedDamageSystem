@@ -762,7 +762,7 @@
         <text name="ads_tutorial_battery_low_title" text="Słaby akumulator"/>
         <text name="ads_tutorial_battery_low_message" text="Ups, wygląda na to, że akumulator zaraz padnie. Może się tak stać po długim postoju, podczas silnych mrozów albo z powodu usterek instalacji elektrycznej.&#10;&#10;Przy niskim poziomie naładowania rozruch będzie trudny albo wręcz niemożliwy. Jeśli nie uda się uruchomić maszyny, możesz odpalić ją z innego pojazdu przy pomocy Jumper Cables."/>
         <text name="ads_tutorial_throttle_control_title" text="Sterowanie gazem"/>
-        <text name="ads_tutorial_throttle_control_message" text="Grając na klawiaturze, możesz ograniczyć gaz, aby nie trzymać pedału wciśniętego do końca i zmniejszyć obciążenie silnika podczas intensywnego przyspieszania. W tym celu przytrzymaj W + T i ustaw odpowiedni limit kółkiem myszy. Od tej pory naciśnięcie W będzie uwzględniać wybrane ograniczenie. Jeśli chcesz na chwilę dać pełny gaz i mimo wszystko wcisnąć pedał do końca, po prostu przytrzymaj W + Shift."/>
+        <text name="ads_tutorial_throttle_control_message" text="Grając na klawiaturze, możesz ograniczyć gaz, aby nie trzymać pedału wciśniętego do końca i zmniejszyć obciążenie silnika podczas intensywnego przyspieszania. W tym celu przytrzymaj W + T i ustaw odpowiedni limit kółkiem myszy. Od tej pory naciśnięcie W będzie uwzględniać wybrane ograniczenie. Jeśli chcesz na chwilę dać pełny gaz i mimo wszystko wcisnąć pedał do końca, po prostu przytrzymaj W + Ctrl."/>
     </texts>
 </l10n>
 

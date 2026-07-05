@@ -762,6 +762,6 @@
         <text name="ads_tutorial_battery_low_title" text="배터리 약함"/>
         <text name="ads_tutorial_battery_low_message" text="앗, 배터리가 거의 방전될 것 같습니다. 장기간 방치, 심한 추위, 전기 시스템 이상 등이 원인일 수 있습니다.&#10;&#10;충전량이 낮으면 시동이 어렵거나 아예 걸리지 않을 수 있습니다. 시동이 되지 않으면 Jumper Cables를 사용해 다른 차량에서 점프 시동을 걸 수 있습니다."/>
         <text name="ads_tutorial_throttle_control_title" text="스로틀 제어"/>
-        <text name="ads_tutorial_throttle_control_message" text="키보드로 플레이할 때 스로틀을 제한하면 가속 페달을 끝까지 밟지 않아도 되어 강하게 가속할 때 엔진의 부담을 줄일 수 있습니다. W + T를 누른 상태에서 마우스 휠로 원하는 제한값을 설정하세요. 이제 W를 누르면 선택한 제한값이 적용됩니다. 잠시 최대한 힘껏 가속하고 페달을 끝까지 밟고 싶다면 W + Shift를 누르고 있으면 됩니다."/>
+        <text name="ads_tutorial_throttle_control_message" text="키보드로 플레이할 때 스로틀을 제한하면 가속 페달을 끝까지 밟지 않아도 되어 강하게 가속할 때 엔진의 부담을 줄일 수 있습니다. W + T를 누른 상태에서 마우스 휠로 원하는 제한값을 설정하세요. 이제 W를 누르면 선택한 제한값이 적용됩니다. 잠시 최대한 힘껏 가속하고 페달을 끝까지 밟고 싶다면 W + Ctrl을 누르고 있으면 됩니다."/>
     </texts>
 </l10n>

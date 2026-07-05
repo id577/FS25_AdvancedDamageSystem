@@ -69,11 +69,11 @@ function ADS_ThrottleControl.update(vehicle)
     end
 
     local isControlled = vehicle.getIsEnteredForInput ~= nil and vehicle:getIsEnteredForInput()
-    if isControlled and Input ~= nil and Input.KEY_lshift ~= nil then
-        local isShiftPressed = Input.isKeyPressed(Input.KEY_lshift)
-        if spec.fullThrottleOverridePressed ~= isShiftPressed then
-            spec.fullThrottleOverridePressed = isShiftPressed
-            ADS_FullThrottleEvent.send(vehicle, isShiftPressed)
+    if isControlled and Input ~= nil and Input.KEY_lctrl ~= nil then
+        local isFullThrottlePressed = Input.isKeyPressed(Input.KEY_lctrl)
+        if spec.fullThrottleOverridePressed ~= isFullThrottlePressed then
+            spec.fullThrottleOverridePressed = isFullThrottlePressed
+            ADS_FullThrottleEvent.send(vehicle, isFullThrottlePressed)
         end
     end
 

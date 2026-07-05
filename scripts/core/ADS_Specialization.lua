@@ -2696,6 +2696,8 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
         return
     end
 
+    -- ADS controls must never replace a conflicting base-game action event.
+    -- This also protects clutch input for profiles that still bind full throttle to Left Shift.
     if InputAction.ADS_FULL_THROTTLE ~= nil then
         local _, actionEventId = self:addActionEvent(
             spec.throttleControlActionEvents,
@@ -2706,10 +2708,12 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
             true,
             false,
             true,
-            nil
+            nil,
+            nil,
+            true
         )
 
-        if actionEventId ~= nil then
+        if actionEventId ~= nil and actionEventId ~= "" then
             g_inputBinding:setActionEventTextVisibility(actionEventId, false)
         end
     end
@@ -2724,10 +2728,12 @@ function AdvancedDamageSystem:onRegisterActionEvents(isActiveForInput, isActiveF
             true,
             false,
             true,
-            nil
+            nil,
+            nil,
+            true
         )
 
-        if actionEventId ~= nil then
+        if actionEventId ~= nil and actionEventId ~= "" then
             g_inputBinding:setActionEventTextVisibility(actionEventId, false)
         end
     end

@@ -3384,6 +3384,19 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
         return superFunc(vehicle, axisForward, axisSide, doHandbrake, dt)
     end
 
+    local drivableSpec = vehicle.spec_drivable
+    local cruiseControl = drivableSpec ~= nil and drivableSpec.cruiseControl or nil
+    local cruiseControlState = cruiseControl ~= nil and cruiseControl.state or nil
+    local isCruiseControlActive = cruiseControlState ~= nil
+        and cruiseControlState ~= Drivable.CRUISECONTROL_STATE_OFF
+    local useLimitedCruiseAcceleration = isCruiseControlActive and axisForward == 0
+
+    if useLimitedCruiseAcceleration then
+        -- Drivable normally replaces the input with full acceleration while cruise control is active.
+        -- Supply the ADS-limited input ourselves, then hide the cruise state from the base function.
+        axisForward = ADS_Breakdowns.getMaxAllowedAcceleration(vehicle, false)
+    end
+
     local brakeEffect = spec_ads and spec_ads.activeEffects.BRAKE_FORCE_MODIFIER
     local hesitationEffect = spec_ads and spec_ads.activeEffects.ENGINE_HESITATION_CHANCE
     local steeringStaticBiasEffect = spec_ads and spec_ads.activeEffects.STEERING_STATIC_BIAS_EFFECT
@@ -3467,7 +3480,15 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
         end
     end
 
+    if useLimitedCruiseAcceleration then
+        cruiseControl.state = Drivable.CRUISECONTROL_STATE_OFF
+    end
+
     local result = superFunc(vehicle, axisForward, axisSide, doHandbrake, dt)
+
+    if useLimitedCruiseAcceleration then
+        cruiseControl.state = cruiseControlState
+    end
 
     if wheelSeizureEffect ~= nil and (tonumber(wheelSeizureEffect.value) or 0) > 0 and vehicle.isAddedToPhysics then
         local wheelData = getWheelSeizureTargetWheel(vehicle)
@@ -3504,40 +3525,6 @@ function ADS_Breakdowns.updateVehiclePhysics(vehicle, superFunc, axisForward, ax
     end
 
     return result
-end
-
-function ADS_Breakdowns.updateWheelsPhysics(vehicle, superFunc, dt, currentSpeed, acceleration, doHandbrake, stopAndGoBraking)
-    local spec_ads = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
-    local drivableSpec = vehicle ~= nil and vehicle.spec_drivable or nil
-    local cruiseControl = drivableSpec ~= nil and drivableSpec.cruiseControl or nil
-    local isCruiseControlActive = cruiseControl ~= nil
-        and cruiseControl.state ~= Drivable.CRUISECONTROL_STATE_OFF
-
-    if spec_ads ~= nil and not spec_ads.isExcludedVehicle and isCruiseControlActive and math.abs(acceleration) > 0.01 then
-        -- Cruise control replaces the driver input with full acceleration inside Drivable.
-        -- Clamp that final value here; Shift only bypasses the manual W limit, not cruise control.
-        local hesitationEffect = spec_ads.activeEffects ~= nil and spec_ads.activeEffects.ENGINE_HESITATION_CHANCE or nil
-        if hesitationEffect ~= nil
-            and hesitationEffect.extraData ~= nil
-            and hesitationEffect.extraData.status == "CHOKING" then
-            acceleration = acceleration * math.max(1 - (tonumber(hesitationEffect.extraData.amplitude) or 0), 0)
-        end
-
-        local maxAllowedAcceleration = ADS_Breakdowns.getMaxAllowedAcceleration(vehicle, false)
-        acceleration = math.clamp(acceleration, -maxAllowedAcceleration, maxAllowedAcceleration)
-    end
-
-    return superFunc(vehicle, dt, currentSpeed, acceleration, doHandbrake, stopAndGoBraking)
-end
-
-if not ADS_Breakdowns.wheelsPhysicsHookInstalled
-    and WheelsUtil ~= nil
-    and WheelsUtil.updateWheelsPhysics ~= nil then
-    WheelsUtil.updateWheelsPhysics = Utils.overwrittenFunction(
-        WheelsUtil.updateWheelsPhysics,
-        ADS_Breakdowns.updateWheelsPhysics
-    )
-    ADS_Breakdowns.wheelsPhysicsHookInstalled = true
 end
 
 -- ==========================================================

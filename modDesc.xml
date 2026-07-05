@@ -352,7 +352,7 @@ Changelog 0.9.0.0:
             <binding device="0_XINPUT_GAMEPAD" input="BUTTON_1"/>
         </actionBinding>
         <actionBinding action="ADS_FULL_THROTTLE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift"/>
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl"/>
         </actionBinding>
         <actionBinding action="ADS_ADJUST_THROTTLE">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_t"/>
