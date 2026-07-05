@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="108">
     <author>id577, Squallqt</author>
-    <version>0.9.2.6</version>
+    <version>0.9.2.7</version>
     <title>
         <en>Advanced Damage System</en>
         <de>Erweitertes Schadenssystem</de>
@@ -11,6 +11,12 @@
         <en><![CDATA[Advanced Damage System adds a deep vehicle wear, failure, diagnostics, maintenance, and repair system to Farming Simulator 25. Instead of relying on a single generic condition value, each machine is built around multiple individual systems with their own condition, wear factors, stress accumulation, and risk of failure. Vehicle behaviour and the nature of breakdowns depend on operating conditions, load, temperature, and service quality.
 
 The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+
+Changelog 0.9.2.7:
+- Reassigned Full Throttle to `W + Ctrl`, preventing conflicts with the clutch and other driving controls
+- Reworked Heavy Trailer and Brake Mass factors: tractors use 10 HP per tonne of towed mass, while trucks use 6 HP per tonne of gross combination weight
+- Fixed throttle limiting with cruise control and More Realistic
+- Fixed savegame loading crashes involving locomotives and Enhanced Vehicle
 
 Changelog 0.9.2.6:
 - Added adjustable keyboard throttle input and a tutorial explaining the mechanic
@@ -118,6 +124,12 @@ Changelog 0.9.0.0:
 
 Der Mod umfasst ein Temperaturmodell für wichtige Systeme, eine erweiterte Batterie- und Lichtmaschinensimulation, realistische Ausfalllogik, erweiterte Werkstattabläufe, Serviceberichte, Wartungshistorie und Vorschicht-Inspektionen. Dadurch wird Fahrzeugmanagement zu einem strategischen Teil des Gameplays: Wartung kostet Zeit, falscher Einsatz erhöht das Ausfallrisiko, und vernachlässigter Maschinenzustand kann wichtige Feldarbeiten gefährden. Ein verantwortungsvoller Landwirt, der seine Technik pflegt, rechtzeitig wartet und unnötige Überlastung vermeidet, hält seinen Fuhrpark zuverlässig und vermeidet ernsthafte Probleme in der Saison.
 
+Changelog 0.9.2.7:
+- Vollgas auf `W + Strg` neu belegt, um Konflikte mit der Kupplung und anderen Fahrsteuerungen zu vermeiden
+- Faktoren für schwere Anhänger und Bremslast überarbeitet: Traktoren verwenden 10 PS pro Tonne Anhängelast, Lkw 6 PS pro Tonne Gesamtzuggewicht
+- Gasbegrenzung bei aktivem Tempomat und mit More Realistic korrigiert
+- Abstürze beim Laden von Spielständen mit Lokomotiven und Enhanced Vehicle behoben
+
 Changelog 0.9.2.6:
 - Einstellbare Gassteuerung für Tastaturspieler und ein passender Tutorial-Hinweis hinzugefügt
 - Konsolenbefehl ads_setExcluded true|false und eine Einstellung für die Geschwindigkeit der thermischen Simulation hinzugefügt
@@ -222,6 +234,12 @@ Changelog 0.9.0.0:
         <fr><![CDATA[Advanced Damage System ajoute à Farming Simulator 25 un système approfondi d'usure, de pannes, de diagnostic, d'entretien et de réparation des véhicules. Au lieu de reposer sur une seule valeur générale d'état, chaque machine est composée de plusieurs systèmes distincts ayant leur propre état, leurs propres facteurs d'usure, leur accumulation de stress et leur risque de panne. Le comportement de la machine et la nature des défaillances dépendent des conditions d'utilisation, de la charge, de la température et de la qualité de l'entretien.
 
 Le mod comprend un modèle thermique pour les systèmes clés, une simulation avancée de la batterie et de l'alternateur, une logique de pannes réaliste, des procédures d'atelier étendues, des rapports d'intervention, un historique d'entretien et des inspections avant prise de poste. La gestion du matériel devient ainsi une dimension stratégique du gameplay : l'entretien prend du temps, une mauvaise utilisation augmente le risque de panne, et négliger l'état des machines peut compromettre des travaux de campagne essentiels. Un agriculteur consciencieux qui surveille son matériel, l'entretient à temps et évite les mauvais traitements inutiles conservera une flotte fiable et évitera de graves problèmes en saison.
+
+Changelog 0.9.2.7:
+- Plein gaz réassigné à `W + Ctrl` afin d'éviter les conflits avec l'embrayage et les autres commandes de conduite
+- Refonte des facteurs de remorque lourde et de freinage sous charge : 10 ch par tonne remorquée pour les tracteurs et 6 ch par tonne de poids total roulant pour les camions
+- Correction de la limitation des gaz avec le régulateur de vitesse et More Realistic
+- Correction des plantages au chargement de sauvegardes contenant des locomotives et Enhanced Vehicle
 
 Changelog 0.9.2.6:
 - Ajout d'une commande d'accélérateur réglable au clavier et d'une astuce de didacticiel expliquant cette mécanique
