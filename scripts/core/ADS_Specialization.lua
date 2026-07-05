@@ -5740,9 +5740,19 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local steerDeltaRate = tonumber(steerState.deltaRate or 0) or 0
     local steerMoving = steerState.isMoving == true
     local brakeMassFactor = 0
-    local hpBrakeMassRatio = tonumber(brakeState.hpMassRatio or 0) or 0
+    local isTruck = spec.isTruck == true
+    local trailerMass = math.max(tonumber(brakeState.trailerMass or 0) or 0, 0)
+    local hpBrakeMassRatio = isTruck
+        and (tonumber(brakeState.hpGrossMassRatio or 100) or 100)
+        or (tonumber(brakeState.hpTrailerMassRatio or brakeState.hpMassRatio or 100) or 100)
     local brakePedal = tonumber(brakeState.pedal or 0) or 0
     local C = ADS_Config.CORE.CHASSIS_FACTOR_DATA
+    local brakeMassRatioThreshold = isTruck
+        and (tonumber(C.BRAKE_MASS_TRUCK_RATIO_THRESHOLD) or 6.0)
+        or (tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 10.0)
+    local brakeMassFullEffectRatio = isTruck
+        and (tonumber(C.BRAKE_MASS_TRUCK_RATIO_FULL_EFFECT) or 3.0)
+        or (tonumber(C.BRAKE_MASS_RATIO_FULL_EFFECT) or 5.0)
     local wearRate = 1.0
 
     if not systemData.enabled then
@@ -5767,10 +5777,9 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
             end
 
             -- braking under mass
-            if brakeState.isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
-                local ratioThreshold = tonumber(C.BRAKE_MASS_RATIO_THRESHOLD) or 12.0
-                if hpBrakeMassRatio < ratioThreshold then
-                    local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(hpBrakeMassRatio, ratioThreshold, true, 5.0)
+            if trailerMass > 0.1 and brakeState.isBraking and speed > (tonumber(C.BRAKE_MASS_SPEED_THRESHOLD) or 2.0) then
+                if hpBrakeMassRatio < brakeMassRatioThreshold then
+                    local ratioFactor = ADS_Utils.calculateQuadraticMultiplier(hpBrakeMassRatio, brakeMassRatioThreshold, true, brakeMassFullEffectRatio)
                     local brakeInputFactor = brakePedal
                     brakeMassFactor = ratioFactor * brakeInputFactor * (tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or 6.0)
                     brakeMassFactor = math.min(brakeMassFactor, tonumber(C.BRAKE_MASS_FACTOR_MULTIPLIER) or brakeMassFactor)
@@ -5823,6 +5832,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         steerMoving = steerMoving,
         brakeMassFactor = brakeMassFactor,
         brakeMassRatio = hpBrakeMassRatio,
+        brakeMassBasis = isTruck and "gcw" or "trailer",
         brakePedal = brakePedal
     })
 end
