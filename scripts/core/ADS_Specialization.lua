@@ -550,12 +550,20 @@ local function getIsVehicleNeedLubticate(vehicle)
     return workProcessSystem.enabled ~= false
 end
 
-local function getIsVehicleNeedBlowOut(vehicle)
+local function getIsTruck(vehicle)
+    if vehicle == nil or g_storeManager == nil or vehicle.configFileName == nil then
+        return false
+    end
+
     local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-    local categoryName = storeItem ~= nil and storeItem.categoryName or ""
+    local categoryName = storeItem ~= nil and tostring(storeItem.categoryName or "") or ""
+    return string.upper(categoryName) == "TRUCKS"
+end
+
+local function getIsVehicleNeedBlowOut(vehicle)
     local vtype = vehicle.type ~= nil and vehicle.type.name or ""
 
-    if categoryName == "TRUCKS" or vtype == "car" or vtype == "carFillable" or vtype == "motorbike" then
+    if getIsTruck(vehicle) or vtype == "car" or vtype == "carFillable" or vtype == "motorbike" then
         return false
     end
 
@@ -1602,6 +1610,7 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.isExcludedByDefault = false
     self.spec_AdvancedDamageSystem.isExcludedByUser = false
     self.spec_AdvancedDamageSystem.isElectricVehicle = false
+    self.spec_AdvancedDamageSystem.isTruck = getIsTruck(self)
     self.spec_AdvancedDamageSystem.isVehicleNeedLubricate = false
     self.spec_AdvancedDamageSystem.isVehicleNeedBlowOut = false
 
@@ -2019,6 +2028,11 @@ function AdvancedDamageSystem:onLoad(savegame)
     self.spec_AdvancedDamageSystem.chassisBrakeState = {
         pedal = 0,
         massRatio = 0,
+        trailerMass = 0,
+        totalMass = 0,
+        hpMassRatio = 1000,
+        hpTrailerMassRatio = 1000,
+        hpGrossMassRatio = 1000,
         isBraking = false,
         isBrakingByAxis = false
     }
@@ -4379,14 +4393,25 @@ local function updateChassisBrakingState(vehicle)
 
     brakeState.pedal = 0
     brakeState.massRatio = 0
+    brakeState.trailerMass = 0
+    brakeState.totalMass = 0
     brakeState.hpMassRatio = 1000
+    brakeState.hpTrailerMassRatio = 1000
+    brakeState.hpGrossMassRatio = 1000
     brakeState.isBraking = false
     brakeState.isBrakingByAxis = false
 
     local totalMass = tonumber(vehicle.getTotalMass ~= nil and vehicle:getTotalMass() or 0) or 0
     local selfMass = tonumber(vehicle.getTotalMass ~= nil and vehicle:getTotalMass(true) or 0) or 0
-    local trailerMass = math.max(totalMass - selfMass, 0.01)
-    brakeState.hpMassRatio = math.max((vehicle:getMotor().peakMotorPower or 0) * 1.36, 0.001) / trailerMass
+    local trailerMass = math.max(totalMass - selfMass, 0)
+    local motor = vehicle.getMotor ~= nil and vehicle:getMotor() or nil
+    local horsepower = math.max(((motor ~= nil and motor.peakMotorPower) or 0) * 1.36, 0.001)
+    brakeState.trailerMass = trailerMass
+    brakeState.totalMass = totalMass
+    brakeState.hpTrailerMassRatio = horsepower / math.max(trailerMass, 0.01)
+    brakeState.hpGrossMassRatio = horsepower / math.max(totalMass, 0.01)
+    -- Keep the legacy field for chassis braking and third-party integrations.
+    brakeState.hpMassRatio = brakeState.hpTrailerMassRatio
 
     local drivable = vehicle.spec_drivable
     if drivable == nil or vehicle.spec_wheels == nil then
@@ -5196,7 +5221,18 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
     local vehicleHaveCVT = hasCVTTransmission(self)
     local expiredServiceFactor, pullOverloadFactor, luggingFactor, heavyTrailerFactor, wheelSlipFactor,  coldTransFactor, hotTransFactor = 0, 0, 0, 0, 0, 0, 0
     local wearRate = 1.0
-    local hpMassRatio = spec.chassisBrakeState.hpMassRatio or 100
+    local brakeState = spec.chassisBrakeState or {}
+    local isTruck = spec.isTruck == true
+    local trailerMass = math.max(tonumber(brakeState.trailerMass or 0) or 0, 0)
+    local hpMassRatio = isTruck
+        and (tonumber(brakeState.hpGrossMassRatio or 100) or 100)
+        or (tonumber(brakeState.hpTrailerMassRatio or brakeState.hpMassRatio or 100) or 100)
+    local heavyTrailerRatioThreshold = isTruck
+        and (tonumber(C.HEAVY_TRAILER_TRUCK_MASS_RATIO_THRESHOLD) or 6.0)
+        or (tonumber(C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD) or 10.0)
+    local heavyTrailerFullEffectRatio = isTruck
+        and (tonumber(C.HEAVY_TRAILER_TRUCK_MASS_RATIO_FULL_EFFECT) or 3.0)
+        or (tonumber(C.HEAVY_TRAILER_MASS_RATIO_FULL_EFFECT) or 5.0)
     local systemKey = ADS_Utils.getSystemKey(AdvancedDamageSystem.SYSTEMS, spec.systems.transmission.name)
     
     if not systemData.enabled then
@@ -5301,8 +5337,8 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         end
 
         -- heavy trailer factor
-        if hpMassRatio < C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD and motorLoad > C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD and speed > 0.5 then
-            heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(hpMassRatio, C.HEAVY_TRAILER_MASS_RATIO_THRESHOLD, true, 5.0)
+        if trailerMass > 0.1 and hpMassRatio < heavyTrailerRatioThreshold and motorLoad > C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD and speed > 0.5 then
+            heavyTrailerFactor = ADS_Utils.calculateQuadraticMultiplier(hpMassRatio, heavyTrailerRatioThreshold, true, heavyTrailerFullEffectRatio)
             local loadRange = math.max(1.0 - C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD, 0.001)
             local loadRatio = math.clamp((motorLoad - C.HEAVY_TRAILER_MOTORLOAD_THRESHOLD) / loadRange, 0, 1.0)
             heavyTrailerFactor = math.max(heavyTrailerFactor * C.HEAVY_TRAILER_MULTIPLIER * loadRatio, 0)
@@ -5371,6 +5407,7 @@ function AdvancedDamageSystem:updateTransmissionSystem(dt)
         pullOverloadTimerMax = systemData.pullOverloadTimerMax,
         heavyTrailerFactor = heavyTrailerFactor,
         heavyTrailerMassRatio = hpMassRatio,
+        heavyTrailerMassBasis = isTruck and "gcw" or "trailer",
         luggingFactor = luggingFactor,
         wheelSlipFactor = wheelSlipFactor,
         coldTransFactor = coldTransFactor,

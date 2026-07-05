@@ -215,7 +215,7 @@ Each system has its own set of wear factors that accelerate `Condition` loss and
 
 - **Overheated Transmission Factor:** Applies only to CVT transmissions. Triggers when transmission temperature is above `95C` and engine load is above `30%`. The effect becomes stronger as temperature increases.
 
-- **Heavy Trailer Factor:** Activates when the mass of the towed trailer exceeds the tractor's own mass by more than `1.2x`.
+- **Heavy Trailer Factor:** Activates under high engine load when available power falls below `10 HP` per tonne of towed mass for tractors, or below `6 HP` per tonne of total combination mass for trucks. The effect increases progressively and only applies when an attached trailer or implement contributes more than `0.1 t` of mass.
 
 ### Hydraulics
 

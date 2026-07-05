@@ -734,7 +734,7 @@
         <text name="ads_tutorial_cvt_overheat_title" text="CVT 과열"/>
         <text name="ads_tutorial_cvt_overheat_message" text="CVT 변속기가 과열되기 시작했습니다. 원인은 하나 이상일 수 있습니다. 변속기에 과도한 부하가 걸렸거나, 라디에이터가 막혔거나, 날씨가 매우 덥기 때문일 수 있습니다. 예를 들어 너무 무거운 쟁기를 끌고 있거나 과적된 트레일러를 견인하고 있을 수도 있습니다.&#10;&#10;주의하세요. 과열은 CVT 변속기에 일어날 수 있는 가장 치명적인 문제 중 하나입니다."/>
         <text name="ads_tutorial_heavy_trailer_title" text="무거운 트레일러"/>
-        <text name="ads_tutorial_heavy_trailer_message" text="트랙터에 비해 너무 무거운 트레일러를 끌고 있는 것 같습니다. 계속할 수는 있겠지만, 변속기는 엄청난 부담을 받게 되고 브레이크도 이 추가 하중을 반기지 않을 것입니다.&#10;&#10;간단한 기준을 기억하세요. 견인 중량 1톤당 10마력 이상이면 차량 수명이 눈에 띄게 길어집니다."/>
+        <text name="ads_tutorial_heavy_trailer_message" text="견인 하중이 이 차량에 비해 너무 무거울 수 있습니다. 계속 주행할 수는 있지만 변속기와 구동계의 부담이 증가합니다.&#10;&#10;ADS는 두 가지 기준을 사용합니다. 트랙터는 견인 중량 1톤당 최소 10마력, 트럭은 총 조합 중량 1톤당 최소 6마력이 필요합니다. 엔진 부하가 높은 상태에서 해당 기준보다 낮으면 변속기 마모가 증가합니다."/>
         <text name="ads_tutorial_chassis_vibration_title" text="서스펜션 부담 증가"/>
         <text name="ads_tutorial_chassis_vibration_message" text="잠깐, 속도를 줄이세요. 거친 지형을 빠르게 달리면 %s 차량의 서스펜션이 금방 닳아버립니다. 게다가 이런 진동은 유압계와 전기계통 같은 다른 시스템에도 해를 줍니다. 부드럽고 차분하게 운전하세요."/>
         <text name="ads_tutorial_steering_title" text="정지 상태 조향"/>

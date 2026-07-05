@@ -735,7 +735,7 @@
         <text name="ads_tutorial_cvt_overheat_title" text="Přehřívání CVT"/>
         <text name="ads_tutorial_cvt_overheat_message" text="Převodovka CVT se začíná přehřívat. Příčinou může být nadměrné zatížení, ucpaný chladič nebo velmi horké počasí. Například můžete táhnout příliš těžký pluh nebo přetížený přívěs.&#10;&#10;Pozor: přehřátí je pro CVT převodovku jednou z nejhorších věcí, co se může stát."/>
         <text name="ads_tutorial_heavy_trailer_title" text="Těžký přívěs"/>
-        <text name="ads_tutorial_heavy_trailer_message" text="Vypadá to, že se pokoušíte táhnout přívěs, který je na váš traktor příliš těžký. Můžete v tom pokračovat, ale převodovka bude pod obrovským tlakem a brzdy vám za tohle extra zatížení také nepoděkují.&#10;&#10;Držte se jednoduchého pravidla: alespoň 10 koní na 1 tunu tažené váhy a stroj vám vydrží znatelně déle."/>
+        <text name="ads_tutorial_heavy_trailer_message" text="Tažený náklad může být pro toto vozidlo příliš těžký. Můžete pokračovat v jízdě, ale převodovka a hnací ústrojí budou více namáhány.&#10;&#10;ADS používá dvě hodnoty: traktor potřebuje alespoň 10 koní na tunu tažené hmotnosti, zatímco nákladní vůz alespoň 6 koní na tunu celkové hmotnosti soupravy. Pod příslušnou hodnotou a při vysokém zatížení motoru se opotřebení převodovky zvyšuje."/>
         <text name="ads_tutorial_chassis_vibration_title" text="Namáhání podvozku"/>
         <text name="ads_tutorial_chassis_vibration_message" text="Prrr, zpomalte! Rychlá jízda nerovným terénem rychle odrovná odpružení vašeho vozidla %s. Navíc tyhle vibrace škodí i ostatním systémům – hlavně hydraulice a elektrice. Jezděte plynule a s rozvahou."/>
         <text name="ads_tutorial_steering_title" text="Zatáčení na místě"/>

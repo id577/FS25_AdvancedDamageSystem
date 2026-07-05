@@ -101,6 +101,20 @@ function ADS_Tutorial:update(dt)
             local ptoAngleDeg = tonumber(spec.maxConnectedPtoAngleDeg or 0) or 0
             local hasConnectedPto = spec.hasConnectedPto == true
             local sharpAngleThreshold = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA.PTO_SHARP_ANGLE_FACTOR_THRESHOLD or 30
+            local transmissionConfig = ADS_Config.CORE.TRANSMISSION_FACTOR_DATA
+            local chassisBrakeState = spec.chassisBrakeState or {}
+            local isTruck = spec.isTruck == true
+            local heavyTrailerMass = math.max(tonumber(chassisBrakeState.trailerMass or 0) or 0, 0)
+            local tractorHeavyTrailerRatio = tonumber(chassisBrakeState.hpTrailerMassRatio or chassisBrakeState.hpMassRatio or 1000) or 1000
+            local truckHeavyTrailerRatio = tonumber(chassisBrakeState.hpGrossMassRatio or 1000) or 1000
+            local tractorHeavyTrailerThreshold = (tonumber(transmissionConfig.HEAVY_TRAILER_MASS_RATIO_THRESHOLD) or 10.0) * 0.8
+            local truckHeavyTrailerThreshold = (tonumber(transmissionConfig.HEAVY_TRAILER_TRUCK_MASS_RATIO_THRESHOLD) or 6.0) * 0.8
+            local hasHeavyTrailerForTractor = not isTruck
+                and heavyTrailerMass > 0.1
+                and tractorHeavyTrailerRatio <= tractorHeavyTrailerThreshold
+            local hasHeavyTrailerForTruck = isTruck
+                and heavyTrailerMass > 0.1
+                and truckHeavyTrailerRatio <= truckHeavyTrailerThreshold
             local preventiveRiskSystem = nil
             local hasPoorPartsBreakdown = false
 
@@ -396,7 +410,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- heavy trailer
-            elseif not messagedData.HEAVY_TRAILER and isMotorStarted and speed > 5 and spec.chassisBrakeState ~= nil and spec.chassisBrakeState.hpMassRatio ~= nil and spec.chassisBrakeState.hpMassRatio <= 8 then
+            elseif not messagedData.HEAVY_TRAILER and isMotorStarted and speed > 5 and (hasHeavyTrailerForTractor or hasHeavyTrailerForTruck) then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_heavy_trailer_message"),
                     0,
