@@ -95,6 +95,19 @@ function ADS_Tutorial:update(dt)
             local vehicle = self.vehicle
             local isMotorStarted = vehicle:getIsMotorStarted()
             local speed = vehicle:getLastSpeed()
+            local systems = spec.systems or {}
+            local function isSystemEnabled(systemKey)
+                local systemData = systems[systemKey]
+                return type(systemData) == "table" and systemData.enabled == true
+            end
+            local engineSystemEnabled = isSystemEnabled("engine")
+            local transmissionSystemEnabled = isSystemEnabled("transmission")
+            local hydraulicsSystemEnabled = isSystemEnabled("hydraulics")
+            local coolingSystemEnabled = isSystemEnabled("cooling")
+            local electricalSystemEnabled = isSystemEnabled("electrical")
+            local chassisSystemEnabled = isSystemEnabled("chassis")
+            local fuelSystemEnabled = isSystemEnabled("fuel")
+            local workprocessSystemEnabled = isSystemEnabled("workprocess")
             local vehicleMass = vehicle.getTotalMass ~= nil and (vehicle:getTotalMass(true) or 0) or 0
             local heavyLiftMassRatio = vehicleMass > 0 and (spec.liftedMass / vehicleMass) or 0
             local heavyLiftThreshold = ADS_Config.CORE.HYDRAULICS_FACTOR_DATA.HEAVY_LIFT_FACTOR_THRESHOLD or 0
@@ -262,6 +275,7 @@ function ADS_Tutorial:update(dt)
 
             --- hot weather
             elseif not messagedData.HOT_WEATHER
+                and (engineSystemEnabled or coolingSystemEnabled)
                 and g_currentMission ~= nil
                 and g_currentMission.environment ~= nil
                 and g_currentMission.environment.weather ~= nil
@@ -280,6 +294,7 @@ function ADS_Tutorial:update(dt)
 
             --- wet weather
             elseif not messagedData.WET_WEATHER
+                and (electricalSystemEnabled or workprocessSystemEnabled)
                 and (
                     ADS_Main.currentWeather == WeatherType.RAIN
                     or ADS_Main.currentWeather == WeatherType.SNOW
@@ -298,7 +313,10 @@ function ADS_Tutorial:update(dt)
             -- ==========================================================
             -- FIELD CARE
             -- ==========================================================
-            elseif not messagedData.RAD_OR_INTAKE_CLOGGED and spec.isVehicleNeedBlowOut and (spec.radiatorClogging >= 0.75 or spec.airIntakeClogging >= 0.75) then
+            elseif not messagedData.RAD_OR_INTAKE_CLOGGED
+                and (engineSystemEnabled or coolingSystemEnabled)
+                and spec.isVehicleNeedBlowOut
+                and (spec.radiatorClogging >= 0.75 or spec.airIntakeClogging >= 0.75) then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_rad_or_intake_clogged_message"),
                     0,
@@ -309,7 +327,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- needs lubrication
-            elseif not messagedData.NEEDS_LUBRICATION and spec.isVehicleNeedLubricate and spec.lubricationLevel <= 0.8 then
+            elseif not messagedData.NEEDS_LUBRICATION and workprocessSystemEnabled and spec.isVehicleNeedLubricate and spec.lubricationLevel <= 0.8 then
                 -- self:showMessage(string.format(g_i18n:getText("ads_tutorial_needs_lubrication"), vehicle:getFullName()), true)
                 ADS_Hud.showNotification(
                     string.format(g_i18n:getText("ads_tutorial_needs_lubrication_message"), vehicle:getFullName()),
@@ -325,6 +343,7 @@ function ADS_Tutorial:update(dt)
             -- ==========================================================
             --- throttle control
             elseif not messagedData.THROTTLE_CONTROL
+                and engineSystemEnabled
                 and isMotorStarted
                 and spec.dynamicMotorLoad >= 0.99
                 and speed >= 10
@@ -339,7 +358,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- engine overheat
-            elseif not messagedData.ENGINE_OVERHEAT and isMotorStarted and spec.engineTemperature > 100 and not spec.isElectricVehicle then
+            elseif not messagedData.ENGINE_OVERHEAT and engineSystemEnabled and isMotorStarted and spec.engineTemperature > 100 and not spec.isElectricVehicle then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_engine_overheat_message"),
                     0,
@@ -351,7 +370,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- cold engine
-            elseif not messagedData.COLD_ENGINE and spec.engineTemperature < 40 and isMotorStarted and speed < 1 and not spec.isElectricVehicle then
+            elseif not messagedData.COLD_ENGINE and engineSystemEnabled and spec.engineTemperature < 40 and isMotorStarted and speed < 1 and not spec.isElectricVehicle then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_cold_engine_message"),
                     0,
@@ -373,7 +392,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- engine overload
-            elseif not messagedData.ENGINE_OVERLOAD and isMotorStarted and spec.dynamicMotorLoad >= 1.15 and not spec.isElectricVehicle then
+            elseif not messagedData.ENGINE_OVERLOAD and engineSystemEnabled and isMotorStarted and spec.dynamicMotorLoad >= 1.15 and not spec.isElectricVehicle then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_engine_overload_message"),
                     0,
@@ -384,7 +403,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- lugging
-            elseif not messagedData.LUGGING and spec.luggingTutorialTimer ~= nil and spec.luggingTutorialTimer >= 5000 and not spec.isElectricVehicle then
+            elseif not messagedData.LUGGING and transmissionSystemEnabled and spec.luggingTutorialTimer ~= nil and spec.luggingTutorialTimer >= 5000 and not spec.isElectricVehicle then
                 ADS_Hud.showNotification(  
                     g_i18n:getText("ads_tutorial_lugging_message"),
                     0,
@@ -398,7 +417,7 @@ function ADS_Tutorial:update(dt)
             -- TRANSMISSION
             -- ==========================================================
             --- cvt overheat
-            elseif not messagedData.CVT_OVERHEAT and isMotorStarted and spec.transmissionTemperature > 100 and not spec.isElectricVehicle then
+            elseif not messagedData.CVT_OVERHEAT and transmissionSystemEnabled and isMotorStarted and spec.transmissionTemperature > 100 and not spec.isElectricVehicle then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_cvt_overheat_message"),
                     0,
@@ -410,7 +429,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- heavy trailer
-            elseif not messagedData.HEAVY_TRAILER and isMotorStarted and speed > 5 and (hasHeavyTrailerForTractor or hasHeavyTrailerForTruck) then
+            elseif not messagedData.HEAVY_TRAILER and transmissionSystemEnabled and isMotorStarted and speed > 5 and (hasHeavyTrailerForTractor or hasHeavyTrailerForTruck) then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_heavy_trailer_message"),
                     0,
@@ -421,7 +440,7 @@ function ADS_Tutorial:update(dt)
                 self.messageDowntime = downtimeAfterMessage
 
             --- wheel slip
-            elseif not messagedData.WHEEL_SLIP and isMotorStarted and spec.wheelSlipIntensity ~= nil and spec.wheelSlipIntensity > 0.9 and spec.wheelSlipTutorialTimer ~= nil and spec.wheelSlipTutorialTimer >= 3000 then
+            elseif not messagedData.WHEEL_SLIP and transmissionSystemEnabled and isMotorStarted and spec.wheelSlipIntensity ~= nil and spec.wheelSlipIntensity > 0.9 and spec.wheelSlipTutorialTimer ~= nil and spec.wheelSlipTutorialTimer >= 3000 then
                 ADS_Hud.showNotification(
                     g_i18n:getText("ads_tutorial_wheel_slip_message"),
                     0,
@@ -435,7 +454,7 @@ function ADS_Tutorial:update(dt)
             -- CHASSIS
             -- ==========================================================
             --- chassis vibration
-            elseif not messagedData.CHASSIS_VIBRATION and isMotorStarted and speed > 40 and vehicle:getIsOnField() then
+            elseif not messagedData.CHASSIS_VIBRATION and chassisSystemEnabled and isMotorStarted and speed > 40 and vehicle:getIsOnField() then
                 ADS_Hud.showNotification(
                     string.format(g_i18n:getText("ads_tutorial_chassis_vibration_message"), vehicle:getFullName()),
                     0,
@@ -447,6 +466,7 @@ function ADS_Tutorial:update(dt)
 
             --- steering
             elseif not messagedData.STEERING
+                and chassisSystemEnabled
                 and isMotorStarted
                 and speed <= 0.1
                 and spec.chassisSteerState ~= nil
@@ -466,7 +486,7 @@ function ADS_Tutorial:update(dt)
             -- ========================================================== 
             --- cranking`
             elseif not messagedData.CRANKING
-                and spec.systems.electrical.enabled
+                and electricalSystemEnabled
                 and not spec.isElectricVehicle
                 and spec.systems.electrical.crankingTimer ~= nil
                 and spec.systems.electrical.crankingTimer >= 9000
@@ -482,7 +502,7 @@ function ADS_Tutorial:update(dt)
 
             --- battery low
             elseif not messagedData.BATTERY_LOW
-                and spec.systems.electrical.enabled
+                and electricalSystemEnabled
                 and not isMotorStarted
                 and not spec.isCranking
                 and vehicle:hasBreakdown('VOLTAGE_SAG') then
@@ -498,6 +518,7 @@ function ADS_Tutorial:update(dt)
 
             --- hard start
             elseif not messagedData.HARD_START
+                and (engineSystemEnabled or electricalSystemEnabled or fuelSystemEnabled)
                 and vehicle:hasEffect("ENGINE_HARD_START_MODIFIER")
                 and not isMotorStarted then
                 ADS_Hud.showNotification(
@@ -511,6 +532,7 @@ function ADS_Tutorial:update(dt)
 
             --- critical failure
             elseif not messagedData.CRITICAL_FAILURE
+                and (engineSystemEnabled or coolingSystemEnabled or electricalSystemEnabled or fuelSystemEnabled)
                 and vehicle:hasEffect("ENGINE_FAILURE") then
                 ADS_Hud.showNotification(
                     string.format(g_i18n:getText("ads_tutorial_critical_failure_message"), vehicle:getFullName()),
@@ -526,6 +548,7 @@ function ADS_Tutorial:update(dt)
             -- ==========================================================
             --- low fuel
             elseif not messagedData.LOW_FUEL
+                and fuelSystemEnabled
                 and isMotorStarted
                 and not spec.isElectricVehicle
                 and spec.fuelState ~= nil
@@ -541,6 +564,7 @@ function ADS_Tutorial:update(dt)
 
             --- idle deposit
             elseif not messagedData.IDLE_DEPOSIT
+                and fuelSystemEnabled
                 and isMotorStarted
                 and not spec.isElectricVehicle
                 and spec.fuelState ~= nil
@@ -558,7 +582,7 @@ function ADS_Tutorial:update(dt)
             -- HYDRAULIC
             -- ========================================================== 
             --- heavy lift
-            elseif not messagedData.HEAVY_LIFT and isMotorStarted and heavyLiftMassRatio > heavyLiftThreshold then
+            elseif not messagedData.HEAVY_LIFT and hydraulicsSystemEnabled and isMotorStarted and heavyLiftMassRatio > heavyLiftThreshold then
                 ADS_Hud.showNotification(
                     string.format(g_i18n:getText("ads_tutorial_heavy_lift_message"), vehicle:getFullName()),
                     0,
@@ -570,6 +594,7 @@ function ADS_Tutorial:update(dt)
 
             --- pto sharp angle
             elseif not messagedData.PTO_SHARP_ANGLE
+                and hydraulicsSystemEnabled
                 and isMotorStarted
                 and spec.isPtoActive
                 and hasConnectedPto
