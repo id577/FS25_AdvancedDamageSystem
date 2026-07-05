@@ -251,7 +251,7 @@ Each system has its own set of wear factors that accelerate `Condition` loss and
 
 - **Vibration Factor:** Triggers when the vibration signal exceeds its threshold. The effect becomes stronger at higher speed and on rougher surfaces.
 
-- **Steering Load Factor:** Triggers at speeds up to `4 km/h` when the steering input is active and changing while the wheels have ground contact. The effect becomes stronger with sharper steering input.
+- **Steering Load Factor:** Triggers at speeds up to `4 km/h` when the steering input is active and changing while the wheels have ground contact. The effect becomes stronger with sharper steering input and higher tire-to-ground friction, so soft ground and snow cause less wear than asphalt.
 
 - **Brake Mass Factor:** Triggers while braking above `2 km/h` with an attached trailer or implement when available power falls below `10 HP` per tonne of towed mass for tractors, or below `6 HP` per tonne of total combination mass for trucks. The effect increases with stronger braking input and reaches full mass influence at `5 HP/t` for tractors or `3 HP/t` for trucks.
 

@@ -1652,7 +1652,7 @@ function ADS_Hud:drawActiveVehicleHUD()
     local chassisLines = buildSystemLines("chassis", chassisDbg, chassisMaxFactor, {
         { shortName = "sf", statKey = "sf", value = chassisDbg.expiredServiceFactor or 0 },
         { shortName = "vf", statKey = "vf", value = chassisDbg.vibFactor or 0, extraInfo = string.format("r/s: %.2f / %.2f", asPercent(chassisDbg.vibRaw or 0), asPercent(chassisDbg.vibSignal or 0)) },
-        { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("lowSp: %.2f m: %s", tonumber(chassisDbg.steerLowSpeedFactor or 0) or 0, tostring(chassisDbg.steerMoving == true)) },
+        { shortName = "slf", statKey = "slf", value = chassisDbg.steerLoadFactor or 0, extraInfo = string.format("lowSp: %.2f c: %.2f m: %s", tonumber(chassisDbg.steerLowSpeedFactor or 0) or 0, tonumber(chassisDbg.steerGroundFrictionCoeff or 0) or 0, tostring(chassisDbg.steerMoving == true)) },
         { shortName = "bmf", statKey = "bmf", value = chassisDbg.brakeMassFactor or 0, extraInfo = string.format("hp/%s: %.1f", chassisDbg.brakeMassBasis or "trailer", chassisDbg.brakeMassRatio or 0) }
     })
 
@@ -2261,6 +2261,9 @@ function ADS_Hud:drawFactorStatsVehicleHUD(vehicle, spec, panel, activeHeaderSiz
             local parts = {}
             if dbg.steerLowSpeedFactor ~= nil then
                 table.insert(parts, string.format("lowSp %.3f", tonumber(dbg.steerLowSpeedFactor) or 0))
+            end
+            if dbg.steerGroundFrictionCoeff ~= nil then
+                table.insert(parts, string.format("friction %.3f", tonumber(dbg.steerGroundFrictionCoeff) or 0))
             end
             if dbg.steerMoving ~= nil then
                 table.insert(parts, string.format("moving %s", tostring(dbg.steerMoving == true)))

@@ -1863,6 +1863,8 @@ function AdvancedDamageSystem:onLoad(savegame)
             vibFieldMultiplier = 1,
             steerLoadFactor = 0,
             steerLowSpeedFactor = 0,
+            steerGroundFrictionCoeff = 0,
+            steerGroundFrictionFactor = 0,
             steerGroundContact = 0,
             steerMoving = false,
             brakeMassFactor = 0,
@@ -5747,6 +5749,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
     local vibAvgDensityType = tonumber(vibState.avgDensityType or 0) or 0
     local vibFieldMultiplier = tonumber(vibState.fieldMultiplier or 1) or 1
     local steerLowSpeedFactor = 0
+    local steerGroundFrictionCoeff = math.max(tonumber(spec.avgTireGroundFrictionCoeff) or 0, 0)
+    local steerGroundFrictionFactor = steerGroundFrictionCoeff ^ 2
     local steerGroundContact = tonumber(steerState.groundContact or 0) or 0
     local steerRateFactor = tonumber(steerState.rateFactor or 0) or 0
     local steerDeltaRate = tonumber(steerState.deltaRate or 0) or 0
@@ -5808,7 +5812,7 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         if steerSpeedThreshold > 0 and steerState.isLowSpeedActive and steerGroundContact > 0 and steerMoving then
             steerLowSpeedFactor = ADS_Utils.calculateQuadraticMultiplier(math.clamp(speed, 0, steerSpeedThreshold), steerSpeedThreshold, true)
             if steerLowSpeedFactor > 0 then
-                steerLoadFactor = steerLowSpeedFactor * steerRateFactor * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0)
+                steerLoadFactor = steerLowSpeedFactor * steerRateFactor * (tonumber(C.STEER_LOAD_FACTOR_MULTIPLIER) or 5.0) * steerGroundFrictionFactor
                 wearRate = wearRate + steerLoadFactor
             end
         end
@@ -5838,6 +5842,8 @@ function AdvancedDamageSystem:updateChassisSystem(dt)
         vibFieldMultiplier = vibFieldMultiplier,
         steerLoadFactor = steerLoadFactor,
         steerLowSpeedFactor = steerLowSpeedFactor,
+        steerGroundFrictionCoeff = steerGroundFrictionCoeff,
+        steerGroundFrictionFactor = steerGroundFrictionFactor,
         steerRateFactor = steerRateFactor,
         steerDeltaRate = steerDeltaRate,
         steerGroundContact = steerGroundContact,
