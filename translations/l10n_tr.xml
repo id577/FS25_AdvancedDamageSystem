@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Garanti kapsamı, yeni araçlarda yapılan onarımlar için geçerlidir (en fazla 20 çalışma saati veya 12 ay). Yalnızca orijinal ekipman üreticisi (OEÜ) ücretsiz olarak garanti kapsamındadır."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Yapay Zeka Aşırı Yük ve Aşırı Isınma Kontrolü"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Etkinleştirildiğinde, yapay zeka işçisi motorun aşırı yüklenmesini veya aşırı ısınmasını önlemek için yükü azaltır."/>
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Stop AI on Critical Overload"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Allows ADS to stop AI workers and AutoDrive during a critical overload."/>
+        <text name="ads_contractVehicleProtection_label" text="Contract Vehicle Protection"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Applies critical-overload AI shutdown and overload/overheat speed regulation to contract vehicles."/>
         <text name="ads_aiWorkerTargetStress_label" text="Yapay Zeka Hızlı Yanıt"/>
         <text name="ads_aiWorkerTargetStress_tooltip" text="Yapay Zeka işçisinin aşırı yüke ve aşırı ısınmaya ne kadar erken tepki vereceğini belirler. Daha yüksek değerler daha az duyarlıdır ve daha geç tepki verir; daha düşük değerler ise daha duyarlıdır ve daha erken yavaşlar."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Rahat"/>

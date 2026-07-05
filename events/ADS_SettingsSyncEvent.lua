@@ -24,6 +24,8 @@ function ADS_SettingsSyncEvent.new()
     self.enableWarningMessages     = ADS_Config.CORE.ENABLE_WARNING_MESSAGES
     self.systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER
     self.aiOverloadControl         = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL
+    self.aiDisableOnCriticalOverload = ADS_Config.CORE.AI_DISABLE_ON_CRITICAL_OVERLOAD
+    self.contractVehicleProtection = ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION
     self.aiWorkerTargetStress      = ADS_Config.CORE.AI_WORKER_PID.TARGET_STRESS
     self.aiWorkerMinSpeed          = ADS_Config.CORE.AI_WORKER_PID.MIN_SPEED
     self.instantInspection         = ADS_Config.MAINTENANCE.INSTANT_INSPECTION
@@ -63,6 +65,8 @@ function ADS_SettingsSyncEvent:writeStream(streamId, connection)
     streamWriteBool(streamId,    self.enableWarningMessages or false)
     streamWriteFloat32(streamId, self.systemStressGlobalMultiplier or 1.0)
     streamWriteBool(streamId,    self.aiOverloadControl      or false)
+    streamWriteBool(streamId,    self.aiDisableOnCriticalOverload or false)
+    streamWriteBool(streamId,    self.contractVehicleProtection or false)
     streamWriteFloat32(streamId, self.aiWorkerTargetStress   or 0.3)
     streamWriteFloat32(streamId, self.aiWorkerMinSpeed       or 3.0)
     streamWriteBool(streamId,    self.instantInspection      or false)
@@ -100,6 +104,8 @@ function ADS_SettingsSyncEvent:readStream(streamId, connection)
     self.enableWarningMessages     = streamReadBool(streamId)
     self.systemStressGlobalMultiplier = streamReadFloat32(streamId)
     self.aiOverloadControl         = streamReadBool(streamId)
+    self.aiDisableOnCriticalOverload = streamReadBool(streamId)
+    self.contractVehicleProtection = streamReadBool(streamId)
     self.aiWorkerTargetStress      = streamReadFloat32(streamId)
     self.aiWorkerMinSpeed          = streamReadFloat32(streamId)
     self.instantInspection         = streamReadBool(streamId)
@@ -146,6 +152,8 @@ local function applyConfig(event)
     ADS_Config.CORE.ENABLE_WARNING_MESSAGES                = event.enableWarningMessages
     ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER        = event.systemStressGlobalMultiplier
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL       = event.aiOverloadControl
+    ADS_Config.CORE.AI_DISABLE_ON_CRITICAL_OVERLOAD        = event.aiDisableOnCriticalOverload
+    ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION            = event.contractVehicleProtection
     ADS_Config.CORE.AI_WORKER_PID.TARGET_STRESS            = event.aiWorkerTargetStress
     ADS_Config.CORE.AI_WORKER_PID.MIN_SPEED                = event.aiWorkerMinSpeed
     ADS_Config.MAINTENANCE.INSTANT_INSPECTION               = event.instantInspection

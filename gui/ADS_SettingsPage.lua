@@ -31,6 +31,8 @@ local function buildPendingConfigFromAdsConfig()
         enableWarningMessages = ADS_Config.CORE.ENABLE_WARNING_MESSAGES,
         systemStressGlobalMultiplier = ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER,
         aiOverloadControl = ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL,
+        aiDisableOnCriticalOverload = ADS_Config.CORE.AI_DISABLE_ON_CRITICAL_OVERLOAD,
+        contractVehicleProtection = ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION,
         aiWorkerTargetStress = ADS_Config.CORE.AI_WORKER_PID.TARGET_STRESS,
         aiWorkerMinSpeed = ADS_Config.CORE.AI_WORKER_PID.MIN_SPEED,
 
@@ -282,6 +284,8 @@ function ADS_InGameSettings.commitPendingConfig(current, pending)
     ADS_Config.CORE.ENABLE_WARNING_MESSAGES = pending.enableWarningMessages
     ADS_Config.CORE.SYSTEM_STRESS_GLOBAL_MULTIPLIER = pending.systemStressGlobalMultiplier
     ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = pending.aiOverloadControl
+    ADS_Config.CORE.AI_DISABLE_ON_CRITICAL_OVERLOAD = pending.aiDisableOnCriticalOverload
+    ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION = pending.contractVehicleProtection
     ADS_Config.CORE.AI_WORKER_PID.TARGET_STRESS = pending.aiWorkerTargetStress
     ADS_Config.CORE.AI_WORKER_PID.MIN_SPEED = pending.aiWorkerMinSpeed
 
@@ -615,6 +619,18 @@ function ADS_InGameSettings:initializeSettingsPageControls(targetPage)
         g_i18n:getText("ads_aiOverloadAndOverheatControl_label"),
         g_i18n:getText("ads_aiOverloadAndOverheatControl_tooltip")
     )
+    page.ads_aiDisableOnCriticalOverload = ADS_InGameSettings:addBinaryOption(
+        page,
+        "onAiDisableOnCriticalOverloadChanged",
+        g_i18n:getText("ads_aiDisableOnCriticalOverload_label"),
+        g_i18n:getText("ads_aiDisableOnCriticalOverload_tooltip")
+    )
+    page.ads_contractVehicleProtection = ADS_InGameSettings:addBinaryOption(
+        page,
+        "onContractVehicleProtectionChanged",
+        g_i18n:getText("ads_contractVehicleProtection_label"),
+        g_i18n:getText("ads_contractVehicleProtection_tooltip")
+    )
     page.ads_aiWorkerTargetStress = ADS_InGameSettings:addMultiTextOption(
         page,
         "onAiWorkerTargetStressChanged",
@@ -811,6 +827,8 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_generalWearEnabled:setIsChecked(pending.generalWearEnabled, false, false)
     currentPage.ads_warningMessages:setIsChecked(pending.enableWarningMessages, false, false)
     currentPage.ads_aiOverloadAndOverheatControl:setIsChecked(pending.aiOverloadControl, false, false)
+    currentPage.ads_aiDisableOnCriticalOverload:setIsChecked(pending.aiDisableOnCriticalOverload, false, false)
+    currentPage.ads_contractVehicleProtection:setIsChecked(pending.contractVehicleProtection, false, false)
     currentPage.ads_dealerWorkshopAvailable:setIsChecked(pending.dealerAlwaysAvailable, false, false)
     currentPage.ads_mobileWorkshopAvailable:setIsChecked(pending.mobileAlwaysAvailable, false, false)
     currentPage.ads_ownWorkshopAvailable:setIsChecked(pending.ownAlwaysAvailable, false, false)
@@ -859,6 +877,8 @@ function ADS_InGameSettings:updateADSSettings(currentPage)
     currentPage.ads_fieldInspectionDuration:setDisabled(disableAll)
     currentPage.ads_lubricationReducePerDay:setDisabled(disableAll)
     currentPage.ads_aiOverloadAndOverheatControl:setDisabled(disableAll)
+    currentPage.ads_aiDisableOnCriticalOverload:setDisabled(disableAll)
+    currentPage.ads_contractVehicleProtection:setDisabled(disableAll)
     currentPage.ads_aiWorkerTargetStress:setDisabled(disableAll or not pending.aiOverloadControl)
     currentPage.ads_aiWorkerMinSpeed:setDisabled(disableAll or not pending.aiOverloadControl)
     currentPage.ads_warningMessages:setDisabled(disableAll)
@@ -1108,6 +1128,18 @@ end
 
 function ADS_InGameSettings:onAiOverloadAndOverheatControlChanged(state)
     getPendingConfig().aiOverloadControl = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onAiDisableOnCriticalOverloadChanged(state)
+    getPendingConfig().aiDisableOnCriticalOverload = (state == BinaryOptionElement.STATE_RIGHT)
+    ADS_InGameSettings.ads_hasPendingSettingsChange = true
+    refreshCurrentSettingsPage()
+end
+
+function ADS_InGameSettings:onContractVehicleProtectionChanged(state)
+    getPendingConfig().contractVehicleProtection = (state == BinaryOptionElement.STATE_RIGHT)
     ADS_InGameSettings.ads_hasPendingSettingsChange = true
     refreshCurrentSettingsPage()
 end

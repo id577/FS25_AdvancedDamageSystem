@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Applica la copertura in garanzia alle riparazioni dei veicoli nuovi fino a 20 ore di lavoro o 12 mesi. Solo i ricambi OEM sono coperti senza costi."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Controllo IA sovraccarico &amp; surriscaldamento"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Se attivato, l'operaio IA riduce il carico per evitare sovraccarico o surriscaldamento del motore."/>
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Stop AI on Critical Overload"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Allows ADS to stop AI workers and AutoDrive during a critical overload."/>
+        <text name="ads_contractVehicleProtection_label" text="Contract Vehicle Protection"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Applies critical-overload AI shutdown and overload/overheat speed regulation to contract vehicles."/>
         <text name="ads_aiWorkerTargetStress_label" text="Reazione velocita IA"/>
         <text name="ads_aiWorkerTargetStress_tooltip" text="Controlla con quanto anticipo l'operaio IA reagisce a sovraccarico e surriscaldamento. I valori piu alti sono meno sensibili e reagiscono piu tardi; i valori piu bassi sono piu sensibili e rallentano prima."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Rilassata"/>

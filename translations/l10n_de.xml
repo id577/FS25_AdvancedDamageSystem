@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Aktiviert Garantieleistungen für Reparaturen an Neufahrzeugen (bis zu 20 Betriebsstunden oder 12 Monate). Nur OEM-Teile werden kostenlos übernommen."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="KI-Überlastungs- und Überhitzungskontrolle"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Der KI-Helfer reduziert die Motorlast bei drohender Überlastung oder Überhitzung."/>
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Stop AI on Critical Overload"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Allows ADS to stop AI workers and AutoDrive during a critical overload."/>
+        <text name="ads_contractVehicleProtection_label" text="Contract Vehicle Protection"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Applies critical-overload AI shutdown and overload/overheat speed regulation to contract vehicles."/>
         <text name="ads_aiWorkerTargetStress_label" text="KI-Reaktion auf Last"/>
         <text name="ads_aiWorkerTargetStress_tooltip" text="Steuert, wie frueh der KI-Helfer auf Ueberlastung und Ueberhitzung reagiert. Hoehere Werte sind weniger empfindlich und reagieren spaeter; niedrigere Werte sind empfindlicher und verlangsamen frueher."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Gelassen"/>

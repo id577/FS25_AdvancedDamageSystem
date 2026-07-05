@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Soveltaa takuusuojaa uusien ajoneuvojen korjauksiin (enintään 20 käyttötuntia tai 12 kuukautta). Vain alkuperäiset varaosat katetaan veloituksetta."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Tekoälyn ylikuormitus- ja ylikuumenemissäätö"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Jos käytössä, tekoälytyöntekijä vähentää kuormaa estääkseen moottorin ylikuormituksen tai ylikuumenemisen."/>
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Stop AI on Critical Overload"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Allows ADS to stop AI workers and AutoDrive during a critical overload."/>
+        <text name="ads_contractVehicleProtection_label" text="Contract Vehicle Protection"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Applies critical-overload AI shutdown and overload/overheat speed regulation to contract vehicles."/>
         <text name="ads_aiWorkerTargetStress_label" text="Tekoälyn nopeusreaktio"/>
         <text name="ads_aiWorkerTargetStress_tooltip" text="Määrittää, kuinka aikaisin tekoälytyöntekijä reagoi ylikuormitukseen ja ylikuumenemiseen. Suuremmat arvot ovat vähemmän herkkiä ja reagoivat myöhemmin; pienemmät arvot ovat herkempiä ja hidastavat aiemmin."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Rento"/>

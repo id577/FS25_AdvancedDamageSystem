@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Включает гарантийный ремонт для новой техники (до 20 м/ч или 12 месяцев). Бесплатно только с оригинальными запчастями (OEM)."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Контроль перегрузки и перегрева ИИ"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Если включено, ИИ-работник будет снижать нагрузку, чтобы не допустить перегрузки двигателя или перегрева."/>
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Остановка ИИ при критической перегрузке"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Разрешает ADS останавливать ИИ-работников и AutoDrive при критической перегрузке."/>
+        <text name="ads_contractVehicleProtection_label" text="Защита контрактной техники"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Включает для контрактной техники остановку ИИ при критической перегрузке и регулирование скорости при перегрузке или перегреве."/>
         <text name="ads_aiWorkerTargetStress_label" text="Реакция ИИ на нагрузку"/>
         <text name="ads_aiWorkerTargetStress_tooltip" text="Определяет, насколько рано помощник ИИ реагирует на перегрузку и перегрев. Более высокие значения делают его менее чувствительным, и он реагирует позже; более низкие значения делают его чувствительнее, и он начинает снижать скорость раньше."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Спокойная"/>

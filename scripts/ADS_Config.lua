@@ -4,7 +4,7 @@ ADS_Config = {
     -- When true, the mod will print detailed information about its calculations,
     -- such as wear rates, breakdown checks, and temperature changes.
     -- Set to false for normal gameplay to avoid performance impact and console spam.
-    VER = 135,
+    VER = 136,
 
     DEBUG = false,
     TUTORIAL_MODE = true,
@@ -215,6 +215,10 @@ ADS_Config = {
         ENABLE_WARNING_MESSAGES = true,
 
         AI_OVERLOAD_AND_OVERHEAT_CONTROL = true,
+        -- Allows a critical overload to stop AI workers and AutoDrive.
+        AI_DISABLE_ON_CRITICAL_OVERLOAD = true,
+        -- Applies critical-overload shutdown and overload/overheat speed control to contract vehicles.
+        CONTRACT_VEHICLE_PROTECTION = false,
         AI_WORKER_PID = {
             MIN_SPEED = 3.0,
             MAX_REDUCTION = 16.0,
@@ -767,6 +771,8 @@ function ADS_Config.saveToXMLFile()
     setXMLBool (xmlFile, root .. ".GENERAL_WEAR_ENABLED",   ADS_Config.CORE.GENERAL_WEAR_ENABLED)
     setXMLBool (xmlFile, root .. ".ENABLE_WARNING_MESSAGES", ADS_Config.CORE.ENABLE_WARNING_MESSAGES)
     setXMLBool (xmlFile, root .. ".AI_OVERLOAD_CONTROL",    ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL)
+    setXMLBool (xmlFile, root .. ".AI_DISABLE_ON_CRITICAL_OVERLOAD", ADS_Config.CORE.AI_DISABLE_ON_CRITICAL_OVERLOAD)
+    setXMLBool (xmlFile, root .. ".CONTRACT_VEHICLE_PROTECTION", ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION)
     setXMLFloat(xmlFile, root .. ".AI_WORKER_TARGET_STRESS", ADS_Config.CORE.AI_WORKER_PID.TARGET_STRESS)
     setXMLFloat(xmlFile, root .. ".AI_WORKER_MIN_SPEED",     ADS_Config.CORE.AI_WORKER_PID.MIN_SPEED)
 
@@ -891,6 +897,16 @@ function ADS_Config.loadFromXMLFile()
 
     v = getXMLBool(xmlFile, root .. ".AI_OVERLOAD_CONTROL")
     if v ~= nil then ADS_Config.CORE.AI_OVERLOAD_AND_OVERHEAT_CONTROL = v end
+
+    v = getXMLBool(xmlFile, root .. ".AI_DISABLE_ON_CRITICAL_OVERLOAD")
+    if v == nil then
+        -- Compatibility with the short-lived broader setting name.
+        v = getXMLBool(xmlFile, root .. ".AI_DISABLE_ON_CRITICAL_FAILURE")
+    end
+    if v ~= nil then ADS_Config.CORE.AI_DISABLE_ON_CRITICAL_OVERLOAD = v end
+
+    v = getXMLBool(xmlFile, root .. ".CONTRACT_VEHICLE_PROTECTION")
+    if v ~= nil then ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION = v end
 
     v = getXMLFloat(xmlFile, root .. ".AI_WORKER_TARGET_STRESS")
     if v ~= nil then ADS_Config.CORE.AI_WORKER_PID.TARGET_STRESS = v end

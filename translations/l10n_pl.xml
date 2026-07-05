@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Obejmuje naprawy nowych pojazdów gwarancją (do 20 godzin pracy lub 12 miesięcy). Bezpłatnie pokrywane są wyłącznie części OEM."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="Sterowanie przeciążeniem i przegrzewaniem pracownika zatrudnionego (AI)."/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Jeśli włączone, pracownik AI zmniejsza obciążenie, aby zapobiec przeciążeniu silnika lub przegrzaniu."/>
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Stop AI on Critical Overload"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Allows ADS to stop AI workers and AutoDrive during a critical overload."/>
+        <text name="ads_contractVehicleProtection_label" text="Contract Vehicle Protection"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Applies critical-overload AI shutdown and overload/overheat speed regulation to contract vehicles."/>
         <text name="ads_aiWorkerTargetStress_label" text="Reakcja prędkości AI"/>
         <text name="ads_aiWorkerTargetStress_tooltip" text="Określa, jak wcześnie pracownik AI reaguje na przeciążenie i przegrzewanie. Wyższe wartości oznaczają mniejszą czułość i późniejszą reakcję, a niższe wartości większą czułość i wcześniejsze zwalnianie."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Spokojna"/>

@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Uplatňuje záruku na opravy nových vozidel (do 20 motohodin nebo 12 měsíců). Zdarma jsou kryty pouze originální (OEM) díly."/>
         <text name="ads_aiOverloadAndOverheatControl_label" text="AI kontrola přetížení a přehřátí"/>
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Je-li povoleno, AI pracovník sníží zatížení, aby zabránil přetížení nebo přehřátí motoru."/>
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Stop AI on Critical Overload"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Allows ADS to stop AI workers and AutoDrive during a critical overload."/>
+        <text name="ads_contractVehicleProtection_label" text="Contract Vehicle Protection"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Applies critical-overload AI shutdown and overload/overheat speed regulation to contract vehicles."/>
         <text name="ads_aiWorkerTargetStress_label" text="Odezva AI na zátěž"/>
         <text name="ads_aiWorkerTargetStress_tooltip" text="Určuje, jak brzy AI pracovník reaguje na přetížení a přehřátí. Vyšší hodnoty jsou méně citlivé a reagují později; nižší hodnoty jsou citlivější a zpomalují dříve."/>
         <text name="ads_aiWorkerTargetStress_relaxed" text="Uvolněná"/>

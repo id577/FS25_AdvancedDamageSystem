@@ -3024,26 +3024,33 @@ local function syncDisableAiWorkers(vehicle)
     if spec.activeEffects ~= nil and next(spec.activeEffects) ~= nil then
         for _, effectData in pairs(spec.activeEffects) do
             if effectData ~= nil and effectData.extraData ~= nil and effectData.extraData.disableAi then
-                local autoDriveActive = vehicle.ad ~= nil
-                    and vehicle.ad.stateModule ~= nil
-                    and vehicle.ad.stateModule.isActive ~= nil
-                    and vehicle.ad.stateModule:isActive()
+                local isCriticalOverload = effectData.extraData.criticalOverload == true
+                local shouldDisableAi = not isCriticalOverload
+                    or (ADS_Config.CORE.AI_DISABLE_ON_CRITICAL_OVERLOAD
+                        and (vehicle.propertyState ~= 4 or ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION))
 
-                if autoDriveActive and vehicle.stopAutoDrive ~= nil then
-                    vehicle.ad.isStoppingWithError = true
+                if shouldDisableAi then
+                    local autoDriveActive = vehicle.ad ~= nil
+                        and vehicle.ad.stateModule ~= nil
+                        and vehicle.ad.stateModule.isActive ~= nil
+                        and vehicle.ad.stateModule:isActive()
 
-                    if vehicle.ad.stateModule.setLoopsDone ~= nil then
-                        vehicle.ad.stateModule:setLoopsDone(0)
+                    if autoDriveActive and vehicle.stopAutoDrive ~= nil then
+                        vehicle.ad.isStoppingWithError = true
+
+                        if vehicle.ad.stateModule.setLoopsDone ~= nil then
+                            vehicle.ad.stateModule:setLoopsDone(0)
+                        end
+
+                        vehicle:stopAutoDrive()
                     end
 
-                    vehicle:stopAutoDrive()
-                end
+                    if vehicle:getIsAIActive() and vehicle.stopCurrentAIJob ~= nil then
+                        vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new())
+                    end
 
-                if vehicle:getIsAIActive() and vehicle.stopCurrentAIJob ~= nil then
-                    vehicle:stopCurrentAIJob(AIMessageErrorVehicleBroken.new())
+                    return
                 end
-
-                return
             end
         end
     end
@@ -4742,6 +4749,11 @@ function AdvancedDamageSystem:updateAiWorkerCruiseControl(dt)
     if not self.isServer then return end
     local spec = self.spec_AdvancedDamageSystem
     if spec == nil then return end
+
+    if self.propertyState == 4 and not ADS_Config.CORE.CONTRACT_VEHICLE_PROTECTION then
+        self:resetAiWorkerCruiseControlState()
+        return
+    end
 
     local config = ADS_Config.CORE and ADS_Config.CORE.AI_WORKER_PID
     if config == nil then return end

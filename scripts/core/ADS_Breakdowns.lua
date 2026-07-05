@@ -510,7 +510,7 @@ ADS_Breakdowns.BreakdownRegistry = {
                 progressMultiplier = 0.0,
                 repairPrice = 0.0,
                 effects = {
-                    { id = "EMPTY_EFFECT", value = 1.0, aggregation = "boolean_or",  extraData = {message = "ads_breakdowns_overload_breakdown_stage2_message", reason = "BREAKDOWN", disableAi = true}}
+                    { id = "EMPTY_EFFECT", value = 1.0, aggregation = "boolean_or",  extraData = {message = "ads_breakdowns_overload_breakdown_stage2_message", reason = "BREAKDOWN", disableAi = true, criticalOverload = true}}
                 },
                 indicators = {
                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }

@@ -38,6 +38,10 @@
         <text name="ads_warrantyEnabled_tooltip" text="Garanciális fedezetet ad az új járművek javításaira, legfeljebb 20 üzemóráig vagy 12 hónapig. Csak az OEM alkatrészek ingyenesek." />
         <text name="ads_aiOverloadAndOverheatControl_label" text="AI túlterhelés- és túlmelegedésvédelem" />
         <text name="ads_aiOverloadAndOverheatControl_tooltip" text="Bekapcsolva az AI munkás csökkenti a terhelést, hogy elkerülje a motor túlterhelését vagy túlmelegedését." />
+        <text name="ads_aiDisableOnCriticalOverload_label" text="Stop AI on Critical Overload"/>
+        <text name="ads_aiDisableOnCriticalOverload_tooltip" text="Allows ADS to stop AI workers and AutoDrive during a critical overload."/>
+        <text name="ads_contractVehicleProtection_label" text="Contract Vehicle Protection"/>
+        <text name="ads_contractVehicleProtection_tooltip" text="Applies critical-overload AI shutdown and overload/overheat speed regulation to contract vehicles."/>
         <text name="ads_aiWorkerTargetStress_label" text="AI sebességreakció" />
         <text name="ads_aiWorkerTargetStress_tooltip" text="Azt szabályozza, milyen korán reagáljon az AI munkás a túlterhelésre és túlmelegedésre. Magasabb értéknél kevésbé érzékeny és később reagál; alacsonyabb értéknél érzékenyebb és hamarabb lassít." />
         <text name="ads_aiWorkerTargetStress_relaxed" text="Laza" />
