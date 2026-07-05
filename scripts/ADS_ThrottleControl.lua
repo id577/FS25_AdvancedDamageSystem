@@ -10,12 +10,7 @@ function ADS_ThrottleControl.isAdjustmentModeActive(vehicle)
         return false
     end
 
-    local isAdjustmentKeyPressed = spec.throttleAdjustmentPressed == true
-    if Input ~= nil and Input.KEY_t ~= nil then
-        isAdjustmentKeyPressed = Input.isKeyPressed(Input.KEY_t)
-    end
-
-    if not isAdjustmentKeyPressed or (tonumber(drivableSpec.axisForward) or 0) <= 0.01 then
+    if spec.throttleAdjustmentPressed ~= true or (tonumber(drivableSpec.axisForward) or 0) <= 0.01 then
         return false
     end
 
@@ -66,15 +61,6 @@ function ADS_ThrottleControl.update(vehicle)
     local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
     if spec == nil or not vehicle.isClient then
         return
-    end
-
-    local isControlled = vehicle.getIsEnteredForInput ~= nil and vehicle:getIsEnteredForInput()
-    if isControlled and Input ~= nil and Input.KEY_lctrl ~= nil then
-        local isFullThrottlePressed = Input.isKeyPressed(Input.KEY_lctrl)
-        if spec.fullThrottleOverridePressed ~= isFullThrottlePressed then
-            spec.fullThrottleOverridePressed = isFullThrottlePressed
-            ADS_FullThrottleEvent.send(vehicle, isFullThrottlePressed)
-        end
     end
 
     local isActive = ADS_ThrottleControl.isAdjustmentModeActive(vehicle)
