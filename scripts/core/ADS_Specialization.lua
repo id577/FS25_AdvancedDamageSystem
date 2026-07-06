@@ -2872,7 +2872,17 @@ end
 
 local function registerVehicle(vehicle)
     if ADS_Main and ADS_Main.vehicles and ADS_Main.vehicles[vehicle.uniqueId] == nil then
-        if (vehicle.propertyState == 2 or vehicle.propertyState == 3 or vehicle.propertyState == 4) and vehicle.ownerFarmId ~= 0 and vehicle.ownerFarmId < 10 then
+        local ownerFarmId = vehicle.getOwnerFarmId ~= nil and vehicle:getOwnerFarmId() or vehicle.ownerFarmId
+        local hasSupportedPropertyState = vehicle.propertyState == VehiclePropertyState.OWNED
+            or vehicle.propertyState == VehiclePropertyState.LEASED
+            or vehicle.propertyState == VehiclePropertyState.MISSION
+            
+        local hasRealFarmOwner = ownerFarmId ~= nil
+            and ownerFarmId ~= FarmManager.SPECTATOR_FARM_ID
+            and g_farmManager ~= nil
+            and g_farmManager:getFarmById(ownerFarmId) ~= nil
+
+        if hasSupportedPropertyState and hasRealFarmOwner then
 
             local spec = vehicle.spec_AdvancedDamageSystem
             if spec == nil then return end
