@@ -1,3 +1,6 @@
+> [!WARNING]
+> **This README is significantly out of date.** The information below will be updated soon.
+
 > [!IMPORTANT]
 > ### Support the Project
 >
