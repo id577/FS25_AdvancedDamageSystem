@@ -1,0 +1,2005 @@
+--- a/scripts/ADS_Breakdowns.lua
++++ b/scripts/ADS_Breakdowns.lua
+@@ -137,7 +137,21 @@
+     FUEL_FILTER = "ads_breakdowns_part_fuel_filter",
+     FUEL_LINE = "ads_breakdowns_part_fuel_line",
+     HARVEST_PROCESSING_SYSTEM = "ads_breakdowns_part_harvest_processing_system",
+-    UNLOADING_AUGER = "ads_breakdowns_part_unloading_auger"
++    UNLOADING_AUGER = "ads_breakdowns_part_unloading_auger",
++    GLOW_PLUGS = "ads_breakdowns_part_glow_plugs",
++    HEAD_GASKET = "ads_breakdowns_part_head_gasket",
++    DPF = "ads_breakdowns_part_dpf",
++    DEF_SYSTEM = "ads_breakdowns_part_def_system",
++    WATER_SEPARATOR = "ads_breakdowns_part_water_separator",
++    SERPENTINE_BELT = "ads_breakdowns_part_serpentine_belt",
++    DIFF_LOCK_ACTUATOR = "ads_breakdowns_part_diff_lock_actuator",
++    TRANSMISSION_SOLENOID = "ads_breakdowns_part_transmission_solenoid",
++    POWER_STEERING_PUMP = "ads_breakdowns_part_power_steering_pump",
++    DASH_SENSORS = "ads_breakdowns_part_dash_sensors",
++    WIRING_HARNESS = "ads_breakdowns_part_wiring_harness",
++    TIRE = "ads_breakdowns_part_tire",
++    TRAILER_AIR_BRAKES = "ads_breakdowns_part_trailer_air_brakes",
++    CHIPPER_KNIVES = "ads_breakdowns_part_chipper_knives"
+ }
+ 
+ local parts = ADS_Breakdowns.PARTS
+@@ -172,6 +186,20 @@
+     FUEL_LINE_AIR_LEAK = 0.45,
+     HARVEST_PROCESSING_SYSTEM_WEAR = 0.85,
+     UNLOADING_AUGER_MALFUNCTION = 0.40,
++    GLOW_PLUG_FAILURE = 0.30,
++    HEAD_GASKET_FAILURE = 1.40,
++    DPF_CLOGGING = 0.90,
++    DEF_SYSTEM_FAULT = 0.70,
++    WATER_IN_FUEL = 0.25,
++    SERPENTINE_BELT_FAILURE = 0.25,
++    DIFF_LOCK_ACTUATOR_STUCK = 0.60,
++    TRANSMISSION_SOLENOID_FAULT = 1.00,
++    POWER_STEERING_PUMP_FAILURE = 0.50,
++    DASH_SENSOR_FAULT = 0.25,
++    RODENT_DAMAGED_WIRING = 0.40,
++    SLOW_PUNCTURE = 0.15,
++    TRAILER_AIR_BRAKE_LEAK = 0.40,
++    FLAT_TIRE = 0.12,
+ }
+ 
+ local breakdownProgressMultipliers = {
+@@ -203,9 +231,232 @@
+     FUEL_FILTER_CLOGGING = 1.2,
+     FUEL_LINE_AIR_LEAK = 0.8,
+     HARVEST_PROCESSING_SYSTEM_WEAR = 1.35,
+-    UNLOADING_AUGER_MALFUNCTION = 1.2
++    UNLOADING_AUGER_MALFUNCTION = 1.2,
++    GLOW_PLUG_FAILURE = 1.2,
++    HEAD_GASKET_FAILURE = 1.0,
++    DPF_CLOGGING = 1.1,
++    DEF_SYSTEM_FAULT = 0.9,
++    WATER_IN_FUEL = 0.8,
++    SERPENTINE_BELT_FAILURE = 0.8,
++    DIFF_LOCK_ACTUATOR_STUCK = 1.0,
++    TRANSMISSION_SOLENOID_FAULT = 1.1,
++    POWER_STEERING_PUMP_FAILURE = 1.0,
++    DASH_SENSOR_FAULT = 1.2,
++    RODENT_DAMAGED_WIRING = 0.9,
++    SLOW_PUNCTURE = 0.7,
++    TRAILER_AIR_BRAKE_LEAK = 0.9
+ }
+ 
++-- ==========================================================
++--          HELPERS FOR THE EXTENDED BREAKDOWN SET
++-- ==========================================================
++
++local function isCarLikeVehicle(vehicle)
++    local vtype = vehicle ~= nil and vehicle.type ~= nil and vehicle.type.name or ""
++    return vtype == "car" or vtype == "carFillable" or vtype == "motorbike"
++end
++
++local function hasCombustionEngine(vehicle)
++    return vehicle ~= nil and vehicle.spec_motorized ~= nil and not getIsElectricVehicle(vehicle)
++end
++
++local function getVehicleYear(vehicle)
++    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
++    return spec ~= nil and (tonumber(spec.year) or 0) or 0
++end
++
++local function hasWheelsWithoutTracks(vehicle)
++    if vehicle == nil or vehicle.spec_wheels == nil or vehicle.spec_wheels.wheels == nil or #vehicle.spec_wheels.wheels == 0 then
++        return false
++    end
++    if vehicle.spec_crawlers ~= nil and vehicle.spec_crawlers.crawlers ~= nil and #vehicle.spec_crawlers.crawlers > 0 then
++        return false
++    end
++    return true
++end
++
++local function hasGearedTransmission(vehicle)
++    if hasCVTAddon(vehicle) then return false end
++    local motor = vehicle.getMotor ~= nil and vehicle:getMotor() or nil
++    if motor == nil then return false end
++    return motor.minForwardGearRatio == nil
++end
++
++local function canTowTrailers(vehicle)
++    if vehicle == nil or isCarLikeVehicle(vehicle) then
++        return false
++    end
++    local spec_aj = vehicle.spec_attacherJoints
++    return spec_aj ~= nil and spec_aj.attacherJoints ~= nil and #spec_aj.attacherJoints > 0
++end
++
++-- True when the vehicle is pulling at least one wheeled implement/trailer whose
++-- wheels can brake (i.e. something that would be on the tractor's trailer air line).
++local function isTowingBrakedImplement(vehicle)
++    if vehicle == nil or vehicle.getAttachedImplements == nil then
++        return false
++    end
++
++    local visited = {}
++    local function hasBrakedWheels(object)
++        local spec_wheels = object.spec_wheels
++        if spec_wheels == nil or spec_wheels.wheels == nil or #spec_wheels.wheels == 0 then
++            return false
++        end
++        if object.spec_trailer ~= nil then
++            return true
++        end
++        for _, wheel in ipairs(spec_wheels.wheels) do
++            local runtime = wheel.physics or wheel
++            local brakeFactor = tonumber(runtime.brakeFactor) or tonumber(wheel.brakeFactor) or 0
++            if brakeFactor > 0 then
++                return true
++            end
++        end
++        return false
++    end
++
++    local function walk(object)
++        if object == nil or visited[object] then
++            return false
++        end
++        visited[object] = true
++        local implements = object.getAttachedImplements ~= nil and object:getAttachedImplements() or nil
++        if implements == nil then
++            return false
++        end
++        for _, implement in pairs(implements) do
++            local child = implement ~= nil and implement.object or nil
++            if child ~= nil then
++                if child.spec_motorized == nil and hasBrakedWheels(child) then
++                    return true
++                end
++                if walk(child) then
++                    return true
++                end
++            end
++        end
++        return false
++    end
++
++    return walk(vehicle)
++end
++
++ADS_Breakdowns.isTowingBrakedImplement = isTowingBrakedImplement
++
++-- Phantom dashboard warning used by DASH_SENSOR_FAULT. Fires a short pulse roughly
++-- once per `periodMs`; the HUD latches it on until the engine is switched off,
++-- just like a real intermittent sensor fault. switchOff stays false so a phantom
++-- light can never hide a genuine warning on the same lamp.
++local function phantomIndicator(periodMs, offsetMs)
++    return function(vehicle)
++        if vehicle == nil or vehicle.getIsMotorStarted == nil or not vehicle:getIsMotorStarted() then
++            return false
++        end
++        local t = (tonumber(g_time) or 0) + (offsetMs or 0)
++        return (t % periodMs) < 250
++    end
++end
++
++local function engineIsColdForGlowPlugs(vehicle)
++    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
++    if spec == nil then return false end
++    local engTemp = tonumber(spec.rawEngineTemperature or spec.engineTemperature) or 20
++    return engTemp < 20
++end
++
++local function engineIsWarmForGlowPlugs(vehicle)
++    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
++    if spec == nil then return true end
++    local engTemp = tonumber(spec.rawEngineTemperature or spec.engineTemperature) or 20
++    return engTemp >= 40
++end
++
++-- DEF (AdBlue) tank on the vehicle, as used by FS25's native DEF consumer and by
++-- the JSM "Diesel Exhaust Fluid System" mod (which refills and displays that same
++-- fill unit). Returns fillLevel, capacity - or nil if the machine has no DEF tank.
++local function getDefTankState(vehicle)
++    if vehicle == nil or vehicle.spec_motorized == nil or FillType == nil or FillType.DEF == nil then
++        return nil
++    end
++
++    local fillUnitIndex = nil
++    if vehicle.getConsumerFillUnitIndex ~= nil then
++        fillUnitIndex = vehicle:getConsumerFillUnitIndex(FillType.DEF)
++    end
++    if fillUnitIndex == nil then
++        local byType = vehicle.spec_motorized.consumersByFillType
++        local consumer = byType ~= nil and byType[FillType.DEF] or nil
++        if consumer == nil and vehicle.spec_motorized.consumers ~= nil then
++            for _, entry in ipairs(vehicle.spec_motorized.consumers) do
++                if entry.fillType == FillType.DEF then
++                    consumer = entry
++                    break
++                end
++            end
++        end
++        fillUnitIndex = consumer ~= nil and consumer.fillUnitIndex or nil
++    end
++
++    if fillUnitIndex == nil or vehicle.getFillUnitCapacity == nil or vehicle.getFillUnitFillLevel == nil then
++        return nil
++    end
++
++    local capacity = tonumber(vehicle:getFillUnitCapacity(fillUnitIndex)) or 0
++    if capacity <= 0 then
++        return nil
++    end
++
++    return tonumber(vehicle:getFillUnitFillLevel(fillUnitIndex)) or 0, capacity
++end
++
++ADS_Breakdowns.getDefTankState = getDefTankState
++
++-- Sudden flat tire (nail, stubble, stone). One entry per side so the pull
++-- direction is saved with the breakdown and identical for every MP client.
++-- Never chosen by wear/stress: AdvancedDamageSystem:updateRandomFlatTire() rolls for it.
++-- side: 1 = left (pulls left), -1 = right (pulls right)
++local function buildFlatTireBreakdown(side)
++    local sideKey = side > 0 and "left" or "right"
++    return {
++        isSelectable = true,
++        system = systems.CHASSIS,
++        part = parts.TIRE,
++        isApplicable = function(vehicle)
++            return hasWheelsWithoutTracks(vehicle)
++        end,
++        probability = function(vehicle)
++            return 0.0
++        end,
++        isCanProgress = function(vehicle)
++            return false
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_flat_tire_" .. sideKey .. "_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 1.0 * breakdownPriceMultipliers.FLAT_TIRE,
++                effects = {
++                    -- "sum" so a right-side (negative) pull is not swallowed by other left-pull effects
++                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.06 * side, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.65, aggregation = "max", extraData = { message = "ads_breakdowns_flat_tire_" .. sideKey .. "_message", disableAi = true } },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 2.0, aggregation = "max" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_flat_tire_" .. sideKey },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    }
++end
++
+ local function getBreakdownFactorWeightPercent(vehicle, systemName, ...)
+     if vehicle == nil or vehicle.spec_AdvancedDamageSystem == nil then
+         return 0
+@@ -1008,14 +1259,15 @@
+     },
+ 
+     -- engine
+-    TURBOCHARGER_MALFUNCTION = { -- TO-DO: add names
++    TURBOCHARGER_MALFUNCTION = {
+         isSelectable = true,
+         system = systems.ENGINE,
+         part = parts.TURBOCHARGER,
+         isApplicable = function(vehicle)
+             local name = vehicle:getFullName()
+             if name == "Fiat 160-90 DT" then return true end
+-            return false
++            -- Turbocharged diesels became standard on farm machinery from the mid-80s on.
++            return hasCombustionEngine(vehicle) and not isCarLikeVehicle(vehicle) and getVehicleYear(vehicle) >= 1985
+         end,
+         probability = function(vehicle)
+             return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"hmf", "mlf"}, {"aicf", "sf"})
+@@ -1075,7 +1327,8 @@
+                 effects = {
+                     { id = "ENGINE_TORQUE_MODIFIER", value = -0.50, aggregation = "sum" },
+                     { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.60, aggregation = "sum" },
+-                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" }, },
++                    { id = "ENGINE_STALLS_CHANCE", value = 10.0, aggregation = "min" },
++                    { id = "DARK_EXHAUST_EFFECT", value = 0.6, aggregation = "max" },
+                 },
+                 inspection = {
+                     { additional = "ads_inspection_hint_turbocharger_malfunction_stage4" },
+@@ -1085,6 +1338,7 @@
+                     { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
+                 }
+             }
++        }
+     },
+ 
+     OIL_PUMP_MALFUNCTION = {
+@@ -2865,6 +3119,1213 @@
+         }
+     },
+ 
++    -- ======================================================================
++    --                      EXTENDED BREAKDOWN SET
++    -- ======================================================================
++
++    -- engine: glow plugs (filed under electrical - they are a 12V heater circuit)
++    GLOW_PLUG_FAILURE = {
++        isSelectable = true,
++        system = systems.ELECTRICAL,
++        part = parts.GLOW_PLUGS,
++        isApplicable = function(vehicle)
++            return hasCombustionEngine(vehicle)
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.ELECTRICAL, {"crf"}, {"wef", "sf"})
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_glow_plug_failure_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.GLOW_PLUG_FAILURE,
++                repairPrice = 1.0 * breakdownPriceMultipliers.GLOW_PLUG_FAILURE,
++                effects = {
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 1, aggregation = "max", extraData = { timer = 0, status = 'IDLE'} },
++                    { id = "GLOW_PLUG_COLD_START_EFFECT", value = 4, aggregation = "max" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_glow_plug_failure_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.GLOW_PLUG_FAILURE,
++                repairPrice = 2.0 * breakdownPriceMultipliers.GLOW_PLUG_FAILURE,
++                effects = {
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 1, aggregation = "max", extraData = { timer = 0, status = 'IDLE'} },
++                    { id = "GLOW_PLUG_COLD_START_EFFECT", value = 10, aggregation = "max" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.WARNING, switchOn = engineIsColdForGlowPlugs, switchOff = engineIsWarmForGlowPlugs }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_glow_plug_failure_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.GLOW_PLUG_FAILURE,
++                repairPrice = 4.0 * breakdownPriceMultipliers.GLOW_PLUG_FAILURE,
++                effects = {
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 2, aggregation = "max", extraData = { timer = 0, status = 'IDLE'} },
++                    { id = "GLOW_PLUG_COLD_START_EFFECT", value = 25, aggregation = "max" },
++                    { id = "IDLE_HUNTING_EFFECT", value = 0.04, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_glow_plug_failure_stage3" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.WARNING, switchOn = engineIsColdForGlowPlugs, switchOff = engineIsWarmForGlowPlugs }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_glow_plug_failure_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.GLOW_PLUG_FAILURE,
++                effects = {
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 3, aggregation = "max", extraData = { timer = 0, status = 'IDLE'} },
++                    { id = "GLOW_PLUG_COLD_START_EFFECT", value = 60, aggregation = "max", extraData = { message = "ads_breakdowns_glow_plug_failure_stage4_message" } },
++                    { id = "IDLE_HUNTING_EFFECT", value = 0.06, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_glow_plug_failure_stage4" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = engineIsColdForGlowPlugs, switchOff = engineIsWarmForGlowPlugs }
++                }
++            }
++        }
++    },
++
++    -- engine: head gasket
++    HEAD_GASKET_FAILURE = {
++        isSelectable = true,
++        system = systems.ENGINE,
++        part = parts.HEAD_GASKET,
++        isApplicable = function(vehicle)
++            return hasCombustionEngine(vehicle)
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"hmf"}, {"cmf", "sf"})
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_head_gasket_failure_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.HEAD_GASKET_FAILURE,
++                repairPrice = 1.0 * breakdownPriceMultipliers.HEAD_GASKET_FAILURE,
++                effects = {
++                    { id = "ENGINE_HEAT_MODIFIER", value = 0.05, aggregation = "sum" },
++                    { id = "RADIATOR_HEALTH_MODIFIER", value = -0.05, aggregation = "min" },
++                },
++                inspection = {
++                    { target = "coolant", status = "ads_inspection_status_slightly_low", additional = "ads_inspection_hint_head_gasket_failure_stage1" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_head_gasket_failure_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.HEAD_GASKET_FAILURE,
++                repairPrice = 2.0 * breakdownPriceMultipliers.HEAD_GASKET_FAILURE,
++                effects = {
++                    { id = "ENGINE_HEAT_MODIFIER", value = 0.12, aggregation = "sum" },
++                    { id = "RADIATOR_HEALTH_MODIFIER", value = -0.15, aggregation = "min" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
++                    { id = "IDLE_HUNTING_EFFECT", value = 0.04, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
++                },
++                inspection = {
++                    { target = "coolant", status = "ads_inspection_status_low", additional = "ads_inspection_hint_head_gasket_failure_stage2" },
++                    { target = "engineOil", status = "ads_inspection_status_slightly_darkened" },
++                },
++                indicators = {
++                    { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_head_gasket_failure_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.HEAD_GASKET_FAILURE,
++                repairPrice = 4.0 * breakdownPriceMultipliers.HEAD_GASKET_FAILURE,
++                effects = {
++                    { id = "ENGINE_HEAT_MODIFIER", value = 0.25, aggregation = "sum" },
++                    { id = "RADIATOR_HEALTH_MODIFIER", value = -0.30, aggregation = "min" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.15, aggregation = "sum" },
++                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 3, aggregation = "max", extraData = { timer = 0, status = 'IDLE'} },
++                },
++                inspection = {
++                    { target = "coolant", status = "ads_inspection_status_very_low", additional = "ads_inspection_hint_head_gasket_failure_stage3" },
++                    { target = "engineOil", status = "ads_inspection_status_contaminated" },
++                },
++                indicators = {
++                    { id = db.COOLANT, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_head_gasket_failure_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.HEAD_GASKET_FAILURE,
++                effects = {
++                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_head_gasket_failure_stage4_message", reason = "BREAKDOWN", disableAi = true} },
++                },
++                inspection = {
++                    { target = "coolant", status = "ads_inspection_status_critically_low", additional = "ads_inspection_hint_head_gasket_failure_stage4" },
++                    { target = "engineOil", status = "ads_inspection_status_critical_condition" },
++                },
++                indicators = {
++                    { id = db.COOLANT, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- engine: diesel particulate filter
++    DPF_CLOGGING = {
++        isSelectable = true,
++        system = systems.ENGINE,
++        part = parts.DPF,
++        isApplicable = function(vehicle)
++            return hasCombustionEngine(vehicle) and getVehicleYear(vehicle) >= 2011
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.ENGINE, {"cmf"}, {"sf", "mlf"})
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getIsMotorStarted()
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_dpf_clogging_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.DPF_CLOGGING,
++                repairPrice = 1.0 * breakdownPriceMultipliers.DPF_CLOGGING,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.04, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.05, aggregation = "sum" },
++                    { id = "DPF_PASSIVE_REGEN_EFFECT", value = 1.0, aggregation = "max", extraData = { breakdownId = "DPF_CLOGGING", regenMs = 600000, minLoad = 0.55 } },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_dpf_clogging_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.DPF_CLOGGING,
++                repairPrice = 2.0 * breakdownPriceMultipliers.DPF_CLOGGING,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
++                    { id = "DARK_EXHAUST_EFFECT", value = 0.30, aggregation = "max" },
++                    { id = "DPF_PASSIVE_REGEN_EFFECT", value = 1.0, aggregation = "max", extraData = { breakdownId = "DPF_CLOGGING", regenMs = 1200000, minLoad = 0.60 } },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_dpf_clogging_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.DPF_CLOGGING,
++                repairPrice = 4.0 * breakdownPriceMultipliers.DPF_CLOGGING,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.15, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
++                    { id = "DARK_EXHAUST_EFFECT", value = 0.50, aggregation = "max" },
++                    { id = "ENGINE_LIMP_EFFECT", value = -0.25, aggregation = "min", extraData = { reason = "BREAKDOWN", message = "ads_breakdowns_dpf_clogging_stage3_message" } },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_dpf_clogging_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.DPF_CLOGGING,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.30, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.50, aggregation = "max" },
++                    { id = "DARK_EXHAUST_EFFECT", value = 0.80, aggregation = "max" },
++                    { id = "ENGINE_LIMP_EFFECT", value = -0.50, aggregation = "min", extraData = { reason = "BREAKDOWN", message = "ads_breakdowns_dpf_clogging_stage4_message", disableAi = true } },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- fuel: DEF / AdBlue (SCR) system
++    DEF_SYSTEM_FAULT = {
++        isSelectable = true,
++        system = systems.FUEL,
++        part = parts.DEF_SYSTEM,
++        isApplicable = function(vehicle)
++            -- only machines that actually carry a DEF tank have an SCR system that can fail
++            return hasCombustionEngine(vehicle) and getDefTankState(vehicle) ~= nil
++        end,
++        probability = function(vehicle)
++            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.FUEL, {"cff"}, {"idf", "sf"})
++            -- running the DEF tank dry is hard on the dosing pump
++            local spec = vehicle.spec_AdvancedDamageSystem
++            local dryRunHours = spec ~= nil and (tonumber(spec.defDryRunTotalMs) or 0) / 3600000 or 0
++            return weight * (1 + math.min(dryRunHours, 1) * 2)
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getIsMotorStarted()
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_def_system_fault_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.DEF_SYSTEM_FAULT,
++                repairPrice = 1.0 * breakdownPriceMultipliers.DEF_SYSTEM_FAULT,
++                effects = {
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.03, aggregation = "sum" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_def_system_fault_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.DEF_SYSTEM_FAULT,
++                repairPrice = 2.0 * breakdownPriceMultipliers.DEF_SYSTEM_FAULT,
++                effects = {
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.05, aggregation = "sum" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_def_system_fault_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.DEF_SYSTEM_FAULT,
++                repairPrice = 4.0 * breakdownPriceMultipliers.DEF_SYSTEM_FAULT,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.25, aggregation = "max" },
++                    { id = "ENGINE_LIMP_EFFECT", value = -0.25, aggregation = "min", extraData = { reason = "BREAKDOWN", message = "ads_breakdowns_def_system_fault_stage3_message" } },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_def_system_fault_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.DEF_SYSTEM_FAULT,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.50, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.60, aggregation = "max" },
++                    { id = "ENGINE_LIMP_EFFECT", value = -0.50, aggregation = "min", extraData = { reason = "BREAKDOWN", message = "ads_breakdowns_def_system_fault_stage4_message", disableAi = true } },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- fuel: DEF tank run dry. Not a part failure and not repairable in the workshop:
++    -- managed by syncDefTankEmpty() in ADS_Specialization.lua and cleared by refilling DEF.
++    DEF_TANK_EMPTY = {
++        isSelectable = false,
++        system = systems.FUEL,
++        part = parts.DEF_SYSTEM,
++        isApplicable = function(vehicle)
++            return getDefTankState(vehicle) ~= nil
++        end,
++        probability = function(vehicle)
++            return 0.0
++        end,
++        isCanProgress = function(vehicle)
++            return false
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_def_tank_empty_stage1_description",
++                detectionChance = 0.0,
++                progressMultiplier = 0.0,
++                repairPrice = 0.0,
++                effects = {
++                    { id = "EMPTY_EFFECT", value = 1.0, aggregation = "boolean_or", extraData = { message = "ads_breakdowns_def_tank_empty_stage1_message" } },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_reduce_power",
++                description = "ads_breakdowns_def_tank_empty_stage2_description",
++                detectionChance = 0.0,
++                progressMultiplier = 0.0,
++                repairPrice = 0.0,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.25, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.25, aggregation = "max" },
++                    { id = "ENGINE_LIMP_EFFECT", value = -0.25, aggregation = "min", extraData = { reason = "BREAKDOWN", message = "ads_breakdowns_def_tank_empty_stage2_message" } },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_reduce_power",
++                description = "ads_breakdowns_def_tank_empty_stage3_description",
++                detectionChance = 0.0,
++                progressMultiplier = 0.0,
++                repairPrice = 0.0,
++                effects = {
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.50, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.60, aggregation = "max" },
++                    { id = "ENGINE_LIMP_EFFECT", value = -0.50, aggregation = "min", extraData = { reason = "BREAKDOWN", message = "ads_breakdowns_def_tank_empty_stage3_message", disableAi = true } },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- workprocess: chipper knives. Not random: driven by chipped volume in
++    -- syncChipperKnifeWear() (ADS_Specialization.lua). Repairing it = changing the knives,
++    -- which resets the knife counter. Critical stage locks the chipper out.
++    CHIPPER_KNIFE_WEAR = {
++        isSelectable = true,
++        system = systems.WORKPROCESS,
++        part = parts.CHIPPER_KNIVES,
++        isApplicable = function(vehicle)
++            return vehicle.spec_woodCrusher ~= nil
++        end,
++        probability = function(vehicle)
++            return 0.0
++        end,
++        isCanProgress = function(vehicle)
++            return false
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_chipper_knife_wear_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.0,
++                repairPrice = 0.4,
++                effects = {
++                    { id = "CHIPPER_KNIFE_DULL_EFFECT", value = 0.10, aggregation = "max" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.05, aggregation = "sum" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_chipper_knife_wear_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.0,
++                repairPrice = 0.5,
++                effects = {
++                    { id = "CHIPPER_KNIFE_DULL_EFFECT", value = 0.25, aggregation = "max" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_chipper_knife_wear_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.0,
++                repairPrice = 0.6,
++                effects = {
++                    { id = "CHIPPER_KNIFE_DULL_EFFECT", value = 0.45, aggregation = "max", extraData = { message = "ads_breakdowns_chipper_knife_wear_stage3_message" } },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.20, aggregation = "sum" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_chipper_knife_wear_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.0,
++                repairPrice = 0.8,
++                effects = {
++                    { id = "CHIPPER_KNIFE_DULL_EFFECT", value = 1.0, aggregation = "max", extraData = { message = "ads_breakdowns_chipper_knife_wear_stage4_message", disableAi = true } },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- fuel: water in fuel / saturated water separator
++    WATER_IN_FUEL = {
++        isSelectable = true,
++        system = systems.FUEL,
++        part = parts.WATER_SEPARATOR,
++        isApplicable = function(vehicle)
++            return hasCombustionEngine(vehicle)
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.FUEL, {"cff", "lff"}, {"sf"})
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_water_in_fuel_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.WATER_IN_FUEL,
++                repairPrice = 1.0 * breakdownPriceMultipliers.WATER_IN_FUEL,
++                effects = {
++                    { id = "IDLE_HUNTING_EFFECT", value = 0.04, aggregation = "max", extraData = { timer = 0, period = 1800, rpmBackup = 0} },
++                    { id = "ENGINE_HESITATION_CHANCE", value = 0.5, aggregation = "max", extraData = {timer = 0, duration = 250, status = 'IDLE', amplitude = 0.5, motorLoad = 0.6, cruiseState = 0} },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_water_in_fuel_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.WATER_IN_FUEL,
++                repairPrice = 2.0 * breakdownPriceMultipliers.WATER_IN_FUEL,
++                effects = {
++                    { id = "IDLE_HUNTING_EFFECT", value = 0.07, aggregation = "max", extraData = { timer = 0, period = 1600, rpmBackup = 0} },
++                    { id = "ENGINE_HESITATION_CHANCE", value = 0.3, aggregation = "max", extraData = {timer = 0, duration = 350, status = 'IDLE', amplitude = 0.7, motorLoad = 0.5, cruiseState = 0} },
++                    { id = "ENGINE_STALLS_CHANCE", value = 30.0, aggregation = "min" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.05, aggregation = "sum" },
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 2, aggregation = "max", extraData = { timer = 0, status = 'IDLE'} },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_water_in_fuel_stage2" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_water_in_fuel_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.WATER_IN_FUEL,
++                repairPrice = 4.0 * breakdownPriceMultipliers.WATER_IN_FUEL,
++                effects = {
++                    { id = "IDLE_HUNTING_EFFECT", value = 0.10, aggregation = "max", extraData = { timer = 0, period = 1500, rpmBackup = 0} },
++                    { id = "ENGINE_HESITATION_CHANCE", value = 0.2, aggregation = "max", extraData = {timer = 0, duration = 500, status = 'IDLE', amplitude = 1.0, motorLoad = 0.4, cruiseState = 0} },
++                    { id = "ENGINE_STALLS_CHANCE", value = 15.0, aggregation = "min" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.12, aggregation = "sum" },
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 4, aggregation = "max", extraData = { timer = 0, status = 'IDLE'} },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_water_in_fuel_stage3" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_water_in_fuel_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.WATER_IN_FUEL,
++                effects = {
++                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = true, message = "ads_breakdowns_water_in_fuel_stage4_message", reason = "BREAKDOWN", disableAi = true} },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_water_in_fuel_stage4" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- cooling: serpentine / fan belt (drives fan, water pump and alternator)
++    SERPENTINE_BELT_FAILURE = {
++        isSelectable = true,
++        system = systems.COOLING,
++        part = parts.SERPENTINE_BELT,
++        isApplicable = function(vehicle)
++            return hasCombustionEngine(vehicle)
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.COOLING, {"hcf"}, {"csf", "sf"})
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getIsMotorStarted()
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_serpentine_belt_failure_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.SERPENTINE_BELT_FAILURE,
++                repairPrice = 1.0 * breakdownPriceMultipliers.SERPENTINE_BELT_FAILURE,
++                effects = {
++                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.4, aggregation = "max" },
++                    { id = "ALTERNATOR_HEALTH_MODIFIER", value = -0.10, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_serpentine_belt_failure_stage1" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_serpentine_belt_failure_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.SERPENTINE_BELT_FAILURE,
++                repairPrice = 2.0 * breakdownPriceMultipliers.SERPENTINE_BELT_FAILURE,
++                effects = {
++                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 0.7, aggregation = "max" },
++                    { id = "FAN_CLUTCH_MODIFIER", value = -0.10, aggregation = "min" },
++                    { id = "ALTERNATOR_HEALTH_MODIFIER", value = -0.30, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_serpentine_belt_failure_stage2" },
++                },
++                indicators = {
++                    { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_serpentine_belt_failure_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.SERPENTINE_BELT_FAILURE,
++                repairPrice = 4.0 * breakdownPriceMultipliers.SERPENTINE_BELT_FAILURE,
++                effects = {
++                    { id = "FAN_CLUTCH_NOISE_EFFECT", value = 1.0, aggregation = "max" },
++                    { id = "FAN_CLUTCH_MODIFIER", value = -0.25, aggregation = "min" },
++                    { id = "ALTERNATOR_HEALTH_MODIFIER", value = -0.60, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_serpentine_belt_failure_stage3" },
++                },
++                indicators = {
++                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.COOLANT, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_serpentine_belt_failure_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.SERPENTINE_BELT_FAILURE,
++                effects = {
++                    { id = "FAN_CLUTCH_MODIFIER", value = -0.60, aggregation = "min", extraData = { message = "ads_breakdowns_serpentine_belt_failure_stage4_message" } },
++                    { id = "ALTERNATOR_HEALTH_MODIFIER", value = -1.0, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_serpentine_belt_failure_stage4" },
++                },
++                indicators = {
++                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.COOLANT, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- transmission: diff-lock actuator stuck engaged
++    DIFF_LOCK_ACTUATOR_STUCK = {
++        isSelectable = true,
++        system = systems.TRANSMISSION,
++        part = parts.DIFF_LOCK_ACTUATOR,
++        isApplicable = function(vehicle)
++            return hasWheelsWithoutTracks(vehicle) and not isCarLikeVehicle(vehicle) and vehicle.getMotor ~= nil and vehicle:getMotor() ~= nil
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.TRANSMISSION, {"wsf"}, {"pof", "sf"})
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getLastSpeed() > 0.01
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_diff_lock_actuator_stuck_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.DIFF_LOCK_ACTUATOR_STUCK,
++                repairPrice = 1.0 * breakdownPriceMultipliers.DIFF_LOCK_ACTUATOR_STUCK,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.08, aggregation = "max" },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 0.5, aggregation = "max" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_diff_lock_actuator_stuck_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.DIFF_LOCK_ACTUATOR_STUCK,
++                repairPrice = 2.0 * breakdownPriceMultipliers.DIFF_LOCK_ACTUATOR_STUCK,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.18, aggregation = "max" },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 1.0, aggregation = "max" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.03, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.05, aggregation = "sum" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_diff_lock_actuator_stuck_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.DIFF_LOCK_ACTUATOR_STUCK,
++                repairPrice = 4.0 * breakdownPriceMultipliers.DIFF_LOCK_ACTUATOR_STUCK,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.30, aggregation = "max" },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 1.5, aggregation = "max" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.06, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.10, aggregation = "max" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_diff_lock_actuator_stuck_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.DIFF_LOCK_ACTUATOR_STUCK,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.45, aggregation = "max", extraData = { message = "ads_breakdowns_diff_lock_actuator_stuck_stage4_message" } },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 2.0, aggregation = "max" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.30, aggregation = "max" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- transmission: shift solenoid / range valve fault (geared transmissions only)
++    TRANSMISSION_SOLENOID_FAULT = {
++        isSelectable = true,
++        system = systems.TRANSMISSION,
++        part = parts.TRANSMISSION_SOLENOID,
++        isApplicable = function(vehicle)
++            return hasGearedTransmission(vehicle) and getVehicleYear(vehicle) >= 1990
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.TRANSMISSION, {"hotf"}, {"lf", "sf"})
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getLastSpeed() > 0.01
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_transmission_solenoid_fault_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.TRANSMISSION_SOLENOID_FAULT,
++                repairPrice = 1.0 * breakdownPriceMultipliers.TRANSMISSION_SOLENOID_FAULT,
++                effects = {
++                    { id = "GEAR_REJECTION_CHANCE", value = 25.0, extraData = {timer = 0, status = 'IDLE', duration = 1500 }, aggregation = "min" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_transmission_solenoid_fault_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.TRANSMISSION_SOLENOID_FAULT,
++                repairPrice = 2.0 * breakdownPriceMultipliers.TRANSMISSION_SOLENOID_FAULT,
++                effects = {
++                    { id = "GEAR_REJECTION_CHANCE", value = 12.0, extraData = {timer = 0, status = 'IDLE', duration = 1800 }, aggregation = "min" },
++                    { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.10, extraData = {timer = 0, status = 'IDLE', duration = 1500}, aggregation = "max" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_transmission_solenoid_fault_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.TRANSMISSION_SOLENOID_FAULT,
++                repairPrice = 4.0 * breakdownPriceMultipliers.TRANSMISSION_SOLENOID_FAULT,
++                effects = {
++                    { id = "GEAR_REJECTION_CHANCE", value = 5.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min" },
++                    { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.30, extraData = {timer = 0, status = 'IDLE', duration = 2000}, aggregation = "max" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.15, aggregation = "max" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_transmission_solenoid_fault_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.TRANSMISSION_SOLENOID_FAULT,
++                effects = {
++                    { id = "MAX_SPEED_MODIFIER", value = 0.60, aggregation = "max", extraData = { message = "ads_breakdowns_transmission_solenoid_fault_stage4_message" } },
++                    { id = "GEAR_REJECTION_CHANCE", value = 2.0, extraData = {timer = 0, status = 'IDLE', duration = 2000 }, aggregation = "min" },
++                    { id = "GEAR_SHIFT_FAILURE_CHANCE", value = 0.60, extraData = {timer = 0, status = 'IDLE', duration = 2200}, aggregation = "max" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- hydraulics: power steering pump
++    POWER_STEERING_PUMP_FAILURE = {
++        isSelectable = true,
++        system = systems.HYDRAULICS,
++        part = parts.POWER_STEERING_PUMP,
++        isApplicable = function(vehicle)
++            local vtype = vehicle.type ~= nil and vehicle.type.name or ""
++            return hasWheelsWithoutTracks(vehicle) and vtype ~= "motorbike" and getVehicleYear(vehicle) >= 1960
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.HYDRAULICS, {"of"}, {"cof", "sf"})
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getIsMotorStarted()
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_power_steering_pump_failure_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.POWER_STEERING_PUMP_FAILURE,
++                repairPrice = 1.0 * breakdownPriceMultipliers.POWER_STEERING_PUMP_FAILURE,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.10, aggregation = "max" },
++                },
++                inspection = {
++                    { target = "hydraulicFluid", status = "ads_inspection_status_slightly_darkened" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_power_steering_pump_failure_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.POWER_STEERING_PUMP_FAILURE,
++                repairPrice = 2.0 * breakdownPriceMultipliers.POWER_STEERING_PUMP_FAILURE,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.25, aggregation = "max" },
++                },
++                inspection = {
++                    { target = "hydraulicFluid", status = "ads_inspection_status_darkened", additional = "ads_inspection_hint_power_steering_pump_failure_stage2" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_power_steering_pump_failure_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.POWER_STEERING_PUMP_FAILURE,
++                repairPrice = 4.0 * breakdownPriceMultipliers.POWER_STEERING_PUMP_FAILURE,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.45, aggregation = "max" },
++                },
++                inspection = {
++                    { target = "hydraulicFluid", status = "ads_inspection_status_contaminated", additional = "ads_inspection_hint_power_steering_pump_failure_stage3" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_power_steering_pump_failure_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.POWER_STEERING_PUMP_FAILURE,
++                effects = {
++                    { id = "STEERING_SENSITIVITY_MODIFIER", value = 0.75, aggregation = "max", extraData = { message = "ads_breakdowns_power_steering_pump_failure_stage4_message", disableAi = true } },
++                },
++                inspection = {
++                    { target = "hydraulicFluid", status = "ads_inspection_status_critical_condition", additional = "ads_inspection_hint_power_steering_pump_failure_stage4" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- electrical: faulty dashboard sensors (phantom warnings, wandering temperature gauge)
++    DASH_SENSOR_FAULT = {
++        isSelectable = true,
++        system = systems.ELECTRICAL,
++        part = parts.DASH_SENSORS,
++        isApplicable = function(vehicle)
++            return getVehicleYear(vehicle) >= 1990
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.ELECTRICAL, {"wef"}, {"crf", "sf"})
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getIsMotorStarted()
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_dash_sensor_fault_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.DASH_SENSOR_FAULT,
++                repairPrice = 1.0 * breakdownPriceMultipliers.DASH_SENSOR_FAULT,
++                effects = {
++                    { id = "TEMP_SENSOR_FAULT_EFFECT", value = 3, aggregation = "max" },
++                    { id = "GAUGE_GLITCH_EFFECT", value = 600, aggregation = "min" },
++                },
++                indicators = {
++                    { id = db.COOLANT, color = color.WARNING, switchOn = phantomIndicator(420000, 0), switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_dash_sensor_fault_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.DASH_SENSOR_FAULT,
++                repairPrice = 2.0 * breakdownPriceMultipliers.DASH_SENSOR_FAULT,
++                effects = {
++                    { id = "TEMP_SENSOR_FAULT_EFFECT", value = 8, aggregation = "max" },
++                    { id = "GAUGE_GLITCH_EFFECT", value = 240, aggregation = "min" },
++                },
++                indicators = {
++                    { id = db.COOLANT, color = color.WARNING, switchOn = phantomIndicator(240000, 0), switchOff = false },
++                    { id = db.ENGINE, color = color.WARNING, switchOn = phantomIndicator(300000, 97000), switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_dash_sensor_fault_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.DASH_SENSOR_FAULT,
++                repairPrice = 4.0 * breakdownPriceMultipliers.DASH_SENSOR_FAULT,
++                effects = {
++                    { id = "TEMP_SENSOR_FAULT_EFFECT", value = 20, aggregation = "max" },
++                    { id = "GAUGE_GLITCH_EFFECT", value = 120, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_dash_sensor_fault_stage3" },
++                },
++                indicators = {
++                    { id = db.COOLANT, color = color.CRITICAL, switchOn = phantomIndicator(150000, 0), switchOff = false },
++                    { id = db.ENGINE, color = color.WARNING, switchOn = phantomIndicator(180000, 61000), switchOff = false },
++                    { id = db.BATTERY, color = color.WARNING, switchOn = phantomIndicator(210000, 133000), switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_dash_sensor_fault_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.DASH_SENSOR_FAULT,
++                effects = {
++                    { id = "TEMP_SENSOR_FAULT_EFFECT", value = 40, aggregation = "max" },
++                    { id = "GAUGE_GLITCH_EFFECT", value = 60, aggregation = "min" },
++                    { id = "ENGINE_LIMP_EFFECT", value = -0.20, aggregation = "min", extraData = { reason = "BREAKDOWN", message = "ads_breakdowns_dash_sensor_fault_stage4_message" } },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_dash_sensor_fault_stage4" },
++                },
++                indicators = {
++                    { id = db.ENGINE, color = color.CRITICAL, switchOn = true, switchOff = false },
++                    { id = db.COOLANT, color = color.CRITICAL, switchOn = phantomIndicator(90000, 0), switchOff = false },
++                    { id = db.BATTERY, color = color.WARNING, switchOn = phantomIndicator(120000, 41000), switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- electrical: rodent-chewed wiring. Never picked by wear/stress - it is added by
++    -- AdvancedDamageSystem:updateIdleRodentRisk() when a machine has sat unused for days.
++    RODENT_DAMAGED_WIRING = {
++        isSelectable = true,
++        system = systems.ELECTRICAL,
++        part = parts.WIRING_HARNESS,
++        isApplicable = function(vehicle)
++            return vehicle.spec_motorized ~= nil and not isCarLikeVehicle(vehicle)
++        end,
++        probability = function(vehicle)
++            return 0.0
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_rodent_damaged_wiring_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.RODENT_DAMAGED_WIRING,
++                repairPrice = 1.0 * breakdownPriceMultipliers.RODENT_DAMAGED_WIRING,
++                effects = {
++                    { id = "LIGHTS_FLICKER_CHANCE", value = 1.0, extraData = {timer = 0, status = 'IDLE', duration = 200, maskBackup = 0}, aggregation = "min" },
++                    { id = "ELECTRICAL_CONTACT_RESISTANCE_EFFECT", value = 1.0, extraData = { timer = 0, status = 'IDLE'}, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_rodent_damaged_wiring_stage1" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_rodent_damaged_wiring_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.RODENT_DAMAGED_WIRING,
++                repairPrice = 2.0 * breakdownPriceMultipliers.RODENT_DAMAGED_WIRING,
++                effects = {
++                    { id = "LIGHTS_FLICKER_CHANCE", value = 0.33, extraData = {timer = 0, status = 'IDLE', duration = 300, maskBackup = 0}, aggregation = "min" },
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 4, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max" },
++                    { id = "ELECTRICAL_CONTACT_RESISTANCE_EFFECT", value = 0.5, extraData = { timer = 0, status = 'IDLE'}, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_rodent_damaged_wiring_stage2" },
++                },
++                indicators = {
++                    { id = db.BATTERY, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_rodent_damaged_wiring_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.RODENT_DAMAGED_WIRING,
++                repairPrice = 4.0 * breakdownPriceMultipliers.RODENT_DAMAGED_WIRING,
++                effects = {
++                    { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
++                    { id = "ENGINE_STALLS_CHANCE", value = 20.0, aggregation = "min" },
++                    { id = "ENGINE_HARD_START_MODIFIER", value = 8, extraData = { timer = 0, status = 'IDLE'}, aggregation = "max" },
++                    { id = "ELECTRICAL_CONTACT_RESISTANCE_EFFECT", value = 0.2, extraData = { timer = 0, status = 'IDLE'}, aggregation = "min" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_rodent_damaged_wiring_stage3" },
++                },
++                indicators = {
++                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_rodent_damaged_wiring_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.RODENT_DAMAGED_WIRING,
++                effects = {
++                    { id = "LIGHTS_FAILURE", value = 1.0, aggregation = "boolean_or" },
++                    { id = "ENGINE_FAILURE", value = 1.0, aggregation = "boolean_or", extraData = {starter = false, message = "ads_breakdowns_rodent_damaged_wiring_stage4_message", reason = "BREAKDOWN", disableAi = true} },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_rodent_damaged_wiring_stage4" },
++                },
++                indicators = {
++                    { id = db.BATTERY, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- chassis: slow puncture / leaking valve stem
++    SLOW_PUNCTURE = {
++        isSelectable = true,
++        system = systems.CHASSIS,
++        part = parts.TIRE,
++        isApplicable = function(vehicle)
++            return hasWheelsWithoutTracks(vehicle)
++        end,
++        probability = function(vehicle)
++            return getBreakdownProbabilityWeightPercent(vehicle, systems.CHASSIS, {"vf"}, {"slf", "sf"})
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getLastSpeed() > 0.01
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_slow_puncture_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.SLOW_PUNCTURE,
++                repairPrice = 1.0 * breakdownPriceMultipliers.SLOW_PUNCTURE,
++                effects = {
++                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.004, aggregation = "max" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.03, aggregation = "sum" },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_slow_puncture_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.SLOW_PUNCTURE,
++                repairPrice = 2.0 * breakdownPriceMultipliers.SLOW_PUNCTURE,
++                effects = {
++                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.012, aggregation = "max" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.06, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.05, aggregation = "max" },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 0.5, aggregation = "max" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_slow_puncture_stage2" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.WARNING, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_slow_puncture_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.SLOW_PUNCTURE,
++                repairPrice = 4.0 * breakdownPriceMultipliers.SLOW_PUNCTURE,
++                effects = {
++                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.03, aggregation = "max" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.10, aggregation = "sum" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.20, aggregation = "max" },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 1.2, aggregation = "max" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.03, aggregation = "sum" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_slow_puncture_stage3" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_slow_puncture_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.SLOW_PUNCTURE,
++                effects = {
++                    { id = "STEERING_STATIC_BIAS_EFFECT", value = 0.06, aggregation = "max" },
++                    { id = "MAX_SPEED_MODIFIER", value = 0.60, aggregation = "max", extraData = { message = "ads_breakdowns_slow_puncture_stage4_message", disableAi = true } },
++                    { id = "VIBRATION_NOISE_EFFECT", value = 2.0, aggregation = "max" },
++                    { id = "ENGINE_TORQUE_MODIFIER", value = -0.10, aggregation = "sum" },
++                    { id = "FUEL_CONSUMPTION_MODIFIER", value = 0.15, aggregation = "sum" },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_slow_puncture_stage4" },
++                },
++                indicators = {
++                    { id = db.WARNING, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- chassis: trailer air brake supply leak (only bites while towing a braked trailer)
++    TRAILER_AIR_BRAKE_LEAK = {
++        isSelectable = true,
++        system = systems.CHASSIS,
++        part = parts.TRAILER_AIR_BRAKES,
++        isApplicable = function(vehicle)
++            return canTowTrailers(vehicle) and getVehicleYear(vehicle) >= 1970
++        end,
++        probability = function(vehicle)
++            local weight = getBreakdownProbabilityWeightPercent(vehicle, systems.CHASSIS, {"bmf"}, {"vf", "sf"})
++            if isTowingBrakedImplement(vehicle) then
++                return weight * 1.5
++            end
++            return weight * 0.5
++        end,
++        isCanProgress = function(vehicle)
++            return vehicle:getLastSpeed() > 0.01
++        end,
++        stages = {
++            {
++                severity = "ads_breakdowns_severity_minor",
++                description = "ads_breakdowns_trailer_air_brake_leak_stage1_description",
++                detectionChance = 1.0,
++                progressMultiplier = 2.0 * breakdownProgressMultipliers.TRAILER_AIR_BRAKE_LEAK,
++                repairPrice = 1.0 * breakdownPriceMultipliers.TRAILER_AIR_BRAKE_LEAK,
++                effects = {
++                    { id = "TRAILER_BRAKE_DRAG_EFFECT", value = 0.0, aggregation = "max", extraData = { buildUpMs = 15000 } },
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_moderate",
++                description = "ads_breakdowns_trailer_air_brake_leak_stage2_description",
++                detectionChance = 1.0,
++                progressMultiplier = 1.0 * breakdownProgressMultipliers.TRAILER_AIR_BRAKE_LEAK,
++                repairPrice = 2.0 * breakdownPriceMultipliers.TRAILER_AIR_BRAKE_LEAK,
++                effects = {
++                    { id = "TRAILER_BRAKE_DRAG_EFFECT", value = 0.15, aggregation = "max", extraData = { buildUpMs = 30000 } },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_trailer_air_brake_leak_stage2" },
++                },
++                indicators = {
++                    { id = db.BRAKES, color = color.WARNING, switchOn = isTowingBrakedImplement, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_major",
++                description = "ads_breakdowns_trailer_air_brake_leak_stage3_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0.5 * breakdownProgressMultipliers.TRAILER_AIR_BRAKE_LEAK,
++                repairPrice = 4.0 * breakdownPriceMultipliers.TRAILER_AIR_BRAKE_LEAK,
++                effects = {
++                    { id = "TRAILER_BRAKE_DRAG_EFFECT", value = 0.35, aggregation = "max", extraData = { buildUpMs = 60000 } },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_trailer_air_brake_leak_stage3" },
++                },
++                indicators = {
++                    { id = db.BRAKES, color = color.CRITICAL, switchOn = isTowingBrakedImplement, switchOff = false }
++                }
++            },
++            {
++                severity = "ads_breakdowns_severity_critical",
++                description = "ads_breakdowns_trailer_air_brake_leak_stage4_description",
++                detectionChance = 1.0,
++                progressMultiplier = 0,
++                repairPrice = 8.0 * breakdownPriceMultipliers.TRAILER_AIR_BRAKE_LEAK,
++                effects = {
++                    { id = "TRAILER_BRAKE_DRAG_EFFECT", value = 1.0, aggregation = "max", extraData = { buildUpMs = 0, message = "ads_breakdowns_trailer_air_brake_leak_stage4_message", disableAi = true } },
++                },
++                inspection = {
++                    { additional = "ads_inspection_hint_trailer_air_brake_leak_stage4" },
++                },
++                indicators = {
++                    { id = db.BRAKES, color = color.CRITICAL, switchOn = true, switchOff = false }
++                }
++            }
++        }
++    },
++
++    -- chassis: random sudden flat tire
++    FLAT_TIRE_LEFT = buildFlatTireBreakdown(1),
++    FLAT_TIRE_RIGHT = buildFlatTireBreakdown(-1),
++
+     -- TO-DO: WORKPROCESS_POWER_DEMAND_MODIFIER
+     -- TO-DO: ROLLING_RESISTANCE_MODIFIER
+     
+@@ -3025,6 +4486,7 @@
+             end
+ 
+             if v:getIsMotorStarted() then
++                v.adsStopCause = "ADS engine failure"
+                 v:stopMotor()
+             end
+             if currentEffect.extraData.status ~= nil and currentEffect.extraData.status == 'CRANKING' then
+@@ -3381,10 +4843,11 @@
+         axisSide = axisSide * sensitivity
+     end
+ 
+-    -- Static steering bias: always drifts left, value controls offset angle/intensity.
++    -- Static steering bias: positive value drifts left (all stock breakdowns), negative
++    -- value drifts right (e.g. a flat on the right side). Magnitude = offset intensity.
+     if steeringStaticBiasEffect ~= nil and steeringStaticBiasEffect.value ~= nil then
+-        local value = math.abs(tonumber(steeringStaticBiasEffect.value) or 0)
+-        local leftBias = -math.clamp(value, 0, 1.0)
++        local value = tonumber(steeringStaticBiasEffect.value) or 0
++        local leftBias = -math.clamp(value, -1.0, 1.0)
+         local x = math.clamp(axisSide, -1.0, 1.0)
+ 
+         -- Keep full steering range while shifting neutral point to the left.
+@@ -3416,6 +4879,24 @@
+         end
+     end
+ 
++    -- Leaking trailer air brakes: trailer brakes held (spring brakes / no pressure yet)
++    -- or dragging while towing.
++    local trailerBrakesHeld, trailerBrakeDrag = ADS_Breakdowns.getTrailerBrakeState(vehicle)
++    if trailerBrakesHeld then
++        axisForward = 0
++        doHandbrake = true
++    elseif trailerBrakeDrag > 0 and axisForward ~= 0 then
++        local isAccelerating
++        if drivingMode == 2 then
++            isAccelerating = axisForward > 0
++        else
++            isAccelerating = vehicle.movingDirection == 0 or math.sign(vehicle.movingDirection) == math.sign(axisForward)
++        end
++        if isAccelerating then
++            axisForward = axisForward * (1 - trailerBrakeDrag)
++        end
++    end
++
+     if brakeEffect and brakeEffect.value ~= 0 then
+         if drivingMode == 2 then
+             isBraking = axisForward < -0.01
+@@ -4341,11 +5822,17 @@
+     end
+ 
+     local effect = spec_ads.activeEffects.MAX_SPEED_MODIFIER
+-    if effect == nil or effect.value == nil then
+-        return speedLimit, doCheckSpeedLimit
++    local reduction = 0
++    if effect ~= nil and effect.value ~= nil then
++        reduction = math.clamp(tonumber(effect.value) or 0, 0, 0.99)
++    end
++
++    -- dragging trailer brakes also pull the top speed down while towing
++    local _, trailerBrakeDrag = ADS_Breakdowns.getTrailerBrakeState(vehicle)
++    if trailerBrakeDrag > 0 then
++        reduction = math.max(reduction, math.clamp(trailerBrakeDrag * 0.5, 0, 0.99))
+     end
+ 
+-    local reduction = math.clamp(tonumber(effect.value) or 0, 0, 0.99)
+     if reduction <= 0 then
+         return speedLimit, doCheckSpeedLimit
+     end
+@@ -4993,6 +6480,17 @@
+                 if effect and effect.value > 0 then
+                     if math.random() < ADS_Utils.getChancePerFrameFromMeanTime(dt, effect.value) then
+                         if v.stopMotor then
++                            -- tell the stall logger (ADS_FluidSystem) which fault did it;
++                            -- the "engine stalled" message below already covers the screen
++                            local causeText = "ADS fault stalled the engine"
++                            if ADS_FluidSystem ~= nil and ADS_FluidSystem.getStallBreakdowns ~= nil then
++                                local names = {}
++                                for _, f in ipairs(ADS_FluidSystem.getStallBreakdowns(v)) do
++                                    table.insert(names, f.visible and string.format("%s stage %d", f.name, f.stage) or "undiagnosed fault - run an inspection")
++                                end
++                                if #names > 0 then causeText = causeText .. ": " .. table.concat(names, ", ") end
++                            end
++                            v.adsStopCause = causeText
+                             v:stopMotor()
+ 
+                             ADS_EffectSyncEvent.send(v, "ENGINE_STALLS_CHANCE", "STALLED")
+@@ -5118,10 +6616,15 @@
+ -- ==========================================================
+ -- ENGINE_HARD_START_MODIFIER
+ 
+-local function tryStartMotor(dt, value, engTemp, batV)
++local function tryStartMotor(dt, value, engTemp, batV, glowPlugPenalty)
+     local tempFactor = 0
+     local batFactor = 1
+     local modValue = value
++    -- failing glow plugs: extra cranking time that grows as the engine gets colder
++    if glowPlugPenalty ~= nil and glowPlugPenalty > 0 then
++        local coldness = math.clamp((20 - engTemp) / 30, 0, 1)
++        modValue = modValue + glowPlugPenalty * coldness
++    end
+     if engTemp <= -10 then
+         tempFactor = math.max((-10 - engTemp) / 2, 0)
+         modValue = modValue + tempFactor
+@@ -5199,7 +6702,9 @@
+ 
+             if not v:getIsMotorStarted() and spec.startButtonHeld and effect.extraData.status == 'CRANKING' then
+                 local rawEngineTemp = spec.rawEngineTemperature or spec.engineTemperature or -99
+-                if v.isServer and tryStartMotor(dt, effect.value, rawEngineTemp, effect.extraData.preCrankVoltageV) then
++                local glowPlugEffect = spec.activeEffects ~= nil and spec.activeEffects.GLOW_PLUG_COLD_START_EFFECT or nil
++                local glowPlugPenalty = glowPlugEffect ~= nil and (tonumber(glowPlugEffect.value) or 0) or 0
++                if v.isServer and tryStartMotor(dt, effect.value, rawEngineTemp, effect.extraData.preCrankVoltageV, glowPlugPenalty) then
+                     effect.extraData.timer = motorStartDelay
+                     effect.extraData.status = 'PASSED'
+                     if v.isClient then
+@@ -5542,6 +7047,87 @@
+ 
+ -- =========================================================
+ -- EMPTY_EFFECT
++-- =========================================================
++-- CHIPPER_KNIFE_DULL_EFFECT
++-- value = share of feed-roller speed/pull lost to dull knives (1.0 = knives done,
++-- chipper locked out until they are changed).
++local function adsSetChipperFeedFactor(vehicle, factor)
++    local wc = vehicle.spec_woodCrusher
++    if wc == nil then return end
++    if wc.adsOrigMoveVelocityZ == nil and type(wc.moveVelocityZ) == "number" then
++        wc.adsOrigMoveVelocityZ = wc.moveVelocityZ
++    end
++    if wc.adsOrigMoveMaxForce == nil and type(wc.moveMaxForce) == "number" then
++        wc.adsOrigMoveMaxForce = wc.moveMaxForce
++    end
++    factor = math.max(math.min(factor, 1.0), 0.0)
++    if wc.adsOrigMoveVelocityZ ~= nil then
++        wc.moveVelocityZ = wc.adsOrigMoveVelocityZ * factor
++        if vehicle.isServer and vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() and type(wc.moveColNodes) == "table" then
++            for _, node in pairs(wc.moveColNodes) do
++                if type(node) == "number" and node ~= 0 then
++                    pcall(setFrictionVelocity, node, wc.moveVelocityZ)
++                end
++            end
++        end
++    end
++    if wc.adsOrigMoveMaxForce ~= nil then
++        wc.moveMaxForce = wc.adsOrigMoveMaxForce * factor
++    end
++end
++
++ADS_Breakdowns.EffectApplicators.CHIPPER_KNIFE_DULL_EFFECT = {
++    apply = function(vehicle, effectData, handler)
++        log_dbg("Applying CHIPPER_KNIFE_DULL_EFFECT:", effectData.value)
++        adsSetChipperFeedFactor(vehicle, 1.0 - (tonumber(effectData.value) or 0))
++    end,
++    remove = function(vehicle, handler)
++        log_dbg("Removing CHIPPER_KNIFE_DULL_EFFECT effect.")
++        adsSetChipperFeedFactor(vehicle, 1.0)
++    end
++}
++
++function ADS_Breakdowns.getIsChipperKnivesLocked(vehicle)
++    if vehicle.spec_woodCrusher == nil or vehicle.spec_AdvancedDamageSystem == nil then
++        return false
++    end
++    local active = vehicle.spec_AdvancedDamageSystem.activeBreakdowns
++    local bd = active ~= nil and active.CHIPPER_KNIFE_WEAR or nil
++    local entry = ADS_Breakdowns.BreakdownRegistry.CHIPPER_KNIFE_WEAR
++    if bd == nil or entry == nil or bd.isActive == false then
++        return false
++    end
++    return (tonumber(bd.stage) or 1) >= #entry.stages
++end
++
++-- counts every log the chipper eats (server only; the counter lives in the ADS spec)
++function ADS_Breakdowns.onCrushedSplitShapeOverwrite(vehicle, superFunc, splitType, volume, ...)
++    local spec = vehicle.spec_AdvancedDamageSystem
++    local C = ADS_Config.CHIPPER_KNIVES
++    if vehicle.isServer and spec ~= nil and C ~= nil and C.ENABLED ~= false and type(volume) == "number" and volume > 0 then
++        local amount = volume
++        if C.COUNT_CHIP_OUTPUT and type(splitType) == "table" and type(splitType.woodChipsPerLiter) == "number" then
++            amount = volume * splitType.woodChipsPerLiter
++        end
++        spec.chipperKnifeVolume = (spec.chipperKnifeVolume or 0) + amount
++    end
++    return superFunc(vehicle, splitType, volume, ...)
++end
++
++function ADS_Breakdowns.getCanBeTurnedOnChipperOverwrite(vehicle, superFunc, ...)
++    if ADS_Breakdowns.getIsChipperKnivesLocked(vehicle) then
++        return false
++    end
++    return superFunc(vehicle, ...)
++end
++
++function ADS_Breakdowns.getTurnedOnNotAllowedWarningChipperOverwrite(vehicle, superFunc, ...)
++    if ADS_Breakdowns.getIsChipperKnivesLocked(vehicle) then
++        return g_i18n:getText("ads_breakdowns_chipper_knife_wear_locked_warning")
++    end
++    return superFunc(vehicle, ...)
++end
++
+ ADS_Breakdowns.EffectApplicators.EMPTY_EFFECT = {
+     apply = function(vehicle, effectData, handler)
+         log_dbg("Applying EMPTY_EFFECT effect")
+@@ -5551,6 +7137,271 @@
+     end
+ }
+ 
++-- =========================================================
++-- GLOW_PLUG_COLD_START_EFFECT
++-- Passive: read by tryStartMotor(). value = extra mean cranking time in seconds
++-- that is added in full at -10 C and fades out completely by +20 C.
++ADS_Breakdowns.EffectApplicators.GLOW_PLUG_COLD_START_EFFECT = {
++    apply = function(vehicle, effectData, handler)
++        log_dbg("Applying GLOW_PLUG_COLD_START_EFFECT:", effectData.value)
++    end,
++    remove = function(vehicle, handler)
++        log_dbg("Removing GLOW_PLUG_COLD_START_EFFECT effect.")
++    end
++}
++
++-- =========================================================
++-- TEMP_SENSOR_FAULT_EFFECT
++-- Passive: read by ADS_Hud. value = max deviation (C) of the displayed engine
++-- temperature from the real one. Physics and wear always use the real value.
++ADS_Breakdowns.EffectApplicators.TEMP_SENSOR_FAULT_EFFECT = {
++    apply = function(vehicle, effectData, handler)
++        log_dbg("Applying TEMP_SENSOR_FAULT_EFFECT:", effectData.value)
++    end,
++    remove = function(vehicle, handler)
++        log_dbg("Removing TEMP_SENSOR_FAULT_EFFECT effect.")
++    end
++}
++
++function ADS_Breakdowns.getDisplayedEngineTemperature(vehicle)
++    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
++    if spec == nil then
++        return 0
++    end
++    local realTemp = tonumber(spec.engineTemperature) or 0
++    local effect = spec.activeEffects ~= nil and spec.activeEffects.TEMP_SENSOR_FAULT_EFFECT or nil
++    if effect == nil then
++        return realTemp
++    end
++    local amplitude = math.max(tonumber(effect.value) or 0, 0)
++    local t = tonumber(g_time) or 0
++    -- two slow, unrelated waves so the needle wanders instead of pulsing
++    local wave = math.sin(t / 9000) * 0.6 + math.sin(t / 2300 + 1.3) * 0.4
++    return realTemp + amplitude * wave
++end
++
++-- =========================================================
++-- GAUGE_GLITCH_EFFECT
++-- Passive: read by the HUD through ADS_Breakdowns.getGaugeReading(). value = mean
++-- seconds between glitches. A glitch picks one random gauge and one random
++-- failure mode for a few seconds. Display only - every system keeps using the
++-- real values. Runs locally on each client, so nothing needs syncing.
++ADS_Breakdowns.EffectApplicators.GAUGE_GLITCH_EFFECT = {
++    apply = function(vehicle, effectData, handler)
++        log_dbg("Applying GAUGE_GLITCH_EFFECT:", effectData.value)
++    end,
++    remove = function(vehicle, handler)
++        log_dbg("Removing GAUGE_GLITCH_EFFECT effect.")
++        if vehicle.spec_AdvancedDamageSystem ~= nil then
++            vehicle.spec_AdvancedDamageSystem.gaugeGlitch = nil
++        end
++    end
++}
++
++ADS_Breakdowns.GAUGE_GLITCH_GAUGES = { "engineTemp", "transTemp", "voltage", "motorLoad", "fuel" }
++ADS_Breakdowns.GAUGE_GLITCH_MODES = { "frozen", "low", "high", "erratic" }
++
++local function getRandomGlitchDelayMs(meanSeconds)
++    local u = math.min(math.random(), 0.999)
++    return -math.log(1 - u) * math.max(meanSeconds, 1) * 1000
++end
++
++-- Returns what the dashboard should show for `gauge` instead of `realValue`.
++-- lowValue/highValue are what the gauge reads when it drops out or pegs.
++function ADS_Breakdowns.getGaugeReading(vehicle, gauge, realValue, lowValue, highValue)
++    local spec = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
++    if spec == nil or spec.activeEffects == nil or realValue == nil then
++        return realValue
++    end
++
++    local effect = spec.activeEffects.GAUGE_GLITCH_EFFECT
++    if effect == nil then
++        spec.gaugeGlitch = nil
++        return realValue
++    end
++
++    local meanSeconds = tonumber(effect.value) or 300
++    local now = tonumber(g_time) or 0
++    local state = spec.gaugeGlitch
++    if state == nil then
++        state = { nextAt = now + getRandomGlitchDelayMs(meanSeconds), active = nil }
++        spec.gaugeGlitch = state
++    end
++
++    if state.active ~= nil and now >= state.active.endsAt then
++        state.active = nil
++        state.nextAt = now + getRandomGlitchDelayMs(meanSeconds)
++    end
++
++    -- only start glitches while the engine runs (cluster is powered and being looked at)
++    if state.active == nil and now >= state.nextAt and vehicle.getIsMotorStarted ~= nil and vehicle:getIsMotorStarted() then
++        local gauges = ADS_Breakdowns.GAUGE_GLITCH_GAUGES
++        local modes = ADS_Breakdowns.GAUGE_GLITCH_MODES
++        state.active = {
++            gauge = gauges[math.random(#gauges)],
++            mode = modes[math.random(#modes)],
++            endsAt = now + math.random(4000, 25000),
++            frozenValue = nil
++        }
++    end
++
++    local glitch = state.active
++    if glitch == nil or glitch.gauge ~= gauge then
++        return realValue
++    end
++
++    if glitch.mode == "frozen" then
++        if glitch.frozenValue == nil then
++            glitch.frozenValue = realValue
++        end
++        return glitch.frozenValue
++    elseif glitch.mode == "low" then
++        return lowValue
++    elseif glitch.mode == "high" then
++        return highValue
++    end
++
++    -- erratic: needle bounces around the whole scale
++    local t = 0.5 + 0.5 * math.sin(now / 170) * math.sin(now / 530 + 0.7)
++    return lowValue + (highValue - lowValue) * math.clamp(t, 0, 1)
++end
++
++-- Stock fuel gauge: misreads while GAUGE_GLITCH_EFFECT is active. Installed lazily
++-- from the ADS HUD in case SpeedMeterDisplay is not available yet at source time.
++function ADS_Breakdowns.installGaugeHooks()
++    if ADS_Breakdowns.gaugeHooksInstalled then
++        return
++    end
++    if SpeedMeterDisplay == nil or SpeedMeterDisplay.getVehicleFuelLevelAndCapacity == nil or Utils == nil or Utils.overwrittenFunction == nil then
++        return
++    end
++
++    SpeedMeterDisplay.getVehicleFuelLevelAndCapacity = Utils.overwrittenFunction(SpeedMeterDisplay.getVehicleFuelLevelAndCapacity, function(vehicle, superFunc, ...)
++        local fuelLevel, fuelCapacity, fuelType = superFunc(vehicle, ...)
++        if vehicle ~= nil and vehicle.spec_AdvancedDamageSystem ~= nil and fuelLevel ~= nil and fuelCapacity ~= nil and fuelCapacity > 0 then
++            fuelLevel = ADS_Breakdowns.getGaugeReading(vehicle, "fuel", fuelLevel, 0, fuelCapacity)
++        end
++        return fuelLevel, fuelCapacity, fuelType
++    end)
++    ADS_Breakdowns.gaugeHooksInstalled = true
++end
++
++ADS_Breakdowns.installGaugeHooks()
++
++-- =========================================================
++-- DPF_PASSIVE_REGEN_EFFECT
++-- Early DPF clogging clears itself if the machine is worked hard for long
++-- enough (soot burns off under sustained load), like a real passive regen.
++ADS_Breakdowns.EffectApplicators.DPF_PASSIVE_REGEN_EFFECT = {
++    getEffectName = function() return "DPF_PASSIVE_REGEN_EFFECT" end,
++    apply = function(vehicle, effectData, handler)
++        log_dbg("Applying DPF_PASSIVE_REGEN_EFFECT")
++        local effectName = handler.getEffectName()
++
++        local activeFunc = function(v, dt)
++            if not v.isServer then
++                return
++            end
++            local spec = v.spec_AdvancedDamageSystem
++            if spec == nil then return end
++            local effect = spec.activeEffects ~= nil and spec.activeEffects[effectName] or nil
++            if effect == nil or effect.extraData == nil then
++                return
++            end
++
++            local extra = effect.extraData
++            if not v:getIsMotorStarted() then
++                return
++            end
++
++            local load = tonumber(v:getMotorLoadPercentage()) or 0
++            if load >= (tonumber(extra.minLoad) or 0.55) then
++                spec.dpfRegenProgressMs = (spec.dpfRegenProgressMs or 0) + dt
++            end
++
++            if (spec.dpfRegenProgressMs or 0) >= (tonumber(extra.regenMs) or 600000) then
++                spec.dpfRegenProgressMs = 0
++                local breakdownId = extra.breakdownId or "DPF_CLOGGING"
++                if v:hasBreakdown(breakdownId) then
++                    v:removeBreakdown(breakdownId)
++                    if v.getIsEntered ~= nil and v:getIsEntered() and g_currentMission ~= nil then
++                        g_currentMission:addIngameNotification(FSBaseMission.INGAME_NOTIFICATION_OK, g_i18n:getText("ads_breakdowns_dpf_regen_complete_message"))
++                    end
++                end
++            end
++        end
++        addFuncToActive(vehicle, effectName, activeFunc)
++    end,
++    remove = function(vehicle, handler)
++        log_dbg("Removing DPF_PASSIVE_REGEN_EFFECT effect.")
++        if vehicle.spec_AdvancedDamageSystem ~= nil then
++            vehicle.spec_AdvancedDamageSystem.dpfRegenProgressMs = 0
++        end
++        removeFuncFromActive(vehicle, handler.getEffectName())
++    end
++}
++
++-- =========================================================
++-- TRAILER_BRAKE_DRAG_EFFECT
++-- value 0..0.9 = trailer brakes dragging while towing (less pull, lower top speed)
++-- value >= 1.0 = spring brakes applied, the trailer will not roll
++-- extraData.buildUpMs = after every engine start, trailer brakes stay applied
++--                       until the leaking system has built enough air pressure
++-- Only has any effect while a braked trailer/implement is attached.
++ADS_Breakdowns.EffectApplicators.TRAILER_BRAKE_DRAG_EFFECT = {
++    getEffectName = function() return "TRAILER_BRAKE_DRAG_EFFECT" end,
++    apply = function(vehicle, effectData, handler)
++        log_dbg("Applying TRAILER_BRAKE_DRAG_EFFECT:", effectData.value)
++        local effectName = handler.getEffectName()
++        local spec = vehicle.spec_AdvancedDamageSystem
++        if spec ~= nil and spec.trailerAirWasMotorOn == nil then
++            spec.trailerAirWasMotorOn = vehicle:getIsMotorStarted()
++        end
++
++        local activeFunc = function(v, dt)
++            local s = v.spec_AdvancedDamageSystem
++            if s == nil then return end
++            local effect = s.activeEffects ~= nil and s.activeEffects[effectName] or nil
++            if effect == nil then return end
++
++            local isOn = v:getIsMotorStarted()
++            if isOn and not s.trailerAirWasMotorOn then
++                local buildUp = effect.extraData ~= nil and (tonumber(effect.extraData.buildUpMs) or 0) or 0
++                s.trailerAirPressureTimer = buildUp
++                if buildUp > 0 and isTowingBrakedImplement(v) and v.getIsActiveForInput ~= nil and v:getIsActiveForInput(true) then
++                    g_currentMission:showBlinkingWarning(g_i18n:getText("ads_breakdowns_trailer_air_pressure_building_message"), math.min(buildUp, 5000))
++                end
++            elseif isOn and (s.trailerAirPressureTimer or 0) > 0 then
++                s.trailerAirPressureTimer = math.max(s.trailerAirPressureTimer - dt, 0)
++            end
++            s.trailerAirWasMotorOn = isOn
++        end
++        addFuncToActive(vehicle, effectName, activeFunc)
++    end,
++    remove = function(vehicle, handler)
++        log_dbg("Removing TRAILER_BRAKE_DRAG_EFFECT effect.")
++        local spec = vehicle.spec_AdvancedDamageSystem
++        if spec ~= nil then
++            spec.trailerAirPressureTimer = nil
++            spec.trailerAirWasMotorOn = nil
++        end
++        removeFuncFromActive(vehicle, handler.getEffectName())
++    end
++}
++
++local function getTrailerBrakeState(vehicle)
++    local spec_ads = vehicle ~= nil and vehicle.spec_AdvancedDamageSystem or nil
++    local effect = spec_ads ~= nil and spec_ads.activeEffects ~= nil and spec_ads.activeEffects.TRAILER_BRAKE_DRAG_EFFECT or nil
++    if effect == nil or not isTowingBrakedImplement(vehicle) then
++        return false, 0
++    end
++    local value = tonumber(effect.value) or 0
++    local isHeld = value >= 1.0 or (spec_ads.trailerAirPressureTimer or 0) > 0
++    return isHeld, math.clamp(value, 0, 0.9)
++end
++
++ADS_Breakdowns.getTrailerBrakeState = getTrailerBrakeState
++
+ -- ==========================================================
+ function ADS_Breakdowns.getCanMotorRun(self, superFunc)
+     local spec = self.spec_AdvancedDamageSystem

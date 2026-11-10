@@ -1,0 +1,367 @@
+--- a/translations/l10n_en.xml
++++ b/translations/l10n_en.xml
+@@ -758,6 +758,364 @@
+         <text name="ads_tutorial_wheel_slip_message" text="It looks like your wheels are slipping badly. You may even be stuck right now and not in the mood for advice, but keep this in mind: wheel slip is one of the most destructive factors for the transmission and will bring your next service visit much closer."/>
+         <text name="ads_tutorial_battery_low_title" text="Weak Battery"/>
+         <text name="ads_tutorial_battery_low_message" text="Oops, it looks like the battery is about to die. This can happen after a long period of standing, because of severe cold, or due to faults in the electrical system.&#10;&#10;With a low charge, starting will be difficult or even impossible. If you cannot get it started, you can jump-start the machine from another vehicle using Jumper Cables."/>
++        <!-- Custom: extra breakdowns, add-ons and extended breakdown set -->
++        <text name="ads_breakdowns_part_four_wheel_drive_system" text="Four-Wheel Drive System"/>
++        <text name="ads_breakdowns_4wd_stage1_description" text="The four-wheel drive / differential lock system is showing early signs of wear. Have it inspected soon."/>
++        <text name="ads_breakdowns_4wd_stage2_description" text="The four-wheel drive / differential lock system has failed. The vehicle is locked to two-wheel drive until repaired."/>
++        <text name="ads_breakdowns_4wd_stage2_message" text="Four-wheel drive has failed and been locked out. Repair the transmission to restore it."/>
++        <text name="ads_breakdowns_part_engine_mount" text="Engine Mount"/>
++        <text name="ads_breakdowns_part_gearbox_linkage" text="Gearbox Linkage"/>
++        <text name="ads_breakdowns_part_driveline_joint" text="Driveline Joint"/>
++        <text name="ads_breakdowns_part_hydraulic_fluid" text="Hydraulic Fluid"/>
++        <text name="ads_breakdowns_part_hydraulic_hose" text="Hydraulic Hose"/>
++        <text name="ads_breakdowns_part_pressure_relief_valve" text="Pressure Relief Valve"/>
++        <text name="ads_breakdowns_part_water_pump" text="Water Pump"/>
++        <text name="ads_breakdowns_part_starter_motor" text="Starter Motor"/>
++        <text name="ads_breakdowns_part_lighting_circuit" text="Lighting Circuit"/>
++        <text name="ads_breakdowns_part_suspension_bushing" text="Suspension Bushing"/>
++        <text name="ads_breakdowns_part_fuel_tank" text="Fuel Tank"/>
++        <text name="ads_breakdowns_engine_mount_deterioration_stage1_description" text="Engine mounts are showing early wear. A faint vibration is noticeable at idle."/>
++        <text name="ads_breakdowns_engine_mount_deterioration_stage2_description" text="Worn engine mounts are letting the engine shift under load, causing noticeable vibration and a small loss of top speed."/>
++        <text name="ads_breakdowns_engine_mount_deterioration_stage3_description" text="Engine mounts are failing. Heavy vibration is affecting drivability and top speed."/>
++        <text name="ads_breakdowns_engine_mount_deterioration_stage4_description" text="An engine mount has failed. Severe vibration is significantly reducing performance."/>
++        <text name="ads_breakdowns_engine_mount_deterioration_stage4_message" text="An engine mount has failed! Vibration is severely reducing performance. Repair immediately."/>
++        <text name="ads_breakdowns_gearbox_linkage_wear_stage1_description" text="The gearbox shift linkage has developed some play. Shifts feel slightly imprecise."/>
++        <text name="ads_breakdowns_gearbox_linkage_wear_stage2_description" text="Shift linkage wear is causing occasional missed or rejected gear changes."/>
++        <text name="ads_breakdowns_gearbox_linkage_wear_stage3_description" text="The shift linkage is badly worn. Gear changes frequently fail or are rejected."/>
++        <text name="ads_breakdowns_gearbox_linkage_wear_stage4_description" text="The shift linkage has failed. Gear selection is highly unreliable."/>
++        <text name="ads_breakdowns_gearbox_linkage_wear_stage4_message" text="The gearbox shift linkage has failed! Gear selection is highly unreliable. Repair immediately."/>
++        <text name="ads_breakdowns_driveline_joint_wear_stage1_description" text="A driveline joint is showing early wear, causing a faint vibration under load."/>
++        <text name="ads_breakdowns_driveline_joint_wear_stage2_description" text="Driveline joint wear is causing noticeable vibration and a small loss of top speed."/>
++        <text name="ads_breakdowns_driveline_joint_wear_stage3_description" text="A driveline joint is badly worn. Vibration is severe and power delivery is affected."/>
++        <text name="ads_breakdowns_driveline_joint_wear_stage4_description" text="A driveline joint has failed. Severe vibration and power loss are affecting the vehicle."/>
++        <text name="ads_breakdowns_driveline_joint_wear_stage4_message" text="A driveline joint has failed! Severe vibration and power loss. Repair immediately."/>
++        <text name="ads_breakdowns_hydraulic_fluid_contamination_stage1_description" text="The hydraulic fluid shows early signs of contamination, slightly slowing hydraulic response."/>
++        <text name="ads_breakdowns_hydraulic_fluid_contamination_stage2_description" text="Contaminated hydraulic fluid is noticeably slowing hydraulic and unloading functions."/>
++        <text name="ads_breakdowns_hydraulic_fluid_contamination_stage3_description" text="Heavily contaminated hydraulic fluid is severely restricting hydraulic flow."/>
++        <text name="ads_breakdowns_hydraulic_fluid_contamination_stage4_description" text="The hydraulic fluid is critically contaminated. Hydraulic functions are barely operating."/>
++        <text name="ads_breakdowns_hydraulic_fluid_contamination_stage4_message" text="The hydraulic fluid is critically contaminated! Hydraulic functions are barely operating. Repair immediately."/>
++        <text name="ads_breakdowns_hydraulic_hose_wear_stage1_description" text="A hydraulic hose is showing early wear, causing a slight amount of load drift."/>
++        <text name="ads_breakdowns_hydraulic_hose_wear_stage2_description" text="Hydraulic hose wear is causing noticeable load drift and slower hydraulic response."/>
++        <text name="ads_breakdowns_hydraulic_hose_wear_stage3_description" text="A hydraulic hose is badly worn and close to failure. Load holding is unreliable."/>
++        <text name="ads_breakdowns_hydraulic_hose_wear_stage4_description" text="A hydraulic hose has failed. The system can no longer reliably hold a raised load."/>
++        <text name="ads_breakdowns_hydraulic_hose_wear_stage4_message" text="A hydraulic hose has failed! The system can no longer reliably hold a raised load. Repair immediately."/>
++        <text name="ads_breakdowns_pressure_relief_valve_sticking_stage1_description" text="The hydraulic pressure relief valve is starting to stick, causing a faint clunk during operation."/>
++        <text name="ads_breakdowns_pressure_relief_valve_sticking_stage2_description" text="The sticking relief valve is causing jerky hydraulic movement and noticeable clunking."/>
++        <text name="ads_breakdowns_pressure_relief_valve_sticking_stage3_description" text="The relief valve sticks badly. Hydraulic movement is harsh and load holding is unreliable."/>
++        <text name="ads_breakdowns_pressure_relief_valve_sticking_stage4_description" text="The pressure relief valve has failed stuck. The hydraulic system can no longer hold a load safely."/>
++        <text name="ads_breakdowns_pressure_relief_valve_sticking_stage4_message" text="The pressure relief valve has failed stuck! The hydraulic system can no longer hold a load safely. Repair immediately."/>
++        <text name="ads_breakdowns_radiator_clogging_stage1_description" text="Debris is starting to clog the radiator fins, slightly reducing cooling efficiency."/>
++        <text name="ads_breakdowns_radiator_clogging_stage2_description" text="The radiator is noticeably clogged, causing the engine to run hotter than normal."/>
++        <text name="ads_breakdowns_radiator_clogging_stage3_description" text="Heavy radiator clogging is significantly reducing cooling capacity."/>
++        <text name="ads_breakdowns_radiator_clogging_stage4_description" text="The radiator is critically clogged. The engine is at serious risk of overheating."/>
++        <text name="ads_breakdowns_radiator_clogging_stage4_message" text="The radiator is critically clogged! The engine is at serious risk of overheating. Repair immediately."/>
++        <text name="ads_breakdowns_water_pump_wear_stage1_description" text="The water pump bearing is showing early wear, slightly reducing coolant circulation."/>
++        <text name="ads_breakdowns_water_pump_wear_stage2_description" text="Water pump wear is reducing coolant flow, causing the engine to run hotter."/>
++        <text name="ads_breakdowns_water_pump_wear_stage3_description" text="The water pump is badly worn, causing poor coolant circulation and rising temperatures."/>
++        <text name="ads_breakdowns_water_pump_wear_stage4_description" text="The water pump is close to failure. Coolant circulation is critically reduced."/>
++        <text name="ads_breakdowns_water_pump_wear_stage4_message" text="The water pump is close to failure! Coolant circulation is critically reduced. Repair immediately."/>
++        <text name="ads_breakdowns_starter_motor_wear_stage1_description" text="The starter motor is showing early wear. Starts are occasionally sluggish."/>
++        <text name="ads_breakdowns_starter_motor_wear_stage2_description" text="Starter motor wear is making the engine noticeably harder to start."/>
++        <text name="ads_breakdowns_starter_motor_wear_stage3_description" text="The starter motor is badly worn. Starting reliably requires several attempts."/>
++        <text name="ads_breakdowns_starter_motor_wear_stage4_description" text="The starter motor is close to failure. Starting the engine is highly unreliable."/>
++        <text name="ads_breakdowns_starter_motor_wear_stage4_message" text="The starter motor is close to failure! Starting the engine is highly unreliable. Repair immediately."/>
++        <text name="ads_breakdowns_lighting_circuit_fault_stage1_description" text="A lighting circuit fault is causing an occasional, brief flicker."/>
++        <text name="ads_breakdowns_lighting_circuit_fault_stage2_description" text="The lighting circuit fault is worsening, causing more frequent flickering."/>
++        <text name="ads_breakdowns_lighting_circuit_fault_stage3_description" text="A poor lighting circuit connection is causing frequent flickering and dimming."/>
++        <text name="ads_breakdowns_lighting_circuit_fault_stage4_description" text="The lighting circuit fault is severe. Lights flicker almost constantly and may fail intermittently."/>
++        <text name="ads_breakdowns_lighting_circuit_fault_stage4_message" text="The lighting circuit fault is severe! Lights flicker almost constantly and may fail intermittently."/>
++        <text name="ads_breakdowns_suspension_bushing_wear_stage1_description" text="Suspension bushings are showing early wear, causing slightly looser steering feel."/>
++        <text name="ads_breakdowns_suspension_bushing_wear_stage2_description" text="Worn suspension bushings are causing noticeably looser, less precise steering."/>
++        <text name="ads_breakdowns_suspension_bushing_wear_stage3_description" text="Suspension bushings are badly worn. Steering response is sloppy and vibration is strong."/>
++        <text name="ads_breakdowns_suspension_bushing_wear_stage4_description" text="Suspension bushings have failed. Steering is imprecise and vibration is severe."/>
++        <text name="ads_breakdowns_suspension_bushing_wear_stage4_message" text="Suspension bushings have failed! Steering is imprecise and vibration is severe. Repair immediately."/>
++        <text name="ads_breakdowns_fuel_tank_contamination_stage1_description" text="Sediment in the fuel tank is slightly increasing fuel consumption and causing occasional hesitation."/>
++        <text name="ads_breakdowns_fuel_tank_contamination_stage2_description" text="Fuel tank contamination is noticeably increasing consumption and engine hesitation."/>
++        <text name="ads_breakdowns_fuel_tank_contamination_stage3_description" text="Heavy fuel contamination is significantly increasing consumption and causing frequent hesitation."/>
++        <text name="ads_breakdowns_fuel_tank_contamination_stage4_description" text="The fuel tank is critically contaminated. Consumption is very high and the engine hesitates constantly."/>
++        <text name="ads_breakdowns_fuel_tank_contamination_stage4_message" text="The fuel tank is critically contaminated! Consumption is very high and the engine hesitates constantly."/>
++        <text name="ads_breakdowns_part_oil_system" text="Oil System"/>
++        <text name="ads_breakdowns_oil_starvation_stage1_description" text="The engine has been run with critically low or badly contaminated oil for too long. Internal components are being damaged by inadequate lubrication."/>
++        <text name="ads_breakdowns_oil_starvation_stage1_message" text="Engine damage from oil starvation! Change the oil and repair the engine immediately."/>
++        <text name="ads_breakdowns_part_glow_plugs" text="Glow plugs"/>
++        <text name="ads_breakdowns_part_head_gasket" text="Cylinder head gasket"/>
++        <text name="ads_breakdowns_part_dpf" text="Diesel particulate filter (DPF)"/>
++        <text name="ads_breakdowns_part_def_system" text="DEF / AdBlue system"/>
++        <text name="ads_breakdowns_part_water_separator" text="Fuel water separator"/>
++        <text name="ads_breakdowns_part_serpentine_belt" text="Fan belt"/>
++        <text name="ads_breakdowns_part_diff_lock_actuator" text="Diff lock actuator"/>
++        <text name="ads_breakdowns_part_transmission_solenoid" text="Transmission shift solenoid"/>
++        <text name="ads_breakdowns_part_power_steering_pump" text="Power steering pump"/>
++        <text name="ads_breakdowns_part_dash_sensors" text="Instrument cluster and sensors"/>
++        <text name="ads_breakdowns_part_wiring_harness" text="Wiring harness"/>
++        <text name="ads_breakdowns_part_tire" text="Tire"/>
++        <text name="ads_breakdowns_part_trailer_air_brakes" text="Trailer air brake supply"/>
++        <text name="ads_breakdowns_glow_plug_failure_stage1_description" text="One glow plug has burned out. Cold starts take a little longer to catch."/>
++        <text name="ads_breakdowns_glow_plug_failure_stage2_description" text="Several glow plugs are weak. The engine needs long cranking when cold and the engine lamp stays on until it warms up."/>
++        <text name="ads_breakdowns_glow_plug_failure_stage3_description" text="Most glow plugs have failed. Cold starts are very hard and the engine runs rough until it is warm."/>
++        <text name="ads_breakdowns_glow_plug_failure_stage4_description" text="The glow plug circuit has failed. In cold weather the engine will barely start at all."/>
++        <text name="ads_breakdowns_glow_plug_failure_stage4_message" text="Glow plug circuit failure! Expect very long cranking in the cold."/>
++        <text name="ads_inspection_hint_glow_plug_failure_stage3" text="Several glow plugs show open circuits on the resistance test."/>
++        <text name="ads_inspection_hint_glow_plug_failure_stage4" text="The glow plug relay and most plugs have failed."/>
++        <text name="ads_breakdowns_head_gasket_failure_stage1_description" text="The head gasket is starting to weep. Coolant level drops slowly and the engine runs slightly warmer."/>
++        <text name="ads_breakdowns_head_gasket_failure_stage2_description" text="Combustion gas is getting into the cooling system. The engine runs hot and idles unevenly."/>
++        <text name="ads_breakdowns_head_gasket_failure_stage3_description" text="The head gasket is badly blown. Coolant is being burned, power is down and the engine overheats under load."/>
++        <text name="ads_breakdowns_head_gasket_failure_stage4_description" text="The head gasket has failed completely. Coolant has entered the cylinders and the engine cannot run."/>
++        <text name="ads_breakdowns_head_gasket_failure_stage4_message" text="Head gasket failure! The engine has shut down. Do not try to keep running it."/>
++        <text name="ads_inspection_hint_head_gasket_failure_stage1" text="Small bubbles appear in the coolant expansion tank with the engine running."/>
++        <text name="ads_inspection_hint_head_gasket_failure_stage2" text="Exhaust smell in the coolant tank and a light milky film under the oil filler cap."/>
++        <text name="ads_inspection_hint_head_gasket_failure_stage3" text="Milky residue in the engine oil and white steam from the exhaust."/>
++        <text name="ads_inspection_hint_head_gasket_failure_stage4" text="Coolant found in the cylinders. The cylinder head must come off."/>
++        <text name="ads_breakdowns_dpf_clogging_stage1_description" text="The particulate filter is loading up with soot. A long stretch of hard work will burn it clean."/>
++        <text name="ads_breakdowns_dpf_clogging_stage2_description" text="The particulate filter is heavily loaded. Back pressure costs power and fuel. Sustained hard work may still clear it."/>
++        <text name="ads_breakdowns_dpf_clogging_stage3_description" text="The particulate filter is blocked. The engine control unit has reduced power to protect the engine."/>
++        <text name="ads_breakdowns_dpf_clogging_stage4_description" text="The particulate filter is fully blocked. The engine is in limp mode and needs a workshop regeneration or a new filter."/>
++        <text name="ads_breakdowns_dpf_clogging_stage3_message" text="DPF blocked! Engine power has been reduced."/>
++        <text name="ads_breakdowns_dpf_clogging_stage4_message" text="DPF fully blocked! The engine is in limp mode. Get the vehicle to a workshop."/>
++        <text name="ads_breakdowns_dpf_regen_complete_message" text="DPF regeneration complete. The particulate filter is clean again."/>
++        <text name="ads_breakdowns_def_system_fault_stage1_description" text="The DEF (AdBlue) dosing system has logged a fault. No loss of power yet."/>
++        <text name="ads_breakdowns_def_system_fault_stage2_description" text="The DEF dosing system is not working properly. Emissions are out of range and engine output is starting to drop."/>
++        <text name="ads_breakdowns_def_system_fault_stage3_description" text="The DEF system has failed. The engine control unit has derated the engine by about 25 percent."/>
++        <text name="ads_breakdowns_def_system_fault_stage4_description" text="The DEF system has been down for too long. The engine has been derated to limp-home power."/>
++        <text name="ads_breakdowns_def_system_fault_stage3_message" text="DEF system fault! Engine power derated."/>
++        <text name="ads_breakdowns_def_system_fault_stage4_message" text="DEF system fault! The engine is limited to limp-home power."/>
++        <text name="ads_breakdowns_water_in_fuel_stage1_description" text="Water is collecting in the fuel water separator. The engine occasionally misfires."/>
++        <text name="ads_breakdowns_water_in_fuel_stage2_description" text="The water separator is nearly full. The engine stumbles under load and may stall."/>
++        <text name="ads_breakdowns_water_in_fuel_stage3_description" text="Water is getting past the separator. The engine runs rough, loses power and is hard to start."/>
++        <text name="ads_breakdowns_water_in_fuel_stage4_description" text="Water has reached the injection system. The engine will not run until the fuel system is cleaned."/>
++        <text name="ads_breakdowns_water_in_fuel_stage4_message" text="Water in the injection system! The engine has stopped."/>
++        <text name="ads_inspection_hint_water_in_fuel_stage2" text="The water separator bowl shows a layer of water under the fuel."/>
++        <text name="ads_inspection_hint_water_in_fuel_stage3" text="The water separator is full and the fuel filter is wet."/>
++        <text name="ads_inspection_hint_water_in_fuel_stage4" text="Water and corrosion found in the injection pump."/>
++        <text name="ads_breakdowns_serpentine_belt_failure_stage1_description" text="The fan belt is glazed and squeals at times. Charging output is slightly down."/>
++        <text name="ads_breakdowns_serpentine_belt_failure_stage2_description" text="The fan belt is slipping. The fan and alternator are not being driven at full speed."/>
++        <text name="ads_breakdowns_serpentine_belt_failure_stage3_description" text="The fan belt is cracked and slipping badly. The battery is barely charging and the engine runs hot."/>
++        <text name="ads_breakdowns_serpentine_belt_failure_stage4_description" text="The fan belt has snapped. The fan and alternator are no longer driven. The engine will overheat and the battery will drain."/>
++        <text name="ads_breakdowns_serpentine_belt_failure_stage4_message" text="Fan belt snapped! The engine will overheat and the battery is no longer charging."/>
++        <text name="ads_inspection_hint_serpentine_belt_failure_stage1" text="The fan belt surface is glazed."/>
++        <text name="ads_inspection_hint_serpentine_belt_failure_stage2" text="The fan belt tension is low and the belt shows wear."/>
++        <text name="ads_inspection_hint_serpentine_belt_failure_stage3" text="The fan belt is cracked across its ribs."/>
++        <text name="ads_inspection_hint_serpentine_belt_failure_stage4" text="The fan belt is broken."/>
++        <text name="ads_breakdowns_diff_lock_actuator_stuck_stage1_description" text="The diff lock is slow to release. The tractor resists turning slightly on firm ground."/>
++        <text name="ads_breakdowns_diff_lock_actuator_stuck_stage2_description" text="The diff lock is not fully releasing. Tires scrub in turns and steering is heavier."/>
++        <text name="ads_breakdowns_diff_lock_actuator_stuck_stage3_description" text="The diff lock is staying engaged. The tractor pushes straight in turns, wears tires and uses more fuel."/>
++        <text name="ads_breakdowns_diff_lock_actuator_stuck_stage4_description" text="The diff lock is stuck fully engaged. Turning is very difficult and speed must be kept low."/>
++        <text name="ads_breakdowns_diff_lock_actuator_stuck_stage4_message" text="Diff lock stuck engaged! Turning is very difficult."/>
++        <text name="ads_breakdowns_transmission_solenoid_fault_stage1_description" text="A transmission shift solenoid is sticking. The gearbox occasionally drops out of gear under load."/>
++        <text name="ads_breakdowns_transmission_solenoid_fault_stage2_description" text="A shift solenoid is failing. Some shifts are refused and the gearbox drops out of gear more often."/>
++        <text name="ads_breakdowns_transmission_solenoid_fault_stage3_description" text="Several shift solenoids are faulty. Upper ranges are unreliable and shifts often fail."/>
++        <text name="ads_breakdowns_transmission_solenoid_fault_stage4_description" text="The transmission controller has locked the gearbox into a limp-home range. Top speed is heavily limited."/>
++        <text name="ads_breakdowns_transmission_solenoid_fault_stage4_message" text="Transmission solenoid failure! The gearbox is locked in limp-home range."/>
++        <text name="ads_breakdowns_power_steering_pump_failure_stage1_description" text="The power steering pump is wearing. Steering is slightly heavier at low engine speed."/>
++        <text name="ads_breakdowns_power_steering_pump_failure_stage2_description" text="The power steering pump is losing pressure. Steering is noticeably heavier."/>
++        <text name="ads_breakdowns_power_steering_pump_failure_stage3_description" text="The power steering pump is badly worn. Steering is very heavy and slow to respond."/>
++        <text name="ads_breakdowns_power_steering_pump_failure_stage4_description" text="The power steering pump has failed. The vehicle can only be steered with great effort."/>
++        <text name="ads_breakdowns_power_steering_pump_failure_stage4_message" text="Power steering failure! Steering is extremely heavy."/>
++        <text name="ads_inspection_hint_power_steering_pump_failure_stage2" text="The power steering pump whines under load."/>
++        <text name="ads_inspection_hint_power_steering_pump_failure_stage3" text="Metal particles found in the steering circuit fluid."/>
++        <text name="ads_inspection_hint_power_steering_pump_failure_stage4" text="The power steering pump produces no pressure."/>
++        <text name="ads_breakdowns_dash_sensor_fault_stage1_description" text="The instrument cluster has a loose connection. Now and then a gauge sticks, drops to zero or jumps to the top of its scale, and a warning lamp may light for no reason."/>
++        <text name="ads_breakdowns_dash_sensor_fault_stage2_description" text="Dashboard readings are unreliable. Gauges misread every few minutes, the temperature needle wanders and false warning lamps come on."/>
++        <text name="ads_breakdowns_dash_sensor_fault_stage3_description" text="Several sensors and the instrument cluster are faulty. Fuel, temperature, voltage and load readings regularly show nonsense and false warnings are frequent."/>
++        <text name="ads_breakdowns_dash_sensor_fault_stage4_description" text="The instrument cluster can no longer be trusted and the engine controller has lost sensor signals, reducing power as a precaution."/>
++        <text name="ads_breakdowns_dash_sensor_fault_stage4_message" text="Sensor signal lost! The engine controller has reduced power."/>
++        <text name="ads_inspection_hint_dash_sensor_fault_stage3" text="The coolant temperature sensor gives erratic values on the diagnostic tester."/>
++        <text name="ads_inspection_hint_dash_sensor_fault_stage4" text="Several sensor connectors are corroded and stored fault codes are present."/>
++        <text name="ads_breakdowns_rodent_damaged_wiring_stage1_description" text="Rodents have nibbled the wiring while the machine sat unused. Lights flicker now and then."/>
++        <text name="ads_breakdowns_rodent_damaged_wiring_stage2_description" text="Rodent damage to the wiring is causing poor contacts. Lights flicker and the engine is hard to start."/>
++        <text name="ads_breakdowns_rodent_damaged_wiring_stage3_description" text="Several wires have been chewed through. The lights have failed and the engine may stall."/>
++        <text name="ads_breakdowns_rodent_damaged_wiring_stage4_description" text="The main wiring harness has been chewed through. The engine cannot run."/>
++        <text name="ads_breakdowns_rodent_damaged_wiring_stage4_message" text="Wiring harness chewed through by rodents! The engine has shut down."/>
++        <text name="ads_inspection_hint_rodent_damaged_wiring_stage1" text="Droppings and nesting material found in the engine bay."/>
++        <text name="ads_inspection_hint_rodent_damaged_wiring_stage2" text="Chewed insulation on several wires in the engine bay."/>
++        <text name="ads_inspection_hint_rodent_damaged_wiring_stage3" text="Several wires are bitten through."/>
++        <text name="ads_inspection_hint_rodent_damaged_wiring_stage4" text="The main wiring harness is badly chewed. A new harness is needed."/>
++        <text name="ads_breakdowns_slow_puncture_stage1_description" text="A tire is slowly losing pressure. The vehicle pulls slightly to one side."/>
++        <text name="ads_breakdowns_slow_puncture_stage2_description" text="A tire is noticeably low. The vehicle pulls to one side and rolling resistance is up."/>
++        <text name="ads_breakdowns_slow_puncture_stage3_description" text="A tire is badly under-inflated. The sidewall is flexing hard and speed should be kept down."/>
++        <text name="ads_breakdowns_slow_puncture_stage4_description" text="A tire is flat. The vehicle can only crawl and the tire may be ruined."/>
++        <text name="ads_breakdowns_slow_puncture_stage4_message" text="Flat tire! Keep speed very low."/>
++        <text name="ads_inspection_hint_slow_puncture_stage2" text="One tire is visibly lower than the others."/>
++        <text name="ads_inspection_hint_slow_puncture_stage3" text="A leaking valve stem or a nail was found in one tire."/>
++        <text name="ads_inspection_hint_slow_puncture_stage4" text="One tire is flat and the sidewall is damaged."/>
++        <text name="ads_breakdowns_trailer_air_brake_leak_stage1_description" text="There is a small leak in the trailer air brake supply. The trailer brakes take a moment to release after starting the engine."/>
++        <text name="ads_breakdowns_trailer_air_brake_leak_stage2_description" text="The trailer air supply is leaking. Trailer brakes drag while towing and take a while to release after starting."/>
++        <text name="ads_breakdowns_trailer_air_brake_leak_stage3_description" text="The trailer air supply is leaking badly. Trailer brakes drag heavily and take a long time to release."/>
++        <text name="ads_breakdowns_trailer_air_brake_leak_stage4_description" text="The trailer air supply cannot hold pressure. Any braked trailer stays locked on its spring brakes."/>
++        <text name="ads_breakdowns_trailer_air_brake_leak_stage4_message" text="Trailer air supply failure! Braked trailers will not release."/>
++        <text name="ads_breakdowns_trailer_air_pressure_building_message" text="Building air pressure, trailer brakes are still applied."/>
++        <text name="ads_inspection_hint_trailer_air_brake_leak_stage2" text="An air leak can be heard at the trailer coupling heads."/>
++        <text name="ads_inspection_hint_trailer_air_brake_leak_stage3" text="The trailer supply line is cracked and leaking."/>
++        <text name="ads_inspection_hint_trailer_air_brake_leak_stage4" text="The trailer brake valve has failed."/>
++        <text name="ads_breakdowns_flat_tire_left_description" text="A left-side tire is flat. The vehicle pulls hard to the left and can only crawl until the tire is repaired."/>
++        <text name="ads_breakdowns_flat_tire_right_description" text="A right-side tire is flat. The vehicle pulls hard to the right and can only crawl until the tire is repaired."/>
++        <text name="ads_breakdowns_flat_tire_left_message" text="Flat tire on the left side! Slow down and get it repaired."/>
++        <text name="ads_breakdowns_flat_tire_right_message" text="Flat tire on the right side! Slow down and get it repaired."/>
++        <text name="ads_inspection_hint_flat_tire_left" text="A left-side tire is flat. A puncture was found in the tread."/>
++        <text name="ads_inspection_hint_flat_tire_right" text="A right-side tire is flat. A puncture was found in the tread."/>
++        <text name="ads_breakdowns_def_tank_empty_stage1_description" text="The DEF tank is empty. Engine power will be reduced soon unless DEF is refilled."/>
++        <text name="ads_breakdowns_def_tank_empty_stage2_description" text="The engine has been running without DEF. The engine control unit has derated power by about 25 percent until DEF is refilled."/>
++        <text name="ads_breakdowns_def_tank_empty_stage3_description" text="The engine has run without DEF for too long and is limited to limp-home power until DEF is refilled."/>
++        <text name="ads_breakdowns_def_tank_empty_stage1_message" text="DEF tank empty! Refill DEF soon or engine power will be reduced."/>
++        <text name="ads_breakdowns_def_tank_empty_stage2_message" text="No DEF! Engine power has been reduced. Refill DEF to restore full power."/>
++        <text name="ads_breakdowns_def_tank_empty_stage3_message" text="No DEF! The engine is limited to limp-home power. Refill DEF to restore full power."/>
++        <!-- Real Tire Wear (Cobra Modding) -->
++        <text name="rtw_axle_single" text="Axle" />
++        <text name="rtw_axle_front" text="Front axle" />
++        <text name="rtw_axle_rear" text="Rear axle" />
++        <text name="rtw_axle_front_numbered" text="Front axle %d" />
++        <text name="rtw_axle_rear_numbered" text="Rear axle %d" />
++        <text name="rtw_info_axle" text="Tire wear axle %d" />
++        <text name="rtw_info_front" text="Front tire wear" />
++        <text name="rtw_info_rear" text="Rear tire wear" />
++        <text name="rtw_display_title" text="Tire Wear" />
++        <text name="rtw_tire_unknown" text="Tire %d" />
++        <text name="input_RTW_TIRE_SERVICE" text="Tire service" />
++        <text name="rtw_vehicle" text="VEHICLE" />
++        <text name="rtw_tracks_plural" text="Tracks" />
++        <text name="rtw_tires_plural" text="Tires" />
++        <text name="rtw_flat" text="FLAT" />
++        <text name="rtw_left" text="Left" />
++        <text name="rtw_right" text="Right" />
++        <text name="rtw_track_number" text="Track %d" />
++        <text name="rtw_tire_number" text="Tire %d" />
++        <text name="rtw_no_replacement_needed" text="NO REPLACEMENT NEEDED" />
++        <text name="rtw_tire_service" text="TIRE SERVICE" />
++        <text name="rtw_click_outside_close" text="Click outside to close" />
++        <text name="rtw_total_wear" text="TOTAL WEAR" />
++        <text name="rtw_flat_summary" text="%d / %d tires flat%s" />
++        <text name="rtw_speed_limit_suffix" text=" | Max. 15 km/h" />
++        <text name="rtw_replace_suffix" text=" REPLACE" />
++        <text name="rtw_replace_all_price" text="REPLACE ALL %s · %s" />
++        <text name="rtw_replace_all_none" text="ALL %s · NO REPLACEMENT NEEDED" />
++        <text name="rtw_total_units" text="Total: %d %s" />
++        <text name="rtw_all_tires" text="All tires" />
++        <text name="rtw_axle_number" text="Axle %d" />
++        <text name="rtw_not_enough_money" text="Not enough money to replace the tires.&#10;&#10;Cost: %s&#10;Balance: %s" />
++        <text name="rtw_replace_question" text="%s&#10;&#10;Replace %s?&#10;&#10;%s: %d&#10;Average wear: %.0f%%&#10;Cost: %s" />
++        <text name="rtw_replace_damaged" text="REPLACE DAMAGED TIRES (%d)" />
++        <text name="rtw_repair_hint" text="Damaged tires only · Wear is preserved" />
++        <text name="rtw_repair_question" text="%s&#10;&#10;Replace %d damaged tires?&#10;&#10;Wear of all tires is preserved.&#10;Cost: %s" />
++        <text name="rtw_vehicle_upper" text="VEHICLE" />
++        <text name="rtw_service_tracks" text="Tracks" />
++        <text name="rtw_service_tires" text="Tires" />
++        <text name="rtw_track" text="Track" />
++        <text name="rtw_no_replacement" text="NO REPLACEMENT NEEDED" />
++        <text name="rtw_service_title" text="TIRE SERVICE" />
++        <text name="rtw_close_hint" text="Click outside to close" />
++        <text name="rtw_flat_count" text="%d / %d tires flat%s" />
++        <text name="rtw_speed_limit" text=" | Max. 15 km/h" />
++        <text name="rtw_replace_all" text="REPLACE ALL %s · %s" />
++        <text name="rtw_all_no_replacement" text="ALL %s · NO REPLACEMENT NEEDED" />
++        <text name="rtw_total_count" text="Total: %d %s" />
++        <text name="rtw_axle_numbered" text="Axle %d" />
++        <text name="rtw_insufficient_money" text="Not enough money to replace the tires.&#10;&#10;Cost: %s&#10;Balance: %s" />
++        <text name="rtw_confirm_replacement" text="%s&#10;&#10;Replace %s?&#10;&#10;%s: %d&#10;Average wear: %.0f%%&#10;Cost: %s" />
++        <text name="rtw_replace_axle" text="REPLACE %s" />
++        <text name="rtw_tire" text="Tire" />
++        <text name="rtw_message_01" text="[RealTireWear] g_materialManager is not available yet" />
++        <text name="rtw_message_02" text="[RealTireWear] addModMaterialHolder is not available" />
++        <text name="rtw_message_03" text="Material holder registered: %s" />
++        <text name="rtw_message_04" text="Tire lifetime in meters" />
++        <text name="rtw_message_05" text="Tire wear enabled" />
++        <text name="rtw_message_06" text="Punctured tire" />
++        <text name="rtw_message_07" text="Real Tire Wear tire wear" />
++        <text name="rtw_message_08" text="[RealTireWear] Material '%s' is not loaded yet" />
++        <text name="rtw_message_09" text="[RealTireWear] T510 compatibility: original material retained; visual tread wear disabled | source='%s'" />
++        <text name="rtw_message_10" text="[RealTireWear] Could not create private material instance" />
++        <text name="rtw_message_11" text="[RealTireWear] T510 dedicated holder/shader | source='%s' shader='%s' variation='%s' -&gt; '%s' diffuse='%s' normal='%s' gloss='%s'" />
++        <text name="rtw_message_12" text="[RealTireWear] Shape '%s' has no realTireWearData parameter after material change" />
++        <text name="rtw_message_13" text="RealTireWear material applied to main shape '%s'" />
++        <text name="rtw_message_14" text="Tread geometry | PhysicsRadius=%.3f Width=%.3f LocalRadius=%.3f TreadDepth=%.3f" />
++        <text name="rtw_message_15" text="Bounding sphere | Radius=%.3f Center=%.3f %.3f %.3f" />
++        <text name="rtw_message_16" text="[RealTireWear] Tire %d: physics values for grip application are missing" />
++        <text name="rtw_message_17" text="[RealTireWear] Could not load crawler material holder: %s" />
++        <text name="rtw_message_18" text="[RealTireWear] Crawler material holder has no material node" />
++        <text name="rtw_message_19" text="Savegame tire data loaded: %s" />
++        <text name="rtw_message_20" text="[RealTireWear] Could not determine savegame base key from '%s'" />
++        <text name="rtw_message_21" text="[RealTireWear] Tire replacement: vehicle is missing" />
++        <text name="rtw_message_22" text="[RealTireWear] Tire replacement: TireWear data is missing" />
++        <text name="rtw_message_23" text="[RealTireWear] Tire replacement: invalid price" />
++        <text name="rtw_message_24" text="[RealTireWear] Tire replacement: FarmId is missing" />
++        <text name="rtw_message_25" text="[RealTireWear] g_specializationManager is missing" />
++        <text name="rtw_message_26" text="Specialization already exists: %s" />
++        <text name="rtw_message_27" text="Registering specialization: %s" />
++        <text name="rtw_message_28" text="[RealTireWear] Specialization is missing after registration" />
++        <text name="rtw_message_29" text="Specialization registered successfully: %s" />
++        <text name="rtw_message_30" text="[RealTireWear] g_vehicleTypeManager is missing" />
++        <text name="rtw_message_31" text="[RealTireWear] g_vehicleTypeManager.types is missing" />
++        <text name="rtw_message_32" text="[RealTireWear] TireWear registration failed: %s" />
++        <text name="rtw_message_33" text="VehicleTypes | Wheels=%d added=%d existing=%d errors=%d" />
++        <text name="rtw_message_34" text="Manager started" />
++        <text name="rtw_message_35" text="[RealTireWear] Aborted: specialization registration failed" />
++        <text name="rtw_message_36" text="Manager registration completed" />
++        <text name="rtw_message_37" text="[RealTireWear] Manager registration completed with errors" />
++        <text name="rtw_message_38" text="[RealTireWear] RTW_TIRE_SERVICE is not registered" />
++        <text name="rtw_message_39" text="[RealTireWear] Could not create tire service button" />
++        <text name="rtw_message_40" text="Tire service button created | Width=%s" />
++        <text name="rtw_message_41" text="Tire service button layout updated | Width=%s" />
++        <text name="rtw_message_42" text="Modal tire service input element created" />
++        <text name="rtw_message_43" text="Tire service opened" />
++        <text name="rtw_message_44" text="Tire service closed" />
++        <text name="rtw_message_45" text="[RealTireWear] TireReplaceEvent is not fully available" />
++        <text name="rtw_message_46" text="[RealTireWear] Invalid tire replacement price" />
++        <text name="rtw_message_47" text="Tire replacement cancelled: vehicle changed" />
++        <text name="rtw_message_48" text="[RealTireWear] TireReplaceEvent.sendEvent is missing" />
++        <text name="rtw_message_49" text="[RealTireWear] YesNoDialog is not available" />
++        <text name="rtw_message_50" text="Global GUI draw hook registered" />
++        <text name="rtw_message_51" text="RTW_TIRE_SERVICE triggered" />
++        <text name="rtw_message_52" text="[RealTireWear] g_inputBinding is not available" />
++        <text name="rtw_message_53" text="[RealTireWear] InputAction.RTW_TIRE_SERVICE is not available" />
++        <text name="rtw_message_54" text="RTW_TIRE_SERVICE registered | success=%s | eventId=%s" />
++        <text name="rtw_message_55" text="WorkshopScreen opened" />
++        <text name="rtw_message_56" text="WorkshopScreen closed" />
++        <text name="rtw_message_57" text="Workshop vehicle updated - button layout refreshed" />
++        <text name="rtw_message_58" text="Workshop hooks registered" />
++        <text name="rtw_message_59" text="WorkshopScreen registered again from existing GUI" />
++        <text name="rtw_message_60" text="Workshop listener loaded" />
++        <text name="rtw_percent_integer" text="%d %%" />
++        <text name="rtw_percent" text="%.0f%%" />
++        <text name="rtw_unit_number" text="%s %d" />
++        <text name="rtw_label_price" text="%s · %s" />
++        <text name="rtw_unit_count" text="%d %s" />
++        <text name="rtw_money_fallback" text="%d €" />
++        <text name="rtw_helper_flat_warning" text="Helper: %s has a flat tire! Please service the tires." />
++        <!-- Hydraulic Suspension System faults -->
++        <text name="ads_breakdowns_part_front_axle_accumulator" text="Front Axle Suspension Accumulator"/>
++        <text name="ads_breakdowns_part_front_suspension_cylinder" text="Front Suspension Cylinders"/>
++        <text name="ads_breakdowns_part_suspension_height_sensor" text="Suspension Height Sensor"/>
++        <text name="ads_breakdowns_front_axle_accumulator_stage1_description" text="The front axle accumulator is slowly losing its nitrogen charge. The front suspension feels a little firmer."/>
++        <text name="ads_breakdowns_front_axle_accumulator_stage2_description" text="Accumulator pressure is low. The front axle rides hard and starts to bounce on bumps."/>
++        <text name="ads_breakdowns_front_axle_accumulator_stage3_description" text="The accumulator has lost most of its charge. The front axle bucks and bounces, especially at road speed."/>
++        <text name="ads_breakdowns_front_axle_accumulator_stage4_description" text="The accumulator is empty. The front suspension is practically rigid and the tractor pitches violently."/>
++        <text name="ads_breakdowns_front_axle_accumulator_stage4_message" text="Front suspension accumulator empty! The axle is almost rigid. Slow down."/>
++        <text name="ads_inspection_hint_front_axle_accumulator_stage2" text="The front axle feels harder than it should when pushed down."/>
++        <text name="ads_inspection_hint_front_axle_accumulator_stage3" text="The accumulator pre-charge is well below spec. The front axle barely gives."/>
++        <text name="ads_inspection_hint_front_axle_accumulator_stage4" text="The accumulator has no gas charge left. It must be recharged or replaced."/>
++        <text name="ads_breakdowns_front_suspension_cylinder_leak_stage1_description" text="The front suspension cylinder seals are starting to weep. The front settles slightly."/>
++        <text name="ads_breakdowns_front_suspension_cylinder_leak_stage2_description" text="Oil is bypassing the cylinder seals. The front sits low and levelling is slow to catch up."/>
++        <text name="ads_breakdowns_front_suspension_cylinder_leak_stage3_description" text="The cylinders are leaking badly. The front keeps sinking and the levelling can barely hold it."/>
++        <text name="ads_breakdowns_front_suspension_cylinder_leak_stage4_description" text="The cylinders can no longer hold pressure. The front axle sits down on its bump stops."/>
++        <text name="ads_breakdowns_front_suspension_cylinder_leak_stage4_message" text="Front suspension cylinders failed! The axle is on its bump stops."/>
++        <text name="ads_inspection_hint_front_suspension_cylinder_leak_stage2" text="There is a film of oil on the front suspension cylinders."/>
++        <text name="ads_inspection_hint_front_suspension_cylinder_leak_stage3" text="Oil is dripping from the front suspension cylinders and the front sits noticeably low."/>
++        <text name="ads_inspection_hint_front_suspension_cylinder_leak_stage4" text="The front axle is resting on its bump stops. The cylinder seals have failed."/>
++        <text name="ads_breakdowns_suspension_height_sensor_stage1_description" text="The axle height sensor gives an occasional wrong reading. The levelling twitches now and then."/>
++        <text name="ads_breakdowns_suspension_height_sensor_stage2_description" text="The height sensor signal is unstable. The front suspension keeps re-levelling for no reason."/>
++        <text name="ads_breakdowns_suspension_height_sensor_stage3_description" text="The height sensor is badly off. The front hunts up and down and never settles."/>
++        <text name="ads_breakdowns_suspension_height_sensor_stage4_description" text="The height sensor has failed. The controller has locked the front suspension in fail-safe mode."/>
++        <text name="ads_breakdowns_suspension_height_sensor_stage4_message" text="Suspension sensor failed! Front suspension locked (fail-safe)."/>
++        <text name="ads_inspection_hint_suspension_height_sensor_stage2" text="The height sensor linkage is loose and its signal jumps."/>
++        <text name="ads_inspection_hint_suspension_height_sensor_stage3" text="The height sensor reading does not match the real axle position."/>
++        <text name="ads_inspection_hint_suspension_height_sensor_stage4" text="The height sensor gives no signal. The suspension controller is in fail-safe."/>
++        <text name="ads_breakdowns_part_chipper_knives" text="Chipper knives"/>
++        <text name="ads_breakdowns_chipper_knife_wear_stage1_description" text="The chipper knives are starting to dull. Feed speed is slightly lower and the engine works a little harder."/>
++        <text name="ads_breakdowns_chipper_knife_wear_stage2_description" text="The chipper knives are dull. Logs feed noticeably slower and fuel use is up. Plan a knife change."/>
++        <text name="ads_breakdowns_chipper_knife_wear_stage3_description" text="The chipper knives are badly worn. Feeding is slow and fuel use is high. Change the knives soon."/>
++        <text name="ads_breakdowns_chipper_knife_wear_stage4_description" text="The chipper knives are worn out. The chipper cannot be run until the knives are changed."/>
++        <text name="ads_breakdowns_chipper_knife_wear_stage3_message" text="Chipper knives badly worn - change them soon"/>
++        <text name="ads_breakdowns_chipper_knife_wear_stage4_message" text="Chipper knives worn out! Change the knives to keep chipping."/>
++        <text name="ads_breakdowns_chipper_knife_wear_locked_warning" text="The chipper knives are worn out. Change the knives in the workshop (ADS repair) before chipping."/>
+     </texts>
+ </l10n>
+ 

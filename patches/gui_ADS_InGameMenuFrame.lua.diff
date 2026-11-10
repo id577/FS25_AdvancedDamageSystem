@@ -1,0 +1,328 @@
+--- a/gui/ADS_InGameMenuFrame.lua
++++ b/gui/ADS_InGameMenuFrame.lua
+@@ -7,7 +7,8 @@
+     ACTIVE = 1,
+     SERVICE = 2,
+     OTHER = 3,
+-    SETTINGS = 4
++    PARTS = 4,
++    SETTINGS = 5
+ }
+ ADS_InGameMenuFrame.SORT_COLUMN = {
+     VEHICLE = "vehicle",
+@@ -25,6 +26,41 @@
+ 
+ local ADS_InGameMenuFrame_mt = Class(ADS_InGameMenuFrame, TabbedMenuFrameElement)
+ 
++-- Each FS25 mod has its own environment, so the Parts Cabinet mod's tables are
++-- looked up in its mod environment (FS25_Parts_Cabinet), not by global name.
++ADS_InGameMenuFrame.PARTS_MOD_NAME = "FS25_Parts_Cabinet"
++
++local function getPartsMod()
++    local cached = ADS_InGameMenuFrame.partsModEnv
++    if cached ~= nil and cached.ADSParts ~= nil then
++        return cached.ADSParts, cached.ADSPartsDialog
++    end
++
++    local mt = getmetatable(_G)
++    local globals = (mt ~= nil and type(mt.__index) == "table") and mt.__index or _G
++    local env = globals[ADS_InGameMenuFrame.PARTS_MOD_NAME]
++    if type(env) ~= "table" or rawget(env, "ADSParts") == nil then
++        env = nil
++        -- zip renamed: find the mod environment that holds ADSParts
++        for _, value in pairs(globals) do
++            if type(value) == "table" and value ~= _G and rawget(value, "ADSParts") ~= nil and rawget(value, "ADSPartsDialog") ~= nil then
++                env = value
++                break
++            end
++        end
++    end
++    if env == nil and rawget(globals, "ADSParts") ~= nil then
++        env = globals
++    end
++
++    if env ~= nil then
++        ADS_InGameMenuFrame.partsModEnv = env
++        return env.ADSParts, env.ADSPartsDialog
++    end
++    return nil, nil
++end
++
++
+ local function log_dbg(...)
+     if ADS_Config ~= nil and ADS_Config.DEBUG then
+         local args = {...}
+@@ -286,6 +322,9 @@
+     self.sortColumn = ADS_InGameMenuFrame.SORT_COLUMN.VEHICLE
+     self.sortingAsc = true
+     self.elementCache = {}
++    self.partsStockRows = {}
++    self.partsDeliveryRows = {}
++    ADS_InGameMenuFrame.INSTANCE = self
+ 
+     return self
+ end
+@@ -371,6 +410,14 @@
+         end
+     }
+ 
++    self.orderPartsButtonInfo = {
++        inputAction = InputAction.MENU_ACTIVATE,
++        text = "Order parts",
++        callback = function()
++            self:onOrderParts()
++        end
++    }
++
+     self:setMenuButtonInfo({
+         self.backButtonInfo,
+         self.prevPageButtonInfo,
+@@ -400,7 +447,7 @@
+     end
+ 
+     if self.subCategoryPaging ~= nil then
+-        self.subCategoryPaging:setTexts({"1", "2", "3", "4"})
++        self.subCategoryPaging:setTexts({"1", "2", "3", "4", "5"})
+         self.subCategoryPaging:setState(self.subCategoryState, false)
+     end
+ 
+@@ -420,6 +467,14 @@
+         self.otherVehicleList:setDataSource(self)
+         self.otherVehicleList:setDelegate(self)
+     end
++    if self.partsStockList ~= nil then
++        self.partsStockList:setDataSource(self)
++        self.partsStockList:setDelegate(self)
++    end
++    if self.partsDeliveryList ~= nil then
++        self.partsDeliveryList:setDataSource(self)
++        self.partsDeliveryList:setDelegate(self)
++    end
+ 
+     self.sortIconMap = {
+         [ADS_InGameMenuFrame.SORT_COLUMN.VEHICLE] = {asc = self.iconVehicleAscending, desc = self.iconVehicleDescending},
+@@ -468,6 +523,10 @@
+         ADS_SettingsPage:activateEmbeddedSettingsPage(self)
+     end
+ 
++    if state == ADS_InGameMenuFrame.SUB_CATEGORY.PARTS then
++        self:reloadPartsRows()
++    end
++
+     self:updateEmptyStates()
+     self:updateDetailsForCurrentSection()
+     self:updateDetailBoxVisibility()
+@@ -477,7 +536,10 @@
+ 
+ function ADS_InGameMenuFrame:updateDetailBoxVisibility()
+     if self.detailBox ~= nil then
+-        self.detailBox:setVisible(self:getCurrentSubCategory() ~= ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS and self.selectedVehicleId ~= nil)
++        local state = self:getCurrentSubCategory()
++        self.detailBox:setVisible(state ~= ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS
++            and state ~= ADS_InGameMenuFrame.SUB_CATEGORY.PARTS
++            and self.selectedVehicleId ~= nil)
+     end
+ end
+ 
+@@ -486,6 +548,7 @@
+         self.activeTableSliderBox,
+         self.serviceTableSliderBox,
+         self.otherTableSliderBox,
++        self.partsDeliverySliderBox,
+         self.settingsSliderBox
+     }
+ 
+@@ -553,7 +616,7 @@
+ 
+ function ADS_InGameMenuFrame:getSelectedVehicle()
+     local state = self:getCurrentSubCategory()
+-    if state == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS then
++    if state == ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS or state == ADS_InGameMenuFrame.SUB_CATEGORY.PARTS then
+         return nil
+     end
+ 
+@@ -582,6 +645,21 @@
+         return
+     end
+ 
++    if currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.PARTS then
++        if self.orderPartsButtonInfo ~= nil then
++            local parts, partsDialog = getPartsMod()
++            self.orderPartsButtonInfo.disabled = (parts == nil or partsDialog == nil)
++        end
++        self:setMenuButtonInfo({
++            self.backButtonInfo,
++            self.prevPageButtonInfo,
++            self.nextPageButtonInfo,
++            self.orderPartsButtonInfo
++        })
++        self:setMenuButtonInfoDirty()
++        return
++    end
++
+     local isVehicleSection = currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.ACTIVE
+         or currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.OTHER
+     local isADSSection = currentSection == ADS_InGameMenuFrame.SUB_CATEGORY.ACTIVE
+@@ -627,7 +705,11 @@
+     self.refreshTimerMs = self.refreshTimerMs - dt
+     if self.refreshTimerMs <= 0 then
+         self.refreshTimerMs = ADS_InGameMenuFrame.REFRESH_INTERVAL_MS
+-        self:reloadRows()
++        if self:getCurrentSubCategory() == ADS_InGameMenuFrame.SUB_CATEGORY.PARTS then
++            self:reloadPartsRows()
++        else
++            self:reloadRows()
++        end
+     end
+ end
+ 
+@@ -993,6 +1075,12 @@
+ end
+ 
+ function ADS_InGameMenuFrame:getNumberOfItemsInSection(_list, _section)
++    if _list == self.partsStockList then
++        return #self.partsStockRows
++    elseif _list == self.partsDeliveryList then
++        return #self.partsDeliveryRows
++    end
++
+     if _list == self.serviceVehicleList then
+         return #self.serviceRows
+     elseif _list == self.otherVehicleList then
+@@ -1003,6 +1091,11 @@
+ end
+ 
+ function ADS_InGameMenuFrame:populateCellForItemInSection(_list, _section, index, cell)
++    if _list == self.partsStockList or _list == self.partsDeliveryList then
++        self:populatePartsCell(_list, index, cell)
++        return
++    end
++
+     local row = nil
+     if _list == self.serviceVehicleList then
+         row = self.serviceRows[index]
+@@ -1097,6 +1190,10 @@
+ end
+ 
+ function ADS_InGameMenuFrame:onListSelectionChanged(_list, _section, index)
++    if _list == self.partsStockList or _list == self.partsDeliveryList then
++        return
++    end
++
+     local row = nil
+ 
+     if _list == self.serviceVehicleList then
+@@ -1150,6 +1247,113 @@
+     self:updateSubCategoryPages(ADS_InGameMenuFrame.SUB_CATEGORY.OTHER)
+ end
+ 
++function ADS_InGameMenuFrame:onClickPartsSection()
++    if self.subCategoryPaging ~= nil then
++        self.subCategoryPaging:setState(ADS_InGameMenuFrame.SUB_CATEGORY.PARTS, true)
++    end
++
++    self:updateSubCategoryPages(ADS_InGameMenuFrame.SUB_CATEGORY.PARTS)
++end
++
++-- ==========================================================
++--   Parts tab (data comes from the Parts Cabinet mod, FS25_Parts_Cabinet)
++-- ==========================================================
++local function setPartsCellText(cell, name, text, r, g, b, a)
++    local element = cell:getAttribute(name)
++    if element ~= nil then
++        element:setText(text or "")
++        element:setTextColor(r or 1, g or 1, b or 1, a or 1)
++    end
++end
++
++function ADS_InGameMenuFrame:reloadPartsRows()
++    local ADSParts = getPartsMod()
++    local available = ADSParts ~= nil and ADSParts.getMenuStockRows ~= nil
++    local farmId = g_currentMission ~= nil and g_currentMission:getFarmId() or FarmManager.SPECTATOR_FARM_ID
++
++    self.partsStockRows = {}
++    self.partsDeliveryRows = {}
++    if available then
++        self.partsStockRows = ADSParts.getMenuStockRows(farmId) or {}
++        self.partsDeliveryRows = ADSParts.getMenuDeliveryRows(farmId) or {}
++    end
++
++    local hasDeliveries = #self.partsDeliveryRows > 0
++    local visibleElements = {
++        { self.partsStockHeader, available },
++        { self.partsStockList, available },
++        { self.partsDeliveryHeader, available and hasDeliveries },
++        { self.partsDeliveryList, available and hasDeliveries },
++        { self.partsDeliverySliderBox, available and hasDeliveries },
++        { self.partsDeliveryEmptyText, available and not hasDeliveries },
++        { self.partsUnavailableText, not available },
++    }
++    for _, entry in ipairs(visibleElements) do
++        if entry[1] ~= nil then
++            entry[1]:setVisible(entry[2])
++        end
++    end
++
++    if self.partsStockList ~= nil then
++        self.partsStockList:reloadData()
++    end
++    if self.partsDeliveryList ~= nil then
++        self.partsDeliveryList:reloadData()
++    end
++    self:updateBalanceDisplay()
++end
++
++function ADS_InGameMenuFrame:populatePartsCell(list, index, cell)
++    if list == self.partsStockList then
++        local row = self.partsStockRows[index]
++        if row == nil then return end
++        setPartsCellText(cell, "partsCategoryText", row.label)
++        setPartsCellText(cell, "partsOemText", row.OEM)
++        setPartsCellText(cell, "partsAftermarketText", row.AFTERMARKET)
++        setPartsCellText(cell, "partsPremiumText", row.PREMIUM)
++        if row.total > 0 then
++            setPartsCellText(cell, "partsTotalText", row.totalText, 0.659, 0.847, 0.286, 1)
++        else
++            setPartsCellText(cell, "partsTotalText", row.totalText)
++        end
++        return
++    end
++
++    local row = self.partsDeliveryRows[index]
++    if row == nil then return end
++    setPartsCellText(cell, "partsItemText", row.item)
++    setPartsCellText(cell, "partsQualityText", row.quality)
++    setPartsCellText(cell, "partsValueText", row.value)
++    if row.isWaiting then
++        -- delivered pallets that still need to be put away
++        setPartsCellText(cell, "partsStatusText", row.status, 1, 0.55, 0.05, 1)
++    else
++        setPartsCellText(cell, "partsStatusText", row.status)
++    end
++    setPartsCellText(cell, "partsWhereText", row.location)
++end
++
++function ADS_InGameMenuFrame:onOrderParts()
++    local _, ADSPartsDialog = getPartsMod()
++    if ADSPartsDialog == nil or g_currentMission == nil then
++        return
++    end
++    local farmId = g_currentMission:getFarmId()
++    if farmId == nil or farmId == FarmManager.SPECTATOR_FARM_ID then
++        return
++    end
++    ADSPartsDialog.show(farmId, nil)
++end
++
++-- called by the Parts Cabinet mod whenever stock, orders or pallets change
++function ADS_InGameMenuFrame.onPartsDataChanged()
++    local frame = ADS_InGameMenuFrame.INSTANCE
++    if frame ~= nil and frame.subCategoryPages ~= nil
++            and frame:getCurrentSubCategory() == ADS_InGameMenuFrame.SUB_CATEGORY.PARTS then
++        frame:reloadPartsRows()
++    end
++end
++
+ function ADS_InGameMenuFrame:onClickSettingsSection()
+     if self.subCategoryPaging ~= nil then
+         self.subCategoryPaging:setState(ADS_InGameMenuFrame.SUB_CATEGORY.SETTINGS, true)

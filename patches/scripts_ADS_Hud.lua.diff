@@ -1,0 +1,234 @@
+--- a/scripts/ADS_Hud.lua
++++ b/scripts/ADS_Hud.lua
+@@ -804,6 +804,74 @@
+ 
+     self.fuelConsoText.offsetX, self.fuelConsoText.offsetY = self:scalePixelValuesToScreenVector(8, 4)
+     self.fuelConsoText.size = self:scalePixelToScreenHeight(13)
++
++    self:storeSideLayoutValues()
++end
++
++-- Side column layout (lights down the left side of the speedometer).
++-- All numbers are HUD pixels relative to the speedometer gauge centre (+y = up).
++ADS_Hud.SIDE_LAYOUT = {
++    columnX = -151,
++    iconSize = 17,
++    smallIconSize = 9,           -- the transmission light sits in the small "dot" slot
++    dividerWidth = 34,
++    textSize = 9,
++    smallTextSize = 7,
++    slots = {
++        brakes       = { iconY = 121 },
++        engine       = { iconY = 94,  textY = 80 },   -- engine load %
++        coolant      = { iconY = 53,  textY = 40 },   -- engine temperature
++        warning      = { iconY = 11 },
++        transmission = { iconY = -29 },
++        battery      = { iconY = -62, textY = -76 },  -- system voltage
++        oil          = { iconY = -102 },
++    },
++    dividers = { 108, 68, 29, -9, -45, -88 },
++    service = { hoursY = 67, lineY = 61, intervalY = 55, lineWidth = 22 },
++}
++
++function ADS_Hud:storeSideLayoutValues()
++    local L = ADS_Hud.SIDE_LAYOUT
++    local cfg = (ADS_Config ~= nil and ADS_Config.HUD) or {}
++    local baseX = L.columnX + (tonumber(cfg.SIDE_OFFSET_X) or 0)
++    local baseY = tonumber(cfg.SIDE_OFFSET_Y) or 0
++
++    local side = { slots = {}, dividers = {} }
++    side.columnX = self:scalePixelValuesToScreenVector(baseX, 0)
++
++    for id, slot in pairs(L.slots) do
++        local size = id == "transmission" and L.smallIconSize or L.iconSize
++        local w, h = self:scalePixelValuesToScreenVector(size, size)
++        local _, iconY = self:scalePixelValuesToScreenVector(0, slot.iconY + baseY)
++        local entry = { iconW = w, iconH = h, iconY = iconY }
++        if slot.textY ~= nil then
++            local _, textY = self:scalePixelValuesToScreenVector(0, slot.textY + baseY)
++            entry.textY = textY
++        end
++        side.slots[id] = entry
++    end
++
++    for i, y in ipairs(L.dividers) do
++        local _, dy = self:scalePixelValuesToScreenVector(0, y + baseY)
++        side.dividers[i] = dy
++    end
++    side.dividerWidth = self:scalePixelValuesToScreenVector(L.dividerWidth, 0)
++    side.dividerHeight = math.max(self:scalePixelToScreenHeight(1), 1 / 1080)
++    side.textSize = self:scalePixelToScreenHeight(L.textSize)
++    side.smallTextSize = self:scalePixelToScreenHeight(L.smallTextSize)
++
++    local _, hoursY = self:scalePixelValuesToScreenVector(0, L.service.hoursY)
++    local _, lineY = self:scalePixelValuesToScreenVector(0, L.service.lineY)
++    local _, intervalY = self:scalePixelValuesToScreenVector(0, L.service.intervalY)
++    side.serviceHoursY, side.serviceLineY, side.serviceIntervalY = hoursY, lineY, intervalY
++    side.serviceLineWidth = self:scalePixelValuesToScreenVector(L.service.lineWidth, 0)
++
++    self.sideLayout = side
++end
++
++function ADS_Hud:getIsSideLayout()
++    local cfg = ADS_Config ~= nil and ADS_Config.HUD or nil
++    return cfg == nil or cfg.DASHBOARD_LAYOUT ~= "classic"
+ end
+ 
+ function ADS_Hud:drawDashboard()
+@@ -817,6 +885,12 @@
+     local activeIndicators = spec.activeIndicators
+     local serviceInterval = (self.vehicle:getHoursSinceLastMaintenance() or 0) / (self.vehicle:getMaintenanceInterval() or 5)
+     local isServiceOverdue = serviceInterval > 1.0
++    -- what the dashboard *shows*; differs from the real temperature when the temp sensor is faulty
++    local displayedEngineTemp = ADS_Breakdowns.getDisplayedEngineTemperature ~= nil and ADS_Breakdowns.getDisplayedEngineTemperature(vehicle) or spec.engineTemperature
++    -- random gauge misreadings (frozen / dropped out / pegged / erratic needle) from a faulty instrument cluster
++    local readGauge = ADS_Breakdowns.getGaugeReading or function(_, _, value) return value end
++    if ADS_Breakdowns.installGaugeHooks ~= nil then ADS_Breakdowns.installGaugeHooks() end
++    displayedEngineTemp = readGauge(vehicle, "engineTemp", displayedEngineTemp, -10, 122)
+ 
+     local function calculateIndicatorTargetColor(hudIndicatorId, mutateActiveState)
+         local targetColor = colors.DEFAULT
+@@ -852,13 +926,13 @@
+             end
+ 
+             local isNotHeated =
+-            (spec.engineTemperature < ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD) or
++            (displayedEngineTemp < ADS_Config.CORE.ENGINE_FACTOR_DATA.COLD_MOTOR_TEMP_THRESHOLD) or
+             (hasCVTTransmission(vehicle) and not hasCVTAddon(vehicle) and spec.transmissionTemperature < ADS_Config.CORE.TRANSMISSION_FACTOR_DATA.COLD_TRANSMISSION_THRESHOLD) or
+             (hasCVTAddon(vehicle) and spec.transmissionTemperature < 55)
+ 
+             if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and isNotHeated then targetColor = colors.COOL
+-            elseif hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.engineTemperature > 99 and spec.engineTemperature < 110 then targetColor = colors.WARNING
+-            elseif hudIndicatorId == self.indicators.coolant.name and spec.engineTemperature > 110 then targetColor = colors.CRITICAL end
++            elseif hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and displayedEngineTemp > 99 and displayedEngineTemp < 110 then targetColor = colors.WARNING
++            elseif hudIndicatorId == self.indicators.coolant.name and displayedEngineTemp > 110 then targetColor = colors.CRITICAL end
+             if hudIndicatorId == self.indicators.coolant.name and targetColor == colors.DEFAULT and spec.transmissionTemperature > 99 and spec.transmissionTemperature < 110 then targetColor = colors.WARNING
+             elseif hudIndicatorId == self.indicators.coolant.name and spec.transmissionTemperature > 110 then targetColor = colors.CRITICAL end
+ 
+@@ -878,6 +952,9 @@
+         return targetColor
+     end
+ 
++    local isSide = self:getIsSideLayout() and self.sideLayout ~= nil
++    local side = self.sideLayout
++
+     local coolantTargetColor = calculateIndicatorTargetColor(self.indicators.coolant.name, false)
+     local coolantSlotVisible = not spec.isElectricVehicle and self.indicators.coolant.year < spec.year
+     local serviceVisible = vehicle:getMotorState() ~= 1
+@@ -885,6 +962,10 @@
+         and self.indicators.service.year < spec.year
+         and coolantSlotVisible
+         and coolantTargetColor == colors.DEFAULT
++    if isSide then
++        -- side layout: service has its own spot at the top of the gauge, always shown
++        serviceVisible = self.indicators.service.year < spec.year
++    end
+ 
+     g_currentMission.hud.speedMeter.speedTextSize = self:scalePixelToScreenHeight(43)
+     local speedBgX, speedBgY = g_currentMission.hud.speedMeter.speedBg:getPosition()
+@@ -896,8 +977,24 @@
+         local targetColor = calculateIndicatorTargetColor(hudIndicatorId, true)
+         local isIndicatorVisible = true
+ 
+-        icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
+-        if (hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle)
++        local sideSlot = isSide and side.slots[hudIndicatorId] or nil
++        if sideSlot ~= nil then
++            icon:setDimension(sideSlot.iconW, sideSlot.iconH)
++            icon:setPosition(posX + side.columnX - sideSlot.iconW * 0.5, posY + sideSlot.iconY - sideSlot.iconH * 0.5)
++        elseif isSide and hudIndicatorId == self.indicators.service.name then
++            icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
++        else
++            icon:setPosition(posX + hudIndicatorData.offsetX, posY + hudIndicatorData.offsetY)
++        end
++
++        if isSide then
++            -- every light has its own slot in the column, nothing overlaps the gauge
++            if hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle then
++                isIndicatorVisible = false
++            else
++                isIndicatorVisible = hudIndicatorData.year < spec.year
++            end
++        elseif (hudIndicatorId == self.indicators.coolant.name and spec.isElectricVehicle)
+             or hudIndicatorId == self.indicators.oil.name
+             or hudIndicatorId == self.indicators.transmission.name then
+             isIndicatorVisible = false
+@@ -929,12 +1026,27 @@
+         self:syncIndicatorActivation(hudIndicatorId, shouldActivateIndicator, targetColor)
+ 
+         local displayColor = self:applyIndicatorBlink(hudIndicatorId, targetColor)
++        if isSide and displayColor ~= nil and (displayColor[4] or 1) <= 0.05 then
++            -- unlit lights stay faintly visible in the column, like a real dash
++            local unlitAlpha = tonumber(ADS_Config.HUD and ADS_Config.HUD.SIDE_UNLIT_ALPHA) or 0.30
++            displayColor = { 1, 1, 1, unlitAlpha }
++        end
+         icon:setColor(unpack(displayColor))
+         icon:render()
+     end
+ 
+-    local engineTemp, transTemp, systemVoltageV = spec.engineTemperature, spec.transmissionTemperature, spec.systemVoltageV
++    if isSide then
++        local divX = posX + side.columnX - side.dividerWidth * 0.5
++        for _, dy in ipairs(side.dividers) do
++            drawFilledRect(divX, posY + dy, side.dividerWidth, side.dividerHeight, 1, 1, 1, 0.18)
++        end
++    end
++
++    local engineTemp, transTemp, systemVoltageV = displayedEngineTemp, spec.transmissionTemperature, spec.systemVoltageV
+     local motorLoad = math.min(spec.dynamicMotorLoad or spec._smoothedMotorLoad or 0, 1)
++    transTemp = readGauge(vehicle, "transTemp", transTemp, -10, 125)
++    systemVoltageV = readGauge(vehicle, "voltage", systemVoltageV, 10.6, 15.8)
++    motorLoad = readGauge(vehicle, "motorLoad", motorLoad, 0, 1)
+ 
+     local tempSign = "°C"
+     local voltageSing = "V"
+@@ -965,7 +1077,48 @@
+         motorLoadTextColor = colors.WARNING
+     end
+ 
+-    if not spec.isElectricVehicle then
++    if isSide then
++        local colX = posX + side.columnX
++        setTextAlignment(RenderText.ALIGN_CENTER)
++        setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
++        setTextBold(true)
++
++        if not spec.isElectricVehicle then
++            setTextColor(motorLoadTextColor[1], motorLoadTextColor[2], motorLoadTextColor[3], motorLoadTextColor[4])
++            renderText(colX, posY + side.slots.engine.textY, side.textSize, motorText)
++
++            setTextColor(1, 1, 1, 1)
++            if hasCVTTransmission(vehicle) or hasCVTAddon(vehicle) then
++                -- engine | transmission on two short lines so it fits the column
++                local half = side.smallTextSize * 0.55
++                renderText(colX, posY + side.slots.coolant.textY + half, side.smallTextSize, string.format("%.0f%s", engineTemp, tempSign))
++                renderText(colX, posY + side.slots.coolant.textY - half, side.smallTextSize, string.format("%.0f%s", transTemp, tempSign))
++            else
++                renderText(colX, posY + side.slots.coolant.textY, side.textSize, string.format("%.0f%s", engineTemp, tempSign))
++            end
++        end
++
++        setTextColor(batteryVoltageTextColor[1], batteryVoltageTextColor[2], batteryVoltageTextColor[3], batteryVoltageTextColor[4])
++        renderText(colX, posY + side.slots.battery.textY, side.textSize, batteryVoltageText)
++
++        -- service hours at the top of the gauge: hours since service over the interval
++        if self.indicators.service.year < spec.year then
++            local hoursSince = self.vehicle:getHoursSinceLastMaintenance() or 0
++            local interval = self.vehicle:getMaintenanceInterval() or 5
++            if isServiceOverdue then
++                setTextColor(colors.WARNING[1], colors.WARNING[2], colors.WARNING[3], 1)
++            else
++                setTextColor(1, 1, 1, 1)
++            end
++            renderText(posX, posY + side.serviceHoursY, side.textSize, string.format("%.1f", hoursSince))
++            setTextBold(false)
++            setTextColor(1, 1, 1, 0.8)
++            renderText(posX, posY + side.serviceIntervalY, side.smallTextSize, string.format("%.0f h", interval))
++            drawFilledRect(posX - side.serviceLineWidth * 0.5, posY + side.serviceLineY, side.serviceLineWidth, side.dividerHeight, 1, 1, 1, 0.6)
++        end
++
++        setTextColor(1, 1, 1, 1)
++    elseif not spec.isElectricVehicle then
+         setTextColor(1, 1, 1, 1)
+         setTextAlignment(RenderText.ALIGN_CENTER)
+         setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_TOP)

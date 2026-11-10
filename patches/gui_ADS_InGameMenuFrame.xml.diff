@@ -1,0 +1,78 @@
+--- a/gui/ADS_InGameMenuFrame.xml
++++ b/gui/ADS_InGameMenuFrame.xml
+@@ -23,7 +23,10 @@
+             <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[3]" text="$l10n_ads_ingame_menu_section_other" onClick="onClickOtherSection">
+                 <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
+             </Button>
+-            <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[4]" text="$l10n_ads_settings_title" onClick="onClickSettingsSection">
++            <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[4]" text="Parts" onClick="onClickPartsSection">
++                <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
++            </Button>
++            <Button profile="fs25_subCategorySelectorTabbedTab" id="subCategoryTabs[5]" text="$l10n_ads_settings_title" onClick="onClickSettingsSection">
+                 <ThreePartBitmap profile="fs25_subCategorySelectorTabbedTabBg" name="background"/>
+             </Button>
+         </BoxLayout>
+@@ -192,7 +195,63 @@
+             </GuiElement>
+         </GuiElement>
+ 
++        <!-- Parts (Parts Cabinet mod) -->
+         <GuiElement profile="fs25_subCategorySelectorTabbedContainer" id="subCategoryPages[4]">
++            <GuiElement profile="ads_menuTableContainer" size="1550px 420px">
++                <GuiElement profile="fs25_statisticsHeaderBox" id="partsStockHeader">
++                    <Button profile="ads_menuHeaderButtonFirst" position="22px 0px" size="420px 40px" text="Parts on hand"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="448px 0px" size="260px 40px" text="OEM"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="714px 0px" size="260px 40px" text="Aftermarket"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="980px 0px" size="260px 40px" text="Premium"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="1246px 0px" size="272px 40px" text="Total"/>
++                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -2dp"/>
++                </GuiElement>
++
++                <SmoothList profile="ads_menuVehicleList" id="partsStockList">
++                    <ListItem profile="ads_menuTableListItemAlt" id="partsStockTemplate" size="1550px 40.77px">
++                        <ThreePartBitmap profile="ads_menuTableListItemGradient" name="alternating"/>
++                        <Text profile="ads_menuTableRowCellFirstAlt" position="22px 0px" size="420px 40.77px" name="partsCategoryText" textLayoutMode="scrolling"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="448px 0px" size="260px 40.77px" name="partsOemText"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="714px 0px" size="260px 40.77px" name="partsAftermarketText"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="980px 0px" size="260px 40.77px" name="partsPremiumText"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="1246px 0px" size="272px 40.77px" name="partsTotalText"/>
++                    </ListItem>
++                </SmoothList>
++            </GuiElement>
++
++            <GuiElement profile="ads_menuTableContainer" position="-10px -430px" size="1550px 370px">
++                <GuiElement profile="fs25_statisticsHeaderBox" id="partsDeliveryHeader">
++                    <Button profile="ads_menuHeaderButtonFirst" position="22px 0px" size="420px 40px" text="Deliveries"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="448px 0px" size="200px 40px" text="Quality"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="654px 0px" size="200px 40px" text="Value"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="860px 0px" size="300px 40px" text="Status"/>
++                    <Button profile="ads_menuHeaderButtonCenter" position="1166px 0px" size="352px 40px" text="Where"/>
++                    <ThreePartBitmap profile="fs25_lineSeparatorBottom" position="0px -2dp"/>
++                </GuiElement>
++
++                <SmoothList profile="ads_menuVehicleList" id="partsDeliveryList">
++                    <ListItem profile="ads_menuTableListItemAlt" id="partsDeliveryTemplate" size="1550px 40.77px">
++                        <ThreePartBitmap profile="ads_menuTableListItemGradient" name="alternating"/>
++                        <Text profile="ads_menuTableRowCellFirstAlt" position="22px 0px" size="420px 40.77px" name="partsItemText" textLayoutMode="scrolling"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="448px 0px" size="200px 40.77px" name="partsQualityText"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="654px 0px" size="200px 40.77px" name="partsValueText"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="860px 0px" size="300px 40.77px" name="partsStatusText" textLayoutMode="scrolling"/>
++                        <Text profile="ads_menuTableRowCellCenterAlt" position="1166px 0px" size="352px 40.77px" name="partsWhereText" textLayoutMode="scrolling"/>
++                    </ListItem>
++                </SmoothList>
++
++                <ThreePartBitmap profile="ads_menuDockedSliderBg" id="partsDeliverySliderBox">
++                    <ThreePartBitmap profile="ads_menuDockedSliderBox">
++                        <Slider profile="ads_menuDockedSlider" dataElementId="partsDeliveryList"/>
++                    </ThreePartBitmap>
++                </ThreePartBitmap>
++                <Text profile="ads_textHeaderGrey" id="partsDeliveryEmptyText" text="Nothing on order. Use Order parts to stock up." position="0px 120px" size="100% 50px" visible="false" with="anchorMiddleCenter"/>
++            </GuiElement>
++
++            <Text profile="ads_textHeaderGrey" id="partsUnavailableText" text="Install the Parts Cabinet mod (FS25_Parts_Cabinet) to order and stock parts." position="0px 180px" size="100% 50px" visible="false" with="anchorMiddleCenter"/>
++        </GuiElement>
++
++        <GuiElement profile="fs25_subCategorySelectorTabbedContainer" id="subCategoryPages[5]">
+             <GuiElement profile="ads_menuSettingsContainer" id="settingsPage">
+                 <ScrollingLayout profile="fs25_settingsLayout" id="settingsLayout">
+                     <Text profile="fs25_settingsSectionHeader" name="sectionHeader" id="subTitlePrefab"/>

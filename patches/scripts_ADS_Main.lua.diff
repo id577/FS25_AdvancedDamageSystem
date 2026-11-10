@@ -1,0 +1,36 @@
+--- a/scripts/ADS_Main.lua
++++ b/scripts/ADS_Main.lua
+@@ -6,6 +6,9 @@
+ source(g_currentModDirectory .. "scripts/ADS_Config.lua")
+ source(g_currentModDirectory .. "scripts/ADS_Utils.lua")
+ source(g_currentModDirectory .. "scripts/ADS_Breakdowns.lua")
++source(g_currentModDirectory .. "scripts/ADS_ExtraBreakdowns.lua")
++source(g_currentModDirectory .. "scripts/ADS_FluidSystem.lua")
++source(g_currentModDirectory .. "scripts/ADS_EnhancedVehicleCompat.lua")
+ source(g_currentModDirectory .. "scripts/ADS_Leasing.lua")
+ source(g_currentModDirectory .. "scripts/ADS_Tutorial.lua")
+ source(g_currentModDirectory .. "gui/ADS_WorkshopDialog.lua")
+@@ -33,6 +36,13 @@
+ source(g_currentModDirectory .. "events/ADS_HandToolSyncEvent.lua")
+ source(g_currentModDirectory .. "events/ADS_JumperCablesEvent.lua")
+ 
++-- Real Tire Wear (Cobra Modding), bundled. Its scripts are unchanged; the
++-- bridge links its punctures to the ADS tire breakdowns.
++source(g_currentModDirectory .. "scripts/RealTireWear.lua")
++source(g_currentModDirectory .. "scripts/TireWearWorkshop.lua")
++source(g_currentModDirectory .. "scripts/ADS_TireWearBridge.lua")
++ADS_TireWearBridge.install()
++
+ function ADS_Main.loadGuiProfiles()
+     if ADS_Main.guiProfilesLoaded or g_gui == nil then
+         return
+@@ -545,6 +555,9 @@
+ 
+ function ADS_Main:loadMap()
+     log_dbg("loadMap() called")
++    if g_modIsLoaded ~= nil and g_modIsLoaded["FS25_RealTireWear"] then
++        Logging.warning("[ADS] Real Tire Wear is built into Advanced Damage System now. Remove FS25_RealTireWear from your mods folder, otherwise every tire wears twice and has two puncture systems.")
++    end
+     ADS_Main.loadGuiProfiles()
+     ADS_SettingsPage.reset()
+     self.shopMenuPageInstalled = false

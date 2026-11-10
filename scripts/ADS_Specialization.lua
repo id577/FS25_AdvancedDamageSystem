@@ -725,6 +725,10 @@ function AdvancedDamageSystem.initSpecialization()
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#airIntakeClogging", "Air intake clogging level")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lubricationLevel", "Lubrication level")
     schemaSavegame:register(XMLValueType.INT,    baseKey .. "#lastLubricationProcessedDay", "Last lubrication processed day")
+    schemaSavegame:register(XMLValueType.INT,    baseKey .. "#lastOperatedDay", "Last day the engine was running")
+    schemaSavegame:register(XMLValueType.INT,    baseKey .. "#lastRodentCheckDay", "Last day the idle rodent check ran")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#defDryRunTotalMs", "Accumulated time run with an empty DEF tank")
+    schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#chipperKnifeVolume", "Volume chipped (m3) since the last knife change")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#thermostatState", "Engine Thermostat Position")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#transmissionThermostatState", "Transmission Thermostat Position")
     schemaSavegame:register(XMLValueType.FLOAT,  baseKey .. "#lastInspPwr", "Last Inspected Power")
@@ -819,6 +823,9 @@ function AdvancedDamageSystem.registerOverwrittenFunctions(vehicleType)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "getSellPrice", AdvancedDamageSystem.getSellPrice)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "updateMotorTemperature", AdvancedDamageSystem.updateMotorTemperature)
     SpecializationUtil.registerOverwrittenFunction(vehicleType, "setOperatingTime", AdvancedDamageSystem.setOperatingTime)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "onCrushedSplitShape", ADS_Breakdowns.onCrushedSplitShapeOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getCanBeTurnedOn", ADS_Breakdowns.getCanBeTurnedOnChipperOverwrite)
+    SpecializationUtil.registerOverwrittenFunction(vehicleType, "getTurnedOnNotAllowedWarning", ADS_Breakdowns.getTurnedOnNotAllowedWarningChipperOverwrite)
 
     
 end
@@ -885,6 +892,8 @@ function AdvancedDamageSystem.registerFunctions(vehicleType)
     SpecializationUtil.registerFunction(vehicleType, "updateAirIntakeClogging", AdvancedDamageSystem.updateAirIntakeClogging)
     SpecializationUtil.registerFunction(vehicleType, "cleanRadiatorAndAirIntake", AdvancedDamageSystem.cleanRadiatorAndAirIntake)
     SpecializationUtil.registerFunction(vehicleType, "updateLubricationLevel", AdvancedDamageSystem.updateLubricationLevel)
+    SpecializationUtil.registerFunction(vehicleType, "updateIdleRodentRisk", AdvancedDamageSystem.updateIdleRodentRisk)
+    SpecializationUtil.registerFunction(vehicleType, "updateRandomFlatTire", AdvancedDamageSystem.updateRandomFlatTire)
     SpecializationUtil.registerFunction(vehicleType, "lubricateVehicle", AdvancedDamageSystem.lubricateVehicle)
     SpecializationUtil.registerFunction(vehicleType, "startFieldVisualInspectionProcess", AdvancedDamageSystem.startFieldVisualInspectionProcess)
 
@@ -1283,6 +1292,10 @@ function AdvancedDamageSystem:saveToXMLFile(xmlFile, key, usedModNames)
         xmlFile:setValue(key .. "#airIntakeClogging", math.max(spec.airIntakeClogging or 0, 0))
         xmlFile:setValue(key .. "#lubricationLevel", math.clamp(spec.lubricationLevel or 1.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#lastLubricationProcessedDay", spec.lastLubricationProcessedDay or 0)
+        xmlFile:setValue(key .. "#lastOperatedDay", spec.lastOperatedDay or 0)
+        xmlFile:setValue(key .. "#lastRodentCheckDay", spec.lastRodentCheckDay or 0)
+        xmlFile:setValue(key .. "#defDryRunTotalMs", spec.defDryRunTotalMs or 0)
+        xmlFile:setValue(key .. "#chipperKnifeVolume", spec.chipperKnifeVolume or 0)
         xmlFile:setValue(key .. "#thermostatState", math.clamp(spec.thermostatState or 0.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#transmissionThermostatState", math.clamp(spec.transmissionThermostatState or 0.0, 0.0, 1.0))
         xmlFile:setValue(key .. "#lastInspPwr", spec.lastInspectedPower or 1)
@@ -1443,6 +1456,8 @@ function AdvancedDamageSystem:onLoad(savegame)
         and g_currentMission.environment ~= nil
         and g_currentMission.environment.currentDay
         or 6
+    self.spec_AdvancedDamageSystem.lastOperatedDay = self.spec_AdvancedDamageSystem.lastLubricationProcessedDay
+    self.spec_AdvancedDamageSystem.lastRodentCheckDay = self.spec_AdvancedDamageSystem.lastLubricationProcessedDay
 
     self.spec_AdvancedDamageSystem.batterySoc = 1.0
     self.spec_AdvancedDamageSystem.batteryChargeAh = nil
@@ -1877,6 +1892,12 @@ function AdvancedDamageSystem:onPostLoad(savegame)
             key .. "#lastLubricationProcessedDay",
             g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.currentDay or spec.lastLubricationProcessedDay or 0
         )
+        -- older saves have no idle tracking yet: start counting from today
+        local adsCurrentDay = g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.currentDay or spec.lastOperatedDay or 0
+        spec.lastOperatedDay = savegame.xmlFile:getValue(key .. "#lastOperatedDay", adsCurrentDay)
+        spec.lastRodentCheckDay = savegame.xmlFile:getValue(key .. "#lastRodentCheckDay", adsCurrentDay)
+        spec.defDryRunTotalMs = savegame.xmlFile:getValue(key .. "#defDryRunTotalMs", 0)
+        spec.chipperKnifeVolume = savegame.xmlFile:getValue(key .. "#chipperKnifeVolume", 0)
         spec.thermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#thermostatState", spec.thermostatState), 0.0, 1.0)
         spec.transmissionThermostatState = math.clamp(savegame.xmlFile:getValue(key .. "#transmissionThermostatState", spec.transmissionThermostatState), 0.0, 1.0)
         if spec.engTermPID ~= nil then
@@ -2592,6 +2613,111 @@ local function syncOverheatProtection(vehicle)
     end
 end
 
+-- DEF tank run dry (FS25 native DEF consumer, as refilled/displayed by the
+-- "Diesel Exhaust Fluid System" mod): warning first, then SCR derate, then
+-- limp-home power. Refilling DEF clears it immediately, like a real machine.
+local function syncDefTankEmpty(vehicle, dt)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil or not vehicle.isServer then return end
+
+    local breakdownId = 'DEF_TANK_EMPTY'
+    local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+    if registryEntry == nil or ADS_Breakdowns.getDefTankState == nil then return end
+
+    local active = vehicle:getActiveBreakdowns()[breakdownId]
+    local level, capacity = ADS_Breakdowns.getDefTankState(vehicle)
+    if level == nil or not registryEntry.isApplicable(vehicle) then
+        if active then vehicle:removeBreakdown(breakdownId) end
+        return
+    end
+
+    local C = ADS_Config.DEF or {}
+    local isEmpty = level <= math.max(capacity * (C.EMPTY_THRESHOLD or 0.005), 0.1)
+    local isRunning = vehicle:getIsMotorStarted()
+
+    if not isEmpty then
+        spec.defDryRunMs = 0
+        if isRunning and (spec.defDryRunTotalMs or 0) > 0 then
+            -- dosing pump recovers slowly once it has fluid again
+            spec.defDryRunTotalMs = math.max(spec.defDryRunTotalMs - dt * (C.DRY_RUN_RECOVERY_RATE or 0.1), 0)
+        end
+        if active then vehicle:removeBreakdown(breakdownId) end
+        return
+    end
+
+    if not isRunning then return end
+
+    spec.defDryRunMs = (spec.defDryRunMs or 0) + dt
+    spec.defDryRunTotalMs = (spec.defDryRunTotalMs or 0) + dt
+
+    if not active then
+        vehicle:addBreakdown(breakdownId, { stage = 1, isActive = true, isVisible = true })
+        if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() and spec.samples ~= nil and spec.samples.warning ~= nil then
+            g_soundManager:playSample(spec.samples.warning)
+        end
+    elseif spec.defDryRunMs >= (C.SEVERE_DERATE_MS or 1200000) and active.stage < 3 then
+        vehicle:changeBreakdownStage(breakdownId, 3)
+    elseif spec.defDryRunMs >= (C.DERATE_DELAY_MS or 120000) and active.stage < 2 then
+        vehicle:changeBreakdownStage(breakdownId, 2)
+    end
+end
+
+-- Chipper knives: stage follows the volume chipped since the last knife change.
+-- Repairing the breakdown in the workshop (or an overhaul) = new knives -> counter reset.
+local function syncChipperKnifeWear(vehicle)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec == nil or not vehicle.isServer or vehicle.spec_woodCrusher == nil then return end
+
+    local C = ADS_Config.CHIPPER_KNIVES
+    local breakdownId = 'CHIPPER_KNIFE_WEAR'
+    local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+    if C == nil or C.ENABLED == false or registryEntry == nil then return end
+
+    local active = vehicle:getActiveBreakdowns()[breakdownId]
+
+    if spec.chipperKnifeWasPresent == nil then
+        spec.chipperKnifeWasPresent = active ~= nil
+    end
+    if spec.chipperKnifeWasPresent and active == nil then
+        -- knives were changed
+        spec.chipperKnifeVolume = 0
+        spec.chipperKnifeWasPresent = false
+    end
+
+    local interval = math.max(tonumber(C.CHANGE_INTERVAL_M3) or 100, 1)
+    local wear = (spec.chipperKnifeVolume or 0) / interval
+    local stageAt = C.STAGE_AT or { 0.70, 0.85, 0.95, 1.0 }
+    local targetStage = 0
+    for i = math.min(#stageAt, #registryEntry.stages), 1, -1 do
+        if wear >= stageAt[i] then
+            targetStage = i
+            break
+        end
+    end
+
+    if targetStage > 0 then
+        if active == nil then
+            -- knife wear is not a random fault: keep it out of the concurrent-breakdown cap
+            registryEntry.isSelectable = false
+            vehicle:addBreakdown(breakdownId, { stage = targetStage, isActive = true, isVisible = true })
+            registryEntry.isSelectable = true
+            if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() and spec.samples ~= nil and spec.samples.warning ~= nil then
+                g_soundManager:playSample(spec.samples.warning)
+            end
+        elseif active.stage < targetStage then
+            vehicle:changeBreakdownStage(breakdownId, targetStage)
+            if vehicle.getIsControlled ~= nil and vehicle:getIsControlled() and spec.samples ~= nil and spec.samples.warning ~= nil then
+                g_soundManager:playSample(spec.samples.warning)
+            end
+        end
+        spec.chipperKnifeWasPresent = vehicle:getActiveBreakdowns()[breakdownId] ~= nil
+    end
+
+    if ADS_Breakdowns.getIsChipperKnivesLocked(vehicle) and vehicle.getIsTurnedOn ~= nil and vehicle:getIsTurnedOn() then
+        vehicle:setIsTurnedOn(false)
+    end
+end
+
 local function syncVoltageSagEffect(vehicle, dt)
     local spec = vehicle.spec_AdvancedDamageSystem
     if spec == nil or not vehicle.isServer then return end
@@ -3076,6 +3202,12 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
     --- Overheat protection for vehcile > 2000 year and engine failure from overheating for < 2000
     syncOverheatProtection(self)
 
+    --- DEF tank run dry -> SCR derate
+    syncDefTankEmpty(self, spec.onUpdateTimer)
+
+    --- Chipper knife wear by volume chipped -> knife change required
+    syncChipperKnifeWear(self)
+
     --- CVT addon breakdown sync
     syncCVTaddonBreakdown(self)
     
@@ -3090,6 +3222,11 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     --- syncing tutorial messages
     syncTutorialMessages(self, spec.onUpdateTimer)
+
+    --- Real Tire Wear link: flats / slow leaks on the actual tires
+    if ADS_TireWearBridge ~= nil then
+        ADS_TireWearBridge.update(self, spec.onUpdateTimer)
+    end
     
     --- just in case, reset damage amount to 0 if it's not
     if self.isServer and self.getDamageAmount ~= nil and self:getDamageAmount() ~= 0 then self:setDamageAmount(0.0, true) end
@@ -3106,7 +3243,13 @@ function AdvancedDamageSystem:onUpdate(dt, ...)
 
     --- Random and permanent effects from breakdowns. Skip if spec.activeEffects is empty
     if spec ~= nil and spec.activeFunctions ~= nil and next(spec.activeFunctions) ~= nil then
+        -- iterate a snapshot: an effect may add/remove breakdowns (and therefore
+        -- active functions) while it runs, e.g. a DPF passive regen finishing
+        local funcs = {}
         for _ , func in pairs(spec.activeFunctions) do
+            table.insert(funcs, func)
+        end
+        for _ , func in ipairs(funcs) do
             func(self, spec.onUpdateTimer)
         end
     end
@@ -3150,6 +3293,7 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
             self:updateAirIntakeClogging(dt)
             self:processBreakdowns(dt)
             self:tryTriggerBreakdown(dt)
+            self:updateRandomFlatTire(dt)
         end
 
         -- service
@@ -3169,6 +3313,8 @@ function AdvancedDamageSystem:adsUpdate(dt, isWorkshopOpen)
         self:processGeneralWearBreakdown()
         -- lubtication level
         self:updateLubricationLevel(dt)
+        -- rodents moving into machines that sit unused
+        self:updateIdleRodentRisk()
         --- Overload warnings / rolling avg stress
         syncOverloadWarning(self, dt)
     end
@@ -6086,6 +6232,10 @@ function AdvancedDamageSystem:suspendBreakdown(breakdownId, resumeTimer)
     if self.isServer and spec.adsDirtyFlag_breakdowns ~= nil then
         self:raiseDirtyFlags(spec.adsDirtyFlag_breakdowns)
     end
+
+    if self.isServer and ADS_TireWearBridge ~= nil then
+        ADS_TireWearBridge.applyAdsToTires(self, { breakdownId })
+    end
 end
 
 function AdvancedDamageSystem:removeBreakdown(...)
@@ -6101,6 +6251,9 @@ function AdvancedDamageSystem:removeBreakdown(...)
         self:recalculateAndApplyEffects()
         if self.isServer and spec.adsDirtyFlag_breakdowns ~= nil then
             self:raiseDirtyFlags(spec.adsDirtyFlag_breakdowns)
+        end
+        if self.isServer and ADS_TireWearBridge ~= nil then
+            ADS_TireWearBridge.applyAdsToTires(self, nil)
         end
         return
     end
@@ -6118,7 +6271,9 @@ function AdvancedDamageSystem:removeBreakdown(...)
         if self.isServer and spec.adsDirtyFlag_breakdowns ~= nil then
             self:raiseDirtyFlags(spec.adsDirtyFlag_breakdowns)
         end
-    else
+        if self.isServer and ADS_TireWearBridge ~= nil then
+            ADS_TireWearBridge.applyAdsToTires(self, idsToRemove)
+        end
     end
 end
 
@@ -8900,6 +9055,123 @@ function AdvancedDamageSystem:updateLubricationLevel(dt)
             spec.lubricationLevel = math.max(spec.lubricationLevel - lubricationReducePerDay, 0)
         end
         spec.lastLubricationProcessedDay = currentDay
+    end
+end
+
+-- Once per in-game day, a machine that has not been started for a while can
+-- have its wiring chewed by rodents. Server only; the breakdown itself syncs
+-- through the normal breakdown dirty flag.
+function AdvancedDamageSystem:updateIdleRodentRisk()
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil or not self.isServer or g_currentMission == nil or g_currentMission.environment == nil then
+        return
+    end
+
+    local currentDay = g_currentMission.environment.currentDay or 0
+
+    if self:getIsMotorStarted() then
+        spec.lastOperatedDay = currentDay
+        spec.lastRodentCheckDay = currentDay
+        return
+    end
+
+    if spec.lastOperatedDay == nil then
+        spec.lastOperatedDay = currentDay
+    end
+    if spec.lastRodentCheckDay == nil then
+        spec.lastRodentCheckDay = currentDay
+    end
+
+    if currentDay <= spec.lastRodentCheckDay then
+        return
+    end
+    spec.lastRodentCheckDay = currentDay
+
+    local C = ADS_Config.FIELD_CARE
+    local breakdownId = "RODENT_DAMAGED_WIRING"
+    local registryEntry = ADS_Breakdowns.BreakdownRegistry[breakdownId]
+    if registryEntry == nil or self:hasBreakdown(breakdownId) then
+        return
+    end
+    if registryEntry.isApplicable ~= nil and not registryEntry.isApplicable(self) then
+        return
+    end
+
+    local idleDays = currentDay - spec.lastOperatedDay
+    local minIdleDays = C.RODENT_MIN_IDLE_DAYS or 7
+    if idleDays < minIdleDays then
+        return
+    end
+
+    local chance = math.min((idleDays - minIdleDays + 1) * (C.RODENT_DAILY_CHANCE_PER_IDLE_DAY or 0.005), C.RODENT_MAX_DAILY_CHANCE or 0.04)
+    if math.random() < chance then
+        local stage = idleDays >= (C.RODENT_LATE_STAGE_IDLE_DAYS or 21) and 2 or 1
+        self:addBreakdown(breakdownId, stage)
+    end
+end
+
+-- Random puncture roll while driving. Server only; the breakdown syncs through
+-- the normal breakdown dirty flag. Likelier on fields (stubble, stones), at
+-- higher road speeds and on machines with a worn chassis.
+function AdvancedDamageSystem:updateRandomFlatTire(dt)
+    local spec = self.spec_AdvancedDamageSystem
+    if spec == nil or not self.isServer or dt == nil or dt <= 0 then
+        return
+    end
+
+    local C = ADS_Config.TIRES
+    if C == nil or (C.FLAT_TIRE_CHANCE_PER_HOUR or 0) <= 0 then
+        return
+    end
+
+    if self:hasBreakdown("FLAT_TIRE_LEFT") or self:hasBreakdown("FLAT_TIRE_RIGHT") then
+        return
+    end
+
+    local speed = self:getLastSpeed()
+    if speed < (C.FLAT_TIRE_MIN_SPEED or 2) then
+        return
+    end
+
+    local registryEntry = ADS_Breakdowns.BreakdownRegistry.FLAT_TIRE_LEFT
+    if registryEntry == nil or (registryEntry.isApplicable ~= nil and not registryEntry.isApplicable(self)) then
+        return
+    end
+
+    local rate = C.FLAT_TIRE_CHANCE_PER_HOUR
+    if self.getIsOnField ~= nil and self:getIsOnField() then
+        rate = rate * (C.FLAT_TIRE_FIELD_MULTIPLIER or 1)
+    end
+
+    local fastSpeed = C.FLAT_TIRE_FAST_SPEED or 30
+    if speed > fastSpeed then
+        rate = rate * (1 + (speed - fastSpeed) / fastSpeed)
+    end
+
+    local chassis = spec.systems ~= nil and spec.systems.chassis or nil
+    local chassisCondition = math.clamp(chassis ~= nil and tonumber(chassis.condition) or 1, 0, 1)
+    rate = rate * (1 + (1 - chassisCondition) * (C.FLAT_TIRE_WEAR_MULTIPLIER or 0))
+
+    -- Real Tire Wear (bundled): worn tread raises the risk, and the flat lands
+    -- on an actual tire (hiss, visible deflation, RTW speed limit)
+    local treadMult, rtwSide, applyRtwFlat = 1, nil, nil
+    if ADS_TireWearBridge ~= nil then
+        treadMult, rtwSide, applyRtwFlat = ADS_TireWearBridge.preparePunctureRoll(self)
+    end
+    rate = rate * (treadMult or 1)
+
+    local chance = rate * dt / 3600000
+    if math.random() < chance then
+        local breakdownId
+        if rtwSide ~= nil then
+            breakdownId = rtwSide > 0 and "FLAT_TIRE_LEFT" or "FLAT_TIRE_RIGHT"
+        else
+            breakdownId = math.random() < 0.5 and "FLAT_TIRE_LEFT" or "FLAT_TIRE_RIGHT"
+        end
+        self:addBreakdown(breakdownId, { stage = 1, isActive = true, isVisible = true })
+        if applyRtwFlat ~= nil and self:hasBreakdown(breakdownId) then
+            applyRtwFlat()
+        end
     end
 end
 

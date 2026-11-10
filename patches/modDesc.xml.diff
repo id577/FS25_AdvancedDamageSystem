@@ -1,0 +1,40 @@
+--- a/modDesc.xml
++++ b/modDesc.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8" standalone="no" ?>
+ <modDesc descVersion="106">
+     <author>id577, Squallqt</author>
+-    <version>0.9.2.4</version>
++    <version>0.10.0.0</version>
+     <title>
+         <en>Advanced Damage System</en>
+         <es>Sistema Avanzado De Daños</es>
+@@ -16,6 +16,12 @@
+ 
+ The mod includes a temperature model for key systems, advanced battery and alternator simulation, realistic breakdown logic, expanded workshop workflows, service reports, maintenance history, and pre-shift inspections. As a result, vehicle management becomes a strategic part of gameplay: service takes time, poor operation increases the risk of failures, and neglecting machine condition can disrupt critical field work. A responsible farmer who looks after equipment, services it on time, and avoids unnecessary abuse will keep the fleet reliable and avoid serious problems during the season.
+ 
++Real Tire Wear (by Marcus / Cobra Modding) is built in:
++- Per-wheel tire wear, visual tread wear and grip loss, tire service in the workshop
++- One puncture system: ADS flat tires and slow punctures now happen on a real tire (hiss, visible deflation, speed limit)
++- Worn tread makes punctures likelier; trailers and implements can get flats too
++- Fixing the flat in the ADS workshop re-inflates the tire; replacing the tire in the tire service clears the ADS fault
++
+ Changelog 0.9.2.4:
+ - ADS settings have been moved again; they are now located next to the ADS Fleet Management menu
+ - Significantly expanded the list of available settings
+@@ -299,6 +305,7 @@
+     <actions>
+         <action name="ADS_FIELD_INSPECTION" axisType="HALF" displayCategory="PLAYER_INTERACTIVE"/>
+         <action name="ADS_CLOSE_NOTIFICATION" displayCategory="PLAYER_INTERACTIVE"/>
++        <action name="RTW_TIRE_SERVICE"/>
+     </actions>
+     <inputBinding>
+         <actionBinding action="ADS_FIELD_INSPECTION">
+@@ -308,6 +315,7 @@
+             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_LEFT"/>
+             <binding device="0_XINPUT_GAMEPAD" input="BUTTON_1"/>
+         </actionBinding>
++        <actionBinding action="RTW_TIRE_SERVICE"></actionBinding>
+     </inputBinding>
+     <l10n filenamePrefix="translations/l10n"/>
+     <dependencies>

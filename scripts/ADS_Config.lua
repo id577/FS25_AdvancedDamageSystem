@@ -512,6 +512,56 @@ ADS_Config = {
         LUBRICATION_REDUCE_PER_DAY = 0.2,
         RAYCAST_DISTANCE = 2.0,
         JUMPER_CABLES_MAX_CONNECTION_DISTANCE = 12.0,
+        -- rodent-chewed wiring on machines left unused
+        RODENT_MIN_IDLE_DAYS = 7,                 -- in-game days without the engine running before rodents can move in
+        RODENT_DAILY_CHANCE_PER_IDLE_DAY = 0.005,  -- daily chance grows by this for every idle day past the minimum
+        RODENT_MAX_DAILY_CHANCE = 0.04,           -- cap on the daily chance
+        RODENT_LATE_STAGE_IDLE_DAYS = 21,         -- idle this long and the damage is found at stage 2
+    },
+
+    -- DEF (AdBlue) tank run dry - works with FS25's native DEF tank, e.g. as refilled by the
+    -- "Diesel Exhaust Fluid System" mod. Times are real milliseconds of engine running while empty.
+    DEF = {
+        EMPTY_THRESHOLD = 0.005,      -- tank counts as empty below 0.5 % of capacity
+        DERATE_DELAY_MS = 120000,     -- warning only for the first 2 minutes, then ~25 % derate
+        SEVERE_DERATE_MS = 1200000,   -- after 20 minutes empty: limp-home power
+        DRY_RUN_RECOVERY_RATE = 0.1,  -- how fast the dry-run wear history fades once refilled
+    },
+
+    -- Dashboard lights layout.
+    --   "side"    = lights in a column down the left side of the speedometer, with
+    --               engine load / temperature / voltage under their lights and the
+    --               service hours at the top of the gauge
+    --   "classic" = original ADS layout, lights inside the gauge
+    -- SIDE_OFFSET_X / SIDE_OFFSET_Y nudge the whole column (HUD pixels, + = right / up).
+    -- SIDE_UNLIT_ALPHA = how visible an unlit light is in the column (0 = hidden).
+    HUD = {
+        DASHBOARD_LAYOUT = "side",
+        SIDE_OFFSET_X = 0,
+        SIDE_OFFSET_Y = 0,
+        SIDE_UNLIT_ALPHA = 0.30,
+    },
+
+    -- Wood chipper / grinder knives (any ADS vehicle with a wood crusher, e.g. the
+    -- 669 Track Chipper and CBI 6800CT). Knives dull with every cubic metre chipped;
+    -- at CHANGE_INTERVAL_M3 the machine refuses to run until the knives are changed
+    -- (repair "Chipper knives" in the ADS workshop, or an overhaul).
+    CHIPPER_KNIVES = {
+        ENABLED = true,
+        CHANGE_INTERVAL_M3 = 100,          -- m3 between knife changes
+        COUNT_CHIP_OUTPUT = false,         -- false = count wood fed in (log m3), true = count chips produced (m3)
+        STAGE_AT = { 0.70, 0.85, 0.95, 1.0 },  -- share of the interval where each wear stage starts
+    },
+
+    -- random sudden flat tires while driving (set FLAT_TIRE_CHANCE_PER_HOUR = 0 to turn off)
+    TIRES = {
+        FLAT_TIRE_CHANCE_PER_HOUR = 0.015,  -- chance per hour of driving on roads (about one flat per ~65 road hours)
+        FLAT_TIRE_FIELD_MULTIPLIER = 3.0,   -- stubble and stones on fields
+        FLAT_TIRE_FAST_SPEED = 30,          -- km/h; above this the chance rises with speed
+        FLAT_TIRE_WEAR_MULTIPLIER = 1.5,    -- up to +150% on a fully worn chassis
+        FLAT_TIRE_MIN_SPEED = 2,            -- km/h; no punctures while standing or creeping
+        TREAD_WEAR_MULTIPLIER = 7.0,        -- Real Tire Wear: a fully worn tire is up to 8x likelier to puncture
+        TRAILER_PUNCTURES = true,           -- Real Tire Wear: trailers/implements get flats at the same base rate
     },
 
     ELECTRICAL = {
